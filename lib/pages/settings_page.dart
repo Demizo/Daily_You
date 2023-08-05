@@ -222,7 +222,8 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                   label: const Text("v1.0"),
                   onPressed: () async {
-                    await launchUrl(Uri.https("github.com", "/Demizo/Jotterly"),
+                    await launchUrl(
+                        Uri.https("github.com", "/Demizo/Daily_You/releases"),
                         mode: LaunchMode.externalApplication);
                   },
                 ),
@@ -243,7 +244,9 @@ class _SettingsPageState extends State<SettingsPage> {
                   icon: const Icon(Icons.gavel_rounded),
                   label: const Text("GPL v3"),
                   onPressed: () async {
-                    await launchUrl(Uri.https("github.com", "/Demizo/Jotterly"),
+                    await launchUrl(
+                        Uri.https("github.com",
+                            "/Demizo/Daily_You/blob/master/LICENSE.txt"),
                         mode: LaunchMode.externalApplication);
                   },
                 ),
@@ -266,7 +269,8 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                   label: const Text("Github"),
                   onPressed: () async {
-                    await launchUrl(Uri.https("github.com", "/Demizo/Jotterly"),
+                    await launchUrl(
+                        Uri.https("github.com", "/Demizo/Daily_You"),
                         mode: LaunchMode.externalApplication);
                   },
                 ),
