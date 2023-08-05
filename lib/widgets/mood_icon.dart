@@ -20,7 +20,7 @@ class _MoodIconState extends State<MoodIcon> {
     String moodIcon;
     switch (widget.moodValue) {
       case 2:
-        moodIcon = '😌';
+        moodIcon = '☺️';
         break;
       case 1:
         moodIcon = '🙂';

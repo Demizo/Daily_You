@@ -38,6 +38,7 @@ class LocalImageLoader extends StatelessWidget {
           return FractionallySizedBox(
             widthFactor: 1,
             child: Image.file(
+              cacheWidth: 300,
               fit: BoxFit.cover,
               File(snapshot.data!),
               errorBuilder: (BuildContext context, Object exception,

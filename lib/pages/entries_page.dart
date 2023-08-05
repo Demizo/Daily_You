@@ -107,42 +107,30 @@ class _EntriesPageState extends State<EntriesPage> {
             'No Logs...',
           ),
         )
-      : ListView(children: [
-          Column(
-            children: [
-              const SizedBox(
-                height: 70,
-              ),
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                  maxCrossAxisExtent: 300,
-                  crossAxisSpacing: 1.0, // Spacing between columns
-                  mainAxisSpacing: 1.0, // Spacing between rows
-                ),
-                itemCount: entries.length,
-                itemBuilder: (context, index) {
-                  final entry = entries[index];
-                  return GestureDetector(
-                    onTap: () async {
-                      await Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) =>
-                            EntryDetailPage(entryId: entry.id!),
-                      ));
-
-                      refreshEntries();
-                    },
-                    child: EntryCardWidget(
-                      entry: entry,
-                    ),
-                  );
-                },
-              ),
-              const SizedBox(
-                height: 60,
-              ),
-            ],
+      : GridView.builder(
+          padding: EdgeInsets.only(top: 70),
+          physics: ScrollPhysics(),
+          shrinkWrap: true,
+          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: 300,
+            crossAxisSpacing: 1.0, // Spacing between columns
+            mainAxisSpacing: 1.0, // Spacing between rows
           ),
-        ]);
+          itemCount: entries.length,
+          itemBuilder: (context, index) {
+            final entry = entries[index];
+            return GestureDetector(
+              onTap: () async {
+                await Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => EntryDetailPage(entryId: entry.id!),
+                ));
+
+                refreshEntries();
+              },
+              child: EntryCardWidget(
+                entry: entry,
+              ),
+            );
+          },
+        );
 }

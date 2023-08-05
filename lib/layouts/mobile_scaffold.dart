@@ -20,7 +20,7 @@ class _MobileScaffoldState extends State<MobileScaffold> {
     const CalendarPage(),
     const EntriesPage(),
   ];
-  final List<String> appBarsTitles = ["Daily You", "Calendar", "Gallery"];
+  final List<String> appBarsTitles = ["Home", "Calendar", "Gallery"];
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);

@@ -51,7 +51,8 @@ class _HomePageState extends State<HomePage> {
     entries = await EntriesDatabase.instance.getAllEntries();
 
     for (var entry in entries) {
-      if (entry.timeCreate.day == DateTime.now().day) {
+      if (entries.indexOf(entry) == 0 &&
+          entry.timeCreate.day == DateTime.now().day) {
         todayEntry = entry;
       } else {
         lastEntry ??= entry;

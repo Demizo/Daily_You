@@ -12,6 +12,7 @@ Daily You is an app made to store memories of the passing days. Log every day an
 - Keep photo memories
 - Record your mood
 - Search your past logs
+- Material You design
 - Set custom storage locations
 - Photo gallery
 - Log calendar

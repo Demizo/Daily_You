@@ -220,7 +220,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   icon: const Icon(
                     Icons.new_releases_rounded,
                   ),
-                  label: const Text("v1.0"),
+                  label: const Text("1.0.0"),
                   onPressed: () async {
                     await launchUrl(
                         Uri.https("github.com", "/Demizo/Daily_You/releases"),

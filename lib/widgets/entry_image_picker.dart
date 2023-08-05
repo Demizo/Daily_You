@@ -45,7 +45,7 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
     final imgDirectory = await EntriesDatabase.instance.getImgDatabasePath();
     final currTime = DateTime.now();
     final imageName =
-        "changelog_${currTime.month}_${currTime.day}_${currTime.year}-${currTime.hour}.${currTime.minute}.${currTime.second}.jpg";
+        "daily_you_${currTime.month}_${currTime.day}_${currTime.year}-${currTime.hour}.${currTime.minute}.${currTime.second}.jpg";
     final imageFilePath = "$imgDirectory/$imageName";
     await pickedFile.saveTo(imageFilePath);
 
