@@ -54,7 +54,7 @@ class _HomePageState extends State<HomePage> {
       if (entries.indexOf(entry) == 0 &&
           entry.timeCreate.day == DateTime.now().day) {
         todayEntry = entry;
-      } else {
+      } else if (entry != todayEntry) {
         lastEntry ??= entry;
       }
       if (entry.mood == 2) {

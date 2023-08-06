@@ -18,6 +18,12 @@ Daily You is an app made to store memories of the passing days. Log every day an
 - Log calendar
 
 <p align="center">
+<img width="200" src="https://github.com/Demizo/Daily_You/blob/master/screenshots/Screenshot_0.png" alt="app screenshot">
+<img width="200" src="https://github.com/Demizo/Daily_You/blob/master/screenshots/Screenshot_1.png" alt="app screenshot">
+<img width="200" src="https://github.com/Demizo/Daily_You/blob/master/screenshots/Screenshot_2.png" alt="app screenshot">
+<img width="200" src="https://github.com/Demizo/Daily_You/blob/master/screenshots/Screenshot_3.png" alt="app screenshot">
+<img width="200" src="https://github.com/Demizo/Daily_You/blob/master/screenshots/Screenshot_4.png" alt="app screenshot">
+<img width="200" src="https://github.com/Demizo/Daily_You/blob/master/screenshots/Screenshot_5.png" alt="app screenshot">
 </p>
 
 ## Installation
