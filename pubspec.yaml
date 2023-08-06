@@ -1,7 +1,7 @@
 name: daily_you
-description: A log of your life.
+description: Every day is worth remembering...
 publish_to: 'none'
-version: 0.1.0
+version: 1.0.0
 
 environment:
   sdk: '>=2.19.6 <3.0.0'
