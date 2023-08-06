@@ -29,7 +29,9 @@ Daily You is an app made to store memories of the passing days. Log every day an
 
 ## Installation
 ### Android
-Download the latest APK from [releases](https://github.com/Demizo/Daily_You/releases).
+<a href="https://apt.izzysoft.de/fdroid/index/apk/com.demizo.daily_you/"><img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png" alt="Get it on IzzyOnDroid" height="100"></a>
+
+Or download the latest APK from [releases](https://github.com/Demizo/Daily_You/releases).
 
 ### Linux
 TBD
