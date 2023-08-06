@@ -1,7 +1,9 @@
-on: [pull_request]
+name: fastlane
+on: [pull_request, workflow_dispatch]
 jobs:
-  # required to run on Linux because this is a docker container action
-  runs-on: ubuntu-latest
-  steps:
+  validate-fastlane:
+    name: Validate Fastlane
+    runs-on: ubuntu-latest
+    steps:
     - uses: actions/checkout@v3
     - uses: ashutoshgngwr/validate-fastlane-supply-metadata@v2
