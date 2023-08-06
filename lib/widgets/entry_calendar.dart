@@ -10,11 +10,12 @@ class EntryCalendar extends StatefulWidget {
 }
 
 class _EntryCalendarState extends State<EntryCalendar> {
+  late DateTime selectedDate = DateTime.now();
   @override
   Widget build(BuildContext context) {
     return TableCalendar(
       availableCalendarFormats: const {CalendarFormat.month: 'Month'},
-      focusedDay: DateTime.now(),
+      focusedDay: selectedDate,
       lastDay: DateTime.now(),
       firstDay: DateTime.utc(2000),
       // Customize other properties of the TableCalendar here, if needed
@@ -30,6 +31,20 @@ class _EntryCalendarState extends State<EntryCalendar> {
           return EntryDayCell(date: date);
         },
       ),
+      onHeaderTapped: (_) async {
+        DateTime? pickedDate = await showDatePicker(
+          initialDatePickerMode: DatePickerMode.year,
+          context: context,
+          initialDate: selectedDate,
+          firstDate: DateTime.utc(2000),
+          lastDate: DateTime.now(),
+        );
+        if (pickedDate != null && pickedDate != selectedDate) {
+          setState(() {
+            selectedDate = pickedDate;
+          });
+        }
+      },
     );
   }
 }
