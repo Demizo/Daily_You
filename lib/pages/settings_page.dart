@@ -53,6 +53,29 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+  void _showImportSelectionPopup() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Import Logs From:'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text("This will NOT modify existing logs..."),
+              ListTile(
+                  title: const Text('OneShot'),
+                  onTap: () async {
+                    await EntriesDatabase.instance.importFromOneShot();
+                    Navigator.pop(context);
+                  }),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   void _updateTheme(ThemeModeProvider themeModeProvider, ThemeMode mode) {
     themeModeProvider.themeMode = mode;
     // setState(() {
@@ -193,6 +216,35 @@ class _SettingsPageState extends State<SettingsPage> {
                         },
                         icon: const Icon(Icons.refresh_rounded))
                   ],
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Import",
+                  style: TextStyle(fontSize: 18),
+                ),
+                ElevatedButton.icon(
+                  icon: const Icon(
+                    Icons.download_rounded,
+                  ),
+                  label: const Text("Import logs..."),
+                  onPressed: () async {
+                    if (Platform.isAndroid) {
+                      var status =
+                          await Permission.manageExternalStorage.request();
+                      if (status.isDenied || status.isPermanentlyDenied) {
+                        return;
+                      }
+                    }
+                    _showImportSelectionPopup();
+                  },
                 ),
               ],
             ),

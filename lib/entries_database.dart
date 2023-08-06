@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:daily_you/models/entry.dart';
@@ -210,5 +211,56 @@ CREATE TABLE $entriesTable (
     }
 
     return '';
+  }
+
+  Future<bool> importFromOneShot() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['json'],
+    );
+
+    if (result == null) {
+      return false;
+    }
+
+    final jsonFile = File(result.files.single.path!);
+    final jsonContent = await jsonFile.readAsString();
+    final jsonData = json.decode(jsonContent);
+
+    final happinessMapping = {
+      "VERY_SAD": -2,
+      "SAD": -1,
+      "NEUTRAL": 0,
+      "HAPPY": 1,
+      "VERY_HAPPY": 2,
+    };
+
+    final db = await instance.database;
+
+    for (var entry in jsonData) {
+      final createdTimestamp = entry['created'];
+      final createdDateTime =
+          DateTime.fromMillisecondsSinceEpoch(createdTimestamp * 1000)
+              .toIso8601String();
+      final modifiedDateTime = DateTime.now().toUtc().toIso8601String();
+
+      final happinessText = entry['happiness'];
+      final mood = happinessMapping[happinessText];
+
+      // Skip if the day already has an entry
+      if (await getEntryForDate(DateTime.parse(createdDateTime)) != null) {
+        continue;
+      }
+
+      await db.insert('entries', {
+        'text': entry['textContent'],
+        'img_path': entry['relativePath'],
+        'mood': mood,
+        'time_create': createdDateTime,
+        'time_modified': modifiedDateTime,
+      });
+    }
+
+    return true;
   }
 }
