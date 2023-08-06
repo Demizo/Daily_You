@@ -4,7 +4,7 @@
 <h1 align="center">Daily You</h1>
 <h2 align="center">Every day is worth remembering...</h2>
 
-Daily You is an app made to store memories of the passing days. Log every day and look back on past memories. All logs and photos are kept locally on your device and can be set to custom storage locations. Daily You is inspired by ptrLx's [OneShot](https://github.com/ptrLx/OneShot).
+Daily You is an app made to store memories of the passing days. Log every day and look back on past memories. All logs and photos are kept locally (the app has no internet access) and can be set to custom storage locations. Daily You is inspired by ptrLx's [OneShot](https://github.com/ptrLx/OneShot).
 
 ### Features:
 - Take daily logs
