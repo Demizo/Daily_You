@@ -4,6 +4,10 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
 
 class ConfigManager {
+  static final ConfigManager instance = ConfigManager._init();
+
+  ConfigManager._init();
+
   String configFilePath = '';
   Map<String, dynamic> _config = {};
   final Map<String, dynamic> _defaultConfig = {
@@ -15,6 +19,7 @@ class ConfigManager {
     'neutralIcon': '😐',
     'sadIcon': '😕',
     'verySadIcon': '😔',
+    'noMoodIcon': '?',
   };
 
   static final moodValueFieldMapping = {
@@ -55,7 +60,7 @@ class ConfigManager {
     }
 
     // Write the updated config data to the file
-    await ConfigManager().writeFile(_config);
+    await ConfigManager.instance.writeFile(_config);
   }
 
   // Read the contents of the config file
