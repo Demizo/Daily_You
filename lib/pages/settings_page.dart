@@ -375,9 +375,17 @@ class _SettingsPageState extends State<SettingsPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  "Database Path",
+                  "Log Folder",
                   style: TextStyle(fontSize: 18),
                 ),
+                FutureBuilder(
+                    future: EntriesDatabase.instance.getLogDatabasePath(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData && snapshot.data != null) {
+                        return Text(snapshot.data!);
+                      }
+                      return const Text("...");
+                    }),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -385,7 +393,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       icon: const Icon(
                         Icons.folder_copy_rounded,
                       ),
-                      label: const Text("Set Database Path..."),
+                      label: const Text("Change Log Folder..."),
                       onPressed: () async {
                         if (Platform.isAndroid) {
                           var status =
@@ -394,12 +402,14 @@ class _SettingsPageState extends State<SettingsPage> {
                             return;
                           }
                         }
-                        EntriesDatabase.instance.selectDatabaseLocation();
+                        await EntriesDatabase.instance.selectDatabaseLocation();
+                        setState(() {});
                       },
                     ),
                     IconButton(
                         onPressed: () async {
                           EntriesDatabase.instance.resetDatabaseLocation();
+                          setState(() {});
                         },
                         icon: const Icon(Icons.refresh_rounded))
                   ],
@@ -417,6 +427,14 @@ class _SettingsPageState extends State<SettingsPage> {
                   "Image Folder",
                   style: TextStyle(fontSize: 18),
                 ),
+                FutureBuilder(
+                    future: EntriesDatabase.instance.getImgDatabasePath(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData && snapshot.data != null) {
+                        return Text(snapshot.data!);
+                      }
+                      return const Text("...");
+                    }),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -424,7 +442,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       icon: const Icon(
                         Icons.folder_copy_rounded,
                       ),
-                      label: const Text("Set Image Folder..."),
+                      label: const Text("Change Image Folder..."),
                       onPressed: () async {
                         if (Platform.isAndroid) {
                           var status =
@@ -433,12 +451,15 @@ class _SettingsPageState extends State<SettingsPage> {
                             return;
                           }
                         }
-                        EntriesDatabase.instance.selectImageFolder();
+                        await EntriesDatabase.instance.selectImageFolder();
+                        setState(() {});
                       },
                     ),
                     IconButton(
                         onPressed: () async {
-                          EntriesDatabase.instance.resetImageFolderLocation();
+                          setState(() {
+                            EntriesDatabase.instance.resetImageFolderLocation();
+                          });
                         },
                         icon: const Icon(Icons.refresh_rounded))
                   ],

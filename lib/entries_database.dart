@@ -5,6 +5,7 @@ import 'package:daily_you/models/entry.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 import 'config_manager.dart';
 
@@ -25,25 +26,9 @@ class EntriesDatabase {
   }
 
   Future<Database> _initDB(String filePath) async {
-    Directory dbPath;
-    var pathFromConfig = ConfigManager().getField('dbPath');
-    if (pathFromConfig != '' && pathFromConfig != null) {
-      dbPath = Directory(pathFromConfig);
-    } else {
-      Directory basePath;
-      if (Platform.isAndroid) {
-        basePath = (await getExternalStorageDirectory())!;
-      } else {
-        basePath = await getApplicationSupportDirectory();
-      }
+    final dbPath = await getLogDatabasePath();
 
-      if (!basePath.existsSync()) {
-        basePath.createSync(recursive: true);
-      }
-      dbPath = basePath;
-    }
-
-    final path = join(dbPath.path, filePath);
+    final path = join(dbPath, filePath);
     return await openDatabase(path, version: 1, onCreate: _createDB);
   }
 
@@ -170,9 +155,35 @@ CREATE TABLE $entriesTable (
     return rootImgPath;
   }
 
-  void selectDatabaseLocation() async {
+  Future<String> getLogDatabasePath() async {
+    Directory dbPath;
+    var pathFromConfig = ConfigManager().getField('dbPath');
+    if (pathFromConfig != '' && pathFromConfig != null) {
+      dbPath = Directory(pathFromConfig);
+    } else {
+      Directory basePath;
+      if (Platform.isAndroid) {
+        basePath = (await getExternalStorageDirectory())!;
+      } else {
+        basePath = await getApplicationSupportDirectory();
+      }
+
+      if (!basePath.existsSync()) {
+        basePath.createSync(recursive: true);
+      }
+      dbPath = basePath;
+    }
+    return dbPath.path;
+  }
+
+  Future<void> selectDatabaseLocation() async {
     final selectedDirectory = await getDirectoryPath();
     if (selectedDirectory.isNotEmpty) {
+      final newDbPath = '$selectedDirectory/daily_you.db';
+      final oldDbPath = '${await getLogDatabasePath()}/daily_you.db';
+      if (!await File(newDbPath).exists() && await File(oldDbPath).exists()) {
+        await File(oldDbPath).copy(newDbPath);
+      }
       ConfigManager().setField('dbPath', selectedDirectory);
     }
   }
@@ -181,7 +192,7 @@ CREATE TABLE $entriesTable (
     ConfigManager().setField('dbPath', '');
   }
 
-  void selectImageFolder() async {
+  Future<void> selectImageFolder() async {
     final selectedDirectory = await getDirectoryPath();
     if (selectedDirectory.isNotEmpty) {
       ConfigManager().setField('imgPath', selectedDirectory);
