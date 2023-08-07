@@ -95,9 +95,6 @@ CREATE TABLE $entriesTable (
           entry.timeCreate.year == date.year) {
         return entry;
       }
-      if (entry.timeCreate.isBefore(date)) {
-        return null;
-      }
     }
 
     return null;
@@ -248,17 +245,15 @@ CREATE TABLE $entriesTable (
       final mood = happinessMapping[happinessText];
 
       // Skip if the day already has an entry
-      if (await getEntryForDate(DateTime.parse(createdDateTime)) != null) {
-        continue;
+      if (await getEntryForDate(DateTime.parse(createdDateTime)) == null) {
+        await db.insert('entries', {
+          'text': entry['textContent'],
+          'img_path': entry['relativePath'],
+          'mood': mood,
+          'time_create': createdDateTime,
+          'time_modified': modifiedDateTime,
+        });
       }
-
-      await db.insert('entries', {
-        'text': entry['textContent'],
-        'img_path': entry['relativePath'],
-        'mood': mood,
-        'time_create': createdDateTime,
-        'time_modified': modifiedDateTime,
-      });
     }
 
     return true;
