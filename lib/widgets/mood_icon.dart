@@ -20,11 +20,11 @@ class _MoodIconState extends State<MoodIcon> {
   Widget build(BuildContext context) {
     String? moodIcon;
     if (ConfigManager.moodValueFieldMapping[widget.moodValue] != null) {
-      moodIcon = ConfigManager()
+      moodIcon = ConfigManager.instance
           .getField(ConfigManager.moodValueFieldMapping[widget.moodValue]!);
     }
     return Text(
-      moodIcon ?? '🫥',
+      moodIcon ?? ConfigManager.instance.getField('noMoodIcon'),
       style: TextStyle(fontSize: widget.size),
     );
   }

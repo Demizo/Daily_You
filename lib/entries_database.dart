@@ -5,7 +5,6 @@ import 'package:daily_you/models/entry.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
-import 'package:table_calendar/table_calendar.dart';
 
 import 'config_manager.dart';
 
@@ -135,7 +134,7 @@ CREATE TABLE $entriesTable (
   }
 
   Future<String> getImgDatabasePath() async {
-    if (ConfigManager().getField('imgPath') == '') {
+    if (ConfigManager.instance.getField('imgPath') == '') {
       Directory basePath;
       if (Platform.isAndroid) {
         basePath = (await getExternalStorageDirectory())!;
@@ -151,13 +150,13 @@ CREATE TABLE $entriesTable (
 
       return basePath.path;
     }
-    final rootImgPath = ConfigManager().getField('imgPath');
+    final rootImgPath = ConfigManager.instance.getField('imgPath');
     return rootImgPath;
   }
 
   Future<String> getLogDatabasePath() async {
     Directory dbPath;
-    var pathFromConfig = ConfigManager().getField('dbPath');
+    var pathFromConfig = ConfigManager.instance.getField('dbPath');
     if (pathFromConfig != '' && pathFromConfig != null) {
       dbPath = Directory(pathFromConfig);
     } else {
@@ -184,23 +183,23 @@ CREATE TABLE $entriesTable (
       if (!await File(newDbPath).exists() && await File(oldDbPath).exists()) {
         await File(oldDbPath).copy(newDbPath);
       }
-      ConfigManager().setField('dbPath', selectedDirectory);
+      ConfigManager.instance.setField('dbPath', selectedDirectory);
     }
   }
 
   void resetDatabaseLocation() async {
-    ConfigManager().setField('dbPath', '');
+    ConfigManager.instance.setField('dbPath', '');
   }
 
   Future<void> selectImageFolder() async {
     final selectedDirectory = await getDirectoryPath();
     if (selectedDirectory.isNotEmpty) {
-      ConfigManager().setField('imgPath', selectedDirectory);
+      ConfigManager.instance.setField('imgPath', selectedDirectory);
     }
   }
 
   void resetImageFolderLocation() async {
-    ConfigManager().setField('imgPath', '');
+    ConfigManager.instance.setField('imgPath', '');
   }
 
   Future<String> getDirectoryPath() async {

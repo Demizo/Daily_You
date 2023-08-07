@@ -20,7 +20,7 @@ void main() async {
   SystemTheme.fallbackColor = const Color.fromARGB(255, 1, 211, 239);
 
   // Create the config file if it doesn't exist
-  await ConfigManager().init();
+  await ConfigManager.instance.init();
   final themeProvider = ThemeModeProvider();
   await themeProvider.initializeThemeFromConfig();
 

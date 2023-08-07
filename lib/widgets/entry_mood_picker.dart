@@ -4,7 +4,7 @@ import 'package:daily_you/widgets/mood_icon.dart';
 class EntryMoodPicker extends StatefulWidget {
   final int? moodValue;
   final String date;
-  final ValueChanged<int> onChangedMood;
+  final ValueChanged<int?> onChangedMood;
 
   const EntryMoodPicker(
       {super.key,
@@ -26,8 +26,12 @@ class _EntryMoodPickerState extends State<EntryMoodPicker> {
           MoodIcon(moodValue: index, size: 24),
           SizedBox(
             height: 24,
-            child:
-                Radio(value: index, groupValue: _mood, onChanged: updateMood),
+            child: Radio(
+              value: index,
+              groupValue: _mood,
+              onChanged: updateMood,
+              toggleable: true,
+            ),
           ),
         ],
       ),
@@ -36,8 +40,11 @@ class _EntryMoodPickerState extends State<EntryMoodPicker> {
   }
 
   void updateMood(int? value) {
+    if (value == _mood) {
+      value = null;
+    }
     setState((() => _mood = value));
-    widget.onChangedMood(_mood!);
+    widget.onChangedMood(_mood);
   }
 
   @override

@@ -46,7 +46,7 @@ class Entry {
         id: id ?? this.id,
         text: text ?? this.text,
         imgPath: imgPath,
-        mood: mood ?? this.mood,
+        mood: mood,
         timeCreate: timeCreate ?? this.timeCreate,
         timeModified: timeModified ?? this.timeModified,
       );

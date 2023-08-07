@@ -14,6 +14,7 @@ class MobileScaffold extends StatefulWidget {
 
 class _MobileScaffoldState extends State<MobileScaffold> {
   int currentIndex = 0;
+  bool isLoading = false;
 
   final List<Widget> pages = [
     const HomePage(),
@@ -29,14 +30,22 @@ class _MobileScaffoldState extends State<MobileScaffold> {
         IconButton(
           icon: const Icon(Icons.settings_rounded),
           onPressed: () async {
+            setState(() {
+              isLoading = true;
+            });
             await Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => const SettingsPage(),
             ));
+            setState(() {
+              isLoading = false;
+            });
           },
         )
       ]),
       backgroundColor: theme.canvasColor,
-      body: pages[currentIndex],
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : pages[currentIndex],
       bottomNavigationBar: NavigationBar(
         labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
         selectedIndex: currentIndex,

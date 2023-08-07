@@ -76,8 +76,11 @@ class EntryCardWidget extends StatelessWidget {
                       fontWeight: FontWeight.bold),
                 ),
               ),
-              MoodIcon(
-                moodValue: entry.mood,
+              Container(
+                constraints: const BoxConstraints(minWidth: 16),
+                child: MoodIcon(
+                  moodValue: entry.mood,
+                ),
               ),
             ],
           ),

@@ -31,21 +31,21 @@ class _SettingsPageState extends State<SettingsPage> {
               ListTile(
                 title: const Text('Follow System'),
                 onTap: () => setState(() {
-                  ConfigManager().setField('theme', 'system');
+                  ConfigManager.instance.setField('theme', 'system');
                   _updateTheme(themeModeProvider, ThemeMode.system);
                 }),
               ),
               ListTile(
                 title: const Text('Dark Theme'),
                 onTap: () => setState(() {
-                  ConfigManager().setField('theme', 'dark');
+                  ConfigManager.instance.setField('theme', 'dark');
                   _updateTheme(themeModeProvider, ThemeMode.dark);
                 }),
               ),
               ListTile(
                   title: const Text('Light Theme'),
                   onTap: () => setState(() {
-                        ConfigManager().setField('theme', 'light');
+                        ConfigManager.instance.setField('theme', 'light');
                         _updateTheme(themeModeProvider, ThemeMode.light);
                       })),
             ],
@@ -55,7 +55,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  void _showMoodEmojiPopup(int value) {
+  void _showMoodEmojiPopup(int? value) {
     String newEmoji = '';
     showDialog(
       context: context,
@@ -97,9 +97,14 @@ class _SettingsPageState extends State<SettingsPage> {
                     onPressed: () async {
                       if (newEmoji.isNotEmpty) {
                         setState(() {
-                          ConfigManager().setField(
-                              ConfigManager.moodValueFieldMapping[value]!,
-                              newEmoji);
+                          if (value != null) {
+                            ConfigManager.instance.setField(
+                                ConfigManager.moodValueFieldMapping[value]!,
+                                newEmoji);
+                          } else {
+                            ConfigManager.instance
+                                .setField('noMoodIcon', newEmoji);
+                          }
                         });
                       }
                       Navigator.pop(context);
@@ -148,12 +153,14 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget moodIconButton(int index) {
+  Widget moodIconButton(int? index) {
     return GestureDetector(
       child: Card(
           child: Padding(
         padding: const EdgeInsets.all(4.0),
-        child: MoodIcon(moodValue: index, size: 24),
+        child: Container(
+            constraints: const BoxConstraints(minWidth: 30),
+            child: Center(child: MoodIcon(moodValue: index, size: 24))),
       )),
       onTap: () => _showMoodEmojiPopup(index),
     );
@@ -330,7 +337,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           ? const Text("Light")
                           : const Text("Dark"),
                   onPressed: () async {
-                    ConfigManager().setField('theme', 'system');
+                    ConfigManager.instance.setField('theme', 'system');
                     _showThemeSelectionPopup(themeProvider);
                   },
                 ),
@@ -354,6 +361,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     moodIconButton(0),
                     moodIconButton(1),
                     moodIconButton(2),
+                    moodIconButton(null),
                   ],
                 )
               ],
