@@ -28,9 +28,17 @@ class LocalImageLoader extends StatelessWidget {
                   Center(
                       child: Icon(
                     Icons.question_mark_rounded,
-                    size: 90,
+                    size: 70,
                   )),
-                  Text('Image not found'),
+                  Text(
+                    'Image not found!',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
+                  Text(
+                    'Check your image folder in settings...',
+                    textAlign: TextAlign.center,
+                  )
                 ],
               ),
             );
@@ -51,7 +59,7 @@ class LocalImageLoader extends StatelessWidget {
                           child: Center(
                               child: Icon(
                         Icons.question_mark_rounded,
-                        size: 90,
+                        size: 70,
                       ))),
                       Text('Image failed to load'),
                     ],

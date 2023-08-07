@@ -168,13 +168,111 @@ class _SettingsPageState extends State<SettingsPage> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text("This will NOT modify existing logs..."),
+              const Text("This will NOT modify existing logs..."),
+              const SizedBox(
+                height: 8,
+              ),
+              ListTile(
+                  title: const Text('Daily You'),
+                  onTap: () async {
+                    await EntriesDatabase.instance.importFromJson();
+                    Navigator.pop(context);
+                  }),
               ListTile(
                   title: const Text('OneShot'),
                   onTap: () async {
                     await EntriesDatabase.instance.importFromOneShot();
                     Navigator.pop(context);
                   }),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showExportSelectionPopup() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Choose Export Format:'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                  title: const Text('Daily You'),
+                  onTap: () async {
+                    await EntriesDatabase.instance.exportToJson();
+                    Navigator.pop(context);
+                  }),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showDeleteEntriesPopup() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete All Logs?'),
+          content: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton.icon(
+                icon: const Icon(
+                  Icons.delete_rounded,
+                  size: 24,
+                ),
+                label: const Padding(
+                  padding: EdgeInsets.all(2.0),
+                  child: Text(
+                    "Delete All",
+                    style: TextStyle(fontSize: 16),
+                  ),
+                ),
+                onPressed: () async {
+                  await EntriesDatabase.instance.deleteAllEntries();
+                  Navigator.pop(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.all(12),
+                  backgroundColor: Theme.of(context).colorScheme.background,
+                  foregroundColor: Theme.of(context).colorScheme.primary,
+                  elevation: 3,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                ),
+              ),
+              ElevatedButton.icon(
+                icon: const Icon(
+                  Icons.cancel_rounded,
+                  size: 24,
+                ),
+                label: const Padding(
+                  padding: EdgeInsets.all(2.0),
+                  child: Text(
+                    "Cancel",
+                    style: TextStyle(fontSize: 16),
+                  ),
+                ),
+                onPressed: () async {
+                  Navigator.pop(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.all(12),
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Theme.of(context).colorScheme.background,
+                  elevation: 3,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                ),
+              ),
             ],
           ),
         );
@@ -277,9 +375,17 @@ class _SettingsPageState extends State<SettingsPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  "Database Path",
+                  "Log Folder",
                   style: TextStyle(fontSize: 18),
                 ),
+                FutureBuilder(
+                    future: EntriesDatabase.instance.getLogDatabasePath(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData && snapshot.data != null) {
+                        return Text(snapshot.data!);
+                      }
+                      return const Text("...");
+                    }),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -287,7 +393,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       icon: const Icon(
                         Icons.folder_copy_rounded,
                       ),
-                      label: const Text("Set Database Path..."),
+                      label: const Text("Change Log Folder..."),
                       onPressed: () async {
                         if (Platform.isAndroid) {
                           var status =
@@ -296,12 +402,14 @@ class _SettingsPageState extends State<SettingsPage> {
                             return;
                           }
                         }
-                        EntriesDatabase.instance.selectDatabaseLocation();
+                        await EntriesDatabase.instance.selectDatabaseLocation();
+                        setState(() {});
                       },
                     ),
                     IconButton(
                         onPressed: () async {
                           EntriesDatabase.instance.resetDatabaseLocation();
+                          setState(() {});
                         },
                         icon: const Icon(Icons.refresh_rounded))
                   ],
@@ -319,6 +427,14 @@ class _SettingsPageState extends State<SettingsPage> {
                   "Image Folder",
                   style: TextStyle(fontSize: 18),
                 ),
+                FutureBuilder(
+                    future: EntriesDatabase.instance.getImgDatabasePath(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData && snapshot.data != null) {
+                        return Text(snapshot.data!);
+                      }
+                      return const Text("...");
+                    }),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -326,7 +442,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       icon: const Icon(
                         Icons.folder_copy_rounded,
                       ),
-                      label: const Text("Set Image Folder..."),
+                      label: const Text("Change Image Folder..."),
                       onPressed: () async {
                         if (Platform.isAndroid) {
                           var status =
@@ -335,15 +451,47 @@ class _SettingsPageState extends State<SettingsPage> {
                             return;
                           }
                         }
-                        EntriesDatabase.instance.selectImageFolder();
+                        await EntriesDatabase.instance.selectImageFolder();
+                        setState(() {});
                       },
                     ),
                     IconButton(
                         onPressed: () async {
-                          EntriesDatabase.instance.resetImageFolderLocation();
+                          setState(() {
+                            EntriesDatabase.instance.resetImageFolderLocation();
+                          });
                         },
                         icon: const Icon(Icons.refresh_rounded))
                   ],
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Export",
+                  style: TextStyle(fontSize: 18),
+                ),
+                ElevatedButton.icon(
+                  icon: const Icon(
+                    Icons.upload_rounded,
+                  ),
+                  label: const Text("Export Logs..."),
+                  onPressed: () async {
+                    if (Platform.isAndroid) {
+                      var status =
+                          await Permission.manageExternalStorage.request();
+                      if (status.isDenied || status.isPermanentlyDenied) {
+                        return;
+                      }
+                    }
+                    _showExportSelectionPopup();
+                  },
                 ),
               ],
             ),
@@ -362,7 +510,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   icon: const Icon(
                     Icons.download_rounded,
                   ),
-                  label: const Text("Import logs..."),
+                  label: const Text("Import Logs..."),
                   onPressed: () async {
                     if (Platform.isAndroid) {
                       var status =
@@ -372,6 +520,28 @@ class _SettingsPageState extends State<SettingsPage> {
                       }
                     }
                     _showImportSelectionPopup();
+                  },
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Delete All",
+                  style: TextStyle(fontSize: 18),
+                ),
+                ElevatedButton.icon(
+                  icon: const Icon(
+                    Icons.delete_forever_rounded,
+                  ),
+                  label: const Text("Delete All Logs..."),
+                  onPressed: () async {
+                    _showDeleteEntriesPopup();
                   },
                 ),
               ],

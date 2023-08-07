@@ -5,6 +5,7 @@ import 'package:daily_you/models/entry.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 import 'config_manager.dart';
 
@@ -25,25 +26,9 @@ class EntriesDatabase {
   }
 
   Future<Database> _initDB(String filePath) async {
-    Directory dbPath;
-    var pathFromConfig = ConfigManager().getField('dbPath');
-    if (pathFromConfig != '' && pathFromConfig != null) {
-      dbPath = Directory(pathFromConfig);
-    } else {
-      Directory basePath;
-      if (Platform.isAndroid) {
-        basePath = (await getExternalStorageDirectory())!;
-      } else {
-        basePath = await getApplicationSupportDirectory();
-      }
+    final dbPath = await getLogDatabasePath();
 
-      if (!basePath.existsSync()) {
-        basePath.createSync(recursive: true);
-      }
-      dbPath = basePath;
-    }
-
-    final path = join(dbPath.path, filePath);
+    final path = join(dbPath, filePath);
     return await openDatabase(path, version: 1, onCreate: _createDB);
   }
 
@@ -130,6 +115,13 @@ CREATE TABLE $entriesTable (
     );
   }
 
+  Future<void> deleteAllEntries() async {
+    final entries = await getAllEntries();
+    for (Entry entry in entries) {
+      await deleteEntry(entry.id!);
+    }
+  }
+
   Future close() async {
     final db = await instance.database;
     _database = null;
@@ -163,9 +155,35 @@ CREATE TABLE $entriesTable (
     return rootImgPath;
   }
 
-  void selectDatabaseLocation() async {
+  Future<String> getLogDatabasePath() async {
+    Directory dbPath;
+    var pathFromConfig = ConfigManager().getField('dbPath');
+    if (pathFromConfig != '' && pathFromConfig != null) {
+      dbPath = Directory(pathFromConfig);
+    } else {
+      Directory basePath;
+      if (Platform.isAndroid) {
+        basePath = (await getExternalStorageDirectory())!;
+      } else {
+        basePath = await getApplicationSupportDirectory();
+      }
+
+      if (!basePath.existsSync()) {
+        basePath.createSync(recursive: true);
+      }
+      dbPath = basePath;
+    }
+    return dbPath.path;
+  }
+
+  Future<void> selectDatabaseLocation() async {
     final selectedDirectory = await getDirectoryPath();
     if (selectedDirectory.isNotEmpty) {
+      final newDbPath = '$selectedDirectory/daily_you.db';
+      final oldDbPath = '${await getLogDatabasePath()}/daily_you.db';
+      if (!await File(newDbPath).exists() && await File(oldDbPath).exists()) {
+        await File(oldDbPath).copy(newDbPath);
+      }
       ConfigManager().setField('dbPath', selectedDirectory);
     }
   }
@@ -174,7 +192,7 @@ CREATE TABLE $entriesTable (
     ConfigManager().setField('dbPath', '');
   }
 
-  void selectImageFolder() async {
+  Future<void> selectImageFolder() async {
     final selectedDirectory = await getDirectoryPath();
     if (selectedDirectory.isNotEmpty) {
       ConfigManager().setField('imgPath', selectedDirectory);
@@ -256,6 +274,65 @@ CREATE TABLE $entriesTable (
       }
     }
 
+    return true;
+  }
+
+  Future<bool> exportToJson() async {
+    String? savePath = await getDirectoryPath();
+
+    if (savePath.isEmpty) {
+      return false;
+    }
+
+    final db = await instance.database;
+
+    final List<Map<String, dynamic>> entries = await db.query('entries');
+
+    final List<Map<String, dynamic>> jsonData = entries.map((entry) {
+      return {
+        'timeCreated': entry['time_create'],
+        'timeModified': entry['time_modified'],
+        'imgPath': entry['img_path'],
+        'mood': entry['mood'],
+        'text': entry['text'] ?? '',
+      };
+    }).toList();
+
+    final jsonFile = File('$savePath/daily_you_logs.json');
+    final jsonString = json.encode(jsonData);
+    await jsonFile.create();
+    await jsonFile.writeAsString(jsonString);
+    return true;
+  }
+
+  Future<bool> importFromJson() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['json'],
+    );
+
+    if (result == null) {
+      return false;
+    }
+
+    final jsonFile = File(result.files.single.path!);
+    final jsonContent = await jsonFile.readAsString();
+    final jsonData = json.decode(jsonContent);
+
+    final db = await instance.database;
+
+    for (var entry in jsonData) {
+      // Skip if the day already has an entry
+      if (await getEntryForDate(DateTime.parse(entry['timeCreated'])) == null) {
+        await db.insert('entries', {
+          'text': entry['text'],
+          'img_path': entry['imgPath'],
+          'mood': entry['mood'],
+          'time_create': entry['timeCreated'],
+          'time_modified': entry['timeModified'],
+        });
+      }
+    }
     return true;
   }
 }
