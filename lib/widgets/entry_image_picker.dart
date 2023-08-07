@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:daily_you/entries_database.dart';
+import 'package:media_scanner/media_scanner.dart';
 
 import 'local_image_loader.dart';
 
@@ -48,7 +49,10 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
         "daily_you_${currTime.month}_${currTime.day}_${currTime.year}-${currTime.hour}.${currTime.minute}.${currTime.second}.jpg";
     final imageFilePath = "$imgDirectory/$imageName";
     await pickedFile.saveTo(imageFilePath);
-
+    if (Platform.isAndroid) {
+      // Add image to media store
+      MediaScanner.loadMedia(path: imageFilePath);
+    }
     setState(() {
       widget.onChangedImage(imageName);
     });
