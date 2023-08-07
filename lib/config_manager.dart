@@ -6,6 +6,24 @@ import 'package:path/path.dart';
 class ConfigManager {
   String configFilePath = '';
   Map<String, dynamic> _config = {};
+  final Map<String, dynamic> _defaultConfig = {
+    'theme': 'system',
+    'dbPath': '',
+    'imgPath': '',
+    'veryHappyIcon': '☺️',
+    'happyIcon': '🙂',
+    'neutralIcon': '😐',
+    'sadIcon': '😕',
+    'verySadIcon': '😔',
+  };
+
+  static final moodValueFieldMapping = {
+    2: 'veryHappyIcon',
+    1: 'happyIcon',
+    0: 'neutralIcon',
+    -1: 'sadIcon',
+    -2: 'verySadIcon',
+  };
 
   static final ConfigManager _instance = ConfigManager._internal();
 
@@ -23,18 +41,21 @@ class ConfigManager {
     if (!(await configFile.exists())) {
       await configFile.create();
       await configFile.writeAsString('{}');
-
-      readFile();
-
-      // Set default config data
-      _config['theme'] = 'system';
-      _config['dbPath'] = '';
-      _config['imgPath'] = '';
-
-      // Write the updated config data to the file
-      await ConfigManager().writeFile(_config);
     }
+    await poplulateDefaults();
     await readFile();
+  }
+
+  Future<void> poplulateDefaults() async {
+    await readFile();
+
+    // Set default config data
+    for (String key in _defaultConfig.keys) {
+      if (!_config.containsKey(key)) _config[key] = _defaultConfig[key];
+    }
+
+    // Write the updated config data to the file
+    await ConfigManager().writeFile(_config);
   }
 
   // Read the contents of the config file

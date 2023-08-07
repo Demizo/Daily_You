@@ -108,8 +108,8 @@ class _EntriesPageState extends State<EntriesPage> {
           ),
         )
       : GridView.builder(
-          padding: EdgeInsets.only(top: 70),
-          physics: ScrollPhysics(),
+          padding: const EdgeInsets.only(top: 70),
+          physics: const ScrollPhysics(),
           shrinkWrap: true,
           gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
             maxCrossAxisExtent: 300,

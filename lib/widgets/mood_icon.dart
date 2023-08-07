@@ -1,3 +1,4 @@
+import 'package:daily_you/config_manager.dart';
 import 'package:flutter/material.dart';
 
 class MoodIcon extends StatefulWidget {
@@ -17,29 +18,13 @@ class MoodIcon extends StatefulWidget {
 class _MoodIconState extends State<MoodIcon> {
   @override
   Widget build(BuildContext context) {
-    String moodIcon;
-    switch (widget.moodValue) {
-      case 2:
-        moodIcon = '☺️';
-        break;
-      case 1:
-        moodIcon = '🙂';
-        break;
-      case 0:
-        moodIcon = '😐';
-        break;
-      case -1:
-        moodIcon = '😕';
-        break;
-      case -2:
-        moodIcon = '😔';
-        break;
-      default:
-        moodIcon = '🫥';
-        break;
+    String? moodIcon;
+    if (ConfigManager.moodValueFieldMapping[widget.moodValue] != null) {
+      moodIcon = ConfigManager()
+          .getField(ConfigManager.moodValueFieldMapping[widget.moodValue]!);
     }
     return Text(
-      moodIcon,
+      moodIcon ?? '🫥',
       style: TextStyle(fontSize: widget.size),
     );
   }
