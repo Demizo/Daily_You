@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:daily_you/entries_database.dart';
@@ -8,6 +9,7 @@ import 'package:daily_you/theme_mode_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../config_manager.dart';
+import '../widgets/mood_icon.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -50,6 +52,110 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         );
       },
+    );
+  }
+
+  void _showMoodEmojiPopup(int value) {
+    String newEmoji = '';
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Change Icon:'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                inputFormatters: [
+                  LengthLimitingTextInputFormatter(1), // Limit to one character
+                ],
+                onChanged: (value) {
+                  newEmoji = value;
+                },
+                decoration: const InputDecoration(
+                  hintText: 'Enter an icon...',
+                ),
+              ),
+              const SizedBox(
+                height: 8,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton.icon(
+                    icon: const Icon(
+                      Icons.check_circle_rounded,
+                      size: 24,
+                    ),
+                    label: const Padding(
+                      padding: EdgeInsets.all(2.0),
+                      child: Text(
+                        "Confirm",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+                    onPressed: () async {
+                      if (newEmoji.isNotEmpty) {
+                        setState(() {
+                          ConfigManager().setField(
+                              ConfigManager.moodValueFieldMapping[value]!,
+                              newEmoji);
+                        });
+                      }
+                      Navigator.pop(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.all(12),
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      foregroundColor: Theme.of(context).colorScheme.background,
+                      elevation: 3,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
+                    ),
+                  ),
+                  ElevatedButton.icon(
+                    icon: const Icon(
+                      Icons.cancel_rounded,
+                      size: 24,
+                    ),
+                    label: const Padding(
+                      padding: EdgeInsets.all(2.0),
+                      child: Text(
+                        "Cancel",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+                    onPressed: () async {
+                      Navigator.pop(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.all(12),
+                      backgroundColor: Theme.of(context).colorScheme.background,
+                      foregroundColor: Theme.of(context).colorScheme.primary,
+                      elevation: 3,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget moodIconButton(int index) {
+    return GestureDetector(
+      child: Card(
+          child: Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: MoodIcon(moodValue: index, size: 24),
+      )),
+      onTap: () => _showMoodEmojiPopup(index),
     );
   }
 
@@ -130,6 +236,28 @@ class _SettingsPageState extends State<SettingsPage> {
                     _showThemeSelectionPopup(themeProvider);
                   },
                 ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Mood Icons",
+                  style: TextStyle(fontSize: 18),
+                ),
+                Row(
+                  children: [
+                    moodIconButton(-2),
+                    moodIconButton(-1),
+                    moodIconButton(0),
+                    moodIconButton(1),
+                    moodIconButton(2),
+                  ],
+                )
               ],
             ),
           ),
