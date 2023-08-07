@@ -130,6 +130,13 @@ CREATE TABLE $entriesTable (
     );
   }
 
+  Future<void> deleteAllEntries() async {
+    final entries = await getAllEntries();
+    for (Entry entry in entries) {
+      await deleteEntry(entry.id!);
+    }
+  }
+
   Future close() async {
     final db = await instance.database;
     _database = null;
@@ -256,6 +263,65 @@ CREATE TABLE $entriesTable (
       }
     }
 
+    return true;
+  }
+
+  Future<bool> exportToJson() async {
+    String? savePath = await getDirectoryPath();
+
+    if (savePath.isEmpty) {
+      return false;
+    }
+
+    final db = await instance.database;
+
+    final List<Map<String, dynamic>> entries = await db.query('entries');
+
+    final List<Map<String, dynamic>> jsonData = entries.map((entry) {
+      return {
+        'timeCreated': entry['time_create'],
+        'timeModified': entry['time_modified'],
+        'imgPath': entry['img_path'],
+        'mood': entry['mood'],
+        'text': entry['text'] ?? '',
+      };
+    }).toList();
+
+    final jsonFile = File('$savePath/daily_you_logs.json');
+    final jsonString = json.encode(jsonData);
+    await jsonFile.create();
+    await jsonFile.writeAsString(jsonString);
+    return true;
+  }
+
+  Future<bool> importFromJson() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['json'],
+    );
+
+    if (result == null) {
+      return false;
+    }
+
+    final jsonFile = File(result.files.single.path!);
+    final jsonContent = await jsonFile.readAsString();
+    final jsonData = json.decode(jsonContent);
+
+    final db = await instance.database;
+
+    for (var entry in jsonData) {
+      // Skip if the day already has an entry
+      if (await getEntryForDate(DateTime.parse(entry['timeCreated'])) == null) {
+        await db.insert('entries', {
+          'text': entry['text'],
+          'img_path': entry['imgPath'],
+          'mood': entry['mood'],
+          'time_create': entry['timeCreated'],
+          'time_modified': entry['timeModified'],
+        });
+      }
+    }
     return true;
   }
 }
