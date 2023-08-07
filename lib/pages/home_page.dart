@@ -183,7 +183,7 @@ class _HomePageState extends State<HomePage> {
                     refreshEntries();
                   },
                   child: EntryCardWidget(
-                    title: "Last Happy Day",
+                    title: "Previous Happy Day",
                     entry: lastHappyEntry!,
                   ),
                 ),
@@ -213,7 +213,7 @@ class _HomePageState extends State<HomePage> {
                     refreshEntries();
                   },
                   child: EntryCardWidget(
-                    title: "One Year Ago",
+                    title: "365 Days Ago",
                     entry: lastYearEntry!,
                   ),
                 ),
