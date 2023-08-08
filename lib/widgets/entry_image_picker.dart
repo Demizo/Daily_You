@@ -45,6 +45,13 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
     // Save the image to a custom location defined by your app
     final imgDirectory = await EntriesDatabase.instance.getImgDatabasePath();
     final currTime = DateTime.now();
+    // Don't make a copy of files already in the folder
+    if (await File("$imgDirectory/${pickedFile.name}").exists()) {
+      setState(() {
+        widget.onChangedImage(pickedFile.name);
+      });
+      return;
+    }
     final imageName =
         "daily_you_${currTime.month}_${currTime.day}_${currTime.year}-${currTime.hour}.${currTime.minute}.${currTime.second}.jpg";
     final imageFilePath = "$imgDirectory/$imageName";
