@@ -43,9 +43,7 @@ class _MobileScaffoldState extends State<MobileScaffold> {
         )
       ]),
       backgroundColor: theme.canvasColor,
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : pages[currentIndex],
+      body: isLoading ? const Center(child: SizedBox()) : pages[currentIndex],
       bottomNavigationBar: NavigationBar(
         labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
         selectedIndex: currentIndex,

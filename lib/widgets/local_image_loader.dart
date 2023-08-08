@@ -14,7 +14,7 @@ class LocalImageLoader extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           // Show a loading indicator while fetching the image path
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: SizedBox());
         } else if (snapshot.hasError) {
           // Handle any error that occurred while fetching the image path
           return Text('Error: ${snapshot.error}');

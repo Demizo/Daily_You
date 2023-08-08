@@ -38,7 +38,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
     return Scaffold(
         appBar: AppBar(),
         body: isLoading
-            ? const CircularProgressIndicator()
+            ? const SizedBox()
             : Padding(
                 padding: const EdgeInsets.all(16),
                 child: Center(

@@ -49,7 +49,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
         actions: [editButton()],
       ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: SizedBox())
           : Center(
               child: Container(
                 constraints: BoxConstraints.loose(const Size.fromWidth(800)),
