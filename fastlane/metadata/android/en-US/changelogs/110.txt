@@ -1,0 +1,10 @@
+Daily You v1.1.0 has arrived! Here are the highlights:
+
+• Added import/export with Json.
+• Added import from OneShot.
+• Added ability to customize mood emojis.
+• Added ability to jump to a date on the calendar.
+• Added ability to unset the mood for a day.
+• Added ability to delete all entries.
+• Fixed images taken with app not showing in gallery.
+• Fixed pages not always refreshing after settings changed.
