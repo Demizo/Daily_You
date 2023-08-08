@@ -40,9 +40,7 @@ class _CalendarPageState extends State<CalendarPage> {
   @override
   Widget build(BuildContext context) => Center(
         child: SingleChildScrollView(
-          child: isLoading
-              ? const CircularProgressIndicator()
-              : buildEntries(context),
+          child: isLoading ? const SizedBox() : buildEntries(context),
         ),
       );
 

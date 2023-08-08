@@ -80,7 +80,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) => Center(
         child: isLoading
-            ? const CircularProgressIndicator()
+            ? const SizedBox()
             : Stack(alignment: Alignment.bottomCenter, children: [
                 buildEntries(),
                 Column(

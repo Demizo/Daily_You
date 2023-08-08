@@ -51,10 +51,7 @@ class _EntryDayCellState extends State<EntryDayCell> {
                   height: 16,
                 ),
                 isLoading
-                    ? Icon(
-                        Icons.add_rounded,
-                        color: Theme.of(context).disabledColor,
-                      )
+                    ? const SizedBox()
                     : entry != null
                         ? MoodIcon(moodValue: entry!.mood)
                         : Icon(

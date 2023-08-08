@@ -62,7 +62,7 @@ class _EntriesPageState extends State<EntriesPage> {
   @override
   Widget build(BuildContext context) => Center(
         child: isLoading
-            ? const CircularProgressIndicator()
+            ? const SizedBox()
             : Stack(alignment: Alignment.topCenter, children: [
                 buildEntries(),
                 Column(
