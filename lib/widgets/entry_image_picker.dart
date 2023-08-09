@@ -24,7 +24,7 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
     final pickedFile = await picker.pickImage(source: ImageSource.camera);
 
     if (pickedFile != null) {
-      saveImage(pickedFile);
+      await saveImage(pickedFile);
     }
   }
 
@@ -33,7 +33,7 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
-      saveImage(pickedFile);
+      await saveImage(pickedFile);
     }
   }
 
@@ -41,7 +41,7 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
     widget.onChangedImage(null);
   }
 
-  void saveImage(XFile pickedFile) async {
+  Future<void> saveImage(XFile pickedFile) async {
     // Save the image to a custom location defined by your app
     final imgDirectory = await EntriesDatabase.instance.getImgDatabasePath();
     final currTime = DateTime.now();
@@ -63,6 +63,8 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
     setState(() {
       widget.onChangedImage(imageName);
     });
+    // Delete picked file from cache
+    await File(pickedFile.path).delete();
   }
 
   @override
