@@ -1,0 +1,6 @@
+Daily You v1.1.1 has arrived! Here are the highlights:
+
+• Added option to delete photos when removing them from a log or deleting a log.
+• Improved screen transitions.
+• Fixed growing cache bug.
+• Fixed app duplicating images picked from the same folder.
