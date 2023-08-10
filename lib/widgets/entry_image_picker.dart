@@ -19,6 +19,88 @@ class EntryImagePicker extends StatefulWidget {
 }
 
 class _EntryImagePickerState extends State<EntryImagePicker> {
+  void _showDeleteImagePopup() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete or Remove Photo?'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text("Do you want to delete the photo from your device?"),
+              const SizedBox(
+                height: 8,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton.icon(
+                    icon: const Icon(
+                      Icons.delete_rounded,
+                      size: 24,
+                    ),
+                    label: const Padding(
+                      padding: EdgeInsets.all(2.0),
+                      child: Text(
+                        "Delete",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+                    onPressed: () async {
+                      final path =
+                          '${await EntriesDatabase.instance.getImgDatabasePath()}/${widget.imgPath!}';
+                      if (await File(path).exists()) {
+                        await File(path).delete();
+                      }
+                      widget.onChangedImage(null);
+                      Navigator.pop(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.all(12),
+                      backgroundColor: Theme.of(context).colorScheme.background,
+                      foregroundColor: Theme.of(context).colorScheme.primary,
+                      elevation: 3,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
+                    ),
+                  ),
+                  ElevatedButton.icon(
+                    icon: const Icon(
+                      Icons.cancel_rounded,
+                      size: 24,
+                    ),
+                    label: const Padding(
+                      padding: EdgeInsets.all(2.0),
+                      child: Text(
+                        "Remove",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+                    onPressed: () async {
+                      widget.onChangedImage(null);
+                      Navigator.pop(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.all(12),
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      foregroundColor: Theme.of(context).colorScheme.background,
+                      elevation: 3,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Future<void> _takePicture() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.camera);
@@ -37,8 +119,8 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
     }
   }
 
-  void clearImage() async {
-    widget.onChangedImage(null);
+  Future<void> clearImage() async {
+    _showDeleteImagePopup();
   }
 
   Future<void> saveImage(XFile pickedFile) async {

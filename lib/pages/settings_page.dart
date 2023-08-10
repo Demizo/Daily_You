@@ -226,59 +226,69 @@ class _SettingsPageState extends State<SettingsPage> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Delete All Logs?'),
-          content: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              ElevatedButton.icon(
-                icon: const Icon(
-                  Icons.delete_rounded,
-                  size: 24,
-                ),
-                label: const Padding(
-                  padding: EdgeInsets.all(2.0),
-                  child: Text(
-                    "Delete All",
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ),
-                onPressed: () async {
-                  await EntriesDatabase.instance.deleteAllEntries();
-                  Navigator.pop(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.all(12),
-                  backgroundColor: Theme.of(context).colorScheme.background,
-                  foregroundColor: Theme.of(context).colorScheme.primary,
-                  elevation: 3,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20.0),
-                  ),
-                ),
+              const Text(
+                  "This will not delete the log photos from your device..."),
+              const SizedBox(
+                height: 8,
               ),
-              ElevatedButton.icon(
-                icon: const Icon(
-                  Icons.cancel_rounded,
-                  size: 24,
-                ),
-                label: const Padding(
-                  padding: EdgeInsets.all(2.0),
-                  child: Text(
-                    "Cancel",
-                    style: TextStyle(fontSize: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton.icon(
+                    icon: const Icon(
+                      Icons.delete_rounded,
+                      size: 24,
+                    ),
+                    label: const Padding(
+                      padding: EdgeInsets.all(2.0),
+                      child: Text(
+                        "Delete All",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+                    onPressed: () async {
+                      await EntriesDatabase.instance.deleteAllEntries();
+                      Navigator.pop(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.all(12),
+                      backgroundColor: Theme.of(context).colorScheme.background,
+                      foregroundColor: Theme.of(context).colorScheme.primary,
+                      elevation: 3,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
+                    ),
                   ),
-                ),
-                onPressed: () async {
-                  Navigator.pop(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.all(12),
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  foregroundColor: Theme.of(context).colorScheme.background,
-                  elevation: 3,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20.0),
+                  ElevatedButton.icon(
+                    icon: const Icon(
+                      Icons.cancel_rounded,
+                      size: 24,
+                    ),
+                    label: const Padding(
+                      padding: EdgeInsets.all(2.0),
+                      child: Text(
+                        "Cancel",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+                    onPressed: () async {
+                      Navigator.pop(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.all(12),
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      foregroundColor: Theme.of(context).colorScheme.background,
+                      elevation: 3,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
             ],
           ),
