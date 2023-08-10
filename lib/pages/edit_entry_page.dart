@@ -131,7 +131,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
                     label: const Padding(
                       padding: EdgeInsets.all(2.0),
                       child: Text(
-                        "Delete Photo",
+                        "Delete",
                         style: TextStyle(fontSize: 16),
                       ),
                     ),
