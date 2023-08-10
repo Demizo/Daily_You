@@ -57,8 +57,13 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
                   ),
                 ),
                 onPressed: () async {
-                  Navigator.of(context).popUntil((route) => route.isFirst);
-                  await EntriesDatabase.instance.deleteEntry(id);
+                  if (imgPath != null) {
+                    Navigator.pop(context);
+                    _showDeleteImagePopup();
+                  } else {
+                    Navigator.of(context).popUntil((route) => route.isFirst);
+                    await EntriesDatabase.instance.deleteEntry(id);
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.all(12),
@@ -94,6 +99,84 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
                     borderRadius: BorderRadius.circular(20.0),
                   ),
                 ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showDeleteImagePopup() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('This log has a photo!'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text("Do you want to delete the photo from your device?"),
+              const SizedBox(
+                height: 8,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton.icon(
+                    icon: const Icon(
+                      Icons.delete_rounded,
+                      size: 24,
+                    ),
+                    label: const Padding(
+                      padding: EdgeInsets.all(2.0),
+                      child: Text(
+                        "Delete",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+                    onPressed: () async {
+                      await EntriesDatabase.instance.deleteEntryImage(id);
+                      Navigator.of(context).popUntil((route) => route.isFirst);
+                      await EntriesDatabase.instance.deleteEntry(id);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.all(12),
+                      backgroundColor: Theme.of(context).colorScheme.background,
+                      foregroundColor: Theme.of(context).colorScheme.primary,
+                      elevation: 3,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
+                    ),
+                  ),
+                  ElevatedButton.icon(
+                    icon: const Icon(
+                      Icons.photo,
+                      size: 24,
+                    ),
+                    label: const Padding(
+                      padding: EdgeInsets.all(2.0),
+                      child: Text(
+                        "Keep Photo",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+                    onPressed: () async {
+                      Navigator.of(context).popUntil((route) => route.isFirst);
+                      await EntriesDatabase.instance.deleteEntry(id);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.all(12),
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      foregroundColor: Theme.of(context).colorScheme.background,
+                      elevation: 3,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

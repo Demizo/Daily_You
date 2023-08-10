@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:daily_you/entries_database.dart';
@@ -70,11 +72,16 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
                           ),
                         ),
                         onTap: () async {
-                          await Navigator.of(context).push(MaterialPageRoute(
-                            fullscreenDialog: true,
-                            builder: (context) =>
-                                ImageViewPage(imgName: entry.imgPath!),
-                          ));
+                          final imgDir = await EntriesDatabase.instance
+                              .getImgDatabasePath();
+                          if (await File("$imgDir/${entry.imgPath!}")
+                              .exists()) {
+                            await Navigator.of(context).push(MaterialPageRoute(
+                              fullscreenDialog: true,
+                              builder: (context) =>
+                                  ImageViewPage(imgName: entry.imgPath!),
+                            ));
+                          }
                         },
                       ),
                     Card(

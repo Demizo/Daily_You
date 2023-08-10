@@ -133,6 +133,16 @@ CREATE TABLE $entriesTable (
     return '$basePath/$imageName';
   }
 
+  Future<void> deleteEntryImage(int id) async {
+    final entry = await getEntry(id);
+    if (entry != null && entry.imgPath != null) {
+      final path = '${await getImgDatabasePath()}/${entry.imgPath!}';
+      if (await File(path).exists()) {
+        await File(path).delete();
+      }
+    }
+  }
+
   Future<String> getImgDatabasePath() async {
     if (ConfigManager.instance.getField('imgPath') == '') {
       Directory basePath;
