@@ -40,12 +40,11 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Delete Entry?'),
+          title: const Text('Delete Log?'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                  "This will also delete any images attached to the log!"),
+              const Text("Do you want to delete this log?"),
               const SizedBox(
                 height: 8,
               ),

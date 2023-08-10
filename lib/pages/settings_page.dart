@@ -229,8 +229,7 @@ class _SettingsPageState extends State<SettingsPage> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                  "This will also delete the log photos from your device..."),
+              const Text("Do you want to delete all of your logs?"),
               const SizedBox(
                 height: 8,
               ),

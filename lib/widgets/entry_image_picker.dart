@@ -28,7 +28,7 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text("Do you want to delete the photo from your device?"),
+              const Text("Do you want to delete this photo?"),
               const SizedBox(
                 height: 8,
               ),
