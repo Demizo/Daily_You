@@ -24,7 +24,7 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Delete or Remove Photo?'),
+          title: const Text('Delete Photo?'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -74,12 +74,11 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
                     label: const Padding(
                       padding: EdgeInsets.all(2.0),
                       child: Text(
-                        "Remove",
+                        "Cancel",
                         style: TextStyle(fontSize: 16),
                       ),
                     ),
                     onPressed: () async {
-                      widget.onChangedImage(null);
                       Navigator.pop(context);
                     },
                     style: ElevatedButton.styleFrom(

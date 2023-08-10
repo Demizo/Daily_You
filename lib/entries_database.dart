@@ -117,6 +117,7 @@ CREATE TABLE $entriesTable (
   Future<void> deleteAllEntries() async {
     final entries = await getAllEntries();
     for (Entry entry in entries) {
+      await deleteEntryImage(entry.id!);
       await deleteEntry(entry.id!);
     }
   }

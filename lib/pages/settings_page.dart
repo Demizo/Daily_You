@@ -230,7 +230,7 @@ class _SettingsPageState extends State<SettingsPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               const Text(
-                  "This will not delete the log photos from your device..."),
+                  "This will also delete the log photos from your device..."),
               const SizedBox(
                 height: 8,
               ),
@@ -588,7 +588,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   icon: const Icon(
                     Icons.new_releases_rounded,
                   ),
-                  label: const Text("1.1.1"),
+                  label: const Text("1.1.2"),
                   onPressed: () async {
                     await launchUrl(
                         Uri.https("github.com", "/Demizo/Daily_You/releases"),
