@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:daily_you/notification_manager.dart';
+import 'package:daily_you/time_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -30,24 +32,30 @@ class _SettingsPageState extends State<SettingsPage> {
             children: [
               ListTile(
                 title: const Text('Follow System'),
-                onTap: () => setState(() {
-                  ConfigManager.instance.setField('theme', 'system');
-                  _updateTheme(themeModeProvider, ThemeMode.system);
-                }),
+                onTap: () async {
+                  await ConfigManager.instance.setField('theme', 'system');
+                  setState(() {
+                    _updateTheme(themeModeProvider, ThemeMode.system);
+                  });
+                },
               ),
               ListTile(
                 title: const Text('Dark Theme'),
-                onTap: () => setState(() {
-                  ConfigManager.instance.setField('theme', 'dark');
-                  _updateTheme(themeModeProvider, ThemeMode.dark);
-                }),
+                onTap: () async {
+                  await ConfigManager.instance.setField('theme', 'dark');
+                  setState(() {
+                    _updateTheme(themeModeProvider, ThemeMode.dark);
+                  });
+                },
               ),
               ListTile(
                   title: const Text('Light Theme'),
-                  onTap: () => setState(() {
-                        ConfigManager.instance.setField('theme', 'light');
-                        _updateTheme(themeModeProvider, ThemeMode.light);
-                      })),
+                  onTap: () async {
+                    await ConfigManager.instance.setField('theme', 'light');
+                    setState(() {
+                      _updateTheme(themeModeProvider, ThemeMode.light);
+                    });
+                  }),
             ],
           ),
         );
@@ -96,16 +104,15 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                     onPressed: () async {
                       if (newEmoji.isNotEmpty) {
-                        setState(() {
-                          if (value != null) {
-                            ConfigManager.instance.setField(
-                                ConfigManager.moodValueFieldMapping[value]!,
-                                newEmoji);
-                          } else {
-                            ConfigManager.instance
-                                .setField('noMoodIcon', newEmoji);
-                          }
-                        });
+                        if (value != null) {
+                          await ConfigManager.instance.setField(
+                              ConfigManager.moodValueFieldMapping[value]!,
+                              newEmoji);
+                        } else {
+                          await ConfigManager.instance
+                              .setField('noMoodIcon', newEmoji);
+                        }
+                        setState(() {});
                       }
                       Navigator.pop(context);
                     },
@@ -304,6 +311,25 @@ class _SettingsPageState extends State<SettingsPage> {
     Navigator.pop(context); // Close the popup
   }
 
+  Future<void> _selectTime(BuildContext context) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: TimeManager.scheduledReminderTime(),
+    );
+
+    if (picked != null) {
+      await ConfigManager.instance
+          .setField('scheduledReminderHour', picked.hour);
+      await ConfigManager.instance
+          .setField('scheduledReminderMinute', picked.minute);
+      setState(() {});
+      if (ConfigManager.instance.getField('dailyReminders')) {
+        await NotificationManager.instance.stopDailyReminders();
+        await NotificationManager.instance.startScheduledDailyReminders();
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeModeProvider>(context);
@@ -346,7 +372,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           ? const Text("Light")
                           : const Text("Dark"),
                   onPressed: () async {
-                    ConfigManager.instance.setField('theme', 'system');
+                    await ConfigManager.instance.setField('theme', 'system');
                     _showThemeSelectionPopup(themeProvider);
                   },
                 ),
@@ -375,6 +401,53 @@ class _SettingsPageState extends State<SettingsPage> {
                 )
               ],
             ),
+          ),
+          const Divider(),
+          const Row(
+            children: [
+              Text(
+                "Notifications",
+                style: TextStyle(fontSize: 24),
+              ),
+            ],
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Daily Reminders",
+                    style: TextStyle(fontSize: 18),
+                  ),
+                  Switch(
+                      value: ConfigManager.instance.getField('dailyReminders'),
+                      onChanged: (value) async {
+                        if (await NotificationManager.instance
+                            .hasNotificationPermission()) {
+                          if (value) {
+                            await NotificationManager.instance
+                                .startScheduledDailyReminders();
+                          } else {
+                            await NotificationManager.instance
+                                .stopDailyReminders();
+                          }
+                          await ConfigManager.instance
+                              .setField('dailyReminders', value);
+                          setState(() {});
+                        }
+                      }),
+                ],
+              ),
+              ElevatedButton.icon(
+                  icon: const Icon(Icons.schedule_rounded),
+                  onPressed: () async {
+                    _selectTime(context);
+                  },
+                  label: Text(TimeManager.timeOfDayString(
+                      TimeManager.scheduledReminderTime()))),
+            ],
           ),
           const Divider(),
           const Row(

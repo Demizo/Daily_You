@@ -194,23 +194,23 @@ CREATE TABLE $entriesTable (
       if (!await File(newDbPath).exists() && await File(oldDbPath).exists()) {
         await File(oldDbPath).copy(newDbPath);
       }
-      ConfigManager.instance.setField('dbPath', selectedDirectory);
+      await ConfigManager.instance.setField('dbPath', selectedDirectory);
     }
   }
 
   void resetDatabaseLocation() async {
-    ConfigManager.instance.setField('dbPath', '');
+    await ConfigManager.instance.setField('dbPath', '');
   }
 
   Future<void> selectImageFolder() async {
     final selectedDirectory = await getDirectoryPath();
     if (selectedDirectory.isNotEmpty) {
-      ConfigManager.instance.setField('imgPath', selectedDirectory);
+      await ConfigManager.instance.setField('imgPath', selectedDirectory);
     }
   }
 
   void resetImageFolderLocation() async {
-    ConfigManager.instance.setField('imgPath', '');
+    await ConfigManager.instance.setField('imgPath', '');
   }
 
   Future<String> getDirectoryPath() async {

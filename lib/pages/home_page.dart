@@ -1,3 +1,4 @@
+import 'package:daily_you/notification_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/models/entry.dart';
@@ -39,6 +40,16 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
+  Future<void> logToday() async {
+    var newEntry = await Navigator.of(context).push(MaterialPageRoute(
+      builder: (context) => const AddEditEntryPage(),
+    ));
+
+    if (newEntry != null) {
+      await refreshEntries();
+    }
+  }
+
   Future refreshEntries() async {
     setState(() => isLoading = true);
 
@@ -74,6 +85,13 @@ class _HomePageState extends State<HomePage> {
         lastYearEntry = entry;
       }
     }
+    var launchDetails = await NotificationManager.instance.notifications
+        .getNotificationAppLaunchDetails();
+    if (NotificationManager.instance.justLaunched &&
+        launchDetails?.notificationResponse?.id == 0) {
+      NotificationManager.instance.justLaunched = false;
+      await logToday();
+    }
     setState(() => isLoading = false);
   }
 
@@ -102,14 +120,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                           onPressed: () async {
-                            var newEntry = await Navigator.of(context)
-                                .push(MaterialPageRoute(
-                              builder: (context) => const AddEditEntryPage(),
-                            ));
-
-                            if (newEntry != null) {
-                              await refreshEntries();
-                            }
+                            await logToday();
                           },
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.all(12),
