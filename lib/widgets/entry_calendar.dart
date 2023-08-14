@@ -1,3 +1,4 @@
+import 'package:daily_you/config_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/widgets/entry_day_cell.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -18,9 +19,11 @@ class _EntryCalendarState extends State<EntryCalendar> {
       focusedDay: selectedDate,
       lastDay: DateTime.now(),
       firstDay: DateTime.utc(2000),
-      // Customize other properties of the TableCalendar here, if needed
+      startingDayOfWeek:
+          ConfigManager.instance.getField('startingDayOfWeek') == 'sunday'
+              ? StartingDayOfWeek.sunday
+              : StartingDayOfWeek.monday,
       calendarBuilders: CalendarBuilders(
-        // Override the default day cell rendering with your custom widget
         defaultBuilder: (context, date, _) {
           return EntryDayCell(date: date);
         },

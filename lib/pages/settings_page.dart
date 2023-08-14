@@ -376,6 +376,33 @@ class _SettingsPageState extends State<SettingsPage> {
               ],
             ),
           ),
+          Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Start Calendar Week on Monday",
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    Switch(
+                        value: ConfigManager.instance
+                                .getField('startingDayOfWeek') !=
+                            'sunday',
+                        onChanged: (value) {
+                          if (value) {
+                            setState(() {
+                              ConfigManager.instance
+                                  .setField('startingDayOfWeek', 'monday');
+                            });
+                          } else {
+                            setState(() {
+                              ConfigManager.instance
+                                  .setField('startingDayOfWeek', 'sunday');
+                            });
+                          }
+                        })
+                  ])),
           const Divider(),
           const Row(
             children: [

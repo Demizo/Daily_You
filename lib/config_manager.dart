@@ -14,6 +14,7 @@ class ConfigManager {
     'theme': 'system',
     'dbPath': '',
     'imgPath': '',
+    'startingDayOfWeek': 'sunday',
     'veryHappyIcon': '☺️',
     'happyIcon': '🙂',
     'neutralIcon': '😐',
