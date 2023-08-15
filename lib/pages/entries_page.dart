@@ -4,7 +4,6 @@ import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/widgets/entry_card_widget.dart';
 import 'package:daily_you/pages/entry_detail_page.dart';
 import 'package:easy_debounce/easy_debounce.dart';
-import 'package:easy_debounce/easy_throttle.dart';
 
 class EntriesPage extends StatefulWidget {
   const EntriesPage({super.key});
