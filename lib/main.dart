@@ -53,12 +53,23 @@ class MainApp extends StatelessWidget {
               seedColor: SystemTheme.accentColor.accent,
               brightness: Brightness.light),
         ),
-        darkTheme: ThemeData(
-          useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(
-              seedColor: SystemTheme.accentColor.accent,
-              brightness: Brightness.dark),
-        ),
+        darkTheme: (ConfigManager.instance.getField('theme') == 'amoled')
+            ? ThemeData(
+                useMaterial3: true,
+                colorScheme: ColorScheme.fromSeed(
+                    seedColor: SystemTheme.accentColor.accent,
+                    brightness: Brightness.dark,
+                    background: Colors.black,
+                    surface: Colors.black,
+                    onSurface: Colors.white,
+                    surfaceTint: Colors.black),
+              )
+            : ThemeData(
+                useMaterial3: true,
+                colorScheme: ColorScheme.fromSeed(
+                    seedColor: SystemTheme.accentColor.accent,
+                    brightness: Brightness.dark),
+              ),
         home: const ResponsiveLayout(
           mobileScaffold: MobileScaffold(),
           tabletScaffold: MobileScaffold(),
