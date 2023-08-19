@@ -1,0 +1,5 @@
+Daily You v1.3.0 has arrived! Here are the highlights:
+
+• Added ability to customize the app accent color.
+• Added ability to quick launch the camera from the home page.
+• Added AMOLED theme.
