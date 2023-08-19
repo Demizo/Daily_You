@@ -14,7 +14,7 @@ class ThemeModeProvider with ChangeNotifier {
 
   Future<void> initializeThemeFromConfig() async {
     final configTheme = ConfigManager.instance.getField('theme');
-    if (configTheme == 'dark') {
+    if (configTheme == 'dark' || configTheme == 'amoled') {
       _themeMode = ThemeMode.dark;
     } else if (configTheme == 'light') {
       _themeMode = ThemeMode.light;

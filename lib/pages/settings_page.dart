@@ -48,6 +48,12 @@ class _SettingsPageState extends State<SettingsPage> {
                         ConfigManager.instance.setField('theme', 'light');
                         _updateTheme(themeModeProvider, ThemeMode.light);
                       })),
+              ListTile(
+                  title: const Text('AMOLED'),
+                  onTap: () => setState(() {
+                        ConfigManager.instance.setField('theme', 'amoled');
+                        _updateTheme(themeModeProvider, ThemeMode.dark);
+                      })),
             ],
           ),
         );
@@ -344,7 +350,10 @@ class _SettingsPageState extends State<SettingsPage> {
                       ? const Text("System")
                       : themeProvider.themeMode == ThemeMode.light
                           ? const Text("Light")
-                          : const Text("Dark"),
+                          : (ConfigManager.instance.getField('theme') ==
+                                  'amoled')
+                              ? const Text("AMOLED")
+                              : const Text("Dark"),
                   onPressed: () async {
                     ConfigManager.instance.setField('theme', 'system');
                     _showThemeSelectionPopup(themeProvider);
