@@ -9,11 +9,13 @@ import 'package:daily_you/widgets/entry_mood_picker.dart';
 class AddEditEntryPage extends StatefulWidget {
   final Entry? entry;
   final DateTime? overrideCreateDate;
+  final bool openCamera;
 
   const AddEditEntryPage({
     Key? key,
     this.entry,
     this.overrideCreateDate,
+    this.openCamera = false,
   }) : super(key: key);
   @override
   State<AddEditEntryPage> createState() => _AddEditEntryPageState();
@@ -127,6 +129,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
               children: [
                 EntryImagePicker(
                     imgPath: imgPath,
+                    openCamera: widget.openCamera,
                     onChangedImage: (imgPath) =>
                         setState(() => this.imgPath = imgPath)),
                 StatefulBuilder(
