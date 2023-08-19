@@ -21,6 +21,8 @@ class ConfigManager {
     'sadIcon': '😕',
     'verySadIcon': '😔',
     'noMoodIcon': '?',
+    'followSystemColor': true,
+    'accentColor': 0xff01d3ef,
   };
 
   static final moodValueFieldMapping = {
@@ -88,7 +90,7 @@ class ConfigManager {
   }
 
   // Set a specific config field
-  void setField(String field, String value) {
+  void setField(String field, dynamic value) {
     _config[field] = value;
     writeFile(_config);
   }

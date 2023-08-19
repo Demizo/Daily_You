@@ -16,12 +16,12 @@ void main() async {
   }
   databaseFactory = databaseFactoryFfi;
   WidgetsFlutterBinding.ensureInitialized();
-  await SystemTheme.accentColor.load();
-  SystemTheme.fallbackColor = const Color.fromARGB(255, 1, 211, 239);
 
   // Create the config file if it doesn't exist
   await ConfigManager.instance.init();
+
   final themeProvider = ThemeModeProvider();
+
   await themeProvider.initializeThemeFromConfig();
 
   runApp(
@@ -50,14 +50,14 @@ class MainApp extends StatelessWidget {
         theme: ThemeData(
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(
-              seedColor: SystemTheme.accentColor.accent,
+              seedColor: themeModeProvider.accentColor,
               brightness: Brightness.light),
         ),
         darkTheme: (ConfigManager.instance.getField('theme') == 'amoled')
             ? ThemeData(
                 useMaterial3: true,
                 colorScheme: ColorScheme.fromSeed(
-                    seedColor: SystemTheme.accentColor.accent,
+                    seedColor: themeModeProvider.accentColor,
                     brightness: Brightness.dark,
                     background: Colors.black,
                     surface: Colors.black,
@@ -67,7 +67,7 @@ class MainApp extends StatelessWidget {
             : ThemeData(
                 useMaterial3: true,
                 colorScheme: ColorScheme.fromSeed(
-                    seedColor: SystemTheme.accentColor.accent,
+                    seedColor: themeModeProvider.accentColor,
                     brightness: Brightness.dark),
               ),
         home: const ResponsiveLayout(
