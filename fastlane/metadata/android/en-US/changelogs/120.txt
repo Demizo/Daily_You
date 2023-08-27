@@ -1,0 +1,5 @@
+Daily You v1.2.0 has arrived! Here are the highlights:
+
+• Added more sorting/filter options to gallery.
+• Added ability to change the calendar start of week day.
+

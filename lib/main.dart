@@ -44,8 +44,8 @@ void callbackDispatcher() async {
   }
 
   await AndroidAlarmManager.oneShot(
-      const Duration(hours: 1), 0, callbackDispatcher,
-      alarmClock: true);
+      const Duration(minutes: 15), 0, callbackDispatcher,
+      allowWhileIdle: true, exact: true);
 }
 
 void main() async {
@@ -55,12 +55,12 @@ void main() async {
   }
   databaseFactory = databaseFactoryFfi;
   WidgetsFlutterBinding.ensureInitialized();
-  await SystemTheme.accentColor.load();
-  SystemTheme.fallbackColor = const Color.fromARGB(255, 1, 211, 239);
 
   // Create the config file if it doesn't exist
   await ConfigManager.instance.init();
+
   final themeProvider = ThemeModeProvider();
+
   await themeProvider.initializeThemeFromConfig();
 
   NotificationManager.instance.init();
@@ -89,7 +89,7 @@ Future<void> setAlarm() async {
       dayToRemind, TimeManager.scheduledReminderTime());
   timeUntilReminder = reminderDateTime.difference(DateTime.now());
   await AndroidAlarmManager.oneShot(timeUntilReminder, 0, callbackDispatcher,
-      alarmClock: true);
+      allowWhileIdle: true, exact: true);
 }
 
 class MainApp extends StatelessWidget {
@@ -110,15 +110,26 @@ class MainApp extends StatelessWidget {
         theme: ThemeData(
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(
-              seedColor: SystemTheme.accentColor.accent,
+              seedColor: themeModeProvider.accentColor,
               brightness: Brightness.light),
         ),
-        darkTheme: ThemeData(
-          useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(
-              seedColor: SystemTheme.accentColor.accent,
-              brightness: Brightness.dark),
-        ),
+        darkTheme: (ConfigManager.instance.getField('theme') == 'amoled')
+            ? ThemeData(
+                useMaterial3: true,
+                colorScheme: ColorScheme.fromSeed(
+                    seedColor: themeModeProvider.accentColor,
+                    brightness: Brightness.dark,
+                    background: Colors.black,
+                    surface: Colors.black,
+                    onSurface: Colors.white,
+                    surfaceTint: Colors.black),
+              )
+            : ThemeData(
+                useMaterial3: true,
+                colorScheme: ColorScheme.fromSeed(
+                    seedColor: themeModeProvider.accentColor,
+                    brightness: Brightness.dark),
+              ),
         home: const ResponsiveLayout(
           mobileScaffold: MobileScaffold(),
           tabletScaffold: MobileScaffold(),

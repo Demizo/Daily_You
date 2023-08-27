@@ -10,9 +10,13 @@ import 'local_image_loader.dart';
 class EntryImagePicker extends StatefulWidget {
   final String? imgPath;
   final ValueChanged<String?> onChangedImage;
+  final bool openCamera;
 
   const EntryImagePicker(
-      {super.key, this.imgPath, required this.onChangedImage});
+      {super.key,
+      this.imgPath,
+      required this.onChangedImage,
+      this.openCamera = false});
 
   @override
   State<EntryImagePicker> createState() => _EntryImagePickerState();
@@ -98,6 +102,14 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
         );
       },
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.openCamera) {
+      _takePicture();
+    }
   }
 
   Future<void> _takePicture() async {

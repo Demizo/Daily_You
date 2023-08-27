@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:daily_you/notification_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/entries_database.dart';
@@ -105,35 +107,78 @@ class _HomePageState extends State<HomePage> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     if (todayEntry == null)
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: ElevatedButton.icon(
-                          icon: const Icon(
-                            Icons.add_circle_rounded,
-                            size: 30,
-                          ),
-                          label: const Padding(
-                            padding: EdgeInsets.all(2.0),
-                            child: Text(
-                              "Log Today...",
-                              style: TextStyle(fontSize: 24),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: ElevatedButton.icon(
+                              icon: const Icon(
+                                Icons.add_circle_rounded,
+                                size: 30,
+                              ),
+                              label: const Padding(
+                                padding: EdgeInsets.all(2.0),
+                                child: Text(
+                                  "Log Today...",
+                                  style: TextStyle(fontSize: 24),
+                                ),
+                              ),
+                              onPressed: () async {
+                                var newEntry = await Navigator.of(context)
+                                    .push(MaterialPageRoute(
+                                  builder: (context) =>
+                                      const AddEditEntryPage(),
+                                ));
+
+                                if (newEntry != null) {
+                                  await refreshEntries();
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.all(12),
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.primary,
+                                foregroundColor:
+                                    Theme.of(context).colorScheme.background,
+                                elevation: 3,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20.0),
+                                ),
+                              ),
                             ),
                           ),
-                          onPressed: () async {
-                            await logToday();
-                          },
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.all(12),
-                            backgroundColor:
-                                Theme.of(context).colorScheme.primary,
-                            foregroundColor:
-                                Theme.of(context).colorScheme.background,
-                            elevation: 3,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20.0),
+                          if (Platform.isAndroid)
+                            IconButton(
+                              icon: const Icon(
+                                Icons.camera_alt_rounded,
+                                size: 30,
+                              ),
+                              onPressed: () async {
+                                var newEntry = await Navigator.of(context)
+                                    .push(MaterialPageRoute(
+                                  builder: (context) => const AddEditEntryPage(
+                                    openCamera: true,
+                                  ),
+                                ));
+
+                                if (newEntry != null) {
+                                  await refreshEntries();
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.all(8),
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.primary,
+                                foregroundColor:
+                                    Theme.of(context).colorScheme.background,
+                                elevation: 3,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(80.0),
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
+                        ],
                       ),
                   ],
                 ),

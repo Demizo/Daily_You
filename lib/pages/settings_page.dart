@@ -4,6 +4,7 @@ import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:daily_you/entries_database.dart';
@@ -56,6 +57,102 @@ class _SettingsPageState extends State<SettingsPage> {
                       _updateTheme(themeModeProvider, ThemeMode.light);
                     });
                   }),
+              ListTile(
+                  title: const Text('AMOLED'),
+                  onTap: () async {
+                    await ConfigManager.instance.setField('theme', 'amoled');
+                    setState(() {
+                      _updateTheme(themeModeProvider, ThemeMode.dark);
+                    });
+                  }),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showAccentColorPopup(ThemeModeProvider themeProvider) {
+    Color accentColor = Color(ConfigManager.instance.getField('accentColor'));
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Choose Accent Color:'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ColorPicker(
+                  enableAlpha: false,
+                  labelTypes: const [ColorLabelType.rgb, ColorLabelType.hex],
+                  paletteType: PaletteType.hueWheel,
+                  pickerColor:
+                      Color(ConfigManager.instance.getField('accentColor')),
+                  onColorChanged: (color) {
+                    accentColor = color;
+                  }),
+              const SizedBox(
+                height: 8,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton.icon(
+                    icon: const Icon(
+                      Icons.check_circle_rounded,
+                      size: 24,
+                    ),
+                    label: const Padding(
+                      padding: EdgeInsets.all(2.0),
+                      child: Text(
+                        "Confirm",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+                    onPressed: () async {
+                      setState(() {
+                        themeProvider.accentColor = accentColor;
+                        themeProvider.updateAccentColor();
+                      });
+                      Navigator.pop(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.all(12),
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      foregroundColor: Theme.of(context).colorScheme.background,
+                      elevation: 3,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
+                    ),
+                  ),
+                  ElevatedButton.icon(
+                    icon: const Icon(
+                      Icons.cancel_rounded,
+                      size: 24,
+                    ),
+                    label: const Padding(
+                      padding: EdgeInsets.all(2.0),
+                      child: Text(
+                        "Cancel",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+                    onPressed: () async {
+                      Navigator.pop(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.all(12),
+                      backgroundColor: Theme.of(context).colorScheme.background,
+                      foregroundColor: Theme.of(context).colorScheme.primary,
+                      elevation: 3,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         );
@@ -370,7 +467,10 @@ class _SettingsPageState extends State<SettingsPage> {
                       ? const Text("System")
                       : themeProvider.themeMode == ThemeMode.light
                           ? const Text("Light")
-                          : const Text("Dark"),
+                          : (ConfigManager.instance.getField('theme') ==
+                                  'amoled')
+                              ? const Text("AMOLED")
+                              : const Text("Dark"),
                   onPressed: () async {
                     await ConfigManager.instance.setField('theme', 'system');
                     _showThemeSelectionPopup(themeProvider);
@@ -379,6 +479,42 @@ class _SettingsPageState extends State<SettingsPage> {
               ],
             ),
           ),
+          Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          "Use System Accent Color",
+                          style: TextStyle(fontSize: 18),
+                        ),
+                        Switch(
+                            value: ConfigManager.instance
+                                .getField('followSystemColor'),
+                            onChanged: (value) {
+                              setState(() {
+                                ConfigManager.instance
+                                    .setField('followSystemColor', value);
+                                themeProvider.updateAccentColor();
+                              });
+                            })
+                      ]),
+                  if (!ConfigManager.instance.getField('followSystemColor'))
+                    ElevatedButton.icon(
+                      icon: const Icon(
+                        Icons.color_lens_rounded,
+                      ),
+                      label: const Text("Custom Accent Color"),
+                      onPressed: () async {
+                        _showAccentColorPopup(themeProvider);
+                      },
+                    ),
+                ],
+              )),
           Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: Column(
@@ -402,6 +538,33 @@ class _SettingsPageState extends State<SettingsPage> {
               ],
             ),
           ),
+          Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Start Calendar Week on Monday",
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    Switch(
+                        value: ConfigManager.instance
+                                .getField('startingDayOfWeek') !=
+                            'sunday',
+                        onChanged: (value) {
+                          if (value) {
+                            setState(() {
+                              ConfigManager.instance
+                                  .setField('startingDayOfWeek', 'monday');
+                            });
+                          } else {
+                            setState(() {
+                              ConfigManager.instance
+                                  .setField('startingDayOfWeek', 'sunday');
+                            });
+                          }
+                        })
+                  ])),
           const Divider(),
           const Row(
             children: [
@@ -660,7 +823,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   icon: const Icon(
                     Icons.new_releases_rounded,
                   ),
-                  label: const Text("1.1.2"),
+                  label: const Text("1.3.0"),
                   onPressed: () async {
                     await launchUrl(
                         Uri.https("github.com", "/Demizo/Daily_You/releases"),

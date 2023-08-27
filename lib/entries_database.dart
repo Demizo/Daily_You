@@ -93,6 +93,14 @@ CREATE TABLE $entriesTable (
     return result.map((json) => Entry.fromJson(json)).toList();
   }
 
+  Future<List<Entry>> getAllEntriesSorted(String orderBy, String order) async {
+    final db = await instance.database;
+
+    final result = await db.query(entriesTable, orderBy: '$orderBy $order');
+
+    return result.map((json) => Entry.fromJson(json)).toList();
+  }
+
   Future<int> updateEntry(Entry entry) async {
     final db = await instance.database;
 
