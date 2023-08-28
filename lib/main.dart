@@ -10,7 +10,6 @@ import 'package:daily_you/layouts/responsive_layout.dart';
 import 'package:daily_you/theme_mode_provider.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'package:system_theme/system_theme.dart';
 import 'config_manager.dart';
 import 'package:provider/provider.dart';
 
