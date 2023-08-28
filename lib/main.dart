@@ -22,15 +22,14 @@ void callbackDispatcher() async {
 
     await flutterLocalNotificationsPlugin.initialize(
         const InitializationSettings(
-            android:
-                AndroidInitializationSettings('@mipmap/ic_launcher_monochrome'),
+            android: AndroidInitializationSettings('@mipmap/ic_reminder_icon'),
             linux:
                 LinuxInitializationSettings(defaultActionName: 'Log Today')));
 
     var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
       'daily_you_reminder',
       'Log Reminder',
-      icon: '@mipmap/ic_launcher_foreground',
+      icon: '@mipmap/ic_reminder_icon',
       importance: Importance.defaultImportance,
       priority: Priority.defaultPriority,
     );
@@ -42,9 +41,13 @@ void callbackDispatcher() async {
     await flutterLocalNotificationsPlugin.show(
         0, 'Log Today!', 'Take your daily log...', platformChannelSpecifics);
   }
-
-  await AndroidAlarmManager.oneShot(
-      const Duration(minutes: 15), 0, callbackDispatcher,
+  await ConfigManager.instance.init();
+  Duration timeUntilReminder;
+  DateTime dayToRemind = TimeManager.startOfNextDay();
+  DateTime reminderDateTime = TimeManager.addTimeOfDay(
+      dayToRemind, TimeManager.scheduledReminderTime());
+  timeUntilReminder = reminderDateTime.difference(DateTime.now());
+  await AndroidAlarmManager.oneShot(timeUntilReminder, 0, callbackDispatcher,
       allowWhileIdle: true, exact: true);
 }
 
@@ -63,9 +66,15 @@ void main() async {
 
   await themeProvider.initializeThemeFromConfig();
 
-  NotificationManager.instance.init();
+  await NotificationManager.instance.init();
 
   await AndroidAlarmManager.initialize();
+
+  if (ConfigManager.instance.getField('dailyReminders')) {
+    await NotificationManager.instance.stopDailyReminders();
+    await NotificationManager.instance.startScheduledDailyReminders();
+  }
+
   runApp(
     ChangeNotifierProvider(
       create: (_) => themeProvider,

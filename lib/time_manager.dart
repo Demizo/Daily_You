@@ -17,7 +17,7 @@ class TimeManager {
 
   static DateTime startOfDay(DateTime dateTime) {
     return dateTime.copyWith(
-        hour: 0, minute: 0, millisecond: 0, microsecond: 0);
+        hour: 0, minute: 0, second: 0, millisecond: 0, microsecond: 0);
   }
 
   static DateTime startOfNextDay() {

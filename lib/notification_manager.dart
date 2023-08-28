@@ -31,8 +31,7 @@ class NotificationManager {
     _notifications = flutterLocalNotificationsPlugin;
 
     await _notifications!.initialize(const InitializationSettings(
-        android:
-            AndroidInitializationSettings('@mipmap/ic_launcher_monochrome'),
+        android: AndroidInitializationSettings('@mipmap/ic_reminder_icon'),
         linux: LinuxInitializationSettings(defaultActionName: 'Log Today')));
   }
 
