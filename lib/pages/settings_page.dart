@@ -578,11 +578,22 @@ class _SettingsPageState extends State<SettingsPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    "Daily Reminders",
-                    style: TextStyle(fontSize: 18),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        "Daily Reminders",
+                        style: TextStyle(fontSize: 18),
+                      ),
+                      const Text(
+                        "Allow app to run in background for best results",
+                        style: TextStyle(fontSize: 14),
+                      ),
+                    ],
                   ),
                   Switch(
                       value: ConfigManager.instance.getField('dailyReminders'),
