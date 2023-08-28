@@ -1,0 +1,4 @@
+Daily You v1.4.0 has arrived! Here are the highlights:
+
+• Added ability to enable daily reminder notifications.
+• Minor bug fixes.
