@@ -205,6 +205,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
     );
 
     var entry = await EntriesDatabase.instance.create(newEntry);
+
     Navigator.of(context).pop(entry);
   }
 }

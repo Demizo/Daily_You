@@ -23,6 +23,9 @@ class ConfigManager {
     'noMoodIcon': '?',
     'followSystemColor': true,
     'accentColor': 0xff01d3ef,
+    'dailyReminders': false,
+    'scheduledReminderHour': 12,
+    'scheduledReminderMinute': 0,
   };
 
   static final moodValueFieldMapping = {
@@ -90,8 +93,8 @@ class ConfigManager {
   }
 
   // Set a specific config field
-  void setField(String field, dynamic value) {
+  Future<void> setField(String field, dynamic value) async {
     _config[field] = value;
-    writeFile(_config);
+    await writeFile(_config);
   }
 }
