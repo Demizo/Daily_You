@@ -90,7 +90,9 @@ class _HomePageState extends State<HomePage> {
     var launchDetails = await NotificationManager.instance.notifications
         .getNotificationAppLaunchDetails();
     if (NotificationManager.instance.justLaunched &&
-        launchDetails?.notificationResponse?.id == 0) {
+        launchDetails?.notificationResponse?.id == 0 &&
+        await EntriesDatabase.instance.getEntryForDate(DateTime.now()) ==
+            null) {
       NotificationManager.instance.justLaunched = false;
       await logToday();
     }

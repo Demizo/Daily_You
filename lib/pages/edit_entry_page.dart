@@ -1,3 +1,4 @@
+import 'package:daily_you/notification_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:daily_you/entries_database.dart';
@@ -204,6 +205,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
       timeModified: DateTime.now(),
     );
 
+    await NotificationManager.instance.notifications.cancel(0);
     var entry = await EntriesDatabase.instance.create(newEntry);
 
     Navigator.of(context).pop(entry);
