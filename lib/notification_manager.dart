@@ -50,6 +50,7 @@ class NotificationManager {
 
   Future<void> stopDailyReminders() async {
     await AndroidAlarmManager.cancel(0);
+    await NotificationManager.instance.notifications.cancel(0);
   }
 
   Future<void> startScheduledDailyReminders() async {
