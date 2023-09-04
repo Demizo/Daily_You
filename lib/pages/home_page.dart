@@ -1,6 +1,9 @@
 import 'dart:io';
 
+import 'package:daily_you/flashback_manager.dart';
+import 'package:daily_you/models/flashback.dart';
 import 'package:daily_you/notification_manager.dart';
+import 'package:daily_you/time_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/models/entry.dart';
@@ -18,11 +21,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late List<Entry> entries;
+  late List<Flashback> flashbacks;
   late Entry? todayEntry;
-  late Entry? lastEntry;
-  late Entry? lastHappyEntry;
-  late Entry? lastWeekEntry;
-  late Entry? lastYearEntry;
 
   bool isLoading = false;
   String searchText = '';
@@ -56,37 +56,15 @@ class _HomePageState extends State<HomePage> {
     setState(() => isLoading = true);
 
     todayEntry = null;
-    lastEntry = null;
-    lastHappyEntry = null;
-    lastWeekEntry = null;
-    lastYearEntry = null;
 
     entries = await EntriesDatabase.instance.getAllEntries();
 
-    for (var entry in entries) {
-      if (entries.indexOf(entry) == 0 &&
-          entry.timeCreate.day == DateTime.now().day) {
-        todayEntry = entry;
-      } else if (entry != todayEntry) {
-        lastEntry ??= entry;
-      }
-      if (entry.mood == 2) {
-        lastHappyEntry ??= entry;
-      }
-      DateTime currentDate = DateTime(
-          DateTime.now().year, DateTime.now().month, DateTime.now().day);
-      DateTime oneWeekAgoDate = currentDate.subtract(const Duration(days: 7));
-      if (oneWeekAgoDate.isAtSameMomentAs(DateTime(entry.timeCreate.year,
-          entry.timeCreate.month, entry.timeCreate.day))) {
-        lastWeekEntry = entry;
-      }
-      //Close enough, I'm lazy
-      DateTime oneYearAgoDate = currentDate.subtract(const Duration(days: 365));
-      if (oneYearAgoDate.isAtSameMomentAs(DateTime(entry.timeCreate.year,
-          entry.timeCreate.month, entry.timeCreate.day))) {
-        lastYearEntry = entry;
-      }
+    if (entries.isNotEmpty && TimeManager.isToday(entries.first.timeCreate)) {
+      todayEntry == entries.first;
     }
+
+    flashbacks = await FlashbackManager.getFlashbacks();
+
     var launchDetails = await NotificationManager.instance.notifications
         .getNotificationAppLaunchDetails();
     if (NotificationManager.instance.justLaunched &&
@@ -103,7 +81,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) => Center(
         child: isLoading
             ? const SizedBox()
-            : Stack(alignment: Alignment.bottomCenter, children: [
+            : Stack(alignment: Alignment.topCenter, children: [
                 buildEntries(),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -193,92 +171,32 @@ class _HomePageState extends State<HomePage> {
             'No Logs...',
           ),
         )
-      : ListView(children: [
-          GridView.extent(
+      : GridView.builder(
+          padding: const EdgeInsets.only(bottom: 80),
+          physics: const ScrollPhysics(),
+          shrinkWrap: true,
+          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
             maxCrossAxisExtent: 300,
-            physics: const NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            childAspectRatio: 1,
-            children: [
-              if (todayEntry != null)
-                GestureDetector(
-                  onTap: () async {
-                    await Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) =>
-                          EntryDetailPage(entryId: todayEntry!.id!),
-                    ));
-
-                    refreshEntries();
-                  },
-                  child: EntryCardWidget(
-                    title: "Today",
-                    entry: todayEntry!,
-                  ),
-                ),
-              if (lastEntry != null)
-                GestureDetector(
-                  onTap: () async {
-                    await Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) =>
-                          EntryDetailPage(entryId: lastEntry!.id!),
-                    ));
-
-                    refreshEntries();
-                  },
-                  child: EntryCardWidget(
-                    title: "Previous",
-                    entry: lastEntry!,
-                  ),
-                ),
-              if (lastHappyEntry != null)
-                GestureDetector(
-                  onTap: () async {
-                    await Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) =>
-                          EntryDetailPage(entryId: lastHappyEntry!.id!),
-                    ));
-
-                    refreshEntries();
-                  },
-                  child: EntryCardWidget(
-                    title: "Previous Happy Day",
-                    entry: lastHappyEntry!,
-                  ),
-                ),
-              if (lastWeekEntry != null)
-                GestureDetector(
-                  onTap: () async {
-                    await Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) =>
-                          EntryDetailPage(entryId: lastWeekEntry!.id!),
-                    ));
-
-                    refreshEntries();
-                  },
-                  child: EntryCardWidget(
-                    title: "One Week Ago",
-                    entry: lastWeekEntry!,
-                  ),
-                ),
-              if (lastYearEntry != null)
-                GestureDetector(
-                  onTap: () async {
-                    await Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) =>
-                          EntryDetailPage(entryId: lastYearEntry!.id!),
-                    ));
-
-                    refreshEntries();
-                  },
-                  child: EntryCardWidget(
-                    title: "365 Days Ago",
-                    entry: lastYearEntry!,
-                  ),
-                ),
-            ],
+            crossAxisSpacing: 1.0, // Spacing between columns
+            mainAxisSpacing: 1.0, // Spacing between rows
           ),
-          const SizedBox(
-            height: 80,
-          )
-        ]);
+          itemCount: flashbacks.length,
+          itemBuilder: (context, index) {
+            final flashback = flashbacks[index];
+            return GestureDetector(
+              onTap: () async {
+                await Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) =>
+                      EntryDetailPage(entryId: flashback.entry.id!),
+                ));
+
+                refreshEntries();
+              },
+              child: EntryCardWidget(
+                title: flashback.title,
+                entry: flashback.entry,
+              ),
+            );
+          },
+        );
 }
