@@ -1,0 +1,5 @@
+Daily You v1.5.0 has arrived! Here are the highlights:
+
+• Improved memories on the home page.
+• Added memories for: 1 month ago, 6 months ago, X year(s) ago, A happy memory, A random memory.
+• Fixed notifications not dismissing.
