@@ -60,7 +60,7 @@ class _HomePageState extends State<HomePage> {
     entries = await EntriesDatabase.instance.getAllEntries();
 
     if (entries.isNotEmpty && TimeManager.isToday(entries.first.timeCreate)) {
-      todayEntry == entries.first;
+      todayEntry = entries.first;
     }
 
     flashbacks = await FlashbackManager.getFlashbacks();
