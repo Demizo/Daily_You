@@ -1,0 +1,4 @@
+Daily You version v1.6.0 has arrived! Here are the changes:
+
+• Added the ability to share daily photos 
+• Fixed notifications not appearing after a reboot
