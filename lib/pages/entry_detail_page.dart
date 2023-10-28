@@ -9,6 +9,8 @@ import 'package:daily_you/pages/image_view_page.dart';
 import 'package:flutter_markdown/flutter_markdown.dart' as md;
 import 'package:daily_you/widgets/local_image_loader.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_extend/share_extend.dart';
 
 class EntryDetailPage extends StatefulWidget {
   final int entryId;
@@ -48,7 +50,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
     final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-        actions: [editButton()],
+        actions: isLoading ? [] : [shareButton(), editButton()],
       ),
       body: isLoading
           ? const Center(child: SizedBox())
@@ -149,4 +151,25 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
 
         refreshEntry();
       });
+
+  Widget shareButton() {
+    if (Platform.isAndroid && entry.imgPath != null) {
+      return IconButton(
+          icon: const Icon(Icons.share_rounded),
+          onPressed: () async {
+            final tempDir = await getTemporaryDirectory();
+            final imgDir = await EntriesDatabase.instance.getImgDatabasePath();
+
+            if (await File("$imgDir/${entry.imgPath!}").exists()) {
+              File temp = await File("$imgDir/${entry.imgPath!}")
+                  .copy("${tempDir.path}/${entry.imgPath!}");
+
+              ShareExtend.share(temp.path, "image",
+                  extraText: DateFormat.yMMMEd().format(entry.timeCreate));
+            }
+          });
+    }
+
+    return Container();
+  }
 }
