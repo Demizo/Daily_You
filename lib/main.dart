@@ -97,7 +97,7 @@ Future<void> setAlarm() async {
       dayToRemind, TimeManager.scheduledReminderTime());
   timeUntilReminder = reminderDateTime.difference(DateTime.now());
   await AndroidAlarmManager.oneShot(timeUntilReminder, 0, callbackDispatcher,
-      allowWhileIdle: true, exact: true);
+      allowWhileIdle: true, exact: true, rescheduleOnReboot: true);
 }
 
 class MainApp extends StatelessWidget {
