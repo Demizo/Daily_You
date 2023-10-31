@@ -1,0 +1,10 @@
+Daily You v1.1.0 ist angekommen! Hier sind die Highlights:
+
+• Hinzugefügt import/export von Json.
+• Hinzugefügt import von OneShot.
+• Hinzugefügte Fähigkeit um die Stimmungsemojis zu verändern.
+• Hinzugefügte Fähigkeit zu einem Datum in Kalender zu springen.
+• Hinzugefügte Fähigkeit die Stimmung eines vergangenes Tages zu ändern.
+• Hinzugefügte Fähigkeit alle Einträge zu löschen.
+• Behoben das Bilder die mit der App gemacht worden nicht in der Gallery angezeigt wurden.
+• Behoben das Seiten nicht immer nach Einstellungsänderungen sich aktualisieren.

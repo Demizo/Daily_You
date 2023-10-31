@@ -1,0 +1,5 @@
+Daily You v1.5.0 ist angekommen! Hier sind die Highlights:
+
+• Verbesserte Erinnerungen auf der Hauptseite.
+• Erinnerungen hinzugefügt für: 1 Monat her, 6 Monate her, X Jahr(e) her, Eine fröhliche Erinnerung, Eine zufällige Erinnerung.
+• Behoben das Benachrichtigung sich nicht verwerfen lassen konnten.

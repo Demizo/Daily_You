@@ -1,0 +1,5 @@
+Daily You v1.3.0 ist angekommen! Hier sind die Highlights:
+
+• Die Möglichkeit zum ändern der Akzentfarbe hinzugefügt.
+• Schnellöffnen der Kamera von der Hauptseite.
+• AMOLED Thema hinzugefügt.
