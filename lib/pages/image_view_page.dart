@@ -43,6 +43,8 @@ class _ImageViewPageState extends State<ImageViewPage> {
                 padding: const EdgeInsets.all(16),
                 child: Center(
                   child: PhotoView(
+                    minScale: 0.1,
+                    maxScale: 50.0,
                     backgroundDecoration:
                         const BoxDecoration(color: Colors.transparent),
                     imageProvider: FileImage(File(imgName)),
