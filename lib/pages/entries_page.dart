@@ -18,6 +18,7 @@ class _EntriesPageState extends State<EntriesPage> {
   String searchText = '';
   bool sortOrderAsc = false;
   int orderBy = 0;
+  int entryCount = 0;
 
   @override
   void initState() {
@@ -37,7 +38,8 @@ class _EntriesPageState extends State<EntriesPage> {
   final orderByMapping = {0: 'time_create', 1: 'mood'};
 
   Future refreshEntries() async {
-    setState(() => isLoading = true);
+    //TODO: Handle this better, don't reload page when searching
+    if (searchText.isEmpty) setState(() => isLoading = true);
 
     entries = await EntriesDatabase.instance.getAllEntriesSorted(
         orderByMapping[orderBy]!, sortOrderMapping[sortOrderAsc]!);
@@ -47,6 +49,7 @@ class _EntriesPageState extends State<EntriesPage> {
               entry.text.toLowerCase().contains(searchText.toLowerCase()))
           .toList();
     }
+    entryCount = entries.length;
     setState(() => isLoading = false);
   }
 
@@ -130,6 +133,7 @@ class _EntriesPageState extends State<EntriesPage> {
                       child: SearchBar(
                         leading: const Icon(Icons.search_rounded),
                         trailing: [
+                          Text("$entryCount logs"),
                           IconButton(
                               icon: const Icon(Icons.sort_rounded),
                               onPressed: () => _showSortSelectionPopup()),
