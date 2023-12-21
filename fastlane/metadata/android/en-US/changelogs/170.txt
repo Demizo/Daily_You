@@ -1,0 +1,7 @@
+Daily You version v1.7.0 has arrived! Here are the changes:
+
+• Added the ability to import/export photos 
+• Added entry count to gallery package
+• Added German fastlane translation
+• Fixed searching refreshing gallery page
+• Bound image viewer scale

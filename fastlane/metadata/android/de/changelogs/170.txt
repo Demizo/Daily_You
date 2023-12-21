@@ -1,0 +1,7 @@
+Daily You v1.7.0 ist da! Hier sind die Änderungen:
+
+• Möglichkeit zum Importieren/Exportieren von Fotos hinzugefügt
+• Anzahl der Einträge zum Galeriepaket hinzugefügt
+• Deutsche Fastlane-Übersetzung hinzugefügt
+• Die Suche nach einer erfrischenden Galerieseite wurde korrigiert
+• Gebundener Bildbetrachter-Maßstab
