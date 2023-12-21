@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:daily_you/models/entry.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:media_scanner/media_scanner.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
@@ -292,6 +294,52 @@ CREATE TABLE $entriesTable (
       }
     }
 
+    return true;
+  }
+
+  Future<bool> exportImages() async {
+    List<Entry> entries = await getAllEntries();
+    final imgDirectory = await EntriesDatabase.instance.getImgDatabasePath();
+
+    String? saveDir = await FilePicker.platform.getDirectoryPath();
+    if (saveDir == null) return false;
+
+    for (Entry entry in entries) {
+      if (entry.imgPath == null) continue;
+
+      final imageFilePath = "$imgDirectory/${entry.imgPath}";
+
+      File image = File(imageFilePath);
+      if (await image.exists()) {
+        final saveFilePath = "$saveDir/${entry.imgPath}";
+        await image.copy(saveFilePath);
+
+        if (Platform.isAndroid) {
+          // Add image to media store
+          MediaScanner.loadMedia(path: saveFilePath);
+        }
+      }
+    }
+
+    return true;
+  }
+
+  Future<bool> importImages() async {
+    final picker = ImagePicker();
+    final pickedFiles = await picker.pickMultiImage();
+
+    for (XFile file in pickedFiles) {
+      final imgDirectory = await EntriesDatabase.instance.getImgDatabasePath();
+
+      final imageFilePath = "$imgDirectory/${file.name}";
+      await file.saveTo(imageFilePath);
+      if (Platform.isAndroid) {
+        // Add image to media store
+        MediaScanner.loadMedia(path: imageFilePath);
+      }
+      // Delete picked file from cache
+      await File(file.path).delete();
+    }
     return true;
   }
 
