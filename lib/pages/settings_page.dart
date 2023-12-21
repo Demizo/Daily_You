@@ -741,21 +741,44 @@ class _SettingsPageState extends State<SettingsPage> {
                   "Export",
                   style: TextStyle(fontSize: 18),
                 ),
-                ElevatedButton.icon(
-                  icon: const Icon(
-                    Icons.upload_rounded,
-                  ),
-                  label: const Text("Export Logs..."),
-                  onPressed: () async {
-                    if (Platform.isAndroid) {
-                      var status =
-                          await Permission.manageExternalStorage.request();
-                      if (status.isDenied || status.isPermanentlyDenied) {
-                        return;
-                      }
-                    }
-                    _showExportSelectionPopup();
-                  },
+                Row(
+                  children: [
+                    ElevatedButton.icon(
+                      icon: const Icon(
+                        Icons.upload_rounded,
+                      ),
+                      label: const Text("Export Logs..."),
+                      onPressed: () async {
+                        if (Platform.isAndroid) {
+                          var status =
+                              await Permission.manageExternalStorage.request();
+                          if (status.isDenied || status.isPermanentlyDenied) {
+                            return;
+                          }
+                        }
+                        _showExportSelectionPopup();
+                      },
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    ElevatedButton.icon(
+                      icon: const Icon(
+                        Icons.photo,
+                      ),
+                      label: const Text("Export Images..."),
+                      onPressed: () async {
+                        if (Platform.isAndroid) {
+                          var status =
+                              await Permission.manageExternalStorage.request();
+                          if (status.isDenied || status.isPermanentlyDenied) {
+                            return;
+                          }
+                        }
+                        await EntriesDatabase.instance.exportImages();
+                      },
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -770,21 +793,44 @@ class _SettingsPageState extends State<SettingsPage> {
                   "Import",
                   style: TextStyle(fontSize: 18),
                 ),
-                ElevatedButton.icon(
-                  icon: const Icon(
-                    Icons.download_rounded,
-                  ),
-                  label: const Text("Import Logs..."),
-                  onPressed: () async {
-                    if (Platform.isAndroid) {
-                      var status =
-                          await Permission.manageExternalStorage.request();
-                      if (status.isDenied || status.isPermanentlyDenied) {
-                        return;
-                      }
-                    }
-                    _showImportSelectionPopup();
-                  },
+                Row(
+                  children: [
+                    ElevatedButton.icon(
+                      icon: const Icon(
+                        Icons.download_rounded,
+                      ),
+                      label: const Text("Import Logs..."),
+                      onPressed: () async {
+                        if (Platform.isAndroid) {
+                          var status =
+                              await Permission.manageExternalStorage.request();
+                          if (status.isDenied || status.isPermanentlyDenied) {
+                            return;
+                          }
+                        }
+                        _showImportSelectionPopup();
+                      },
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    ElevatedButton.icon(
+                      icon: const Icon(
+                        Icons.photo,
+                      ),
+                      label: const Text("Import Images..."),
+                      onPressed: () async {
+                        if (Platform.isAndroid) {
+                          var status =
+                              await Permission.manageExternalStorage.request();
+                          if (status.isDenied || status.isPermanentlyDenied) {
+                            return;
+                          }
+                        }
+                        await EntriesDatabase.instance.importImages();
+                      },
+                    ),
+                  ],
                 ),
               ],
             ),
