@@ -1,0 +1,4 @@
+Daily You v1.4.0 ist angekommen! Hier sind die Highlights:
+
+• Möglichkeit zum aktivieren einer täglichen Erinnerungsbenachrichtigung hinzugefügt.
+• Kleine Fehlerbehebung.

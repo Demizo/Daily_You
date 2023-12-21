@@ -1,0 +1,6 @@
+Daily You v1.1.1 ist angekommen! Hier sind die Highlights:
+
+• Option hinzugefügt Fotos zu löschen von einem Eintrag oder wenn man einen Eintrag löscht.
+• Verbesserte Bildschirmübergänge.
+• Fehlerbehebung vergrößerder Cache.
+• Behoben das die App Bilder aus einem Ordner genutzt dubliziert werden.
