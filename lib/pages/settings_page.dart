@@ -22,6 +22,30 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
+  Future<bool> requestStoragePermission() async {
+    var hasPermission = false;
+
+    //Legacy Permission
+    var status = await Permission.storage.status;
+    if (!status.isGranted) {
+      status = await Permission.storage.request();
+    }
+    if (status.isGranted) {
+      hasPermission = true;
+    }
+
+    //Modern Permission
+    status = await Permission.manageExternalStorage.status;
+    if (!status.isGranted && hasPermission == false) {
+      status = await Permission.manageExternalStorage.request();
+    }
+    if (status.isGranted) {
+      hasPermission = true;
+    }
+
+    return hasPermission;
+  }
+
   void _showThemeSelectionPopup(ThemeModeProvider themeModeProvider) {
     showDialog(
       context: context,
@@ -659,12 +683,9 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                       label: const Text("Change Log Folder..."),
                       onPressed: () async {
-                        if (Platform.isAndroid) {
-                          var status =
-                              await Permission.manageExternalStorage.request();
-                          if (status.isDenied || status.isPermanentlyDenied) {
-                            return;
-                          }
+                        if (Platform.isAndroid &&
+                            !await requestStoragePermission()) {
+                          return;
                         }
                         await EntriesDatabase.instance.selectDatabaseLocation();
                         setState(() {});
@@ -708,12 +729,9 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                       label: const Text("Change Image Folder..."),
                       onPressed: () async {
-                        if (Platform.isAndroid) {
-                          var status =
-                              await Permission.manageExternalStorage.request();
-                          if (status.isDenied || status.isPermanentlyDenied) {
-                            return;
-                          }
+                        if (Platform.isAndroid &&
+                            !await requestStoragePermission()) {
+                          return;
                         }
                         await EntriesDatabase.instance.selectImageFolder();
                         setState(() {});
@@ -749,12 +767,9 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                       label: const Text("Export Logs..."),
                       onPressed: () async {
-                        if (Platform.isAndroid) {
-                          var status =
-                              await Permission.manageExternalStorage.request();
-                          if (status.isDenied || status.isPermanentlyDenied) {
-                            return;
-                          }
+                        if (Platform.isAndroid &&
+                            !await requestStoragePermission()) {
+                          return;
                         }
                         _showExportSelectionPopup();
                       },
@@ -768,12 +783,9 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                       label: const Text("Export Images..."),
                       onPressed: () async {
-                        if (Platform.isAndroid) {
-                          var status =
-                              await Permission.manageExternalStorage.request();
-                          if (status.isDenied || status.isPermanentlyDenied) {
-                            return;
-                          }
+                        if (Platform.isAndroid &&
+                            !await requestStoragePermission()) {
+                          return;
                         }
                         await EntriesDatabase.instance.exportImages();
                       },
@@ -801,12 +813,9 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                       label: const Text("Import Logs..."),
                       onPressed: () async {
-                        if (Platform.isAndroid) {
-                          var status =
-                              await Permission.manageExternalStorage.request();
-                          if (status.isDenied || status.isPermanentlyDenied) {
-                            return;
-                          }
+                        if (Platform.isAndroid &&
+                            !await requestStoragePermission()) {
+                          return;
                         }
                         _showImportSelectionPopup();
                       },
@@ -820,12 +829,9 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                       label: const Text("Import Images..."),
                       onPressed: () async {
-                        if (Platform.isAndroid) {
-                          var status =
-                              await Permission.manageExternalStorage.request();
-                          if (status.isDenied || status.isPermanentlyDenied) {
-                            return;
-                          }
+                        if (Platform.isAndroid &&
+                            !await requestStoragePermission()) {
+                          return;
                         }
                         await EntriesDatabase.instance.importImages();
                       },
