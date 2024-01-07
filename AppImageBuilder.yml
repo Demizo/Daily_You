@@ -1,0 +1,44 @@
+# appimage-builder recipe see https://appimage-builder.readthedocs.io for details
+version: 1
+script:
+- rm -rf AppDir || true
+- cp -r build/linux/x64/release/bundle AppDir
+- mkdir -p AppDir/usr/share/icons/
+- cp assets/logo.svg AppDir/usr/share/icons/
+AppDir:
+  path: ./AppDir
+  app_info:
+    id: com.demizo.daily_you
+    name: Daily You
+    icon: logo
+    version: 1.7.1
+    exec: daily_you
+    exec_args: $@
+  files:
+    include:
+    - /lib64/ld-linux-x86-64.so.2
+    exclude:
+    - usr/share/man
+    - usr/share/doc/*/README.*
+    - usr/share/doc/*/changelog.*
+    - usr/share/doc/*/NEWS.*
+    - usr/share/doc/*/TODO.*
+  test:
+    fedora-30:
+      image: appimagecrafters/tests-env:fedora-30
+      command: ./AppRun
+    debian-stable:
+      image: appimagecrafters/tests-env:debian-stable
+      command: ./AppRun
+    archlinux-latest:
+      image: appimagecrafters/tests-env:archlinux-latest
+      command: ./AppRun
+    centos-7:
+      image: appimagecrafters/tests-env:centos-7
+      command: ./AppRun
+    ubuntu-xenial:
+      image: appimagecrafters/tests-env:ubuntu-xenial
+      command: ./AppRun
+AppImage:
+  arch: x86_64
+  update-information: guess
