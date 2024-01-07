@@ -40,7 +40,7 @@ class NotificationManager {
       var hasPermissions = await _notifications!
           .resolvePlatformSpecificImplementation<
               AndroidFlutterLocalNotificationsPlugin>()!
-          .requestPermission();
+          .requestNotificationsPermission();
       if (hasPermissions != null && hasPermissions) {
         return true;
       }
