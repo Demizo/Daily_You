@@ -27,6 +27,7 @@ class _HomePageState extends State<HomePage> {
   bool isLoading = false;
   String searchText = '';
   bool sortOrderAsc = true;
+  bool firstLoad = true;
 
   @override
   void initState() {
@@ -53,7 +54,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future refreshEntries() async {
-    setState(() => isLoading = true);
+    if (firstLoad) setState(() => isLoading = true);
+    firstLoad = false;
 
     todayEntry = null;
 
