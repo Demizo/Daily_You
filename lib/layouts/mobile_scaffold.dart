@@ -1,3 +1,4 @@
+import 'dart:io';
 
 import 'package:daily_you/config_manager.dart';
 import 'package:daily_you/notification_manager.dart';
@@ -32,24 +33,25 @@ class _MobileScaffoldState extends State<MobileScaffold> {
     final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(appBarsTitles[currentIndex]), actions: [
-        IconButton(
-          icon: ConfigManager.instance.getField('dailyReminders')
-              ? const Icon(Icons.notifications)
-              : const Icon(Icons.notifications_off_rounded),
-          onPressed: () async {
-            if (await NotificationManager.instance
-                .hasNotificationPermission()) {
-              var value = !ConfigManager.instance.getField('dailyReminders');
-              if (value) {
-                NotificationManager.instance.startScheduledDailyReminders();
-              } else {
-                NotificationManager.instance.stopDailyReminders();
+        if (Platform.isAndroid)
+          IconButton(
+            icon: ConfigManager.instance.getField('dailyReminders')
+                ? const Icon(Icons.notifications)
+                : const Icon(Icons.notifications_off_rounded),
+            onPressed: () async {
+              if (await NotificationManager.instance
+                  .hasNotificationPermission()) {
+                var value = !ConfigManager.instance.getField('dailyReminders');
+                if (value) {
+                  NotificationManager.instance.startScheduledDailyReminders();
+                } else {
+                  NotificationManager.instance.stopDailyReminders();
+                }
+                await ConfigManager.instance.setField('dailyReminders', value);
+                setState(() {});
               }
-              await ConfigManager.instance.setField('dailyReminders', value);
-              setState(() {});
-            }
-          },
-        ),
+            },
+          ),
         IconButton(
           icon: const Icon(Icons.settings_rounded),
           onPressed: () async {
