@@ -690,7 +690,18 @@ class _SettingsPageState extends State<SettingsPage> {
                             !await requestStoragePermission()) {
                           return;
                         }
-                        await EntriesDatabase.instance.selectDatabaseLocation();
+                        bool locationSet = await EntriesDatabase.instance
+                            .selectDatabaseLocation();
+                        if (!locationSet) {
+                          await showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return const AlertDialog(
+                                    title: Text("Error:"),
+                                    content: Text(
+                                        "Permission Denied: Log folder not changed!"));
+                              });
+                        }
                         setState(() {});
                       },
                     ),
@@ -736,7 +747,18 @@ class _SettingsPageState extends State<SettingsPage> {
                             !await requestStoragePermission()) {
                           return;
                         }
-                        await EntriesDatabase.instance.selectImageFolder();
+                        bool locationSet =
+                            await EntriesDatabase.instance.selectImageFolder();
+                        if (!locationSet) {
+                          await showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return const AlertDialog(
+                                    title: Text("Error:"),
+                                    content: Text(
+                                        "Permission Denied: Image folder not changed!"));
+                              });
+                        }
                         setState(() {});
                       },
                     ),
