@@ -27,6 +27,7 @@ class _HomePageState extends State<HomePage> {
   bool isLoading = false;
   String searchText = '';
   bool sortOrderAsc = true;
+  bool firstLoad = true;
 
   @override
   void initState() {
@@ -53,7 +54,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future refreshEntries() async {
-    setState(() => isLoading = true);
+    if (firstLoad) setState(() => isLoading = true);
+    firstLoad = false;
 
     todayEntry = null;
 
@@ -65,15 +67,18 @@ class _HomePageState extends State<HomePage> {
 
     flashbacks = await FlashbackManager.getFlashbacks();
 
-    var launchDetails = await NotificationManager.instance.notifications
-        .getNotificationAppLaunchDetails();
-    if (NotificationManager.instance.justLaunched &&
-        launchDetails?.notificationResponse?.id == 0 &&
-        await EntriesDatabase.instance.getEntryForDate(DateTime.now()) ==
-            null) {
-      NotificationManager.instance.justLaunched = false;
-      await logToday();
+    if (Platform.isAndroid) {
+      var launchDetails = await NotificationManager.instance.notifications
+          .getNotificationAppLaunchDetails();
+      if (NotificationManager.instance.justLaunched &&
+          launchDetails?.notificationResponse?.id == 0 &&
+          await EntriesDatabase.instance.getEntryForDate(DateTime.now()) ==
+              null) {
+        NotificationManager.instance.justLaunched = false;
+        await logToday();
+      }
     }
+
     setState(() => isLoading = false);
   }
 

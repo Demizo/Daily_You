@@ -19,6 +19,7 @@ class _EntriesPageState extends State<EntriesPage> {
   bool sortOrderAsc = false;
   int orderBy = 0;
   int entryCount = 0;
+  bool firstLoad = true;
 
   @override
   void initState() {
@@ -38,8 +39,8 @@ class _EntriesPageState extends State<EntriesPage> {
   final orderByMapping = {0: 'time_create', 1: 'mood'};
 
   Future refreshEntries() async {
-    //TODO: Handle this better, don't reload page when searching
-    if (searchText.isEmpty) setState(() => isLoading = true);
+    if (firstLoad) setState(() => isLoading = true);
+    firstLoad = false;
 
     entries = await EntriesDatabase.instance.getAllEntriesSorted(
         orderByMapping[orderBy]!, sortOrderMapping[sortOrderAsc]!);

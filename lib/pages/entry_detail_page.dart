@@ -132,6 +132,15 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
                               ),
                             ),
                           ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          left: 8, top: 4, bottom: 4, right: 8),
+                      child: Text(
+                        "Modified: ${DateFormat.yMMMEd().format(entry.timeModified)} at ${DateFormat.jm().format(entry.timeModified)}",
+                        style:
+                            TextStyle(fontSize: 12, color: theme.disabledColor),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -153,19 +162,41 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
       });
 
   Widget shareButton() {
-    if (Platform.isAndroid && entry.imgPath != null) {
+    if (Platform.isAndroid &&
+        (entry.imgPath != null || entry.text.isNotEmpty)) {
       return IconButton(
           icon: const Icon(Icons.share_rounded),
           onPressed: () async {
-            final tempDir = await getTemporaryDirectory();
-            final imgDir = await EntriesDatabase.instance.getImgDatabasePath();
+            String subject;
+            entry.mood != null
+                ? subject =
+                    "${MoodIcon.getMoodIcon(entry.mood)} ${DateFormat.yMMMEd().format(entry.timeCreate)}"
+                : subject = DateFormat.yMMMEd().format(entry.timeCreate);
 
-            if (await File("$imgDir/${entry.imgPath!}").exists()) {
-              File temp = await File("$imgDir/${entry.imgPath!}")
-                  .copy("${tempDir.path}/${entry.imgPath!}");
+            if (entry.imgPath != null) {
+              // Share Image
+              final tempDir = await getTemporaryDirectory();
+              final imgDir =
+                  await EntriesDatabase.instance.getImgDatabasePath();
 
-              ShareExtend.share(temp.path, "image",
-                  extraText: DateFormat.yMMMEd().format(entry.timeCreate));
+              if (await File("$imgDir/${entry.imgPath!}").exists()) {
+                File temp = await File("$imgDir/${entry.imgPath!}")
+                    .copy("${tempDir.path}/${entry.imgPath!}");
+
+                ShareExtend.share(temp.path, "image",
+                    subject: subject, extraText: entry.text);
+              } else {
+                await showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return const AlertDialog(
+                          title: Text("Error:"),
+                          content: Text("Image could not be shared!"));
+                    });
+              }
+            } else {
+              // Share text
+              ShareExtend.share(entry.text, "text", subject: subject);
             }
           });
     }

@@ -590,64 +590,67 @@ class _SettingsPageState extends State<SettingsPage> {
                         })
                   ])),
           const Divider(),
-          const Row(
-            children: [
-              Text(
-                "Notifications",
-                style: TextStyle(fontSize: 24),
-              ),
-            ],
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                        "Daily Reminders",
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      const Text(
-                        "Allow app to run in background for best results",
-                        style: TextStyle(fontSize: 14),
-                      ),
-                    ],
-                  ),
-                  Switch(
-                      value: ConfigManager.instance.getField('dailyReminders'),
-                      onChanged: (value) async {
-                        if (await NotificationManager.instance
-                            .hasNotificationPermission()) {
-                          if (value) {
-                            await NotificationManager.instance
-                                .startScheduledDailyReminders();
-                          } else {
-                            await NotificationManager.instance
-                                .stopDailyReminders();
+          if (Platform.isAndroid)
+            const Row(
+              children: [
+                Text(
+                  "Notifications",
+                  style: TextStyle(fontSize: 24),
+                ),
+              ],
+            ),
+          if (Platform.isAndroid)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text(
+                          "Daily Reminders",
+                          style: TextStyle(fontSize: 18),
+                        ),
+                        const Text(
+                          "Allow app to run in background for best results",
+                          style: TextStyle(fontSize: 14),
+                        ),
+                      ],
+                    ),
+                    Switch(
+                        value:
+                            ConfigManager.instance.getField('dailyReminders'),
+                        onChanged: (value) async {
+                          if (await NotificationManager.instance
+                              .hasNotificationPermission()) {
+                            if (value) {
+                              await NotificationManager.instance
+                                  .startScheduledDailyReminders();
+                            } else {
+                              await NotificationManager.instance
+                                  .stopDailyReminders();
+                            }
+                            await ConfigManager.instance
+                                .setField('dailyReminders', value);
+                            setState(() {});
                           }
-                          await ConfigManager.instance
-                              .setField('dailyReminders', value);
-                          setState(() {});
-                        }
-                      }),
-                ],
-              ),
-              ElevatedButton.icon(
-                  icon: const Icon(Icons.schedule_rounded),
-                  onPressed: () async {
-                    _selectTime(context);
-                  },
-                  label: Text(TimeManager.timeOfDayString(
-                      TimeManager.scheduledReminderTime()))),
-            ],
-          ),
-          const Divider(),
+                        }),
+                  ],
+                ),
+                ElevatedButton.icon(
+                    icon: const Icon(Icons.schedule_rounded),
+                    onPressed: () async {
+                      _selectTime(context);
+                    },
+                    label: Text(TimeManager.timeOfDayString(
+                        TimeManager.scheduledReminderTime()))),
+              ],
+            ),
+          if (Platform.isAndroid) const Divider(),
           const Row(
             children: [
               Text(
@@ -687,7 +690,18 @@ class _SettingsPageState extends State<SettingsPage> {
                             !await requestStoragePermission()) {
                           return;
                         }
-                        await EntriesDatabase.instance.selectDatabaseLocation();
+                        bool locationSet = await EntriesDatabase.instance
+                            .selectDatabaseLocation();
+                        if (!locationSet) {
+                          await showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return const AlertDialog(
+                                    title: Text("Error:"),
+                                    content: Text(
+                                        "Permission Denied: Log folder not changed!"));
+                              });
+                        }
                         setState(() {});
                       },
                     ),
@@ -733,7 +747,18 @@ class _SettingsPageState extends State<SettingsPage> {
                             !await requestStoragePermission()) {
                           return;
                         }
-                        await EntriesDatabase.instance.selectImageFolder();
+                        bool locationSet =
+                            await EntriesDatabase.instance.selectImageFolder();
+                        if (!locationSet) {
+                          await showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return const AlertDialog(
+                                    title: Text("Error:"),
+                                    content: Text(
+                                        "Permission Denied: Image folder not changed!"));
+                              });
+                        }
                         setState(() {});
                       },
                     ),

@@ -65,13 +65,16 @@ void main() async {
 
   await themeProvider.initializeThemeFromConfig();
 
-  await NotificationManager.instance.init();
+  //TODO: Notification only supported on android
+  if (Platform.isAndroid) {
+    await NotificationManager.instance.init();
 
-  await AndroidAlarmManager.initialize();
+    await AndroidAlarmManager.initialize();
 
-  if (ConfigManager.instance.getField('dailyReminders')) {
-    await NotificationManager.instance.stopDailyReminders();
-    await NotificationManager.instance.startScheduledDailyReminders();
+    if (ConfigManager.instance.getField('dailyReminders')) {
+      await NotificationManager.instance.stopDailyReminders();
+      await NotificationManager.instance.startScheduledDailyReminders();
+    }
   }
 
   runApp(
