@@ -13,18 +13,22 @@ class MoodIcon extends StatefulWidget {
 
   @override
   State<MoodIcon> createState() => _MoodIconState();
+
+  static String getMoodIcon(int? moodValue) {
+    String? moodIcon;
+    if (ConfigManager.moodValueFieldMapping[moodValue] != null) {
+      moodIcon = ConfigManager.instance
+          .getField(ConfigManager.moodValueFieldMapping[moodValue]!);
+    }
+    return moodIcon ?? ConfigManager.instance.getField('noMoodIcon');
+  }
 }
 
 class _MoodIconState extends State<MoodIcon> {
   @override
   Widget build(BuildContext context) {
-    String? moodIcon;
-    if (ConfigManager.moodValueFieldMapping[widget.moodValue] != null) {
-      moodIcon = ConfigManager.instance
-          .getField(ConfigManager.moodValueFieldMapping[widget.moodValue]!);
-    }
     return Text(
-      moodIcon ?? ConfigManager.instance.getField('noMoodIcon'),
+      MoodIcon.getMoodIcon(widget.moodValue),
       style: TextStyle(fontSize: widget.size),
     );
   }
