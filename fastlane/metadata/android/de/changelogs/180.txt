@@ -1,0 +1,9 @@
+Daily You v1.8.0 ist da! Hier sind die Änderungen:
+
+• Streaks hinzugefügt
+• Linux-Unterstützung hinzugefügt (Beta)
+• Verbesserte Protokollfreigabe (beinhaltet jetzt Stimmung und Text)
+• Letzte Änderungszeit zu den Protokollen hinzugefügt
+• Fehlermeldungen hinzugefügt, wenn Speicherberechtigungen fehlschlagen
+• Chore: Aktualisierte Abhängigkeiten
+• Tool zum Importieren aus Daylio (siehe ReadMe)

@@ -35,6 +35,9 @@ Daily You is an app made to store memories of the passing days. Log every day an
 
 Or download the latest APK from [releases](https://github.com/Demizo/Daily_You/releases).
 
+### Linux (Beta)
+Download the latest Appimage from [releases](https://github.com/Demizo/Daily_You/releases). [AppImageLauncher](https://github.com/TheAssassin/AppImageLauncher) recommended.
+
 ## Migrate From Another App
 Are you coming from another app? Daily You supports migration from other apps! If the app you use isn't listed below feel free to request it. **Note:** Imports from some apps may not be one-to-one since Daily You likely has different features/limitations.
 ### OneShot

@@ -1,0 +1,9 @@
+Daily You v1.8.0 has arrived! Here are the changes:
+
+• Added Streaks
+• Added Linux support (Beta)
+• Improved log sharing (Now includes mood and text)
+• Added last modified time to logs
+• Added error messages when storage permissions fail
+• Chore: Updated dependencies
+• Tool to import from Daylio (See ReadMe)
