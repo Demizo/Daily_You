@@ -132,6 +132,15 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
                               ),
                             ),
                           ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          left: 8, top: 4, bottom: 4, right: 8),
+                      child: Text(
+                        "Modified: ${DateFormat.yMMMEd().format(entry.timeModified)} at ${DateFormat.jm().format(entry.timeModified)}",
+                        style:
+                            TextStyle(fontSize: 12, color: theme.disabledColor),
+                      ),
+                    ),
                   ],
                 ),
               ),
