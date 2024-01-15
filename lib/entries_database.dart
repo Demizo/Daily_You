@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:daily_you/stats_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:image_picker/image_picker.dart';
@@ -50,7 +51,7 @@ CREATE TABLE $entriesTable (
     final db = await instance.database;
 
     final id = await db.insert(entriesTable, entry.toJson());
-
+    await StatsProvider.instance.updateStats();
     return entry.copy(id: id);
   }
 
@@ -106,22 +107,26 @@ CREATE TABLE $entriesTable (
   Future<int> updateEntry(Entry entry) async {
     final db = await instance.database;
 
-    return await db.update(
+    final id = await db.update(
       entriesTable,
       entry.toJson(),
       where: '${EntryFields.id} = ?',
       whereArgs: [entry.id],
     );
+    await StatsProvider.instance.updateStats();
+    return id;
   }
 
   Future<int> deleteEntry(int id) async {
     final db = await instance.database;
 
-    return await db.delete(
+    final removedId = await db.delete(
       entriesTable,
       where: '${EntryFields.id} = ?',
       whereArgs: [id],
     );
+    await StatsProvider.instance.updateStats();
+    return removedId;
   }
 
   Future<void> deleteAllEntries() async {

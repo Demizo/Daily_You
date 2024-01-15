@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/notification_manager.dart';
+import 'package:daily_you/stats_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/layouts/mobile_scaffold.dart';
@@ -62,7 +63,6 @@ void main() async {
   await ConfigManager.instance.init();
 
   final themeProvider = ThemeModeProvider();
-
   await themeProvider.initializeThemeFromConfig();
 
   //TODO: Notification only supported on android
@@ -77,12 +77,14 @@ void main() async {
     }
   }
 
-  runApp(
-    ChangeNotifierProvider(
+  runApp(MultiProvider(providers: [
+    ChangeNotifierProvider<ThemeModeProvider>(
       create: (_) => themeProvider,
-      child: const MainApp(),
     ),
-  );
+    ChangeNotifierProvider<StatsProvider>(
+      create: (_) => StatsProvider.instance,
+    )
+  ], builder: (context, child) => const MainApp()));
 }
 
 Future<void> setAlarm() async {
