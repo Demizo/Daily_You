@@ -12,7 +12,8 @@ class ConfigManager {
   Map<String, dynamic> _config = {};
   final Map<String, dynamic> _defaultConfig = {
     'theme': 'system',
-    'dbPath': '',
+    'useExternalDb': false,
+    'externalDbUri': '',
     'imgPath': '',
     'startingDayOfWeek': 'sunday',
     'veryHappyIcon': '☺️',

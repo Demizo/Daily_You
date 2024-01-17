@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
@@ -23,27 +24,86 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   Future<bool> requestStoragePermission() async {
-    var hasPermission = false;
-
-    //Legacy Permission
-    var status = await Permission.storage.status;
-    if (!status.isGranted) {
-      status = await Permission.storage.request();
-    }
-    if (status.isGranted) {
-      hasPermission = true;
+    DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
+    AndroidDeviceInfo androidInfo = await deviceInfoPlugin.androidInfo;
+    if (androidInfo.version.sdkInt < 33) {
+      //Legacy Permission
+      var status = await Permission.storage.status;
+      if (!status.isGranted) {
+        status = await Permission.storage.request();
+      }
+      if (status.isGranted) {
+        return true;
+      }
+      return false;
     }
 
     //Modern Permission
-    status = await Permission.manageExternalStorage.status;
-    if (!status.isGranted && hasPermission == false) {
-      status = await Permission.manageExternalStorage.request();
-    }
-    if (status.isGranted) {
-      hasPermission = true;
-    }
+    return true;
+  }
 
-    return hasPermission;
+  Future<bool> requestPhotosPermission() async {
+    DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
+    AndroidDeviceInfo androidInfo = await deviceInfoPlugin.androidInfo;
+    if (androidInfo.version.sdkInt < 33) {
+      //Legacy Permission
+      var status = await Permission.storage.status;
+      if (!status.isGranted) {
+        status = await Permission.storage.request();
+      }
+      if (status.isGranted) {
+        return true;
+      }
+      return false;
+    } else {
+      //Modern Photos Permission
+      var status = await Permission.photos.status;
+      if (!status.isGranted) {
+        status = await Permission.photos.request();
+      }
+      if (status.isGranted) {
+        return true;
+      }
+      return false;
+    }
+  }
+
+  Future<void> _showChangeLogFolderWarning(BuildContext context) async {
+    bool confirmed = false;
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Warning:'),
+          content: const Text(
+              "If the selected directory already contains \"daily_you.db\" your current logs will be overwritten!"),
+          actions: [
+            ElevatedButton(
+              child: const Text("Ok"),
+              onPressed: () async {
+                confirmed = true;
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+    if (confirmed) {
+      bool locationSet =
+          await EntriesDatabase.instance.selectDatabaseLocation();
+      if (!locationSet) {
+        await showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return const AlertDialog(
+                  title: Text("Error:"),
+                  content: Text("Permission Denied: Log folder not changed!"));
+            });
+      }
+
+      setState(() {});
+    }
   }
 
   void _showThemeSelectionPopup(ThemeModeProvider themeModeProvider) {
@@ -673,6 +733,10 @@ class _SettingsPageState extends State<SettingsPage> {
                     future: EntriesDatabase.instance.getLogDatabasePath(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData && snapshot.data != null) {
+                        if (EntriesDatabase.instance.usingExternalDb()) {
+                          return Text(
+                              ConfigManager.instance.getField('externalDbUri'));
+                        }
                         return Text(snapshot.data!);
                       }
                       return const Text("...");
@@ -690,19 +754,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             !await requestStoragePermission()) {
                           return;
                         }
-                        bool locationSet = await EntriesDatabase.instance
-                            .selectDatabaseLocation();
-                        if (!locationSet) {
-                          await showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return const AlertDialog(
-                                    title: Text("Error:"),
-                                    content: Text(
-                                        "Permission Denied: Log folder not changed!"));
-                              });
-                        }
-                        setState(() {});
+                        await _showChangeLogFolderWarning(context);
                       },
                     ),
                     IconButton(
@@ -744,7 +796,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       label: const Text("Change Image Folder..."),
                       onPressed: () async {
                         if (Platform.isAndroid &&
-                            !await requestStoragePermission()) {
+                            !await requestPhotosPermission()) {
                           return;
                         }
                         bool locationSet =
@@ -809,7 +861,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       label: const Text("Export Images..."),
                       onPressed: () async {
                         if (Platform.isAndroid &&
-                            !await requestStoragePermission()) {
+                            !await requestPhotosPermission()) {
                           return;
                         }
                         await EntriesDatabase.instance.exportImages();
@@ -855,7 +907,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       label: const Text("Import Images..."),
                       onPressed: () async {
                         if (Platform.isAndroid &&
-                            !await requestStoragePermission()) {
+                            !await requestPhotosPermission()) {
                           return;
                         }
                         await EntriesDatabase.instance.importImages();

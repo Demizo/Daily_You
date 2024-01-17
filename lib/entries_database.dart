@@ -8,6 +8,7 @@ import 'package:media_scanner/media_scanner.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
+import 'package:shared_storage/shared_storage.dart' as saf;
 
 import 'config_manager.dart';
 
@@ -23,15 +24,15 @@ class EntriesDatabase {
       return _database!;
     }
 
-    _database = await _initDB('daily_you.db');
+    _database = await _initDB();
     return _database!;
   }
 
-  Future<Database> _initDB(String filePath) async {
+  Future<Database> _initDB() async {
+    if (usingExternalDb()) syncExternalDatabase();
     final dbPath = await getLogDatabasePath();
 
-    final path = join(dbPath, filePath);
-    return await openDatabase(path, version: 1, onCreate: _createDB);
+    return await openDatabase(dbPath, version: 1, onCreate: _createDB);
   }
 
   Future _createDB(Database db, int version) async {
@@ -52,6 +53,7 @@ CREATE TABLE $entriesTable (
 
     final id = await db.insert(entriesTable, entry.toJson());
     await StatsProvider.instance.updateStats();
+    if (usingExternalDb()) await updateExternalDatabase();
     return entry.copy(id: id);
   }
 
@@ -114,6 +116,7 @@ CREATE TABLE $entriesTable (
       whereArgs: [entry.id],
     );
     await StatsProvider.instance.updateStats();
+    if (usingExternalDb()) await updateExternalDatabase();
     return id;
   }
 
@@ -126,6 +129,7 @@ CREATE TABLE $entriesTable (
       whereArgs: [id],
     );
     await StatsProvider.instance.updateStats();
+    if (usingExternalDb()) await updateExternalDatabase();
     return removedId;
   }
 
@@ -141,6 +145,10 @@ CREATE TABLE $entriesTable (
     final db = await instance.database;
     _database = null;
     db.close();
+  }
+
+  bool usingExternalDb() {
+    return ConfigManager.instance.getField('useExternalDb') ?? false;
   }
 
   Future<String> getImgPath(String imageName) async {
@@ -181,43 +189,104 @@ CREATE TABLE $entriesTable (
   }
 
   Future<String> getLogDatabasePath() async {
-    Directory dbPath;
-    var pathFromConfig = ConfigManager.instance.getField('dbPath');
-    if (pathFromConfig != '' && pathFromConfig != null) {
-      dbPath = Directory(pathFromConfig);
+    Directory basePath;
+    if (Platform.isAndroid) {
+      basePath = (await getExternalStorageDirectory())!;
     } else {
-      Directory basePath;
-      if (Platform.isAndroid) {
-        basePath = (await getExternalStorageDirectory())!;
-      } else {
-        basePath = await getApplicationSupportDirectory();
-      }
-
-      if (!basePath.existsSync()) {
-        basePath.createSync(recursive: true);
-      }
-      dbPath = basePath;
+      basePath = await getApplicationSupportDirectory();
     }
-    return dbPath.path;
+    if (!basePath.existsSync()) {
+      basePath.createSync(recursive: true);
+    }
+
+    return join(basePath.path, 'daily_you.db');
   }
 
   Future<bool> selectDatabaseLocation() async {
-    final selectedDirectory = await getDirectoryPath();
-    if (selectedDirectory.isNotEmpty && selectedDirectory != "/") {
-      final newDbPath = '$selectedDirectory/daily_you.db';
-      final oldDbPath = '${await getLogDatabasePath()}/daily_you.db';
-      if (!await File(newDbPath).exists() && await File(oldDbPath).exists()) {
-        await File(oldDbPath).copy(newDbPath);
+    // Get external folder Uri
+    var newFolderUri = await saf.openDocumentTree();
+    if (newFolderUri != null) {
+      // Check if DB exists in external directory
+      var existingNewDb = await saf.child(newFolderUri, "daily_you.db",
+          requiresWriteAccess: true);
+      if (existingNewDb != null) {
+        // Import external DB
+        var bytes = await existingNewDb.getContent();
+        if (bytes != null) {
+          //Overwrite internal DB
+          await File(await getLogDatabasePath()).writeAsBytes(bytes);
+
+          // Use external DB
+          await ConfigManager.instance
+              .setField('externalDbUri', existingNewDb.uri.toString());
+          await ConfigManager.instance.setField('useExternalDb', true);
+
+          return true;
+        }
+      } else {
+        // Export internal DB
+        var bytes = await File(await getLogDatabasePath()).readAsBytes();
+        var newExternalDb = await saf.createFileAsBytes(newFolderUri,
+            mimeType: "*/*", displayName: "daily_you.db", bytes: bytes);
+        if (newExternalDb != null) {
+          // Use external DB
+          await ConfigManager.instance
+              .setField('externalDbUri', newExternalDb.uri.toString());
+          await ConfigManager.instance.setField('useExternalDb', true);
+
+          return true;
+        }
       }
-      await ConfigManager.instance.setField('dbPath', selectedDirectory);
-      return true;
-    } else {
-      return false;
     }
+
+    return false;
+  }
+
+  Future<bool> updateExternalDatabase() async {
+    var updated = false;
+
+    var externalUriPath = ConfigManager.instance.getField('externalDbUri');
+    var bytes = await File(await getLogDatabasePath()).readAsBytes();
+    var externUri = Uri.parse(externalUriPath);
+    var canWrite = await saf.canWrite(externUri);
+    if (canWrite != null && canWrite) {
+      updated = await saf.writeToFileAsBytes(externUri, bytes: bytes) ?? false;
+    }
+    return updated;
+  }
+
+  Future<bool> syncExternalDatabase() async {
+    // Check which file is newer
+    if (await isExternalDbNewer()) {
+      var bytes = await saf.getDocumentContent(
+          Uri.parse(ConfigManager.instance.getField('externalDbUri')));
+      if (bytes != null) {
+        //Overwrite internal DB
+        await File(await getLogDatabasePath()).writeAsBytes(bytes);
+        return true;
+      } else {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  Future<bool> isExternalDbNewer() async {
+    var internalModifiedTime =
+        await File(await getLogDatabasePath()).lastModified();
+
+    var externalModifiedTime = DateTime.now();
+    var externalDb = await saf.DocumentFile.fromTreeUri(
+        Uri.parse(ConfigManager.instance.getField('externalDbUri')));
+    if (externalDb != null) {
+      externalModifiedTime = externalDb.lastModified ?? DateTime.now();
+    }
+
+    return externalModifiedTime.isAfter(internalModifiedTime);
   }
 
   void resetDatabaseLocation() async {
-    await ConfigManager.instance.setField('dbPath', '');
+    await ConfigManager.instance.setField('useExternalDb', false);
   }
 
   Future<bool> selectImageFolder() async {
@@ -246,8 +315,7 @@ CREATE TABLE $entriesTable (
 
   Future<String> getFilePath() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['db'],
+      type: FileType.any,
     );
 
     if (result != null) {
