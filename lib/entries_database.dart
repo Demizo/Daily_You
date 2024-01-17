@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:daily_you/stats_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:daily_you/models/entry.dart';
@@ -203,63 +204,93 @@ CREATE TABLE $entriesTable (
   }
 
   Future<bool> selectDatabaseLocation() async {
-    // Get external folder Uri
-    var newFolderUri = await saf.openDocumentTree();
-    if (newFolderUri != null) {
-      // Check if DB exists in external directory
-      var existingNewDb = await saf.child(newFolderUri, "daily_you.db",
-          requiresWriteAccess: true);
-      if (existingNewDb != null) {
-        // Import external DB
-        var bytes = await existingNewDb.getContent();
-        if (bytes != null) {
-          //Overwrite internal DB
-          await File(await getLogDatabasePath()).writeAsBytes(bytes);
+    if (Platform.isAndroid) {
+      // Get external folder Uri
+      var newFolderUri = await saf.openDocumentTree();
+      if (newFolderUri != null) {
+        // Check if DB exists in external directory
+        var existingNewDb = await saf.child(newFolderUri, "daily_you.db",
+            requiresWriteAccess: true);
+        if (existingNewDb != null) {
+          // Import external DB
+          var bytes = await existingNewDb.getContent();
+          if (bytes != null) {
+            //Overwrite internal DB
+            await File(await getLogDatabasePath()).writeAsBytes(bytes);
 
-          // Use external DB
-          await ConfigManager.instance
-              .setField('externalDbUri', existingNewDb.uri.toString());
-          await ConfigManager.instance.setField('useExternalDb', true);
+            // Use external DB
+            await ConfigManager.instance
+                .setField('externalDbUri', existingNewDb.uri.toString());
+            await ConfigManager.instance.setField('useExternalDb', true);
 
-          return true;
-        }
-      } else {
-        // Export internal DB
-        var bytes = await File(await getLogDatabasePath()).readAsBytes();
-        var newExternalDb = await saf.createFileAsBytes(newFolderUri,
-            mimeType: "*/*", displayName: "daily_you.db", bytes: bytes);
-        if (newExternalDb != null) {
-          // Use external DB
-          await ConfigManager.instance
-              .setField('externalDbUri', newExternalDb.uri.toString());
-          await ConfigManager.instance.setField('useExternalDb', true);
+            return true;
+          }
+        } else {
+          // Export internal DB
+          var bytes = await File(await getLogDatabasePath()).readAsBytes();
+          var newExternalDb = await saf.createFileAsBytes(newFolderUri,
+              mimeType: "*/*", displayName: "daily_you.db", bytes: bytes);
+          if (newExternalDb != null) {
+            // Use external DB
+            await ConfigManager.instance
+                .setField('externalDbUri', newExternalDb.uri.toString());
+            await ConfigManager.instance.setField('useExternalDb', true);
 
-          return true;
+            return true;
+          }
         }
       }
-    }
+    } else {
+      final selectedDirectory = await getDirectoryPath();
+      if (selectedDirectory.isNotEmpty && selectedDirectory != "/") {
+        final newDbPath = '$selectedDirectory/daily_you.db';
+        final oldDbPath = await getLogDatabasePath();
+        if (await File(newDbPath).exists()) {
+          await File(newDbPath).copy(oldDbPath);
+        } else {
+          await File(oldDbPath).copy(newDbPath);
+        }
+        await ConfigManager.instance.setField('externalDbUri', newDbPath);
+        await ConfigManager.instance.setField('useExternalDb', true);
+        return true;
+      }
 
+      return false;
+    }
     return false;
   }
 
   Future<bool> updateExternalDatabase() async {
     var updated = false;
-
-    var externalUriPath = ConfigManager.instance.getField('externalDbUri');
     var bytes = await File(await getLogDatabasePath()).readAsBytes();
-    var externUri = Uri.parse(externalUriPath);
-    var canWrite = await saf.canWrite(externUri);
-    if (canWrite != null && canWrite) {
-      updated = await saf.writeToFileAsBytes(externUri, bytes: bytes) ?? false;
+    var externalUriPath = ConfigManager.instance.getField('externalDbUri');
+    if (Platform.isAndroid) {
+      var externUri = Uri.parse(externalUriPath);
+      var canWrite = await saf.canWrite(externUri);
+      if (canWrite != null && canWrite) {
+        updated =
+            await saf.writeToFileAsBytes(externUri, bytes: bytes) ?? false;
+      }
+    } else {
+      await File(externalUriPath).writeAsBytes(bytes);
+      updated = true;
     }
+
     return updated;
   }
 
   Future<bool> syncExternalDatabase() async {
     // Check which file is newer
     if (await isExternalDbNewer()) {
-      var bytes = await saf.getDocumentContent(
-          Uri.parse(ConfigManager.instance.getField('externalDbUri')));
+      Uint8List? bytes;
+      if (Platform.isAndroid) {
+        bytes = await saf.getDocumentContent(
+            Uri.parse(ConfigManager.instance.getField('externalDbUri')));
+      } else {
+        bytes = await File(ConfigManager.instance.getField('externalDbUri'))
+            .readAsBytes();
+      }
+
       if (bytes != null) {
         //Overwrite internal DB
         await File(await getLogDatabasePath()).writeAsBytes(bytes);
@@ -276,10 +307,16 @@ CREATE TABLE $entriesTable (
         await File(await getLogDatabasePath()).lastModified();
 
     var externalModifiedTime = DateTime.now();
-    var externalDb = await saf.DocumentFile.fromTreeUri(
-        Uri.parse(ConfigManager.instance.getField('externalDbUri')));
-    if (externalDb != null) {
-      externalModifiedTime = externalDb.lastModified ?? DateTime.now();
+    if (Platform.isAndroid) {
+      var externalDb = await saf.DocumentFile.fromTreeUri(
+          Uri.parse(ConfigManager.instance.getField('externalDbUri')));
+      if (externalDb != null) {
+        externalModifiedTime = externalDb.lastModified ?? DateTime.now();
+      }
+    } else {
+      externalModifiedTime =
+          await File(ConfigManager.instance.getField('externalDbUri'))
+              .lastModified();
     }
 
     return externalModifiedTime.isAfter(internalModifiedTime);

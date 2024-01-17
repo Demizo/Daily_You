@@ -157,7 +157,9 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
       widget.onChangedImage(imageName);
     });
     // Delete picked file from cache
-    await File(pickedFile.path).delete();
+    if (Platform.isAndroid) {
+      await File(pickedFile.path).delete();
+    }
   }
 
   @override
