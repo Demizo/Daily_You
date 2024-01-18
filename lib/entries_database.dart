@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:daily_you/file_layer.dart';
 import 'package:daily_you/stats_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:daily_you/models/entry.dart';
@@ -152,15 +153,48 @@ CREATE TABLE $entriesTable (
     return ConfigManager.instance.getField('useExternalDb') ?? false;
   }
 
+  bool usingExternalImg() {
+    return ConfigManager.instance.getField('useExternalImg') ?? false;
+  }
+
   Future<String> getImgPath(String imageName) async {
     var basePath = await getImgDatabasePath();
 
     return '$basePath/$imageName';
   }
 
+  Future<Uint8List?> getImgBytes(String imageName) async {
+    var basePath = await getImgDatabasePath();
+    if (Platform.isAndroid) {
+      if (usingExternalImg()) {
+        var externalImg = await saf.child(
+            Uri.parse(ConfigManager.instance.getField('externalImgUri')),
+            imageName,
+            requiresWriteAccess: true);
+        if (externalImg != null) {
+          var bytes = await externalImg.getContent();
+          if (bytes != null) {
+            return bytes;
+          } else {
+            return null;
+          }
+        } else {
+          return null;
+        }
+      } else {
+        var imgFile = File(join(basePath, imageName));
+        return await imgFile.exists() ? await imgFile.readAsBytes() : null;
+      }
+    } else {
+      var imgFile = File(join(basePath, imageName));
+      return await imgFile.exists() ? await imgFile.readAsBytes() : null;
+    }
+  }
+
   Future<void> deleteEntryImage(int id) async {
     final entry = await getEntry(id);
     if (entry != null && entry.imgPath != null) {
+      //TODO delete with SAF
       final path = '${await getImgDatabasePath()}/${entry.imgPath!}';
       if (await File(path).exists()) {
         await File(path).delete();
@@ -169,7 +203,7 @@ CREATE TABLE $entriesTable (
   }
 
   Future<String> getImgDatabasePath() async {
-    if (ConfigManager.instance.getField('imgPath') == '') {
+    if (!usingExternalImg()) {
       Directory basePath;
       if (Platform.isAndroid) {
         basePath = (await getExternalStorageDirectory())!;
@@ -185,7 +219,7 @@ CREATE TABLE $entriesTable (
 
       return basePath.path;
     }
-    final rootImgPath = ConfigManager.instance.getField('imgPath');
+    final rootImgPath = ConfigManager.instance.getField('externalImgUri');
     return rootImgPath;
   }
 
@@ -204,92 +238,47 @@ CREATE TABLE $entriesTable (
   }
 
   Future<bool> selectDatabaseLocation() async {
-    if (Platform.isAndroid) {
-      // Get external folder Uri
-      var newFolderUri = await saf.openDocumentTree();
-      if (newFolderUri != null) {
-        // Check if DB exists in external directory
-        var existingNewDb = await saf.child(newFolderUri, "daily_you.db",
-            requiresWriteAccess: true);
-        if (existingNewDb != null) {
-          // Import external DB
-          var bytes = await existingNewDb.getContent();
-          if (bytes != null) {
-            //Overwrite internal DB
-            await File(await getLogDatabasePath()).writeAsBytes(bytes);
+    var selectedDirectory = await FileLayer.pickDirectory();
+    if (selectedDirectory == null) return false;
 
-            // Use external DB
-            await ConfigManager.instance
-                .setField('externalDbUri', existingNewDb.uri.toString());
-            await ConfigManager.instance.setField('useExternalDb', true);
-
-            return true;
-          }
-        } else {
-          // Export internal DB
-          var bytes = await File(await getLogDatabasePath()).readAsBytes();
-          var newExternalDb = await saf.createFileAsBytes(newFolderUri,
-              mimeType: "*/*", displayName: "daily_you.db", bytes: bytes);
-          if (newExternalDb != null) {
-            // Use external DB
-            await ConfigManager.instance
-                .setField('externalDbUri', newExternalDb.uri.toString());
-            await ConfigManager.instance.setField('useExternalDb', true);
-
-            return true;
-          }
-        }
-      }
+    // Check if DB exists in external directory
+    var existingDbBytes =
+        await FileLayer.getFileBytes(selectedDirectory, name: "daily_you.db");
+    if (existingDbBytes != null) {
+      //Overwrite internal DB
+      var overwritten = await FileLayer.writeFileBytes(
+          Uri.file(await getLogDatabasePath()).toString(), existingDbBytes);
+      if (overwritten == false) return false;
     } else {
-      final selectedDirectory = await getDirectoryPath();
-      if (selectedDirectory.isNotEmpty && selectedDirectory != "/") {
-        final newDbPath = '$selectedDirectory/daily_you.db';
-        final oldDbPath = await getLogDatabasePath();
-        if (await File(newDbPath).exists()) {
-          await File(newDbPath).copy(oldDbPath);
-        } else {
-          await File(oldDbPath).copy(newDbPath);
-        }
-        await ConfigManager.instance.setField('externalDbUri', newDbPath);
-        await ConfigManager.instance.setField('useExternalDb', true);
-        return true;
-      }
-
-      return false;
+      // Export internal DB
+      var bytes = await File(await getLogDatabasePath()).readAsBytes();
+      var externalDbPath =
+          await FileLayer.createFile(selectedDirectory, "daily_you.db", bytes);
+      if (externalDbPath == null) return false;
     }
-    return false;
+    // Use external DB
+    await ConfigManager.instance.setField('externalDbUri', selectedDirectory);
+    await ConfigManager.instance.setField('useExternalDb', true);
+    return true;
   }
 
   Future<bool> updateExternalDatabase() async {
-    var updated = false;
-    var bytes = await File(await getLogDatabasePath()).readAsBytes();
-    var externalUriPath = ConfigManager.instance.getField('externalDbUri');
-    if (Platform.isAndroid) {
-      var externUri = Uri.parse(externalUriPath);
-      var canWrite = await saf.canWrite(externUri);
-      if (canWrite != null && canWrite) {
-        updated =
-            await saf.writeToFileAsBytes(externUri, bytes: bytes) ?? false;
-      }
-    } else {
-      await File(externalUriPath).writeAsBytes(bytes);
-      updated = true;
-    }
-
-    return updated;
+    //TODO Can't use file URI here since it doesn't work on the desktop, make a helper function to get the URI or path
+    var bytes = await FileLayer.getFileBytes(
+        Uri.file(await getLogDatabasePath()).toString());
+    if (bytes == null) return false;
+    return await FileLayer.writeFileBytes(
+        ConfigManager.instance.getField('externalDbUri'), bytes,
+        name: "daily_you.db");
   }
 
   Future<bool> syncExternalDatabase() async {
     // Check which file is newer
-    if (await isExternalDbNewer()) {
-      Uint8List? bytes;
-      if (Platform.isAndroid) {
-        bytes = await saf.getDocumentContent(
-            Uri.parse(ConfigManager.instance.getField('externalDbUri')));
-      } else {
-        bytes = await File(ConfigManager.instance.getField('externalDbUri'))
-            .readAsBytes();
-      }
+    //TODO Quickly switching tabs causes this to corrupt the internal database
+    if (false) {
+      var bytes = await FileLayer.getFileBytes(
+          ConfigManager.instance.getField('externalDbUri'),
+          name: "daily_you.db");
 
       if (bytes != null) {
         //Overwrite internal DB
@@ -308,6 +297,10 @@ CREATE TABLE $entriesTable (
 
     var externalModifiedTime = DateTime.now();
     if (Platform.isAndroid) {
+      //TODO testing to see if this updates the document provider
+      await saf.getDocumentContent(
+          Uri.parse(ConfigManager.instance.getField('externalDbUri')));
+
       var externalDb = await saf.DocumentFile.fromTreeUri(
           Uri.parse(ConfigManager.instance.getField('externalDbUri')));
       if (externalDb != null) {
@@ -327,16 +320,33 @@ CREATE TABLE $entriesTable (
   }
 
   Future<bool> selectImageFolder() async {
-    final selectedDirectory = await getDirectoryPath();
-    if (selectedDirectory.isNotEmpty && selectedDirectory != "/") {
-      await ConfigManager.instance.setField('imgPath', selectedDirectory);
-      return true;
+    if (Platform.isAndroid) {
+      var newFolderUri = await saf.openDocumentTree();
+      if (newFolderUri != null) {
+        if (await saf.canWrite(newFolderUri) == true) {
+          await ConfigManager.instance
+              .setField('externalImgUri', newFolderUri.toString());
+          await ConfigManager.instance.setField('useExternalImg', true);
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        return false;
+      }
+    } else {
+      final selectedDirectory = await getDirectoryPath();
+      if (selectedDirectory.isNotEmpty && selectedDirectory != "/") {
+        await ConfigManager.instance
+            .setField('externalImgUri', selectedDirectory);
+        return true;
+      }
+      return false;
     }
-    return false;
   }
 
   void resetImageFolderLocation() async {
-    await ConfigManager.instance.setField('imgPath', '');
+    await ConfigManager.instance.setField('useExternalImg', false);
   }
 
   Future<String> getDirectoryPath() async {

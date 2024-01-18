@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:daily_you/entries_database.dart';
 import 'package:flutter/material.dart';
@@ -19,15 +20,18 @@ class ImageViewPage extends StatefulWidget {
 class _ImageViewPageState extends State<ImageViewPage> {
   late String imgName;
   late bool isLoading = true;
+  Uint8List? imgBytes;
   @override
   void initState() {
     super.initState();
     imgName = widget.imgName;
+    imgBytes = null;
+    isLoading = true;
     fetchImagePath();
   }
 
   void fetchImagePath() async {
-    imgName = await EntriesDatabase.instance.getImgPath(imgName);
+    imgBytes = await EntriesDatabase.instance.getImgBytes(imgName);
     setState(() {
       isLoading = false;
     });
@@ -47,7 +51,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
                     maxScale: 50.0,
                     backgroundDecoration:
                         const BoxDecoration(color: Colors.transparent),
-                    imageProvider: FileImage(File(imgName)),
+                    imageProvider: MemoryImage(imgBytes!),
                   ),
                 ),
               ));

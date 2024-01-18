@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:daily_you/entries_database.dart';
 
@@ -9,18 +10,45 @@ class LocalImageLoader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<String>(
-      future: EntriesDatabase.instance.getImgPath(imagePath),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          // Show a loading indicator while fetching the image path
-          return const Center(child: SizedBox());
-        } else if (snapshot.hasError) {
-          // Handle any error that occurred while fetching the image path
-          return Text('Error: ${snapshot.error}');
-        } else if (snapshot.hasData) {
-          // Render the card with the fetched image path
-          if (!File(snapshot.data!).existsSync()) {
+    return FutureBuilder<Uint8List?>(
+        future: EntriesDatabase.instance.getImgBytes(imagePath),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            // Show a loading indicator while fetching the image path
+            return const Center(child: SizedBox());
+          } else if (snapshot.hasError) {
+            // Handle any error that occurred while fetching the image path
+            return Text('Error: ${snapshot.error}');
+          } else if (snapshot.hasData) {
+            // Render the card with the fetched image path
+
+            return FractionallySizedBox(
+              widthFactor: 1,
+              child: Image.memory(
+                snapshot.data!,
+                cacheWidth: 400,
+                fit: BoxFit.cover,
+                errorBuilder: (BuildContext context, Object exception,
+                    StackTrace? stackTrace) {
+                  // Image failed to load, display a different widget
+                  return const Center(
+                    child: Column(
+                      children: [
+                        Expanded(
+                            child: Center(
+                                child: Icon(
+                          Icons.question_mark_rounded,
+                          size: 70,
+                        ))),
+                        Text('Image failed to load'),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            );
+          } else {
+            // Image not found
             return const Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -43,35 +71,6 @@ class LocalImageLoader extends StatelessWidget {
               ),
             );
           }
-          return FractionallySizedBox(
-            widthFactor: 1,
-            child: Image.file(
-              cacheWidth: 400,
-              fit: BoxFit.cover,
-              File(snapshot.data!),
-              errorBuilder: (BuildContext context, Object exception,
-                  StackTrace? stackTrace) {
-                // Image failed to load, display a different widget
-                return const Center(
-                  child: Column(
-                    children: [
-                      Expanded(
-                          child: Center(
-                              child: Icon(
-                        Icons.question_mark_rounded,
-                        size: 70,
-                      ))),
-                      Text('Image failed to load'),
-                    ],
-                  ),
-                );
-              },
-            ),
-          );
-        } else {
-          return const Text('Image failed to load');
-        }
-      },
-    );
+        });
   }
 }

@@ -74,10 +74,9 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
                           ),
                         ),
                         onTap: () async {
-                          final imgDir = await EntriesDatabase.instance
-                              .getImgDatabasePath();
-                          if (await File("$imgDir/${entry.imgPath!}")
-                              .exists()) {
+                          if (await EntriesDatabase.instance
+                                  .getImgBytes(entry.imgPath!) !=
+                              null) {
                             await Navigator.of(context).push(MaterialPageRoute(
                               fullscreenDialog: true,
                               builder: (context) =>
