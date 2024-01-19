@@ -174,6 +174,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
 
             if (entry.imgPath != null) {
               // Share Image
+              //TODO Use SAF
               final tempDir = await getTemporaryDirectory();
               final imgDir =
                   await EntriesDatabase.instance.getImgDatabasePath();

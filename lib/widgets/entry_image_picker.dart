@@ -52,6 +52,7 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
                       ),
                     ),
                     onPressed: () async {
+                      //TODO Use SAF
                       final path =
                           '${await EntriesDatabase.instance.getImgDatabasePath()}/${widget.imgPath!}';
                       if (await File(path).exists()) {
@@ -135,6 +136,7 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
   }
 
   Future<void> saveImage(XFile pickedFile) async {
+    //TODO Use SAF
     // Save the image to a custom location defined by your app
     final imgDirectory = await EntriesDatabase.instance.getImgDatabasePath();
     final currTime = DateTime.now();

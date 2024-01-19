@@ -75,4 +75,21 @@ class FileLayer {
       return newFile.path;
     }
   }
+
+  static Future<bool> deleteFile(String destination, {String? name}) async {
+    if (Platform.isAndroid) {
+      // Android
+      if (name == null) {
+        return await saf.delete(Uri.parse(destination)) ?? false;
+      } else {
+        var targetFile = await saf.child(Uri.parse(destination), name);
+        if (targetFile == null) return false;
+        return await targetFile.delete() ?? false;
+      }
+    } else {
+      // Desktop
+      await File(join(destination, name)).delete();
+      return true;
+    }
+  }
 }

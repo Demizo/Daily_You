@@ -139,6 +139,7 @@ CREATE TABLE $entriesTable (
     final entries = await getAllEntries();
     for (Entry entry in entries) {
       await deleteEntryImage(entry.id!);
+      //TODO drop all entries at once to lower SAF calls
       await deleteEntry(entry.id!);
     }
   }
@@ -157,38 +158,9 @@ CREATE TABLE $entriesTable (
     return ConfigManager.instance.getField('useExternalImg') ?? false;
   }
 
-  Future<String> getImgPath(String imageName) async {
-    var basePath = await getImgDatabasePath();
-
-    return '$basePath/$imageName';
-  }
-
   Future<Uint8List?> getImgBytes(String imageName) async {
-    var basePath = await getImgDatabasePath();
-    if (Platform.isAndroid) {
-      if (usingExternalImg()) {
-        var externalImg = await saf.child(
-            Uri.parse(ConfigManager.instance.getField('externalImgUri')),
-            imageName,
-            requiresWriteAccess: true);
-        if (externalImg != null) {
-          var bytes = await externalImg.getContent();
-          if (bytes != null) {
-            return bytes;
-          } else {
-            return null;
-          }
-        } else {
-          return null;
-        }
-      } else {
-        var imgFile = File(join(basePath, imageName));
-        return await imgFile.exists() ? await imgFile.readAsBytes() : null;
-      }
-    } else {
-      var imgFile = File(join(basePath, imageName));
-      return await imgFile.exists() ? await imgFile.readAsBytes() : null;
-    }
+    String basePath = await getImgDatabasePath();
+    return await FileLayer.getFileBytes(basePath, name: imageName);
   }
 
   Future<void> deleteEntryImage(int id) async {
@@ -208,16 +180,20 @@ CREATE TABLE $entriesTable (
       if (Platform.isAndroid) {
         basePath = (await getExternalStorageDirectory())!;
         basePath = Directory('${basePath.path}/Images');
+        if (!basePath.existsSync()) {
+          basePath.createSync(recursive: true);
+        }
+
+        return Uri.file(basePath.path).toString();
       } else {
         basePath = await getApplicationSupportDirectory();
         basePath = Directory('${basePath.path}/Images');
-      }
+        if (!basePath.existsSync()) {
+          basePath.createSync(recursive: true);
+        }
 
-      if (!basePath.existsSync()) {
-        basePath.createSync(recursive: true);
+        return basePath.path;
       }
-
-      return basePath.path;
     }
     final rootImgPath = ConfigManager.instance.getField('externalImgUri');
     return rootImgPath;
@@ -227,14 +203,15 @@ CREATE TABLE $entriesTable (
     Directory basePath;
     if (Platform.isAndroid) {
       basePath = (await getExternalStorageDirectory())!;
+      return Uri.file(join(basePath.path, 'daily_you.db')).toString();
     } else {
       basePath = await getApplicationSupportDirectory();
-    }
-    if (!basePath.existsSync()) {
-      basePath.createSync(recursive: true);
-    }
+      if (!basePath.existsSync()) {
+        basePath.createSync(recursive: true);
+      }
 
-    return join(basePath.path, 'daily_you.db');
+      return join(basePath.path, 'daily_you.db');
+    }
   }
 
   Future<bool> selectDatabaseLocation() async {
@@ -247,7 +224,7 @@ CREATE TABLE $entriesTable (
     if (existingDbBytes != null) {
       //Overwrite internal DB
       var overwritten = await FileLayer.writeFileBytes(
-          Uri.file(await getLogDatabasePath()).toString(), existingDbBytes);
+          await getLogDatabasePath(), existingDbBytes);
       if (overwritten == false) return false;
     } else {
       // Export internal DB
@@ -263,9 +240,7 @@ CREATE TABLE $entriesTable (
   }
 
   Future<bool> updateExternalDatabase() async {
-    //TODO Can't use file URI here since it doesn't work on the desktop, make a helper function to get the URI or path
-    var bytes = await FileLayer.getFileBytes(
-        Uri.file(await getLogDatabasePath()).toString());
+    var bytes = await FileLayer.getFileBytes(await getLogDatabasePath());
     if (bytes == null) return false;
     return await FileLayer.writeFileBytes(
         ConfigManager.instance.getField('externalDbUri'), bytes,
@@ -320,44 +295,15 @@ CREATE TABLE $entriesTable (
   }
 
   Future<bool> selectImageFolder() async {
-    if (Platform.isAndroid) {
-      var newFolderUri = await saf.openDocumentTree();
-      if (newFolderUri != null) {
-        if (await saf.canWrite(newFolderUri) == true) {
-          await ConfigManager.instance
-              .setField('externalImgUri', newFolderUri.toString());
-          await ConfigManager.instance.setField('useExternalImg', true);
-          return true;
-        } else {
-          return false;
-        }
-      } else {
-        return false;
-      }
-    } else {
-      final selectedDirectory = await getDirectoryPath();
-      if (selectedDirectory.isNotEmpty && selectedDirectory != "/") {
-        await ConfigManager.instance
-            .setField('externalImgUri', selectedDirectory);
-        return true;
-      }
-      return false;
-    }
+    var selectedDirectory = await FileLayer.pickDirectory();
+    if (selectedDirectory == null) return false;
+    await ConfigManager.instance.setField('externalImgUri', selectedDirectory);
+    await ConfigManager.instance.setField('useExternalImg', true);
+    return true;
   }
 
   void resetImageFolderLocation() async {
     await ConfigManager.instance.setField('useExternalImg', false);
-  }
-
-  Future<String> getDirectoryPath() async {
-    Directory? selectedDirectory;
-    final result = await FilePicker.platform.getDirectoryPath();
-
-    if (result != null) {
-      selectedDirectory = Directory(result);
-    }
-
-    return selectedDirectory?.path ?? '';
   }
 
   Future<String> getFilePath() async {
@@ -423,6 +369,7 @@ CREATE TABLE $entriesTable (
   }
 
   Future<bool> exportImages() async {
+    //TODO Use file layer
     List<Entry> entries = await getAllEntries();
     final imgDirectory = await EntriesDatabase.instance.getImgDatabasePath();
 
@@ -450,6 +397,7 @@ CREATE TABLE $entriesTable (
   }
 
   Future<bool> importImages() async {
+    // TODO Verify this works with content providers
     final picker = ImagePicker();
     final pickedFiles = await picker.pickMultiImage();
 
@@ -469,9 +417,10 @@ CREATE TABLE $entriesTable (
   }
 
   Future<bool> exportToJson() async {
-    String? savePath = await getDirectoryPath();
+    //TODO Use file layer
+    String? savePath = await FileLayer.pickDirectory();
 
-    if (savePath.isEmpty) {
+    if (savePath == null) {
       return false;
     }
 
