@@ -36,13 +36,6 @@ class _HomePageState extends State<HomePage> {
     refreshEntries();
   }
 
-  @override
-  void dispose() {
-    EntriesDatabase.instance.close();
-
-    super.dispose();
-  }
-
   Future<void> logToday() async {
     var newEntry = await Navigator.of(context).push(MaterialPageRoute(
       builder: (context) => const AddEditEntryPage(),

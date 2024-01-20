@@ -21,20 +21,12 @@ class EntriesDatabase {
 
   EntriesDatabase._init();
 
-  Future<Database> get database async {
-    if (_database != null) {
-      return _database!;
-    }
-
-    _database = await _initDB();
-    return _database!;
-  }
-
-  Future<Database> _initDB() async {
+  Future<bool> initDB() async {
     if (usingExternalDb()) syncExternalDatabase();
     final dbPath = await getLogDatabasePath();
 
-    return await openDatabase(dbPath, version: 1, onCreate: _createDB);
+    _database = await openDatabase(dbPath, version: 1, onCreate: _createDB);
+    return _database != null;
   }
 
   Future _createDB(Database db, int version) async {
@@ -51,7 +43,7 @@ CREATE TABLE $entriesTable (
   }
 
   Future<Entry> create(Entry entry) async {
-    final db = await instance.database;
+    final db = _database!;
 
     final id = await db.insert(entriesTable, entry.toJson());
     await StatsProvider.instance.updateStats();
@@ -60,7 +52,7 @@ CREATE TABLE $entriesTable (
   }
 
   Future<Entry?> getEntry(int id) async {
-    final db = await instance.database;
+    final db = _database!;
 
     final maps = await db.query(
       entriesTable,
@@ -92,7 +84,7 @@ CREATE TABLE $entriesTable (
   }
 
   Future<List<Entry>> getAllEntries() async {
-    final db = await instance.database;
+    final db = _database!;
 
     final result =
         await db.query(entriesTable, orderBy: '${EntryFields.timeCreate} DESC');
@@ -101,7 +93,7 @@ CREATE TABLE $entriesTable (
   }
 
   Future<List<Entry>> getAllEntriesSorted(String orderBy, String order) async {
-    final db = await instance.database;
+    final db = _database!;
 
     final result = await db.query(entriesTable, orderBy: '$orderBy $order');
 
@@ -109,7 +101,7 @@ CREATE TABLE $entriesTable (
   }
 
   Future<int> updateEntry(Entry entry) async {
-    final db = await instance.database;
+    final db = _database!;
 
     final id = await db.update(
       entriesTable,
@@ -123,7 +115,7 @@ CREATE TABLE $entriesTable (
   }
 
   Future<int> deleteEntry(int id) async {
-    final db = await instance.database;
+    final db = _database!;
 
     final removedId = await db.delete(
       entriesTable,
@@ -138,14 +130,22 @@ CREATE TABLE $entriesTable (
   Future<void> deleteAllEntries() async {
     final entries = await getAllEntries();
     for (Entry entry in entries) {
-      await deleteEntryImage(entry.id!);
-      //TODO drop all entries at once to lower SAF calls
-      await deleteEntry(entry.id!);
+      if (entry.imgPath != null) await deleteImg(entry.imgPath!);
     }
+    //TODO Test this
+    final db = _database!;
+
+    await db.delete(
+      entriesTable,
+      where: '*',
+    );
+
+    await StatsProvider.instance.updateStats();
+    if (usingExternalDb()) await updateExternalDatabase();
   }
 
   Future close() async {
-    final db = await instance.database;
+    final db = _database!;
     _database = null;
     db.close();
   }
@@ -163,15 +163,9 @@ CREATE TABLE $entriesTable (
     return await FileLayer.getFileBytes(basePath, name: imageName);
   }
 
-  Future<void> deleteEntryImage(int id) async {
-    final entry = await getEntry(id);
-    if (entry != null && entry.imgPath != null) {
-      //TODO delete with SAF
-      final path = '${await getImgDatabasePath()}/${entry.imgPath!}';
-      if (await File(path).exists()) {
-        await File(path).delete();
-      }
-    }
+  Future<bool> deleteImg(String imageName) async {
+    String basePath = await getImgDatabasePath();
+    return await FileLayer.deleteFile(basePath, name: imageName);
   }
 
   Future<String> getImgDatabasePath() async {
@@ -217,7 +211,8 @@ CREATE TABLE $entriesTable (
   Future<bool> selectDatabaseLocation() async {
     var selectedDirectory = await FileLayer.pickDirectory();
     if (selectedDirectory == null) return false;
-
+    // Close current database
+    await _database!.close();
     // Check if DB exists in external directory
     var existingDbBytes =
         await FileLayer.getFileBytes(selectedDirectory, name: "daily_you.db");
@@ -236,6 +231,9 @@ CREATE TABLE $entriesTable (
     // Use external DB
     await ConfigManager.instance.setField('externalDbUri', selectedDirectory);
     await ConfigManager.instance.setField('useExternalDb', true);
+    // Open new database and update stats
+    await initDB();
+    await StatsProvider.instance.updateStats();
     return true;
   }
 
@@ -291,7 +289,10 @@ CREATE TABLE $entriesTable (
   }
 
   void resetDatabaseLocation() async {
+    await _database!.close();
     await ConfigManager.instance.setField('useExternalDb', false);
+    await initDB();
+    await StatsProvider.instance.updateStats();
   }
 
   Future<bool> selectImageFolder() async {
@@ -341,7 +342,7 @@ CREATE TABLE $entriesTable (
       "VERY_HAPPY": 2,
     };
 
-    final db = await instance.database;
+    final db = _database!;
 
     for (var entry in jsonData) {
       final createdTimestamp = entry['created'];
@@ -424,7 +425,7 @@ CREATE TABLE $entriesTable (
       return false;
     }
 
-    final db = await instance.database;
+    final db = _database!;
 
     final List<Map<String, dynamic>> entries = await db.query('entries');
 
@@ -459,7 +460,7 @@ CREATE TABLE $entriesTable (
     final jsonContent = await jsonFile.readAsString();
     final jsonData = json.decode(jsonContent);
 
-    final db = await instance.database;
+    final db = _database!;
 
     for (var entry in jsonData) {
       // Skip if the day already has an entry

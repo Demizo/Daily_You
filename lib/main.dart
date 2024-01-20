@@ -62,6 +62,9 @@ void main() async {
   // Create the config file if it doesn't exist
   await ConfigManager.instance.init();
 
+  //Initialize Database
+  await EntriesDatabase.instance.initDB();
+
   final themeProvider = ThemeModeProvider();
   await themeProvider.initializeThemeFromConfig();
 

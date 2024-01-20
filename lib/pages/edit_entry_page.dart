@@ -71,7 +71,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
                     ),
                     onPressed: () async {
                       if (imgPath != null) {
-                        await EntriesDatabase.instance.deleteEntryImage(id);
+                        await EntriesDatabase.instance.deleteImg(imgPath!);
                       }
                       Navigator.of(context).popUntil((route) => route.isFirst);
                       await EntriesDatabase.instance.deleteEntry(id);

@@ -28,13 +28,6 @@ class _EntriesPageState extends State<EntriesPage> {
     refreshEntries();
   }
 
-  @override
-  void dispose() {
-    EntriesDatabase.instance.close();
-
-    super.dispose();
-  }
-
   final sortOrderMapping = {true: 'ASC', false: 'DESC'};
   final orderByMapping = {0: 'time_create', 1: 'mood'};
 
