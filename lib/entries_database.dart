@@ -10,7 +10,6 @@ import 'package:media_scanner/media_scanner.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
-import 'package:shared_storage/shared_storage.dart' as saf;
 
 import 'config_manager.dart';
 
@@ -132,12 +131,10 @@ CREATE TABLE $entriesTable (
     for (Entry entry in entries) {
       if (entry.imgPath != null) await deleteImg(entry.imgPath!);
     }
-    //TODO Test this
     final db = _database!;
 
     await db.delete(
       entriesTable,
-      where: '*',
     );
 
     await StatsProvider.instance.updateStats();
@@ -160,7 +157,28 @@ CREATE TABLE $entriesTable (
 
   Future<Uint8List?> getImgBytes(String imageName) async {
     String basePath = await getImgDatabasePath();
-    return await FileLayer.getFileBytes(basePath, name: imageName);
+    var bytes = await FileLayer.getFileBytes(basePath, name: imageName);
+    return bytes;
+  }
+
+  Future<String?> createImg(String imageName, Uint8List bytes) async {
+    final currTime = DateTime.now();
+    // Don't make a copy of files already in the folder
+    if (await getImgBytes(imageName) != null) {
+      return imageName;
+    }
+    final newImageName =
+        "daily_you_${currTime.month}_${currTime.day}_${currTime.year}-${currTime.hour}.${currTime.minute}.${currTime.second}.jpg";
+    var imageFilePath = await FileLayer.createFile(
+        await EntriesDatabase.instance.getImgDatabasePath(),
+        newImageName,
+        bytes);
+    if (imageFilePath == null) return null;
+    if (Platform.isAndroid) {
+      // Add image to media store
+      MediaScanner.loadMedia(path: imageFilePath);
+    }
+    return newImageName;
   }
 
   Future<bool> deleteImg(String imageName) async {
@@ -246,16 +264,15 @@ CREATE TABLE $entriesTable (
 
   Future<bool> syncExternalDatabase() async {
     // Check which file is newer
-    //TODO Quickly switching tabs causes this to corrupt the internal database
-    if (false) {
+    if (await isExternalDbNewer()) {
       var bytes = await FileLayer.getFileBytes(
           ConfigManager.instance.getField('externalDbUri'),
           name: "daily_you.db");
 
       if (bytes != null) {
         //Overwrite internal DB
-        await File(await getLogDatabasePath()).writeAsBytes(bytes);
-        return true;
+        return await FileLayer.writeFileBytes(
+            await getLogDatabasePath(), bytes);
       } else {
         return false;
       }
@@ -264,25 +281,26 @@ CREATE TABLE $entriesTable (
   }
 
   Future<bool> isExternalDbNewer() async {
-    var internalModifiedTime =
-        await File(await getLogDatabasePath()).lastModified();
-
-    var externalModifiedTime = DateTime.now();
+    // Get internal time
+    String internalPath;
+    Directory basePath;
     if (Platform.isAndroid) {
-      //TODO testing to see if this updates the document provider
-      await saf.getDocumentContent(
-          Uri.parse(ConfigManager.instance.getField('externalDbUri')));
-
-      var externalDb = await saf.DocumentFile.fromTreeUri(
-          Uri.parse(ConfigManager.instance.getField('externalDbUri')));
-      if (externalDb != null) {
-        externalModifiedTime = externalDb.lastModified ?? DateTime.now();
-      }
+      basePath = (await getExternalStorageDirectory())!;
+      internalPath = join(basePath.path, 'daily_you.db');
     } else {
-      externalModifiedTime =
-          await File(ConfigManager.instance.getField('externalDbUri'))
-              .lastModified();
+      basePath = await getApplicationSupportDirectory();
+      if (!basePath.existsSync()) {
+        basePath.createSync(recursive: true);
+      }
+
+      internalPath = join(basePath.path, 'daily_you.db');
     }
+    var internalModifiedTime = await File(internalPath).lastModified();
+
+    var externalModifiedTime = await FileLayer.getFileModifiedTime(
+            ConfigManager.instance.getField('externalDbUri'),
+            name: "daily_you.db") ??
+        DateTime.now();
 
     return externalModifiedTime.isAfter(internalModifiedTime);
   }
@@ -369,27 +387,21 @@ CREATE TABLE $entriesTable (
   }
 
   Future<bool> exportImages() async {
-    //TODO Use file layer
     List<Entry> entries = await getAllEntries();
-    final imgDirectory = await EntriesDatabase.instance.getImgDatabasePath();
 
-    String? saveDir = await FilePicker.platform.getDirectoryPath();
+    String? saveDir = await FileLayer.pickDirectory();
     if (saveDir == null) return false;
 
     for (Entry entry in entries) {
       if (entry.imgPath == null) continue;
-
-      final imageFilePath = "$imgDirectory/${entry.imgPath}";
-
-      File image = File(imageFilePath);
-      if (await image.exists()) {
-        final saveFilePath = "$saveDir/${entry.imgPath}";
-        await image.copy(saveFilePath);
-
-        if (Platform.isAndroid) {
-          // Add image to media store
-          MediaScanner.loadMedia(path: saveFilePath);
-        }
+      var bytes = await getImgBytes(entry.imgPath!);
+      if (bytes == null) return false;
+      var newImageName =
+          await FileLayer.createFile(saveDir, entry.imgPath!, bytes);
+      if (newImageName == null) return false;
+      if (Platform.isAndroid) {
+        // Add image to media store
+        MediaScanner.loadMedia(path: newImageName);
       }
     }
 
@@ -397,21 +409,16 @@ CREATE TABLE $entriesTable (
   }
 
   Future<bool> importImages() async {
-    // TODO Verify this works with content providers
     final picker = ImagePicker();
     final pickedFiles = await picker.pickMultiImage();
 
     for (XFile file in pickedFiles) {
-      final imgDirectory = await EntriesDatabase.instance.getImgDatabasePath();
-
-      final imageFilePath = "$imgDirectory/${file.name}";
-      await file.saveTo(imageFilePath);
+      var importedImage = await createImg(file.name, await file.readAsBytes());
+      if (importedImage == null) return false;
       if (Platform.isAndroid) {
-        // Add image to media store
-        MediaScanner.loadMedia(path: imageFilePath);
+        // Delete picked file from cache
+        await File(file.path).delete();
       }
-      // Delete picked file from cache
-      await File(file.path).delete();
     }
     return true;
   }

@@ -1,6 +1,7 @@
 {
     "java.configuration.updateBuildConfiguration": "interactive",
     "cSpell.words": [
-        "Appimage"
+        "Appimage",
+        "curr"
     ]
 }

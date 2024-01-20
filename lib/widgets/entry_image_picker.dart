@@ -132,25 +132,9 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
   }
 
   Future<void> saveImage(XFile pickedFile) async {
-    final currTime = DateTime.now();
-    // Don't make a copy of files already in the folder
-    if (await EntriesDatabase.instance.getImgBytes(pickedFile.name) != null) {
-      setState(() {
-        widget.onChangedImage(pickedFile.name);
-      });
-      return;
-    }
-    final imageName =
-        "daily_you_${currTime.month}_${currTime.day}_${currTime.year}-${currTime.hour}.${currTime.minute}.${currTime.second}.jpg";
-    var imageFilePath = await FileLayer.createFile(
-        await EntriesDatabase.instance.getImgDatabasePath(),
-        imageName,
-        await pickedFile.readAsBytes());
-    if (imageFilePath == null) return;
-    if (Platform.isAndroid) {
-      // Add image to media store
-      MediaScanner.loadMedia(path: imageFilePath);
-    }
+    var imageName = await EntriesDatabase.instance
+        .createImg(pickedFile.name, await pickedFile.readAsBytes());
+    if (imageName == null) return;
     setState(() {
       widget.onChangedImage(imageName);
     });

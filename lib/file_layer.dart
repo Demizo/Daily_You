@@ -41,6 +41,27 @@ class FileLayer {
     }
   }
 
+  static Future<DateTime?> getFileModifiedTime(String uri,
+      {String? name}) async {
+    if (Platform.isAndroid) {
+      // Android
+      if (name != null) {
+        // Find file in directory
+        var targetFile =
+            await saf.child(Uri.parse(uri), name, requiresWriteAccess: true);
+        return targetFile?.lastModified;
+      } else {
+        // Get the file directly
+        var targetFile = await saf.copy(Uri.parse(uri), Uri.parse(uri));
+        return targetFile?.lastModified;
+      }
+    } else {
+      // Desktop
+      var targetFile = File(join(uri, name));
+      return await targetFile.exists() ? await targetFile.lastModified() : null;
+    }
+  }
+
   static Future<bool> writeFileBytes(String destination, Uint8List bytes,
       {String? name}) async {
     if (Platform.isAndroid) {
