@@ -174,16 +174,13 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
 
             if (entry.imgPath != null) {
               // Share Image
-              //TODO Use SAF
               final tempDir = await getTemporaryDirectory();
-              final imgDir =
-                  await EntriesDatabase.instance.getImgDatabasePath();
-
-              if (await File("$imgDir/${entry.imgPath!}").exists()) {
-                File temp = await File("$imgDir/${entry.imgPath!}")
-                    .copy("${tempDir.path}/${entry.imgPath!}");
-
-                ShareExtend.share(temp.path, "image",
+              var bytes =
+                  await EntriesDatabase.instance.getImgBytes(entry.imgPath!);
+              if (bytes != null) {
+                File temp = await File("${tempDir.path}/${entry.imgPath!}")
+                    .writeAsBytes(bytes);
+                await ShareExtend.share(temp.path, "image",
                     subject: subject, extraText: entry.text);
               } else {
                 await showDialog(

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:daily_you/file_layer.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:daily_you/entries_database.dart';
@@ -52,12 +53,7 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
                       ),
                     ),
                     onPressed: () async {
-                      //TODO Use SAF
-                      final path =
-                          '${await EntriesDatabase.instance.getImgDatabasePath()}/${widget.imgPath!}';
-                      if (await File(path).exists()) {
-                        await File(path).delete();
-                      }
+                      await EntriesDatabase.instance.deleteImg(widget.imgPath!);
                       widget.onChangedImage(null);
                       Navigator.pop(context);
                     },
@@ -136,12 +132,9 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
   }
 
   Future<void> saveImage(XFile pickedFile) async {
-    //TODO Use SAF
-    // Save the image to a custom location defined by your app
-    final imgDirectory = await EntriesDatabase.instance.getImgDatabasePath();
     final currTime = DateTime.now();
     // Don't make a copy of files already in the folder
-    if (await File("$imgDirectory/${pickedFile.name}").exists()) {
+    if (await EntriesDatabase.instance.getImgBytes(pickedFile.name) != null) {
       setState(() {
         widget.onChangedImage(pickedFile.name);
       });
@@ -149,8 +142,11 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
     }
     final imageName =
         "daily_you_${currTime.month}_${currTime.day}_${currTime.year}-${currTime.hour}.${currTime.minute}.${currTime.second}.jpg";
-    final imageFilePath = "$imgDirectory/$imageName";
-    await pickedFile.saveTo(imageFilePath);
+    var imageFilePath = await FileLayer.createFile(
+        await EntriesDatabase.instance.getImgDatabasePath(),
+        imageName,
+        await pickedFile.readAsBytes());
+    if (imageFilePath == null) return;
     if (Platform.isAndroid) {
       // Add image to media store
       MediaScanner.loadMedia(path: imageFilePath);

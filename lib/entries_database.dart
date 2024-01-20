@@ -211,8 +211,6 @@ CREATE TABLE $entriesTable (
   Future<bool> selectDatabaseLocation() async {
     var selectedDirectory = await FileLayer.pickDirectory();
     if (selectedDirectory == null) return false;
-    // Close current database
-    await _database!.close();
     // Check if DB exists in external directory
     var existingDbBytes =
         await FileLayer.getFileBytes(selectedDirectory, name: "daily_you.db");
@@ -232,6 +230,7 @@ CREATE TABLE $entriesTable (
     await ConfigManager.instance.setField('externalDbUri', selectedDirectory);
     await ConfigManager.instance.setField('useExternalDb', true);
     // Open new database and update stats
+    await _database!.close();
     await initDB();
     await StatsProvider.instance.updateStats();
     return true;
