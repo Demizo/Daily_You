@@ -339,18 +339,11 @@ CREATE TABLE $entriesTable (
   }
 
   Future<bool> importFromOneShot() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['json'],
-    );
-
-    if (result == null) {
-      return false;
-    }
-
-    final jsonFile = File(result.files.single.path!);
-    final jsonContent = await jsonFile.readAsString();
-    final jsonData = json.decode(jsonContent);
+    var selectedFile = await FileLayer.pickFile();
+    if (selectedFile == null) return false;
+    var bytes = await FileLayer.getFileBytes(selectedFile);
+    if (bytes == null) return false;
+    final jsonData = json.decode(utf8.decode(bytes.toList()));
 
     final happinessMapping = {
       "VERY_SAD": -2,
@@ -428,12 +421,8 @@ CREATE TABLE $entriesTable (
   }
 
   Future<bool> exportToJson() async {
-    //TODO Use file layer
     String? savePath = await FileLayer.pickDirectory();
-
-    if (savePath == null) {
-      return false;
-    }
+    if (savePath == null) return false;
 
     final db = _database!;
 
@@ -449,26 +438,21 @@ CREATE TABLE $entriesTable (
       };
     }).toList();
 
-    final jsonFile = File('$savePath/daily_you_logs.json');
     final jsonString = json.encode(jsonData);
-    await jsonFile.create();
-    await jsonFile.writeAsString(jsonString);
-    return true;
+    final currTime = DateTime.now();
+    final exportedJsonName =
+        "daily_you_logs_${currTime.month}_${currTime.day}_${currTime.year}.json";
+    return await FileLayer.createFile(savePath, exportedJsonName,
+            Uint8List.fromList(utf8.encode(jsonString))) !=
+        null;
   }
 
   Future<bool> importFromJson() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['json'],
-    );
-
-    if (result == null) {
-      return false;
-    }
-
-    final jsonFile = File(result.files.single.path!);
-    final jsonContent = await jsonFile.readAsString();
-    final jsonData = json.decode(jsonContent);
+    var selectedFile = await FileLayer.pickFile();
+    if (selectedFile == null) return false;
+    var bytes = await FileLayer.getFileBytes(selectedFile);
+    if (bytes == null) return false;
+    final jsonData = json.decode(utf8.decode(bytes.toList()));
 
     final db = _database!;
 

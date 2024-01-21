@@ -22,6 +22,23 @@ class FileLayer {
     }
   }
 
+  static Future<String?> pickFile() async {
+    if (Platform.isAndroid) {
+      // Android
+      var selectedFile = await saf.openDocument();
+      if (selectedFile == null) return null;
+      return selectedFile.first.toString();
+    } else {
+      // Desktop
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['json'],
+      );
+      if (result == null) return null;
+      return result.files.first.path;
+    }
+  }
+
   static Future<Uint8List?> getFileBytes(String uri,
       {String? name, bool useExternalPath = true}) async {
     if (Platform.isAndroid && useExternalPath) {
