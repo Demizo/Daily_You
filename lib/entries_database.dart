@@ -157,7 +157,8 @@ CREATE TABLE $entriesTable (
 
   Future<Uint8List?> getImgBytes(String imageName) async {
     String basePath = await getImgDatabasePath();
-    var bytes = await FileLayer.getFileBytes(basePath, name: imageName);
+    var bytes = await FileLayer.getFileBytes(basePath,
+        name: imageName, useExternalPath: usingExternalImg());
     return bytes;
   }
 
@@ -170,9 +171,8 @@ CREATE TABLE $entriesTable (
     final newImageName =
         "daily_you_${currTime.month}_${currTime.day}_${currTime.year}-${currTime.hour}.${currTime.minute}.${currTime.second}.jpg";
     var imageFilePath = await FileLayer.createFile(
-        await EntriesDatabase.instance.getImgDatabasePath(),
-        newImageName,
-        bytes);
+        await getImgDatabasePath(), newImageName, bytes,
+        useExternalPath: usingExternalImg());
     if (imageFilePath == null) return null;
     if (Platform.isAndroid) {
       // Add image to media store
@@ -183,7 +183,8 @@ CREATE TABLE $entriesTable (
 
   Future<bool> deleteImg(String imageName) async {
     String basePath = await getImgDatabasePath();
-    return await FileLayer.deleteFile(basePath, name: imageName);
+    return await FileLayer.deleteFile(basePath,
+        name: imageName, useExternalPath: usingExternalImg());
   }
 
   Future<String> getImgDatabasePath() async {
@@ -195,8 +196,7 @@ CREATE TABLE $entriesTable (
         if (!basePath.existsSync()) {
           basePath.createSync(recursive: true);
         }
-
-        return Uri.file(basePath.path).toString();
+        return basePath.path;
       } else {
         basePath = await getApplicationSupportDirectory();
         basePath = Directory('${basePath.path}/Images');
@@ -239,7 +239,8 @@ CREATE TABLE $entriesTable (
       if (overwritten == false) return false;
     } else {
       // Export internal DB
-      var bytes = await File(await getLogDatabasePath()).readAsBytes();
+      var bytes = await FileLayer.getFileBytes(await getLogDatabasePath());
+      if (bytes == null) return false;
       var externalDbPath =
           await FileLayer.createFile(selectedDirectory, "daily_you.db", bytes);
       if (externalDbPath == null) return false;
@@ -395,7 +396,7 @@ CREATE TABLE $entriesTable (
     for (Entry entry in entries) {
       if (entry.imgPath == null) continue;
       var bytes = await getImgBytes(entry.imgPath!);
-      if (bytes == null) return false;
+      if (bytes == null) continue;
       var newImageName =
           await FileLayer.createFile(saveDir, entry.imgPath!, bytes);
       if (newImageName == null) return false;
@@ -413,10 +414,13 @@ CREATE TABLE $entriesTable (
     final pickedFiles = await picker.pickMultiImage();
 
     for (XFile file in pickedFiles) {
-      var importedImage = await createImg(file.name, await file.readAsBytes());
-      if (importedImage == null) return false;
+      var imageFilePath = await FileLayer.createFile(
+          await getImgDatabasePath(), file.name, await file.readAsBytes(),
+          useExternalPath: usingExternalImg());
+      if (imageFilePath == null) return false;
       if (Platform.isAndroid) {
-        // Delete picked file from cache
+        // Add image to media store
+        MediaScanner.loadMedia(path: imageFilePath);
         await File(file.path).delete();
       }
     }

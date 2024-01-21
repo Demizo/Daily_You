@@ -22,8 +22,9 @@ class FileLayer {
     }
   }
 
-  static Future<Uint8List?> getFileBytes(String uri, {String? name}) async {
-    if (Platform.isAndroid) {
+  static Future<Uint8List?> getFileBytes(String uri,
+      {String? name, bool useExternalPath = true}) async {
+    if (Platform.isAndroid && useExternalPath) {
       // Android
       if (name != null) {
         // Find file in directory
@@ -78,14 +79,15 @@ class FileLayer {
       return await saf.writeToFileAsBytes(targetUri, bytes: bytes) ?? false;
     } else {
       // Desktop
-      await File(destination).writeAsBytes(bytes);
+      await File(join(destination, name)).writeAsBytes(bytes);
       return true;
     }
   }
 
   static Future<String?> createFile(
-      String destination, String name, Uint8List bytes) async {
-    if (Platform.isAndroid) {
+      String destination, String name, Uint8List bytes,
+      {bool useExternalPath = true}) async {
+    if (Platform.isAndroid && useExternalPath) {
       // Android
       var newFile = await saf.createFileAsBytes(Uri.parse(destination),
           mimeType: "*/*", displayName: name, bytes: bytes);
@@ -97,8 +99,9 @@ class FileLayer {
     }
   }
 
-  static Future<bool> deleteFile(String destination, {String? name}) async {
-    if (Platform.isAndroid) {
+  static Future<bool> deleteFile(String destination,
+      {String? name, bool useExternalPath = true}) async {
+    if (Platform.isAndroid && useExternalPath) {
       // Android
       if (name == null) {
         return await saf.delete(Uri.parse(destination)) ?? false;
@@ -109,7 +112,9 @@ class FileLayer {
       }
     } else {
       // Desktop
-      await File(join(destination, name)).delete();
+      if (await File(join(destination, name)).exists()) {
+        await File(join(destination, name)).delete();
+      }
       return true;
     }
   }
