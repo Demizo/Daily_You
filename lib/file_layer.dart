@@ -70,7 +70,7 @@ class FileLayer {
         return targetFile?.lastModified;
       } else {
         // Get the file directly
-        var targetFile = await saf.copy(Uri.parse(uri), Uri.parse(uri));
+        var targetFile = await saf.fromTreeUri(Uri.parse(uri));
         return targetFile?.lastModified;
       }
     } else {

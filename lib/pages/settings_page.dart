@@ -76,7 +76,7 @@ class _SettingsPageState extends State<SettingsPage> {
         return AlertDialog(
           title: const Text('Warning:'),
           content: const Text(
-              "If the selected directory already contains \"daily_you.db\" your current logs will be overwritten!"),
+              "If the selected directory already contains \"daily_you.db\", it will be used to overwrite your current logs!"),
           actions: [
             ElevatedButton(
               child: const Text("Ok"),
