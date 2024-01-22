@@ -297,7 +297,10 @@ CREATE TABLE $entriesTable (
       internalPath = join(basePath.path, 'daily_you.db');
     }
     var internalModifiedTime = await File(internalPath).lastModified();
-
+    //HACK: This ensures the content provider provides and up to date file
+    await FileLayer.getFileBytes(
+        ConfigManager.instance.getField('externalDbUri'),
+        name: "daily_you.db");
     var externalModifiedTime = await FileLayer.getFileModifiedTime(
             ConfigManager.instance.getField('externalDbUri'),
             name: "daily_you.db") ??

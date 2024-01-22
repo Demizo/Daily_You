@@ -30,7 +30,9 @@ dependencies:
   android_alarm_manager_plus: ^3.0.2
   flutter_colorpicker: ^1.0.3
   share_extend: ^2.0.0
-  shared_storage: ^0.8.0
+  shared_storage:
+    git:
+      url: https://github.com/Demizo/shared-storage
   device_info_plus: ^9.1.1
 
 dev_dependencies:

@@ -595,11 +595,12 @@ packages:
   shared_storage:
     dependency: "direct main"
     description:
-      name: shared_storage
-      sha256: "7c65a9d64f0f5521256be974cfd74010af12196657cec9f9fb7b03b2f11bcaf6"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.8.0"
+      path: "."
+      ref: HEAD
+      resolved-ref: df4f4855c63e27d94e5066d68044cc345cf1df8d
+      url: "https://github.com/Demizo/shared-storage"
+    source: git
+    version: "0.7.0"
   simple_gesture_detector:
     dependency: transitive
     description:
