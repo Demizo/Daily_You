@@ -11,6 +11,7 @@ class ConfigManager {
   String configFilePath = '';
   Map<String, dynamic> _config = {};
   final Map<String, dynamic> _defaultConfig = {
+    'configVersion': '1',
     'theme': 'system',
     'useExternalDb': false,
     'externalDbUri': '',
@@ -48,7 +49,12 @@ class ConfigManager {
 
   // Create an empty config file
   Future<void> init() async {
-    final dbPath = await getApplicationSupportDirectory();
+    Directory dbPath;
+    if (Platform.isAndroid) {
+      dbPath = (await getExternalStorageDirectory())!;
+    } else {
+      dbPath = await getApplicationSupportDirectory();
+    }
     configFilePath = join(dbPath.path, 'config.json');
     final configFile = File(configFilePath);
     if (!(await configFile.exists())) {
