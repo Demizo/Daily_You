@@ -1,10 +1,8 @@
 import 'dart:io';
 
-import 'package:daily_you/file_layer.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:daily_you/entries_database.dart';
-import 'package:media_scanner/media_scanner.dart';
 
 import 'local_image_loader.dart';
 

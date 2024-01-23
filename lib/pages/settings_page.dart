@@ -779,9 +779,14 @@ class _SettingsPageState extends State<SettingsPage> {
                   style: TextStyle(fontSize: 18),
                 ),
                 FutureBuilder(
-                    future: EntriesDatabase.instance.getImgDatabasePath(),
+                    future:
+                        EntriesDatabase.instance.getInternalImgDatabasePath(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData && snapshot.data != null) {
+                        if (EntriesDatabase.instance.usingExternalImg()) {
+                          return Text(ConfigManager.instance
+                              .getField('externalImgUri'));
+                        }
                         return Text(snapshot.data!);
                       }
                       return const Text("...");

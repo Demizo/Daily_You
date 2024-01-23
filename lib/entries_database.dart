@@ -156,9 +156,20 @@ CREATE TABLE $entriesTable (
   }
 
   Future<Uint8List?> getImgBytes(String imageName) async {
-    String basePath = await getImgDatabasePath();
-    var bytes = await FileLayer.getFileBytes(basePath,
-        name: imageName, useExternalPath: usingExternalImg());
+    // Fetch local copy if present
+    var bytes = await FileLayer.getFileBytes(await getInternalImgDatabasePath(),
+        name: imageName, useExternalPath: false);
+    // Attempt to fetch file externally
+    if (bytes == null && usingExternalImg()) {
+      // Get and cache external image
+      bytes = await FileLayer.getFileBytes(await getExternalImgDatabasePath(),
+          name: imageName, useExternalPath: true);
+      if (bytes != null) {
+        FileLayer.createFile(
+            await getInternalImgDatabasePath(), imageName, bytes,
+            useExternalPath: false); // Background
+      }
+    }
     return bytes;
   }
 
@@ -166,13 +177,18 @@ CREATE TABLE $entriesTable (
     final currTime = DateTime.now();
     // Don't make a copy of files already in the folder
     if (await getImgBytes(imageName) != null) {
+      // Create the image externally if not already present
+      if (usingExternalImg()) createImgExternal(imageName, bytes); // Background
       return imageName;
     }
     final newImageName =
         "daily_you_${currTime.month}_${currTime.day}_${currTime.year}-${currTime.hour}.${currTime.minute}.${currTime.second}.jpg";
+    if (usingExternalImg()) {
+      createImgExternal(newImageName, bytes); // Background
+    }
     var imageFilePath = await FileLayer.createFile(
-        await getImgDatabasePath(), newImageName, bytes,
-        useExternalPath: usingExternalImg());
+        await getInternalImgDatabasePath(), newImageName, bytes,
+        useExternalPath: false);
     if (imageFilePath == null) return null;
     if (Platform.isAndroid) {
       // Add image to media store
@@ -181,32 +197,50 @@ CREATE TABLE $entriesTable (
     return newImageName;
   }
 
-  Future<bool> deleteImg(String imageName) async {
-    String basePath = await getImgDatabasePath();
-    return await FileLayer.deleteFile(basePath,
-        name: imageName, useExternalPath: usingExternalImg());
+  Future<String?> createImgExternal(String imageName, Uint8List bytes) async {
+    // Check that image does not exist
+    if (await FileLayer.getFileBytes(await getExternalImgDatabasePath(),
+            name: imageName, useExternalPath: true) ==
+        null) {
+      return await FileLayer.createFile(
+          await getExternalImgDatabasePath(), imageName, bytes,
+          useExternalPath: true);
+    }
+    return null;
   }
 
-  Future<String> getImgDatabasePath() async {
-    if (!usingExternalImg()) {
-      Directory basePath;
-      if (Platform.isAndroid) {
-        basePath = (await getExternalStorageDirectory())!;
-        basePath = Directory('${basePath.path}/Images');
-        if (!basePath.existsSync()) {
-          basePath.createSync(recursive: true);
-        }
-        return basePath.path;
-      } else {
-        basePath = await getApplicationSupportDirectory();
-        basePath = Directory('${basePath.path}/Images');
-        if (!basePath.existsSync()) {
-          basePath.createSync(recursive: true);
-        }
-
-        return basePath.path;
-      }
+  Future<bool> deleteImg(String imageName) async {
+    // Delete remote
+    if (usingExternalImg()) {
+      await FileLayer.deleteFile(await getExternalImgDatabasePath(),
+          name: imageName, useExternalPath: true);
     }
+    // Delete local
+    return await FileLayer.deleteFile(await getInternalImgDatabasePath(),
+        name: imageName, useExternalPath: false);
+  }
+
+  Future<String> getInternalImgDatabasePath() async {
+    Directory basePath;
+    if (Platform.isAndroid) {
+      basePath = (await getExternalStorageDirectory())!;
+      basePath = Directory('${basePath.path}/Images');
+      if (!basePath.existsSync()) {
+        basePath.createSync(recursive: true);
+      }
+      return basePath.path;
+    } else {
+      basePath = await getApplicationSupportDirectory();
+      basePath = Directory('${basePath.path}/Images');
+      if (!basePath.existsSync()) {
+        basePath.createSync(recursive: true);
+      }
+
+      return basePath.path;
+    }
+  }
+
+  Future<String> getExternalImgDatabasePath() async {
     final rootImgPath = ConfigManager.instance.getField('externalImgUri');
     return rootImgPath;
   }
@@ -411,8 +445,13 @@ CREATE TABLE $entriesTable (
 
     for (XFile file in pickedFiles) {
       var imageFilePath = await FileLayer.createFile(
-          await getImgDatabasePath(), file.name, await file.readAsBytes(),
-          useExternalPath: usingExternalImg());
+          await getInternalImgDatabasePath(),
+          file.name,
+          await file.readAsBytes(),
+          useExternalPath: false);
+      if (usingExternalImg()) {
+        await createImgExternal(file.name, await file.readAsBytes());
+      }
       if (imageFilePath == null) return false;
       if (Platform.isAndroid) {
         // Add image to media store
