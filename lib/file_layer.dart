@@ -60,8 +60,8 @@ class FileLayer {
   }
 
   static Future<DateTime?> getFileModifiedTime(String uri,
-      {String? name}) async {
-    if (Platform.isAndroid) {
+      {String? name, useExternalPath = true}) async {
+    if (Platform.isAndroid && useExternalPath) {
       // Android
       if (name != null) {
         // Find file in directory

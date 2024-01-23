@@ -261,32 +261,26 @@ CREATE TABLE $entriesTable (
   Future<bool> selectDatabaseLocation() async {
     var selectedDirectory = await FileLayer.pickDirectory();
     if (selectedDirectory == null) return false;
-    // Check if DB exists in external directory
-    var existingDbBytes =
-        await FileLayer.getFileBytes(selectedDirectory, name: "daily_you.db");
-    if (existingDbBytes != null) {
-      //Overwrite internal DB
-      var overwritten = await FileLayer.writeFileBytes(
-          await getInternalDbPath(), existingDbBytes,
-          useExternalPath: false);
-      if (overwritten == false) return false;
-    } else {
-      // Export internal DB
-      var bytes = await FileLayer.getFileBytes(await getInternalDbPath(),
-          useExternalPath: false);
-      if (bytes == null) return false;
-      var externalDbPath =
-          await FileLayer.createFile(selectedDirectory, "daily_you.db", bytes);
-      if (externalDbPath == null) return false;
-    }
-    // Use external DB
+
+    // Save old external path
+    var oldExternalPath = ConfigManager.instance.getField('externalDbUri');
+
     await ConfigManager.instance.setField('externalDbUri', selectedDirectory);
     await ConfigManager.instance.setField('useExternalDb', true);
-    // Open new database and update stats
-    await _database!.close();
-    await initDB();
-    await StatsProvider.instance.updateStats();
-    return true;
+    // Sync with external folder
+    var synced = await syncExternalDatabase(forceOverwrite: true);
+    if (synced) {
+      // Open new database and update stats
+      await _database!.close();
+      await initDB();
+      await StatsProvider.instance.updateStats();
+      return true;
+    } else {
+      // Restore state after failure
+      await ConfigManager.instance.setField('externalDbUri', oldExternalPath);
+      await ConfigManager.instance.setField('useExternalDb', false);
+      return false;
+    }
   }
 
   Future<bool> updateExternalDatabase() async {
@@ -298,44 +292,37 @@ CREATE TABLE $entriesTable (
         name: "daily_you.db");
   }
 
-  Future<bool> syncExternalDatabase() async {
-    // Check which file is newer
-    if (await isExternalDbNewer()) {
-      var bytes = await FileLayer.getFileBytes(
-          ConfigManager.instance.getField('externalDbUri'),
-          name: "daily_you.db");
+  Future<bool> syncExternalDatabase({bool forceOverwrite = false}) async {
+    var externalBytes = await FileLayer.getFileBytes(
+        ConfigManager.instance.getField('externalDbUri'),
+        name: "daily_you.db");
 
-      if (bytes != null) {
-        //Overwrite internal DB
-        return await FileLayer.writeFileBytes(await getInternalDbPath(), bytes,
-            useExternalPath: false);
-      } else {
-        return false;
-      }
+    if (externalBytes == null) {
+      // Export internal DB
+      var bytes = await FileLayer.getFileBytes(await getInternalDbPath(),
+          useExternalPath: false);
+      if (bytes == null) return false;
+      var externalDbPath = await FileLayer.createFile(
+          ConfigManager.instance.getField('externalDbUri'),
+          "daily_you.db",
+          bytes);
+      return externalDbPath != null;
+    } else if (forceOverwrite || await isExternalDbNewer()) {
+      // Overwrite internal DB
+      return await FileLayer.writeFileBytes(
+          await getInternalDbPath(), externalBytes,
+          useExternalPath: false);
     }
     return true;
   }
 
   Future<bool> isExternalDbNewer() async {
     // Get internal time
-    String internalPath;
-    Directory basePath;
-    if (Platform.isAndroid) {
-      basePath = (await getExternalStorageDirectory())!;
-      internalPath = join(basePath.path, 'daily_you.db');
-    } else {
-      basePath = await getApplicationSupportDirectory();
-      if (!basePath.existsSync()) {
-        basePath.createSync(recursive: true);
-      }
+    var internalModifiedTime = await FileLayer.getFileModifiedTime(
+            await getInternalDbPath(),
+            useExternalPath: false) ??
+        DateTime.now();
 
-      internalPath = join(basePath.path, 'daily_you.db');
-    }
-    var internalModifiedTime = await File(internalPath).lastModified();
-    //HACK: This ensures the content provider provides and up to date file
-    await FileLayer.getFileBytes(
-        ConfigManager.instance.getField('externalDbUri'),
-        name: "daily_you.db");
     var externalModifiedTime = await FileLayer.getFileModifiedTime(
             ConfigManager.instance.getField('externalDbUri'),
             name: "daily_you.db") ??
