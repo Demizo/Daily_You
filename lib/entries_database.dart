@@ -22,7 +22,7 @@ class EntriesDatabase {
 
   Future<bool> initDB() async {
     if (usingExternalDb()) syncExternalDatabase();
-    final dbPath = await getLogDatabasePath();
+    final dbPath = await getInternalDbPath();
 
     _database = await openDatabase(dbPath, version: 1, onCreate: _createDB);
     return _database != null;
@@ -245,19 +245,17 @@ CREATE TABLE $entriesTable (
     return rootImgPath;
   }
 
-  Future<String> getLogDatabasePath() async {
+  Future<String> getInternalDbPath() async {
     Directory basePath;
     if (Platform.isAndroid) {
       basePath = (await getExternalStorageDirectory())!;
-      return Uri.file(join(basePath.path, 'daily_you.db')).toString();
     } else {
       basePath = await getApplicationSupportDirectory();
       if (!basePath.existsSync()) {
         basePath.createSync(recursive: true);
       }
-
-      return join(basePath.path, 'daily_you.db');
     }
+    return join(basePath.path, 'daily_you.db');
   }
 
   Future<bool> selectDatabaseLocation() async {
@@ -269,11 +267,13 @@ CREATE TABLE $entriesTable (
     if (existingDbBytes != null) {
       //Overwrite internal DB
       var overwritten = await FileLayer.writeFileBytes(
-          await getLogDatabasePath(), existingDbBytes);
+          await getInternalDbPath(), existingDbBytes,
+          useExternalPath: false);
       if (overwritten == false) return false;
     } else {
       // Export internal DB
-      var bytes = await FileLayer.getFileBytes(await getLogDatabasePath());
+      var bytes = await FileLayer.getFileBytes(await getInternalDbPath(),
+          useExternalPath: false);
       if (bytes == null) return false;
       var externalDbPath =
           await FileLayer.createFile(selectedDirectory, "daily_you.db", bytes);
@@ -290,7 +290,8 @@ CREATE TABLE $entriesTable (
   }
 
   Future<bool> updateExternalDatabase() async {
-    var bytes = await FileLayer.getFileBytes(await getLogDatabasePath());
+    var bytes = await FileLayer.getFileBytes(await getInternalDbPath(),
+        useExternalPath: false);
     if (bytes == null) return false;
     return await FileLayer.writeFileBytes(
         ConfigManager.instance.getField('externalDbUri'), bytes,
@@ -306,8 +307,8 @@ CREATE TABLE $entriesTable (
 
       if (bytes != null) {
         //Overwrite internal DB
-        return await FileLayer.writeFileBytes(
-            await getLogDatabasePath(), bytes);
+        return await FileLayer.writeFileBytes(await getInternalDbPath(), bytes,
+            useExternalPath: false);
       } else {
         return false;
       }

@@ -81,8 +81,8 @@ class FileLayer {
   }
 
   static Future<bool> writeFileBytes(String destination, Uint8List bytes,
-      {String? name}) async {
-    if (Platform.isAndroid) {
+      {String? name, useExternalPath = true}) async {
+    if (Platform.isAndroid && useExternalPath) {
       // Android
       Uri targetUri;
       if (name == null) {
