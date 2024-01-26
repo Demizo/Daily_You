@@ -165,9 +165,9 @@ CREATE TABLE $entriesTable (
       bytes = await FileLayer.getFileBytes(await getExternalImgDatabasePath(),
           name: imageName, useExternalPath: true);
       if (bytes != null) {
-        FileLayer.createFile(
+        await FileLayer.createFile(
             await getInternalImgDatabasePath(), imageName, bytes,
-            useExternalPath: false); // Background
+            useExternalPath: false);
       }
     }
     return bytes;
@@ -182,7 +182,9 @@ CREATE TABLE $entriesTable (
     final newImageName =
         "daily_you_${currTime.month}_${currTime.day}_${currTime.year}-${currTime.hour}.${currTime.minute}.${currTime.second}.jpg";
     if (usingExternalImg()) {
-      createImgExternal(newImageName, bytes); // Background
+      await FileLayer.createFile(
+          await getExternalImgDatabasePath(), imageName, bytes,
+          useExternalPath: true);
     }
     var imageFilePath = await FileLayer.createFile(
         await getInternalImgDatabasePath(), newImageName, bytes,
@@ -193,18 +195,6 @@ CREATE TABLE $entriesTable (
       MediaScanner.loadMedia(path: imageFilePath);
     }
     return newImageName;
-  }
-
-  Future<String?> createImgExternal(String imageName, Uint8List bytes) async {
-    // Check that image does not exist
-    if (await FileLayer.getFileBytes(await getExternalImgDatabasePath(),
-            name: imageName, useExternalPath: true) ==
-        null) {
-      return await FileLayer.createFile(
-          await getExternalImgDatabasePath(), imageName, bytes,
-          useExternalPath: true);
-    }
-    return null;
   }
 
   Future<bool> deleteImg(String imageName) async {
@@ -495,8 +485,12 @@ CREATE TABLE $entriesTable (
     String? saveDir = await FileLayer.pickDirectory();
     if (saveDir == null) return false;
 
+    List<String> externalImages =
+        await FileLayer.listFiles(saveDir, useExternalPath: true);
+
     for (Entry entry in entries) {
       if (entry.imgPath == null) continue;
+      if (externalImages.contains(entry.imgPath!)) continue;
       var bytes = await getImgBytes(entry.imgPath!);
       if (bytes == null) continue;
       var newImageName =
@@ -532,7 +526,9 @@ CREATE TABLE $entriesTable (
             await file.readAsBytes(),
             useExternalPath: false);
         if (usingExternalImg() && !externalImages.contains(file.name)) {
-          await createImgExternal(file.name, await file.readAsBytes());
+          await FileLayer.createFile(await getExternalImgDatabasePath(),
+              file.name, await file.readAsBytes(),
+              useExternalPath: true);
         }
         if (imageFilePath == null) return false;
         if (Platform.isAndroid) {
