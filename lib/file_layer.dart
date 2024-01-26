@@ -135,4 +135,35 @@ class FileLayer {
       return true;
     }
   }
+
+  static Future<List<String>> listFiles(String destination,
+      {useExternalPath = true}) async {
+    List<String> fileNames = List.empty(growable: true);
+    if (Platform.isAndroid && useExternalPath) {
+      // Android
+      const List<saf.DocumentFileColumn> columns = <saf.DocumentFileColumn>[
+        saf.DocumentFileColumn.displayName,
+        saf.DocumentFileColumn.mimeType,
+      ];
+
+      var fileList = saf.listFiles(Uri.parse(destination), columns: columns);
+
+      await for (saf.DocumentFile file in fileList) {
+        if (file.isFile != null && file.isFile!) {
+          if (file.name != null) {
+            fileNames.add(file.name!);
+          }
+        }
+      }
+    } else {
+      // Desktop
+      var files = Directory(destination).list();
+      await for (FileSystemEntity fileEntity in files) {
+        if (fileEntity is File) {
+          fileNames.add(basename(fileEntity.path));
+        }
+      }
+    }
+    return fileNames;
+  }
 }

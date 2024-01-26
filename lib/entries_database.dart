@@ -21,7 +21,7 @@ class EntriesDatabase {
   EntriesDatabase._init();
 
   Future<bool> initDB() async {
-    if (usingExternalDb()) syncExternalDatabase();
+    if (usingExternalDb()) syncDatabase();
     final dbPath = await getInternalDbPath();
 
     _database = await openDatabase(dbPath, version: 1, onCreate: _createDB);
@@ -177,8 +177,6 @@ CREATE TABLE $entriesTable (
     final currTime = DateTime.now();
     // Don't make a copy of files already in the folder
     if (await getImgBytes(imageName) != null) {
-      // Create the image externally if not already present
-      if (usingExternalImg()) createImgExternal(imageName, bytes); // Background
       return imageName;
     }
     final newImageName =
@@ -259,26 +257,30 @@ CREATE TABLE $entriesTable (
   }
 
   Future<bool> selectDatabaseLocation() async {
+    StatsProvider.instance.updateSyncStats(0, 0);
     var selectedDirectory = await FileLayer.pickDirectory();
     if (selectedDirectory == null) return false;
 
     // Save old external path
     var oldExternalPath = ConfigManager.instance.getField('externalDbUri');
+    var oldUseExternalPath = usingExternalDb();
 
     await ConfigManager.instance.setField('externalDbUri', selectedDirectory);
     await ConfigManager.instance.setField('useExternalDb', true);
     // Sync with external folder
-    var synced = await syncExternalDatabase(forceOverwrite: true);
+    var synced = await syncDatabase(forceOverwrite: true);
     if (synced) {
       // Open new database and update stats
       await _database!.close();
       await initDB();
       await StatsProvider.instance.updateStats();
+      if (usingExternalImg()) await syncImageFolder(true);
       return true;
     } else {
       // Restore state after failure
       await ConfigManager.instance.setField('externalDbUri', oldExternalPath);
-      await ConfigManager.instance.setField('useExternalDb', false);
+      await ConfigManager.instance
+          .setField('useExternalDb', oldUseExternalPath);
       return false;
     }
   }
@@ -292,7 +294,7 @@ CREATE TABLE $entriesTable (
         name: "daily_you.db");
   }
 
-  Future<bool> syncExternalDatabase({bool forceOverwrite = false}) async {
+  Future<bool> syncDatabase({bool forceOverwrite = false}) async {
     var externalBytes = await FileLayer.getFileBytes(
         ConfigManager.instance.getField('externalDbUri'),
         name: "daily_you.db");
@@ -331,6 +333,72 @@ CREATE TABLE $entriesTable (
     return externalModifiedTime.isAfter(internalModifiedTime);
   }
 
+  Future<bool> syncImageFolder(bool garbageCollect) async {
+    StatsProvider.instance.updateSyncStats(0, 0);
+    List<String> entryImages = List.empty(growable: true);
+
+    List<String> externalImages = await FileLayer.listFiles(
+        await getExternalImgDatabasePath(),
+        useExternalPath: true);
+    List<String> internalImages = await FileLayer.listFiles(
+        await getInternalImgDatabasePath(),
+        useExternalPath: false);
+
+    List<Entry> entries = await getAllEntries();
+    int syncedEntries = 0;
+    for (Entry entry in entries) {
+      if (entry.imgPath != null) {
+        var entryImg = entry.imgPath!;
+        entryImages.add(entryImg);
+
+        // Export
+        if (internalImages.contains(entryImg) &&
+            !externalImages.contains(entryImg)) {
+          var bytes = await FileLayer.getFileBytes(
+              await getInternalImgDatabasePath(),
+              name: entry.imgPath!,
+              useExternalPath: false);
+          await FileLayer.createFile(
+              await getExternalImgDatabasePath(), entryImg, bytes!,
+              useExternalPath: true);
+        }
+
+        // Import
+        if (externalImages.contains(entryImg) &&
+            !internalImages.contains(entryImg)) {
+          var bytes = await FileLayer.getFileBytes(
+              await getExternalImgDatabasePath(),
+              name: entryImg,
+              useExternalPath: true);
+          await FileLayer.createFile(
+              await getInternalImgDatabasePath(), entryImg, bytes!,
+              useExternalPath: false);
+        }
+      }
+      syncedEntries += 1;
+      StatsProvider.instance.updateSyncStats(entries.length, syncedEntries);
+    }
+
+    if (garbageCollect) {
+      return await garbageCollectImages(entryImages);
+    }
+    return true;
+  }
+
+  Future<bool> garbageCollectImages(List<String> entryImages) async {
+    // Get all internal photos
+    var internalImages = Directory(await getInternalImgDatabasePath()).list();
+    await for (FileSystemEntity fileEntity in internalImages) {
+      if (fileEntity is File) {
+        // Delete any that aren't used
+        if (!entryImages.contains(basename(fileEntity.path))) {
+          await File(fileEntity.path).delete();
+        }
+      }
+    }
+    return true;
+  }
+
   void resetDatabaseLocation() async {
     await _database!.close();
     await ConfigManager.instance.setField('useExternalDb', false);
@@ -341,9 +409,24 @@ CREATE TABLE $entriesTable (
   Future<bool> selectImageFolder() async {
     var selectedDirectory = await FileLayer.pickDirectory();
     if (selectedDirectory == null) return false;
+
+    // Save Old Settings
+    var oldExternalImgUri = ConfigManager.instance.getField('externalImgUri');
+    var oldUseExternalImg = usingExternalImg();
+
     await ConfigManager.instance.setField('externalImgUri', selectedDirectory);
     await ConfigManager.instance.setField('useExternalImg', true);
-    return true;
+    var synced = await syncImageFolder(true);
+    if (synced) {
+      return true;
+    } else {
+      // Restore Settings
+      await ConfigManager.instance
+          .setField('externalImgUri', oldExternalImgUri);
+      await ConfigManager.instance
+          .setField('useExternalImg', oldUseExternalImg);
+      return false;
+    }
   }
 
   void resetImageFolderLocation() async {
@@ -364,6 +447,7 @@ CREATE TABLE $entriesTable (
   }
 
   Future<bool> importFromOneShot() async {
+    StatsProvider.instance.updateSyncStats(0, 0);
     var selectedFile = await FileLayer.pickFile();
     if (selectedFile == null) return false;
     var bytes = await FileLayer.getFileBytes(selectedFile);
@@ -401,7 +485,7 @@ CREATE TABLE $entriesTable (
         });
       }
     }
-
+    if (usingExternalImg()) await syncImageFolder(true);
     return true;
   }
 
@@ -428,24 +512,38 @@ CREATE TABLE $entriesTable (
   }
 
   Future<bool> importImages() async {
+    StatsProvider.instance.updateSyncStats(0, 0);
     final picker = ImagePicker();
     final pickedFiles = await picker.pickMultiImage();
 
+    List<String> externalImages = await FileLayer.listFiles(
+        await getExternalImgDatabasePath(),
+        useExternalPath: true);
+    List<String> internalImages = await FileLayer.listFiles(
+        await getInternalImgDatabasePath(),
+        useExternalPath: false);
+
+    int imported = 0;
     for (XFile file in pickedFiles) {
-      var imageFilePath = await FileLayer.createFile(
-          await getInternalImgDatabasePath(),
-          file.name,
-          await file.readAsBytes(),
-          useExternalPath: false);
-      if (usingExternalImg()) {
-        await createImgExternal(file.name, await file.readAsBytes());
+      if (!internalImages.contains(file.name)) {
+        var imageFilePath = await FileLayer.createFile(
+            await getInternalImgDatabasePath(),
+            file.name,
+            await file.readAsBytes(),
+            useExternalPath: false);
+        if (usingExternalImg() && !externalImages.contains(file.name)) {
+          await createImgExternal(file.name, await file.readAsBytes());
+        }
+        if (imageFilePath == null) return false;
+        if (Platform.isAndroid) {
+          // Add image to media store
+          MediaScanner.loadMedia(path: imageFilePath);
+          await File(file.path).delete();
+        }
       }
-      if (imageFilePath == null) return false;
-      if (Platform.isAndroid) {
-        // Add image to media store
-        MediaScanner.loadMedia(path: imageFilePath);
-        await File(file.path).delete();
-      }
+
+      imported += 1;
+      StatsProvider.instance.updateSyncStats(pickedFiles.length, imported);
     }
     return true;
   }
@@ -478,6 +576,7 @@ CREATE TABLE $entriesTable (
   }
 
   Future<bool> importFromJson() async {
+    StatsProvider.instance.updateSyncStats(0, 0);
     var selectedFile = await FileLayer.pickFile();
     if (selectedFile == null) return false;
     var bytes = await FileLayer.getFileBytes(selectedFile);
@@ -498,6 +597,7 @@ CREATE TABLE $entriesTable (
         });
       }
     }
+    if (usingExternalImg()) await syncImageFolder(true);
     return true;
   }
 }

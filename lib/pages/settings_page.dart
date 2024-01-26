@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:daily_you/notification_manager.dart';
+import 'package:daily_you/stats_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +24,8 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
+  bool isSyncing = false;
+
   Future<bool> requestStoragePermission() async {
     DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
     AndroidDeviceInfo androidInfo = await deviceInfoPlugin.androidInfo;
@@ -57,14 +60,7 @@ class _SettingsPageState extends State<SettingsPage> {
       return false;
     } else {
       //Modern Photos Permission
-      var status = await Permission.photos.status;
-      if (!status.isGranted) {
-        status = await Permission.photos.request();
-      }
-      if (status.isGranted) {
-        return true;
-      }
-      return false;
+      return true;
     }
   }
 
@@ -76,7 +72,7 @@ class _SettingsPageState extends State<SettingsPage> {
         return AlertDialog(
           title: const Text('Warning:'),
           content: const Text(
-              "If the selected directory already contains \"daily_you.db\", it will be used to overwrite your current logs!"),
+              "Backup your logs and images before changing the log folder! If the selected directory already contains \"daily_you.db\", it will be used to overwrite your current logs!"),
           actions: [
             ElevatedButton(
               child: const Text("Ok"),
@@ -90,8 +86,14 @@ class _SettingsPageState extends State<SettingsPage> {
       },
     );
     if (confirmed) {
+      setState(() {
+        isSyncing = true;
+      });
       bool locationSet =
           await EntriesDatabase.instance.selectDatabaseLocation();
+      setState(() {
+        isSyncing = false;
+      });
       if (!locationSet) {
         await showDialog(
             context: context,
@@ -99,6 +101,50 @@ class _SettingsPageState extends State<SettingsPage> {
               return const AlertDialog(
                   title: Text("Error:"),
                   content: Text("Permission Denied: Log folder not changed!"));
+            });
+      }
+
+      setState(() {});
+    }
+  }
+
+  Future<void> _showChangeImgFolderWarning(BuildContext context) async {
+    bool confirmed = false;
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Warning:'),
+          content: const Text(
+              "Backup your images before changing the image folder!"),
+          actions: [
+            ElevatedButton(
+              child: const Text("Ok"),
+              onPressed: () async {
+                confirmed = true;
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+    if (confirmed) {
+      setState(() {
+        isSyncing = true;
+      });
+      bool locationSet = await EntriesDatabase.instance.selectImageFolder();
+      setState(() {
+        isSyncing = false;
+      });
+      if (!locationSet) {
+        await showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return const AlertDialog(
+                  title: Text("Error:"),
+                  content:
+                      Text("Permission Denied: Image folder not changed!"));
             });
       }
 
@@ -370,14 +416,26 @@ class _SettingsPageState extends State<SettingsPage> {
               ListTile(
                   title: const Text('Daily You'),
                   onTap: () async {
-                    await EntriesDatabase.instance.importFromJson();
                     Navigator.pop(context);
+                    setState(() {
+                      isSyncing = true;
+                    });
+                    await EntriesDatabase.instance.importFromJson();
+                    setState(() {
+                      isSyncing = false;
+                    });
                   }),
               ListTile(
                   title: const Text('OneShot'),
                   onTap: () async {
-                    await EntriesDatabase.instance.importFromOneShot();
                     Navigator.pop(context);
+                    setState(() {
+                      isSyncing = true;
+                    });
+                    await EntriesDatabase.instance.importFromOneShot();
+                    setState(() {
+                      isSyncing = false;
+                    });
                   }),
             ],
           ),
@@ -398,8 +456,8 @@ class _SettingsPageState extends State<SettingsPage> {
               ListTile(
                   title: const Text('Daily You'),
                   onTap: () async {
-                    await EntriesDatabase.instance.exportToJson();
                     Navigator.pop(context);
+                    await EntriesDatabase.instance.exportToJson();
                   }),
             ],
           ),
@@ -437,8 +495,8 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                     ),
                     onPressed: () async {
-                      await EntriesDatabase.instance.deleteAllEntries();
                       Navigator.pop(context);
+                      await EntriesDatabase.instance.deleteAllEntries();
                     },
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.all(12),
@@ -513,520 +571,550 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final statsProvider = Provider.of<StatsProvider>(context);
     final themeProvider = Provider.of<ThemeModeProvider>(context);
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Settings"),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(8),
-        children: [
-          const Row(
-            children: [
-              Text(
-                "Appearance",
-                style: TextStyle(fontSize: 24),
+    return PopScope(
+      canPop: !isSyncing,
+      child: isSyncing
+          ? Scaffold(
+              body: Center(
+                  child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  "Syncing...",
+                  style: TextStyle(fontSize: 22),
+                ),
+                const Text(
+                  "Do not close the app! This may take awhile...",
+                  style: TextStyle(fontSize: 18),
+                ),
+                statsProvider.totalEntries == 0
+                    ? const Text("Loading...")
+                    : Text(
+                        "Synced ${statsProvider.syncedEntries} out of ${statsProvider.totalEntries}"),
+                const SizedBox(
+                  height: 10,
+                ),
+                const CircularProgressIndicator(),
+              ],
+            )))
+          : Scaffold(
+              appBar: AppBar(
+                title: const Text("Settings"),
               ),
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "Theme",
-                  style: TextStyle(fontSize: 18),
-                ),
-                ElevatedButton.icon(
-                  icon: Icon(
-                    themeProvider.themeMode == ThemeMode.system
-                        ? Icons.brightness_medium
-                        : themeProvider.themeMode == ThemeMode.light
-                            ? Icons.brightness_high
-                            : Icons.brightness_2_rounded,
-                  ),
-                  label: themeProvider.themeMode == ThemeMode.system
-                      ? const Text("System")
-                      : themeProvider.themeMode == ThemeMode.light
-                          ? const Text("Light")
-                          : (ConfigManager.instance.getField('theme') ==
-                                  'amoled')
-                              ? const Text("AMOLED")
-                              : const Text("Dark"),
-                  onPressed: () async {
-                    await ConfigManager.instance.setField('theme', 'system');
-                    _showThemeSelectionPopup(themeProvider);
-                  },
-                ),
-              ],
-            ),
-          ),
-          Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
+              body: ListView(
+                padding: const EdgeInsets.all(8),
                 children: [
-                  Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          "Use System Accent Color",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        Switch(
-                            value: ConfigManager.instance
-                                .getField('followSystemColor'),
-                            onChanged: (value) {
-                              setState(() {
-                                ConfigManager.instance
-                                    .setField('followSystemColor', value);
-                                themeProvider.updateAccentColor();
-                              });
-                            })
-                      ]),
-                  if (!ConfigManager.instance.getField('followSystemColor'))
-                    ElevatedButton.icon(
-                      icon: const Icon(
-                        Icons.color_lens_rounded,
+                  const Row(
+                    children: [
+                      Text(
+                        "Appearance",
+                        style: TextStyle(fontSize: 24),
                       ),
-                      label: const Text("Custom Accent Color"),
-                      onPressed: () async {
-                        _showAccentColorPopup(themeProvider);
-                      },
-                    ),
-                ],
-              )),
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "Mood Icons",
-                  style: TextStyle(fontSize: 18),
-                ),
-                Row(
-                  children: [
-                    moodIconButton(-2),
-                    moodIconButton(-1),
-                    moodIconButton(0),
-                    moodIconButton(1),
-                    moodIconButton(2),
-                    moodIconButton(null),
-                  ],
-                )
-              ],
-            ),
-          ),
-          Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      "Start Calendar Week on Monday",
-                      style: TextStyle(fontSize: 18),
-                    ),
-                    Switch(
-                        value: ConfigManager.instance
-                                .getField('startingDayOfWeek') !=
-                            'sunday',
-                        onChanged: (value) {
-                          if (value) {
-                            setState(() {
-                              ConfigManager.instance
-                                  .setField('startingDayOfWeek', 'monday');
-                            });
-                          } else {
-                            setState(() {
-                              ConfigManager.instance
-                                  .setField('startingDayOfWeek', 'sunday');
-                            });
-                          }
-                        })
-                  ])),
-          const Divider(),
-          if (Platform.isAndroid)
-            const Row(
-              children: [
-                Text(
-                  "Notifications",
-                  style: TextStyle(fontSize: 24),
-                ),
-              ],
-            ),
-          if (Platform.isAndroid)
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
+                    ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
                       children: [
                         const Text(
-                          "Daily Reminders",
+                          "Theme",
                           style: TextStyle(fontSize: 18),
                         ),
-                        const Text(
-                          "Allow app to run in background for best results",
-                          style: TextStyle(fontSize: 14),
+                        ElevatedButton.icon(
+                          icon: Icon(
+                            themeProvider.themeMode == ThemeMode.system
+                                ? Icons.brightness_medium
+                                : themeProvider.themeMode == ThemeMode.light
+                                    ? Icons.brightness_high
+                                    : Icons.brightness_2_rounded,
+                          ),
+                          label: themeProvider.themeMode == ThemeMode.system
+                              ? const Text("System")
+                              : themeProvider.themeMode == ThemeMode.light
+                                  ? const Text("Light")
+                                  : (ConfigManager.instance.getField('theme') ==
+                                          'amoled')
+                                      ? const Text("AMOLED")
+                                      : const Text("Dark"),
+                          onPressed: () async {
+                            await ConfigManager.instance
+                                .setField('theme', 'system');
+                            _showThemeSelectionPopup(themeProvider);
+                          },
                         ),
                       ],
                     ),
-                    Switch(
-                        value:
-                            ConfigManager.instance.getField('dailyReminders'),
-                        onChanged: (value) async {
-                          if (await NotificationManager.instance
-                              .hasNotificationPermission()) {
-                            if (value) {
-                              await NotificationManager.instance
-                                  .startScheduledDailyReminders();
-                            } else {
-                              await NotificationManager.instance
-                                  .stopDailyReminders();
-                            }
-                            await ConfigManager.instance
-                                .setField('dailyReminders', value);
-                            setState(() {});
-                          }
-                        }),
-                  ],
-                ),
-                ElevatedButton.icon(
-                    icon: const Icon(Icons.schedule_rounded),
-                    onPressed: () async {
-                      _selectTime(context);
-                    },
-                    label: Text(TimeManager.timeOfDayString(
-                        TimeManager.scheduledReminderTime()))),
-              ],
-            ),
-          if (Platform.isAndroid) const Divider(),
-          const Row(
-            children: [
-              Text(
-                "Storage",
-                style: TextStyle(fontSize: 24),
+                  ),
+                  Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  "Use System Accent Color",
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                                Switch(
+                                    value: ConfigManager.instance
+                                        .getField('followSystemColor'),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        ConfigManager.instance.setField(
+                                            'followSystemColor', value);
+                                        themeProvider.updateAccentColor();
+                                      });
+                                    })
+                              ]),
+                          if (!ConfigManager.instance
+                              .getField('followSystemColor'))
+                            ElevatedButton.icon(
+                              icon: const Icon(
+                                Icons.color_lens_rounded,
+                              ),
+                              label: const Text("Custom Accent Color"),
+                              onPressed: () async {
+                                _showAccentColorPopup(themeProvider);
+                              },
+                            ),
+                        ],
+                      )),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Mood Icons",
+                          style: TextStyle(fontSize: 18),
+                        ),
+                        Row(
+                          children: [
+                            moodIconButton(-2),
+                            moodIconButton(-1),
+                            moodIconButton(0),
+                            moodIconButton(1),
+                            moodIconButton(2),
+                            moodIconButton(null),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                  Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              "Start Calendar Week on Monday",
+                              style: TextStyle(fontSize: 18),
+                            ),
+                            Switch(
+                                value: ConfigManager.instance
+                                        .getField('startingDayOfWeek') !=
+                                    'sunday',
+                                onChanged: (value) {
+                                  if (value) {
+                                    setState(() {
+                                      ConfigManager.instance.setField(
+                                          'startingDayOfWeek', 'monday');
+                                    });
+                                  } else {
+                                    setState(() {
+                                      ConfigManager.instance.setField(
+                                          'startingDayOfWeek', 'sunday');
+                                    });
+                                  }
+                                })
+                          ])),
+                  const Divider(),
+                  if (Platform.isAndroid)
+                    const Row(
+                      children: [
+                        Text(
+                          "Notifications",
+                          style: TextStyle(fontSize: 24),
+                        ),
+                      ],
+                    ),
+                  if (Platform.isAndroid)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  "Daily Reminders",
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                                Text(
+                                  "Allow app to run in background for best results",
+                                  style: TextStyle(fontSize: 14),
+                                ),
+                              ],
+                            ),
+                            Switch(
+                                value: ConfigManager.instance
+                                    .getField('dailyReminders'),
+                                onChanged: (value) async {
+                                  if (await NotificationManager.instance
+                                      .hasNotificationPermission()) {
+                                    if (value) {
+                                      await NotificationManager.instance
+                                          .startScheduledDailyReminders();
+                                    } else {
+                                      await NotificationManager.instance
+                                          .stopDailyReminders();
+                                    }
+                                    await ConfigManager.instance
+                                        .setField('dailyReminders', value);
+                                    setState(() {});
+                                  }
+                                }),
+                          ],
+                        ),
+                        ElevatedButton.icon(
+                            icon: const Icon(Icons.schedule_rounded),
+                            onPressed: () async {
+                              _selectTime(context);
+                            },
+                            label: Text(TimeManager.timeOfDayString(
+                                TimeManager.scheduledReminderTime()))),
+                      ],
+                    ),
+                  if (Platform.isAndroid) const Divider(),
+                  const Row(
+                    children: [
+                      Text(
+                        "Storage",
+                        style: TextStyle(fontSize: 24),
+                      ),
+                    ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Log Folder",
+                          style: TextStyle(fontSize: 18),
+                        ),
+                        FutureBuilder(
+                            future:
+                                EntriesDatabase.instance.getInternalDbPath(),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData && snapshot.data != null) {
+                                if (EntriesDatabase.instance
+                                    .usingExternalDb()) {
+                                  return Text(ConfigManager.instance
+                                      .getField('externalDbUri'));
+                                }
+                                return Text(snapshot.data!);
+                              }
+                              return const Text("...");
+                            }),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            ElevatedButton.icon(
+                              icon: const Icon(
+                                Icons.folder_copy_rounded,
+                              ),
+                              label: const Text("Change Log Folder..."),
+                              onPressed: () async {
+                                if (Platform.isAndroid &&
+                                    !await requestStoragePermission()) {
+                                  return;
+                                }
+                                await _showChangeLogFolderWarning(context);
+                              },
+                            ),
+                            IconButton(
+                                onPressed: () async {
+                                  EntriesDatabase.instance
+                                      .resetDatabaseLocation();
+                                  setState(() {});
+                                },
+                                icon: const Icon(Icons.refresh_rounded))
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Image Folder",
+                          style: TextStyle(fontSize: 18),
+                        ),
+                        FutureBuilder(
+                            future: EntriesDatabase.instance
+                                .getInternalImgDatabasePath(),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData && snapshot.data != null) {
+                                if (EntriesDatabase.instance
+                                    .usingExternalImg()) {
+                                  return Text(ConfigManager.instance
+                                      .getField('externalImgUri'));
+                                }
+                                return Text(snapshot.data!);
+                              }
+                              return const Text("...");
+                            }),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            ElevatedButton.icon(
+                              icon: const Icon(
+                                Icons.folder_copy_rounded,
+                              ),
+                              label: const Text("Change Image Folder..."),
+                              onPressed: () async {
+                                if (Platform.isAndroid &&
+                                    !await requestPhotosPermission()) {
+                                  return;
+                                }
+                                await _showChangeImgFolderWarning(context);
+                              },
+                            ),
+                            IconButton(
+                                onPressed: () async {
+                                  setState(() {
+                                    EntriesDatabase.instance
+                                        .resetImageFolderLocation();
+                                  });
+                                },
+                                icon: const Icon(Icons.refresh_rounded))
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Export",
+                          style: TextStyle(fontSize: 18),
+                        ),
+                        Row(
+                          children: [
+                            ElevatedButton.icon(
+                              icon: const Icon(
+                                Icons.upload_rounded,
+                              ),
+                              label: const Text("Export Logs..."),
+                              onPressed: () async {
+                                if (Platform.isAndroid &&
+                                    !await requestStoragePermission()) {
+                                  return;
+                                }
+                                _showExportSelectionPopup();
+                              },
+                            ),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            ElevatedButton.icon(
+                              icon: const Icon(
+                                Icons.photo,
+                              ),
+                              label: const Text("Export Images..."),
+                              onPressed: () async {
+                                if (Platform.isAndroid &&
+                                    !await requestPhotosPermission()) {
+                                  return;
+                                }
+                                await EntriesDatabase.instance.exportImages();
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Import",
+                          style: TextStyle(fontSize: 18),
+                        ),
+                        Row(
+                          children: [
+                            ElevatedButton.icon(
+                              icon: const Icon(
+                                Icons.download_rounded,
+                              ),
+                              label: const Text("Import Logs..."),
+                              onPressed: () async {
+                                if (Platform.isAndroid &&
+                                    !await requestStoragePermission()) {
+                                  return;
+                                }
+                                _showImportSelectionPopup();
+                              },
+                            ),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            ElevatedButton.icon(
+                              icon: const Icon(
+                                Icons.photo,
+                              ),
+                              label: const Text("Import Images..."),
+                              onPressed: () async {
+                                if (Platform.isAndroid &&
+                                    !await requestPhotosPermission()) {
+                                  return;
+                                }
+                                setState(() {
+                                  isSyncing = true;
+                                });
+                                await EntriesDatabase.instance.importImages();
+                                setState(() {
+                                  isSyncing = false;
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Delete All",
+                          style: TextStyle(fontSize: 18),
+                        ),
+                        ElevatedButton.icon(
+                          icon: const Icon(
+                            Icons.delete_forever_rounded,
+                          ),
+                          label: const Text("Delete All Logs..."),
+                          onPressed: () async {
+                            _showDeleteEntriesPopup();
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Divider(),
+                  const Row(
+                    children: [
+                      Text(
+                        "About",
+                        style: TextStyle(fontSize: 24),
+                      ),
+                    ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Version",
+                          style: TextStyle(fontSize: 18),
+                        ),
+                        ElevatedButton.icon(
+                          icon: const Icon(
+                            Icons.new_releases_rounded,
+                          ),
+                          label: const Text("1.8.0"),
+                          onPressed: () async {
+                            await launchUrl(
+                                Uri.https(
+                                    "github.com", "/Demizo/Daily_You/releases"),
+                                mode: LaunchMode.externalApplication);
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "License",
+                          style: TextStyle(fontSize: 18),
+                        ),
+                        ElevatedButton.icon(
+                          icon: const Icon(Icons.gavel_rounded),
+                          label: const Text("GPL v3"),
+                          onPressed: () async {
+                            await launchUrl(
+                                Uri.https("github.com",
+                                    "/Demizo/Daily_You/blob/master/LICENSE.txt"),
+                                mode: LaunchMode.externalApplication);
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Source Code",
+                          style: TextStyle(fontSize: 18),
+                        ),
+                        ElevatedButton.icon(
+                          icon: const Icon(
+                            Icons.code_rounded,
+                          ),
+                          label: const Text("Github"),
+                          onPressed: () async {
+                            await launchUrl(
+                                Uri.https("github.com", "/Demizo/Daily_You"),
+                                mode: LaunchMode.externalApplication);
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "Log Folder",
-                  style: TextStyle(fontSize: 18),
-                ),
-                FutureBuilder(
-                    future: EntriesDatabase.instance.getInternalDbPath(),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData && snapshot.data != null) {
-                        if (EntriesDatabase.instance.usingExternalDb()) {
-                          return Text(
-                              ConfigManager.instance.getField('externalDbUri'));
-                        }
-                        return Text(snapshot.data!);
-                      }
-                      return const Text("...");
-                    }),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    ElevatedButton.icon(
-                      icon: const Icon(
-                        Icons.folder_copy_rounded,
-                      ),
-                      label: const Text("Change Log Folder..."),
-                      onPressed: () async {
-                        if (Platform.isAndroid &&
-                            !await requestStoragePermission()) {
-                          return;
-                        }
-                        await _showChangeLogFolderWarning(context);
-                      },
-                    ),
-                    IconButton(
-                        onPressed: () async {
-                          EntriesDatabase.instance.resetDatabaseLocation();
-                          setState(() {});
-                        },
-                        icon: const Icon(Icons.refresh_rounded))
-                  ],
-                ),
-              ],
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "Image Folder",
-                  style: TextStyle(fontSize: 18),
-                ),
-                FutureBuilder(
-                    future:
-                        EntriesDatabase.instance.getInternalImgDatabasePath(),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData && snapshot.data != null) {
-                        if (EntriesDatabase.instance.usingExternalImg()) {
-                          return Text(ConfigManager.instance
-                              .getField('externalImgUri'));
-                        }
-                        return Text(snapshot.data!);
-                      }
-                      return const Text("...");
-                    }),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    ElevatedButton.icon(
-                      icon: const Icon(
-                        Icons.folder_copy_rounded,
-                      ),
-                      label: const Text("Change Image Folder..."),
-                      onPressed: () async {
-                        if (Platform.isAndroid &&
-                            !await requestPhotosPermission()) {
-                          return;
-                        }
-                        bool locationSet =
-                            await EntriesDatabase.instance.selectImageFolder();
-                        if (!locationSet) {
-                          await showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return const AlertDialog(
-                                    title: Text("Error:"),
-                                    content: Text(
-                                        "Permission Denied: Image folder not changed!"));
-                              });
-                        }
-                        setState(() {});
-                      },
-                    ),
-                    IconButton(
-                        onPressed: () async {
-                          setState(() {
-                            EntriesDatabase.instance.resetImageFolderLocation();
-                          });
-                        },
-                        icon: const Icon(Icons.refresh_rounded))
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "Export",
-                  style: TextStyle(fontSize: 18),
-                ),
-                Row(
-                  children: [
-                    ElevatedButton.icon(
-                      icon: const Icon(
-                        Icons.upload_rounded,
-                      ),
-                      label: const Text("Export Logs..."),
-                      onPressed: () async {
-                        if (Platform.isAndroid &&
-                            !await requestStoragePermission()) {
-                          return;
-                        }
-                        _showExportSelectionPopup();
-                      },
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    ElevatedButton.icon(
-                      icon: const Icon(
-                        Icons.photo,
-                      ),
-                      label: const Text("Export Images..."),
-                      onPressed: () async {
-                        if (Platform.isAndroid &&
-                            !await requestPhotosPermission()) {
-                          return;
-                        }
-                        await EntriesDatabase.instance.exportImages();
-                      },
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "Import",
-                  style: TextStyle(fontSize: 18),
-                ),
-                Row(
-                  children: [
-                    ElevatedButton.icon(
-                      icon: const Icon(
-                        Icons.download_rounded,
-                      ),
-                      label: const Text("Import Logs..."),
-                      onPressed: () async {
-                        if (Platform.isAndroid &&
-                            !await requestStoragePermission()) {
-                          return;
-                        }
-                        _showImportSelectionPopup();
-                      },
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    ElevatedButton.icon(
-                      icon: const Icon(
-                        Icons.photo,
-                      ),
-                      label: const Text("Import Images..."),
-                      onPressed: () async {
-                        if (Platform.isAndroid &&
-                            !await requestPhotosPermission()) {
-                          return;
-                        }
-                        await EntriesDatabase.instance.importImages();
-                      },
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "Delete All",
-                  style: TextStyle(fontSize: 18),
-                ),
-                ElevatedButton.icon(
-                  icon: const Icon(
-                    Icons.delete_forever_rounded,
-                  ),
-                  label: const Text("Delete All Logs..."),
-                  onPressed: () async {
-                    _showDeleteEntriesPopup();
-                  },
-                ),
-              ],
-            ),
-          ),
-          const Divider(),
-          const Row(
-            children: [
-              Text(
-                "About",
-                style: TextStyle(fontSize: 24),
-              ),
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "Version",
-                  style: TextStyle(fontSize: 18),
-                ),
-                ElevatedButton.icon(
-                  icon: const Icon(
-                    Icons.new_releases_rounded,
-                  ),
-                  label: const Text("1.8.0"),
-                  onPressed: () async {
-                    await launchUrl(
-                        Uri.https("github.com", "/Demizo/Daily_You/releases"),
-                        mode: LaunchMode.externalApplication);
-                  },
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "License",
-                  style: TextStyle(fontSize: 18),
-                ),
-                ElevatedButton.icon(
-                  icon: const Icon(Icons.gavel_rounded),
-                  label: const Text("GPL v3"),
-                  onPressed: () async {
-                    await launchUrl(
-                        Uri.https("github.com",
-                            "/Demizo/Daily_You/blob/master/LICENSE.txt"),
-                        mode: LaunchMode.externalApplication);
-                  },
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "Source Code",
-                  style: TextStyle(fontSize: 18),
-                ),
-                ElevatedButton.icon(
-                  icon: const Icon(
-                    Icons.code_rounded,
-                  ),
-                  label: const Text("Github"),
-                  onPressed: () async {
-                    await launchUrl(
-                        Uri.https("github.com", "/Demizo/Daily_You"),
-                        mode: LaunchMode.externalApplication);
-                  },
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

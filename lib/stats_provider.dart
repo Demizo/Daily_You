@@ -19,6 +19,15 @@ class StatsProvider with ChangeNotifier {
   int? _daysSinceBadDay = null;
   int? get daysSinceBadDay => _daysSinceBadDay;
 
+  int totalEntries = 0;
+  int syncedEntries = 0;
+
+  void updateSyncStats(int total, int synced) {
+    totalEntries = total;
+    syncedEntries = synced;
+    notifyListeners();
+  }
+
   List<Entry> entries = List.empty();
 
   Future<void> updateStats() async {
