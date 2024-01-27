@@ -166,11 +166,12 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
       return IconButton(
           icon: const Icon(Icons.share_rounded),
           onPressed: () async {
-            String subject;
-            entry.mood != null
-                ? subject =
-                    "${MoodIcon.getMoodIcon(entry.mood)} ${DateFormat.yMMMEd().format(entry.timeCreate)}"
-                : subject = DateFormat.yMMMEd().format(entry.timeCreate);
+            String sharedText = "";
+            if (entry.mood != null) {
+              sharedText = "${MoodIcon.getMoodIcon(entry.mood)} ";
+            }
+            sharedText =
+                "$sharedText${DateFormat.yMMMEd().format(entry.timeCreate)}\n${entry.text}";
 
             if (entry.imgPath != null) {
               // Share Image
@@ -181,19 +182,11 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
                 File temp = await File("${tempDir.path}/${entry.imgPath!}")
                     .writeAsBytes(bytes);
                 await ShareExtend.share(temp.path, "image",
-                    subject: subject, extraText: entry.text);
-              } else {
-                await showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return const AlertDialog(
-                          title: Text("Error:"),
-                          content: Text("Image could not be shared!"));
-                    });
+                    extraText: sharedText);
               }
             } else {
               // Share text
-              ShareExtend.share(entry.text, "text", subject: subject);
+              ShareExtend.share(sharedText, "text");
             }
           });
     }
