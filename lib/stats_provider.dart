@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/time_manager.dart';
@@ -10,6 +9,7 @@ class StatsProvider with ChangeNotifier {
 
   StatsProvider._init();
 
+  // Streaks
   int _currentStreak = 0;
   int get currentStreak => _currentStreak;
 
@@ -28,12 +28,71 @@ class StatsProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  DateTime _referenceDay = DateTime.now();
+  set referenceDay(DateTime dateTime) {
+    _referenceDay = dateTime;
+  }
+
+  // Moods
+  Map<int, int> _moodCountsAllTime = {
+    -2: 0,
+    -1: 0,
+    0: 0,
+    1: 0,
+    2: 0,
+  };
+  Map<int, int> get moodCountsAllTime => _moodCountsAllTime;
+  Map<int, int> _moodCountsThisMonth = {
+    -2: 0,
+    -1: 0,
+    0: 0,
+    1: 0,
+    2: 0,
+  };
+  Map<int, int> get moodCountsThisMonth => _moodCountsThisMonth;
+
   List<Entry> entries = List.empty();
 
   Future<void> updateStats() async {
     entries = await EntriesDatabase.instance.getAllEntries();
     await getStreaks();
+    await getMoodCounts(_referenceDay);
     notifyListeners();
+  }
+
+  Future<void> getMoodCounts(DateTime referenceTime) async {
+    // Reset mood counts
+    _resetMoodCounts();
+    for (Entry entry in entries) {
+      if (entry.mood == null) continue;
+      _moodCountsAllTime.update(
+        entry.mood!,
+        (value) => _moodCountsAllTime[entry.mood!]! + 1,
+      );
+      if (TimeManager.isSameMonth(entry.timeCreate, referenceTime)) {
+        _moodCountsThisMonth.update(
+          entry.mood!,
+          (value) => _moodCountsThisMonth[entry.mood!]! + 1,
+        );
+      }
+    }
+  }
+
+  void _resetMoodCounts() {
+    _moodCountsAllTime = {
+      -2: 0,
+      -1: 0,
+      0: 0,
+      1: 0,
+      2: 0,
+    };
+    _moodCountsThisMonth = {
+      -2: 0,
+      -1: 0,
+      0: 0,
+      1: 0,
+      2: 0,
+    };
   }
 
   Future getStreaks() async {

@@ -1,4 +1,5 @@
 import 'package:daily_you/stats_provider.dart';
+import 'package:daily_you/widgets/mood_totals_chart.dart';
 import 'package:daily_you/widgets/streak_card.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/entries_database.dart';
@@ -15,9 +16,8 @@ class CalendarPage extends StatefulWidget {
 
 class _CalendarPageState extends State<CalendarPage> {
   late Entry? todaysEntry;
+  bool allTime = false;
   bool isLoading = false;
-  String searchText = '';
-  bool sortOrderAsc = true;
 
   @override
   void initState() {
@@ -72,6 +72,26 @@ class _CalendarPageState extends State<CalendarPage> {
         ),
         const Center(
             child: SizedBox(height: 400, width: 400, child: EntryCalendar())),
+        Padding(
+          padding: const EdgeInsets.only(left: 8.0),
+          child: ElevatedButton(
+            onPressed: (() => setState(() {
+                  allTime = !allTime;
+                })),
+            style: ButtonStyle(
+                padding: MaterialStateProperty.all(const EdgeInsets.all(8)),
+                elevation: MaterialStateProperty.all(0.0)),
+            child: Text(
+              allTime ? "All Time" : "This Month",
+              style: const TextStyle(fontSize: 16),
+            ),
+          ),
+        ),
+        MoodTotalsChart(
+          moodCounts: allTime
+              ? StatsProvider.instance.moodCountsAllTime
+              : StatsProvider.instance.moodCountsThisMonth,
+        ),
       ],
     );
   }

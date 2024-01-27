@@ -15,6 +15,13 @@ class TimeManager {
     return false;
   }
 
+  static bool isSameMonth(DateTime dayOne, DateTime dayTwo) {
+    if (dayOne.year == dayTwo.year && dayOne.month == dayTwo.month) {
+      return true;
+    }
+    return false;
+  }
+
   static DateTime startOfDay(DateTime dateTime) {
     return dateTime.copyWith(
         hour: 0, minute: 0, second: 0, millisecond: 0, microsecond: 0);

@@ -34,6 +34,7 @@ dependencies:
     git:
       url: https://github.com/Demizo/shared-storage
   device_info_plus: ^9.1.1
+  fl_chart: ^0.66.0
 
 dev_dependencies:
   flutter_lints: ^3.0.1
