@@ -31,11 +31,14 @@ class StreakCard extends StatelessWidget {
                       style: TextStyle(
                           fontSize: 18,
                           color: Theme.of(context).colorScheme.secondary)),
-                  Text(number.toString(),
-                      style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.primary)),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 6.0),
+                    child: Text(number.toString(),
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.primary)),
+                  ),
                 ],
               ),
             ),
