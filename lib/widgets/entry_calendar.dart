@@ -1,4 +1,5 @@
 import 'package:daily_you/config_manager.dart';
+import 'package:daily_you/stats_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/widgets/entry_day_cell.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -48,6 +49,10 @@ class _EntryCalendarState extends State<EntryCalendar> {
           });
         }
       },
+      onPageChanged: ((focusedDay) {
+        StatsProvider.instance.referenceDay = focusedDay;
+        StatsProvider.instance.updateStats();
+      }),
     );
   }
 }
