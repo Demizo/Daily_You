@@ -1,0 +1,9 @@
+Daily You v2.0.0 ist da! Hier sind die Änderungen:
+
+HINWEIS: Die App ist jetzt signiert! Zum Aktualisieren müssen Sie die alte Version deinstallieren.
+WARNUNG: Sichern Sie unbedingt Ihre Protokolle und Bilder, bevor Sie die alte Version deinstallieren!
+
+• Unterstützung für Android-Inhaltsanbieter hinzugefügt!
+• Der Kalenderseite wurde ein erster Blick auf Stimmungsstatistiken hinzugefügt
+• Verbesserte Kompatibilität mit der Protokollfreigabe-App
+• Berechtigungen für gefährliche Apps entfernt

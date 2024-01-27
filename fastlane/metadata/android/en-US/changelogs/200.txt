@@ -1,0 +1,9 @@
+Daily You v2.0.0 has arrived! Here are the changes:
+
+NOTE: The app is now signed! You will need to uninstall the old version in order to update.
+WARNING: Be sure to backup your logs and images before uninstalling the old version!
+
+• Added support for Android Content Providers!
+• Added a first pass at mood stats to the calendar page
+• Improved log sharing app compatibility
+• Removed dangerous app permissions
