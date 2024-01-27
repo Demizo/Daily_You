@@ -27,13 +27,6 @@ class _CalendarPageState extends State<CalendarPage> {
     getToday();
   }
 
-  @override
-  void dispose() {
-    EntriesDatabase.instance.close();
-
-    super.dispose();
-  }
-
   Future getToday() async {
     setState(() => isLoading = true);
     await StatsProvider.instance.updateStats();

@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:daily_you/entries_database.dart';
-import 'package:media_scanner/media_scanner.dart';
 
 import 'local_image_loader.dart';
 
@@ -52,11 +51,7 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
                       ),
                     ),
                     onPressed: () async {
-                      final path =
-                          '${await EntriesDatabase.instance.getImgDatabasePath()}/${widget.imgPath!}';
-                      if (await File(path).exists()) {
-                        await File(path).delete();
-                      }
+                      await EntriesDatabase.instance.deleteImg(widget.imgPath!);
                       widget.onChangedImage(null);
                       Navigator.pop(context);
                     },
@@ -135,29 +130,16 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
   }
 
   Future<void> saveImage(XFile pickedFile) async {
-    // Save the image to a custom location defined by your app
-    final imgDirectory = await EntriesDatabase.instance.getImgDatabasePath();
-    final currTime = DateTime.now();
-    // Don't make a copy of files already in the folder
-    if (await File("$imgDirectory/${pickedFile.name}").exists()) {
-      setState(() {
-        widget.onChangedImage(pickedFile.name);
-      });
-      return;
-    }
-    final imageName =
-        "daily_you_${currTime.month}_${currTime.day}_${currTime.year}-${currTime.hour}.${currTime.minute}.${currTime.second}.jpg";
-    final imageFilePath = "$imgDirectory/$imageName";
-    await pickedFile.saveTo(imageFilePath);
-    if (Platform.isAndroid) {
-      // Add image to media store
-      MediaScanner.loadMedia(path: imageFilePath);
-    }
+    var imageName = await EntriesDatabase.instance
+        .createImg(pickedFile.name, await pickedFile.readAsBytes());
+    if (imageName == null) return;
     setState(() {
       widget.onChangedImage(imageName);
     });
     // Delete picked file from cache
-    await File(pickedFile.path).delete();
+    if (Platform.isAndroid) {
+      await File(pickedFile.path).delete();
+    }
   }
 
   @override

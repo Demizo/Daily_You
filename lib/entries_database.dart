@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
+import 'package:daily_you/file_layer.dart';
 import 'package:daily_you/stats_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:daily_you/models/entry.dart';
@@ -18,20 +20,12 @@ class EntriesDatabase {
 
   EntriesDatabase._init();
 
-  Future<Database> get database async {
-    if (_database != null) {
-      return _database!;
-    }
+  Future<bool> initDB() async {
+    if (usingExternalDb()) syncDatabase();
+    final dbPath = await getInternalDbPath();
 
-    _database = await _initDB('daily_you.db');
-    return _database!;
-  }
-
-  Future<Database> _initDB(String filePath) async {
-    final dbPath = await getLogDatabasePath();
-
-    final path = join(dbPath, filePath);
-    return await openDatabase(path, version: 1, onCreate: _createDB);
+    _database = await openDatabase(dbPath, version: 1, onCreate: _createDB);
+    return _database != null;
   }
 
   Future _createDB(Database db, int version) async {
@@ -48,15 +42,16 @@ CREATE TABLE $entriesTable (
   }
 
   Future<Entry> create(Entry entry) async {
-    final db = await instance.database;
+    final db = _database!;
 
     final id = await db.insert(entriesTable, entry.toJson());
     await StatsProvider.instance.updateStats();
+    if (usingExternalDb()) await updateExternalDatabase();
     return entry.copy(id: id);
   }
 
   Future<Entry?> getEntry(int id) async {
-    final db = await instance.database;
+    final db = _database!;
 
     final maps = await db.query(
       entriesTable,
@@ -88,7 +83,7 @@ CREATE TABLE $entriesTable (
   }
 
   Future<List<Entry>> getAllEntries() async {
-    final db = await instance.database;
+    final db = _database!;
 
     final result =
         await db.query(entriesTable, orderBy: '${EntryFields.timeCreate} DESC');
@@ -97,7 +92,7 @@ CREATE TABLE $entriesTable (
   }
 
   Future<List<Entry>> getAllEntriesSorted(String orderBy, String order) async {
-    final db = await instance.database;
+    final db = _database!;
 
     final result = await db.query(entriesTable, orderBy: '$orderBy $order');
 
@@ -105,7 +100,7 @@ CREATE TABLE $entriesTable (
   }
 
   Future<int> updateEntry(Entry entry) async {
-    final db = await instance.database;
+    final db = _database!;
 
     final id = await db.update(
       entriesTable,
@@ -114,11 +109,12 @@ CREATE TABLE $entriesTable (
       whereArgs: [entry.id],
     );
     await StatsProvider.instance.updateStats();
+    if (usingExternalDb()) await updateExternalDatabase();
     return id;
   }
 
   Future<int> deleteEntry(int id) async {
-    final db = await instance.database;
+    final db = _database!;
 
     final removedId = await db.delete(
       entriesTable,
@@ -126,128 +122,309 @@ CREATE TABLE $entriesTable (
       whereArgs: [id],
     );
     await StatsProvider.instance.updateStats();
+    if (usingExternalDb()) await updateExternalDatabase();
     return removedId;
   }
 
   Future<void> deleteAllEntries() async {
     final entries = await getAllEntries();
     for (Entry entry in entries) {
-      await deleteEntryImage(entry.id!);
-      await deleteEntry(entry.id!);
+      if (entry.imgPath != null) await deleteImg(entry.imgPath!);
     }
+    final db = _database!;
+
+    await db.delete(
+      entriesTable,
+    );
+
+    await StatsProvider.instance.updateStats();
+    if (usingExternalDb()) await updateExternalDatabase();
   }
 
   Future close() async {
-    final db = await instance.database;
+    final db = _database!;
     _database = null;
     db.close();
   }
 
-  Future<String> getImgPath(String imageName) async {
-    var basePath = await getImgDatabasePath();
-
-    return '$basePath/$imageName';
+  bool usingExternalDb() {
+    return ConfigManager.instance.getField('useExternalDb') ?? false;
   }
 
-  Future<void> deleteEntryImage(int id) async {
-    final entry = await getEntry(id);
-    if (entry != null && entry.imgPath != null) {
-      final path = '${await getImgDatabasePath()}/${entry.imgPath!}';
-      if (await File(path).exists()) {
-        await File(path).delete();
+  bool usingExternalImg() {
+    return ConfigManager.instance.getField('useExternalImg') ?? false;
+  }
+
+  Future<Uint8List?> getImgBytes(String imageName) async {
+    // Fetch local copy if present
+    var bytes = await FileLayer.getFileBytes(await getInternalImgDatabasePath(),
+        name: imageName, useExternalPath: false);
+    // Attempt to fetch file externally
+    if (bytes == null && usingExternalImg()) {
+      // Get and cache external image
+      bytes = await FileLayer.getFileBytes(await getExternalImgDatabasePath(),
+          name: imageName, useExternalPath: true);
+      if (bytes != null) {
+        await FileLayer.createFile(
+            await getInternalImgDatabasePath(), imageName, bytes,
+            useExternalPath: false);
       }
     }
+    return bytes;
   }
 
-  Future<String> getImgDatabasePath() async {
-    if (ConfigManager.instance.getField('imgPath') == '') {
-      Directory basePath;
-      if (Platform.isAndroid) {
-        basePath = (await getExternalStorageDirectory())!;
-        basePath = Directory('${basePath.path}/Images');
-      } else {
-        basePath = await getApplicationSupportDirectory();
-        basePath = Directory('${basePath.path}/Images');
-      }
+  Future<String?> createImg(String imageName, Uint8List bytes) async {
+    final currTime = DateTime.now();
+    // Don't make a copy of files already in the folder
+    if (await getImgBytes(imageName) != null) {
+      return imageName;
+    }
+    final newImageName =
+        "daily_you_${currTime.month}_${currTime.day}_${currTime.year}-${currTime.hour}.${currTime.minute}.${currTime.second}.jpg";
+    if (usingExternalImg()) {
+      FileLayer.createFile(await getExternalImgDatabasePath(), imageName, bytes,
+          useExternalPath: true); //Background
+    }
+    var imageFilePath = await FileLayer.createFile(
+        await getInternalImgDatabasePath(), newImageName, bytes,
+        useExternalPath: false);
+    if (imageFilePath == null) return null;
+    if (Platform.isAndroid) {
+      // Add image to media store
+      MediaScanner.loadMedia(path: imageFilePath);
+    }
+    return newImageName;
+  }
 
+  Future<bool> deleteImg(String imageName) async {
+    // Delete remote
+    if (usingExternalImg()) {
+      await FileLayer.deleteFile(await getExternalImgDatabasePath(),
+          name: imageName, useExternalPath: true);
+    }
+    // Delete local
+    return await FileLayer.deleteFile(await getInternalImgDatabasePath(),
+        name: imageName, useExternalPath: false);
+  }
+
+  Future<String> getInternalImgDatabasePath() async {
+    Directory basePath;
+    if (Platform.isAndroid) {
+      basePath = (await getExternalStorageDirectory())!;
+      basePath = Directory('${basePath.path}/Images');
+      if (!basePath.existsSync()) {
+        basePath.createSync(recursive: true);
+      }
+      return basePath.path;
+    } else {
+      basePath = await getApplicationSupportDirectory();
+      basePath = Directory('${basePath.path}/Images');
       if (!basePath.existsSync()) {
         basePath.createSync(recursive: true);
       }
 
       return basePath.path;
     }
-    final rootImgPath = ConfigManager.instance.getField('imgPath');
+  }
+
+  Future<String> getExternalImgDatabasePath() async {
+    final rootImgPath = ConfigManager.instance.getField('externalImgUri');
     return rootImgPath;
   }
 
-  Future<String> getLogDatabasePath() async {
-    Directory dbPath;
-    var pathFromConfig = ConfigManager.instance.getField('dbPath');
-    if (pathFromConfig != '' && pathFromConfig != null) {
-      dbPath = Directory(pathFromConfig);
+  Future<String> getInternalDbPath() async {
+    Directory basePath;
+    if (Platform.isAndroid) {
+      basePath = (await getExternalStorageDirectory())!;
     } else {
-      Directory basePath;
-      if (Platform.isAndroid) {
-        basePath = (await getExternalStorageDirectory())!;
-      } else {
-        basePath = await getApplicationSupportDirectory();
-      }
-
+      basePath = await getApplicationSupportDirectory();
       if (!basePath.existsSync()) {
         basePath.createSync(recursive: true);
       }
-      dbPath = basePath;
     }
-    return dbPath.path;
+    return join(basePath.path, 'daily_you.db');
   }
 
   Future<bool> selectDatabaseLocation() async {
-    final selectedDirectory = await getDirectoryPath();
-    if (selectedDirectory.isNotEmpty && selectedDirectory != "/") {
-      final newDbPath = '$selectedDirectory/daily_you.db';
-      final oldDbPath = '${await getLogDatabasePath()}/daily_you.db';
-      if (!await File(newDbPath).exists() && await File(oldDbPath).exists()) {
-        await File(oldDbPath).copy(newDbPath);
-      }
-      await ConfigManager.instance.setField('dbPath', selectedDirectory);
+    StatsProvider.instance.updateSyncStats(0, 0);
+    var selectedDirectory = await FileLayer.pickDirectory();
+    if (selectedDirectory == null) return false;
+
+    // Save old external path
+    var oldExternalPath = ConfigManager.instance.getField('externalDbUri');
+    var oldUseExternalPath = usingExternalDb();
+
+    await ConfigManager.instance.setField('externalDbUri', selectedDirectory);
+    await ConfigManager.instance.setField('useExternalDb', true);
+    // Sync with external folder
+    var synced = await syncDatabase(forceOverwrite: true);
+    if (synced) {
+      // Open new database and update stats
+      await _database!.close();
+      await initDB();
+      await StatsProvider.instance.updateStats();
+      if (usingExternalImg()) await syncImageFolder(true);
       return true;
     } else {
+      // Restore state after failure
+      await ConfigManager.instance.setField('externalDbUri', oldExternalPath);
+      await ConfigManager.instance
+          .setField('useExternalDb', oldUseExternalPath);
       return false;
     }
   }
 
+  Future<bool> updateExternalDatabase() async {
+    var bytes = await FileLayer.getFileBytes(await getInternalDbPath(),
+        useExternalPath: false);
+    if (bytes == null) return false;
+    return await FileLayer.writeFileBytes(
+        ConfigManager.instance.getField('externalDbUri'), bytes,
+        name: "daily_you.db");
+  }
+
+  Future<bool> syncDatabase({bool forceOverwrite = false}) async {
+    var externalBytes = await FileLayer.getFileBytes(
+        ConfigManager.instance.getField('externalDbUri'),
+        name: "daily_you.db");
+
+    if (externalBytes == null) {
+      // Export internal DB
+      var bytes = await FileLayer.getFileBytes(await getInternalDbPath(),
+          useExternalPath: false);
+      if (bytes == null) return false;
+      var externalDbPath = await FileLayer.createFile(
+          ConfigManager.instance.getField('externalDbUri'),
+          "daily_you.db",
+          bytes);
+      return externalDbPath != null;
+    } else if (forceOverwrite || await isExternalDbNewer()) {
+      // Overwrite internal DB
+      return await FileLayer.writeFileBytes(
+          await getInternalDbPath(), externalBytes,
+          useExternalPath: false);
+    }
+    return true;
+  }
+
+  Future<bool> isExternalDbNewer() async {
+    // Get internal time
+    var internalModifiedTime = await FileLayer.getFileModifiedTime(
+            await getInternalDbPath(),
+            useExternalPath: false) ??
+        DateTime.now();
+
+    var externalModifiedTime = await FileLayer.getFileModifiedTime(
+            ConfigManager.instance.getField('externalDbUri'),
+            name: "daily_you.db") ??
+        DateTime.now();
+
+    return externalModifiedTime.isAfter(internalModifiedTime);
+  }
+
+  Future<bool> syncImageFolder(bool garbageCollect) async {
+    StatsProvider.instance.updateSyncStats(0, 0);
+    List<String> entryImages = List.empty(growable: true);
+
+    List<String> externalImages = await FileLayer.listFiles(
+        await getExternalImgDatabasePath(),
+        useExternalPath: true);
+    List<String> internalImages = await FileLayer.listFiles(
+        await getInternalImgDatabasePath(),
+        useExternalPath: false);
+
+    List<Entry> entries = await getAllEntries();
+    int syncedEntries = 0;
+    for (Entry entry in entries) {
+      if (entry.imgPath != null) {
+        var entryImg = entry.imgPath!;
+        entryImages.add(entryImg);
+
+        // Export
+        if (internalImages.contains(entryImg) &&
+            !externalImages.contains(entryImg)) {
+          var bytes = await FileLayer.getFileBytes(
+              await getInternalImgDatabasePath(),
+              name: entry.imgPath!,
+              useExternalPath: false);
+          await FileLayer.createFile(
+              await getExternalImgDatabasePath(), entryImg, bytes!,
+              useExternalPath: true);
+        }
+
+        // Import
+        if (externalImages.contains(entryImg) &&
+            !internalImages.contains(entryImg)) {
+          var bytes = await FileLayer.getFileBytes(
+              await getExternalImgDatabasePath(),
+              name: entryImg,
+              useExternalPath: true);
+          await FileLayer.createFile(
+              await getInternalImgDatabasePath(), entryImg, bytes!,
+              useExternalPath: false);
+        }
+      }
+      syncedEntries += 1;
+      StatsProvider.instance.updateSyncStats(entries.length, syncedEntries);
+    }
+
+    if (garbageCollect) {
+      return await garbageCollectImages(entryImages);
+    }
+    return true;
+  }
+
+  Future<bool> garbageCollectImages(List<String> entryImages) async {
+    // Get all internal photos
+    var internalImages = Directory(await getInternalImgDatabasePath()).list();
+    await for (FileSystemEntity fileEntity in internalImages) {
+      if (fileEntity is File) {
+        // Delete any that aren't used
+        if (!entryImages.contains(basename(fileEntity.path))) {
+          await File(fileEntity.path).delete();
+        }
+      }
+    }
+    return true;
+  }
+
   void resetDatabaseLocation() async {
-    await ConfigManager.instance.setField('dbPath', '');
+    await _database!.close();
+    await ConfigManager.instance.setField('useExternalDb', false);
+    await initDB();
+    await StatsProvider.instance.updateStats();
   }
 
   Future<bool> selectImageFolder() async {
-    final selectedDirectory = await getDirectoryPath();
-    if (selectedDirectory.isNotEmpty && selectedDirectory != "/") {
-      await ConfigManager.instance.setField('imgPath', selectedDirectory);
+    var selectedDirectory = await FileLayer.pickDirectory();
+    if (selectedDirectory == null) return false;
+
+    // Save Old Settings
+    var oldExternalImgUri = ConfigManager.instance.getField('externalImgUri');
+    var oldUseExternalImg = usingExternalImg();
+
+    await ConfigManager.instance.setField('externalImgUri', selectedDirectory);
+    await ConfigManager.instance.setField('useExternalImg', true);
+    var synced = await syncImageFolder(true);
+    if (synced) {
       return true;
+    } else {
+      // Restore Settings
+      await ConfigManager.instance
+          .setField('externalImgUri', oldExternalImgUri);
+      await ConfigManager.instance
+          .setField('useExternalImg', oldUseExternalImg);
+      return false;
     }
-    return false;
   }
 
   void resetImageFolderLocation() async {
-    await ConfigManager.instance.setField('imgPath', '');
-  }
-
-  Future<String> getDirectoryPath() async {
-    Directory? selectedDirectory;
-    final result = await FilePicker.platform.getDirectoryPath();
-
-    if (result != null) {
-      selectedDirectory = Directory(result);
-    }
-
-    return selectedDirectory?.path ?? '';
+    await ConfigManager.instance.setField('useExternalImg', false);
   }
 
   Future<String> getFilePath() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['db'],
+      type: FileType.any,
     );
 
     if (result != null) {
@@ -259,18 +436,12 @@ CREATE TABLE $entriesTable (
   }
 
   Future<bool> importFromOneShot() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['json'],
-    );
-
-    if (result == null) {
-      return false;
-    }
-
-    final jsonFile = File(result.files.single.path!);
-    final jsonContent = await jsonFile.readAsString();
-    final jsonData = json.decode(jsonContent);
+    StatsProvider.instance.updateSyncStats(0, 0);
+    var selectedFile = await FileLayer.pickFile();
+    if (selectedFile == null) return false;
+    var bytes = await FileLayer.getFileBytes(selectedFile);
+    if (bytes == null) return false;
+    final jsonData = json.decode(utf8.decode(bytes.toList()));
 
     final happinessMapping = {
       "VERY_SAD": -2,
@@ -280,7 +451,7 @@ CREATE TABLE $entriesTable (
       "VERY_HAPPY": 2,
     };
 
-    final db = await instance.database;
+    final db = _database!;
 
     for (var entry in jsonData) {
       final createdTimestamp = entry['created'];
@@ -303,31 +474,30 @@ CREATE TABLE $entriesTable (
         });
       }
     }
-
+    if (usingExternalImg()) await syncImageFolder(true);
     return true;
   }
 
   Future<bool> exportImages() async {
     List<Entry> entries = await getAllEntries();
-    final imgDirectory = await EntriesDatabase.instance.getImgDatabasePath();
 
-    String? saveDir = await FilePicker.platform.getDirectoryPath();
+    String? saveDir = await FileLayer.pickDirectory();
     if (saveDir == null) return false;
+
+    List<String> externalImages =
+        await FileLayer.listFiles(saveDir, useExternalPath: true);
 
     for (Entry entry in entries) {
       if (entry.imgPath == null) continue;
-
-      final imageFilePath = "$imgDirectory/${entry.imgPath}";
-
-      File image = File(imageFilePath);
-      if (await image.exists()) {
-        final saveFilePath = "$saveDir/${entry.imgPath}";
-        await image.copy(saveFilePath);
-
-        if (Platform.isAndroid) {
-          // Add image to media store
-          MediaScanner.loadMedia(path: saveFilePath);
-        }
+      if (externalImages.contains(entry.imgPath!)) continue;
+      var bytes = await getImgBytes(entry.imgPath!);
+      if (bytes == null) continue;
+      var newImageName =
+          await FileLayer.createFile(saveDir, entry.imgPath!, bytes);
+      if (newImageName == null) return false;
+      if (Platform.isAndroid) {
+        // Add image to media store
+        MediaScanner.loadMedia(path: newImageName);
       }
     }
 
@@ -335,32 +505,49 @@ CREATE TABLE $entriesTable (
   }
 
   Future<bool> importImages() async {
+    StatsProvider.instance.updateSyncStats(0, 0);
     final picker = ImagePicker();
     final pickedFiles = await picker.pickMultiImage();
 
-    for (XFile file in pickedFiles) {
-      final imgDirectory = await EntriesDatabase.instance.getImgDatabasePath();
+    List<String> externalImages = await FileLayer.listFiles(
+        await getExternalImgDatabasePath(),
+        useExternalPath: true);
+    List<String> internalImages = await FileLayer.listFiles(
+        await getInternalImgDatabasePath(),
+        useExternalPath: false);
 
-      final imageFilePath = "$imgDirectory/${file.name}";
-      await file.saveTo(imageFilePath);
-      if (Platform.isAndroid) {
-        // Add image to media store
-        MediaScanner.loadMedia(path: imageFilePath);
+    int imported = 0;
+    for (XFile file in pickedFiles) {
+      if (!internalImages.contains(file.name)) {
+        var imageFilePath = await FileLayer.createFile(
+            await getInternalImgDatabasePath(),
+            file.name,
+            await file.readAsBytes(),
+            useExternalPath: false);
+        if (usingExternalImg() && !externalImages.contains(file.name)) {
+          await FileLayer.createFile(await getExternalImgDatabasePath(),
+              file.name, await file.readAsBytes(),
+              useExternalPath: true);
+        }
+        if (imageFilePath == null) return false;
+        if (Platform.isAndroid) {
+          // Add image to media store
+          MediaScanner.loadMedia(path: imageFilePath);
+          await File(file.path).delete();
+        }
       }
-      // Delete picked file from cache
-      await File(file.path).delete();
+
+      imported += 1;
+      StatsProvider.instance.updateSyncStats(pickedFiles.length, imported);
     }
     return true;
   }
 
   Future<bool> exportToJson() async {
-    String? savePath = await getDirectoryPath();
+    String? savePath = await FileLayer.pickDirectory();
+    if (savePath == null) return false;
 
-    if (savePath.isEmpty) {
-      return false;
-    }
-
-    final db = await instance.database;
+    final db = _database!;
 
     final List<Map<String, dynamic>> entries = await db.query('entries');
 
@@ -374,28 +561,24 @@ CREATE TABLE $entriesTable (
       };
     }).toList();
 
-    final jsonFile = File('$savePath/daily_you_logs.json');
     final jsonString = json.encode(jsonData);
-    await jsonFile.create();
-    await jsonFile.writeAsString(jsonString);
-    return true;
+    final currTime = DateTime.now();
+    final exportedJsonName =
+        "daily_you_logs_${currTime.month}_${currTime.day}_${currTime.year}.json";
+    return await FileLayer.createFile(savePath, exportedJsonName,
+            Uint8List.fromList(utf8.encode(jsonString))) !=
+        null;
   }
 
   Future<bool> importFromJson() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['json'],
-    );
+    StatsProvider.instance.updateSyncStats(0, 0);
+    var selectedFile = await FileLayer.pickFile();
+    if (selectedFile == null) return false;
+    var bytes = await FileLayer.getFileBytes(selectedFile);
+    if (bytes == null) return false;
+    final jsonData = json.decode(utf8.decode(bytes.toList()));
 
-    if (result == null) {
-      return false;
-    }
-
-    final jsonFile = File(result.files.single.path!);
-    final jsonContent = await jsonFile.readAsString();
-    final jsonData = json.decode(jsonContent);
-
-    final db = await instance.database;
+    final db = _database!;
 
     for (var entry in jsonData) {
       // Skip if the day already has an entry
@@ -409,6 +592,7 @@ CREATE TABLE $entriesTable (
         });
       }
     }
+    if (usingExternalImg()) await syncImageFolder(true);
     return true;
   }
 }
