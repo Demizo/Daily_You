@@ -40,6 +40,19 @@ class FileLayer {
     }
   }
 
+  static Future<bool> hasPermission(String uri) async {
+    if (Platform.isAndroid) {
+      if (await saf.exists(Uri.parse(uri)) == true &&
+          await saf.canWrite(Uri.parse(uri)) == true) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return await Directory(uri).exists();
+    }
+  }
+
   static Future<Uint8List?> getFileBytes(String uri,
       {String? name, bool useExternalPath = true}) async {
     if (Platform.isAndroid && useExternalPath) {
