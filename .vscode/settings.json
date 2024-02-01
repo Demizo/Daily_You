@@ -2,6 +2,7 @@
     "java.configuration.updateBuildConfiguration": "interactive",
     "cSpell.words": [
         "Appimage",
-        "curr"
+        "curr",
+        "persistable"
     ]
 }

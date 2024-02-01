@@ -33,6 +33,7 @@ dependencies:
   shared_storage:
     git:
       url: https://github.com/Demizo/shared-storage
+      ref: release
   device_info_plus: ^9.1.1
   fl_chart: ^0.66.0
 

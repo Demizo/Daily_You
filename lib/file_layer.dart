@@ -25,7 +25,8 @@ class FileLayer {
   static Future<String?> pickFile() async {
     if (Platform.isAndroid) {
       // Android
-      var selectedFile = await saf.openDocument();
+      var selectedFile = await saf.openDocument(
+          grantWritePermission: false, persistablePermission: false);
       if (selectedFile == null) return null;
       return selectedFile.first.toString();
     } else {
