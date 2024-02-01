@@ -245,6 +245,16 @@ CREATE TABLE $entriesTable (
     return join(basePath.path, 'daily_you.db');
   }
 
+  // Ensure external folders can be accessed if in use
+  Future<bool> hasDbUriPermission() async {
+    return FileLayer.hasPermission(
+        await ConfigManager.instance.getField('externalDbUri'));
+  }
+
+  Future<bool> hasImgUriPermission() async {
+    return FileLayer.hasPermission(await getExternalImgDatabasePath());
+  }
+
   Future<bool> selectDatabaseLocation() async {
     StatsProvider.instance.updateSyncStats(0, 0);
     var selectedDirectory = await FileLayer.pickDirectory();

@@ -583,11 +583,11 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: HEAD
-      resolved-ref: df4f4855c63e27d94e5066d68044cc345cf1df8d
+      ref: release
+      resolved-ref: "789927b69de53bb4dbe5b4b803da0e5944f9bf40"
       url: "https://github.com/Demizo/shared-storage"
     source: git
-    version: "0.7.0"
+    version: "0.8.0"
   simple_gesture_detector:
     dependency: transitive
     description:

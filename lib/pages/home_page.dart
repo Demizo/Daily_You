@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:daily_you/config_manager.dart';
 import 'package:daily_you/flashback_manager.dart';
 import 'package:daily_you/models/flashback.dart';
 import 'package:daily_you/notification_manager.dart';
@@ -9,7 +10,6 @@ import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/pages/entry_detail_page.dart';
 import 'package:daily_you/pages/edit_entry_page.dart';
-
 import '../widgets/entry_card_widget.dart';
 
 class HomePage extends StatefulWidget {
@@ -46,6 +46,17 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  Future<void> uriErrorPopup(String folderType) async {
+    await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+              title: const Text("Error:"),
+              content: Text(
+                  "Can't access the $folderType folder! Go to settings, backup your logs and images, then reset the your external folder locations!"));
+        });
+  }
+
   Future refreshEntries() async {
     if (firstLoad) setState(() => isLoading = true);
     firstLoad = false;
@@ -56,6 +67,16 @@ class _HomePageState extends State<HomePage> {
 
     if (entries.isNotEmpty && TimeManager.isToday(entries.first.timeCreate)) {
       todayEntry = entries.first;
+    }
+
+    if (await ConfigManager.instance.getField("useExternalDb") &&
+        !await EntriesDatabase.instance.hasDbUriPermission()) {
+      uriErrorPopup("Log");
+    }
+
+    if (await ConfigManager.instance.getField("useExternalImg") &&
+        !await EntriesDatabase.instance.hasImgUriPermission()) {
+      uriErrorPopup("Image");
     }
 
     flashbacks = await FlashbackManager.getFlashbacks();

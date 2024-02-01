@@ -25,7 +25,8 @@ class FileLayer {
   static Future<String?> pickFile() async {
     if (Platform.isAndroid) {
       // Android
-      var selectedFile = await saf.openDocument();
+      var selectedFile = await saf.openDocument(
+          grantWritePermission: false, persistablePermission: false);
       if (selectedFile == null) return null;
       return selectedFile.first.toString();
     } else {
@@ -36,6 +37,19 @@ class FileLayer {
       );
       if (result == null) return null;
       return result.files.first.path;
+    }
+  }
+
+  static Future<bool> hasPermission(String uri) async {
+    if (Platform.isAndroid) {
+      if (await saf.exists(Uri.parse(uri)) == true &&
+          await saf.canWrite(Uri.parse(uri)) == true) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return await Directory(uri).exists();
     }
   }
 
