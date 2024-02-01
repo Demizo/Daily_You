@@ -1,0 +1,7 @@
+Daily You v2.0.1 ist da! Hier sind die Änderungen:
+
+HINWEIS: Wenn Sie einen externen Bildspeicherort verwenden und Fotos mit v2.0.0 aufgenommen haben, lesen Sie in den Github-Versionshinweisen nach, wie Sie die Bildnamen korrigieren können!
+
+• Warnung hinzugefügt, wenn auf einen externen Ordner nicht zugegriffen werden kann
+• Wichtiger Fix: Externe Ordnerberechtigungen bleiben jetzt auch bei Geräteneustarts bestehen
+• Wichtiger Fix: Eintragsbilder werden jetzt extern mit dem richtigen Namen gespeichert

@@ -1,0 +1,7 @@
+Daily You v2.0.1 has arrived! Here are the changes:
+
+NOTE: If you use an external image location and took photos with v2.0.0, see the Github release notes for how to correct the image names!
+
+• Added warning when an external folder can't be accessed
+• Important Fix: External folder permissions now persist over device reboots
+• Important Fix: Entry images now save with the correct name externally
