@@ -182,7 +182,8 @@ CREATE TABLE $entriesTable (
     final newImageName =
         "daily_you_${currTime.month}_${currTime.day}_${currTime.year}-${currTime.hour}.${currTime.minute}.${currTime.second}.jpg";
     if (usingExternalImg()) {
-      FileLayer.createFile(await getExternalImgDatabasePath(), imageName, bytes,
+      FileLayer.createFile(
+          await getExternalImgDatabasePath(), newImageName, bytes,
           useExternalPath: true); //Background
     }
     var imageFilePath = await FileLayer.createFile(
