@@ -521,7 +521,7 @@ CREATE TABLE $entriesTable (
     final pickedFiles = await picker.pickMultiImage();
 
     List<String> externalImages = List.empty(growable: true);
-    if (usingExternalDb()) {
+    if (usingExternalImg()) {
       externalImages.addAll(await FileLayer.listFiles(
           await getExternalImgDatabasePath(),
           useExternalPath: true));
