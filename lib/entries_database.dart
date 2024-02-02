@@ -520,9 +520,12 @@ CREATE TABLE $entriesTable (
     final picker = ImagePicker();
     final pickedFiles = await picker.pickMultiImage();
 
-    List<String> externalImages = await FileLayer.listFiles(
-        await getExternalImgDatabasePath(),
-        useExternalPath: true);
+    List<String> externalImages = List.empty(growable: true);
+    if (usingExternalDb()) {
+      externalImages.addAll(await FileLayer.listFiles(
+          await getExternalImgDatabasePath(),
+          useExternalPath: true));
+    }
     List<String> internalImages = await FileLayer.listFiles(
         await getInternalImgDatabasePath(),
         useExternalPath: false);
