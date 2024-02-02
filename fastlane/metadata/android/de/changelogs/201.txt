@@ -1,4 +1,4 @@
-Daily You v2.0.1 ist da! Hier sind die Änderungen:
+Daily You v2.0.1 ist da!
 
 HINWEIS: Wenn Sie einen externen Bildspeicherort verwenden und Fotos mit v2.0.0 aufgenommen haben, lesen Sie in den Github-Versionshinweisen nach, wie Sie die Bildnamen korrigieren können!
 
