@@ -44,7 +44,12 @@ class EntryCardWidget extends StatelessWidget {
                     ? Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Wrap(children: [
-                          IgnorePointer(child: MarkdownBlock(data: entry.text))
+                          IgnorePointer(
+                              child: MarkdownBlock(
+                                  config: theme.brightness == Brightness.light
+                                      ? MarkdownConfig.defaultConfig
+                                      : MarkdownConfig.darkConfig,
+                                  data: entry.text))
                         ]),
                       )
                     : Column(
