@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:markdown_toolbar/markdown_toolbar.dart';
@@ -15,6 +17,7 @@ class EntryTextEditor extends StatefulWidget {
 
 class _EntryTextEditorState extends State<EntryTextEditor> {
   final TextEditingController _controller = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   late final FocusNode _focusNode;
 
   @override
@@ -66,23 +69,36 @@ class _EntryTextEditorState extends State<EntryTextEditor> {
         ),
         Card(
             child: Padding(
-          padding: const EdgeInsets.only(left: 8, top: 0, bottom: 0, right: 8),
-          child: TextField(
-            controller: _controller,
-            focusNode: _focusNode,
-            minLines: 5,
-            maxLines: 10,
-            spellCheckConfiguration: SpellCheckConfiguration(
-                spellCheckService: DefaultSpellCheckService()),
-            textCapitalization: TextCapitalization.sentences,
-            style: const TextStyle(fontSize: 16),
-            decoration: const InputDecoration(
-              border: InputBorder.none,
-              hintText: 'Type something... (supports markdown)',
-            ),
-          ),
+          padding: const EdgeInsets.only(left: 8, top: 2, bottom: 0, right: 8),
+          child: Platform.isAndroid
+              ? Scrollbar(
+                  controller: _scrollController,
+                  thumbVisibility: true,
+                  interactive: true,
+                  child: entryTextField(),
+                )
+              : entryTextField(),
         ))
       ],
+    );
+  }
+
+  TextField entryTextField() {
+    return TextField(
+      scrollPadding: EdgeInsets.zero,
+      controller: _controller,
+      focusNode: _focusNode,
+      scrollController: _scrollController,
+      minLines: 5,
+      maxLines: 10,
+      spellCheckConfiguration: SpellCheckConfiguration(
+          spellCheckService: DefaultSpellCheckService()),
+      textCapitalization: TextCapitalization.sentences,
+      style: const TextStyle(fontSize: 16),
+      decoration: const InputDecoration(
+        border: InputBorder.none,
+        hintText: 'Type something... (supports markdown)',
+      ),
     );
   }
 }
