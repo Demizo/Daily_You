@@ -1,3 +1,5 @@
+import 'package:daily_you/config_manager.dart';
+import 'package:daily_you/widgets/large_entry_card_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/models/entry.dart';
@@ -20,11 +22,13 @@ class _EntriesPageState extends State<EntriesPage> {
   int orderBy = 0;
   int entryCount = 0;
   bool firstLoad = true;
+  bool listView = false;
 
   @override
   void initState() {
     super.initState();
-
+    String viewMode = ConfigManager.instance.getField('galleryPageViewMode');
+    listView = viewMode == 'list';
     refreshEntries();
   }
 
@@ -45,6 +49,11 @@ class _EntriesPageState extends State<EntriesPage> {
     }
     entryCount = entries.length;
     setState(() => isLoading = false);
+  }
+
+  Future<void> setViewMode() async {
+    var viewMode = listView ? 'list' : 'grid';
+    await ConfigManager.instance.setField('galleryPageViewMode', viewMode);
   }
 
   void filterEntries(String query) {
@@ -125,9 +134,24 @@ class _EntriesPageState extends State<EntriesPage> {
                       padding: const EdgeInsets.only(
                           top: 4, bottom: 8, left: 3, right: 3),
                       child: SearchBar(
-                        leading: const Icon(Icons.search_rounded),
+                        leading: const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Icon(Icons.search_rounded),
+                        ),
                         trailing: [
-                          Text("$entryCount logs"),
+                          Padding(
+                            padding: const EdgeInsets.only(right: 8.0),
+                            child: Text("$entryCount logs"),
+                          ),
+                          IconButton(
+                              onPressed: () async {
+                                listView = !listView;
+                                await setViewMode();
+                                setState(() {});
+                              },
+                              icon: listView
+                                  ? const Icon(Icons.grid_view_rounded)
+                                  : const Icon(Icons.view_list_rounded)),
                           IconButton(
                               icon: const Icon(Icons.sort_rounded),
                               onPressed: () => _showSortSelectionPopup()),
@@ -158,11 +182,11 @@ class _EntriesPageState extends State<EntriesPage> {
           padding: const EdgeInsets.only(top: 70),
           physics: const ScrollPhysics(),
           shrinkWrap: true,
-          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: 300,
-            crossAxisSpacing: 1.0, // Spacing between columns
-            mainAxisSpacing: 1.0, // Spacing between rows
-          ),
+          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent: listView ? 500 : 300,
+              crossAxisSpacing: 1.0, // Spacing between columns
+              mainAxisSpacing: 1.0, // Spacing between rows
+              childAspectRatio: listView ? 2.0 : 1.0),
           itemCount: entries.length,
           itemBuilder: (context, index) {
             final entry = entries[index];
@@ -174,9 +198,11 @@ class _EntriesPageState extends State<EntriesPage> {
 
                 refreshEntries();
               },
-              child: EntryCardWidget(
-                entry: entry,
-              ),
+              child: listView
+                  ? LargeEntryCardWidget(entry: entry)
+                  : EntryCardWidget(
+                      entry: entry,
+                    ),
             );
           },
         );

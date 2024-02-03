@@ -220,7 +220,7 @@ class _HomePageState extends State<HomePage> {
                         },
                         icon: listView
                             ? const Icon(Icons.grid_view_rounded)
-                            : const Icon(Icons.list_rounded)),
+                            : const Icon(Icons.view_list_rounded)),
                   ]),
             ),
           GridView.builder(
