@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/stats_provider.dart';
@@ -569,43 +570,61 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
+  void _selectRandomTime() async {
+    final random = Random();
+    int next(int min, int max) =>
+        min +
+        random.nextInt(max -
+            min); // Function that generates a number between the given man and min value
+
+    final TimeOfDay randomTime = TimeOfDay(
+        hour: next(0, 23), minute: next(0, 59)); //Selecting random time
+    await ConfigManager.instance
+        .setField('scheduledReminderHour', randomTime.hour);
+    await ConfigManager.instance
+        .setField('scheduledReminderMinute', randomTime.minute);
+    setState(() {});
+    if (ConfigManager.instance.getField('dailyReminders')) {
+      await NotificationManager.instance.stopDailyReminders();
+      await NotificationManager.instance.startScheduledDailyReminders();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final statsProvider = Provider.of<StatsProvider>(context);
     final themeProvider = Provider.of<ThemeModeProvider>(context);
     return PopScope(
-      canPop: !isSyncing,
-      child: isSyncing
-          ? Scaffold(
-              body: Center(
-                  child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text(
-                  "Syncing...",
-                  style: TextStyle(fontSize: 22),
-                ),
-                const Text(
-                  "Do not close the app! This may take awhile...",
-                  style: TextStyle(fontSize: 18),
-                ),
-                statsProvider.totalEntries == 0
-                    ? const Text("Loading...")
-                    : Text(
-                        "Synced ${statsProvider.syncedEntries} out of ${statsProvider.totalEntries}"),
-                const SizedBox(
-                  height: 10,
-                ),
-                const CircularProgressIndicator(),
-              ],
-            )))
-          : Scaffold(
-              appBar: AppBar(
-                title: const Text("Settings"),
-              ),
-              body: ListView(
-                padding: const EdgeInsets.all(8),
+        canPop: !isSyncing,
+        child: isSyncing
+            ? Scaffold(
+                body: Center(
+                    child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  const Text(
+                    "Syncing...",
+                    style: TextStyle(fontSize: 22),
+                  ),
+                  const Text(
+                    "Do not close the app! This may take awhile...",
+                    style: TextStyle(fontSize: 18),
+                  ),
+                  statsProvider.totalEntries == 0
+                      ? const Text("Loading...")
+                      : Text(
+                          "Synced ${statsProvider.syncedEntries} out of ${statsProvider.totalEntries}"),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  const CircularProgressIndicator(),
+                ],
+              )))
+            : Scaffold(
+                appBar: AppBar(
+                  title: const Text("Settings"),
+                ),
+                body: ListView(padding: const EdgeInsets.all(8), children: [
                   const Row(
                     children: [
                       Text(
@@ -788,333 +807,380 @@ class _SettingsPageState extends State<SettingsPage> {
                                 }),
                           ],
                         ),
-                        ElevatedButton.icon(
-                            icon: const Icon(Icons.schedule_rounded),
-                            onPressed: () async {
-                              _selectTime(context);
-                            },
-                            label: Text(TimeManager.timeOfDayString(
-                                TimeManager.scheduledReminderTime()))),
-                      ],
-                    ),
-                  if (Platform.isAndroid) const Divider(),
-                  const Row(
-                    children: [
-                      Text(
-                        "Storage",
-                        style: TextStyle(fontSize: 24),
-                      ),
-                    ],
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Log Folder",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        FutureBuilder(
-                            future:
-                                EntriesDatabase.instance.getInternalDbPath(),
-                            builder: (context, snapshot) {
-                              if (snapshot.hasData && snapshot.data != null) {
-                                if (EntriesDatabase.instance
-                                    .usingExternalDb()) {
-                                  return Text(ConfigManager.instance
-                                      .getField('externalDbUri'));
-                                }
-                                return Text(snapshot.data!);
-                              }
-                              return const Text("...");
-                            }),
                         Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            ElevatedButton.icon(
-                              icon: const Icon(
-                                Icons.folder_copy_rounded,
-                              ),
-                              label: const Text("Change Log Folder..."),
-                              onPressed: () async {
-                                if (Platform.isAndroid &&
-                                    !await requestStoragePermission()) {
-                                  return;
-                                }
-                                await _showChangeLogFolderWarning(context);
-                              },
+                            const Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  "Random Reminder",
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                                Text(
+                                  "Sets off a reminder at a random time of the day",
+                                  style: TextStyle(fontSize: 14),
+                                )
+                              ],
                             ),
-                            IconButton(
+                            Switch(
+                                value: ConfigManager.instance
+                                    .getField('randomReminder'),
+                                onChanged: (value) async {
+                                  if (await NotificationManager.instance
+                                      .hasNotificationPermission()) {
+                                    if (value) {
+                                      await NotificationManager.instance
+                                          .stopDailyReminders();
+                                      _selectRandomTime();
+                                      await NotificationManager.instance
+                                          .startScheduledDailyReminders();
+                                    }
+                                    await ConfigManager.instance
+                                        .setField('randomReminder', value);
+                                    setState(() {});
+                                  }
+                                }),
+                            if (!ConfigManager.instance
+                                .getField('randomReminder'))
+                              ElevatedButton.icon(
+                                  icon: const Icon(Icons.schedule_rounded),
+                                  onPressed: () async {
+                                    _selectTime(context);
+                                  },
+                                  label: Text(TimeManager.timeOfDayString(
+                                      TimeManager.scheduledReminderTime()))),
+                          ],
+                        ),
+                        if (Platform.isAndroid) const Divider(),
+                        const Row(
+                          children: [
+                            Text(
+                              "Storage",
+                              style: TextStyle(fontSize: 24),
+                            ),
+                          ],
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                "Log Folder",
+                                style: TextStyle(fontSize: 18),
+                              ),
+                              FutureBuilder(
+                                  future: EntriesDatabase.instance
+                                      .getInternalDbPath(),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData &&
+                                        snapshot.data != null) {
+                                      if (EntriesDatabase.instance
+                                          .usingExternalDb()) {
+                                        return Text(ConfigManager.instance
+                                            .getField('externalDbUri'));
+                                      }
+                                      return Text(snapshot.data!);
+                                    }
+                                    return const Text("...");
+                                  }),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  ElevatedButton.icon(
+                                    icon: const Icon(
+                                      Icons.folder_copy_rounded,
+                                    ),
+                                    label: const Text("Change Log Folder..."),
+                                    onPressed: () async {
+                                      if (Platform.isAndroid &&
+                                          !await requestStoragePermission()) {
+                                        return;
+                                      }
+                                      await _showChangeLogFolderWarning(
+                                          context);
+                                    },
+                                  ),
+                                  IconButton(
+                                      onPressed: () async {
+                                        EntriesDatabase.instance
+                                            .resetDatabaseLocation();
+                                        setState(() {});
+                                      },
+                                      icon: const Icon(Icons.refresh_rounded))
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                "Image Folder",
+                                style: TextStyle(fontSize: 18),
+                              ),
+                              FutureBuilder(
+                                  future: EntriesDatabase.instance
+                                      .getInternalImgDatabasePath(),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData &&
+                                        snapshot.data != null) {
+                                      if (EntriesDatabase.instance
+                                          .usingExternalImg()) {
+                                        return Text(ConfigManager.instance
+                                            .getField('externalImgUri'));
+                                      }
+                                      return Text(snapshot.data!);
+                                    }
+                                    return const Text("...");
+                                  }),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  ElevatedButton.icon(
+                                    icon: const Icon(
+                                      Icons.folder_copy_rounded,
+                                    ),
+                                    label: const Text("Change Image Folder..."),
+                                    onPressed: () async {
+                                      if (Platform.isAndroid &&
+                                          !await requestPhotosPermission()) {
+                                        return;
+                                      }
+                                      await _showChangeImgFolderWarning(
+                                          context);
+                                    },
+                                  ),
+                                  IconButton(
+                                      onPressed: () async {
+                                        setState(() {
+                                          EntriesDatabase.instance
+                                              .resetImageFolderLocation();
+                                        });
+                                      },
+                                      icon: const Icon(Icons.refresh_rounded))
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                "Export",
+                                style: TextStyle(fontSize: 18),
+                              ),
+                              Row(
+                                children: [
+                                  ElevatedButton.icon(
+                                    icon: const Icon(
+                                      Icons.upload_rounded,
+                                    ),
+                                    label: const Text("Export Logs..."),
+                                    onPressed: () async {
+                                      if (Platform.isAndroid &&
+                                          !await requestStoragePermission()) {
+                                        return;
+                                      }
+                                      _showExportSelectionPopup();
+                                    },
+                                  ),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  ElevatedButton.icon(
+                                    icon: const Icon(
+                                      Icons.photo,
+                                    ),
+                                    label: const Text("Export Images..."),
+                                    onPressed: () async {
+                                      if (Platform.isAndroid &&
+                                          !await requestPhotosPermission()) {
+                                        return;
+                                      }
+                                      await EntriesDatabase.instance
+                                          .exportImages();
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                "Import",
+                                style: TextStyle(fontSize: 18),
+                              ),
+                              Row(
+                                children: [
+                                  ElevatedButton.icon(
+                                    icon: const Icon(
+                                      Icons.download_rounded,
+                                    ),
+                                    label: const Text("Import Logs..."),
+                                    onPressed: () async {
+                                      if (Platform.isAndroid &&
+                                          !await requestStoragePermission()) {
+                                        return;
+                                      }
+                                      _showImportSelectionPopup();
+                                    },
+                                  ),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  ElevatedButton.icon(
+                                    icon: const Icon(
+                                      Icons.photo,
+                                    ),
+                                    label: const Text("Import Images..."),
+                                    onPressed: () async {
+                                      if (Platform.isAndroid &&
+                                          !await requestPhotosPermission()) {
+                                        return;
+                                      }
+                                      setState(() {
+                                        isSyncing = true;
+                                      });
+                                      await EntriesDatabase.instance
+                                          .importImages();
+                                      setState(() {
+                                        isSyncing = false;
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                "Delete All",
+                                style: TextStyle(fontSize: 18),
+                              ),
+                              ElevatedButton.icon(
+                                icon: const Icon(
+                                  Icons.delete_forever_rounded,
+                                ),
+                                label: const Text("Delete All Logs..."),
                                 onPressed: () async {
-                                  EntriesDatabase.instance
-                                      .resetDatabaseLocation();
-                                  setState(() {});
+                                  _showDeleteEntriesPopup();
                                 },
-                                icon: const Icon(Icons.refresh_rounded))
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Divider(),
+                        const Row(
+                          children: [
+                            Text(
+                              "About",
+                              style: TextStyle(fontSize: 24),
+                            ),
                           ],
                         ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Image Folder",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        FutureBuilder(
-                            future: EntriesDatabase.instance
-                                .getInternalImgDatabasePath(),
-                            builder: (context, snapshot) {
-                              if (snapshot.hasData && snapshot.data != null) {
-                                if (EntriesDatabase.instance
-                                    .usingExternalImg()) {
-                                  return Text(ConfigManager.instance
-                                      .getField('externalImgUri'));
-                                }
-                                return Text(snapshot.data!);
-                              }
-                              return const Text("...");
-                            }),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            ElevatedButton.icon(
-                              icon: const Icon(
-                                Icons.folder_copy_rounded,
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                "Version",
+                                style: TextStyle(fontSize: 18),
                               ),
-                              label: const Text("Change Image Folder..."),
-                              onPressed: () async {
-                                if (Platform.isAndroid &&
-                                    !await requestPhotosPermission()) {
-                                  return;
-                                }
-                                await _showChangeImgFolderWarning(context);
-                              },
-                            ),
-                            IconButton(
+                              ElevatedButton.icon(
+                                icon: const Icon(
+                                  Icons.new_releases_rounded,
+                                ),
+                                label: const Text("2.0.1"),
                                 onPressed: () async {
-                                  setState(() {
-                                    EntriesDatabase.instance
-                                        .resetImageFolderLocation();
-                                  });
+                                  await launchUrl(
+                                      Uri.https("github.com",
+                                          "/Demizo/Daily_You/releases"),
+                                      mode: LaunchMode.externalApplication);
                                 },
-                                icon: const Icon(Icons.refresh_rounded))
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Export",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        Row(
-                          children: [
-                            ElevatedButton.icon(
-                              icon: const Icon(
-                                Icons.upload_rounded,
                               ),
-                              label: const Text("Export Logs..."),
-                              onPressed: () async {
-                                if (Platform.isAndroid &&
-                                    !await requestStoragePermission()) {
-                                  return;
-                                }
-                                _showExportSelectionPopup();
-                              },
-                            ),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            ElevatedButton.icon(
-                              icon: const Icon(
-                                Icons.photo,
-                              ),
-                              label: const Text("Export Images..."),
-                              onPressed: () async {
-                                if (Platform.isAndroid &&
-                                    !await requestPhotosPermission()) {
-                                  return;
-                                }
-                                await EntriesDatabase.instance.exportImages();
-                              },
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Import",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        Row(
-                          children: [
-                            ElevatedButton.icon(
-                              icon: const Icon(
-                                Icons.download_rounded,
-                              ),
-                              label: const Text("Import Logs..."),
-                              onPressed: () async {
-                                if (Platform.isAndroid &&
-                                    !await requestStoragePermission()) {
-                                  return;
-                                }
-                                _showImportSelectionPopup();
-                              },
-                            ),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            ElevatedButton.icon(
-                              icon: const Icon(
-                                Icons.photo,
-                              ),
-                              label: const Text("Import Images..."),
-                              onPressed: () async {
-                                if (Platform.isAndroid &&
-                                    !await requestPhotosPermission()) {
-                                  return;
-                                }
-                                setState(() {
-                                  isSyncing = true;
-                                });
-                                await EntriesDatabase.instance.importImages();
-                                setState(() {
-                                  isSyncing = false;
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Delete All",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        ElevatedButton.icon(
-                          icon: const Icon(
-                            Icons.delete_forever_rounded,
+                            ],
                           ),
-                          label: const Text("Delete All Logs..."),
-                          onPressed: () async {
-                            _showDeleteEntriesPopup();
-                          },
                         ),
-                      ],
-                    ),
-                  ),
-                  const Divider(),
-                  const Row(
-                    children: [
-                      Text(
-                        "About",
-                        style: TextStyle(fontSize: 24),
-                      ),
-                    ],
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Version",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        ElevatedButton.icon(
-                          icon: const Icon(
-                            Icons.new_releases_rounded,
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                "License",
+                                style: TextStyle(fontSize: 18),
+                              ),
+                              ElevatedButton.icon(
+                                icon: const Icon(Icons.gavel_rounded),
+                                label: const Text("GPL v3"),
+                                onPressed: () async {
+                                  await launchUrl(
+                                      Uri.https("github.com",
+                                          "/Demizo/Daily_You/blob/master/LICENSE.txt"),
+                                      mode: LaunchMode.externalApplication);
+                                },
+                              ),
+                            ],
                           ),
-                          label: const Text("2.0.1"),
-                          onPressed: () async {
-                            await launchUrl(
-                                Uri.https(
-                                    "github.com", "/Demizo/Daily_You/releases"),
-                                mode: LaunchMode.externalApplication);
-                          },
                         ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "License",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        ElevatedButton.icon(
-                          icon: const Icon(Icons.gavel_rounded),
-                          label: const Text("GPL v3"),
-                          onPressed: () async {
-                            await launchUrl(
-                                Uri.https("github.com",
-                                    "/Demizo/Daily_You/blob/master/LICENSE.txt"),
-                                mode: LaunchMode.externalApplication);
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Source Code",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        ElevatedButton.icon(
-                          icon: const Icon(
-                            Icons.code_rounded,
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                "Source Code",
+                                style: TextStyle(fontSize: 18),
+                              ),
+                              ElevatedButton.icon(
+                                icon: const Icon(
+                                  Icons.code_rounded,
+                                ),
+                                label: const Text("Github"),
+                                onPressed: () async {
+                                  await launchUrl(
+                                      Uri.https(
+                                          "github.com", "/Demizo/Daily_You"),
+                                      mode: LaunchMode.externalApplication);
+                                },
+                              ),
+                            ],
                           ),
-                          label: const Text("Github"),
-                          onPressed: () async {
-                            await launchUrl(
-                                Uri.https("github.com", "/Demizo/Daily_You"),
-                                mode: LaunchMode.externalApplication);
-                          },
                         ),
                       ],
                     ),
-                  ),
-                ],
-              ),
-            ),
-    );
+                ]),
+              ));
   }
 }
