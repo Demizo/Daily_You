@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:daily_you/config_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:markdown_toolbar/markdown_toolbar.dart';
@@ -43,30 +44,32 @@ class _EntryTextEditorState extends State<EntryTextEditor> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 4, top: 6, bottom: 0, right: 8),
-          child: MarkdownToolbar(
-            useIncludedTextField: false,
-            controller: _controller,
-            focusNode: _focusNode,
-            width: 36,
-            height: 36,
-            spacing: 4,
-            hideImage: true,
-            hideCode: true,
-            hideLink: false,
-            hideCheckbox: true,
-            hideNumberedList: true,
-            hideHorizontalRule: true,
-            borderRadius: BorderRadius.circular(30),
-            iconColor: theme.colorScheme.onBackground,
-            backgroundColor: theme.cardColor,
-            dropdownTextColor: theme.colorScheme.onBackground,
-            collapsable: false,
-            alignCollapseButtonEnd: false,
-            italicCharacter: '_',
+        if (ConfigManager.instance.getField('useMarkdownToolbar'))
+          Padding(
+            padding:
+                const EdgeInsets.only(left: 4, top: 6, bottom: 0, right: 8),
+            child: MarkdownToolbar(
+              useIncludedTextField: false,
+              controller: _controller,
+              focusNode: _focusNode,
+              width: 36,
+              height: 36,
+              spacing: 4,
+              hideImage: true,
+              hideCode: true,
+              hideLink: false,
+              hideCheckbox: true,
+              hideNumberedList: true,
+              hideHorizontalRule: true,
+              borderRadius: BorderRadius.circular(30),
+              iconColor: theme.colorScheme.onBackground,
+              backgroundColor: theme.cardColor,
+              dropdownTextColor: theme.colorScheme.onBackground,
+              collapsable: false,
+              alignCollapseButtonEnd: false,
+              italicCharacter: '_',
+            ),
           ),
-        ),
         Card(
             child: Padding(
           padding: const EdgeInsets.only(left: 8, top: 2, bottom: 0, right: 8),
