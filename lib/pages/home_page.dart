@@ -5,6 +5,7 @@ import 'package:daily_you/flashback_manager.dart';
 import 'package:daily_you/models/flashback.dart';
 import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:daily_you/widgets/large_entry_card_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/models/entry.dart';
@@ -23,6 +24,7 @@ class _HomePageState extends State<HomePage> {
   late List<Entry> entries;
   late List<Flashback> flashbacks;
   late Entry? todayEntry;
+  bool listView = true;
 
   bool isLoading = false;
   String searchText = '';
@@ -32,7 +34,8 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-
+    String viewMode = ConfigManager.instance.getField('homePageViewMode');
+    listView = viewMode == 'list';
     refreshEntries();
   }
 
@@ -44,6 +47,11 @@ class _HomePageState extends State<HomePage> {
     if (newEntry != null) {
       await refreshEntries();
     }
+  }
+
+  Future<void> setViewMode() async {
+    var viewMode = listView ? 'list' : 'grid';
+    await ConfigManager.instance.setField('homePageViewMode', viewMode);
   }
 
   Future<void> uriErrorPopup(String folderType) async {
@@ -190,32 +198,61 @@ class _HomePageState extends State<HomePage> {
             'No Logs...',
           ),
         )
-      : GridView.builder(
-          padding: const EdgeInsets.only(bottom: 80),
-          physics: const ScrollPhysics(),
-          shrinkWrap: true,
-          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: 300,
-            crossAxisSpacing: 1.0, // Spacing between columns
-            mainAxisSpacing: 1.0, // Spacing between rows
-          ),
-          itemCount: flashbacks.length,
-          itemBuilder: (context, index) {
-            final flashback = flashbacks[index];
-            return GestureDetector(
-              onTap: () async {
-                await Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) =>
-                      EntryDetailPage(entryId: flashback.entry.id!),
-                ));
+      : ListView(children: [
+          if (flashbacks.isNotEmpty)
+            Card(
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text(
+                        "Flashbacks",
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.normal),
+                      ),
+                    ),
+                    IconButton(
+                        onPressed: () async {
+                          listView = !listView;
+                          await setViewMode();
+                          setState(() {});
+                        },
+                        icon: listView
+                            ? const Icon(Icons.grid_view_rounded)
+                            : const Icon(Icons.view_list_rounded)),
+                  ]),
+            ),
+          GridView.builder(
+            padding: const EdgeInsets.only(bottom: 80),
+            physics: const ScrollPhysics(),
+            shrinkWrap: true,
+            gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent: listView ? 500 : 300,
+              crossAxisSpacing: 1.0, // Spacing between columns
+              mainAxisSpacing: 1.0, // Spacing between rows
+              childAspectRatio: listView ? 2.0 : 1.0,
+            ),
+            itemCount: flashbacks.length,
+            itemBuilder: (context, index) {
+              final flashback = flashbacks[index];
+              return GestureDetector(
+                  onTap: () async {
+                    await Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) =>
+                          EntryDetailPage(entryId: flashback.entry.id!),
+                    ));
 
-                refreshEntries();
-              },
-              child: EntryCardWidget(
-                title: flashback.title,
-                entry: flashback.entry,
-              ),
-            );
-          },
-        );
+                    refreshEntries();
+                  },
+                  child: listView
+                      ? LargeEntryCardWidget(
+                          title: flashback.title,
+                          entry: flashback.entry,
+                        )
+                      : EntryCardWidget(
+                          title: flashback.title, entry: flashback.entry));
+            },
+          ),
+        ]);
 }

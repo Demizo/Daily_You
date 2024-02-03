@@ -736,6 +736,24 @@ class _SettingsPageState extends State<SettingsPage> {
                                   }
                                 })
                           ])),
+                  Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              "Show Markdown Toolbar",
+                              style: TextStyle(fontSize: 18),
+                            ),
+                            Switch(
+                                value: ConfigManager.instance
+                                    .getField('useMarkdownToolbar'),
+                                onChanged: (value) async {
+                                  await ConfigManager.instance
+                                      .setField('useMarkdownToolbar', value);
+                                  setState(() {});
+                                })
+                          ])),
                   const Divider(),
                   if (Platform.isAndroid)
                     const Row(
