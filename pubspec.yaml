@@ -36,6 +36,8 @@ dependencies:
       ref: release
   device_info_plus: ^9.1.1
   fl_chart: ^0.66.0
+  markdown_toolbar: ^0.5.0
+  markdown_widget: ^2.3.2+3
 
 dev_dependencies:
   flutter_lints: ^3.0.1
