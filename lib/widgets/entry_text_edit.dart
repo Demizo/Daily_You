@@ -75,6 +75,7 @@ class _EntryTextEditorState extends State<EntryTextEditor> {
                   controller: _scrollController,
                   thumbVisibility: true,
                   interactive: true,
+                  radius: const Radius.circular(8),
                   child: entryTextField(),
                 )
               : entryTextField(),
