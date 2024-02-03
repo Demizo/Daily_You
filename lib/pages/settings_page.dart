@@ -843,17 +843,16 @@ class _SettingsPageState extends State<SettingsPage> {
                                     setState(() {});
                                   }
                                 }),
-                            if (!ConfigManager.instance
-                                .getField('randomReminder'))
-                              ElevatedButton.icon(
-                                  icon: const Icon(Icons.schedule_rounded),
-                                  onPressed: () async {
-                                    _selectTime(context);
-                                  },
-                                  label: Text(TimeManager.timeOfDayString(
-                                      TimeManager.scheduledReminderTime()))),
                           ],
                         ),
+                        if (!ConfigManager.instance.getField('randomReminder'))
+                          ElevatedButton.icon(
+                              icon: const Icon(Icons.schedule_rounded),
+                              onPressed: () async {
+                                _selectTime(context);
+                              },
+                              label: Text(TimeManager.timeOfDayString(
+                                  TimeManager.scheduledReminderTime()))),
                         if (Platform.isAndroid) const Divider(),
                         const Row(
                           children: [
