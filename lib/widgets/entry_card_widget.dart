@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
+import 'package:markdown_widget/markdown_widget.dart';
 import 'local_image_loader.dart';
 
 class EntryCardWidget extends StatelessWidget {
@@ -39,23 +40,30 @@ class EntryCardWidget extends StatelessWidget {
                       )))
                     ],
                   )
-                : Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Center(
-                          child: Icon(
-                        Icons.no_photography_rounded,
-                        color: theme.disabledColor,
-                        size: 90,
-                      )),
-                      Text(
-                        'No Image',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: theme.disabledColor),
+                : (entry.text.isNotEmpty)
+                    ? Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Wrap(children: [
+                          IgnorePointer(child: MarkdownBlock(data: entry.text))
+                        ]),
+                      )
+                    : Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Center(
+                              child: Icon(
+                            Icons.photo,
+                            color: theme.disabledColor,
+                            size: 90,
+                          )),
+                          Text(
+                            'Empty Log',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: theme.disabledColor),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
           ]),
         ),
       ),
