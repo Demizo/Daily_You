@@ -27,33 +27,15 @@ class LargeEntryCardWidget extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: (entry.imgPath != null)
-                ? Center(
-                    child: ClipRRect(
-                        borderRadius: BorderRadius.circular(16),
-                        child: LocalImageLoader(
-                          imagePath: entry.imgPath!,
-                        )),
-                  )
-                : Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Center(
-                          child: Icon(
-                        Icons.no_photography_rounded,
-                        color: theme.disabledColor,
-                        size: 90,
-                      )),
-                      Text(
-                        'No Image...',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: theme.disabledColor),
-                      ),
-                    ],
-                  ),
-          ),
+          if (entry.imgPath != null)
+            Expanded(
+                child: Center(
+              child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: LocalImageLoader(
+                    imagePath: entry.imgPath!,
+                  )),
+            )),
           Expanded(
             child: Wrap(children: [
               Padding(
