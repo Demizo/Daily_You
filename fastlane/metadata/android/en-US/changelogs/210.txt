@@ -1,0 +1,6 @@
+Daily You v2.1.0 has arrived! Here are the changes:
+
+• Added a list view option to the home and gallery page
+• Added a markdown toolbar
+• Logs with no image now show a preview of their text
+• Fixed image imports freezing when not using external folders
