@@ -146,17 +146,11 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
                       onChangedMood: (mood) =>
                           {setState(() => this.mood = mood)}),
                 ),
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                        left: 8, top: 4, bottom: 4, right: 8),
-                    child: StatefulBuilder(
-                      builder: (context, setState) => EntryTextEditor(
-                          text: text,
-                          onChangedText: (text) =>
-                              setState(() => this.text = text)),
-                    ),
-                  ),
+                StatefulBuilder(
+                  builder: (context, setState) => EntryTextEditor(
+                      text: text,
+                      onChangedText: (text) =>
+                          setState(() => this.text = text)),
                 ),
                 const SizedBox(height: 16),
               ],

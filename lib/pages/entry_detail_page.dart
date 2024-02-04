@@ -6,9 +6,9 @@ import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/pages/edit_entry_page.dart';
 import 'package:daily_you/pages/image_view_page.dart';
-import 'package:flutter_markdown/flutter_markdown.dart' as md;
 import 'package:daily_you/widgets/local_image_loader.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
+import 'package:markdown_widget/markdown_widget.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_extend/share_extend.dart';
 
@@ -107,19 +107,14 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
                     entry.text.isNotEmpty
                         ? Card(
                             child: Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 8, top: 4, bottom: 4, right: 8),
-                              child: md.MarkdownBody(
-                                data: entry.text,
-                                styleSheet: md.MarkdownStyleSheet(
-                                    p: const TextStyle(
-                                      fontSize: 16,
-                                    ),
-                                    checkbox: TextStyle(
-                                        color: theme.colorScheme.primary)),
-                              ),
-                            ),
-                          )
+                                padding: const EdgeInsets.only(
+                                    left: 8, top: 4, bottom: 4, right: 8),
+                                child: MarkdownBlock(
+                                  config: theme.brightness == Brightness.light
+                                      ? MarkdownConfig.defaultConfig
+                                      : MarkdownConfig.darkConfig,
+                                  data: entry.text,
+                                )))
                         : Card(
                             child: Padding(
                               padding: const EdgeInsets.only(
