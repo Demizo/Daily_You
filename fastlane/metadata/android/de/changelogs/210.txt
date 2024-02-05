@@ -1,0 +1,6 @@
+Daily You v2.1.0 ist da! Hier sind die Änderungen:
+
+• Der Startseite und der Galerieseite wurde eine Listenansichtsoption hinzugefügt
+• Eine Markdown-Symbolleiste hinzugefügt
+• Protokolle ohne Bild zeigen jetzt eine Vorschau ihres Textes
+• Das Einfrieren von Bildimporten, wenn keine externen Ordner verwendet wurden, wurde behoben
