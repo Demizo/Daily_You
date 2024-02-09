@@ -16,6 +16,8 @@ import 'package:provider/provider.dart';
 
 @pragma('vm:entry-point')
 void callbackDispatcher() async {
+  await ConfigManager.instance.init();
+  await EntriesDatabase.instance.initDB();
   if (await EntriesDatabase.instance.getEntryForDate(DateTime.now()) == null) {
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
         FlutterLocalNotificationsPlugin();
@@ -41,7 +43,7 @@ void callbackDispatcher() async {
     await flutterLocalNotificationsPlugin.show(
         0, 'Log Today!', 'Take your daily log...', platformChannelSpecifics);
   }
-  await ConfigManager.instance.init();
+  EntriesDatabase.instance.close();
   Duration timeUntilReminder;
   DateTime dayToRemind = TimeManager.startOfNextDay();
   DateTime reminderDateTime = TimeManager.addTimeOfDay(
