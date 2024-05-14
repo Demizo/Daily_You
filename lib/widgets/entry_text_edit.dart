@@ -98,10 +98,10 @@ class _EntryTextEditorState extends State<EntryTextEditor> {
                     color: theme.colorScheme.onBackground,
                   ),
                   underline: Container(),
-                  value: ConfigManager.instance.getField("defaultTemplate"),
+                  value: 1, //TODO Set this to the default or a fallback?
                   items: templates.map((Template template) {
                     return DropdownMenuItem<int>(
-                        value: template.id, child: Text(template.name));
+                        value: template.id!, child: Text(template.name));
                   }).toList(),
                   onChanged: (templateId) async {
                     var template =

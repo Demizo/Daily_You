@@ -1,8 +1,10 @@
 import 'dart:io';
 
+import 'package:daily_you/models/template.dart';
 import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/stats_provider.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:daily_you/widgets/template_manager.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -25,6 +27,7 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   bool isSyncing = false;
+  List<Template> _templates = [];
 
   Future<bool> requestStoragePermission() async {
     DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
@@ -569,6 +572,24 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
+  Future<void> _loadTemplates() async {
+    List<Template> templates = await EntriesDatabase.instance.getAllTemplates();
+    setState(() {
+      _templates = templates;
+    });
+  }
+
+  void _showTemplateManagementPopup(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return TemplateManager(
+          onTemplatesUpdated: _loadTemplates,
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final statsProvider = Provider.of<StatsProvider>(context);
@@ -815,6 +836,21 @@ class _SettingsPageState extends State<SettingsPage> {
                                 TimeManager.scheduledReminderTime()))),
                       ],
                     ),
+                  const Divider(),
+                  const Row(
+                    children: [
+                      Text(
+                        "Templates",
+                        style: TextStyle(fontSize: 24),
+                      ),
+                    ],
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.manage_search),
+                    onPressed: () {
+                      _showTemplateManagementPopup(context);
+                    },
+                  ),
                   if (Platform.isAndroid) const Divider(),
                   const Row(
                     children: [
