@@ -32,6 +32,7 @@ class _EntryTextEditorState extends State<EntryTextEditor> {
           widget.onChangedText(_controller.text);
         }));
     _focusNode = FocusNode();
+    _focusNode.addListener(_handleFocusChange);
 
     super.initState();
   }
@@ -41,6 +42,46 @@ class _EntryTextEditorState extends State<EntryTextEditor> {
     _controller.dispose();
     _focusNode.dispose();
     super.dispose();
+  }
+
+  void _handleFocusChange() {
+    if (_focusNode.hasFocus) {
+      RawKeyboard.instance.addListener(_handleKeyPress);
+    } else {
+      RawKeyboard.instance.removeListener(_handleKeyPress);
+    }
+  }
+
+  void _handleKeyPress(RawKeyEvent event) {
+    if (event is RawKeyDownEvent &&
+        event.logicalKey == LogicalKeyboardKey.enter) {
+      _autoList();
+    }
+  }
+
+  void _autoList() {
+    final text = _controller.text;
+    final selection = _controller.selection;
+
+    if (selection.baseOffset > 0 && text.length > selection.baseOffset) {
+      final previousLineStart =
+          text.lastIndexOf('\n', selection.baseOffset - 1) + 1;
+      final previousLineEnd = selection.baseOffset;
+      print(text.substring(previousLineStart, previousLineEnd));
+      if (previousLineEnd > previousLineStart &&
+          text[previousLineStart] == '-') {
+        final newText = text.substring(0, selection.baseOffset) +
+            '\n- ' +
+            text.substring(selection.baseOffset);
+        final newSelection =
+            TextSelection.collapsed(offset: selection.baseOffset + 2);
+
+        _controller.value = _controller.value.copyWith(
+          text: newText,
+          selection: newSelection,
+        );
+      }
+    }
   }
 
   void _showTemplateSelectPopup(BuildContext context) {
