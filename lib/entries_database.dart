@@ -22,7 +22,7 @@ class EntriesDatabase {
   EntriesDatabase._init();
 
   Future<bool> initDB() async {
-    if (usingExternalDb()) syncDatabase();
+    if (usingExternalDb()) await syncDatabase();
     final dbPath = await getInternalDbPath();
 
     _database = await openDatabase(dbPath,
