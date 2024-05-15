@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:flutter/material.dart';

@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:daily_you/config_manager.dart';
-import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:daily_you/widgets/template_select.dart';
 import 'package:flutter/material.dart';
