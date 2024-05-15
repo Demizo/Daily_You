@@ -1,3 +1,4 @@
+import 'package:daily_you/config_manager.dart';
 import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:daily_you/widgets/edit_template.dart';
@@ -6,7 +7,7 @@ import 'package:flutter/material.dart';
 class TemplateManager extends StatefulWidget {
   final Function onTemplatesUpdated;
 
-  TemplateManager({required this.onTemplatesUpdated});
+  const TemplateManager({super.key, required this.onTemplatesUpdated});
 
   @override
   State<TemplateManager> createState() => _TemplateManagementDialogState();
@@ -46,35 +47,43 @@ class _TemplateManagementDialogState extends State<TemplateManager> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Manage Templates'),
-      content: Container(
+      title: const Text('Manage Templates'),
+      content: SizedBox(
         width: double.maxFinite,
         child: ListView.builder(
           shrinkWrap: true,
           itemCount: _templates.length,
           itemBuilder: (context, index) {
             final template = _templates[index];
-            return ListTile(
-              title: Text(template.name),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.edit),
-                    onPressed: () {
-                      _showEditTemplatePopup(context, template);
-                    },
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.delete),
-                    onPressed: () async {
-                      await EntriesDatabase.instance
-                          .deleteTemplate(template.id!);
-                      _loadTemplates();
-                      widget.onTemplatesUpdated();
-                    },
-                  ),
-                ],
+            return Card(
+              child: ListTile(
+                title: Text(template.name),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.delete),
+                      onPressed: () async {
+                        await EntriesDatabase.instance
+                            .deleteTemplate(template.id!);
+                        if (ConfigManager.instance
+                                .getField("defaultTemplate") ==
+                            template.id!) {
+                          await ConfigManager.instance
+                              .setField("defaultTemplate", -1);
+                        }
+                        _loadTemplates();
+                        widget.onTemplatesUpdated();
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.edit),
+                      onPressed: () {
+                        _showEditTemplatePopup(context, template);
+                      },
+                    ),
+                  ],
+                ),
               ),
             );
           },
@@ -82,13 +91,14 @@ class _TemplateManagementDialogState extends State<TemplateManager> {
       ),
       actions: [
         TextButton(
-          child: Text('Cancel'),
+          child: const Text('Cancel'),
           onPressed: () {
             Navigator.of(context).pop();
           },
         ),
-        TextButton(
-          child: Text('Add Template'),
+        ElevatedButton.icon(
+          icon: const Icon(Icons.add_rounded),
+          label: const Text('Add Template'),
           onPressed: () {
             _showEditTemplatePopup(context, null);
           },

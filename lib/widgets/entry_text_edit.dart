@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:daily_you/config_manager.dart';
 import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/models/template.dart';
+import 'package:daily_you/widgets/template_select.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:markdown_toolbar/markdown_toolbar.dart';
@@ -32,21 +33,8 @@ class _EntryTextEditorState extends State<EntryTextEditor> {
           widget.onChangedText(_controller.text);
         }));
     _focusNode = FocusNode();
-    loadTemplates();
 
     super.initState();
-  }
-
-  Future loadTemplates() async {
-    setState(() {
-      isLoading = true;
-    });
-
-    templates = await EntriesDatabase.instance.getAllTemplates();
-
-    setState(() {
-      isLoading = false;
-    });
   }
 
   @override
@@ -54,6 +42,24 @@ class _EntryTextEditorState extends State<EntryTextEditor> {
     _controller.dispose();
     _focusNode.dispose();
     super.dispose();
+  }
+
+  void _showTemplateSelectPopup(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return TemplateSelect(
+          onTemplatesSelected: (Template template, bool insert) {
+            if (insert && _controller.text.isNotEmpty) {
+              _controller.text += "\n${template.text ?? ""}";
+            } else {
+              _controller.text = template.text ?? "";
+            }
+            widget.onChangedText(_controller.text);
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -91,43 +97,33 @@ class _EntryTextEditorState extends State<EntryTextEditor> {
                   italicCharacter: '_',
                 ),
               ),
-            if (!isLoading)
-              DropdownButton<int>(
-                  hint: Icon(
-                    Icons.document_scanner_rounded,
-                    color: theme.colorScheme.onBackground,
-                  ),
-                  underline: Container(),
-                  value: 1, //TODO Set this to the default or a fallback?
-                  items: templates.map((Template template) {
-                    return DropdownMenuItem<int>(
-                        value: template.id!, child: Text(template.name));
-                  }).toList(),
-                  onChanged: (templateId) async {
-                    var template =
-                        await EntriesDatabase.instance.getTemplate(templateId!);
-                    if (template != null) {
-                      setState(() {
-                        _controller.text = template.text ?? "";
-                        widget.onChangedText(_controller.text);
-                      });
-                    }
-                  })
           ],
         ),
-        Card(
-            child: Padding(
-          padding: const EdgeInsets.only(left: 8, top: 2, bottom: 0, right: 8),
-          child: Platform.isAndroid
-              ? Scrollbar(
-                  controller: _scrollController,
-                  thumbVisibility: true,
-                  interactive: true,
-                  radius: const Radius.circular(8),
-                  child: entryTextField(),
-                )
-              : entryTextField(),
-        ))
+        Stack(alignment: Alignment.topRight, children: [
+          Card(
+              child: Padding(
+            padding:
+                const EdgeInsets.only(left: 8, top: 2, bottom: 0, right: 8),
+            child: Platform.isAndroid
+                ? Scrollbar(
+                    controller: _scrollController,
+                    thumbVisibility: true,
+                    interactive: true,
+                    radius: const Radius.circular(8),
+                    child: entryTextField(),
+                  )
+                : entryTextField(),
+          )),
+          Padding(
+            padding: const EdgeInsets.all(2.0),
+            child: IconButton(
+                onPressed: () => _showTemplateSelectPopup(context),
+                icon: Icon(
+                  Icons.description_rounded,
+                  color: theme.disabledColor,
+                )),
+          ),
+        ])
       ],
     );
   }
