@@ -31,6 +31,7 @@ class EntriesDatabase {
   }
 
   Future _createDB(Database db, int version) async {
+    _database = db;
     await db.execute('''
 CREATE TABLE $entriesTable (
   ${EntryFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -50,9 +51,11 @@ CREATE TABLE $templatesTable (
   ${TemplatesFields.timeModified} DATETIME NOT NULL DEFAULT (DATETIME('now'))
 )
 ''');
+    await createDefaultTemplates();
   }
 
   void _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    _database = db;
     // In this case, oldVersion is 1, newVersion is 2
     if (oldVersion == 1) {
       await db.execute('''
@@ -64,10 +67,33 @@ CREATE TABLE $templatesTable (
   ${TemplatesFields.timeModified} DATETIME NOT NULL DEFAULT (DATETIME('now'))
 )
 ''');
+      await createDefaultTemplates();
     }
   }
 
   // Template Methods
+  Future createDefaultTemplates() async {
+    await createTemplate(Template(
+        name: "High/Low",
+        text: '''
+### High
+- 
+
+### Low
+- 
+''',
+        timeCreate: DateTime.now(),
+        timeModified: DateTime.now()));
+    await createTemplate(Template(
+        name: "Quote",
+        text: '''
+### Quote of the day...
+> ""
+''',
+        timeCreate: DateTime.now(),
+        timeModified: DateTime.now()));
+  }
+
   Future<Template> createTemplate(Template template) async {
     final db = _database!;
 
