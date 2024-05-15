@@ -92,6 +92,14 @@ CREATE TABLE $templatesTable (
 ''',
         timeCreate: DateTime.now(),
         timeModified: DateTime.now()));
+    await createTemplate(Template(
+        name: "List",
+        text: '''
+- 
+- 
+- ''',
+        timeCreate: DateTime.now(),
+        timeModified: DateTime.now()));
   }
 
   Future<Template> createTemplate(Template template) async {
