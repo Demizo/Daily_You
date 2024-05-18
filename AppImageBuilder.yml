@@ -11,7 +11,7 @@ AppDir:
     id: com.demizo.daily_you
     name: Daily You
     icon: logo
-    version: 2.1.1
+    version: 2.2.0
     exec: daily_you
     exec_args: $@
   files:

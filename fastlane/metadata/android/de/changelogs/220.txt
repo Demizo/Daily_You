@@ -1,0 +1,3 @@
+Daily You v2.2.0 ist da! Hier sind die Änderungen:
+
+• Vorlagen hinzugefügt! (Verwalten, erstellen und bearbeiten Sie Vorlagen für Ihre Protokolle)
