@@ -48,8 +48,8 @@ class _EntryTextEditorState extends State<EntryTextEditor> {
       context: context,
       builder: (BuildContext context) {
         return TemplateSelect(
-          onTemplatesSelected: (Template template, bool insert) {
-            if (insert && _controller.text.isNotEmpty) {
+          onTemplatesSelected: (Template template) {
+            if (_controller.text.isNotEmpty) {
               _controller.text += "\n${template.text ?? ""}";
             } else {
               _controller.text = template.text ?? "";

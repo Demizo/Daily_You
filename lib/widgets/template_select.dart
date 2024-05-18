@@ -3,7 +3,7 @@ import 'package:daily_you/models/template.dart';
 import 'package:flutter/material.dart';
 
 class TemplateSelect extends StatefulWidget {
-  final Function(Template template, bool insert) onTemplatesSelected;
+  final Function(Template template) onTemplatesSelected;
 
   const TemplateSelect({super.key, required this.onTemplatesSelected});
 
@@ -44,24 +44,12 @@ class _TemplateSelectDialogState extends State<TemplateSelect> {
           return Card(
             child: ListTile(
               title: Text(template.name),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.add_rounded),
-                    onPressed: () {
-                      widget.onTemplatesSelected(template, true);
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.check_rounded),
-                    onPressed: () {
-                      widget.onTemplatesSelected(template, false);
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ],
+              trailing: IconButton(
+                icon: const Icon(Icons.add_rounded),
+                onPressed: () {
+                  widget.onTemplatesSelected(template);
+                  Navigator.of(context).pop();
+                },
               ),
             ),
           );
