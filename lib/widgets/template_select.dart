@@ -61,7 +61,7 @@ class _TemplateSelectDialogState extends State<TemplateSelect> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Select or Add Template'),
+      title: const Text('Add a Template'),
       content: SizedBox(width: double.maxFinite, child: _buildTemplatesList()),
       actions: [
         TextButton(
