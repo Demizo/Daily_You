@@ -11,7 +11,7 @@ class ConfigManager {
   String configFilePath = '';
   Map<String, dynamic> _config = {};
   final Map<String, dynamic> _defaultConfig = {
-    'configVersion': '1',
+    'configVersion': '2',
     'theme': 'system',
     'useExternalDb': false,
     'externalDbUri': '',
@@ -33,6 +33,7 @@ class ConfigManager {
     'dailyReminders': false,
     'scheduledReminderHour': 12,
     'scheduledReminderMinute': 0,
+    'defaultTemplate': -1,
   };
 
   static final moodValueFieldMapping = {

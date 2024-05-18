@@ -1,8 +1,10 @@
 import 'dart:io';
 
+import 'package:daily_you/models/template.dart';
 import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/stats_provider.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:daily_you/widgets/template_manager.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -25,6 +27,14 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   bool isSyncing = false;
+  List<Template> _templates = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTemplates();
+  }
 
   Future<bool> requestStoragePermission() async {
     DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
@@ -569,6 +579,42 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
+  Future<void> _loadTemplates() async {
+    List<Template> templates = await EntriesDatabase.instance.getAllTemplates();
+    setState(() {
+      _templates = templates;
+      isLoading = false;
+    });
+  }
+
+  void _showTemplateManagementPopup(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return TemplateManager(
+          onTemplatesUpdated: _loadTemplates,
+        );
+      },
+    );
+  }
+
+  List<DropdownMenuItem<int>> _buildDefaultTemplateDropdownItems() {
+    var dropdownItems = _templates.map((Template template) {
+      return DropdownMenuItem<int>(
+        value: template.id,
+        child: Text(
+          template.name,
+          overflow: TextOverflow.ellipsis,
+        ),
+      );
+    }).toList();
+    dropdownItems.add(const DropdownMenuItem<int>(
+      value: -1,
+      child: Text("None"),
+    ));
+    return dropdownItems;
+  }
+
   @override
   Widget build(BuildContext context) {
     final statsProvider = Provider.of<StatsProvider>(context);
@@ -816,6 +862,68 @@ class _SettingsPageState extends State<SettingsPage> {
                       ],
                     ),
                   if (Platform.isAndroid) const Divider(),
+                  const Row(
+                    children: [
+                      Text(
+                        "Templates",
+                        style: TextStyle(fontSize: 24),
+                      ),
+                    ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              "Default Template",
+                              style: TextStyle(fontSize: 18),
+                            ),
+                            if (!isLoading)
+                              SizedBox(
+                                width: 200,
+                                child: DropdownButton<int>(
+                                  underline: Container(),
+                                  isDense: true,
+                                  isExpanded: true,
+                                  borderRadius: BorderRadius.circular(20),
+                                  padding: const EdgeInsets.only(
+                                      left: 8, right: 4, top: 4, bottom: 4),
+                                  hint: const Text('Select a template'),
+                                  value: ConfigManager.instance
+                                      .getField("defaultTemplate"),
+                                  items: _buildDefaultTemplateDropdownItems(),
+                                  onChanged: (int? newValue) {
+                                    setState(() {
+                                      ConfigManager.instance.setField(
+                                          "defaultTemplate", newValue);
+                                    });
+                                  },
+                                ),
+                              ),
+                          ],
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              ElevatedButton.icon(
+                                icon: const Icon(Icons.edit_document),
+                                label: const Text("Manage Templates"),
+                                onPressed: () {
+                                  _showTemplateManagementPopup(context);
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Divider(),
                   const Row(
                     children: [
                       Text(

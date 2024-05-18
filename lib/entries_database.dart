@@ -5,6 +5,7 @@ import 'package:daily_you/file_layer.dart';
 import 'package:daily_you/stats_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:daily_you/models/entry.dart';
+import 'package:daily_you/models/template.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:media_scanner/media_scanner.dart';
 import 'package:sqflite/sqflite.dart';
@@ -21,14 +22,16 @@ class EntriesDatabase {
   EntriesDatabase._init();
 
   Future<bool> initDB() async {
-    if (usingExternalDb()) syncDatabase();
+    if (usingExternalDb()) await syncDatabase();
     final dbPath = await getInternalDbPath();
 
-    _database = await openDatabase(dbPath, version: 1, onCreate: _createDB);
+    _database = await openDatabase(dbPath,
+        version: 2, onCreate: _createDB, onUpgrade: _onUpgrade);
     return _database != null;
   }
 
   Future _createDB(Database db, int version) async {
+    _database = db;
     await db.execute('''
 CREATE TABLE $entriesTable (
   ${EntryFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -39,8 +42,128 @@ CREATE TABLE $entriesTable (
   ${EntryFields.timeModified} DATETIME NOT NULL DEFAULT (DATETIME('now'))
 )
 ''');
+    await db.execute('''
+CREATE TABLE $templatesTable (
+  ${TemplatesFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  ${TemplatesFields.name} TEXT NOT NULL,
+  ${TemplatesFields.text} TEXT,
+  ${TemplatesFields.timeCreate} DATETIME NOT NULL DEFAULT (DATETIME('now')),
+  ${TemplatesFields.timeModified} DATETIME NOT NULL DEFAULT (DATETIME('now'))
+)
+''');
+    await createDefaultTemplates();
   }
 
+  void _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    _database = db;
+    // In this case, oldVersion is 1, newVersion is 2
+    if (oldVersion == 1) {
+      await db.execute('''
+CREATE TABLE $templatesTable (
+  ${TemplatesFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  ${TemplatesFields.name} TEXT NOT NULL,
+  ${TemplatesFields.text} TEXT,
+  ${TemplatesFields.timeCreate} DATETIME NOT NULL DEFAULT (DATETIME('now')),
+  ${TemplatesFields.timeModified} DATETIME NOT NULL DEFAULT (DATETIME('now'))
+)
+''');
+      await createDefaultTemplates();
+    }
+  }
+
+  // Template Methods
+  Future createDefaultTemplates() async {
+    await createTemplate(Template(
+        name: "High/Low",
+        text: '''
+### High
+- 
+
+### Low
+- 
+''',
+        timeCreate: DateTime.now(),
+        timeModified: DateTime.now()));
+    await createTemplate(Template(
+        name: "Quote",
+        text: '''
+### Quote of the day...
+> ""
+''',
+        timeCreate: DateTime.now(),
+        timeModified: DateTime.now()));
+    await createTemplate(Template(
+        name: "List",
+        text: '''
+- 
+- 
+- ''',
+        timeCreate: DateTime.now(),
+        timeModified: DateTime.now()));
+  }
+
+  Future<Template> createTemplate(Template template) async {
+    final db = _database!;
+
+    final id = await db.insert(templatesTable, template.toJson());
+    if (usingExternalDb()) await updateExternalDatabase();
+    return template.copy(id: id);
+  }
+
+  Future<Template?> getTemplate(int id) async {
+    final db = _database!;
+
+    final maps = await db.query(
+      templatesTable,
+      columns: TemplatesFields.values,
+      where: '${TemplatesFields.id} = ?',
+      whereArgs: [id],
+    );
+
+    if (maps.isNotEmpty) {
+      return Template.fromJson(maps.first);
+    } else {
+      return null;
+    }
+  }
+
+  Future<List<Template>> getAllTemplates() async {
+    final db = _database!;
+
+    final result =
+        await db.query(templatesTable, orderBy: '${TemplatesFields.name} DESC');
+
+    return result.map((json) => Template.fromJson(json)).toList();
+  }
+
+  Future<int> updateTemplate(Template template) async {
+    final db = _database!;
+
+    final id = await db.update(
+      templatesTable,
+      template.toJson(),
+      where: '${TemplatesFields.id} = ?',
+      whereArgs: [template.id],
+    );
+
+    if (usingExternalDb()) await updateExternalDatabase();
+    return id;
+  }
+
+  Future<int> deleteTemplate(int id) async {
+    final db = _database!;
+
+    final removedId = await db.delete(
+      templatesTable,
+      where: '${TemplatesFields.id} = ?',
+      whereArgs: [id],
+    );
+
+    if (usingExternalDb()) await updateExternalDatabase();
+    return removedId;
+  }
+
+  // Entry Methods
   Future<Entry> create(Entry entry) async {
     final db = _database!;
 

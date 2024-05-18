@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:daily_you/config_manager.dart';
 import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:flutter/material.dart';
@@ -31,6 +32,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
   late String? imgPath;
   late int? mood;
   bool entryChanged = false;
+  bool loadingTemplate = true;
 
   @override
   void initState() {
@@ -39,6 +41,25 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
     imgPath = widget.entry?.imgPath;
     mood = widget.entry?.mood;
     text = widget.entry?.text ?? '';
+    if (widget.entry == null) {
+      _loadTemplate();
+    } else {
+      loadingTemplate = false;
+    }
+  }
+
+  Future _loadTemplate() async {
+    var defaultTemplateId = ConfigManager.instance.getField("defaultTemplate");
+    if (defaultTemplateId != -1) {
+      var defaultTemplate =
+          await EntriesDatabase.instance.getTemplate(defaultTemplateId);
+      if (defaultTemplate != null) {
+        text = defaultTemplate.text ?? '';
+      }
+    }
+    setState(() {
+      loadingTemplate = false;
+    });
   }
 
   void _showDeleteEntryPopup() {
@@ -146,12 +167,13 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
                       onChangedMood: (mood) =>
                           {setState(() => this.mood = mood)}),
                 ),
-                StatefulBuilder(
-                  builder: (context, setState) => EntryTextEditor(
-                      text: text,
-                      onChangedText: (text) =>
-                          setState(() => this.text = text)),
-                ),
+                if (!loadingTemplate)
+                  StatefulBuilder(
+                    builder: (context, setState) => EntryTextEditor(
+                        text: text,
+                        onChangedText: (text) =>
+                            setState(() => this.text = text)),
+                  ),
                 const SizedBox(height: 16),
               ],
             ),
