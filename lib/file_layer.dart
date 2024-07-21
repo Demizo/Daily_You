@@ -33,7 +33,6 @@ class FileLayer {
       // Desktop
       FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
-        allowedExtensions: ['json'],
       );
       if (result == null) return null;
       return result.files.first.path;
