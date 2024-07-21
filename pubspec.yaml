@@ -38,6 +38,7 @@ dependencies:
   fl_chart: ^0.66.0
   markdown_toolbar: ^0.5.0
   markdown_widget: ^2.3.2+3
+  archive: ^3.6.1
 
 dev_dependencies:
   flutter_lints: ^3.0.1

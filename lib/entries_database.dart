@@ -11,7 +11,7 @@ import 'package:media_scanner/media_scanner.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
-
+import 'package:archive/archive_io.dart';
 import 'config_manager.dart';
 
 class EntriesDatabase {
@@ -612,80 +612,14 @@ CREATE TABLE $templatesTable (
     return true;
   }
 
-  Future<bool> exportImages() async {
-    List<Entry> entries = await getAllEntries();
-
-    String? saveDir = await FileLayer.pickDirectory();
-    if (saveDir == null) return false;
-
-    List<String> externalImages =
-        await FileLayer.listFiles(saveDir, useExternalPath: true);
-
-    for (Entry entry in entries) {
-      if (entry.imgPath == null) continue;
-      if (externalImages.contains(entry.imgPath!)) continue;
-      var bytes = await getImgBytes(entry.imgPath!);
-      if (bytes == null) continue;
-      var newImageName =
-          await FileLayer.createFile(saveDir, entry.imgPath!, bytes);
-      if (newImageName == null) return false;
-      if (Platform.isAndroid) {
-        // Add image to media store
-        MediaScanner.loadMedia(path: newImageName);
-      }
-    }
-
-    return true;
-  }
-
-  Future<bool> importImages() async {
-    StatsProvider.instance.updateSyncStats(0, 0);
-    final picker = ImagePicker();
-    final pickedFiles = await picker.pickMultiImage();
-
-    List<String> externalImages = List.empty(growable: true);
-    if (usingExternalImg()) {
-      externalImages.addAll(await FileLayer.listFiles(
-          await getExternalImgDatabasePath(),
-          useExternalPath: true));
-    }
-    List<String> internalImages = await FileLayer.listFiles(
-        await getInternalImgDatabasePath(),
-        useExternalPath: false);
-
-    int imported = 0;
-    for (XFile file in pickedFiles) {
-      if (!internalImages.contains(file.name)) {
-        var imageFilePath = await FileLayer.createFile(
-            await getInternalImgDatabasePath(),
-            file.name,
-            await file.readAsBytes(),
-            useExternalPath: false);
-        if (usingExternalImg() && !externalImages.contains(file.name)) {
-          await FileLayer.createFile(await getExternalImgDatabasePath(),
-              file.name, await file.readAsBytes(),
-              useExternalPath: true);
-        }
-        if (imageFilePath == null) return false;
-        if (Platform.isAndroid) {
-          // Add image to media store
-          MediaScanner.loadMedia(path: imageFilePath);
-          await File(file.path).delete();
-        }
-      }
-
-      imported += 1;
-      StatsProvider.instance.updateSyncStats(pickedFiles.length, imported);
-    }
-    return true;
-  }
-
-  Future<bool> exportToJson() async {
+  Future<bool> exportEntries() async {
     String? savePath = await FileLayer.pickDirectory();
     if (savePath == null) return false;
 
     final db = _database!;
+    var tempDir = await getTemporaryDirectory();
 
+    // Save temporary JSON file
     final List<Map<String, dynamic>> entries = await db.query('entries');
 
     final List<Map<String, dynamic>> jsonData = entries.map((entry) {
@@ -702,34 +636,114 @@ CREATE TABLE $templatesTable (
     final currTime = DateTime.now();
     final exportedJsonName =
         "daily_you_logs_${currTime.month}_${currTime.day}_${currTime.year}.json";
-    return await FileLayer.createFile(savePath, exportedJsonName,
-            Uint8List.fromList(utf8.encode(jsonString))) !=
-        null;
+
+    File tempLogJson = await File(join(tempDir.path, exportedJsonName))
+        .writeAsBytes(Uint8List.fromList(utf8.encode(jsonString)));
+
+    final exportedZipName =
+        "daily_you_backup_${currTime.month}_${currTime.day}_${currTime.year}.zip";
+    var encoder = ZipFileEncoder();
+
+    // Create archive
+    encoder.create(join(tempDir.path, exportedZipName));
+    await encoder.addFile(tempLogJson);
+    var internalImgPath = await getInternalImgDatabasePath();
+    await encoder.addDirectory(Directory(internalImgPath));
+    await encoder.close();
+
+    // Save archive
+    var tempZipBytes =
+        await File(join(tempDir.path, exportedZipName)).readAsBytes();
+    var savedFile =
+        await FileLayer.createFile(savePath, exportedZipName, tempZipBytes);
+
+    // Delete temp files
+    await tempLogJson.delete();
+    await File(join(tempDir.path, exportedZipName)).delete();
+
+    return savedFile != null;
   }
 
-  Future<bool> importFromJson() async {
+  Future<bool> importEntries() async {
     StatsProvider.instance.updateSyncStats(0, 0);
+
+    // Open archive
     var selectedFile = await FileLayer.pickFile();
     if (selectedFile == null) return false;
+
     var bytes = await FileLayer.getFileBytes(selectedFile);
     if (bytes == null) return false;
-    final jsonData = json.decode(utf8.decode(bytes.toList()));
 
-    final db = _database!;
+    var decoder = ZipDecoder();
+    var archive = decoder.decodeBytes(bytes);
 
-    for (var entry in jsonData) {
-      // Skip if the day already has an entry
-      if (await getEntryForDate(DateTime.parse(entry['timeCreated'])) == null) {
-        await db.insert('entries', {
-          'text': entry['text'],
-          'img_path': entry['imgPath'],
-          'mood': entry['mood'],
-          'time_create': entry['timeCreated'],
-          'time_modified': entry['timeModified'],
-        });
+    // Read archive
+    List<ArchiveFile> importImages = List.empty(growable: true);
+    for (final file in archive) {
+      if (file.isFile) {
+        if (file.name.endsWith(".json")) {
+          // Import Logs
+          final jsonData = json.decode(utf8.decode(file.content));
+
+          final db = _database!;
+
+          for (var entry in jsonData) {
+            // Skip if the day already has an entry
+            if (await getEntryForDate(DateTime.parse(entry['timeCreated'])) ==
+                null) {
+              await db.insert('entries', {
+                'text': entry['text'],
+                'img_path': entry['imgPath'],
+                'mood': entry['mood'],
+                'time_create': entry['timeCreated'],
+                'time_modified': entry['timeModified'],
+              });
+            }
+          }
+        } else {
+          // Add images to import
+          importImages.add(file);
+          StatsProvider.instance.updateSyncStats(importImages.length, 0);
+        }
       }
     }
-    if (usingExternalImg()) await syncImageFolder(true);
+    // Import Images
+    List<String> externalImages = List.empty(growable: true);
+    if (usingExternalImg()) {
+      externalImages.addAll(await FileLayer.listFiles(
+          await getExternalImgDatabasePath(),
+          useExternalPath: true));
+    }
+    List<String> internalImages = await FileLayer.listFiles(
+        await getInternalImgDatabasePath(),
+        useExternalPath: false);
+
+    int imported = 0;
+    for (final file in importImages) {
+      final fileName = basename(file.name);
+      // Skip existing images
+      if (!internalImages.contains(fileName)) {
+        var imageFilePath = await FileLayer.createFile(
+            await getInternalImgDatabasePath(), fileName, await file.content,
+            useExternalPath: false);
+        // Skip existing images
+        if (usingExternalImg() && !externalImages.contains(fileName)) {
+          await FileLayer.createFile(
+              await getExternalImgDatabasePath(), fileName, await file.content,
+              useExternalPath: true);
+        }
+        if (imageFilePath == null) return false;
+        if (Platform.isAndroid) {
+          // Add image to media store
+          MediaScanner.loadMedia(path: imageFilePath);
+        }
+      }
+
+      // Update sync status
+      imported += 1;
+      StatsProvider.instance.updateSyncStats(importImages.length, imported);
+    }
+
     return true;
   }
 }

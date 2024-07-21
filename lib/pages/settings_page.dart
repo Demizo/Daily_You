@@ -415,7 +415,7 @@ class _SettingsPageState extends State<SettingsPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Import Logs From:'),
+          title: const Text('Import Logs From...'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -430,7 +430,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     setState(() {
                       isSyncing = true;
                     });
-                    await EntriesDatabase.instance.importFromJson();
+                    await EntriesDatabase.instance.importEntries();
                     setState(() {
                       isSyncing = false;
                     });
@@ -459,7 +459,7 @@ class _SettingsPageState extends State<SettingsPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Choose Export Format:'),
+          title: const Text('Choose Export Format'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -467,7 +467,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   title: const Text('Daily You'),
                   onTap: () async {
                     Navigator.pop(context);
-                    await EntriesDatabase.instance.exportToJson();
+                    await EntriesDatabase.instance.exportEntries();
                   }),
             ],
           ),
@@ -1062,22 +1062,6 @@ class _SettingsPageState extends State<SettingsPage> {
                                 _showExportSelectionPopup();
                               },
                             ),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            ElevatedButton.icon(
-                              icon: const Icon(
-                                Icons.photo,
-                              ),
-                              label: const Text("Export Images..."),
-                              onPressed: () async {
-                                if (Platform.isAndroid &&
-                                    !await requestPhotosPermission()) {
-                                  return;
-                                }
-                                await EntriesDatabase.instance.exportImages();
-                              },
-                            ),
                           ],
                         ),
                       ],
@@ -1106,28 +1090,6 @@ class _SettingsPageState extends State<SettingsPage> {
                                   return;
                                 }
                                 _showImportSelectionPopup();
-                              },
-                            ),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            ElevatedButton.icon(
-                              icon: const Icon(
-                                Icons.photo,
-                              ),
-                              label: const Text("Import Images..."),
-                              onPressed: () async {
-                                if (Platform.isAndroid &&
-                                    !await requestPhotosPermission()) {
-                                  return;
-                                }
-                                setState(() {
-                                  isSyncing = true;
-                                });
-                                await EntriesDatabase.instance.importImages();
-                                setState(() {
-                                  isSyncing = false;
-                                });
                               },
                             ),
                           ],
