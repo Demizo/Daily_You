@@ -1,3 +1,4 @@
+import 'package:daily_you/models/image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:daily_you/models/entry.dart';
@@ -10,9 +11,11 @@ class LargeEntryCardWidget extends StatelessWidget {
     Key? key,
     this.title,
     required this.entry,
+    this.image,
   }) : super(key: key);
 
   final Entry entry;
+  final EntryImage? image;
   final String? title;
 
   @override
@@ -21,19 +24,18 @@ class LargeEntryCardWidget extends StatelessWidget {
     final time = DateFormat.yMMMd().format(entry.timeCreate);
     return Card(
       clipBehavior: Clip.antiAlias,
-      color: theme.cardColor,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (entry.imgPath != null)
+          if (image != null)
             Expanded(
                 child: Center(
               child: ClipRRect(
                   borderRadius: BorderRadius.circular(16),
                   child: LocalImageLoader(
-                    imagePath: entry.imgPath!,
+                    imagePath: image!.imgPath,
                   )),
             )),
           Expanded(

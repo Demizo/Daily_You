@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:daily_you/config_manager.dart';
+import 'package:daily_you/models/image.dart';
 import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:flutter/material.dart';
@@ -15,12 +16,14 @@ class AddEditEntryPage extends StatefulWidget {
   final Entry? entry;
   final DateTime? overrideCreateDate;
   final bool openCamera;
+  final List<EntryImage> images;
 
   const AddEditEntryPage({
     Key? key,
     this.entry,
     this.overrideCreateDate,
     this.openCamera = false,
+    this.images = const <EntryImage>[],
   }) : super(key: key);
   @override
   State<AddEditEntryPage> createState() => _AddEditEntryPageState();
@@ -29,7 +32,6 @@ class AddEditEntryPage extends StatefulWidget {
 class _AddEditEntryPageState extends State<AddEditEntryPage> {
   late int id;
   late String text;
-  late String? imgPath;
   late int? mood;
   bool entryChanged = false;
   bool loadingTemplate = true;
@@ -38,7 +40,6 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
   void initState() {
     super.initState();
     id = widget.entry?.id ?? -1;
-    imgPath = widget.entry?.imgPath;
     mood = widget.entry?.mood;
     text = widget.entry?.text ?? '';
     if (widget.entry == null) {
@@ -91,15 +92,13 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
                       ),
                     ),
                     onPressed: () async {
-                      if (imgPath != null) {
-                        await EntriesDatabase.instance.deleteImg(imgPath!);
-                      }
+                      // TODO: Delete images for entry
                       Navigator.of(context).popUntil((route) => route.isFirst);
                       await EntriesDatabase.instance.deleteEntry(id);
                     },
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.all(12),
-                      backgroundColor: Theme.of(context).colorScheme.background,
+                      backgroundColor: Theme.of(context).colorScheme.surface,
                       foregroundColor: Theme.of(context).colorScheme.primary,
                       elevation: 3,
                       shape: RoundedRectangleBorder(
@@ -125,7 +124,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.all(12),
                       backgroundColor: Theme.of(context).colorScheme.primary,
-                      foregroundColor: Theme.of(context).colorScheme.background,
+                      foregroundColor: Theme.of(context).colorScheme.surface,
                       elevation: 3,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20.0),
@@ -152,11 +151,28 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
             child: ListView(
               padding: const EdgeInsets.only(left: 8, right: 8),
               children: [
-                EntryImagePicker(
-                    imgPath: imgPath,
-                    openCamera: widget.openCamera,
-                    onChangedImage: (imgPath) =>
-                        setState(() => this.imgPath = imgPath)),
+                Container(
+                  height: 200,
+                  child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: widget.images.length + 1,
+                      itemBuilder: ((context, index) {
+                        if (index == 0) {
+                          return SizedBox(
+                            width: 200,
+                            height: 200,
+                            child: Card(),
+                          );
+                        } else {
+                          return EntryImagePicker(
+                              imgPath: widget.images[index - 1].imgPath,
+                              openCamera: widget.openCamera,
+                              onChangedImage: (imgPath) => setState(() {
+                                    //TODO: Update image
+                                  }));
+                        }
+                      })),
+                ),
                 StatefulBuilder(
                   builder: (context, setState) => EntryMoodPicker(
                       date: widget.entry != null
@@ -206,7 +222,6 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
   Future updateEntry() async {
     final updatedEntry = widget.entry!.copy(
       text: text,
-      imgPath: imgPath,
       mood: mood,
       timeModified: DateTime.now(),
     );
@@ -218,7 +233,6 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
   Future addEntry() async {
     final newEntry = Entry(
       text: text,
-      imgPath: imgPath,
       mood: mood,
       timeCreate: widget.overrideCreateDate ?? DateTime.now(),
       timeModified: DateTime.now(),

@@ -147,7 +147,7 @@ class _HomePageState extends State<HomePage> {
                                 backgroundColor:
                                     Theme.of(context).colorScheme.primary,
                                 foregroundColor:
-                                    Theme.of(context).colorScheme.background,
+                                    Theme.of(context).colorScheme.surface,
                                 elevation: 3,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(20.0),
@@ -178,7 +178,7 @@ class _HomePageState extends State<HomePage> {
                                 backgroundColor:
                                     Theme.of(context).colorScheme.primary,
                                 foregroundColor:
-                                    Theme.of(context).colorScheme.background,
+                                    Theme.of(context).colorScheme.surface,
                                 elevation: 3,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(80.0),

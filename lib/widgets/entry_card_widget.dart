@@ -1,3 +1,4 @@
+import 'package:daily_you/models/image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:daily_you/models/entry.dart';
@@ -10,10 +11,12 @@ class EntryCardWidget extends StatelessWidget {
     Key? key,
     this.title,
     required this.entry,
+    this.image,
   }) : super(key: key);
 
   final Entry entry;
   final String? title;
+  final EntryImage? image;
 
   @override
   Widget build(BuildContext context) {
@@ -22,13 +25,12 @@ class EntryCardWidget extends StatelessWidget {
     return Stack(alignment: Alignment.bottomLeft, children: [
       Card(
         clipBehavior: Clip.antiAlias,
-        color: theme.cardColor,
         surfaceTintColor: null,
         child: Container(
           constraints: const BoxConstraints.expand(),
           padding: const EdgeInsets.all(0),
           child: Stack(clipBehavior: Clip.antiAlias, children: [
-            (entry.imgPath != null)
+            (image != null)
                 ? Column(
                     mainAxisSize: MainAxisSize.max,
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -36,7 +38,7 @@ class EntryCardWidget extends StatelessWidget {
                       Expanded(
                           child: ClipRect(
                               child: LocalImageLoader(
-                        imagePath: entry.imgPath!,
+                        imagePath: image!.imgPath,
                       )))
                     ],
                   )
