@@ -51,7 +51,6 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
                       ),
                     ),
                     onPressed: () async {
-                      await EntriesDatabase.instance.deleteImg(widget.imgPath!);
                       widget.onChangedImage(null);
                       Navigator.pop(context);
                     },
@@ -147,8 +146,8 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
     if (widget.imgPath != null) {
       return Stack(alignment: Alignment.center, children: [
         SizedBox(
-          height: 200,
-          width: 200,
+          height: 220,
+          width: 220,
           child: Card(
               clipBehavior: Clip.antiAlias,
               child: LocalImageLoader(imagePath: widget.imgPath!)),
@@ -170,8 +169,8 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
     } else {
       return Center(
         child: SizedBox(
-          height: 300,
-          width: 300,
+          height: 220,
+          width: 220,
           child: Card(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,

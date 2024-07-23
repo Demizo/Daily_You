@@ -65,7 +65,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
                   children: [
                     if (images.isNotEmpty && images.length > 1)
                       Container(
-                        height: 300,
+                        height: 220,
                         child: ListView.builder(
                             scrollDirection: Axis.horizontal,
                             itemCount: images.length,
@@ -74,8 +74,8 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
                                 child: Center(
                                   child: Container(
                                     alignment: Alignment.center,
-                                    height: 300,
-                                    width: 300,
+                                    height: 220,
+                                    width: 220,
                                     child: Card(
                                         clipBehavior: Clip.antiAlias,
                                         child: LocalImageLoader(
@@ -102,8 +102,8 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
                         child: Center(
                           child: Container(
                             alignment: Alignment.center,
-                            height: 300,
-                            width: 300,
+                            height: 220,
+                            width: 220,
                             child: Card(
                                 clipBehavior: Clip.antiAlias,
                                 child: LocalImageLoader(

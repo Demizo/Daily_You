@@ -17,12 +17,12 @@ class EntryImageFields {
 
 class EntryImage {
   final int? id;
-  final int? entryId;
+  int? entryId;
   final String imgPath;
-  final int imgRank;
+  int imgRank;
   final DateTime timeCreate;
 
-  const EntryImage({
+  EntryImage({
     this.id,
     required this.entryId,
     required this.imgPath,

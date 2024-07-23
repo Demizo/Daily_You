@@ -226,8 +226,8 @@ DROP TABLE old_entries;
   Future<List<EntryImage>> getAllEntryImages() async {
     final db = _database!;
 
-    final result =
-        await db.query(imagesTable, orderBy: '${EntryImageFields.imgPath} ASC');
+    final result = await db.query(imagesTable,
+        orderBy: '${EntryImageFields.imgPath} DESC');
 
     return result.map((json) => EntryImage.fromJson(json)).toList();
   }
@@ -238,10 +238,9 @@ DROP TABLE old_entries;
     List<EntryImage> entryImages = List.empty(growable: true);
 
     final maps = await db.query(imagesTable,
-        columns: EntryImageFields.values,
         where: '${EntryImageFields.entryId} = ?',
         whereArgs: [entryId],
-        orderBy: '${EntryImageFields.imgRank} ASC');
+        orderBy: '${EntryImageFields.imgRank} DESC');
 
     for (final map in maps) {
       entryImages.add(EntryImage.fromJson(map));
@@ -274,6 +273,20 @@ DROP TABLE old_entries;
 
     if (usingExternalDb()) await updateExternalDatabase();
     return removedId;
+  }
+
+  Future<int> updateImg(EntryImage image) async {
+    final db = _database!;
+
+    final id = await db.update(
+      imagesTable,
+      image.toJson(),
+      where: '${EntryImageFields.id} = ?',
+      whereArgs: [image.id],
+    );
+
+    if (usingExternalDb()) await updateExternalDatabase();
+    return id;
   }
 
   Future<Uint8List?> getImgBytes(String imageName) async {

@@ -33,6 +33,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
   late int id;
   late String text;
   late int? mood;
+  late List<EntryImage> currentImages;
   bool entryChanged = false;
   bool loadingTemplate = true;
 
@@ -42,6 +43,8 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
     id = widget.entry?.id ?? -1;
     mood = widget.entry?.mood;
     text = widget.entry?.text ?? '';
+    currentImages = List.empty(growable: true);
+    currentImages.addAll(widget.images);
     if (widget.entry == null) {
       _loadTemplate();
     } else {
@@ -151,28 +154,33 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
             child: ListView(
               padding: const EdgeInsets.only(left: 8, right: 8),
               children: [
-                Container(
-                  height: 200,
-                  child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: widget.images.length + 1,
-                      itemBuilder: ((context, index) {
-                        if (index == 0) {
-                          return SizedBox(
-                            width: 200,
-                            height: 200,
-                            child: Card(),
-                          );
-                        } else {
-                          return EntryImagePicker(
-                              imgPath: widget.images[index - 1].imgPath,
+                if (currentImages.length == 0)
+                  EntryImagePicker(
+                      imgPath: null,
+                      openCamera: widget.openCamera,
+                      onChangedImage: (imgPath) => addLocalImage(imgPath)),
+                if (currentImages.length > 0)
+                  Container(
+                    height: 220,
+                    child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: currentImages.length + 1,
+                        itemBuilder: ((context, index) {
+                          if (index == 0) {
+                            return EntryImagePicker(
+                              imgPath: null,
                               openCamera: widget.openCamera,
-                              onChangedImage: (imgPath) => setState(() {
-                                    //TODO: Update image
-                                  }));
-                        }
-                      })),
-                ),
+                              onChangedImage: (imgPath) =>
+                                  addLocalImage(imgPath),
+                            );
+                          } else {
+                            return EntryImagePicker(
+                                imgPath: currentImages[index - 1].imgPath,
+                                onChangedImage: (imgPath) =>
+                                    removeLocalImage(index));
+                          }
+                        })),
+                  ),
                 StatefulBuilder(
                   builder: (context, setState) => EntryMoodPicker(
                       date: widget.entry != null
@@ -227,6 +235,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
     );
 
     var entry = await EntriesDatabase.instance.updateEntry(updatedEntry);
+    await saveOrUpdateImage(widget.entry!.id!);
     Navigator.of(context).pop(entry);
   }
 
@@ -243,7 +252,71 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
       await NotificationManager.instance.notifications.cancel(0);
     }
     var entry = await EntriesDatabase.instance.create(newEntry);
-
+    await saveOrUpdateImage(entry.id!);
     Navigator.of(context).pop(entry);
+  }
+
+  Future saveOrUpdateImage(int entryId) async {
+    // Add images
+    for (EntryImage currentImage in currentImages) {
+      currentImage.entryId = entryId;
+      if (currentImage.id == null ||
+          widget.images
+              .where((image) => image.id == currentImage.id!)
+              .isEmpty) {
+        await EntriesDatabase.instance.addImg(currentImage);
+      }
+    }
+    // Update images
+    for (EntryImage existingImage in widget.images) {
+      EntryImage? matchingImage = currentImages
+          .where((image) => image.id == existingImage.id!)
+          .firstOrNull;
+      if (matchingImage == null) {
+        // Delete image
+        await EntriesDatabase.instance.removeImg(existingImage);
+      } else {
+        await EntriesDatabase.instance.updateImg(matchingImage);
+      }
+    }
+  }
+
+  void addLocalImage(String? imgPath) {
+    if (imgPath != null) {
+      currentImages.add(EntryImage(
+          entryId: widget.entry?.id,
+          imgPath: imgPath,
+          imgRank: currentImages.length + 1,
+          timeCreate: DateTime.now()));
+      currentImages.sort((a, b) {
+        if (a.imgRank == b.imgRank) {
+          return 0;
+        } else if (a.imgRank < b.imgRank) {
+          return 1;
+        } else {
+          return -1;
+        }
+      });
+    }
+    setState(() {});
+  }
+
+  void removeLocalImage(int index) {
+    currentImages.remove(currentImages[index - 1]);
+    // Update ranks
+    // TODO fix sort order
+    for (int i = currentImages.length - 1; i > 0; i--) {
+      currentImages[i].imgRank = i;
+    }
+    currentImages.sort((a, b) {
+      if (a.imgRank == b.imgRank) {
+        return 0;
+      } else if (a.imgRank < b.imgRank) {
+        return 1;
+      } else {
+        return -1;
+      }
+    });
+    setState(() {});
   }
 }
