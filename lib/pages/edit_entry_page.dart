@@ -174,10 +174,16 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
                                   addLocalImage(imgPath),
                             );
                           } else {
-                            return EntryImagePicker(
-                                imgPath: currentImages[index - 1].imgPath,
-                                onChangedImage: (imgPath) =>
-                                    removeLocalImage(index));
+                            // TODO: Remove rank number card
+                            return Stack(children: [
+                              EntryImagePicker(
+                                  imgPath: currentImages[index - 1].imgPath,
+                                  onChangedImage: (imgPath) =>
+                                      removeLocalImage(index - 1)),
+                              Card(
+                                  child: Text(
+                                      "${currentImages[index - 1].imgRank}")),
+                            ]);
                           }
                         })),
                   ),
@@ -281,33 +287,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
     }
   }
 
-  void addLocalImage(String? imgPath) {
-    if (imgPath != null) {
-      currentImages.add(EntryImage(
-          entryId: widget.entry?.id,
-          imgPath: imgPath,
-          imgRank: currentImages.length + 1,
-          timeCreate: DateTime.now()));
-      currentImages.sort((a, b) {
-        if (a.imgRank == b.imgRank) {
-          return 0;
-        } else if (a.imgRank < b.imgRank) {
-          return 1;
-        } else {
-          return -1;
-        }
-      });
-    }
-    setState(() {});
-  }
-
-  void removeLocalImage(int index) {
-    currentImages.remove(currentImages[index - 1]);
-    // Update ranks
-    // TODO fix sort order
-    for (int i = currentImages.length - 1; i > 0; i--) {
-      currentImages[i].imgRank = i;
-    }
+  void sortImages() {
     currentImages.sort((a, b) {
       if (a.imgRank == b.imgRank) {
         return 0;
@@ -317,6 +297,31 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
         return -1;
       }
     });
-    setState(() {});
+  }
+
+  void addLocalImage(String? imgPath) {
+    if (imgPath != null) {
+      currentImages.add(EntryImage(
+          entryId: widget.entry?.id,
+          imgPath: imgPath,
+          imgRank: currentImages.length,
+          timeCreate: DateTime.now()));
+      sortImages();
+    }
+    setState(() {
+      currentImages;
+    });
+  }
+
+  void removeLocalImage(int index) {
+    currentImages.remove(currentImages[index]);
+    // Update ranks
+    for (int i = 0; i < currentImages.length; i++) {
+      currentImages[i].imgRank = currentImages.length - 1 - i;
+    }
+    sortImages();
+    setState(() {
+      currentImages;
+    });
   }
 }

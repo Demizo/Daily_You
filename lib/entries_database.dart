@@ -227,7 +227,7 @@ DROP TABLE old_entries;
     final db = _database!;
 
     final result = await db.query(imagesTable,
-        orderBy: '${EntryImageFields.imgPath} DESC');
+        orderBy: '${EntryImageFields.imgRank} DESC');
 
     return result.map((json) => EntryImage.fromJson(json)).toList();
   }
