@@ -64,7 +64,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
                   padding: const EdgeInsets.only(left: 8, right: 8),
                   children: [
                     if (images.isNotEmpty && images.length > 1)
-                      Container(
+                      SizedBox(
                         height: 220,
                         child: ListView.builder(
                             scrollDirection: Axis.horizontal,

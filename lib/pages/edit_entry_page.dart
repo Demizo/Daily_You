@@ -165,7 +165,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
                       openCamera: widget.openCamera,
                       onChangedImage: (imgPath) => addLocalImage(imgPath)),
                 if (currentImages.isNotEmpty)
-                  Container(
+                  SizedBox(
                     height: 220,
                     child: Listener(
                       onPointerMove: _handlePointerMove,

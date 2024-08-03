@@ -160,9 +160,9 @@ class _EntriesPageState extends State<EntriesPage> {
                               onPressed: () => _showSortSelectionPopup()),
                         ],
                         hintText: 'Search logs...',
-                        padding: MaterialStateProperty.all(
+                        padding: WidgetStateProperty.all(
                             const EdgeInsets.only(left: 8, right: 8)),
-                        elevation: MaterialStateProperty.all(1),
+                        elevation: WidgetStateProperty.all(1),
                         onChanged: (queryText) => EasyDebounce.debounce(
                             'search-debounce',
                             const Duration(milliseconds: 500), () {
