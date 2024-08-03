@@ -72,8 +72,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
                             itemBuilder: (context, index) {
                               return GestureDetector(
                                 child: Center(
-                                  child: Container(
-                                    alignment: Alignment.center,
+                                  child: SizedBox(
                                     height: 220,
                                     width: 220,
                                     child: Card(

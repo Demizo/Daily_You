@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:daily_you/config_manager.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:daily_you/widgets/local_image_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:daily_you/entries_database.dart';
@@ -36,6 +38,10 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
   late List<EntryImage> currentImages;
   bool entryChanged = false;
   bool loadingTemplate = true;
+  final ScrollController _scrollController = ScrollController();
+  bool _isDragging = false;
+  Timer? _autoScrollTimer;
+  Offset _draggingOffset = Offset.zero;
 
   @override
   void initState() {
@@ -154,38 +160,36 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
             child: ListView(
               padding: const EdgeInsets.only(left: 8, right: 8),
               children: [
-                if (currentImages.length == 0)
+                if (currentImages.isEmpty)
                   EntryImagePicker(
                       imgPath: null,
                       openCamera: widget.openCamera,
                       onChangedImage: (imgPath) => addLocalImage(imgPath)),
-                if (currentImages.length > 0)
+                if (currentImages.isNotEmpty)
                   Container(
                     height: 220,
-                    child: ListView.builder(
+                    child: Listener(
+                      onPointerMove: _handlePointerMove,
+                      onPointerDown: _handlePointerDown,
+                      onPointerUp: _handlePointerUp,
+                      child: ListView.builder(
+                        controller: _scrollController,
+                        shrinkWrap: true,
                         scrollDirection: Axis.horizontal,
                         itemCount: currentImages.length + 1,
-                        itemBuilder: ((context, index) {
+                        itemBuilder: (context, index) {
                           if (index == 0) {
                             return EntryImagePicker(
-                              imgPath: null,
-                              openCamera: widget.openCamera,
-                              onChangedImage: (imgPath) =>
-                                  addLocalImage(imgPath),
-                            );
+                                imgPath: null,
+                                openCamera: widget.openCamera,
+                                onChangedImage: (imgPath) =>
+                                    addLocalImage(imgPath));
                           } else {
-                            // TODO: Remove rank number card
-                            return Stack(children: [
-                              EntryImagePicker(
-                                  imgPath: currentImages[index - 1].imgPath,
-                                  onChangedImage: (imgPath) =>
-                                      removeLocalImage(index - 1)),
-                              Card(
-                                  child: Text(
-                                      "${currentImages[index - 1].imgRank}")),
-                            ]);
+                            return _buildDraggableListItem(index - 1);
                           }
-                        })),
+                        },
+                      ),
+                    ),
                   ),
                 StatefulBuilder(
                   builder: (context, setState) => EntryMoodPicker(
@@ -222,6 +226,135 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
         icon: const Icon(Icons.delete),
         onPressed: () => _showDeleteEntryPopup(),
       );
+
+  Widget _buildDraggableListItem(int index) {
+    bool isHovered = false;
+    return LongPressDraggable<EntryImage>(
+      onDragStarted: () => _isDragging = true,
+      data: currentImages[index],
+      feedback: Opacity(
+        opacity: 0.7,
+        child: SizedBox(
+          key: ValueKey(currentImages[index].imgRank),
+          height: 220,
+          width: 220,
+          child: Card(
+              clipBehavior: Clip.antiAlias,
+              child: LocalImageLoader(imagePath: currentImages[index].imgPath)),
+        ),
+      ),
+      childWhenDragging: Opacity(
+        opacity: 0.2,
+        child: SizedBox(
+          key: ValueKey(currentImages[index].imgRank),
+          height: 220,
+          width: 220,
+          child: Card(
+              clipBehavior: Clip.antiAlias,
+              child: LocalImageLoader(imagePath: currentImages[index].imgPath)),
+        ),
+      ),
+      child: DragTarget<EntryImage>(
+        onLeave: (data) {
+          isHovered = false;
+        },
+        onWillAcceptWithDetails: (data) {
+          isHovered = true;
+          return true;
+        },
+        onAcceptWithDetails: (data) {
+          int fromIndex = currentImages.indexOf(data.data);
+          isHovered = false;
+          final movedItem = currentImages.removeAt(fromIndex);
+          currentImages.insert(index, movedItem);
+          // Update ranks
+          for (int i = 0; i < currentImages.length; i++) {
+            currentImages[i].imgRank = currentImages.length - 1 - i;
+          }
+          sortImages();
+          setState(() {
+            currentImages;
+          });
+        },
+        builder: (context, candidateData, rejectedData) {
+          return _buildListItem(index, isHovered, context);
+        },
+      ),
+    );
+  }
+
+  Widget _buildListItem(int index, bool isHovered, context) {
+    if (isHovered && _isDragging) {
+      return SizedBox(
+          key: ValueKey(currentImages[index].imgRank),
+          height: 220,
+          width: 220,
+          child: Stack(alignment: Alignment.center, children: [
+            Opacity(
+              opacity: 0.2,
+              child: Card(
+                  clipBehavior: Clip.antiAlias,
+                  child: LocalImageLoader(
+                      imagePath: currentImages[index].imgPath)),
+            ),
+            Icon(
+                size: 100.0,
+                color: Theme.of(context).colorScheme.primary,
+                Icons.arrow_downward_rounded)
+          ]));
+    } else {
+      return Stack(alignment: Alignment.bottomCenter, children: [
+        EntryImagePicker(
+            imgPath: currentImages[index].imgPath,
+            openCamera: false,
+            onChangedImage: (imgPath) {
+              if (imgPath == null) {
+                removeLocalImage(index);
+              }
+            }),
+        const Padding(
+          padding: EdgeInsets.all(8.0),
+          child: Icon(Icons.drag_handle_rounded),
+        ),
+        Text("${currentImages[index].imgRank}")
+      ]);
+    }
+  }
+
+  void _handlePointerDown(PointerEvent event) {
+    _startAutoScrollTimer();
+  }
+
+  void _handlePointerUp(PointerEvent event) {
+    _isDragging = false;
+    _autoScrollTimer?.cancel();
+  }
+
+  void _handlePointerMove(PointerEvent event) {
+    _draggingOffset = event.position;
+  }
+
+  void _startAutoScrollTimer() {
+    const autoScrollThreshold = 50.0;
+    const scrollSpeed = 15.0;
+
+    _autoScrollTimer =
+        Timer.periodic(const Duration(milliseconds: 20), (timer) {
+      if (!_isDragging) {
+        return;
+      }
+
+      final position = _scrollController.position;
+      if (_draggingOffset.dx < autoScrollThreshold &&
+          position.pixels > position.minScrollExtent) {
+        _scrollController.jumpTo(position.pixels - scrollSpeed);
+      } else if (_draggingOffset.dx >
+              position.viewportDimension - autoScrollThreshold &&
+          position.pixels < position.maxScrollExtent) {
+        _scrollController.jumpTo(position.pixels + scrollSpeed);
+      }
+    });
+  }
 
   void addOrUpdateNote() async {
     final isUpdating = widget.entry != null;
