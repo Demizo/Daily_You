@@ -315,7 +315,6 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
           padding: EdgeInsets.all(8.0),
           child: Icon(Icons.drag_handle_rounded),
         ),
-        Text("${currentImages[index].imgRank}")
       ]);
     }
   }
