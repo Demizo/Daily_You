@@ -821,17 +821,38 @@ DROP TABLE old_entries;
 
     final List<Map<String, dynamic>> entries = await db.query('entries');
 
-    final List<Map<String, dynamic>> jsonData = entries.map((entry) {
-      return {
-        'timeCreated': entry['time_create'],
-        'timeModified': entry['time_modified'],
-        // TODO: Add images
-        'mood': entry['mood'],
-        'text': entry['text'] ?? '',
-      };
-    }).toList();
+    List<Map<String, dynamic>> jsonList = [];
 
-    final jsonString = json.encode(jsonData);
+    for (var entry in entries) {
+      // Query to get images for the current entry
+      List<Map<String, dynamic>> images = await db.query(
+        imagesTable,
+        where: '${EntryImageFields.entryId} = ?',
+        whereArgs: [entry[EntryFields.id]],
+      );
+
+      // Convert images to a list of maps
+      List<Map<String, dynamic>> imageList = images
+          .map((img) => {
+                'imgPath': img[EntryImageFields.imgPath],
+                'imgRank': img[EntryImageFields.imgRank],
+                'timeCreated': img[EntryImageFields.timeCreate],
+              })
+          .toList();
+
+      // Structure the entry
+      Map<String, dynamic> jsonEntry = {
+        'timeCreated': entry[EntryFields.timeCreate],
+        'timeModified': entry[EntryFields.timeModified],
+        'images': imageList,
+        'mood': entry[EntryFields.mood],
+        'text': entry[EntryFields.text] ?? '',
+      };
+
+      jsonList.add(jsonEntry);
+    }
+
+    final jsonString = json.encode(jsonList);
     final currTime = DateTime.now();
     final exportedJsonName =
         "daily_you_logs_${currTime.month}_${currTime.day}_${currTime.year}.json";
@@ -853,13 +874,32 @@ DROP TABLE old_entries;
     for (var entry in jsonData) {
       // Skip if the day already has an entry
       if (await getEntryForDate(DateTime.parse(entry['timeCreated'])) == null) {
-        await db.insert('entries', {
+        int id = await db.insert(entriesTable, {
           'text': entry['text'],
-          // TODO: Add images
           'mood': entry['mood'],
           'time_create': entry['timeCreated'],
           'time_modified': entry['timeModified'],
         });
+        // Support old imgPath field
+        if (entry['imgPath'] != null) {
+          EntryImage image = EntryImage(
+              entryId: id,
+              imgPath: entry['imgPath'],
+              imgRank: 0,
+              timeCreate: DateTime.now());
+          await addImg(image);
+        }
+        // Import images
+        if (entry['images'] != null) {
+          for (var img in entry['images']) {
+            await db.insert(imagesTable, {
+              EntryImageFields.entryId: id,
+              EntryImageFields.imgPath: img['imgPath'],
+              EntryImageFields.imgRank: img['imgRank'],
+              EntryImageFields.timeCreate: img['timeCreated'],
+            });
+          }
+        }
       }
     }
     if (usingExternalImg()) await syncImageFolder(true);
