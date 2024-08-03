@@ -101,9 +101,8 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
                       ),
                     ),
                     onPressed: () async {
-                      // TODO: Delete images for entry
+                      await deleteEntry(id);
                       Navigator.of(context).popUntil((route) => route.isFirst);
-                      await EntriesDatabase.instance.deleteEntry(id);
                     },
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.all(12),
@@ -393,6 +392,17 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
     var entry = await EntriesDatabase.instance.create(newEntry);
     await saveOrUpdateImage(entry.id!);
     Navigator.of(context).pop(entry);
+  }
+
+  Future deleteEntry(int id) async {
+    // Delete entry images
+    var entryImages = await EntriesDatabase.instance.getImagesForEntry(id);
+    for (EntryImage image in entryImages) {
+      await EntriesDatabase.instance.deleteImg(image.imgPath);
+      await EntriesDatabase.instance.removeImg(image);
+    }
+    // Delete entry
+    await EntriesDatabase.instance.deleteEntry(id);
   }
 
   Future saveOrUpdateImage(int entryId) async {
