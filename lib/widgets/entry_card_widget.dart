@@ -8,11 +8,11 @@ import 'local_image_loader.dart';
 
 class EntryCardWidget extends StatelessWidget {
   const EntryCardWidget({
-    Key? key,
+    super.key,
     this.title,
     required this.entry,
     this.image,
-  }) : super(key: key);
+  });
 
   final Entry entry;
   final String? title;

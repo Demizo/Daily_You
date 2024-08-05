@@ -17,7 +17,7 @@ class MoodTotalsChart extends StatefulWidget {
       .entries
       .map((entry) => MapEntry(entry.value, entry.key)));
 
-  MoodTotalsChart({super.key, required this.moodCounts});
+  const MoodTotalsChart({super.key, required this.moodCounts});
 
   @override
   State<MoodTotalsChart> createState() => _MoodTotalsChartState();

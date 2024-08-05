@@ -21,12 +21,12 @@ class AddEditEntryPage extends StatefulWidget {
   final List<EntryImage> images;
 
   const AddEditEntryPage({
-    Key? key,
+    super.key,
     this.entry,
     this.overrideCreateDate,
     this.openCamera = false,
     this.images = const <EntryImage>[],
-  }) : super(key: key);
+  });
   @override
   State<AddEditEntryPage> createState() => _AddEditEntryPageState();
 }

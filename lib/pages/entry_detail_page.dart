@@ -17,9 +17,9 @@ class EntryDetailPage extends StatefulWidget {
   final int entryId;
 
   const EntryDetailPage({
-    Key? key,
+    super.key,
     required this.entryId,
-  }) : super(key: key);
+  });
 
   @override
   _EntryDetailPageState createState() => _EntryDetailPageState();
