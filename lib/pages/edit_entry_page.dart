@@ -42,6 +42,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
   bool _isDragging = false;
   Timer? _autoScrollTimer;
   Offset _draggingOffset = Offset.zero;
+  bool _openedCamera = false;
 
   @override
   void initState() {
@@ -162,8 +163,11 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
                 if (currentImages.isEmpty)
                   EntryImagePicker(
                       imgPath: null,
-                      openCamera: widget.openCamera,
-                      onChangedImage: (imgPath) => addLocalImage(imgPath)),
+                      openCamera: widget.openCamera && !_openedCamera,
+                      onChangedImage: (imgPath) {
+                        _openedCamera = true;
+                        addLocalImage(imgPath);
+                      }),
                 if (currentImages.isNotEmpty)
                   SizedBox(
                     height: 220,
@@ -180,7 +184,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
                           if (index == 0) {
                             return EntryImagePicker(
                                 imgPath: null,
-                                openCamera: widget.openCamera,
+                                openCamera: false,
                                 onChangedImage: (imgPath) =>
                                     addLocalImage(imgPath));
                           } else {
