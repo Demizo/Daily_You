@@ -1,3 +1,4 @@
+import 'package:daily_you/models/image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:daily_you/models/entry.dart';
@@ -7,13 +8,15 @@ import 'local_image_loader.dart';
 
 class EntryCardWidget extends StatelessWidget {
   const EntryCardWidget({
-    Key? key,
+    super.key,
     this.title,
     required this.entry,
-  }) : super(key: key);
+    required this.images,
+  });
 
   final Entry entry;
   final String? title;
+  final List<EntryImage> images;
 
   @override
   Widget build(BuildContext context) {
@@ -22,54 +25,65 @@ class EntryCardWidget extends StatelessWidget {
     return Stack(alignment: Alignment.bottomLeft, children: [
       Card(
         clipBehavior: Clip.antiAlias,
-        color: theme.cardColor,
         surfaceTintColor: null,
         child: Container(
           constraints: const BoxConstraints.expand(),
           padding: const EdgeInsets.all(0),
-          child: Stack(clipBehavior: Clip.antiAlias, children: [
-            (entry.imgPath != null)
-                ? Column(
-                    mainAxisSize: MainAxisSize.max,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Expanded(
-                          child: ClipRect(
-                              child: LocalImageLoader(
-                        imagePath: entry.imgPath!,
-                      )))
-                    ],
-                  )
-                : (entry.text.isNotEmpty)
-                    ? Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Wrap(children: [
-                          IgnorePointer(
-                              child: MarkdownBlock(
-                                  config: theme.brightness == Brightness.light
-                                      ? MarkdownConfig.defaultConfig
-                                      : MarkdownConfig.darkConfig,
-                                  data: entry.text))
-                        ]),
-                      )
-                    : Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+          child: Stack(
+              alignment: Alignment.topRight,
+              clipBehavior: Clip.antiAlias,
+              children: [
+                (images.isNotEmpty)
+                    ? Column(
+                        mainAxisSize: MainAxisSize.max,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Center(
-                              child: Icon(
-                            Icons.photo,
-                            color: theme.disabledColor,
-                            size: 90,
-                          )),
-                          Text(
-                            'Empty Log',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: theme.disabledColor),
-                          ),
+                          Expanded(
+                              child: ClipRect(
+                                  child: LocalImageLoader(
+                            imagePath: images.first.imgPath,
+                          )))
                         ],
-                      ),
-          ]),
+                      )
+                    : (entry.text.isNotEmpty)
+                        ? Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Wrap(children: [
+                              IgnorePointer(
+                                  child: MarkdownBlock(
+                                      config:
+                                          theme.brightness == Brightness.light
+                                              ? MarkdownConfig.defaultConfig
+                                              : MarkdownConfig.darkConfig,
+                                      data: entry.text))
+                            ]),
+                          )
+                        : Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Center(
+                                  child: Icon(
+                                Icons.photo,
+                                color: theme.disabledColor,
+                                size: 90,
+                              )),
+                              Text(
+                                'Empty Log',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: theme.disabledColor),
+                              ),
+                            ],
+                          ),
+                if (images.length > 1)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Icon(
+                      Icons.photo_library_rounded,
+                      color: theme.disabledColor,
+                    ),
+                  ),
+              ]),
         ),
       ),
       Card(

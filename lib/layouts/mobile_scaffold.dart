@@ -32,6 +32,7 @@ class _MobileScaffoldState extends State<MobileScaffold> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(title: Text(appBarsTitles[currentIndex]), actions: [
         if (Platform.isAndroid)
           IconButton(
@@ -67,7 +68,6 @@ class _MobileScaffoldState extends State<MobileScaffold> {
           },
         )
       ]),
-      backgroundColor: theme.canvasColor,
       body: isLoading ? const Center(child: SizedBox()) : pages[currentIndex],
       bottomNavigationBar: NavigationBar(
         labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,

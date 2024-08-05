@@ -51,13 +51,12 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
                       ),
                     ),
                     onPressed: () async {
-                      await EntriesDatabase.instance.deleteImg(widget.imgPath!);
                       widget.onChangedImage(null);
                       Navigator.pop(context);
                     },
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.all(12),
-                      backgroundColor: Theme.of(context).colorScheme.background,
+                      backgroundColor: Theme.of(context).colorScheme.surface,
                       foregroundColor: Theme.of(context).colorScheme.primary,
                       elevation: 3,
                       shape: RoundedRectangleBorder(
@@ -83,7 +82,7 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.all(12),
                       backgroundColor: Theme.of(context).colorScheme.primary,
-                      foregroundColor: Theme.of(context).colorScheme.background,
+                      foregroundColor: Theme.of(context).colorScheme.surface,
                       elevation: 3,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20.0),
@@ -147,8 +146,8 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
     if (widget.imgPath != null) {
       return Stack(alignment: Alignment.center, children: [
         SizedBox(
-          height: 300,
-          width: 300,
+          height: 220,
+          width: 220,
           child: Card(
               clipBehavior: Clip.antiAlias,
               child: LocalImageLoader(imagePath: widget.imgPath!)),
@@ -157,7 +156,7 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
           style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.all(6),
             backgroundColor: Theme.of(context).colorScheme.primary,
-            foregroundColor: Theme.of(context).colorScheme.background,
+            foregroundColor: Theme.of(context).colorScheme.surface,
             elevation: 3,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20.0),
@@ -170,8 +169,8 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
     } else {
       return Center(
         child: SizedBox(
-          height: 300,
-          width: 300,
+          height: 220,
+          width: 220,
           child: Card(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -181,7 +180,7 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.all(6),
                       backgroundColor: Theme.of(context).colorScheme.primary,
-                      foregroundColor: Theme.of(context).colorScheme.background,
+                      foregroundColor: Theme.of(context).colorScheme.surface,
                       elevation: 3,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20.0),
@@ -197,7 +196,7 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.all(6),
                     backgroundColor: Theme.of(context).colorScheme.primary,
-                    foregroundColor: Theme.of(context).colorScheme.background,
+                    foregroundColor: Theme.of(context).colorScheme.surface,
                     elevation: 3,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20.0),

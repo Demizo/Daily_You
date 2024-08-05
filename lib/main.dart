@@ -135,13 +135,26 @@ class MainApp extends StatelessWidget {
             ? ThemeData(
                 useMaterial3: true,
                 colorScheme: ColorScheme.fromSeed(
-                    seedColor: themeModeProvider.accentColor,
-                    brightness: Brightness.dark,
-                    background: Colors.black,
-                    surface: Colors.black,
-                    onSurface: Colors.white,
-                    surfaceTint: Colors.black),
-              )
+                  seedColor: themeModeProvider.accentColor,
+                  brightness: Brightness.dark,
+                  surfaceContainerLowest: Colors.black,
+                  surfaceContainerLow: Colors.black,
+                  surfaceContainerHighest: Colors.black,
+                  surfaceContainerHigh: Colors.black,
+                  surfaceBright: Colors.black,
+                  surfaceDim: Colors.black,
+                  surface: Colors.black,
+                  surfaceContainer: Colors.black,
+                  onSurface: Colors.white,
+                  surfaceTint: Colors.black,
+                  primaryContainer: Colors.black,
+                  secondaryContainer: Colors.black,
+                  tertiaryContainer: Colors.black,
+                  inverseSurface: Colors.black,
+                  inversePrimary: Colors.black,
+                  scrim: Colors.black,
+                ),
+                scaffoldBackgroundColor: Colors.black)
             : ThemeData(
                 useMaterial3: true,
                 colorScheme: ColorScheme.fromSeed(

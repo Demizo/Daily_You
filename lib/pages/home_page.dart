@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:daily_you/config_manager.dart';
 import 'package:daily_you/flashback_manager.dart';
 import 'package:daily_you/models/flashback.dart';
+import 'package:daily_you/models/image.dart';
 import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/large_entry_card_widget.dart';
@@ -22,6 +23,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late List<Entry> entries;
+  late List<EntryImage> images;
   late List<Flashback> flashbacks;
   late Entry? todayEntry;
   bool listView = true;
@@ -72,6 +74,7 @@ class _HomePageState extends State<HomePage> {
     todayEntry = null;
 
     entries = await EntriesDatabase.instance.getAllEntries();
+    images = await EntriesDatabase.instance.getAllEntryImages();
 
     if (entries.isNotEmpty && TimeManager.isToday(entries.first.timeCreate)) {
       todayEntry = entries.first;
@@ -147,7 +150,7 @@ class _HomePageState extends State<HomePage> {
                                 backgroundColor:
                                     Theme.of(context).colorScheme.primary,
                                 foregroundColor:
-                                    Theme.of(context).colorScheme.background,
+                                    Theme.of(context).colorScheme.surface,
                                 elevation: 3,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(20.0),
@@ -178,7 +181,7 @@ class _HomePageState extends State<HomePage> {
                                 backgroundColor:
                                     Theme.of(context).colorScheme.primary,
                                 foregroundColor:
-                                    Theme.of(context).colorScheme.background,
+                                    Theme.of(context).colorScheme.surface,
                                 elevation: 3,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(80.0),
@@ -249,9 +252,18 @@ class _HomePageState extends State<HomePage> {
                       ? LargeEntryCardWidget(
                           title: flashback.title,
                           entry: flashback.entry,
-                        )
+                          images: images
+                              .where(
+                                  (img) => img.entryId == flashback.entry.id!)
+                              .toList())
                       : EntryCardWidget(
-                          title: flashback.title, entry: flashback.entry));
+                          title: flashback.title,
+                          entry: flashback.entry,
+                          images: images
+                              .where(
+                                  (img) => img.entryId == flashback.entry.id!)
+                              .toList(),
+                        ));
             },
           ),
         ]);

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:daily_you/file_layer.dart';
+import 'package:daily_you/models/image.dart';
 import 'package:daily_you/stats_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:daily_you/models/entry.dart';
@@ -26,7 +27,7 @@ class EntriesDatabase {
     final dbPath = await getInternalDbPath();
 
     _database = await openDatabase(dbPath,
-        version: 2, onCreate: _createDB, onUpgrade: _onUpgrade);
+        version: 3, onCreate: _createDB, onUpgrade: _onUpgrade);
     return _database != null;
   }
 
@@ -36,7 +37,6 @@ class EntriesDatabase {
 CREATE TABLE $entriesTable (
   ${EntryFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   ${EntryFields.text} TEXT NOT NULL,
-  ${EntryFields.imgPath} TEXT,
   ${EntryFields.mood} INTEGER,
   ${EntryFields.timeCreate} DATETIME NOT NULL DEFAULT (DATETIME('now')),
   ${EntryFields.timeModified} DATETIME NOT NULL DEFAULT (DATETIME('now'))
@@ -52,6 +52,16 @@ CREATE TABLE $templatesTable (
 )
 ''');
     await createDefaultTemplates();
+    await db.execute('''
+CREATE TABLE $imagesTable (
+    ${EntryImageFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    ${EntryImageFields.entryId} INTEGER NOT NULL,
+    ${EntryImageFields.imgPath} TEXT NOY NULL,
+    ${EntryImageFields.imgRank} INTEGER NOT NULL,
+    ${EntryImageFields.timeCreate} DATETIME NOT NULL DEFAULT (DATETIME('now')),
+    FOREIGN KEY (${EntryImageFields.entryId}) REFERENCES $entriesTable (id)
+)
+''');
   }
 
   void _onUpgrade(Database db, int oldVersion, int newVersion) async {
@@ -68,6 +78,55 @@ CREATE TABLE $templatesTable (
 )
 ''');
       await createDefaultTemplates();
+    }
+    if (oldVersion <= 2) {
+      await db.execute('''
+CREATE TABLE $imagesTable (
+    ${EntryImageFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    ${EntryImageFields.entryId} INTEGER NOT NULL,
+    ${EntryImageFields.imgPath} TEXT NOY NULL,
+    ${EntryImageFields.imgRank} INTEGER NOT NULL,
+    ${EntryImageFields.timeCreate} DATETIME NOT NULL DEFAULT (DATETIME('now')),
+    FOREIGN KEY (${EntryImageFields.entryId}) REFERENCES $entriesTable (id)
+)
+''');
+      await db.transaction((txn) async {
+        await txn.execute('''
+-- Step 1: Insert the non-null imgPath entries into the imagesTable
+INSERT INTO $imagesTable (${EntryImageFields.entryId}, ${EntryImageFields.imgPath}, ${EntryImageFields.imgRank}, ${EntryImageFields.timeCreate})
+SELECT ${EntryFields.id}, $deprecatedImgPath, 0, ${EntryFields.timeCreate}
+FROM $entriesTable
+WHERE $deprecatedImgPath IS NOT NULL;
+    ''');
+
+        await txn.execute('''
+-- Step 2: Rename the old entries table
+ALTER TABLE $entriesTable RENAME TO old_entries;
+    ''');
+
+        await txn.execute('''
+-- Step 3: Create a new entries table without the imgPath field
+CREATE TABLE $entriesTable (
+  ${EntryFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  ${EntryFields.text} TEXT NOT NULL,
+  ${EntryFields.mood} INTEGER,
+  ${EntryFields.timeCreate} DATETIME NOT NULL DEFAULT (DATETIME('now')),
+  ${EntryFields.timeModified} DATETIME NOT NULL DEFAULT (DATETIME('now'))
+);
+    ''');
+
+        await txn.execute('''
+-- Step 4: Copy data from the old entries table to the new one
+INSERT INTO $entriesTable (${EntryFields.id}, ${EntryFields.text}, ${EntryFields.mood}, ${EntryFields.timeCreate}, ${EntryFields.timeModified})
+SELECT ${EntryFields.id}, ${EntryFields.text}, ${EntryFields.mood}, ${EntryFields.timeCreate}, ${EntryFields.timeModified}
+FROM old_entries;
+    ''');
+
+        await txn.execute('''
+-- Step 5: Drop the old entries table
+DROP TABLE old_entries;
+    ''');
+      });
     }
   }
 
@@ -163,6 +222,126 @@ CREATE TABLE $templatesTable (
     return removedId;
   }
 
+  // Image Methods
+  Future<List<EntryImage>> getAllEntryImages() async {
+    final db = _database!;
+
+    final result = await db.query(imagesTable,
+        orderBy: '${EntryImageFields.imgRank} DESC');
+
+    return result.map((json) => EntryImage.fromJson(json)).toList();
+  }
+
+  Future<List<EntryImage>> getImagesForEntry(int entryId) async {
+    final db = _database!;
+
+    List<EntryImage> entryImages = List.empty(growable: true);
+
+    final maps = await db.query(imagesTable,
+        where: '${EntryImageFields.entryId} = ?',
+        whereArgs: [entryId],
+        orderBy: '${EntryImageFields.imgRank} DESC');
+
+    for (final map in maps) {
+      entryImages.add(EntryImage.fromJson(map));
+    }
+
+    return entryImages;
+  }
+
+  Future<EntryImage> addImg(EntryImage entryImage) async {
+    final db = _database!;
+
+    final id = await db.insert(imagesTable, entryImage.toJson());
+    await StatsProvider.instance.updateStats();
+    if (usingExternalDb()) await updateExternalDatabase();
+    return entryImage.copy(id: id);
+  }
+
+  Future<int> removeImg(EntryImage entryImage) async {
+    final db = _database!;
+
+    // Delete image
+    await deleteImg(entryImage.imgPath);
+
+    // Remove from database
+    final removedId = await db.delete(
+      imagesTable,
+      where: '${EntryImageFields.id} = ?',
+      whereArgs: [entryImage.id],
+    );
+
+    if (usingExternalDb()) await updateExternalDatabase();
+    return removedId;
+  }
+
+  Future<int> updateImg(EntryImage image) async {
+    final db = _database!;
+
+    final id = await db.update(
+      imagesTable,
+      image.toJson(),
+      where: '${EntryImageFields.id} = ?',
+      whereArgs: [image.id],
+    );
+
+    if (usingExternalDb()) await updateExternalDatabase();
+    return id;
+  }
+
+  Future<Uint8List?> getImgBytes(String imageName) async {
+    // Fetch local copy if present
+    var bytes = await FileLayer.getFileBytes(await getInternalImgDatabasePath(),
+        name: imageName, useExternalPath: false);
+    // Attempt to fetch file externally
+    if (bytes == null && usingExternalImg()) {
+      // Get and cache external image
+      bytes = await FileLayer.getFileBytes(await getExternalImgDatabasePath(),
+          name: imageName, useExternalPath: true);
+      if (bytes != null) {
+        await FileLayer.createFile(
+            await getInternalImgDatabasePath(), imageName, bytes,
+            useExternalPath: false);
+      }
+    }
+    return bytes;
+  }
+
+  Future<String?> createImg(String imageName, Uint8List bytes) async {
+    final currTime = DateTime.now();
+    // Don't make a copy of files already in the folder
+    if (await getImgBytes(imageName) != null) {
+      return imageName;
+    }
+    final newImageName =
+        "daily_you_${currTime.month}_${currTime.day}_${currTime.year}-${currTime.hour}.${currTime.minute}.${currTime.second}.jpg";
+    if (usingExternalImg()) {
+      FileLayer.createFile(
+          await getExternalImgDatabasePath(), newImageName, bytes,
+          useExternalPath: true); //Background
+    }
+    var imageFilePath = await FileLayer.createFile(
+        await getInternalImgDatabasePath(), newImageName, bytes,
+        useExternalPath: false);
+    if (imageFilePath == null) return null;
+    if (Platform.isAndroid) {
+      // Add image to media store
+      MediaScanner.loadMedia(path: imageFilePath);
+    }
+    return newImageName;
+  }
+
+  Future<bool> deleteImg(String imageName) async {
+    // Delete remote
+    if (usingExternalImg()) {
+      await FileLayer.deleteFile(await getExternalImgDatabasePath(),
+          name: imageName, useExternalPath: true);
+    }
+    // Delete local
+    return await FileLayer.deleteFile(await getInternalImgDatabasePath(),
+        name: imageName, useExternalPath: false);
+  }
+
   // Entry Methods
   Future<Entry> create(Entry entry) async {
     final db = _database!;
@@ -252,7 +431,10 @@ CREATE TABLE $templatesTable (
   Future<void> deleteAllEntries() async {
     final entries = await getAllEntries();
     for (Entry entry in entries) {
-      if (entry.imgPath != null) await deleteImg(entry.imgPath!);
+      var images = await getImagesForEntry(entry.id!);
+      for (final image in images) {
+        await removeImg(image);
+      }
     }
     final db = _database!;
 
@@ -276,59 +458,6 @@ CREATE TABLE $templatesTable (
 
   bool usingExternalImg() {
     return ConfigManager.instance.getField('useExternalImg') ?? false;
-  }
-
-  Future<Uint8List?> getImgBytes(String imageName) async {
-    // Fetch local copy if present
-    var bytes = await FileLayer.getFileBytes(await getInternalImgDatabasePath(),
-        name: imageName, useExternalPath: false);
-    // Attempt to fetch file externally
-    if (bytes == null && usingExternalImg()) {
-      // Get and cache external image
-      bytes = await FileLayer.getFileBytes(await getExternalImgDatabasePath(),
-          name: imageName, useExternalPath: true);
-      if (bytes != null) {
-        await FileLayer.createFile(
-            await getInternalImgDatabasePath(), imageName, bytes,
-            useExternalPath: false);
-      }
-    }
-    return bytes;
-  }
-
-  Future<String?> createImg(String imageName, Uint8List bytes) async {
-    final currTime = DateTime.now();
-    // Don't make a copy of files already in the folder
-    if (await getImgBytes(imageName) != null) {
-      return imageName;
-    }
-    final newImageName =
-        "daily_you_${currTime.month}_${currTime.day}_${currTime.year}-${currTime.hour}.${currTime.minute}.${currTime.second}.jpg";
-    if (usingExternalImg()) {
-      FileLayer.createFile(
-          await getExternalImgDatabasePath(), newImageName, bytes,
-          useExternalPath: true); //Background
-    }
-    var imageFilePath = await FileLayer.createFile(
-        await getInternalImgDatabasePath(), newImageName, bytes,
-        useExternalPath: false);
-    if (imageFilePath == null) return null;
-    if (Platform.isAndroid) {
-      // Add image to media store
-      MediaScanner.loadMedia(path: imageFilePath);
-    }
-    return newImageName;
-  }
-
-  Future<bool> deleteImg(String imageName) async {
-    // Delete remote
-    if (usingExternalImg()) {
-      await FileLayer.deleteFile(await getExternalImgDatabasePath(),
-          name: imageName, useExternalPath: true);
-    }
-    // Delete local
-    return await FileLayer.deleteFile(await getInternalImgDatabasePath(),
-        name: imageName, useExternalPath: false);
   }
 
   Future<String> getInternalImgDatabasePath() async {
@@ -470,8 +599,10 @@ CREATE TABLE $templatesTable (
     List<Entry> entries = await getAllEntries();
     int syncedEntries = 0;
     for (Entry entry in entries) {
-      if (entry.imgPath != null) {
-        var entryImg = entry.imgPath!;
+      var images = await getImagesForEntry(entry.id!);
+      for (final image in images) {
+        var entryImg = image.imgPath;
+
         entryImages.add(entryImg);
 
         // Export
@@ -479,7 +610,7 @@ CREATE TABLE $templatesTable (
             !externalImages.contains(entryImg)) {
           var bytes = await FileLayer.getFileBytes(
               await getInternalImgDatabasePath(),
-              name: entry.imgPath!,
+              name: entryImg,
               useExternalPath: false);
           await FileLayer.createFile(
               await getExternalImgDatabasePath(), entryImg, bytes!,
@@ -497,9 +628,9 @@ CREATE TABLE $templatesTable (
               await getInternalImgDatabasePath(), entryImg, bytes!,
               useExternalPath: false);
         }
+        syncedEntries += 1;
+        StatsProvider.instance.updateSyncStats(entries.length, syncedEntries);
       }
-      syncedEntries += 1;
-      StatsProvider.instance.updateSyncStats(entries.length, syncedEntries);
     }
 
     if (garbageCollect) {
@@ -622,16 +753,18 @@ CREATE TABLE $templatesTable (
         await FileLayer.listFiles(saveDir, useExternalPath: true);
 
     for (Entry entry in entries) {
-      if (entry.imgPath == null) continue;
-      if (externalImages.contains(entry.imgPath!)) continue;
-      var bytes = await getImgBytes(entry.imgPath!);
-      if (bytes == null) continue;
-      var newImageName =
-          await FileLayer.createFile(saveDir, entry.imgPath!, bytes);
-      if (newImageName == null) return false;
-      if (Platform.isAndroid) {
-        // Add image to media store
-        MediaScanner.loadMedia(path: newImageName);
+      var images = await getImagesForEntry(entry.id!);
+      for (final image in images) {
+        if (externalImages.contains(image.imgPath)) continue;
+        var bytes = await getImgBytes(image.imgPath);
+        if (bytes == null) continue;
+        var newImageName =
+            await FileLayer.createFile(saveDir, image.imgPath, bytes);
+        if (newImageName == null) return false;
+        if (Platform.isAndroid) {
+          // Add image to media store
+          MediaScanner.loadMedia(path: newImageName);
+        }
       }
     }
 
@@ -688,17 +821,38 @@ CREATE TABLE $templatesTable (
 
     final List<Map<String, dynamic>> entries = await db.query('entries');
 
-    final List<Map<String, dynamic>> jsonData = entries.map((entry) {
-      return {
-        'timeCreated': entry['time_create'],
-        'timeModified': entry['time_modified'],
-        'imgPath': entry['img_path'],
-        'mood': entry['mood'],
-        'text': entry['text'] ?? '',
-      };
-    }).toList();
+    List<Map<String, dynamic>> jsonList = [];
 
-    final jsonString = json.encode(jsonData);
+    for (var entry in entries) {
+      // Query to get images for the current entry
+      List<Map<String, dynamic>> images = await db.query(
+        imagesTable,
+        where: '${EntryImageFields.entryId} = ?',
+        whereArgs: [entry[EntryFields.id]],
+      );
+
+      // Convert images to a list of maps
+      List<Map<String, dynamic>> imageList = images
+          .map((img) => {
+                'imgPath': img[EntryImageFields.imgPath],
+                'imgRank': img[EntryImageFields.imgRank],
+                'timeCreated': img[EntryImageFields.timeCreate],
+              })
+          .toList();
+
+      // Structure the entry
+      Map<String, dynamic> jsonEntry = {
+        'timeCreated': entry[EntryFields.timeCreate],
+        'timeModified': entry[EntryFields.timeModified],
+        'images': imageList,
+        'mood': entry[EntryFields.mood],
+        'text': entry[EntryFields.text] ?? '',
+      };
+
+      jsonList.add(jsonEntry);
+    }
+
+    final jsonString = json.encode(jsonList);
     final currTime = DateTime.now();
     final exportedJsonName =
         "daily_you_logs_${currTime.month}_${currTime.day}_${currTime.year}.json";
@@ -720,13 +874,32 @@ CREATE TABLE $templatesTable (
     for (var entry in jsonData) {
       // Skip if the day already has an entry
       if (await getEntryForDate(DateTime.parse(entry['timeCreated'])) == null) {
-        await db.insert('entries', {
+        int id = await db.insert(entriesTable, {
           'text': entry['text'],
-          'img_path': entry['imgPath'],
           'mood': entry['mood'],
           'time_create': entry['timeCreated'],
           'time_modified': entry['timeModified'],
         });
+        // Support old imgPath field
+        if (entry['imgPath'] != null) {
+          EntryImage image = EntryImage(
+              entryId: id,
+              imgPath: entry['imgPath'],
+              imgRank: 0,
+              timeCreate: DateTime.now());
+          await addImg(image);
+        }
+        // Import images
+        if (entry['images'] != null) {
+          for (var img in entry['images']) {
+            await db.insert(imagesTable, {
+              EntryImageFields.entryId: id,
+              EntryImageFields.imgPath: img['imgPath'],
+              EntryImageFields.imgRank: img['imgRank'],
+              EntryImageFields.timeCreate: img['timeCreated'],
+            });
+          }
+        }
       }
     }
     if (usingExternalImg()) await syncImageFolder(true);

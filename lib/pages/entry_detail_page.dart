@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:daily_you/models/image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:daily_you/entries_database.dart';
@@ -16,9 +17,9 @@ class EntryDetailPage extends StatefulWidget {
   final int entryId;
 
   const EntryDetailPage({
-    Key? key,
+    super.key,
     required this.entryId,
-  }) : super(key: key);
+  });
 
   @override
   _EntryDetailPageState createState() => _EntryDetailPageState();
@@ -26,6 +27,7 @@ class EntryDetailPage extends StatefulWidget {
 
 class _EntryDetailPageState extends State<EntryDetailPage> {
   late Entry entry;
+  late List<EntryImage> images;
   bool isLoading = false;
 
   @override
@@ -41,6 +43,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
     var entryOption = await EntriesDatabase.instance.getEntry(widget.entryId);
     if (entryOption != null) {
       entry = entryOption;
+      images = await EntriesDatabase.instance.getImagesForEntry(entry.id!);
       setState(() => isLoading = false);
     }
   }
@@ -60,27 +63,60 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
                 child: ListView(
                   padding: const EdgeInsets.only(left: 8, right: 8),
                   children: [
-                    if (entry.imgPath != null)
+                    if (images.isNotEmpty && images.length > 1)
+                      SizedBox(
+                        height: 220,
+                        child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: images.length,
+                            itemBuilder: (context, index) {
+                              return GestureDetector(
+                                child: Center(
+                                  child: SizedBox(
+                                    height: 220,
+                                    width: 220,
+                                    child: Card(
+                                        clipBehavior: Clip.antiAlias,
+                                        child: LocalImageLoader(
+                                            imagePath: images[index].imgPath)),
+                                  ),
+                                ),
+                                onTap: () async {
+                                  if (await EntriesDatabase.instance
+                                          .getImgBytes(images[index].imgPath) !=
+                                      null) {
+                                    await Navigator.of(context)
+                                        .push(MaterialPageRoute(
+                                      fullscreenDialog: true,
+                                      builder: (context) => ImageViewPage(
+                                          imgName: images[index].imgPath),
+                                    ));
+                                  }
+                                },
+                              );
+                            }),
+                      ),
+                    if (images.isNotEmpty && images.length == 1)
                       GestureDetector(
                         child: Center(
                           child: Container(
                             alignment: Alignment.center,
-                            height: 300,
-                            width: 300,
+                            height: 220,
+                            width: 220,
                             child: Card(
                                 clipBehavior: Clip.antiAlias,
                                 child: LocalImageLoader(
-                                    imagePath: entry.imgPath!)),
+                                    imagePath: images.first.imgPath)),
                           ),
                         ),
                         onTap: () async {
                           if (await EntriesDatabase.instance
-                                  .getImgBytes(entry.imgPath!) !=
+                                  .getImgBytes(images.first.imgPath) !=
                               null) {
                             await Navigator.of(context).push(MaterialPageRoute(
                               fullscreenDialog: true,
                               builder: (context) =>
-                                  ImageViewPage(imgName: entry.imgPath!),
+                                  ImageViewPage(imgName: images.first.imgPath),
                             ));
                           }
                         },
@@ -149,15 +185,14 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
 
         await Navigator.of(context).push(MaterialPageRoute(
           fullscreenDialog: true,
-          builder: (context) => AddEditEntryPage(entry: entry),
+          builder: (context) => AddEditEntryPage(entry: entry, images: images),
         ));
 
         refreshEntry();
       });
 
   Widget shareButton() {
-    if (Platform.isAndroid &&
-        (entry.imgPath != null || entry.text.isNotEmpty)) {
+    if (Platform.isAndroid && (images.isNotEmpty || entry.text.isNotEmpty)) {
       return IconButton(
           icon: const Icon(Icons.share_rounded),
           onPressed: () async {
@@ -168,14 +203,15 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
             sharedText =
                 "$sharedText${DateFormat.yMMMEd().format(entry.timeCreate)}\n${entry.text}";
 
-            if (entry.imgPath != null) {
+            if (images.isNotEmpty) {
               // Share Image
               final tempDir = await getTemporaryDirectory();
-              var bytes =
-                  await EntriesDatabase.instance.getImgBytes(entry.imgPath!);
+              var bytes = await EntriesDatabase.instance
+                  .getImgBytes(images.first.imgPath);
               if (bytes != null) {
-                File temp = await File("${tempDir.path}/${entry.imgPath!}")
-                    .writeAsBytes(bytes);
+                File temp =
+                    await File("${tempDir.path}/${images.first.imgPath}")
+                        .writeAsBytes(bytes);
                 await ShareExtend.share(temp.path, "image",
                     extraText: sharedText);
               }
