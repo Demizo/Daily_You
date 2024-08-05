@@ -252,20 +252,17 @@ class _HomePageState extends State<HomePage> {
                       ? LargeEntryCardWidget(
                           title: flashback.title,
                           entry: flashback.entry,
-                          image: images
+                          images: images
                               .where(
                                   (img) => img.entryId == flashback.entry.id!)
-                              .toList()
-                              .firstOrNull,
-                        )
+                              .toList())
                       : EntryCardWidget(
                           title: flashback.title,
                           entry: flashback.entry,
-                          image: images
+                          images: images
                               .where(
                                   (img) => img.entryId == flashback.entry.id!)
-                              .toList()
-                              .firstOrNull,
+                              .toList(),
                         ));
             },
           ),

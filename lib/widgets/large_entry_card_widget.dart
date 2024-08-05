@@ -11,11 +11,11 @@ class LargeEntryCardWidget extends StatelessWidget {
     super.key,
     this.title,
     required this.entry,
-    this.image,
+    required this.images,
   });
 
   final Entry entry;
-  final EntryImage? image;
+  final List<EntryImage> images;
   final String? title;
 
   @override
@@ -29,15 +29,25 @@ class LargeEntryCardWidget extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (image != null)
+          if (images.isNotEmpty)
             Expanded(
-                child: Center(
-              child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: LocalImageLoader(
-                    imagePath: image!.imgPath,
-                  )),
-            )),
+                child: Stack(alignment: Alignment.topRight, children: [
+              Center(
+                child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: LocalImageLoader(
+                      imagePath: images.first.imgPath,
+                    )),
+              ),
+              if (images.length > 1)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Icon(
+                    Icons.photo_library_rounded,
+                    color: theme.disabledColor,
+                  ),
+                ),
+            ])),
           Expanded(
             child: Wrap(children: [
               Padding(

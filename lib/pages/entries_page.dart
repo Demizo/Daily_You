@@ -204,18 +204,14 @@ class _EntriesPageState extends State<EntriesPage> {
               child: listView
                   ? LargeEntryCardWidget(
                       entry: entry,
-                      image: images
+                      images: images
                           .where((img) => img.entryId == entry.id!)
-                          .toList()
-                          .firstOrNull,
-                    )
+                          .toList())
                   : EntryCardWidget(
                       entry: entry,
-                      image: images
+                      images: images
                           .where((img) => img.entryId == entry.id!)
-                          .toList()
-                          .firstOrNull,
-                    ),
+                          .toList()),
             );
           },
         );
