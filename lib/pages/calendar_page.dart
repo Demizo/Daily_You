@@ -79,8 +79,8 @@ class _CalendarPageState extends State<CalendarPage> {
                   allTime = !allTime;
                 })),
             style: ButtonStyle(
-                padding: MaterialStateProperty.all(const EdgeInsets.all(8)),
-                elevation: MaterialStateProperty.all(0.0)),
+                padding: WidgetStateProperty.all(const EdgeInsets.all(8)),
+                elevation: WidgetStateProperty.all(0.0)),
             child: Text(
               allTime ? "All Time" : "This Month",
               style: const TextStyle(fontSize: 16),

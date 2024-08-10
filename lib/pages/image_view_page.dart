@@ -8,9 +8,9 @@ class ImageViewPage extends StatefulWidget {
   final String imgName;
 
   const ImageViewPage({
-    Key? key,
+    super.key,
     required this.imgName,
-  }) : super(key: key);
+  });
 
   @override
   _ImageViewPageState createState() => _ImageViewPageState();

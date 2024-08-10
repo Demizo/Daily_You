@@ -1,4 +1,5 @@
 import 'package:daily_you/config_manager.dart';
+import 'package:daily_you/models/image.dart';
 import 'package:daily_you/widgets/large_entry_card_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/entries_database.dart';
@@ -16,6 +17,7 @@ class EntriesPage extends StatefulWidget {
 
 class _EntriesPageState extends State<EntriesPage> {
   late List<Entry> entries;
+  late List<EntryImage> images;
   bool isLoading = false;
   String searchText = '';
   bool sortOrderAsc = false;
@@ -39,6 +41,7 @@ class _EntriesPageState extends State<EntriesPage> {
     if (firstLoad) setState(() => isLoading = true);
     firstLoad = false;
 
+    images = await EntriesDatabase.instance.getAllEntryImages();
     entries = await EntriesDatabase.instance.getAllEntriesSorted(
         orderByMapping[orderBy]!, sortOrderMapping[sortOrderAsc]!);
     if (searchText.length > 2) {
@@ -157,9 +160,9 @@ class _EntriesPageState extends State<EntriesPage> {
                               onPressed: () => _showSortSelectionPopup()),
                         ],
                         hintText: 'Search logs...',
-                        padding: MaterialStateProperty.all(
+                        padding: WidgetStateProperty.all(
                             const EdgeInsets.only(left: 8, right: 8)),
-                        elevation: MaterialStateProperty.all(1),
+                        elevation: WidgetStateProperty.all(1),
                         onChanged: (queryText) => EasyDebounce.debounce(
                             'search-debounce',
                             const Duration(milliseconds: 500), () {
@@ -199,10 +202,16 @@ class _EntriesPageState extends State<EntriesPage> {
                 refreshEntries();
               },
               child: listView
-                  ? LargeEntryCardWidget(entry: entry)
+                  ? LargeEntryCardWidget(
+                      entry: entry,
+                      images: images
+                          .where((img) => img.entryId == entry.id!)
+                          .toList())
                   : EntryCardWidget(
                       entry: entry,
-                    ),
+                      images: images
+                          .where((img) => img.entryId == entry.id!)
+                          .toList()),
             );
           },
         );

@@ -1,3 +1,4 @@
+import 'package:daily_you/models/image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:daily_you/models/entry.dart';
@@ -7,12 +8,14 @@ import 'local_image_loader.dart';
 
 class LargeEntryCardWidget extends StatelessWidget {
   const LargeEntryCardWidget({
-    Key? key,
+    super.key,
     this.title,
     required this.entry,
-  }) : super(key: key);
+    required this.images,
+  });
 
   final Entry entry;
+  final List<EntryImage> images;
   final String? title;
 
   @override
@@ -21,21 +24,30 @@ class LargeEntryCardWidget extends StatelessWidget {
     final time = DateFormat.yMMMd().format(entry.timeCreate);
     return Card(
       clipBehavior: Clip.antiAlias,
-      color: theme.cardColor,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (entry.imgPath != null)
+          if (images.isNotEmpty)
             Expanded(
-                child: Center(
-              child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: LocalImageLoader(
-                    imagePath: entry.imgPath!,
-                  )),
-            )),
+                child: Stack(alignment: Alignment.topRight, children: [
+              Center(
+                child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: LocalImageLoader(
+                      imagePath: images.first.imgPath,
+                    )),
+              ),
+              if (images.length > 1)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Icon(
+                    Icons.photo_library_rounded,
+                    color: theme.disabledColor,
+                  ),
+                ),
+            ])),
           Expanded(
             child: Wrap(children: [
               Padding(

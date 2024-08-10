@@ -17,7 +17,7 @@ class MoodTotalsChart extends StatefulWidget {
       .entries
       .map((entry) => MapEntry(entry.value, entry.key)));
 
-  MoodTotalsChart({super.key, required this.moodCounts});
+  const MoodTotalsChart({super.key, required this.moodCounts});
 
   @override
   State<MoodTotalsChart> createState() => _MoodTotalsChartState();
@@ -58,10 +58,8 @@ class _MoodTotalsChartState extends State<MoodTotalsChart> {
               show: true,
               border: Border.symmetric(
                 horizontal: BorderSide(
-                  color: Theme.of(context)
-                      .colorScheme
-                      .onBackground
-                      .withOpacity(0.2),
+                  color:
+                      Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
                 ),
               ),
             ),
@@ -96,8 +94,7 @@ class _MoodTotalsChartState extends State<MoodTotalsChart> {
               show: true,
               drawVerticalLine: false,
               getDrawingHorizontalLine: (value) => FlLine(
-                color:
-                    Theme.of(context).colorScheme.onBackground.withOpacity(0.2),
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
                 strokeWidth: 1,
               ),
             ),
