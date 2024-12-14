@@ -167,7 +167,7 @@ class _SettingsPageState extends State<SettingsPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Select Theme:'),
+          title: const Text('Select Theme'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -218,7 +218,7 @@ class _SettingsPageState extends State<SettingsPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Choose Accent Color:'),
+          title: const Text('Choose Accent Color'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -235,20 +235,16 @@ class _SettingsPageState extends State<SettingsPage> {
                 height: 8,
               ),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  ElevatedButton.icon(
-                    icon: const Icon(
-                      Icons.check_circle_rounded,
-                      size: 24,
-                    ),
-                    label: const Padding(
-                      padding: EdgeInsets.all(2.0),
-                      child: Text(
-                        "Confirm",
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
+                  TextButton(
+                    child: const Text("Cancel"),
+                    onPressed: () async {
+                      Navigator.pop(context);
+                    },
+                  ),
+                  TextButton(
+                    child: const Text("Save"),
                     onPressed: () async {
                       setState(() {
                         themeProvider.accentColor = accentColor;
@@ -256,40 +252,6 @@ class _SettingsPageState extends State<SettingsPage> {
                       });
                       Navigator.pop(context);
                     },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.all(12),
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      foregroundColor: Theme.of(context).colorScheme.surface,
-                      elevation: 3,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.0),
-                      ),
-                    ),
-                  ),
-                  ElevatedButton.icon(
-                    icon: const Icon(
-                      Icons.cancel_rounded,
-                      size: 24,
-                    ),
-                    label: const Padding(
-                      padding: EdgeInsets.all(2.0),
-                      child: Text(
-                        "Cancel",
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
-                    onPressed: () async {
-                      Navigator.pop(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.all(12),
-                      backgroundColor: Theme.of(context).colorScheme.surface,
-                      foregroundColor: Theme.of(context).colorScheme.primary,
-                      elevation: 3,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.0),
-                      ),
-                    ),
                   ),
                 ],
               ),
@@ -300,13 +262,13 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  void _showMoodEmojiPopup(int? value) {
+  void _showMoodEmojiPopup(int? value, String title) {
     String newEmoji = '';
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Change Icon:'),
+          title: Text(title),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -325,20 +287,16 @@ class _SettingsPageState extends State<SettingsPage> {
                 height: 8,
               ),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  ElevatedButton.icon(
-                    icon: const Icon(
-                      Icons.check_circle_rounded,
-                      size: 24,
-                    ),
-                    label: const Padding(
-                      padding: EdgeInsets.all(2.0),
-                      child: Text(
-                        "Confirm",
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
+                  TextButton(
+                    child: const Text("Cancel"),
+                    onPressed: () async {
+                      Navigator.pop(context);
+                    },
+                  ),
+                  TextButton(
+                    child: const Text("Save"),
                     onPressed: () async {
                       if (newEmoji.isNotEmpty) {
                         if (value != null) {
@@ -353,40 +311,6 @@ class _SettingsPageState extends State<SettingsPage> {
                       }
                       Navigator.pop(context);
                     },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.all(12),
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      foregroundColor: Theme.of(context).colorScheme.surface,
-                      elevation: 3,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.0),
-                      ),
-                    ),
-                  ),
-                  ElevatedButton.icon(
-                    icon: const Icon(
-                      Icons.cancel_rounded,
-                      size: 24,
-                    ),
-                    label: const Padding(
-                      padding: EdgeInsets.all(2.0),
-                      child: Text(
-                        "Cancel",
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
-                    onPressed: () async {
-                      Navigator.pop(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.all(12),
-                      backgroundColor: Theme.of(context).colorScheme.surface,
-                      foregroundColor: Theme.of(context).colorScheme.primary,
-                      elevation: 3,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.0),
-                      ),
-                    ),
                   ),
                 ],
               ),
@@ -397,7 +321,14 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget moodIconButton(int? index) {
+  _resetMoodIcons() async {
+    for (var mood in ConfigManager.defaultMoodIconFieldMapping.entries) {
+      await ConfigManager.instance.setField(mood.key, mood.value);
+    }
+    setState(() {});
+  }
+
+  Widget moodIconButton(int? index, String title) {
     return GestureDetector(
       child: Card(
           child: Padding(
@@ -406,7 +337,7 @@ class _SettingsPageState extends State<SettingsPage> {
             constraints: const BoxConstraints(minWidth: 30),
             child: Center(child: MoodIcon(moodValue: index, size: 24))),
       )),
-      onTap: () => _showMoodEmojiPopup(index),
+      onTap: () => _showMoodEmojiPopup(index, title),
     );
   }
 
@@ -739,17 +670,25 @@ class _SettingsPageState extends State<SettingsPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          "Mood Icons",
+                          "Change Mood Icons",
                           style: TextStyle(fontSize: 18),
                         ),
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            moodIconButton(-2),
-                            moodIconButton(-1),
-                            moodIconButton(0),
-                            moodIconButton(1),
-                            moodIconButton(2),
-                            moodIconButton(null),
+                            Row(
+                              children: [
+                                moodIconButton(-2, "Very Sad Icon"),
+                                moodIconButton(-1, "Sad Icon"),
+                                moodIconButton(0, "Neutral Icon"),
+                                moodIconButton(1, "Happy Icon"),
+                                moodIconButton(2, "Very Happy Icon"),
+                                moodIconButton(null, "Unknown Mood Icon"),
+                              ],
+                            ),
+                            IconButton(
+                                onPressed: _resetMoodIcons,
+                                icon: const Icon(Icons.refresh_rounded))
                           ],
                         )
                       ],

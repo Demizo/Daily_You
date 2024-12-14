@@ -44,6 +44,15 @@ class ConfigManager {
     -2: 'verySadIcon',
   };
 
+  static final defaultMoodIconFieldMapping = {
+    'veryHappyIcon': '☺️',
+    'happyIcon': '🙂',
+    'neutralIcon': '😐',
+    'sadIcon': '😕',
+    'verySadIcon': '😔',
+    'noMoodIcon': '?',
+  };
+
   static final ConfigManager _instance = ConfigManager._internal();
 
   factory ConfigManager() {
