@@ -4,8 +4,10 @@ import 'package:daily_you/entries_database.dart';
 
 class LocalImageLoader extends StatelessWidget {
   final String imagePath;
+  final int cacheSize;
 
-  const LocalImageLoader({super.key, required this.imagePath});
+  const LocalImageLoader(
+      {super.key, required this.imagePath, this.cacheSize = 400});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +27,7 @@ class LocalImageLoader extends StatelessWidget {
               widthFactor: 1,
               child: Image.memory(
                 snapshot.data!,
-                cacheWidth: 400,
+                cacheWidth: cacheSize,
                 fit: BoxFit.cover,
                 errorBuilder: (BuildContext context, Object exception,
                     StackTrace? stackTrace) {
