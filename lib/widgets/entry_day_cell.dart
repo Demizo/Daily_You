@@ -1,96 +1,157 @@
+import 'package:daily_you/models/image.dart';
+import 'package:daily_you/stats_provider.dart';
+import 'package:daily_you/widgets/local_image_loader.dart';
 import 'package:flutter/material.dart';
-import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
+import 'package:provider/provider.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 import '../models/entry.dart';
 import '../pages/edit_entry_page.dart';
 import '../pages/entry_detail_page.dart';
 
-class EntryDayCell extends StatefulWidget {
+class EntryDayCell extends StatelessWidget {
   final DateTime date;
 
   const EntryDayCell({super.key, required this.date});
 
   @override
-  State<EntryDayCell> createState() => _EntryDayCellState();
-}
-
-class _EntryDayCellState extends State<EntryDayCell> {
-  late Entry? entry;
-  bool isLoading = false;
-
-  @override
-  void initState() {
-    super.initState();
-
-    getDateEntry();
-  }
-
-  void getDateEntry() async {
-    setState(() => isLoading = true);
-
-    entry = await EntriesDatabase.instance.getEntryForDate(widget.date);
-
-    setState(() => isLoading = false);
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      child: Container(
-        alignment: Alignment.center,
-        child: Stack(
-          alignment: Alignment.topCenter,
-          children: [
-            // Your custom widget for the day cell (e.g., background, decorations, etc.)
-            // This could be an image, gradient, or any other widget you want to draw over the day cell.
-            // Example:
-            Column(
+    final statsProvider = Provider.of<StatsProvider>(context);
+
+    Entry? entry = StatsProvider.instance.entries
+        .where((entry) => isSameDay(entry.timeCreate, date))
+        .firstOrNull;
+
+    EntryImage? image;
+    if (entry != null) {
+      image = statsProvider.images
+          .where((img) => img.entryId == entry.id!)
+          .firstOrNull;
+    }
+
+    bool showMood = statsProvider.calendarViewMode == 'mood';
+
+    if (entry != null) {
+      if (showMood) {
+        return GestureDetector(
+          child: Container(
+            alignment: Alignment.center,
+            child: Stack(
+              alignment: Alignment.topCenter,
               children: [
-                const SizedBox(
-                  height: 16,
+                Column(
+                  children: [
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    MoodIcon(moodValue: entry.mood)
+                  ],
                 ),
-                isLoading
-                    ? const SizedBox()
-                    : entry != null
-                        ? MoodIcon(moodValue: entry!.mood)
-                        : Icon(
-                            Icons.add_rounded,
-                            color: Theme.of(context).disabledColor,
-                          ),
+                Text(
+                  '${date.day}',
+                  style: const TextStyle(fontSize: 16),
+                ),
               ],
             ),
-
-            // The default day number rendering
-            Text(
-              '${widget.date.day}',
-              style: const TextStyle(
-                fontSize: 16,
-              ),
-            ),
-          ],
-        ),
-      ),
-      onTap: () async {
-        if (!isLoading) {
-          if (entry != null) {
+          ),
+          onTap: () async {
             await Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => EntryDetailPage(entryId: entry!.id!),
+              builder: (context) => EntryDetailPage(entryId: entry.id!),
             ));
-          } else {
-            var newEntry = await Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => AddEditEntryPage(
-                overrideCreateDate: widget.date,
+          },
+        );
+      } else {
+        return GestureDetector(
+          child: Container(
+            alignment: Alignment.center,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                image != null
+                    ? Expanded(
+                        child: Card(
+                            clipBehavior: Clip.antiAlias,
+                            child: LocalImageLoader(
+                              imagePath: image.imgPath,
+                              cacheSize: 100,
+                            )),
+                      )
+                    : Icon(
+                        size: 57,
+                        Icons.image_rounded,
+                        color: Theme.of(context).disabledColor.withOpacity(0.1),
+                      ),
+                Text(
+                  '${date.day}',
+                  style: TextStyle(fontSize: 18, shadows: [
+                    if (image != null)
+                      Shadow(
+                          color: Theme.of(context).canvasColor.withOpacity(0.5),
+                          blurRadius: 10,
+                          offset: Offset(1, 1)),
+                    if (image != null)
+                      Shadow(
+                          color: Theme.of(context).canvasColor.withOpacity(0.5),
+                          blurRadius: 10,
+                          offset: Offset(-1, -1)),
+                    if (image != null)
+                      Shadow(
+                          color: Theme.of(context).canvasColor.withOpacity(0.5),
+                          blurRadius: 10,
+                          offset: Offset(1, -1)),
+                    if (image != null)
+                      Shadow(
+                          color: Theme.of(context).canvasColor.withOpacity(0.5),
+                          blurRadius: 10,
+                          offset: Offset(-1, 1)),
+                  ]),
+                ),
+              ],
+            ),
+          ),
+          onTap: () async {
+            await Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => EntryDetailPage(entryId: entry.id!),
+            ));
+          },
+        );
+      }
+    } else {
+      return GestureDetector(
+        child: Container(
+          alignment: Alignment.center,
+          child: Stack(
+            alignment: Alignment.topCenter,
+            children: [
+              Column(
+                children: [
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Icon(
+                    Icons.add_rounded,
+                    color: Theme.of(context).disabledColor,
+                  ),
+                ],
               ),
-            ));
-
-            if (newEntry != null) {
-              getDateEntry();
-            }
-          }
-          getDateEntry();
-        }
-      },
-    );
+              Text(
+                '${date.day}',
+                style: const TextStyle(
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
+        ),
+        onTap: () async {
+          await Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => AddEditEntryPage(
+              overrideCreateDate: date,
+            ),
+          ));
+        },
+      );
+    }
   }
 }

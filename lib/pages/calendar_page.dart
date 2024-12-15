@@ -2,8 +2,6 @@ import 'package:daily_you/stats_provider.dart';
 import 'package:daily_you/widgets/mood_totals_chart.dart';
 import 'package:daily_you/widgets/streak_card.dart';
 import 'package:flutter/material.dart';
-import 'package:daily_you/entries_database.dart';
-import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/widgets/entry_calendar.dart';
 import 'package:provider/provider.dart';
 
@@ -15,23 +13,19 @@ class CalendarPage extends StatefulWidget {
 }
 
 class _CalendarPageState extends State<CalendarPage> {
-  late Entry? todaysEntry;
   bool allTime = false;
-  bool isLoading = false;
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    todaysEntry = null;
 
-    getToday();
+    updateStats();
   }
 
-  Future getToday() async {
+  Future updateStats() async {
     setState(() => isLoading = true);
     await StatsProvider.instance.updateStats();
-    todaysEntry =
-        await EntriesDatabase.instance.getEntryForDate(DateTime.now());
     setState(() => isLoading = false);
   }
 
@@ -71,7 +65,7 @@ class _CalendarPageState extends State<CalendarPage> {
           ],
         ),
         const Center(
-            child: SizedBox(height: 400, width: 400, child: EntryCalendar())),
+            child: SizedBox(height: 430, width: 400, child: EntryCalendar())),
         Padding(
           padding: const EdgeInsets.only(left: 8.0),
           child: ElevatedButton(
