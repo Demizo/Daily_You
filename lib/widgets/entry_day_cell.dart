@@ -19,15 +19,17 @@ class EntryDayCell extends StatelessWidget {
   Widget build(BuildContext context) {
     final statsProvider = Provider.of<StatsProvider>(context);
 
-    Entry? entry = StatsProvider.instance.entries
+    var entries = StatsProvider.instance.entries
         .where((entry) => isSameDay(entry.timeCreate, date))
-        .firstOrNull;
+        .toList();
+    Entry? entry = entries.isNotEmpty ? entries.first : null;
 
     EntryImage? image;
     if (entry != null) {
-      image = statsProvider.images
+      var images = statsProvider.images
           .where((img) => img.entryId == entry.id!)
-          .firstOrNull;
+          .toList();
+      image = images.isNotEmpty ? images.first : null;
     }
 
     bool showMood = statsProvider.calendarViewMode == 'mood';
@@ -69,7 +71,8 @@ class EntryDayCell extends StatelessWidget {
               alignment: Alignment.center,
               children: [
                 image != null
-                    ? Expanded(
+                    ? SizedBox(
+                        width: 57,
                         child: Card(
                             clipBehavior: Clip.antiAlias,
                             child: LocalImageLoader(
