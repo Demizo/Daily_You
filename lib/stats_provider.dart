@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'package:daily_you/config_manager.dart';
 import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/models/entry.dart';
+import 'package:daily_you/models/image.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:flutter/material.dart';
 
@@ -52,9 +54,14 @@ class StatsProvider with ChangeNotifier {
   Map<int, int> get moodCountsThisMonth => _moodCountsThisMonth;
 
   List<Entry> entries = List.empty();
+  List<EntryImage> images = List.empty();
+
+  String calendarViewMode = "mood";
 
   Future<void> updateStats() async {
     entries = await EntriesDatabase.instance.getAllEntries();
+    images = await EntriesDatabase.instance.getAllEntryImages();
+    calendarViewMode = ConfigManager.instance.getField('calendarPageViewMode');
     await getStreaks();
     await getMoodCounts(_referenceDay);
     notifyListeners();
