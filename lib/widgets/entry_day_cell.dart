@@ -87,28 +87,31 @@ class EntryDayCell extends StatelessWidget {
                       ),
                 Text(
                   '${date.day}',
-                  style: TextStyle(fontSize: 18, shadows: [
-                    if (image != null)
-                      Shadow(
-                          color: Theme.of(context).canvasColor.withOpacity(0.5),
-                          blurRadius: 10,
-                          offset: Offset(1, 1)),
-                    if (image != null)
-                      Shadow(
-                          color: Theme.of(context).canvasColor.withOpacity(0.5),
-                          blurRadius: 10,
-                          offset: Offset(-1, -1)),
-                    if (image != null)
-                      Shadow(
-                          color: Theme.of(context).canvasColor.withOpacity(0.5),
-                          blurRadius: 10,
-                          offset: Offset(1, -1)),
-                    if (image != null)
-                      Shadow(
-                          color: Theme.of(context).canvasColor.withOpacity(0.5),
-                          blurRadius: 10,
-                          offset: Offset(-1, 1)),
-                  ]),
+                  style: TextStyle(
+                      fontSize: 18,
+                      color: (image != null) ? Colors.white : null,
+                      shadows: [
+                        if (image != null)
+                          Shadow(
+                              color: Colors.black.withOpacity(0.5),
+                              blurRadius: 10,
+                              offset: Offset(1, 1)),
+                        if (image != null)
+                          Shadow(
+                              color: Colors.black.withOpacity(0.5),
+                              blurRadius: 10,
+                              offset: Offset(-1, -1)),
+                        if (image != null)
+                          Shadow(
+                              color: Colors.black.withOpacity(0.5),
+                              blurRadius: 10,
+                              offset: Offset(1, -1)),
+                        if (image != null)
+                          Shadow(
+                              color: Colors.black.withOpacity(0.5),
+                              blurRadius: 10,
+                              offset: Offset(-1, 1)),
+                      ]),
                 ),
               ],
             ),
