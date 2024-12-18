@@ -8,14 +8,14 @@ import 'package:daily_you/widgets/streak_card.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class CalendarPage extends StatefulWidget {
-  const CalendarPage({super.key});
+class StatsPage extends StatefulWidget {
+  const StatsPage({super.key});
 
   @override
-  State<CalendarPage> createState() => _CalendarPageState();
+  State<StatsPage> createState() => _StatsPageState();
 }
 
-class _CalendarPageState extends State<CalendarPage> {
+class _StatsPageState extends State<StatsPage> {
   StatsRange statsRange = StatsRange.month;
   bool isLoading = true;
 
