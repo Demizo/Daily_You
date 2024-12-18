@@ -18,24 +18,27 @@ class StreakCard extends StatelessWidget {
     return isVisible
         ? Card(
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(4.0),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(right: 6.0),
-                    child: Icon(icon,
-                        color: Theme.of(context).colorScheme.secondary),
+                    padding: const EdgeInsets.only(right: 4.0),
+                    child: Icon(
+                      icon,
+                      color: Theme.of(context).colorScheme.secondary,
+                      size: 20,
+                    ),
                   ),
                   Text(title,
                       style: TextStyle(
-                          fontSize: 18,
+                          fontSize: 16,
                           color: Theme.of(context).colorScheme.secondary)),
                   Padding(
                     padding: const EdgeInsets.only(right: 6.0),
                     child: Text(number.toString(),
                         style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: Theme.of(context).colorScheme.primary)),
                   ),

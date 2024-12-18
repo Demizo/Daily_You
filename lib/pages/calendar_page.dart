@@ -45,6 +45,7 @@ class _CalendarPageState extends State<CalendarPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        const MoodByMonthChart(),
         Wrap(
           children: [
             StreakCard(
@@ -67,13 +68,14 @@ class _CalendarPageState extends State<CalendarPage> {
                 icon: Icons.timeline_rounded),
           ],
         ),
-        const Center(
-            child: SizedBox(height: 430, width: 400, child: EntryCalendar())),
-        Center(
-          child: StatsRangeSelector(
-            onSelectionChanged: (newSelection) {
-              statsRange = newSelection.first;
-            },
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Center(
+            child: StatsRangeSelector(
+              onSelectionChanged: (newSelection) {
+                statsRange = newSelection.first;
+              },
+            ),
           ),
         ),
         const Center(
@@ -92,14 +94,6 @@ class _CalendarPageState extends State<CalendarPage> {
           ),
         ),
         MoodByDayChart(),
-        if (statsProvider.statsRange != StatsRange.month)
-          const Center(
-            child: Text(
-              "Mood History",
-              style: TextStyle(fontSize: 18),
-            ),
-          ),
-        if (statsProvider.statsRange != StatsRange.month) MoodByMonthChart()
       ],
     );
   }

@@ -96,10 +96,10 @@ class CalendarViewModeSelector extends StatelessWidget {
   });
 
   Future<void> setViewMode() async {
-    String viewMode = ConfigManager.instance.getField('calendarPageViewMode');
+    String viewMode = ConfigManager.instance.getField('calendarViewMode');
     bool showMood = viewMode == 'mood';
     viewMode = showMood ? 'image' : 'mood';
-    await ConfigManager.instance.setField('calendarPageViewMode', viewMode);
+    await ConfigManager.instance.setField('calendarViewMode', viewMode);
     await StatsProvider.instance.updateStats();
   }
 

@@ -1,7 +1,6 @@
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/stats_provider.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
-import 'package:daily_you/widgets/stat_range_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
@@ -17,7 +16,7 @@ class _MoodByMonthChartState extends State<MoodByMonthChart> {
   Map<String, double?> averageMood = {};
   late List<String> sortedKeys;
   int currentPage = 0;
-  int monthsPerPage = 6;
+  int monthsPerPage = 12;
   bool notEnoughData = true;
 
   @override
@@ -27,51 +26,11 @@ class _MoodByMonthChartState extends State<MoodByMonthChart> {
 
   @override
   Widget build(BuildContext context) {
-    // Get data
-    StatsRange statsRange = StatsProvider.instance.statsRange;
     List<Entry> entries = StatsProvider.instance.entries;
     Map<String, List<double>> moodsByMonth = {};
 
-    var filterMonthCount = 0;
-    switch (statsRange) {
-      case StatsRange.month:
-        {
-          filterMonthCount = 1;
-          break;
-        }
-      case StatsRange.sixMonths:
-        {
-          filterMonthCount = 6;
-          monthsPerPage = 6;
-          break;
-        }
-      case StatsRange.year:
-        {
-          filterMonthCount = 12;
-          monthsPerPage = 12;
-          break;
-        }
-      case StatsRange.allTime:
-        {
-          filterMonthCount = 0;
-          monthsPerPage = 12;
-          break;
-        }
-    }
-
-    // Filter entries by time range
-    var filteredEntries = entries;
-    if (filterMonthCount > 0) {
-      filteredEntries = filteredEntries.where((entry) {
-        DateTime now = DateTime.now();
-        DateTime monthsAgo =
-            DateTime(now.year, now.month - filterMonthCount, now.day);
-        return entry.timeCreate.isAfter(monthsAgo);
-      }).toList();
-    }
-
     // Collect moods by month
-    for (Entry entry in filteredEntries) {
+    for (Entry entry in entries) {
       if (entry.mood == null) continue;
       String monthKey =
           "${entry.timeCreate.year}-${entry.timeCreate.month.toString().padLeft(2, '0')}";
@@ -145,7 +104,7 @@ class _MoodByMonthChartState extends State<MoodByMonthChart> {
                 _buildPaginationControls(currentPageKeys),
                 Padding(
                   padding: const EdgeInsets.only(
-                      left: 0, right: 42, bottom: 24, top: 8),
+                      left: 0, right: 42, bottom: 0, top: 8),
                   child: AspectRatio(
                     aspectRatio: 2,
                     child: LineChart(_buildLineChartData(

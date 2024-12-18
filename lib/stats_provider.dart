@@ -49,7 +49,7 @@ class StatsProvider with ChangeNotifier {
   Future<void> updateStats() async {
     entries = await EntriesDatabase.instance.getAllEntries();
     images = await EntriesDatabase.instance.getAllEntryImages();
-    calendarViewMode = ConfigManager.instance.getField('calendarPageViewMode');
+    calendarViewMode = ConfigManager.instance.getField('calendarViewMode');
     await getStreaks();
     await getMoodCounts();
     notifyListeners();

@@ -20,7 +20,7 @@ class ConfigManager {
     'startingDayOfWeek': 'sunday',
     'useMarkdownToolbar': true,
     'homePageViewMode': 'list',
-    'calendarPageViewMode': 'mood',
+    'calendarViewMode': 'image',
     'galleryPageViewMode': 'grid',
     'veryHappyIcon': '☺️',
     'happyIcon': '🙂',
