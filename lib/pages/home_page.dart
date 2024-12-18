@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:daily_you/config_manager.dart';
 import 'package:daily_you/flashback_manager.dart';
 import 'package:daily_you/models/flashback.dart';
-import 'package:daily_you/models/image.dart';
 import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/stats_provider.dart';
 import 'package:daily_you/time_manager.dart';
@@ -25,10 +24,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late List<Entry> entries;
-  late List<EntryImage> images;
-  late List<Flashback> flashbacks;
-  late Entry? todayEntry;
   bool listView = true;
 
   bool isLoading = false;
@@ -72,12 +67,6 @@ class _HomePageState extends State<HomePage> {
 
   Future refreshEntries() async {
     if (firstLoad) setState(() => isLoading = true);
-    await StatsProvider.instance.updateStats();
-    firstLoad = false;
-
-    entries = await EntriesDatabase.instance.getAllEntries();
-    images = await EntriesDatabase.instance.getAllEntryImages();
-
     if (await ConfigManager.instance.getField("useExternalDb") &&
         !await EntriesDatabase.instance.hasDbUriPermission()) {
       uriErrorPopup("Log");
@@ -88,7 +77,8 @@ class _HomePageState extends State<HomePage> {
       uriErrorPopup("Image");
     }
 
-    flashbacks = await FlashbackManager.getFlashbacks();
+    await StatsProvider.instance.updateStats();
+    firstLoad = false;
 
     if (Platform.isAndroid) {
       var launchDetails = await NotificationManager.instance.notifications
@@ -108,9 +98,12 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final statsProvider = Provider.of<StatsProvider>(context);
-    todayEntry = null;
+    Entry? todayEntry;
 
-    entries = statsProvider.entries;
+    List<Flashback> flashbacks =
+        FlashbackManager.getFlashbacks(StatsProvider.instance.entries);
+
+    var entries = statsProvider.entries;
     if (entries.isNotEmpty && TimeManager.isToday(entries.first.timeCreate)) {
       todayEntry = entries.first;
     }
@@ -119,7 +112,7 @@ class _HomePageState extends State<HomePage> {
       child: isLoading
           ? const SizedBox()
           : Stack(alignment: Alignment.topCenter, children: [
-              buildEntries(),
+              buildEntries(flashbacks),
               Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -202,78 +195,77 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget buildEntries() => entries.isEmpty
-      ? const Center(
-          child: Text(
-            'No Logs...',
-          ),
-        )
-      : ListView(children: [
-          const Center(
-              child: SizedBox(height: 430, width: 400, child: EntryCalendar())),
-          if (flashbacks.isNotEmpty)
-            Card(
-              child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        "Flashbacks",
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.normal),
-                      ),
-                    ),
-                    IconButton(
-                        onPressed: () async {
-                          listView = !listView;
-                          await setViewMode();
-                          setState(() {});
-                        },
-                        icon: listView
-                            ? const Icon(Icons.grid_view_rounded)
-                            : const Icon(Icons.view_list_rounded)),
-                  ]),
+  Widget buildEntries(List<Flashback> flashbacks) => ListView(children: [
+        const Center(
+            child: SizedBox(height: 430, width: 400, child: EntryCalendar())),
+        Card(
+          child:
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text(
+                "Flashbacks",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.normal),
+              ),
             ),
-          GridView.builder(
-            padding: const EdgeInsets.only(bottom: 80),
-            physics: const ScrollPhysics(),
-            shrinkWrap: true,
-            gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-              maxCrossAxisExtent: listView ? 500 : 300,
-              crossAxisSpacing: 1.0, // Spacing between columns
-              mainAxisSpacing: 1.0, // Spacing between rows
-              childAspectRatio: listView ? 2.0 : 1.0,
-            ),
-            itemCount: flashbacks.length,
-            itemBuilder: (context, index) {
-              final flashback = flashbacks[index];
-              return GestureDetector(
-                  onTap: () async {
-                    await Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) =>
-                          EntryDetailPage(entryId: flashback.entry.id!),
-                    ));
-
-                    refreshEntries();
-                  },
-                  child: listView
-                      ? LargeEntryCardWidget(
-                          title: flashback.title,
-                          entry: flashback.entry,
-                          images: images
-                              .where(
-                                  (img) => img.entryId == flashback.entry.id!)
-                              .toList())
-                      : EntryCardWidget(
-                          title: flashback.title,
-                          entry: flashback.entry,
-                          images: images
-                              .where(
-                                  (img) => img.entryId == flashback.entry.id!)
-                              .toList(),
+            IconButton(
+                onPressed: () async {
+                  listView = !listView;
+                  await setViewMode();
+                  setState(() {});
+                },
+                icon: listView
+                    ? const Icon(Icons.grid_view_rounded)
+                    : const Icon(Icons.view_list_rounded)),
+          ]),
+        ),
+        flashbacks.isEmpty
+            ? Center(
+                child: Text(
+                  "No flashbacks yet...",
+                  style: TextStyle(
+                      fontSize: 18, color: Theme.of(context).disabledColor),
+                ),
+              )
+            : GridView.builder(
+                padding: const EdgeInsets.only(bottom: 80),
+                physics: const ScrollPhysics(),
+                shrinkWrap: true,
+                gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: listView ? 500 : 300,
+                  crossAxisSpacing: 1.0, // Spacing between columns
+                  mainAxisSpacing: 1.0, // Spacing between rows
+                  childAspectRatio: listView ? 2.0 : 1.0,
+                ),
+                itemCount: flashbacks.length,
+                itemBuilder: (context, index) {
+                  final flashback = flashbacks[index];
+                  return GestureDetector(
+                      onTap: () async {
+                        await Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) =>
+                              EntryDetailPage(entryId: flashback.entry.id!),
                         ));
-            },
-          ),
-        ]);
+
+                        refreshEntries();
+                      },
+                      child: listView
+                          ? LargeEntryCardWidget(
+                              title: flashback.title,
+                              entry: flashback.entry,
+                              images: StatsProvider.instance.images
+                                  .where((img) =>
+                                      img.entryId == flashback.entry.id!)
+                                  .toList())
+                          : EntryCardWidget(
+                              title: flashback.title,
+                              entry: flashback.entry,
+                              images: StatsProvider.instance.images
+                                  .where((img) =>
+                                      img.entryId == flashback.entry.id!)
+                                  .toList(),
+                            ));
+                },
+              ),
+      ]);
 }

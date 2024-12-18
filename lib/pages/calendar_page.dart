@@ -46,27 +46,30 @@ class _StatsPageState extends State<StatsPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const MoodByMonthChart(),
-        Wrap(
-          children: [
-            StreakCard(
-              title: "Current Streak ",
-              number: statsProvider.currentStreak,
-              isVisible: true,
-              icon: Icons.bolt,
-            ),
-            StreakCard(
-                title: "Longest Streak ",
-                number: statsProvider.longestStreak,
-                isVisible:
-                    statsProvider.longestStreak > statsProvider.currentStreak,
-                icon: Icons.history_rounded),
-            StreakCard(
-                title: "Days since a Bad Day ",
-                number: statsProvider.daysSinceBadDay ?? -1,
-                isVisible: statsProvider.daysSinceBadDay != null &&
-                    statsProvider.daysSinceBadDay! > 3,
-                icon: Icons.timeline_rounded),
-          ],
+        Padding(
+          padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+          child: Wrap(
+            children: [
+              StreakCard(
+                title: "Current Streak ",
+                number: statsProvider.currentStreak,
+                isVisible: true,
+                icon: Icons.bolt,
+              ),
+              StreakCard(
+                  title: "Longest Streak ",
+                  number: statsProvider.longestStreak,
+                  isVisible:
+                      statsProvider.longestStreak > statsProvider.currentStreak,
+                  icon: Icons.history_rounded),
+              StreakCard(
+                  title: "Days since a Bad Day ",
+                  number: statsProvider.daysSinceBadDay ?? -1,
+                  isVisible: statsProvider.daysSinceBadDay != null &&
+                      statsProvider.daysSinceBadDay! > 3,
+                  icon: Icons.timeline_rounded),
+            ],
+          ),
         ),
         Padding(
           padding: const EdgeInsets.all(8.0),
