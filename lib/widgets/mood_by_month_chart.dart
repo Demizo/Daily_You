@@ -171,20 +171,21 @@ class _MoodByMonthChartState extends State<MoodByMonthChart> {
       maxY: 2,
       lineTouchData: const LineTouchData(enabled: false),
       lineBarsData: [
-        LineChartBarData(
-          spots: spots.whereType<FlSpot>().toList(),
-          isCurved: false,
-          color: color,
-          barWidth: 4,
-          isStrokeCapRound: true,
-          dotData: FlDotData(
-            show: true,
-            getDotPainter: (p0, p1, p2, p3) {
-              return FlDotCirclePainter(color: color, radius: 6);
-            },
+        if (spots.whereType<FlSpot>().toList().isNotEmpty)
+          LineChartBarData(
+            spots: spots.whereType<FlSpot>().toList(),
+            isCurved: false,
+            color: color,
+            barWidth: 4,
+            isStrokeCapRound: true,
+            dotData: FlDotData(
+              show: true,
+              getDotPainter: (p0, p1, p2, p3) {
+                return FlDotCirclePainter(color: color, radius: 6);
+              },
+            ),
+            belowBarData: BarAreaData(show: false),
           ),
-          belowBarData: BarAreaData(show: false),
-        ),
       ],
       titlesData: FlTitlesData(
           bottomTitles: AxisTitles(
