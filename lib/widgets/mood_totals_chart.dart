@@ -53,7 +53,7 @@ class _MoodTotalsChartState extends State<MoodTotalsChart> {
         aspectRatio: 2,
         child: BarChart(
           BarChartData(
-            alignment: BarChartAlignment.spaceBetween,
+            alignment: BarChartAlignment.spaceAround,
             borderData: FlBorderData(
               show: true,
               border: Border.symmetric(
@@ -70,6 +70,7 @@ class _MoodTotalsChartState extends State<MoodTotalsChart> {
                 sideTitles: SideTitles(
                   showTitles: true,
                   reservedSize: 42,
+                  interval: 1,
                 ),
               ),
               bottomTitles: AxisTitles(

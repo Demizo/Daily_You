@@ -84,10 +84,6 @@ class _EntryCalendarState extends State<EntryCalendar> {
               );
             },
           ),
-          onPageChanged: ((focusedDay) {
-            StatsProvider.instance.referenceDay = focusedDay;
-            StatsProvider.instance.updateStats();
-          }),
         ),
       ],
     );

@@ -1,5 +1,8 @@
 import 'package:daily_you/stats_provider.dart';
+import 'package:daily_you/widgets/mood_by_day_chart.dart';
+import 'package:daily_you/widgets/mood_by_month_chart.dart';
 import 'package:daily_you/widgets/mood_totals_chart.dart';
+import 'package:daily_you/widgets/stat_range_selector.dart';
 import 'package:daily_you/widgets/streak_card.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/widgets/entry_calendar.dart';
@@ -13,7 +16,7 @@ class CalendarPage extends StatefulWidget {
 }
 
 class _CalendarPageState extends State<CalendarPage> {
-  bool allTime = false;
+  StatsRange statsRange = StatsRange.month;
   bool isLoading = true;
 
   @override
@@ -66,26 +69,37 @@ class _CalendarPageState extends State<CalendarPage> {
         ),
         const Center(
             child: SizedBox(height: 430, width: 400, child: EntryCalendar())),
-        Padding(
-          padding: const EdgeInsets.only(left: 8.0),
-          child: ElevatedButton(
-            onPressed: (() => setState(() {
-                  allTime = !allTime;
-                })),
-            style: ButtonStyle(
-                padding: WidgetStateProperty.all(const EdgeInsets.all(8)),
-                elevation: WidgetStateProperty.all(0.0)),
-            child: Text(
-              allTime ? "All Time" : "This Month",
-              style: const TextStyle(fontSize: 16),
-            ),
+        Center(
+          child: StatsRangeSelector(
+            onSelectionChanged: (newSelection) {
+              statsRange = newSelection.first;
+            },
+          ),
+        ),
+        const Center(
+          child: Text(
+            "Mood Summary",
+            style: TextStyle(fontSize: 18),
           ),
         ),
         MoodTotalsChart(
-          moodCounts: allTime
-              ? StatsProvider.instance.moodCountsAllTime
-              : StatsProvider.instance.moodCountsThisMonth,
+          moodCounts: statsProvider.moodTotals,
         ),
+        const Center(
+          child: Text(
+            "Mood By Day",
+            style: TextStyle(fontSize: 18),
+          ),
+        ),
+        MoodByDayChart(),
+        if (statsProvider.statsRange != StatsRange.month)
+          const Center(
+            child: Text(
+              "Mood History",
+              style: TextStyle(fontSize: 18),
+            ),
+          ),
+        if (statsProvider.statsRange != StatsRange.month) MoodByMonthChart()
       ],
     );
   }

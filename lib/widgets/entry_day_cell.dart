@@ -72,7 +72,7 @@ class EntryDayCell extends StatelessWidget {
               children: [
                 image != null
                     ? SizedBox(
-                        width: 57,
+                        height: 57,
                         child: Card(
                             clipBehavior: Clip.antiAlias,
                             child: LocalImageLoader(
