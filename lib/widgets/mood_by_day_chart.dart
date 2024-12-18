@@ -3,26 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class MoodByDayChart extends StatelessWidget {
+  final Map<String, double> averageMood;
   final bool startOnSunday;
 
-  MoodByDayChart({super.key, this.startOnSunday = false});
-
-  // Sample data: average mood for each day of the week
-  final Map<String, double> averageMood = {
-    'Mon': -2,
-    'Tue': 1.0,
-    'Wed': 1.5,
-    'Thu': 1.0,
-    'Fri': 1.5,
-    'Sat': 1.0,
-    'Sun': 0.0,
-  };
+  const MoodByDayChart(
+      {super.key, required this.averageMood, this.startOnSunday = false});
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.only(left: 0, right: 42, bottom: 24, top: 8),
+        padding: const EdgeInsets.only(left: 0, right: 42, bottom: 0, top: 8),
         child: AspectRatio(
           aspectRatio: 2,
           child: BarChart(

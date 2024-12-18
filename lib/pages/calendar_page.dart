@@ -1,3 +1,4 @@
+import 'package:daily_you/config_manager.dart';
 import 'package:daily_you/stats_provider.dart';
 import 'package:daily_you/widgets/mood_by_day_chart.dart';
 import 'package:daily_you/widgets/mood_by_month_chart.dart';
@@ -5,7 +6,6 @@ import 'package:daily_you/widgets/mood_totals_chart.dart';
 import 'package:daily_you/widgets/stat_range_selector.dart';
 import 'package:daily_you/widgets/streak_card.dart';
 import 'package:flutter/material.dart';
-import 'package:daily_you/widgets/entry_calendar.dart';
 import 'package:provider/provider.dart';
 
 class CalendarPage extends StatefulWidget {
@@ -93,7 +93,11 @@ class _CalendarPageState extends State<CalendarPage> {
             style: TextStyle(fontSize: 18),
           ),
         ),
-        MoodByDayChart(),
+        MoodByDayChart(
+          averageMood: statsProvider.getMoodsByDay(),
+          startOnSunday:
+              ConfigManager.instance.getField('startingDayOfWeek') == 'sunday',
+        ),
       ],
     );
   }

@@ -6,6 +6,7 @@ import 'package:daily_you/models/image.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/stat_range_selector.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class StatsProvider with ChangeNotifier {
   static final StatsProvider instance = StatsProvider._init();
@@ -75,6 +76,49 @@ class StatsProvider with ChangeNotifier {
       1: 0,
       2: 0,
     };
+  }
+
+  Map<String, double> getMoodsByDay() {
+    Map<String, List<double>> moodsByDay = {};
+
+    var filteredEntries = getEntriesInRange();
+    for (Entry entry in filteredEntries) {
+      if (entry.mood == null) continue;
+      String dayKey = DateFormat('EEE').format(entry.timeCreate);
+
+      if (moodsByDay[dayKey] == null) {
+        moodsByDay[dayKey] = List.empty(growable: true);
+        moodsByDay[dayKey]!.add(entry.mood!.toDouble());
+      } else {
+        moodsByDay[dayKey]!.add(entry.mood!.toDouble());
+      }
+    }
+
+    // Average the mood for each day
+    for (var key in moodsByDay.keys) {
+      moodsByDay[key]!.first =
+          moodsByDay[key]!.reduce((a, b) => a + b) / moodsByDay[key]!.length;
+    }
+
+    Map<String, double> averageMoodsByDay = {
+      'Mon': -2,
+      'Tue': -2,
+      'Wed': -2,
+      'Thu': -2,
+      'Fri': -2,
+      'Sat': -2,
+      'Sun': -2,
+    };
+
+    for (String key in moodsByDay.keys) {
+      if (moodsByDay[key] == null) {
+        averageMoodsByDay[key] = -2;
+      } else {
+        averageMoodsByDay[key] = moodsByDay[key]!.first;
+      }
+    }
+
+    return averageMoodsByDay;
   }
 
   List<Entry> getEntriesInRange() {
