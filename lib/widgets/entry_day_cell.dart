@@ -137,14 +137,22 @@ class EntryDayCell extends StatelessWidget {
                   ),
                   Icon(
                     Icons.add_rounded,
-                    color: Theme.of(context).disabledColor,
+                    color: isSameDay(date, DateTime.now())
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).disabledColor,
                   ),
                 ],
               ),
               Text(
                 '${date.day}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
+                  fontWeight: isSameDay(date, DateTime.now())
+                      ? FontWeight.bold
+                      : FontWeight.normal,
+                  color: isSameDay(date, DateTime.now())
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ],
