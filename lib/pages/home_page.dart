@@ -135,14 +135,10 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ),
                             onPressed: () async {
-                              var newEntry = await Navigator.of(context)
+                              await Navigator.of(context)
                                   .push(MaterialPageRoute(
                                 builder: (context) => const AddEditEntryPage(),
                               ));
-
-                              if (newEntry != null) {
-                                await refreshEntries();
-                              }
                             },
                             style: ElevatedButton.styleFrom(
                               padding: const EdgeInsets.all(12),
@@ -164,16 +160,12 @@ class _HomePageState extends State<HomePage> {
                               size: 30,
                             ),
                             onPressed: () async {
-                              var newEntry = await Navigator.of(context)
+                              await Navigator.of(context)
                                   .push(MaterialPageRoute(
                                 builder: (context) => const AddEditEntryPage(
                                   openCamera: true,
                                 ),
                               ));
-
-                              if (newEntry != null) {
-                                await refreshEntries();
-                              }
                             },
                             style: ElevatedButton.styleFrom(
                               padding: const EdgeInsets.all(8),
@@ -246,8 +238,6 @@ class _HomePageState extends State<HomePage> {
                           builder: (context) =>
                               EntryDetailPage(entryId: flashback.entry.id!),
                         ));
-
-                        refreshEntries();
                       },
                       child: listView
                           ? LargeEntryCardWidget(
