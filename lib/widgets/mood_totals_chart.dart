@@ -70,7 +70,6 @@ class _MoodTotalsChartState extends State<MoodTotalsChart> {
                 sideTitles: SideTitles(
                   showTitles: true,
                   reservedSize: 42,
-                  interval: 1,
                 ),
               ),
               bottomTitles: AxisTitles(
