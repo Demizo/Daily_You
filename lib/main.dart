@@ -206,7 +206,7 @@ class _MainAppState extends State<MainApp> {
                         brightness: Brightness.dark),
                   ),
             home: isLoading
-                ? const SizedBox()
+                ? const Scaffold(body: SizedBox())
                 : canReachDatabase
                     ? const ResponsiveLayout(
                         mobileScaffold: MobileScaffold(),
