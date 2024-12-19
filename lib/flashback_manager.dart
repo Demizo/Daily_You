@@ -46,21 +46,21 @@ class FlashbackManager {
     }
 
     // Random Memories
-    int? seed = int.tryParse(
-        "${DateTime.now().year}${DateTime.now().month}${DateTime.now().day}");
-
-    // A happy memory
-    Random random = Random(seed);
-    int index = 0;
-    while (index < happyEntries.length) {
-      Entry randomEntry = happyEntries[random.nextInt(happyEntries.length)];
-      if (flashbacks.containsValue(randomEntry)) continue;
-      flashbacks.putIfAbsent('A Happy Day', () => randomEntry);
-      break;
-    }
-
-    // A random memory
     if (entries.length > 7) {
+      int? seed = int.tryParse(
+          "${DateTime.now().year}${DateTime.now().month}${DateTime.now().day}");
+
+      // A happy memory
+      Random random = Random(seed);
+      int index = 0;
+      while (index < happyEntries.length) {
+        Entry randomEntry = happyEntries[random.nextInt(happyEntries.length)];
+        if (flashbacks.containsValue(randomEntry)) continue;
+        flashbacks.putIfAbsent('A Happy Day', () => randomEntry);
+        break;
+      }
+
+      // A random memory
       random = Random(seed);
       index = 0;
       while (index < entries.length) {
