@@ -26,6 +26,7 @@ class MoodByDayChart extends StatelessWidget {
                 titlesData: FlTitlesData(
                   leftTitles: AxisTitles(
                       sideTitles: SideTitles(
+                    interval: 1,
                     showTitles: true,
                     reservedSize: 42,
                     getTitlesWidget: (value, meta) {
