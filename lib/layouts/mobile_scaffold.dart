@@ -68,7 +68,16 @@ class _MobileScaffoldState extends State<MobileScaffold> {
           },
         )
       ]),
-      body: isLoading ? const Center(child: SizedBox()) : pages[currentIndex],
+      body: isLoading
+          ? const Center(child: SizedBox())
+          : AnimatedSwitcher(
+              duration: const Duration(milliseconds: 200),
+              transitionBuilder: (Widget child, Animation<double> animation) {
+                return FadeTransition(opacity: animation, child: child);
+              },
+              switchInCurve: Curves.easeIn,
+              switchOutCurve: Curves.easeOut,
+              child: pages[currentIndex]),
       bottomNavigationBar: NavigationBar(
         labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
         selectedIndex: currentIndex,
