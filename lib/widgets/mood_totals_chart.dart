@@ -48,12 +48,12 @@ class _MoodTotalsChartState extends State<MoodTotalsChart> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 0, right: 42, bottom: 24, top: 8),
+      padding: const EdgeInsets.only(left: 0, right: 42, bottom: 10, top: 8),
       child: AspectRatio(
         aspectRatio: 2,
         child: BarChart(
           BarChartData(
-            alignment: BarChartAlignment.spaceBetween,
+            alignment: BarChartAlignment.spaceAround,
             borderData: FlBorderData(
               show: true,
               border: Border.symmetric(

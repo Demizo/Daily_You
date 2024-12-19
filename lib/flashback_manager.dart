@@ -1,35 +1,21 @@
-import 'package:daily_you/entries_database.dart';
+import 'dart:math';
+
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/flashback.dart';
 import 'package:daily_you/time_manager.dart';
 
 class FlashbackManager {
-  static Future<List<Flashback>> getFlashbacks() async {
+  static List<Flashback> getFlashbacks(List<Entry> entries) {
     List<Flashback> flashbacksList = List.empty(growable: true);
     Map<String, Entry> flashbacks = {};
 
-    var entries = await EntriesDatabase.instance.getAllEntries();
     List<Entry> happyEntries = List.empty(growable: true);
 
     if (entries.isEmpty) return flashbacksList;
 
     // Time based memories
-    for (var entry in entries) {
+    for (var entry in entries.reversed.toList()) {
       if (flashbacks.containsValue(entry)) continue;
-      if (TimeManager.isToday(entry.timeCreate)) {
-        flashbacks.putIfAbsent('Today', () => entry);
-        continue;
-      }
-      if (TimeManager.isSameDay(
-          entry.timeCreate, DateTime.now().subtract(const Duration(days: 1)))) {
-        flashbacks.putIfAbsent('Yesterday', () => entry);
-        continue;
-      }
-      if (TimeManager.isSameDay(
-          entry.timeCreate, DateTime.now().subtract(const Duration(days: 7)))) {
-        flashbacks.putIfAbsent('1 Week Ago', () => entry);
-        continue;
-      }
       if (entry.timeCreate.day == DateTime.now().day &&
           entry.timeCreate.month == DateTime.now().month &&
           entry.timeCreate.year != DateTime.now().year) {
@@ -39,13 +25,18 @@ class FlashbackManager {
         continue;
       }
       if (TimeManager.datesExactMonthDiff(entry.timeCreate, DateTime.now()) ==
+          6) {
+        flashbacks.putIfAbsent('6 Months Ago', () => entry);
+        continue;
+      }
+      if (TimeManager.datesExactMonthDiff(entry.timeCreate, DateTime.now()) ==
           1) {
         flashbacks.putIfAbsent('1 Month Ago', () => entry);
         continue;
       }
-      if (TimeManager.datesExactMonthDiff(entry.timeCreate, DateTime.now()) ==
-          6) {
-        flashbacks.putIfAbsent('6 Months Ago', () => entry);
+      if (TimeManager.isSameDay(
+          entry.timeCreate, DateTime.now().subtract(const Duration(days: 7)))) {
+        flashbacks.putIfAbsent('1 Week Ago', () => entry);
         continue;
       }
       if (entry.mood == 1 || entry.mood == 2) {
@@ -55,21 +46,29 @@ class FlashbackManager {
     }
 
     // Random Memories
+    if (entries.length > 7) {
+      int? seed = int.tryParse(
+          "${DateTime.now().year}${DateTime.now().month}${DateTime.now().day}");
 
-    // A happy memory
-    happyEntries.shuffle();
-    for (var entry in happyEntries) {
-      if (flashbacks.containsValue(entry)) continue;
-      flashbacks.putIfAbsent('A Happy Day', () => entry);
-      break;
-    }
+      // A happy memory
+      Random random = Random(seed);
+      int index = 0;
+      while (index < happyEntries.length) {
+        Entry randomEntry = happyEntries[random.nextInt(happyEntries.length)];
+        if (flashbacks.containsValue(randomEntry)) continue;
+        flashbacks.putIfAbsent('A Happy Day', () => randomEntry);
+        break;
+      }
 
-    // A random memory
-    entries.shuffle();
-    for (var entry in entries) {
-      if (flashbacks.containsValue(entry)) continue;
-      flashbacks.putIfAbsent('A Random Day', () => entry);
-      break;
+      // A random memory
+      random = Random(seed);
+      index = 0;
+      while (index < entries.length) {
+        Entry randomEntry = entries[random.nextInt(entries.length)];
+        if (flashbacks.containsValue(randomEntry)) continue;
+        flashbacks.putIfAbsent('A Random Day', () => randomEntry);
+        break;
+      }
     }
 
     flashbacks.forEach((key, value) {

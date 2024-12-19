@@ -1,19 +1,22 @@
+import 'package:daily_you/config_manager.dart';
 import 'package:daily_you/stats_provider.dart';
+import 'package:daily_you/widgets/mood_by_day_chart.dart';
+import 'package:daily_you/widgets/mood_by_month_chart.dart';
 import 'package:daily_you/widgets/mood_totals_chart.dart';
+import 'package:daily_you/widgets/stat_range_selector.dart';
 import 'package:daily_you/widgets/streak_card.dart';
 import 'package:flutter/material.dart';
-import 'package:daily_you/widgets/entry_calendar.dart';
 import 'package:provider/provider.dart';
 
-class CalendarPage extends StatefulWidget {
-  const CalendarPage({super.key});
+class StatsPage extends StatefulWidget {
+  const StatsPage({super.key});
 
   @override
-  State<CalendarPage> createState() => _CalendarPageState();
+  State<StatsPage> createState() => _StatsPageState();
 }
 
-class _CalendarPageState extends State<CalendarPage> {
-  bool allTime = false;
+class _StatsPageState extends State<StatsPage> {
+  StatsRange statsRange = StatsRange.month;
   bool isLoading = true;
 
   @override
@@ -42,49 +45,61 @@ class _CalendarPageState extends State<CalendarPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Wrap(
-          children: [
-            StreakCard(
-              title: "Current Streak ",
-              number: statsProvider.currentStreak,
-              isVisible: true,
-              icon: Icons.bolt,
-            ),
-            StreakCard(
-                title: "Longest Streak ",
-                number: statsProvider.longestStreak,
-                isVisible:
-                    statsProvider.longestStreak > statsProvider.currentStreak,
-                icon: Icons.history_rounded),
-            StreakCard(
-                title: "Days since a Bad Day ",
-                number: statsProvider.daysSinceBadDay ?? -1,
-                isVisible: statsProvider.daysSinceBadDay != null &&
-                    statsProvider.daysSinceBadDay! > 3,
-                icon: Icons.timeline_rounded),
-          ],
-        ),
-        const Center(
-            child: SizedBox(height: 430, width: 400, child: EntryCalendar())),
+        const MoodByMonthChart(),
         Padding(
-          padding: const EdgeInsets.only(left: 8.0),
-          child: ElevatedButton(
-            onPressed: (() => setState(() {
-                  allTime = !allTime;
-                })),
-            style: ButtonStyle(
-                padding: WidgetStateProperty.all(const EdgeInsets.all(8)),
-                elevation: WidgetStateProperty.all(0.0)),
-            child: Text(
-              allTime ? "All Time" : "This Month",
-              style: const TextStyle(fontSize: 16),
+          padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+          child: Wrap(
+            children: [
+              StreakCard(
+                title: "Current Streak ",
+                number: statsProvider.currentStreak,
+                isVisible: true,
+                icon: Icons.bolt,
+              ),
+              StreakCard(
+                  title: "Longest Streak ",
+                  number: statsProvider.longestStreak,
+                  isVisible:
+                      statsProvider.longestStreak > statsProvider.currentStreak,
+                  icon: Icons.history_rounded),
+              StreakCard(
+                  title: "Days since a Bad Day ",
+                  number: statsProvider.daysSinceBadDay ?? -1,
+                  isVisible: statsProvider.daysSinceBadDay != null &&
+                      statsProvider.daysSinceBadDay! > 3,
+                  icon: Icons.timeline_rounded),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Center(
+            child: StatsRangeSelector(
+              onSelectionChanged: (newSelection) {
+                statsRange = newSelection.first;
+              },
             ),
           ),
         ),
+        const Center(
+          child: Text(
+            "Mood Summary",
+            style: TextStyle(fontSize: 18),
+          ),
+        ),
         MoodTotalsChart(
-          moodCounts: allTime
-              ? StatsProvider.instance.moodCountsAllTime
-              : StatsProvider.instance.moodCountsThisMonth,
+          moodCounts: statsProvider.moodTotals,
+        ),
+        const Center(
+          child: Text(
+            "Mood By Day",
+            style: TextStyle(fontSize: 18),
+          ),
+        ),
+        MoodByDayChart(
+          averageMood: statsProvider.getMoodsByDay(),
+          startOnSunday:
+              ConfigManager.instance.getField('startingDayOfWeek') == 'sunday',
         ),
       ],
     );

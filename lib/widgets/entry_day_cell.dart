@@ -1,3 +1,4 @@
+import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/stats_provider.dart';
 import 'package:daily_you/widgets/local_image_loader.dart';
@@ -18,6 +19,7 @@ class EntryDayCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final statsProvider = Provider.of<StatsProvider>(context);
+    final configProvider = Provider.of<ConfigProvider>(context);
 
     var entries = StatsProvider.instance.entries
         .where((entry) => isSameDay(entry.timeCreate, date))
@@ -32,7 +34,7 @@ class EntryDayCell extends StatelessWidget {
       image = images.isNotEmpty ? images.first : null;
     }
 
-    bool showMood = statsProvider.calendarViewMode == 'mood';
+    bool showMood = configProvider.calendarViewMode == 'mood';
 
     if (entry != null) {
       if (showMood) {
@@ -72,7 +74,7 @@ class EntryDayCell extends StatelessWidget {
               children: [
                 image != null
                     ? SizedBox(
-                        width: 57,
+                        height: 57,
                         child: Card(
                             clipBehavior: Clip.antiAlias,
                             child: LocalImageLoader(
@@ -137,14 +139,22 @@ class EntryDayCell extends StatelessWidget {
                   ),
                   Icon(
                     Icons.add_rounded,
-                    color: Theme.of(context).disabledColor,
+                    color: isSameDay(date, DateTime.now())
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).disabledColor,
                   ),
                 ],
               ),
               Text(
                 '${date.day}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
+                  fontWeight: isSameDay(date, DateTime.now())
+                      ? FontWeight.bold
+                      : FontWeight.normal,
+                  color: isSameDay(date, DateTime.now())
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ],

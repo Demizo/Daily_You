@@ -1,5 +1,5 @@
 import 'package:daily_you/config_manager.dart';
-import 'package:daily_you/stats_provider.dart';
+import 'package:daily_you/config_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/widgets/entry_day_cell.dart';
 import 'package:intl/intl.dart';
@@ -84,10 +84,6 @@ class _EntryCalendarState extends State<EntryCalendar> {
               );
             },
           ),
-          onPageChanged: ((focusedDay) {
-            StatsProvider.instance.referenceDay = focusedDay;
-            StatsProvider.instance.updateStats();
-          }),
         ),
       ],
     );
@@ -100,21 +96,21 @@ class CalendarViewModeSelector extends StatelessWidget {
   });
 
   Future<void> setViewMode() async {
-    String viewMode = ConfigManager.instance.getField('calendarPageViewMode');
+    String viewMode = ConfigManager.instance.getField('calendarViewMode');
     bool showMood = viewMode == 'mood';
     viewMode = showMood ? 'image' : 'mood';
-    await ConfigManager.instance.setField('calendarPageViewMode', viewMode);
-    await StatsProvider.instance.updateStats();
+    await ConfigManager.instance.setField('calendarViewMode', viewMode);
+    await ConfigProvider.instance.updateConfig();
   }
 
   @override
   Widget build(BuildContext context) {
-    final statsProvider = Provider.of<StatsProvider>(context);
+    final configProvider = Provider.of<ConfigProvider>(context);
     return IconButton(
         onPressed: () async {
           await setViewMode();
         },
-        icon: statsProvider.calendarViewMode == "mood"
+        icon: configProvider.calendarViewMode == "mood"
             ? const Icon(Icons.image_rounded)
             : const Icon(Icons.mood_rounded));
   }

@@ -4,7 +4,9 @@ import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:daily_you/widgets/stat_range_selector.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class StatsProvider with ChangeNotifier {
   static final StatsProvider instance = StatsProvider._init();
@@ -30,76 +32,130 @@ class StatsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  DateTime _referenceDay = DateTime.now();
-  set referenceDay(DateTime dateTime) {
-    _referenceDay = dateTime;
-  }
-
   // Moods
-  Map<int, int> _moodCountsAllTime = {
+  Map<int, int> moodTotals = {
     -2: 0,
     -1: 0,
     0: 0,
     1: 0,
     2: 0,
   };
-  Map<int, int> get moodCountsAllTime => _moodCountsAllTime;
-  Map<int, int> _moodCountsThisMonth = {
-    -2: 0,
-    -1: 0,
-    0: 0,
-    1: 0,
-    2: 0,
-  };
-  Map<int, int> get moodCountsThisMonth => _moodCountsThisMonth;
 
   List<Entry> entries = List.empty();
   List<EntryImage> images = List.empty();
 
-  String calendarViewMode = "mood";
+  StatsRange statsRange = StatsRange.month;
 
   Future<void> updateStats() async {
     entries = await EntriesDatabase.instance.getAllEntries();
     images = await EntriesDatabase.instance.getAllEntryImages();
-    calendarViewMode = ConfigManager.instance.getField('calendarPageViewMode');
     await getStreaks();
-    await getMoodCounts(_referenceDay);
+    await getMoodCounts();
     notifyListeners();
   }
 
-  Future<void> getMoodCounts(DateTime referenceTime) async {
+  Future<void> getMoodCounts() async {
     // Reset mood counts
     _resetMoodCounts();
-    for (Entry entry in entries) {
+    for (Entry entry in getEntriesInRange()) {
       if (entry.mood == null) continue;
-      _moodCountsAllTime.update(
+      moodTotals.update(
         entry.mood!,
-        (value) => _moodCountsAllTime[entry.mood!]! + 1,
+        (value) => moodTotals[entry.mood!]! + 1,
       );
-      if (TimeManager.isSameMonth(entry.timeCreate, referenceTime)) {
-        _moodCountsThisMonth.update(
-          entry.mood!,
-          (value) => _moodCountsThisMonth[entry.mood!]! + 1,
-        );
-      }
     }
   }
 
   void _resetMoodCounts() {
-    _moodCountsAllTime = {
+    moodTotals = {
       -2: 0,
       -1: 0,
       0: 0,
       1: 0,
       2: 0,
     };
-    _moodCountsThisMonth = {
-      -2: 0,
-      -1: 0,
-      0: 0,
-      1: 0,
-      2: 0,
+  }
+
+  Map<String, double> getMoodsByDay() {
+    Map<String, List<double>> moodsByDay = {};
+
+    var filteredEntries = getEntriesInRange();
+    for (Entry entry in filteredEntries) {
+      if (entry.mood == null) continue;
+      String dayKey = DateFormat('EEE').format(entry.timeCreate);
+
+      if (moodsByDay[dayKey] == null) {
+        moodsByDay[dayKey] = List.empty(growable: true);
+        moodsByDay[dayKey]!.add(entry.mood!.toDouble());
+      } else {
+        moodsByDay[dayKey]!.add(entry.mood!.toDouble());
+      }
+    }
+
+    // Average the mood for each day
+    for (var key in moodsByDay.keys) {
+      moodsByDay[key]!.first =
+          moodsByDay[key]!.reduce((a, b) => a + b) / moodsByDay[key]!.length;
+    }
+
+    Map<String, double> averageMoodsByDay = {
+      'Mon': -2,
+      'Tue': -2,
+      'Wed': -2,
+      'Thu': -2,
+      'Fri': -2,
+      'Sat': -2,
+      'Sun': -2,
     };
+
+    for (String key in moodsByDay.keys) {
+      if (moodsByDay[key] == null) {
+        averageMoodsByDay[key] = -2;
+      } else {
+        averageMoodsByDay[key] = moodsByDay[key]!.first;
+      }
+    }
+
+    return averageMoodsByDay;
+  }
+
+  List<Entry> getEntriesInRange() {
+    int filterMonthCount = 0;
+    switch (statsRange) {
+      case StatsRange.month:
+        {
+          filterMonthCount = 1;
+          break;
+        }
+      case StatsRange.sixMonths:
+        {
+          filterMonthCount = 6;
+          break;
+        }
+      case StatsRange.year:
+        {
+          filterMonthCount = 12;
+          break;
+        }
+      case StatsRange.allTime:
+        {
+          filterMonthCount = 0;
+          break;
+        }
+    }
+
+    // Filter entries by time range
+    var filteredEntries = entries;
+    if (filterMonthCount > 0) {
+      filteredEntries = filteredEntries.where((entry) {
+        DateTime now = DateTime.now();
+        DateTime monthsAgo =
+            DateTime(now.year, now.month - filterMonthCount, now.day);
+        return entry.timeCreate.isAfter(monthsAgo);
+      }).toList();
+    }
+
+    return filteredEntries;
   }
 
   Future getStreaks() async {

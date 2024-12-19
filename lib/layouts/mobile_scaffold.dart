@@ -22,11 +22,11 @@ class _MobileScaffoldState extends State<MobileScaffold> {
 
   final List<Widget> pages = [
     const HomePage(),
-    const CalendarPage(),
     const EntriesPage(),
+    const StatsPage(),
   ];
 
-  final List<String> appBarsTitles = ["Home", "Calendar", "Gallery"];
+  final List<String> appBarsTitles = ["Home", "Gallery", "Statistics"];
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +68,16 @@ class _MobileScaffoldState extends State<MobileScaffold> {
           },
         )
       ]),
-      body: isLoading ? const Center(child: SizedBox()) : pages[currentIndex],
+      body: isLoading
+          ? const Center(child: SizedBox())
+          : AnimatedSwitcher(
+              duration: const Duration(milliseconds: 200),
+              transitionBuilder: (Widget child, Animation<double> animation) {
+                return FadeTransition(opacity: animation, child: child);
+              },
+              switchInCurve: Curves.easeIn,
+              switchOutCurve: Curves.easeOut,
+              child: pages[currentIndex]),
       bottomNavigationBar: NavigationBar(
         labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
         selectedIndex: currentIndex,
@@ -83,12 +92,12 @@ class _MobileScaffoldState extends State<MobileScaffold> {
             label: 'Home',
           ),
           NavigationDestination(
-            icon: Icon(Icons.calendar_month_rounded),
-            label: 'Calendar',
-          ),
-          NavigationDestination(
             icon: Icon(Icons.photo_library_rounded),
             label: 'Gallery',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.auto_graph_rounded),
+            label: 'Statistics',
           ),
         ],
       ),
