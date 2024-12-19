@@ -44,13 +44,11 @@ class StatsProvider with ChangeNotifier {
   List<Entry> entries = List.empty();
   List<EntryImage> images = List.empty();
 
-  String calendarViewMode = "mood";
   StatsRange statsRange = StatsRange.month;
 
   Future<void> updateStats() async {
     entries = await EntriesDatabase.instance.getAllEntries();
     images = await EntriesDatabase.instance.getAllEntryImages();
-    calendarViewMode = ConfigManager.instance.getField('calendarViewMode');
     await getStreaks();
     await getMoodCounts();
     notifyListeners();

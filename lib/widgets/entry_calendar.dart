@@ -1,5 +1,5 @@
 import 'package:daily_you/config_manager.dart';
-import 'package:daily_you/stats_provider.dart';
+import 'package:daily_you/config_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/widgets/entry_day_cell.dart';
 import 'package:intl/intl.dart';
@@ -100,17 +100,17 @@ class CalendarViewModeSelector extends StatelessWidget {
     bool showMood = viewMode == 'mood';
     viewMode = showMood ? 'image' : 'mood';
     await ConfigManager.instance.setField('calendarViewMode', viewMode);
-    await StatsProvider.instance.updateStats();
+    await ConfigProvider.instance.updateConfig();
   }
 
   @override
   Widget build(BuildContext context) {
-    final statsProvider = Provider.of<StatsProvider>(context);
+    final configProvider = Provider.of<ConfigProvider>(context);
     return IconButton(
         onPressed: () async {
           await setViewMode();
         },
-        icon: statsProvider.calendarViewMode == "mood"
+        icon: configProvider.calendarViewMode == "mood"
             ? const Icon(Icons.image_rounded)
             : const Icon(Icons.mood_rounded));
   }

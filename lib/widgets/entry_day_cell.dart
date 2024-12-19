@@ -1,3 +1,4 @@
+import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/stats_provider.dart';
 import 'package:daily_you/widgets/local_image_loader.dart';
@@ -18,6 +19,7 @@ class EntryDayCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final statsProvider = Provider.of<StatsProvider>(context);
+    final configProvider = Provider.of<ConfigProvider>(context);
 
     var entries = StatsProvider.instance.entries
         .where((entry) => isSameDay(entry.timeCreate, date))
@@ -32,7 +34,7 @@ class EntryDayCell extends StatelessWidget {
       image = images.isNotEmpty ? images.first : null;
     }
 
-    bool showMood = statsProvider.calendarViewMode == 'mood';
+    bool showMood = configProvider.calendarViewMode == 'mood';
 
     if (entry != null) {
       if (showMood) {

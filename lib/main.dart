@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
+import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/stats_provider.dart';
@@ -63,6 +64,7 @@ void main() async {
 
   // Create the config file if it doesn't exist
   await ConfigManager.instance.init();
+  await ConfigProvider.instance.updateConfig();
 
   //Initialize Database
   await EntriesDatabase.instance.initDB();
@@ -88,6 +90,9 @@ void main() async {
     ),
     ChangeNotifierProvider<StatsProvider>(
       create: (_) => StatsProvider.instance,
+    ),
+    ChangeNotifierProvider<ConfigProvider>(
+      create: (_) => ConfigProvider.instance,
     )
   ], builder: (context, child) => const MainApp()));
 }
