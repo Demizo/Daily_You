@@ -64,9 +64,6 @@ void main() async {
   // Create the config file if it doesn't exist
   await ConfigManager.instance.init();
 
-  //Initialize Database
-  await EntriesDatabase.instance.initDB();
-
   final themeProvider = ThemeModeProvider();
   await themeProvider.initializeThemeFromConfig();
 
@@ -110,63 +107,149 @@ Future<void> setAlarm() async {
       allowWhileIdle: true, exact: true, rescheduleOnReboot: true);
 }
 
-class MainApp extends StatelessWidget {
+class MainApp extends StatefulWidget {
   const MainApp({super.key});
+
+  @override
+  State<MainApp> createState() => _MainAppState();
+}
+
+class _MainAppState extends State<MainApp> {
+  bool canReachDatabase = false;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkDatabaseConnection();
+  }
+
+  Future<void> uriErrorPopup(String folderType) async {
+    await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+              title: const Text("Error:"),
+              content: Text(
+                  "Can't access the $folderType folder! Go to settings, backup your logs and images, then reset the your external folder locations!"));
+        });
+  }
+
+  _checkDatabaseConnection() async {
+    //Initialize Database
+    canReachDatabase = await EntriesDatabase.instance.initDB();
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  _forceLocalDatabase() async {
+    canReachDatabase =
+        await EntriesDatabase.instance.initDB(forceWithoutSync: true);
+    setState(() {
+      canReachDatabase;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final themeModeProvider = Provider.of<ThemeModeProvider>(context);
 
     return GestureDetector(
-      onTap: () {
-        FocusManager.instance.primaryFocus?.unfocus();
-      },
-      child: MaterialApp(
-        title: 'Daily You',
-        themeMode: themeModeProvider.themeMode,
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(
-              seedColor: themeModeProvider.accentColor,
-              brightness: Brightness.light),
-        ),
-        darkTheme: (ConfigManager.instance.getField('theme') == 'amoled')
-            ? ThemeData(
-                useMaterial3: true,
-                colorScheme: ColorScheme.fromSeed(
+        onTap: () {
+          FocusManager.instance.primaryFocus?.unfocus();
+        },
+        child: MaterialApp(
+            title: 'Daily You',
+            themeMode: themeModeProvider.themeMode,
+            debugShowCheckedModeBanner: false,
+            theme: ThemeData(
+              useMaterial3: true,
+              colorScheme: ColorScheme.fromSeed(
                   seedColor: themeModeProvider.accentColor,
-                  brightness: Brightness.dark,
-                  surfaceContainerLowest: Colors.black,
-                  surfaceContainerLow: Colors.black,
-                  surfaceContainerHighest: Colors.black,
-                  surfaceContainerHigh: Colors.black,
-                  surfaceBright: Colors.black,
-                  surfaceDim: Colors.black,
-                  surface: Colors.black,
-                  surfaceContainer: Colors.black,
-                  onSurface: Colors.white,
-                  surfaceTint: Colors.black,
-                  primaryContainer: Colors.black,
-                  secondaryContainer: Colors.black,
-                  tertiaryContainer: Colors.black,
-                  inverseSurface: Colors.black,
-                  inversePrimary: Colors.black,
-                  scrim: Colors.black,
-                ),
-                scaffoldBackgroundColor: Colors.black)
-            : ThemeData(
-                useMaterial3: true,
-                colorScheme: ColorScheme.fromSeed(
-                    seedColor: themeModeProvider.accentColor,
-                    brightness: Brightness.dark),
-              ),
-        home: const ResponsiveLayout(
-          mobileScaffold: MobileScaffold(),
-          tabletScaffold: MobileScaffold(),
-          desktopScaffold: MobileScaffold(),
-        ),
-      ),
-    );
+                  brightness: Brightness.light),
+            ),
+            darkTheme: (ConfigManager.instance.getField('theme') == 'amoled')
+                ? ThemeData(
+                    useMaterial3: true,
+                    colorScheme: ColorScheme.fromSeed(
+                      seedColor: themeModeProvider.accentColor,
+                      brightness: Brightness.dark,
+                      surfaceContainerLowest: Colors.black,
+                      surfaceContainerLow: Colors.black,
+                      surfaceContainerHighest: Colors.black,
+                      surfaceContainerHigh: Colors.black,
+                      surfaceBright: Colors.black,
+                      surfaceDim: Colors.black,
+                      surface: Colors.black,
+                      surfaceContainer: Colors.black,
+                      onSurface: Colors.white,
+                      surfaceTint: Colors.black,
+                      primaryContainer: Colors.black,
+                      secondaryContainer: Colors.black,
+                      tertiaryContainer: Colors.black,
+                      inverseSurface: Colors.black,
+                      inversePrimary: Colors.black,
+                      scrim: Colors.black,
+                    ),
+                    scaffoldBackgroundColor: Colors.black)
+                : ThemeData(
+                    useMaterial3: true,
+                    colorScheme: ColorScheme.fromSeed(
+                        seedColor: themeModeProvider.accentColor,
+                        brightness: Brightness.dark),
+                  ),
+            home: isLoading
+                ? const SizedBox()
+                : canReachDatabase
+                    ? const ResponsiveLayout(
+                        mobileScaffold: MobileScaffold(),
+                        tabletScaffold: MobileScaffold(),
+                        desktopScaffold: MobileScaffold(),
+                      )
+                    : Scaffold(
+                        extendBody: true,
+                        backgroundColor: themeModeProvider.accentColor,
+                        body: Center(
+                          child: Card(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "Error",
+                                  style: TextStyle(
+                                      fontSize: 36,
+                                      fontWeight: FontWeight.bold,
+                                      color: themeModeProvider.accentColor),
+                                ),
+                                const Text(
+                                  "Can't access your external storage location!",
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                const Padding(
+                                  padding: EdgeInsets.all(
+                                    32.0,
+                                  ),
+                                  child: Text(
+                                    """
+If you are using network storage make sure the service is online and you have network access.
+
+Otherwise, the app may have lost permissions for the external folder. Go to settings, and reselect the external folder to grant access.
+          
+Warning, changes will not be synced until restore access to the external storage location!""",
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                                ),
+                                TextButton(
+                                    onPressed: _forceLocalDatabase,
+                                    child: const Text(
+                                        "Continue With Local Database")),
+                              ],
+                            ),
+                          ),
+                        ))));
   }
 }

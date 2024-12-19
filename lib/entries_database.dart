@@ -22,8 +22,15 @@ class EntriesDatabase {
 
   EntriesDatabase._init();
 
-  Future<bool> initDB() async {
-    if (usingExternalDb()) await syncDatabase();
+  Future<bool> initDB({bool forceWithoutSync = false}) async {
+    if (usingExternalDb() && !forceWithoutSync) {
+      if (await hasDbUriPermission()) {
+        await syncDatabase();
+      } else {
+        return false;
+      }
+    }
+
     final dbPath = await getInternalDbPath();
 
     _database = await openDatabase(dbPath,
