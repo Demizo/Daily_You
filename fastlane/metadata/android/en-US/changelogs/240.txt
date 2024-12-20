@@ -1,0 +1,9 @@
+Daily You v2.4.0 has arrived! Here are the changes:
+
+• Revamped home page with a log calendar
+• New statistics page for tracking mood over time
+• Improved flashback relevance
+• Manage templates while editing logs
+• Performance improvements
+• Option to reset mood icons
+• Fix app freeze when external storage location is inaccessible

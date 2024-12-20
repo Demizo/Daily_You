@@ -1119,7 +1119,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           icon: const Icon(
                             Icons.new_releases_rounded,
                           ),
-                          label: const Text("2.3.0"),
+                          label: const Text("2.4.0"),
                           onPressed: () async {
                             await launchUrl(
                                 Uri.https(

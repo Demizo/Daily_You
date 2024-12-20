@@ -1,0 +1,9 @@
+Daily You v2.4.0 ist da! Hier sind die Änderungen:
+
+• Überarbeitete Startseite mit einem Protokollkalender
+• Neue Statistikseite zur Stimmungsverfolgung im Zeitverlauf
+• Verbesserte Flashback-Relevanz
+• Vorlagen verwalten, während Protokolle bearbeitet werden
+• Leistungsverbesserungen
+• Option zum Zurücksetzen von Stimmungssymbolen
+• App-Einfrieren behoben, wenn externer Speicherort nicht zugänglich ist
