@@ -17,10 +17,10 @@ Daily You is an app made to store memories of the passing days. Log each day and
 
 ## Screenshots
 <p>
-<img width="200" src="https://github.com/Demizo/Daily_You/blob/master/screenshots/Screenshot_0.png" alt="app screenshot">
-<img width="200" src="https://github.com/Demizo/Daily_You/blob/master/screenshots/Screenshot_1.png" alt="app screenshot">
-<img width="200" src="https://github.com/Demizo/Daily_You/blob/master/screenshots/Screenshot_2.png" alt="app screenshot">
-<img width="200" src="https://github.com/Demizo/Daily_You/blob/master/screenshots/Screenshot_3.png" alt="app screenshot">
+<img width="200" src="https://github.com/Demizo/Daily_You/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/Screenshot_0.png" alt="app screenshot">
+<img width="200" src="https://github.com/Demizo/Daily_You/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/Screenshot_1.png" alt="app screenshot">
+<img width="200" src="https://github.com/Demizo/Daily_You/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/Screenshot_2.png" alt="app screenshot">
+<img width="200" src="https://github.com/Demizo/Daily_You/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/Screenshot_3.png" alt="app screenshot">
 </p>
 
 ## Installation
