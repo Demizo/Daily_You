@@ -277,7 +277,7 @@ DROP TABLE old_entries;
       where: '${EntryImageFields.id} = ?',
       whereArgs: [entryImage.id],
     );
-
+    await StatsProvider.instance.updateStats();
     if (usingExternalDb()) await updateExternalDatabase();
     return removedId;
   }
@@ -291,7 +291,7 @@ DROP TABLE old_entries;
       where: '${EntryImageFields.id} = ?',
       whereArgs: [image.id],
     );
-
+    await StatsProvider.instance.updateStats();
     if (usingExternalDb()) await updateExternalDatabase();
     return id;
   }
