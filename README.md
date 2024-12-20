@@ -4,20 +4,16 @@
 <h1 align="center">Daily You</h1>
 <h2 align="center">Every day is worth remembering...</h2>
 
-Daily You is an app made to store memories of the passing days. Log every day and look back on past memories. All logs and photos are stored locally (the app has no internet access) and can be set to custom storage locations. Daily You is inspired by ptrLx's [OneShot](https://github.com/ptrLx/OneShot).
+Daily You is an app made to store memories of the passing days. Log each day and look back on past moments. Works offline with support for external storage locations. Daily You is inspired by ptrLx's [OneShot](https://github.com/ptrLx/OneShot).
 
 ### Features:
 - Take daily logs
-- Markdown support
-- Keep photo memories
-- Reminder notifications
 - Record your mood
+- Keep photo memories
+- Markdown support
+- Reminder notifications
 - Search your past logs
-- Material You design
 - Set custom storage locations
-- Json Import/Export
-- Photo gallery
-- Log calendar
 
 ## Screenshots
 <p>
@@ -25,8 +21,6 @@ Daily You is an app made to store memories of the passing days. Log every day an
 <img width="200" src="https://github.com/Demizo/Daily_You/blob/master/screenshots/Screenshot_1.png" alt="app screenshot">
 <img width="200" src="https://github.com/Demizo/Daily_You/blob/master/screenshots/Screenshot_2.png" alt="app screenshot">
 <img width="200" src="https://github.com/Demizo/Daily_You/blob/master/screenshots/Screenshot_3.png" alt="app screenshot">
-<img width="200" src="https://github.com/Demizo/Daily_You/blob/master/screenshots/Screenshot_4.png" alt="app screenshot">
-<img width="200" src="https://github.com/Demizo/Daily_You/blob/master/screenshots/Screenshot_5.png" alt="app screenshot">
 </p>
 
 ## Installation
