@@ -9,7 +9,7 @@ import device_info_plus
 import file_selector_macos
 import flutter_local_notifications
 import path_provider_foundation
-import sqflite
+import sqflite_darwin
 import sqlite3_flutter_libs
 import system_theme
 import url_launcher_macos
