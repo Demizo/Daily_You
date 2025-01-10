@@ -1,8 +1,9 @@
 {
-    "java.configuration.updateBuildConfiguration": "interactive",
-    "cSpell.words": [
-        "Appimage",
-        "curr",
-        "persistable"
-    ]
+  "java.configuration.updateBuildConfiguration": "interactive",
+  "cSpell.words": [
+    "Appimage",
+    "curr",
+    "persistable"
+  ],
+  "dart.flutterSdkPath": ".fvm/versions/3.22.3"
 }
