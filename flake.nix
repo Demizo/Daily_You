@@ -16,8 +16,8 @@ outputs = { self, nixpkgs, flake-utils }:
       };
       buildToolsVersion = "34.0.0";
       androidComposition = pkgs.androidenv.composeAndroidPackages {
-        buildToolsVersions = [ buildToolsVersion "28.0.3" ];
-        platformVersions = [ "34" "28" ];
+        buildToolsVersions = [ buildToolsVersion "33.0.1" ];
+        platformVersions = [ "35" "34" ];
         abiVersions = [ "armeabi-v7a" "arm64-v8a" ];
       };
       androidSdk = androidComposition.androidsdk;
@@ -26,6 +26,7 @@ outputs = { self, nixpkgs, flake-utils }:
       devShell =
         with pkgs; mkShell rec {
           ANDROID_SDK_ROOT = "${androidSdk}/libexec/android-sdk";
+          JAVA_HOME = jdk17.home;
           buildInputs = [
             flutter
             androidSdk # The customized SDK that we've made above
