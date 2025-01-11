@@ -424,8 +424,9 @@ class _SettingsPageState extends State<SettingsPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   ElevatedButton.icon(
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.delete_rounded,
+                      color: Theme.of(context).colorScheme.primary,
                       size: 24,
                     ),
                     label: const Padding(
@@ -450,8 +451,9 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   ),
                   ElevatedButton.icon(
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.cancel_rounded,
+                      color: Theme.of(context).colorScheme.surface,
                       size: 24,
                     ),
                     label: const Padding(

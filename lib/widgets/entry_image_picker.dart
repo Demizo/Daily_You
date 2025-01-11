@@ -39,8 +39,9 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   ElevatedButton.icon(
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.delete_rounded,
+                      color: Theme.of(context).colorScheme.surface,
                       size: 24,
                     ),
                     label: const Padding(
@@ -65,8 +66,9 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
                     ),
                   ),
                   ElevatedButton.icon(
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.cancel_rounded,
+                      color: Theme.of(context).colorScheme.surface,
                       size: 24,
                     ),
                     label: const Padding(
@@ -163,7 +165,11 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
             ),
           ),
           onPressed: clearImage,
-          child: const Icon(Icons.cancel_rounded),
+          child: Icon(
+            Icons.cancel_rounded,
+            color: Theme.of(context).colorScheme.surface,
+            size: 24,
+          ),
         ),
       ]);
     } else {
@@ -187,7 +193,11 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
                       ),
                     ),
                     onPressed: _takePicture,
-                    child: const Icon(Icons.photo_camera_rounded),
+                    child: Icon(
+                      Icons.photo_camera_rounded,
+                      color: Theme.of(context).colorScheme.surface,
+                      size: 24,
+                    ),
                   ),
                 const SizedBox(
                   width: 6,
@@ -203,7 +213,11 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
                     ),
                   ),
                   onPressed: _choosePicture,
-                  child: const Icon(Icons.photo),
+                  child: Icon(
+                    Icons.photo,
+                    color: Theme.of(context).colorScheme.surface,
+                    size: 24,
+                  ),
                 ),
               ],
             ),

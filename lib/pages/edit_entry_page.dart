@@ -90,8 +90,9 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   ElevatedButton.icon(
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.delete_rounded,
+                      color: Theme.of(context).colorScheme.primary,
                       size: 24,
                     ),
                     label: const Padding(
@@ -116,8 +117,9 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
                     ),
                   ),
                   ElevatedButton.icon(
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.cancel_rounded,
+                      color: Theme.of(context).colorScheme.surface,
                       size: 24,
                     ),
                     label: const Padding(

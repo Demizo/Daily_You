@@ -123,8 +123,9 @@ class _HomePageState extends State<HomePage> {
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: ElevatedButton.icon(
-                            icon: const Icon(
+                            icon: Icon(
                               Icons.add_circle_rounded,
+                              color: Theme.of(context).colorScheme.surface,
                               size: 30,
                             ),
                             label: const Padding(
