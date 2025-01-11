@@ -5,6 +5,7 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   file_selector_windows
   permission_handler_windows
+  share_plus
   sqlite3_flutter_libs
   system_theme
   url_launcher_windows

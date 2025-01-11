@@ -28,17 +28,21 @@ dependencies:
   flutter_local_notifications: ^18.0.1
   android_alarm_manager_plus: ^4.0.5
   flutter_colorpicker: ^1.0.3
-  share_extend: ^2.0.0
   shared_storage:
     git:
       url: https://github.com/Demizo/shared-storage
       ref: release
+  media_scanner:
+    git:
+      url: https://github.com/mbfakourii/media_scanner.git
+      ref: support_gradle_8
   device_info_plus: ^11.2.0
   fl_chart: ^0.66.2
   markdown_toolbar: ^0.5.0
   markdown_widget: ^2.3.2+3
 
   intl: any
+  share_plus: ^10.1.3
 dev_dependencies:
   flutter_lints: ^5.0.0
 

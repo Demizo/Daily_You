@@ -10,8 +10,7 @@ import 'package:daily_you/pages/image_view_page.dart';
 import 'package:daily_you/widgets/local_image_loader.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
 import 'package:markdown_widget/markdown_widget.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:share_extend/share_extend.dart';
+import 'package:share_plus/share_plus.dart';
 
 class EntryDetailPage extends StatefulWidget {
   final int entryId;
@@ -205,19 +204,17 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
 
             if (images.isNotEmpty) {
               // Share Image
-              final tempDir = await getTemporaryDirectory();
               var bytes = await EntriesDatabase.instance
                   .getImgBytes(images.first.imgPath);
               if (bytes != null) {
-                File temp =
-                    await File("${tempDir.path}/${images.first.imgPath}")
-                        .writeAsBytes(bytes);
-                await ShareExtend.share(temp.path, "image",
-                    extraText: sharedText);
+                await Share.shareXFiles(
+                    [XFile.fromData(bytes, mimeType: "images/*")],
+                    fileNameOverrides: [images.first.imgPath],
+                    text: sharedText);
               }
             } else {
               // Share text
-              ShareExtend.share(sharedText, "text");
+              Share.share(sharedText);
             }
           });
     }

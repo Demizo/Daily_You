@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:daily_you/config_manager.dart';
 import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/image.dart';

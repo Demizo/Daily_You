@@ -169,6 +169,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.9.3+3"
+  fixnum:
+    dependency: transitive
+    description:
+      name: fixnum
+      sha256: b6dc7065e46c974bc7c5f143080a6764ec7a4be6da1285ececdc37be96de53be
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.1"
   fl_chart:
     dependency: "direct main"
     description:
@@ -403,6 +411,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.11.1"
+  media_scanner:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: support_gradle_8
+      resolved-ref: "7bff48e28845c4fed3b997e95d39cd2d09382b2b"
+      url: "https://github.com/mbfakourii/media_scanner.git"
+    source: git
+    version: "2.1.0"
   meta:
     dependency: transitive
     description:
@@ -587,20 +604,28 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.1"
-  share_extend:
+  share_plus:
     dependency: "direct main"
     description:
-      name: share_extend
-      sha256: "98c26f04abae42b0d2080102a42a2653a867a4bec862be1e921cb0cf7cc00916"
+      name: share_plus
+      sha256: "6327c3f233729374d0abaafd61f6846115b2a481b4feddd8534211dc10659400"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.0"
+    version: "10.1.3"
+  share_plus_platform_interface:
+    dependency: transitive
+    description:
+      name: share_plus_platform_interface
+      sha256: cc012a23fc2d479854e6c80150696c4a5f5bb62cb89af4de1c505cf78d0a5d0b
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.0.2"
   shared_storage:
     dependency: "direct main"
     description:
       path: "."
       ref: release
-      resolved-ref: "9f643e8983c314edf9cac1dcf06a20169d481735"
+      resolved-ref: f3b12b798a2d042a25659557ae7da47baae41701
       url: "https://github.com/Demizo/shared-storage"
     source: git
     version: "0.8.0"
@@ -625,6 +650,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.10.1"
+  sprintf:
+    dependency: transitive
+    description:
+      name: sprintf
+      sha256: "1fc9ffe69d4df602376b52949af107d8f5703b77cda567c4d7d86a0693120f23"
+      url: "https://pub.dev"
+    source: hosted
+    version: "7.0.0"
   sqflite:
     dependency: "direct main"
     description:
@@ -825,6 +858,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.3"
+  uuid:
+    dependency: transitive
+    description:
+      name: uuid
+      sha256: a5be9ef6618a7ac1e964353ef476418026db906c4facdedaa299b7a2e71690ff
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.5.1"
   vector_math:
     dependency: transitive
     description:
