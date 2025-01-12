@@ -14,11 +14,22 @@ outputs = { self, nixpkgs, flake-utils }:
           allowUnfree = true;
         };
       };
-      buildToolsVersion = "34.0.0";
-      androidComposition = pkgs.androidenv.composeAndroidPackages {
+      buildToolsVersion = "35.0.0";
+      androidEnv = pkgs.androidenv.override { licenseAccepted = true; };
+      androidComposition = androidEnv.composeAndroidPackages {
         buildToolsVersions = [ buildToolsVersion "33.0.1" ];
-        platformVersions = [ "35" "34" ];
+        platformVersions = [ "35" "34" "33" "32" "31"];
         abiVersions = [ "armeabi-v7a" "arm64-v8a" ];
+        extraLicenses = [
+            "android-googletv-license"
+            "android-sdk-arm-dbt-license"
+            "android-sdk-license"
+            "android-sdk-preview-license"
+            "google-gdk-license"
+            "intel-android-extra-license"
+            "intel-android-sysimage-license"
+            "mips-android-sysimage-license"
+        ];
       };
       androidSdk = androidComposition.androidsdk;
     in
