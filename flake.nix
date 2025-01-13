@@ -19,7 +19,6 @@ outputs = { self, nixpkgs, flake-utils }:
       androidComposition = androidEnv.composeAndroidPackages {
         buildToolsVersions = [ buildToolsVersion "33.0.1" ];
         platformVersions = [ "35" "34" "33" "32" "31"];
-        abiVersions = [ "armeabi-v7a" "arm64-v8a" ];
         extraLicenses = [
             "android-googletv-license"
             "android-sdk-arm-dbt-license"
@@ -36,8 +35,11 @@ outputs = { self, nixpkgs, flake-utils }:
     {
       devShell =
         with pkgs; mkShell rec {
+          ANDROID_HOME = "${androidSdk}/libexec/android-sdk";
           ANDROID_SDK_ROOT = "${androidSdk}/libexec/android-sdk";
           JAVA_HOME = jdk17.home;
+          FLUTTER_ROOT = flutter;
+          DART_ROOT = "${flutter}/bin/cache/dart-sdk";
           buildInputs = [
             flutter
             androidSdk # The customized SDK that we've made above
