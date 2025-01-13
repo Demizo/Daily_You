@@ -41,7 +41,7 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
                   ElevatedButton.icon(
                     icon: Icon(
                       Icons.delete_rounded,
-                      color: Theme.of(context).colorScheme.surface,
+                      color: Theme.of(context).colorScheme.primary,
                       size: 24,
                     ),
                     label: const Padding(
