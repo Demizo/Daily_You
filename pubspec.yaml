@@ -43,6 +43,7 @@ dependencies:
 
   intl: any
   share_plus: ^10.1.3
+  cached_memory_image: ^1.5.0
 dev_dependencies:
   flutter_lints: ^5.0.0
 

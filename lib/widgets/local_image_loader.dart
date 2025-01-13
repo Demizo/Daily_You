@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:cached_memory_image/cached_memory_image.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/entries_database.dart';
 
@@ -25,8 +26,9 @@ class LocalImageLoader extends StatelessWidget {
 
             return FractionallySizedBox(
               widthFactor: 1,
-              child: Image.memory(
-                snapshot.data!,
+              child: CachedMemoryImage(
+		uniqueKey: imagePath,
+                bytes: snapshot.data!,
                 cacheWidth: cacheSize,
                 fit: BoxFit.cover,
                 errorBuilder: (BuildContext context, Object exception,
