@@ -40,6 +40,12 @@ class StatsProvider with ChangeNotifier {
     2: 0,
   };
 
+  DateTime selectedDate = DateTime.now();
+  void forceUpdate() {
+    notifyListeners();
+  }
+
+
   List<Entry> entries = List.empty();
   List<EntryImage> images = List.empty();
 

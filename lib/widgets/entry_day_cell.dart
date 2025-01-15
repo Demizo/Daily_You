@@ -85,35 +85,23 @@ class EntryDayCell extends StatelessWidget {
                     : Icon(
                         size: 57,
                         Icons.image_rounded,
-                        color: Theme.of(context).disabledColor.withOpacity(0.1),
+                        color: Theme.of(context).disabledColor.withValues(alpha: 0.1),
                       ),
                 Text(
                   '${date.day}',
-                  style: TextStyle(
+                  style: image == null ? 
+		  TextStyle(
                       fontSize: 18,
-                      color: (image != null) ? Colors.white : null,
+		      ) : TextStyle(
+                      fontSize: 18,
+                      color: Colors.white,
                       shadows: [
-                        if (image != null)
                           Shadow(
-                              color: Colors.black.withOpacity(0.5),
+                              color: Colors.black.withValues(alpha: 0.8),
                               blurRadius: 10,
-                              offset: Offset(1, 1)),
-                        if (image != null)
-                          Shadow(
-                              color: Colors.black.withOpacity(0.5),
-                              blurRadius: 10,
-                              offset: Offset(-1, -1)),
-                        if (image != null)
-                          Shadow(
-                              color: Colors.black.withOpacity(0.5),
-                              blurRadius: 10,
-                              offset: Offset(1, -1)),
-                        if (image != null)
-                          Shadow(
-                              color: Colors.black.withOpacity(0.5),
-                              blurRadius: 10,
-                              offset: Offset(-1, 1)),
-                      ]),
+                              offset: Offset(0, 0)),
+                      ]
+		      )
                 ),
               ],
             ),
