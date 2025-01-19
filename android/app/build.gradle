@@ -29,6 +29,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
+    namespace = "com.demizo.daily_you"
     compileSdkVersion flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
@@ -67,6 +68,9 @@ android {
     }
      buildTypes {
         release {
+            signingConfig signingConfigs.release
+        }
+        profile {
             signingConfig signingConfigs.release
         }
     }

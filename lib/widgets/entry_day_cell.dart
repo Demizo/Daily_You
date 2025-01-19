@@ -21,7 +21,7 @@ class EntryDayCell extends StatelessWidget {
     final statsProvider = Provider.of<StatsProvider>(context);
     final configProvider = Provider.of<ConfigProvider>(context);
 
-    var entries = StatsProvider.instance.entries
+    var entries = statsProvider.entries
         .where((entry) => isSameDay(entry.timeCreate, date))
         .toList();
     Entry? entry = entries.isNotEmpty ? entries.first : null;
@@ -87,34 +87,20 @@ class EntryDayCell extends StatelessWidget {
                         Icons.image_rounded,
                         color: Theme.of(context).disabledColor.withOpacity(0.1),
                       ),
-                Text(
-                  '${date.day}',
-                  style: TextStyle(
-                      fontSize: 18,
-                      color: (image != null) ? Colors.white : null,
-                      shadows: [
-                        if (image != null)
-                          Shadow(
-                              color: Colors.black.withOpacity(0.5),
-                              blurRadius: 10,
-                              offset: Offset(1, 1)),
-                        if (image != null)
-                          Shadow(
-                              color: Colors.black.withOpacity(0.5),
-                              blurRadius: 10,
-                              offset: Offset(-1, -1)),
-                        if (image != null)
-                          Shadow(
-                              color: Colors.black.withOpacity(0.5),
-                              blurRadius: 10,
-                              offset: Offset(1, -1)),
-                        if (image != null)
-                          Shadow(
-                              color: Colors.black.withOpacity(0.5),
-                              blurRadius: 10,
-                              offset: Offset(-1, 1)),
-                      ]),
-                ),
+                Text('${date.day}',
+                    style: image == null
+                        ? TextStyle(
+                            fontSize: 18,
+                          )
+                        : TextStyle(
+                            fontSize: 18,
+                            color: Colors.white,
+                            shadows: [
+                                Shadow(
+                                    color: Colors.black.withOpacity(0.8),
+                                    blurRadius: 6,
+                                    offset: Offset(0, 0)),
+                              ])),
               ],
             ),
           ),

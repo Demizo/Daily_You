@@ -1,8 +1,8 @@
 {
-    "java.configuration.updateBuildConfiguration": "interactive",
-    "cSpell.words": [
-        "Appimage",
-        "curr",
-        "persistable"
-    ]
+  "java.configuration.updateBuildConfiguration": "interactive",
+  "cSpell.words": [
+    "Appimage",
+    "curr",
+    "persistable"
+  ],
 }

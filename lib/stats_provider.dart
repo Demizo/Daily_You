@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:daily_you/config_manager.dart';
 import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/image.dart';
@@ -40,6 +39,12 @@ class StatsProvider with ChangeNotifier {
     1: 0,
     2: 0,
   };
+
+  DateTime selectedDate = DateTime.now();
+  void forceUpdate() {
+    notifyListeners();
+  }
+
 
   List<Entry> entries = List.empty();
   List<EntryImage> images = List.empty();

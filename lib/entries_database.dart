@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:daily_you/file_bytes_cache.dart';
 import 'package:daily_you/file_layer.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/stats_provider.dart';
@@ -9,6 +10,7 @@ import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:media_scanner/media_scanner.dart';
+import 'package:schedulers/schedulers.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
@@ -19,6 +21,9 @@ class EntriesDatabase {
   static final EntriesDatabase instance = EntriesDatabase._init();
 
   static Database? _database;
+
+  final FileBytesCache imageCache = FileBytesCache(maxCacheSize: 100 * 1024 * 1024);
+  final imgFetchScheduler = ParallelScheduler(5);
 
   EntriesDatabase._init();
 
@@ -297,9 +302,15 @@ DROP TABLE old_entries;
   }
 
   Future<Uint8List?> getImgBytes(String imageName) async {
+    // Fetch cache copy if present
+    var bytes = imageCache.get(imageName);
+    if (bytes != null) {
+      return bytes;
+    }
     // Fetch local copy if present
-    var bytes = await FileLayer.getFileBytes(await getInternalImgDatabasePath(),
-        name: imageName, useExternalPath: false);
+    var internalDir = await getInternalImgDatabasePath();
+    bytes = await imgFetchScheduler.run(() => FileLayer.getFileBytes(internalDir,
+        name: imageName, useExternalPath: false)).result;
     // Attempt to fetch file externally
     if (bytes == null && usingExternalImg()) {
       // Get and cache external image
@@ -310,6 +321,9 @@ DROP TABLE old_entries;
             await getInternalImgDatabasePath(), imageName, bytes,
             useExternalPath: false);
       }
+    }
+    if (bytes != null) {
+      imageCache.put(imageName, bytes);
     }
     return bytes;
   }
