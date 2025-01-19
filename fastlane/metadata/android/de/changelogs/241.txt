@@ -1,0 +1,5 @@
+Daily You v2.4.1 ist da! Hier sind die Änderungen:
+
+• Verbessertes Zwischenspeichern und Laden von Bildern
+• Verbesserte Abhängigkeiten
+• Verschiedene Leistungsverbesserungen

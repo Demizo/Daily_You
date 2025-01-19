@@ -1,0 +1,5 @@
+Daily You v2.4.1 has arrived! Here are the changes:
+
+• Improved image caching and loading
+• Upgraded dependencies
+• Various performance improvements
