@@ -38,10 +38,10 @@ outputs = { self, nixpkgs, flake-utils }:
           ANDROID_HOME = "${androidSdk}/libexec/android-sdk";
           ANDROID_SDK_ROOT = "${androidSdk}/libexec/android-sdk";
           JAVA_HOME = jdk17.home;
-          FLUTTER_ROOT = flutter;
-          DART_ROOT = "${flutter}/bin/cache/dart-sdk";
+          FLUTTER_ROOT = flutter324;
+          DART_ROOT = "${flutter324}/bin/cache/dart-sdk";
           buildInputs = [
-            flutter
+            flutter324
             androidSdk # The customized SDK that we've made above
             jdk17
           ];

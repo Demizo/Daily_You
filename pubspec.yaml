@@ -20,7 +20,7 @@ dependencies:
   permission_handler: ^11.0.1
   image_picker: ^1.0.0
   easy_debounce: ^2.0.3
-  table_calendar: ^3.0.9
+  table_calendar: ^3.2.0
   system_theme: ^3.1.2
   url_launcher: ^6.1.12
   icons_launcher: ^3.0.0
