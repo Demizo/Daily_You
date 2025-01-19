@@ -8,34 +8,13 @@ import 'package:daily_you/widgets/streak_card.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class StatsPage extends StatefulWidget {
+class StatsPage extends StatelessWidget {
   const StatsPage({super.key});
-
-  @override
-  State<StatsPage> createState() => _StatsPageState();
-}
-
-class _StatsPageState extends State<StatsPage> {
-  StatsRange statsRange = StatsRange.month;
-  bool isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-
-    updateStats();
-  }
-
-  Future updateStats() async {
-    setState(() => isLoading = true);
-    await StatsProvider.instance.updateStats();
-    setState(() => isLoading = false);
-  }
 
   @override
   Widget build(BuildContext context) => Center(
         child: SingleChildScrollView(
-          child: isLoading ? const SizedBox() : buildEntries(context),
+          child: buildEntries(context),
         ),
       );
 
@@ -75,9 +54,7 @@ class _StatsPageState extends State<StatsPage> {
           padding: const EdgeInsets.all(8.0),
           child: Center(
             child: StatsRangeSelector(
-              onSelectionChanged: (newSelection) {
-                statsRange = newSelection.first;
-              },
+              onSelectionChanged: (newSelection) {},
             ),
           ),
         ),
