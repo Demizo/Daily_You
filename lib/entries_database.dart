@@ -21,7 +21,7 @@ class EntriesDatabase {
 
   static Database? _database;
 
-  final FileBytesCache imageCache = FileBytesCache(maxCacheSize: 100 * 1024 * 1024);
+  final FileBytesCache imageCache = FileBytesCache(maxCacheSize: 20 * 1024 * 1024);
 
   EntriesDatabase._init();
 
