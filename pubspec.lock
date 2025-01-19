@@ -620,6 +620,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.28.0"
+  schedulers:
+    dependency: "direct main"
+    description:
+      name: schedulers
+      sha256: "11a3694c700735b85d6955ffebde32fd5e06ed5f52f2679e30973e6437fcc998"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1"
   scroll_to_index:
     dependency: transitive
     description:

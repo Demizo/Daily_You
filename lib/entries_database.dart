@@ -10,6 +10,7 @@ import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:media_scanner/media_scanner.dart';
+import 'package:schedulers/schedulers.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
@@ -21,7 +22,8 @@ class EntriesDatabase {
 
   static Database? _database;
 
-  final FileBytesCache imageCache = FileBytesCache(maxCacheSize: 20 * 1024 * 1024);
+  final FileBytesCache imageCache = FileBytesCache(maxCacheSize: 100 * 1024 * 1024);
+  final imgFetchScheduler = ParallelScheduler(5);
 
   EntriesDatabase._init();
 
@@ -306,8 +308,9 @@ DROP TABLE old_entries;
       return bytes;
     }
     // Fetch local copy if present
-    bytes = await FileLayer.getFileBytes(await getInternalImgDatabasePath(),
-        name: imageName, useExternalPath: false);
+    var internalDir = await getInternalImgDatabasePath();
+    bytes = await imgFetchScheduler.run(() => FileLayer.getFileBytes(internalDir,
+        name: imageName, useExternalPath: false)).result;
     // Attempt to fetch file externally
     if (bytes == null && usingExternalImg()) {
       // Get and cache external image
