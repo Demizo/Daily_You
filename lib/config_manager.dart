@@ -31,8 +31,13 @@ class ConfigManager {
     'followSystemColor': true,
     'accentColor': 0xff01d3ef,
     'dailyReminders': false,
+    'setReminderTime': false,
     'scheduledReminderHour': 12,
     'scheduledReminderMinute': 0,
+    'reminderStartHour': 9,
+    'reminderStartMinute': 0,
+    'reminderEndHour': 21,
+    'reminderEndMinute': 0,
     'defaultTemplate': -1,
   };
 

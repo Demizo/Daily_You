@@ -13,6 +13,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/theme_mode_provider.dart';
+import 'package:time_range_picker/time_range_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../config_manager.dart';
@@ -512,6 +513,37 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
+  Future<void> _selectTimeRange(BuildContext context) async {
+    ThemeData theme = Theme.of(context);
+    TimeRange currentRange = TimeManager.getReminderTimeRange();
+    TimeRange range = await showTimeRangePicker(
+        context: context,
+        use24HourFormat: false,
+        start: currentRange.startTime,
+        end: currentRange.endTime,
+        ticks: 24,
+        handlerColor: theme.colorScheme.primary,
+        strokeColor: theme.colorScheme.primary,
+        selectedColor: theme.colorScheme.primary,
+        backgroundColor: theme.disabledColor.withOpacity(0.2),
+        ticksColor: theme.colorScheme.surface,
+        interval: Duration(minutes: 10),
+        ticksWidth: 2,
+        autoAdjustLabels: false,
+        labels: [
+          ClockLabel.fromTime(
+              time: TimeOfDay(hour: 0, minute: 0), text: "12 AM"),
+          ClockLabel.fromTime(
+              time: TimeOfDay(hour: 6, minute: 6), text: "6 AM"),
+          ClockLabel.fromTime(
+              time: TimeOfDay(hour: 12, minute: 0), text: "12 PM"),
+          ClockLabel.fromTime(
+              time: TimeOfDay(hour: 18, minute: 6), text: "6 PM"),
+        ]);
+    await TimeManager.setReminderTimeRange(range);
+    setState(() {});
+  }
+
   Future<void> _loadTemplates() async {
     List<Template> templates = await EntriesDatabase.instance.getAllTemplates();
     setState(() {
@@ -793,13 +825,51 @@ class _SettingsPageState extends State<SettingsPage> {
                                 }),
                           ],
                         ),
-                        ElevatedButton.icon(
-                            icon: const Icon(Icons.schedule_rounded),
-                            onPressed: () async {
-                              _selectTime(context);
-                            },
-                            label: Text(TimeManager.timeOfDayString(
-                                TimeManager.scheduledReminderTime()))),
+                        if (ConfigManager.instance.getField('dailyReminders'))
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    "Set Reminder Time",
+                                    style: TextStyle(fontSize: 18),
+                                  ),
+                                  Text(
+                                    "Pick a set time for the reminder to occur",
+                                    style: TextStyle(fontSize: 14),
+                                  ),
+                                ],
+                              ),
+                              Switch(
+                                  value: ConfigManager.instance
+                                      .getField('setReminderTime'),
+                                  onChanged: (value) async {
+                                    await ConfigManager.instance
+                                        .setField('setReminderTime', value);
+                                    setState(() {});
+                                  }),
+                            ],
+                          ),
+                        if (ConfigManager.instance.getField('dailyReminders'))
+                          ConfigManager.instance.getField('setReminderTime')
+                              ? ElevatedButton.icon(
+                                  icon: const Icon(Icons.schedule_rounded),
+                                  onPressed: () async {
+                                    _selectTime(context);
+                                  },
+                                  label: Text(TimeManager.timeOfDayString(
+                                      TimeManager.scheduledReminderTime())))
+                              : ElevatedButton.icon(
+                                  icon: const Icon(Icons.timelapse_rounded),
+                                  onPressed: () async {
+                                    _selectTimeRange(context);
+                                  },
+                                  label: Text(TimeManager.timeRangeString(
+                                      TimeManager.getReminderTimeRange()))),
                       ],
                     ),
                   if (Platform.isAndroid) const Divider(),
