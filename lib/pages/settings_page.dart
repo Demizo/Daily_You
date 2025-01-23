@@ -9,6 +9,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:daily_you/entries_database.dart';
@@ -30,6 +31,7 @@ class _SettingsPageState extends State<SettingsPage> {
   bool isSyncing = false;
   List<Template> _templates = [];
   bool isLoading = true;
+  String versionString = "0.0.0";
 
   @override
   void initState() {
@@ -551,6 +553,8 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> _loadTemplates() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    versionString = packageInfo.version;
     List<Template> templates = await EntriesDatabase.instance.getAllTemplates();
     setState(() {
       _templates = templates;
@@ -1199,7 +1203,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           icon: const Icon(
                             Icons.new_releases_rounded,
                           ),
-                          label: const Text("2.4.1"),
+                          label: Text(versionString),
                           onPressed: () async {
                             await launchUrl(
                                 Uri.https(
