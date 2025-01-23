@@ -516,7 +516,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<void> _selectTimeRange(BuildContext context) async {
     ThemeData theme = Theme.of(context);
     TimeRange currentRange = TimeManager.getReminderTimeRange();
-    TimeRange range = await showTimeRangePicker(
+    TimeRange? range = await showTimeRangePicker(
         context: context,
         use24HourFormat: false,
         start: currentRange.startTime,
@@ -540,8 +540,14 @@ class _SettingsPageState extends State<SettingsPage> {
           ClockLabel.fromTime(
               time: TimeOfDay(hour: 18, minute: 6), text: "6 PM"),
         ]);
-    await TimeManager.setReminderTimeRange(range);
-    setState(() {});
+    if (range != null) {
+      await TimeManager.setReminderTimeRange(range);
+      if (ConfigManager.instance.getField('dailyReminders')) {
+        await NotificationManager.instance.stopDailyReminders();
+        await NotificationManager.instance.startScheduledDailyReminders();
+      }
+      setState(() {});
+    }
   }
 
   Future<void> _loadTemplates() async {
@@ -850,6 +856,8 @@ class _SettingsPageState extends State<SettingsPage> {
                                   onChanged: (value) async {
                                     await ConfigManager.instance
                                         .setField('setReminderTime', value);
+					await NotificationManager.instance.stopDailyReminders();
+					await NotificationManager.instance.startScheduledDailyReminders();
                                     setState(() {});
                                   }),
                             ],
