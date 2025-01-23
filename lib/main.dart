@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:daily_you/config_provider.dart';
@@ -12,6 +13,7 @@ import 'package:daily_you/layouts/responsive_layout.dart';
 import 'package:daily_you/theme_mode_provider.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:time_range_picker/time_range_picker.dart';
 import 'config_manager.dart';
 import 'package:provider/provider.dart';
 
@@ -45,13 +47,7 @@ void callbackDispatcher() async {
         0, 'Log Today!', 'Take your daily log...', platformChannelSpecifics);
   }
   EntriesDatabase.instance.close();
-  Duration timeUntilReminder;
-  DateTime dayToRemind = TimeManager.startOfNextDay();
-  DateTime reminderDateTime = TimeManager.addTimeOfDay(
-      dayToRemind, TimeManager.scheduledReminderTime());
-  timeUntilReminder = reminderDateTime.difference(DateTime.now());
-  await AndroidAlarmManager.oneShot(timeUntilReminder, 0, callbackDispatcher,
-      allowWhileIdle: true, exact: true);
+  setAlarm(firstSet: false);
 }
 
 void main() async {
@@ -74,11 +70,7 @@ void main() async {
     await NotificationManager.instance.init();
 
     await AndroidAlarmManager.initialize();
-
-    if (ConfigManager.instance.getField('dailyReminders')) {
-      await NotificationManager.instance.stopDailyReminders();
-      await NotificationManager.instance.startScheduledDailyReminders();
-    }
+    await NotificationManager.instance.dismissReminderNotification();
   }
 
   runApp(MultiProvider(providers: [
@@ -94,21 +86,48 @@ void main() async {
   ], builder: (context, child) => const MainApp()));
 }
 
-Future<void> setAlarm() async {
-  Duration timeUntilReminder;
-  DateTime dayToRemind;
-  if (TimeOfDay.now().hour < TimeManager.scheduledReminderTime().hour) {
-    dayToRemind = TimeManager.startOfDay(DateTime.now());
-  } else if (TimeOfDay.now().hour == TimeManager.scheduledReminderTime().hour &&
-      TimeOfDay.now().minute < TimeManager.scheduledReminderTime().minute) {
-    dayToRemind = TimeManager.startOfDay(DateTime.now());
+Future<void> setAlarm({bool firstSet = false}) async {
+  DateTime dayToRemind = TimeManager.startOfNextDay();
+  if (firstSet) {
+    if (ConfigManager.instance.getField('setReminderTime')) {
+      if (TimeOfDay.now().hour < TimeManager.scheduledReminderTime().hour) {
+	dayToRemind = TimeManager.startOfDay(DateTime.now());
+      } else if (TimeOfDay.now().hour == TimeManager.scheduledReminderTime().hour &&
+	  TimeOfDay.now().minute < TimeManager.scheduledReminderTime().minute) {
+	dayToRemind = TimeManager.startOfDay(DateTime.now());
+      } else {
+	dayToRemind = TimeManager.startOfNextDay();
+      }
+    } else {
+      TimeOfDay endTime = TimeManager.getReminderTimeRange().endTime;
+      if ((TimeOfDay.now().hour < endTime.hour) || ((TimeOfDay.now().hour == endTime.hour) && (TimeOfDay.now().minute < endTime.minute))) {
+	dayToRemind = TimeManager.startOfDay(DateTime.now());
+      }
+    }
+  } 
+  
+  DateTime reminderDateTime;
+  if (ConfigManager.instance.getField('setReminderTime')) {
+    reminderDateTime = TimeManager.addTimeOfDay(
+	dayToRemind, TimeManager.scheduledReminderTime());
   } else {
-    dayToRemind = TimeManager.startOfNextDay();
+    final random = Random();
+    TimeRange timeRange = TimeManager.getReminderTimeRange();
+    if (TimeManager.isSameDay(dayToRemind, DateTime.now())) {
+      timeRange.startTime = TimeOfDay.now(); 
+    }
+    
+    int randomHour = (random.nextInt(timeRange.endTime.hour - timeRange.startTime.hour + 1) + timeRange.startTime.hour);
+    int randomMinute = timeRange.endTime.hour > timeRange.startTime.hour ? (random.nextInt(60)) : (random.nextInt(timeRange.endTime.minute - timeRange.startTime.minute + 1) + timeRange.startTime.minute);
+    TimeOfDay randomTime = TimeOfDay(
+		  hour: randomHour,
+		  minute: randomMinute
+		 );
+
+    reminderDateTime = TimeManager.addTimeOfDay(dayToRemind, randomTime);
   }
-  DateTime reminderDateTime = TimeManager.addTimeOfDay(
-      dayToRemind, TimeManager.scheduledReminderTime());
-  timeUntilReminder = reminderDateTime.difference(DateTime.now());
-  await AndroidAlarmManager.oneShot(timeUntilReminder, 0, callbackDispatcher,
+
+  await AndroidAlarmManager.oneShotAt(reminderDateTime, 0, callbackDispatcher,
       allowWhileIdle: true, exact: true, rescheduleOnReboot: true);
 }
 

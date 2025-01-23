@@ -802,6 +802,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.2"
+  time_range_picker:
+    dependency: "direct main"
+    description:
+      name: time_range_picker
+      sha256: "220b144aaafb64fc07f372604ed79b8a7ff620171e20e34743ee19f183252178"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.3.0"
   timezone:
     dependency: transitive
     description:
