@@ -62,7 +62,7 @@ class TimeManager {
   }
 
   static String timeRangeString(TimeRange timeRange) {
-    return '${timeOfDayString(timeRange.startTime)} to ${timeOfDayString(timeRange.endTime)}';
+    return 'Between ${timeOfDayString(timeRange.startTime)} and ${timeOfDayString(timeRange.endTime)}';
   }
 
   static String timeOfDayString(TimeOfDay timeOfDay) {
