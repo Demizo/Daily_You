@@ -795,7 +795,8 @@ DROP TABLE old_entries;
   Future<bool> importImages() async {
     StatsProvider.instance.updateSyncStats(0, 0);
     final picker = ImagePicker();
-    final pickedFiles = await picker.pickMultiImage();
+    final pickedFiles = await picker.pickMultiImage(
+	imageQuality: ConfigManager.instance.getField('imageQuality'));
 
     List<String> externalImages = List.empty(growable: true);
     if (usingExternalImg()) {

@@ -876,8 +876,10 @@ class _SettingsPageState extends State<SettingsPage> {
                                   onChanged: (value) async {
                                     await ConfigManager.instance
                                         .setField('setReminderTime', value);
-				    await NotificationManager.instance.stopDailyReminders();
-				    await NotificationManager.instance.startScheduledDailyReminders();
+                                    await NotificationManager.instance
+                                        .stopDailyReminders();
+                                    await NotificationManager.instance
+                                        .startScheduledDailyReminders();
                                     setState(() {});
                                   }),
                             ],
@@ -961,6 +963,52 @@ class _SettingsPageState extends State<SettingsPage> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8.0),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    "Image Quality",
+                                    style: TextStyle(fontSize: 18),
+                                  ),
+                                ],
+                              ),
+                              DropdownButton<int>(
+                                underline: Container(),
+                                isDense: true,
+                                isExpanded: false,
+                                borderRadius: BorderRadius.circular(20),
+                                padding: const EdgeInsets.only(
+                                    left: 8, right: 4, top: 4, bottom: 4),
+                                value: ConfigManager.instance
+                                    .getField("imageQuality"),
+                                items: [
+                                  DropdownMenuItem<int>(
+                                      value: 100,
+                                      child: Text("No Compression")),
+                                  DropdownMenuItem<int>(
+                                      value: 90, child: Text("High")),
+                                  DropdownMenuItem<int>(
+                                      value: 75, child: Text("Medium")),
+                                  DropdownMenuItem<int>(
+                                      value: 50, child: Text("Low")),
+                                ],
+                                onChanged: (int? newValue) {
+                                  setState(() {
+                                    ConfigManager.instance
+                                        .setField("imageQuality", newValue);
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
                         const Text(
                           "Log Folder",
                           style: TextStyle(fontSize: 18),

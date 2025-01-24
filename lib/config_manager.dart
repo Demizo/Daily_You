@@ -39,6 +39,7 @@ class ConfigManager {
     'reminderEndHour': 21,
     'reminderEndMinute': 0,
     'defaultTemplate': -1,
+    'imageQuality': 100,
   };
 
   static final moodValueFieldMapping = {
