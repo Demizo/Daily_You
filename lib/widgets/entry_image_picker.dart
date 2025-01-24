@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:daily_you/config_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:daily_you/entries_database.dart';
@@ -110,7 +111,10 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
 
   Future<void> _takePicture() async {
     final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.camera);
+    final pickedFile = await picker.pickImage(
+      source: ImageSource.camera,
+      imageQuality: ConfigManager.instance.getField('imageQuality')
+    );
 
     if (pickedFile != null) {
       await saveImage(pickedFile);
@@ -119,7 +123,10 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
 
   Future<void> _choosePicture() async {
     final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    final pickedFile = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: ConfigManager.instance.getField('imageQuality')
+    );
 
     if (pickedFile != null) {
       await saveImage(pickedFile);
