@@ -1,0 +1,5 @@
+Daily You v2.5.0 ist da! Hier sind die Änderungen:
+
+• Zufällige tägliche Erinnerungszeiten
+• Optionale Bildkomprimierung hinzugefügt
+• Verschiedene Leistungsverbesserungen

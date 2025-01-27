@@ -1,0 +1,5 @@
+Daily You v2.5.0 has arrived! Here are the changes:
+
+• Randomized daily reminder times
+• Added optional image compression
+• Various performance improvements
