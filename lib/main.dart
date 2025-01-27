@@ -91,38 +91,44 @@ Future<void> setAlarm({bool firstSet = false}) async {
   if (firstSet) {
     if (ConfigManager.instance.getField('setReminderTime')) {
       if (TimeOfDay.now().hour < TimeManager.scheduledReminderTime().hour) {
-	dayToRemind = TimeManager.startOfDay(DateTime.now());
-      } else if (TimeOfDay.now().hour == TimeManager.scheduledReminderTime().hour &&
-	  TimeOfDay.now().minute < TimeManager.scheduledReminderTime().minute) {
-	dayToRemind = TimeManager.startOfDay(DateTime.now());
+        dayToRemind = TimeManager.startOfDay(DateTime.now());
+      } else if (TimeOfDay.now().hour ==
+              TimeManager.scheduledReminderTime().hour &&
+          TimeOfDay.now().minute < TimeManager.scheduledReminderTime().minute) {
+        dayToRemind = TimeManager.startOfDay(DateTime.now());
       } else {
-	dayToRemind = TimeManager.startOfNextDay();
+        dayToRemind = TimeManager.startOfNextDay();
       }
     } else {
       TimeOfDay endTime = TimeManager.getReminderTimeRange().endTime;
-      if ((TimeOfDay.now().hour < endTime.hour) || ((TimeOfDay.now().hour == endTime.hour) && (TimeOfDay.now().minute < endTime.minute))) {
-	dayToRemind = TimeManager.startOfDay(DateTime.now());
+      if ((TimeOfDay.now().hour < endTime.hour) ||
+          ((TimeOfDay.now().hour == endTime.hour) &&
+              (TimeOfDay.now().minute < endTime.minute))) {
+        dayToRemind = TimeManager.startOfDay(DateTime.now());
       }
     }
-  } 
-  
+  }
+
   DateTime reminderDateTime;
   if (ConfigManager.instance.getField('setReminderTime')) {
     reminderDateTime = TimeManager.addTimeOfDay(
-	dayToRemind, TimeManager.scheduledReminderTime());
+        dayToRemind, TimeManager.scheduledReminderTime());
   } else {
     final random = Random();
     TimeRange timeRange = TimeManager.getReminderTimeRange();
     if (TimeManager.isSameDay(dayToRemind, DateTime.now())) {
-      timeRange.startTime = TimeOfDay.now(); 
+      timeRange.startTime = TimeOfDay.now();
     }
-    
-    int randomHour = (random.nextInt(timeRange.endTime.hour - timeRange.startTime.hour + 1) + timeRange.startTime.hour);
-    int randomMinute = timeRange.endTime.hour > timeRange.startTime.hour ? (random.nextInt(60)) : (random.nextInt(timeRange.endTime.minute - timeRange.startTime.minute + 1) + timeRange.startTime.minute);
-    TimeOfDay randomTime = TimeOfDay(
-		  hour: randomHour,
-		  minute: randomMinute
-		 );
+
+    int randomHour =
+        (random.nextInt(timeRange.endTime.hour - timeRange.startTime.hour + 1) +
+            timeRange.startTime.hour);
+    int randomMinute = timeRange.endTime.hour > timeRange.startTime.hour
+        ? (random.nextInt(60))
+        : (random.nextInt(
+                timeRange.endTime.minute - timeRange.startTime.minute + 1) +
+            timeRange.startTime.minute);
+    TimeOfDay randomTime = TimeOfDay(hour: randomHour, minute: randomMinute);
 
     reminderDateTime = TimeManager.addTimeOfDay(dayToRemind, randomTime);
   }
