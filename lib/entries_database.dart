@@ -10,6 +10,7 @@ import 'package:daily_you/stats_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:daily_you/models/entry.dart';
+import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:flutter/foundation.dart';
 import 'package:media_scanner/media_scanner.dart';
@@ -73,6 +74,26 @@ CREATE TABLE $imagesTable (
     ${EntryImageFields.imgRank} INTEGER NOT NULL,
     ${EntryImageFields.timeCreate} DATETIME NOT NULL DEFAULT (DATETIME('now')),
     FOREIGN KEY (${EntryImageFields.entryId}) REFERENCES $entriesTable (id)
+)
+''');
+    await db.execute('''
+CREATE TABLE $tagsTable (
+  ${TagsFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  ${TagsFields.name} TEXT NOT NULL,
+  ${TagsFields.timeCreate} DATETIME NOT NULL DEFAULT (DATETIME('now')),
+  ${TagsFields.timeModified} DATETIME NOT NULL DEFAULT (DATETIME('now'))
+)
+''');
+    await createDefaultTags();
+    await db.execute('''
+CREATE TABLE $entryTagsTable (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    entry_id INTEGER NOT NULL,
+    tag_id INTEGER NOT NULL,
+    value INTEGER,
+    time_create DATETIME NOT NULL DEFAULT (DATETIME('now')),
+    FOREIGN KEY (entry_id) REFERENCES $entriesTable (id)
+    FOREIGN KEY (tag_id) REFERENCES $tagsTable (id)
 )
 ''');
   }
@@ -140,6 +161,103 @@ DROP TABLE old_entries;
     ''');
       });
     }
+
+    if (oldVersion <= 3) {
+      await db.execute('''
+CREATE TABLE $tagsTable (
+  ${TagsFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  ${TagsFields.name} TEXT NOT NULL,
+  ${TagsFields.timeCreate} DATETIME NOT NULL DEFAULT (DATETIME('now')),
+  ${TagsFields.timeModified} DATETIME NOT NULL DEFAULT (DATETIME('now'))
+)
+''');
+      await createDefaultTags();
+      await db.execute('''
+CREATE TABLE $entryTagsTable (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    entry_id INTEGER NOT NULL,
+    tag_id INTEGER NOT NULL,
+    value INTEGER,
+    time_create DATETIME NOT NULL DEFAULT (DATETIME('now')),
+    FOREIGN KEY (entry_id) REFERENCES $entriesTable (id)
+    FOREIGN KEY (tag_id) REFERENCES $tagsTable (id)
+)
+''');
+    }
+  }
+
+  // Tag Methods
+  Future createDefaultTags() async {
+    await createTag(Tag(
+        name: "Favorite",
+        timeCreate: DateTime.now(),
+        timeModified: DateTime.now()));
+
+    await createTag(Tag(
+        name: "Mood",
+        timeCreate: DateTime.now(),
+        timeModified: DateTime.now()));
+  }
+
+  Future<Tag> createTag(Tag tag) async {
+    final db = _database!;
+
+    final id = await db.insert(tagsTable, tag.toJson());
+    if (usingExternalDb()) await updateExternalDatabase();
+    return tag.copy(id: id);
+  }
+
+  Future<Tag?> getTag(int id) async {
+    final db = _database!;
+
+    final maps = await db.query(
+      tagsTable,
+      columns: TagsFields.values,
+      where: '${TagsFields.id} = ?',
+      whereArgs: [id],
+    );
+
+    if (maps.isNotEmpty) {
+      return Tag.fromJson(maps.first);
+    } else {
+      return null;
+    }
+  }
+
+  Future<List<Tag>> getAllTags() async {
+    final db = _database!;
+
+    final result =
+        await db.query(tagsTable, orderBy: '${TagsFields.name} DESC');
+
+    return result.map((json) => Tag.fromJson(json)).toList();
+  }
+
+  Future<int> updateTag(Tag tag) async {
+    final db = _database!;
+
+    final id = await db.update(
+      tagsTable,
+      tag.toJson(),
+      where: '${TagsFields.id} = ?',
+      whereArgs: [tag.id],
+    );
+
+    if (usingExternalDb()) await updateExternalDatabase();
+    return id;
+  }
+
+  Future<int> deleteTag(int id) async {
+    final db = _database!;
+
+    final removedId = await db.delete(
+      tagsTable,
+      where: '${TagsFields.id} = ?',
+      whereArgs: [id],
+    );
+
+    if (usingExternalDb()) await updateExternalDatabase();
+    return removedId;
   }
 
   // Template Methods
