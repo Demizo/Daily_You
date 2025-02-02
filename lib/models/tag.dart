@@ -1,5 +1,4 @@
 const String tagsTable = 'tags';
-const String entryTagsTable = 'entryTags';
 
 class TagsFields {
   static const List<String> values = [id, name, timeCreate, timeModified];
@@ -25,7 +24,6 @@ class Tag {
   Tag copy({
     int? id,
     String? name,
-    int? value,
     DateTime? timeCreate,
     DateTime? timeModified,
   }) =>

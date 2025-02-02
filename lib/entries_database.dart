@@ -10,6 +10,7 @@ import 'package:daily_you/stats_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:daily_you/models/entry.dart';
+import 'package:daily_you/models/entry_tag.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:flutter/foundation.dart';
@@ -87,13 +88,14 @@ CREATE TABLE $tagsTable (
     await createDefaultTags();
     await db.execute('''
 CREATE TABLE $entryTagsTable (
-    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    entry_id INTEGER NOT NULL,
-    tag_id INTEGER NOT NULL,
-    value INTEGER,
-    time_create DATETIME NOT NULL DEFAULT (DATETIME('now')),
-    FOREIGN KEY (entry_id) REFERENCES $entriesTable (id)
-    FOREIGN KEY (tag_id) REFERENCES $tagsTable (id)
+    ${EntryTagsFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    ${EntryTagsFields.entryId} INTEGER NOT NULL,
+    ${EntryTagsFields.tagId} INTEGER NOT NULL,
+    ${EntryTagsFields.value} INTEGER,
+    ${EntryTagsFields.timeCreate} DATETIME NOT NULL DEFAULT (DATETIME('now')),
+    ${EntryTagsFields.timeModified} DATETIME NOT NULL DEFAULT (DATETIME('now')),
+    FOREIGN KEY (${EntryTagsFields.entryId}) REFERENCES $entriesTable (id)
+    FOREIGN KEY (${EntryTagsFields.tagId}) REFERENCES $tagsTable (id)
 )
 ''');
   }
@@ -174,13 +176,14 @@ CREATE TABLE $tagsTable (
       await createDefaultTags();
       await db.execute('''
 CREATE TABLE $entryTagsTable (
-    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    entry_id INTEGER NOT NULL,
-    tag_id INTEGER NOT NULL,
-    value INTEGER,
-    time_create DATETIME NOT NULL DEFAULT (DATETIME('now')),
-    FOREIGN KEY (entry_id) REFERENCES $entriesTable (id)
-    FOREIGN KEY (tag_id) REFERENCES $tagsTable (id)
+    ${EntryTagsFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    ${EntryTagsFields.entryId} INTEGER NOT NULL,
+    ${EntryTagsFields.tagId} INTEGER NOT NULL,
+    ${EntryTagsFields.value} INTEGER,
+    ${EntryTagsFields.timeCreate} DATETIME NOT NULL DEFAULT (DATETIME('now')),
+    ${EntryTagsFields.timeModified} DATETIME NOT NULL DEFAULT (DATETIME('now')),
+    FOREIGN KEY (${EntryTagsFields.entryId}) REFERENCES $entriesTable (id)
+    FOREIGN KEY (${EntryTagsFields.tagId}) REFERENCES $tagsTable (id)
 )
 ''');
     }
