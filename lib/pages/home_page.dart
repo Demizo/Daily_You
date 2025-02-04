@@ -9,6 +9,7 @@ import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/entry_calendar.dart';
 import 'package:daily_you/widgets/large_entry_card_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/pages/entry_detail_page.dart';
@@ -128,10 +129,10 @@ class _HomePageState extends State<HomePage> {
                               color: Theme.of(context).colorScheme.surface,
                               size: 30,
                             ),
-                            label: const Padding(
+                            label: Padding(
                               padding: EdgeInsets.all(2.0),
                               child: Text(
-                                "Log Today...",
+                                AppLocalizations.of(context)!.helloWorld,
                                 style: TextStyle(fontSize: 24),
                               ),
                             ),

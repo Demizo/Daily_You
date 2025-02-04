@@ -53,10 +53,10 @@ packages:
     dependency: transitive
     description:
       name: clock
-      sha256: fddb70d9b5277016c77a80201021d40a2247104d9f4aa7bab7157b7e3f05b84b
+      sha256: cb6d7f03e1de671e34607e909a7213e31d7752be4fb66a86d29fe1eb14bfb5cf
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.2"
+    version: "1.1.1"
   collection:
     dependency: transitive
     description:
@@ -254,6 +254,11 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "8.0.0"
+  flutter_localizations:
+    dependency: "direct main"
+    description: flutter
+    source: sdk
+    version: "0.0.0"
   flutter_markdown:
     dependency: "direct main"
     description:
@@ -383,10 +388,10 @@ packages:
     dependency: "direct main"
     description:
       name: intl
-      sha256: "00f33b908655e606b86d2ade4710a231b802eec6f11e87e4ea3783fd72077a50"
+      sha256: d6f56758b7d3014a48af9701c085700aac781a92a87a62b1333b46d8879661cf
       url: "https://pub.dev"
     source: hosted
-    version: "0.20.1"
+    version: "0.19.0"
   lints:
     dependency: transitive
     description:
@@ -480,10 +485,10 @@ packages:
     dependency: "direct main"
     description:
       name: path
-      sha256: "75cca69d1490965be98c73ceaea117e8a04dd21217b37b292c9ddbec0d955bc5"
+      sha256: "087ce49c3f0dc39180befefc60fdb4acd8f8620e5682fe2476afd0b3688bb4af"
       url: "https://pub.dev"
     source: hosted
-    version: "1.9.1"
+    version: "1.9.0"
   path_provider:
     dependency: "direct main"
     description:
@@ -806,10 +811,10 @@ packages:
     dependency: "direct main"
     description:
       name: table_calendar
-      sha256: "0c0c6219878b363a2d5f40c7afb159d845f253d061dc3c822aa0d5fe0f721982"
+      sha256: b2896b7c86adf3a4d9c911d860120fe3dbe03c85db43b22fd61f14ee78cdbb63
       url: "https://pub.dev"
     source: hosted
-    version: "3.2.0"
+    version: "3.1.3"
   term_glyph:
     dependency: transitive
     description:

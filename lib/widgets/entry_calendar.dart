@@ -14,6 +14,7 @@ class EntryCalendar extends StatelessWidget {
   Widget build(BuildContext context) {
     final statsProvider = Provider.of<StatsProvider>(context);
     return TableCalendar(
+      locale: Localizations.localeOf(context).languageCode,
       rowHeight: 57,
       sixWeekMonthsEnforced: true,
       availableCalendarFormats: const {

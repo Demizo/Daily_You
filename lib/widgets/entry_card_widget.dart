@@ -21,7 +21,7 @@ class EntryCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final time = DateFormat.yMMMd().format(entry.timeCreate);
+    final time = DateFormat.yMMMd(Localizations.localeOf(context).languageCode).format(entry.timeCreate);
     return Stack(alignment: Alignment.bottomLeft, children: [
       Card(
         clipBehavior: Clip.antiAlias,

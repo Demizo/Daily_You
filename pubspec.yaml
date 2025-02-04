@@ -9,6 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
   sqflite: 
   path_provider: 
   sqflite_common_ffi:
@@ -20,7 +22,7 @@ dependencies:
   permission_handler: ^11.0.1
   image_picker: ^1.0.0
   easy_debounce: ^2.0.3
-  table_calendar: ^3.2.0
+  table_calendar: ^3.1.3
   system_theme: ^3.1.2
   url_launcher: ^6.1.12
   icons_launcher: ^3.0.0
@@ -41,7 +43,7 @@ dependencies:
   markdown_toolbar: ^0.5.0
   markdown_widget: ^2.3.2+3
 
-  intl: any
+  intl: ^0.19.0
   share_plus: ^10.1.3
   cached_memory_image: ^1.5.0
   schedulers: ^1.0.1
@@ -51,6 +53,7 @@ dev_dependencies:
   flutter_lints: ^5.0.0
 
 flutter:
+  generate: true
   uses-material-design: true
 
 icons_launcher:

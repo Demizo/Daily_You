@@ -8,6 +8,7 @@ import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/stats_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:daily_you/layouts/mobile_scaffold.dart';
 import 'package:daily_you/layouts/responsive_layout.dart';
 import 'package:daily_you/theme_mode_provider.dart';
@@ -194,6 +195,8 @@ class _MainAppState extends State<MainApp> {
             title: 'Daily You',
             themeMode: themeModeProvider.themeMode,
             debugShowCheckedModeBanner: false,
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             theme: ThemeData(
               useMaterial3: true,
               colorScheme: ColorScheme.fromSeed(
