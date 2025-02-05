@@ -35,7 +35,7 @@ class EntryCalendar extends StatelessWidget {
             children: [
               GestureDetector(
                 child: Text(
-                  DateFormat("MMMM y").format(date).toString(),
+                  DateFormat("MMMM y", Localizations.localeOf(context).languageCode).format(date).toString(),
                   style: const TextStyle(fontSize: 18),
                 ),
                 onTap: () async {

@@ -44,6 +44,7 @@ void callbackDispatcher() async {
       android: androidPlatformChannelSpecifics,
     );
 
+    //TODO: Need a way to localize notification text
     await flutterLocalNotificationsPlugin.show(
         0, 'Log Today!', 'Take your daily log...', platformChannelSpecifics);
   }
@@ -192,6 +193,8 @@ class _MainAppState extends State<MainApp> {
           FocusManager.instance.primaryFocus?.unfocus();
         },
         child: MaterialApp(
+            onGenerateTitle: (context) =>
+                AppLocalizations.of(context)!.appTitle,
             title: 'Daily You',
             themeMode: themeModeProvider.themeMode,
             debugShowCheckedModeBanner: false,
@@ -250,6 +253,7 @@ class _MainAppState extends State<MainApp> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
+                                  // TODO: Need build context. Perhaps use onRouteGenerate
                                   "Error",
                                   style: TextStyle(
                                       fontSize: 36,

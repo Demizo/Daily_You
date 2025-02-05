@@ -102,7 +102,7 @@ class _HomePageState extends State<HomePage> {
     Entry? todayEntry;
 
     List<Flashback> flashbacks =
-        FlashbackManager.getFlashbacks(StatsProvider.instance.entries);
+        FlashbackManager.getFlashbacks(context, StatsProvider.instance.entries);
 
     var entries = statsProvider.entries;
     if (entries.isNotEmpty && TimeManager.isToday(entries.first.timeCreate)) {
@@ -113,28 +113,48 @@ class _HomePageState extends State<HomePage> {
       child: isLoading
           ? const SizedBox()
           : Stack(alignment: Alignment.topCenter, children: [
-              buildEntries(flashbacks),
+              buildEntries(context, flashbacks),
               Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   if (todayEntry == null)
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: ElevatedButton.icon(
-                            icon: Icon(
-                              Icons.add_circle_rounded,
-                              color: Theme.of(context).colorScheme.surface,
-                              size: 30,
-                            ),
-                            label: Padding(
-                              padding: EdgeInsets.all(2.0),
-                              child: Text(
-                                AppLocalizations.of(context)!.helloWorld,
-                                style: TextStyle(fontSize: 24),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                      	crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          if (Platform.isAndroid)
+                            IconButton(
+                              icon: const Icon(
+                                Icons.camera_alt_rounded,
+                                size: 24,
                               ),
+                              onPressed: () async {
+                                await Navigator.of(context)
+                                    .push(MaterialPageRoute(
+                                  builder: (context) => const AddEditEntryPage(
+                                    openCamera: true,
+                                  ),
+                                ));
+                              },
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.all(8),
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.primary,
+                                foregroundColor:
+                                    Theme.of(context).colorScheme.surface,
+                                elevation: 3,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(80.0),
+                                ),
+                              ),
+                            ),
+                          IconButton(
+                            icon: Icon(
+                              Icons.add_rounded,
+                              color: Theme.of(context).colorScheme.surface,
+                              size: 36,
                             ),
                             onPressed: () async {
                               await Navigator.of(context)
@@ -150,38 +170,12 @@ class _HomePageState extends State<HomePage> {
                                   Theme.of(context).colorScheme.surface,
                               elevation: 3,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20.0),
-                              ),
-                            ),
-                          ),
-                        ),
-                        if (Platform.isAndroid)
-                          IconButton(
-                            icon: const Icon(
-                              Icons.camera_alt_rounded,
-                              size: 30,
-                            ),
-                            onPressed: () async {
-                              await Navigator.of(context)
-                                  .push(MaterialPageRoute(
-                                builder: (context) => const AddEditEntryPage(
-                                  openCamera: true,
-                                ),
-                              ));
-                            },
-                            style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.all(8),
-                              backgroundColor:
-                                  Theme.of(context).colorScheme.primary,
-                              foregroundColor:
-                                  Theme.of(context).colorScheme.surface,
-                              elevation: 3,
-                              shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(80.0),
                               ),
                             ),
                           ),
-                      ],
+                        ],
+                      ),
                     ),
                 ],
               ),
@@ -189,16 +183,16 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget buildEntries(List<Flashback> flashbacks) => ListView(children: [
+  Widget buildEntries(BuildContext context, List<Flashback> flashbacks) => ListView(children: [
         const Center(
             child: SizedBox(height: 430, width: 400, child: EntryCalendar())),
         Card(
           child:
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            const Padding(
+            Padding(
               padding: EdgeInsets.all(8.0),
               child: Text(
-                "Flashbacks",
+                AppLocalizations.of(context)!.flashbacksTitle,
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.normal),
               ),
             ),
@@ -216,7 +210,7 @@ class _HomePageState extends State<HomePage> {
         flashbacks.isEmpty
             ? Center(
                 child: Text(
-                  "No flashbacks yet...",
+		  AppLocalizations.of(context)!.flaskbacksEmpty,
                   style: TextStyle(
                       fontSize: 18, color: Theme.of(context).disabledColor),
                 ),

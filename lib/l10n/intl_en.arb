@@ -1,9 +1,31 @@
 {
-  "helloWorld": "Hello World!",
+  "appTitle": "Daily You",
+
   "pageHomeTitle": "Home",
+
+  "flashbacksTitle": "Flashbacks",
+  "flaskbacksEmpty": "No Flashbacks Yet...",
+  "flashbackGoodDay": "A Good Day",
+  "flashbackRandomDay": "A Random Day",
+  "flashbackWeek": "{count, plural, one{{count} Week Ago} other{{count} Week Ago}}",
+  "flashbackMonth": "{count, plural, one{{count} Month Ago} other{{count} Months Ago}}",
+  "flashbackYear": "{count, plural, one{{count} Year Ago} other{{count} Years Ago}}",
+
+
+
   "pageGalleryTitle": "Gallery",
+  
+  "searchLogsHint": "Search Logs...",
+  "logCount": "{count, plural, one{{count} log} other{{count} logs}}",
+  "noLogs": "No Logs...",
+  "sortDateTitle": "Date",
+  "sortOrderAscendingTitle": "Ascending",
+  "sortOrderDescendingTitle": "Descending",
+
+
 
   "pageStatisticsTitle": "Statistics",
+
   "statisticsRangeOneMonth": "1 Month",
   "statisticsRangeSixMonths": "6 Months",
   "statisticsRangeOneYear": "1 Year",
@@ -13,6 +35,16 @@
   "streakCurrent": "Current Streak",
   "streakLongest": "Longest Streak",
   "streakSinceBadDay": "Days Since a Bad Day",
+
+
+
+  "errorTitle": "Error",
+
+  "errorExternalStorageAccessTitle": "Can't access your external storage location!",
+  "errorExternalStorageAccessDescription": "If you are using network storage make sure the service is online and you have network access.\n\nOtherwise, the app may have lost permissions for the external folder. Go to settings, and reselect the external folder to grant access.\n\nWarning, changes will not be synced until restore access to the external storage location!",
+  "errorExternalStorageAccessContinue": "Continue With Local Database",
+
+
 
   "tagMoodTitle": "Mood"
 }

@@ -2,6 +2,7 @@ import 'package:daily_you/config_manager.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/widgets/large_entry_card_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/widgets/entry_card_widget.dart';
@@ -80,7 +81,6 @@ class _EntriesPageState extends State<EntriesPage> {
       builder: (BuildContext context) {
         return StatefulBuilder(
             builder: (context, setState) => AlertDialog(
-                  title: const Text('Sort by...'),
                   content: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -90,7 +90,7 @@ class _EntriesPageState extends State<EntriesPage> {
                         onChanged: (value) => setState(() {
                           switchOrderBy(value!);
                         }),
-                        title: const Text('Date'),
+                        title: Text(AppLocalizations.of(context)!.sortDateTitle),
                       ),
                       RadioListTile<int>(
                         value: 1,
@@ -98,7 +98,7 @@ class _EntriesPageState extends State<EntriesPage> {
                         onChanged: (value) => setState(() {
                           switchOrderBy(value!);
                         }),
-                        title: const Text('Mood'),
+                        title: Text(AppLocalizations.of(context)!.tagMoodTitle),
                       ),
                       const Divider(),
                       RadioListTile<bool>(
@@ -107,7 +107,7 @@ class _EntriesPageState extends State<EntriesPage> {
                         onChanged: (value) => setState(() {
                           switchSortOrder(value!);
                         }),
-                        title: const Text('Ascending'),
+                        title: Text(AppLocalizations.of(context)!.sortOrderAscendingTitle),
                       ),
                       RadioListTile<bool>(
                         value: false,
@@ -115,7 +115,7 @@ class _EntriesPageState extends State<EntriesPage> {
                         onChanged: (value) => setState(() {
                           switchSortOrder(value!);
                         }),
-                        title: const Text('Descending'),
+                        title: Text(AppLocalizations.of(context)!.sortOrderDescendingTitle),
                       ),
                     ],
                   ),
@@ -144,7 +144,7 @@ class _EntriesPageState extends State<EntriesPage> {
                         trailing: [
                           Padding(
                             padding: const EdgeInsets.only(right: 8.0),
-                            child: Text("$entryCount logs"),
+                            child: Text(AppLocalizations.of(context)!.logCount(entryCount)),
                           ),
                           IconButton(
                               onPressed: () async {
@@ -159,7 +159,7 @@ class _EntriesPageState extends State<EntriesPage> {
                               icon: const Icon(Icons.sort_rounded),
                               onPressed: () => _showSortSelectionPopup()),
                         ],
-                        hintText: 'Search logs...',
+                        hintText: AppLocalizations.of(context)!.searchLogsHint,
                         padding: WidgetStateProperty.all(
                             const EdgeInsets.only(left: 8, right: 8)),
                         elevation: WidgetStateProperty.all(1),
@@ -176,9 +176,9 @@ class _EntriesPageState extends State<EntriesPage> {
       );
 
   Widget buildEntries() => entries.isEmpty
-      ? const Center(
+      ? Center(
           child: Text(
-            'No Logs...',
+	    AppLocalizations.of(context)!.noLogs,
           ),
         )
       : GridView.builder(
