@@ -1,3 +1,18 @@
 {
-  "helloWorld": "Hello World!"
+  "helloWorld": "Hello World!",
+  "pageHomeTitle": "Home",
+  "pageGalleryTitle": "Gallery",
+
+  "pageStatisticsTitle": "Statistics",
+  "statisticsRangeOneMonth": "1 Month",
+  "statisticsRangeSixMonths": "6 Months",
+  "statisticsRangeOneYear": "1 Year",
+  "statisticsRangeAllTime": "All Time",
+  "chartSummaryTitle": "{tag} Summary",
+  "chartByDayTitle": "{tag} By Day",
+  "streakCurrent": "Current Streak",
+  "streakLongest": "Longest Streak",
+  "streakSinceBadDay": "Days Since a Bad Day",
+
+  "tagMoodTitle": "Mood"
 }

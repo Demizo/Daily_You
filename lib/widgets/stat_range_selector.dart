@@ -1,5 +1,6 @@
 import 'package:daily_you/stats_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 enum StatsRange { month, sixMonths, year, allTime }
@@ -18,22 +19,22 @@ class _StatsRangeSelectorState extends State<StatsRangeSelector> {
     final statsProvider = Provider.of<StatsProvider>(context);
     return SegmentedButton<StatsRange>(
       showSelectedIcon: false,
-      segments: const <ButtonSegment<StatsRange>>[
+      segments: <ButtonSegment<StatsRange>>[
         ButtonSegment<StatsRange>(
           value: StatsRange.month,
-          label: Text('1 Month'),
+          label: Text(AppLocalizations.of(context)!.statisticsRangeOneMonth),
         ),
         ButtonSegment<StatsRange>(
           value: StatsRange.sixMonths,
-          label: Text('6 Months'),
+          label: Text(AppLocalizations.of(context)!.statisticsRangeSixMonths),
         ),
         ButtonSegment<StatsRange>(
           value: StatsRange.year,
-          label: Text('1 Year'),
+          label: Text(AppLocalizations.of(context)!.statisticsRangeOneYear),
         ),
         ButtonSegment<StatsRange>(
           value: StatsRange.allTime,
-          label: Text('All Time'),
+          label: Text(AppLocalizations.of(context)!.statisticsRangeAllTime),
         ),
       ],
       selected: <StatsRange>{statsProvider.statsRange},

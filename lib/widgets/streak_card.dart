@@ -35,7 +35,7 @@ class StreakCard extends StatelessWidget {
                           fontSize: 16,
                           color: Theme.of(context).colorScheme.secondary)),
                   Padding(
-                    padding: const EdgeInsets.only(right: 6.0),
+                    padding: const EdgeInsets.only(left: 6.0, right: 6.0),
                     child: Text(number.toString(),
                         style: TextStyle(
                             fontSize: 16,

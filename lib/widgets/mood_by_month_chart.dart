@@ -129,7 +129,7 @@ class _MoodByMonthChartState extends State<MoodByMonthChart> {
             icon: const Icon(Icons.arrow_back_ios_new_rounded),
           ),
         Text(
-            "${_formatMonthYear(keys.first, context)} to ${_formatMonthYear(keys.last, context)}"),
+            "${_formatMonthYear(keys.first, context)} - ${_formatMonthYear(keys.last, context)}"),
         if (_totalPages() > 1)
           IconButton(
             onPressed: currentPage > 0 ? _goToPreviousPage : null,

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:daily_you/config_manager.dart';
 import 'package:daily_you/notification_manager.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:daily_you/pages/calendar_page.dart';
 import 'package:daily_you/pages/entries_page.dart';
 import 'package:daily_you/pages/home_page.dart';
@@ -86,18 +87,18 @@ class _MobileScaffoldState extends State<MobileScaffold> {
             currentIndex = index;
           });
         },
-        destinations: const [
+        destinations: [
           NavigationDestination(
-            icon: Icon(Icons.home_rounded),
-            label: 'Home',
+            icon: const Icon(Icons.home_rounded),
+            label: AppLocalizations.of(context)!.pageHomeTitle,
           ),
           NavigationDestination(
-            icon: Icon(Icons.photo_library_rounded),
-            label: 'Gallery',
+            icon: const Icon(Icons.photo_library_rounded),
+            label: AppLocalizations.of(context)!.pageGalleryTitle,
           ),
           NavigationDestination(
-            icon: Icon(Icons.auto_graph_rounded),
-            label: 'Statistics',
+            icon: const Icon(Icons.auto_graph_rounded),
+            label: AppLocalizations.of(context)!.pageStatisticsTitle,
           ),
         ],
       ),
