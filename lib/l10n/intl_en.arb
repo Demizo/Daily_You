@@ -38,10 +38,8 @@
 
 
 
-  "errorTitle": "Error",
-
-  "errorExternalStorageAccessTitle": "Can't access your external storage location!",
-  "errorExternalStorageAccessDescription": "If you are using network storage make sure the service is online and you have network access.\n\nOtherwise, the app may have lost permissions for the external folder. Go to settings, and reselect the external folder to grant access.\n\nWarning, changes will not be synced until restore access to the external storage location!",
+  "errorExternalStorageAccessTitle": "Can't Access External Storage",
+  "errorExternalStorageAccessDescription": "If you are using network storage make sure the service is online and you have network access.\n\nOtherwise, the app may have lost permissions for the external folder. Go to settings, and reselect the external folder to grant access.\n\nWarning, changes will not be synced until you restore access to the external storage location!",
   "errorExternalStorageAccessContinue": "Continue With Local Database",
 
 
