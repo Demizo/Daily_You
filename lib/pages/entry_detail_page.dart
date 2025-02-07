@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:daily_you/models/image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/pages/edit_entry_page.dart';
@@ -21,7 +22,7 @@ class EntryDetailPage extends StatefulWidget {
   });
 
   @override
-  _EntryDetailPageState createState() => _EntryDetailPageState();
+  State<EntryDetailPage> createState() => _EntryDetailPageState();
 }
 
 class _EntryDetailPageState extends State<EntryDetailPage> {
@@ -52,7 +53,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
     final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-        actions: isLoading ? [] : [shareButton(), editButton()],
+        actions: isLoading ? [] : [shareButton(context), editButton()],
       ),
       body: isLoading
           ? const Center(child: SizedBox())
@@ -128,7 +129,9 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              DateFormat.yMMMEd().format(entry.timeCreate),
+                              DateFormat.yMMMEd(Localizations.localeOf(context)
+                                      .languageCode)
+                                  .format(entry.timeCreate),
                               style: const TextStyle(fontSize: 16),
                             ),
                             MoodIcon(
@@ -165,7 +168,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
                       padding: const EdgeInsets.only(
                           left: 8, top: 4, bottom: 4, right: 8),
                       child: Text(
-                        "Modified: ${DateFormat.yMMMEd().format(entry.timeModified)} at ${DateFormat.jm().format(entry.timeModified)}",
+                        "${AppLocalizations.of(context)!.lastModified}: ${DateFormat.yMMMEd(Localizations.localeOf(context).languageCode).format(entry.timeModified)} ${DateFormat.jm(Localizations.localeOf(context).languageCode).format(entry.timeModified)}",
                         style:
                             TextStyle(fontSize: 12, color: theme.disabledColor),
                       ),
@@ -190,7 +193,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
         refreshEntry();
       });
 
-  Widget shareButton() {
+  Widget shareButton(BuildContext context) {
     if (Platform.isAndroid && (images.isNotEmpty || entry.text.isNotEmpty)) {
       return IconButton(
           icon: const Icon(Icons.share_rounded),
@@ -200,7 +203,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
               sharedText = "${MoodIcon.getMoodIcon(entry.mood)} ";
             }
             sharedText =
-                "$sharedText${DateFormat.yMMMEd().format(entry.timeCreate)}\n${entry.text}";
+                "$sharedText${DateFormat.yMMMEd(Localizations.localeOf(context).languageCode).format(entry.timeCreate)}\n${entry.text}";
 
             if (images.isNotEmpty) {
               // Share Image

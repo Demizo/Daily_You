@@ -27,11 +27,11 @@ class _MobileScaffoldState extends State<MobileScaffold> {
     const StatsPage(),
   ];
 
-  final List<String> appBarsTitles = ["Home", "Gallery", "Statistics"];
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final List<String> appBarsTitles = [AppLocalizations.of(context)!.pageHomeTitle, AppLocalizations.of(context)!.pageGalleryTitle, AppLocalizations.of(context)!.pageStatisticsTitle];
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(title: Text(appBarsTitles[currentIndex]), actions: [
