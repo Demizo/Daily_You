@@ -9,14 +9,14 @@ import 'package:daily_you/widgets/entry_card_widget.dart';
 import 'package:daily_you/pages/entry_detail_page.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 
-class EntriesPage extends StatefulWidget {
-  const EntriesPage({super.key});
+class GalleryPage extends StatefulWidget {
+  const GalleryPage({super.key});
 
   @override
-  State<EntriesPage> createState() => _EntriesPageState();
+  State<GalleryPage> createState() => _GalleryPageState();
 }
 
-class _EntriesPageState extends State<EntriesPage> {
+class _GalleryPageState extends State<GalleryPage> {
   late List<Entry> entries;
   late List<EntryImage> images;
   bool isLoading = false;

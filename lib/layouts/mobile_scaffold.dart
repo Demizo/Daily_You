@@ -4,8 +4,8 @@ import 'package:daily_you/config_manager.dart';
 import 'package:daily_you/notification_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:daily_you/pages/calendar_page.dart';
-import 'package:daily_you/pages/entries_page.dart';
+import 'package:daily_you/pages/statistics_page.dart';
+import 'package:daily_you/pages/gallery_page.dart';
 import 'package:daily_you/pages/home_page.dart';
 
 import '../pages/settings_page.dart';
@@ -23,7 +23,7 @@ class _MobileScaffoldState extends State<MobileScaffold> {
 
   final List<Widget> pages = [
     const HomePage(),
-    const EntriesPage(),
+    const GalleryPage(),
     const StatsPage(),
   ];
 
