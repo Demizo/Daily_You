@@ -1,5 +1,9 @@
 import 'dart:io';
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
 
@@ -18,6 +22,7 @@ class ConfigManager {
     'useExternalImg': false,
     'externalImgUri': '',
     'startingDayOfWeek': 'sunday',
+    'use24HourFormat': false,
     'useMarkdownToolbar': true,
     'homePageViewMode': 'list',
     'calendarViewMode': 'image',
@@ -69,6 +74,8 @@ class ConfigManager {
 
   // Create an empty config file
   Future<void> init() async {
+    initializeDateFormatting();
+
     Directory dbPath;
     if (Platform.isAndroid) {
       dbPath = (await getExternalStorageDirectory())!;
@@ -90,11 +97,26 @@ class ConfigManager {
 
     // Set default config data
     for (String key in _defaultConfig.keys) {
-      if (!_config.containsKey(key)) _config[key] = _defaultConfig[key];
+      if (!_config.containsKey(key)) {
+        _config[key] = _defaultConfig[key];
+
+        // Set default based on locale
+        if (key == 'use24HourFormat') {
+          _config[key] = is24HourFormat();
+        }
+      }
     }
 
     // Write the updated config data to the file
     await ConfigManager.instance.writeFile(_config);
+  }
+
+  bool is24HourFormat() {
+    String formattedTime =
+        DateFormat.jm(PlatformDispatcher.instance.locale.toString())
+            .format(DateTime.now());
+    // If the output contains text, it's a 12-hour format
+    return !formattedTime.contains(RegExp(r'[A-Za-z]'));
   }
 
   // Read the contents of the config file

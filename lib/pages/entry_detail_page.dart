@@ -129,8 +129,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              DateFormat.yMMMEd(Localizations.localeOf(context)
-                                      .languageCode)
+                              DateFormat.yMMMEd(WidgetsBinding.instance.platformDispatcher.locale.toString())
                                   .format(entry.timeCreate),
                               style: const TextStyle(fontSize: 16),
                             ),
@@ -168,7 +167,8 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
                       padding: const EdgeInsets.only(
                           left: 8, top: 4, bottom: 4, right: 8),
                       child: Text(
-                        "${AppLocalizations.of(context)!.lastModified}: ${DateFormat.yMMMEd(Localizations.localeOf(context).languageCode).format(entry.timeModified)} ${DateFormat.jm(Localizations.localeOf(context).languageCode).format(entry.timeModified)}",
+                        "${AppLocalizations.of(context)!.lastModified}: ${DateFormat.yMMMEd(WidgetsBinding.instance.platformDispatcher.locale.toString()).format(entry.timeModified)} ${DateFormat.jm(WidgetsBinding.instance.platformDispatcher.locale.toString()
+).format(entry.timeModified)}",
                         style:
                             TextStyle(fontSize: 12, color: theme.disabledColor),
                       ),
@@ -203,7 +203,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
               sharedText = "${MoodIcon.getMoodIcon(entry.mood)} ";
             }
             sharedText =
-                "$sharedText${DateFormat.yMMMEd(Localizations.localeOf(context).languageCode).format(entry.timeCreate)}\n${entry.text}";
+                "$sharedText${DateFormat.yMMMEd(WidgetsBinding.instance.platformDispatcher.locale.toString()).format(entry.timeCreate)}\n${entry.text}";
 
             if (images.isNotEmpty) {
               // Share Image

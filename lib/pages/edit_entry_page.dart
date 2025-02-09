@@ -153,8 +153,8 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
                 StatefulBuilder(
                   builder: (context, setState) => EntryMoodPicker(
                       date: widget.entry != null
-                          ? DateFormat.yMMMEd(Localizations.localeOf(context).languageCode).format(widget.entry!.timeCreate)
-                          : DateFormat.yMMMEd(Localizations.localeOf(context).languageCode).format(
+                          ? DateFormat.yMMMEd(WidgetsBinding.instance.platformDispatcher.locale.toString()).format(widget.entry!.timeCreate)
+                          : DateFormat.yMMMEd(WidgetsBinding.instance.platformDispatcher.locale.toString()).format(
                               widget.overrideCreateDate ?? DateTime.now()),
                       moodValue: mood,
                       onChangedMood: (mood) =>

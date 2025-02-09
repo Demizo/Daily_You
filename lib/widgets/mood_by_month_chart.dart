@@ -241,13 +241,13 @@ class _MoodByMonthChartState extends State<MoodByMonthChart> {
 
   String _formatMonth(String dateKey, BuildContext context) {
     DateTime date = DateFormat('yyyy-MM').parse(dateKey);
-    return DateFormat('MMM', Localizations.localeOf(context).languageCode)
+    return DateFormat('MMM', WidgetsBinding.instance.platformDispatcher.locale.toString())
         .format(date); // Return shorthand month (e.g., "Jan")
   }
 
   String _formatMonthYear(String dateKey, BuildContext context) {
     DateTime date = DateFormat('yyyy-MM').parse(dateKey);
-    return DateFormat('MMM yyyy', Localizations.localeOf(context).languageCode)
+    return DateFormat('MMM yyyy', WidgetsBinding.instance.platformDispatcher.locale.toString())
         .format(date); // Return shorthand month (e.g., "Jan")
   }
 

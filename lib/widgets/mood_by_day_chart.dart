@@ -113,7 +113,7 @@ class MoodByDayChart extends StatelessWidget {
 
   String _getDayLabel(BuildContext context, int index) {
     final now = DateTime.now();
-    final formatter = DateFormat.E(Localizations.localeOf(context).languageCode);
+    final formatter = DateFormat.E(WidgetsBinding.instance.platformDispatcher.locale.toString());
 
     List<String> days = List.generate(7, (index) {
       final day = now.subtract(Duration(days: now.weekday - 1)).add(Duration(days: index));

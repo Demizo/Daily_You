@@ -21,7 +21,7 @@ class LargeEntryCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final time = DateFormat.yMMMd(Localizations.localeOf(context).languageCode).format(entry.timeCreate);
+    final time = DateFormat.yMMMd(WidgetsBinding.instance.platformDispatcher.locale.toString()).format(entry.timeCreate);
     return Card(
       clipBehavior: Clip.antiAlias,
       child: Row(

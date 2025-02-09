@@ -14,7 +14,7 @@ class EntryCalendar extends StatelessWidget {
   Widget build(BuildContext context) {
     final statsProvider = Provider.of<StatsProvider>(context);
     return TableCalendar(
-      locale: Localizations.localeOf(context).languageCode,
+      locale: WidgetsBinding.instance.platformDispatcher.locale.toString(),
       rowHeight: 57,
       sixWeekMonthsEnforced: true,
       availableCalendarFormats: const {
@@ -35,7 +35,7 @@ class EntryCalendar extends StatelessWidget {
             children: [
               GestureDetector(
                 child: Text(
-                  DateFormat("MMMM y", Localizations.localeOf(context).languageCode).format(date).toString(),
+                  DateFormat("MMMM y", WidgetsBinding.instance.platformDispatcher.locale.toString()).format(date).toString(),
                   style: const TextStyle(fontSize: 18),
                 ),
                 onTap: () async {

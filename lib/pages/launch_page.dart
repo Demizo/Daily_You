@@ -21,7 +21,7 @@ class _LaunchPageState extends State<LaunchPage> {
 
   _checkDatabaseConnection() async {
     //Initialize Database
-    if(await EntriesDatabase.instance.initDB()) {
+    if (await EntriesDatabase.instance.initDB()) {
       await _nextPage();
     }
 
@@ -36,42 +36,44 @@ class _LaunchPageState extends State<LaunchPage> {
   }
 
   Future<void> _nextPage() async {
-    await Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => widget.nextPage));
+    await Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => widget.nextPage));
   }
 
   @override
   Widget build(BuildContext context) {
-    return isLoading ? const Scaffold(body: SizedBox()) :
-      Scaffold(
-	extendBody: true,
-	body: Center(
-	  child: Card(
-	    child: Column(
-	      mainAxisAlignment: MainAxisAlignment.center,
-	      children: [
-	      Text(
-		AppLocalizations.of(context)!.errorExternalStorageAccessTitle,
-		style: TextStyle(
-		  fontSize: 18,
-		  fontWeight: FontWeight.bold),
-		),
-	      Padding(
-		padding: EdgeInsets.all(
-		  32.0,
-		  ),
-		child: Text(
-		  AppLocalizations.of(context)!.errorExternalStorageAccessDescription,
-		  style: TextStyle(fontSize: 16),
-		  ),
-		),
-	      TextButton(
-		  onPressed: _forceLocalDatabase,
-		  child: Text(
-		    AppLocalizations.of(context)!.errorExternalStorageAccessContinue)),
-	      ],
-	      ),
-	      ),
-	      ));
+    return isLoading
+        ? const Scaffold(body: SizedBox())
+        : Scaffold(
+            extendBody: true,
+            body: Center(
+              child: Card(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      AppLocalizations.of(context)!
+                          .errorExternalStorageAccessTitle,
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(
+                        32.0,
+                      ),
+                      child: Text(
+                        AppLocalizations.of(context)!
+                            .errorExternalStorageAccessDescription,
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+                    TextButton(
+                        onPressed: _forceLocalDatabase,
+                        child: Text(AppLocalizations.of(context)!
+                            .errorExternalStorageAccessContinue)),
+                  ],
+                ),
+              ),
+            ));
   }
-
 }
