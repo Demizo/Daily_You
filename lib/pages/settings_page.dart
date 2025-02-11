@@ -9,6 +9,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:intl/intl.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -520,7 +521,7 @@ class _SettingsPageState extends State<SettingsPage> {
     TimeRange currentRange = TimeManager.getReminderTimeRange();
     TimeRange? range = await showTimeRangePicker(
         context: context,
-        use24HourFormat: false,
+        use24HourFormat: ConfigManager.instance.is24HourFormat(),
         start: currentRange.startTime,
         end: currentRange.endTime,
         ticks: 24,
@@ -534,14 +535,15 @@ class _SettingsPageState extends State<SettingsPage> {
         autoAdjustLabels: false,
         labels: [
           ClockLabel.fromTime(
-              time: TimeOfDay(hour: 0, minute: 0), text: "12 AM"),
-          ClockLabel.fromTime(
-              time: TimeOfDay(hour: 6, minute: 6), text: "6 AM"),
-          ClockLabel.fromTime(
-              time: TimeOfDay(hour: 12, minute: 0), text: "12 PM"),
-          ClockLabel.fromTime(
-              time: TimeOfDay(hour: 18, minute: 6), text: "6 PM"),
-        ]);
+              time: TimeOfDay(hour: 0, minute: 0), text: DateFormat.j(WidgetsBinding.instance.platformDispatcher.locale.toString()).format(TimeManager.addTimeOfDay(TimeManager.startOfDay(DateTime.now()), TimeOfDay(hour: 0, minute: 0)))),
+           ClockLabel.fromTime(
+              time: TimeOfDay(hour: 6, minute: 0), text: DateFormat.j(WidgetsBinding.instance.platformDispatcher.locale.toString()).format(TimeManager.addTimeOfDay(TimeManager.startOfDay(DateTime.now()), TimeOfDay(hour: 6, minute: 0)))),
+           ClockLabel.fromTime(
+              time: TimeOfDay(hour: 12, minute: 0), text: DateFormat.j(WidgetsBinding.instance.platformDispatcher.locale.toString()).format(TimeManager.addTimeOfDay(TimeManager.startOfDay(DateTime.now()), TimeOfDay(hour: 12, minute: 0)))),
+           ClockLabel.fromTime(
+              time: TimeOfDay(hour: 18, minute: 0), text: DateFormat.j(WidgetsBinding.instance.platformDispatcher.locale.toString()).format(TimeManager.addTimeOfDay(TimeManager.startOfDay(DateTime.now()), TimeOfDay(hour: 18, minute: 0)))),
+        ]
+	);
     if (range != null) {
       await TimeManager.setReminderTimeRange(range);
       if (ConfigManager.instance.getField('dailyReminders')) {
@@ -738,33 +740,6 @@ class _SettingsPageState extends State<SettingsPage> {
                       ],
                     ),
                   ),
-                  Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              "Start Calendar Week on Monday",
-                              style: TextStyle(fontSize: 18),
-                            ),
-                            Switch(
-                                value: ConfigManager.instance
-                                        .getField('startingDayOfWeek') !=
-                                    'sunday',
-                                onChanged: (value) {
-                                  if (value) {
-                                    setState(() {
-                                      ConfigManager.instance.setField(
-                                          'startingDayOfWeek', 'monday');
-                                    });
-                                  } else {
-                                    setState(() {
-                                      ConfigManager.instance.setField(
-                                          'startingDayOfWeek', 'sunday');
-                                    });
-                                  }
-                                })
-                          ])),
                   Padding(
                       padding: const EdgeInsets.only(top: 8.0),
                       child: Row(

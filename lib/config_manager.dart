@@ -21,8 +21,6 @@ class ConfigManager {
     'externalDbUri': '',
     'useExternalImg': false,
     'externalImgUri': '',
-    'startingDayOfWeek': 'sunday',
-    'use24HourFormat': false,
     'useMarkdownToolbar': true,
     'homePageViewMode': 'list',
     'calendarViewMode': 'image',
@@ -100,10 +98,6 @@ class ConfigManager {
       if (!_config.containsKey(key)) {
         _config[key] = _defaultConfig[key];
 
-        // Set default based on locale
-        if (key == 'use24HourFormat') {
-          _config[key] = is24HourFormat();
-        }
       }
     }
 
@@ -117,6 +111,10 @@ class ConfigManager {
             .format(DateTime.now());
     // If the output contains text, it's a 12-hour format
     return !formattedTime.contains(RegExp(r'[A-Za-z]'));
+  }
+
+  int getFirstDayOfWeekIndex() {
+    return DateFormat.yMd(WidgetsBinding.instance.platformDispatcher.locale.toString()).dateSymbols.FIRSTDAYOFWEEK;
   }
 
   // Read the contents of the config file

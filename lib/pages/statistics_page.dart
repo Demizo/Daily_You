@@ -76,8 +76,6 @@ class StatsPage extends StatelessWidget {
         ),
         MoodByDayChart(
           averageMood: statsProvider.getMoodsByDay(),
-          startOnSunday:
-              ConfigManager.instance.getField('startingDayOfWeek') == 'sunday',
         ),
       ],
     );

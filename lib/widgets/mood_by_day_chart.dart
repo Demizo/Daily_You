@@ -1,3 +1,4 @@
+import 'package:daily_you/config_manager.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -5,10 +6,9 @@ import 'package:intl/intl.dart';
 
 class MoodByDayChart extends StatelessWidget {
   final Map<String, double> averageMood;
-  final bool startOnSunday;
 
   const MoodByDayChart(
-      {super.key, required this.averageMood, this.startOnSunday = false});
+      {super.key, required this.averageMood});
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +44,7 @@ class MoodByDayChart extends StatelessWidget {
                     showTitles: true,
                     reservedSize: 36,
                     getTitlesWidget: (double value, _) {
-                      return Text(_getDayLabel(context, value.toInt()));
+                      return Text(_getDayLabel(value.toInt()));
                     },
                   )),
                   rightTitles: const AxisTitles(),
@@ -101,7 +101,7 @@ class MoodByDayChart extends StatelessWidget {
 
   List<MapEntry<String, double>> _getOrderedDays() {
     List<MapEntry<String, double>> days = averageMood.entries.toList();
-    if (startOnSunday) {
+    if (ConfigManager.instance.getFirstDayOfWeekIndex() == 6) {
       // Move Sunday to the beginning
       days = [
         days.last, // Sunday
@@ -111,7 +111,7 @@ class MoodByDayChart extends StatelessWidget {
     return days;
   }
 
-  String _getDayLabel(BuildContext context, int index) {
+  String _getDayLabel(int index) {
     final now = DateTime.now();
     final formatter = DateFormat.E(WidgetsBinding.instance.platformDispatcher.locale.toString());
 
@@ -120,7 +120,7 @@ class MoodByDayChart extends StatelessWidget {
       return formatter.format(day); // Gets localized short name
     });
 
-    if (startOnSunday) {
+    if (ConfigManager.instance.getFirstDayOfWeekIndex() == 6) {
       days.insert(0, days.removeLast()); // Move Sunday to the front
     }
 

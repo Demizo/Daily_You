@@ -17,16 +17,13 @@ class EntryCalendar extends StatelessWidget {
       locale: WidgetsBinding.instance.platformDispatcher.locale.toString(),
       rowHeight: 57,
       sixWeekMonthsEnforced: true,
+      startingDayOfWeek: StartingDayOfWeek.values[ConfigManager.instance.getFirstDayOfWeekIndex()],
       availableCalendarFormats: const {
         CalendarFormat.month: 'Month',
       },
       focusedDay: statsProvider.selectedDate,
       lastDay: DateTime.now(),
       firstDay: DateTime.utc(2000),
-      startingDayOfWeek:
-          ConfigManager.instance.getField('startingDayOfWeek') == 'sunday'
-              ? StartingDayOfWeek.sunday
-              : StartingDayOfWeek.monday,
       onPageChanged: (DateTime date) => statsProvider.selectedDate = date,
       calendarBuilders: CalendarBuilders(
         headerTitleBuilder: (context, date) {

@@ -148,12 +148,10 @@ class MainApp extends StatefulWidget {
 }
 
 class _MainAppState extends State<MainApp> {
-
   @override
   void initState() {
     super.initState();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -208,12 +206,10 @@ class _MainAppState extends State<MainApp> {
                         brightness: Brightness.dark),
                   ),
             home: LaunchPage(
-		    nextPage: ResponsiveLayout(
-			mobileScaffold: MobileScaffold(),
-                        tabletScaffold: MobileScaffold(),
-                        desktopScaffold: MobileScaffold(),
-                      )
-		  )
-      ));
+                nextPage: ResponsiveLayout(
+              mobileScaffold: MobileScaffold(),
+              tabletScaffold: MobileScaffold(),
+              desktopScaffold: MobileScaffold(),
+            ))));
   }
 }
