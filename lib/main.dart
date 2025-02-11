@@ -20,7 +20,8 @@ import 'package:provider/provider.dart';
 @pragma('vm:entry-point')
 void callbackDispatcher() async {
   await ConfigManager.instance.init();
-  await EntriesDatabase.instance.initDB();
+  // Skip syncing for the alarm background task
+  await EntriesDatabase.instance.initDB(forceWithoutSync: true);
   if (await EntriesDatabase.instance.getEntryForDate(DateTime.now()) == null) {
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
         FlutterLocalNotificationsPlugin();
