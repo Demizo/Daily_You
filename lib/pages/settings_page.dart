@@ -168,56 +168,6 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
-  void _showThemeSelectionPopup(ThemeModeProvider themeModeProvider) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Select Theme'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                title: const Text('Follow System'),
-                onTap: () async {
-                  await ConfigManager.instance.setField('theme', 'system');
-                  setState(() {
-                    _updateTheme(themeModeProvider, ThemeMode.system);
-                  });
-                },
-              ),
-              ListTile(
-                title: const Text('Dark Theme'),
-                onTap: () async {
-                  await ConfigManager.instance.setField('theme', 'dark');
-                  setState(() {
-                    _updateTheme(themeModeProvider, ThemeMode.dark);
-                  });
-                },
-              ),
-              ListTile(
-                  title: const Text('Light Theme'),
-                  onTap: () async {
-                    await ConfigManager.instance.setField('theme', 'light');
-                    setState(() {
-                      _updateTheme(themeModeProvider, ThemeMode.light);
-                    });
-                  }),
-              ListTile(
-                  title: const Text('AMOLED'),
-                  onTap: () async {
-                    await ConfigManager.instance.setField('theme', 'amoled');
-                    setState(() {
-                      _updateTheme(themeModeProvider, ThemeMode.dark);
-                    });
-                  }),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
   void _showAccentColorPopup(ThemeModeProvider themeProvider) {
     Color accentColor = Color(ConfigManager.instance.getField('accentColor'));
     showDialog(
@@ -491,14 +441,6 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  void _updateTheme(ThemeModeProvider themeModeProvider, ThemeMode mode) {
-    themeModeProvider.themeMode = mode;
-    // setState(() {
-    //   currentThemeMode = mode;
-    // });
-    Navigator.pop(context); // Close the popup
-  }
-
   Future<void> _selectTime(BuildContext context) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
@@ -655,41 +597,41 @@ class _SettingsPageState extends State<SettingsPage> {
                 padding: const EdgeInsets.all(8),
                 children: [
                   SettingsHeader(text: "Appearance"),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Theme",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        ElevatedButton.icon(
-                          icon: Icon(
-                            themeProvider.themeMode == ThemeMode.system
-                                ? Icons.brightness_medium
-                                : themeProvider.themeMode == ThemeMode.light
-                                    ? Icons.brightness_high
-                                    : Icons.brightness_2_rounded,
-                          ),
-                          label: themeProvider.themeMode == ThemeMode.system
-                              ? const Text("System")
-                              : themeProvider.themeMode == ThemeMode.light
-                                  ? const Text("Light")
-                                  : (ConfigManager.instance.getField('theme') ==
-                                          'amoled')
-                                      ? const Text("AMOLED")
-                                      : const Text("Dark"),
-                          onPressed: () async {
-                            await ConfigManager.instance
-                                .setField('theme', 'system');
-                            _showThemeSelectionPopup(themeProvider);
-                          },
-                        ),
+                  SettingsDropdown<String>(
+                      title: "Theme",
+                      settingsKey: "theme",
+                      options: [
+                        DropdownMenuItem<String>(
+                            value: "system", child: Text("System")),
+                        DropdownMenuItem<String>(
+                            value: "dark", child: Text("Dark")),
+                        DropdownMenuItem<String>(
+                            value: "light", child: Text("Light")),
+                        DropdownMenuItem<String>(
+                            value: "amoled", child: Text("AMOLED")),
                       ],
-                    ),
-                  ),
+                      onChanged: (String? newValue) {
+                        ThemeMode themeMode = ThemeMode.system;
+                        switch (newValue) {
+                          case "system":
+                            themeMode = ThemeMode.system;
+                            break;
+                          case "light":
+                            themeMode = ThemeMode.light;
+                            break;
+                          case "dark":
+                          case "amoled":
+                            themeMode = ThemeMode.dark;
+                            break;
+                          default:
+                            themeMode = ThemeMode.system;
+                            break;
+                        }
+                        setState(() {
+                          themeProvider.themeMode = themeMode;
+                          ConfigManager.instance.setField("theme", newValue);
+                        });
+                      }),
                   Padding(
                       padding: const EdgeInsets.only(top: 8.0),
                       child: Column(
@@ -873,17 +815,18 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   if (Platform.isAndroid) const Divider(),
                   SettingsHeader(text: "Templates"),
-                  SettingsDropdown<int>(
-                    title: "Default Template",
-                    settingsKey: "defaultTemplate",
-                    options: _buildDefaultTemplateDropdownItems(),
-                    onChanged: (int? newValue) {
-                      setState(() {
-                        ConfigManager.instance
-                            .setField("defaultTemplate", newValue);
-                      });
-                    },
-                  ),
+                  if (!isLoading)
+                    SettingsDropdown<int>(
+                      title: "Default Template",
+                      settingsKey: "defaultTemplate",
+                      options: _buildDefaultTemplateDropdownItems(),
+                      onChanged: (int? newValue) {
+                        setState(() {
+                          ConfigManager.instance
+                              .setField("defaultTemplate", newValue);
+                        });
+                      },
+                    ),
                   Padding(
                     padding: const EdgeInsets.only(top: 8.0),
                     child: Column(
