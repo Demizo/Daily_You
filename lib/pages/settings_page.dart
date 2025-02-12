@@ -4,6 +4,8 @@ import 'package:daily_you/models/template.dart';
 import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/stats_provider.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:daily_you/widgets/settings_dropdown.dart';
+import 'package:daily_you/widgets/settings_header.dart';
 import 'package:daily_you/widgets/template_manager.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
@@ -535,15 +537,38 @@ class _SettingsPageState extends State<SettingsPage> {
         autoAdjustLabels: false,
         labels: [
           ClockLabel.fromTime(
-              time: TimeOfDay(hour: 0, minute: 0), text: DateFormat.j(WidgetsBinding.instance.platformDispatcher.locale.toString()).format(TimeManager.addTimeOfDay(TimeManager.startOfDay(DateTime.now()), TimeOfDay(hour: 0, minute: 0)))),
-           ClockLabel.fromTime(
-              time: TimeOfDay(hour: 6, minute: 0), text: DateFormat.j(WidgetsBinding.instance.platformDispatcher.locale.toString()).format(TimeManager.addTimeOfDay(TimeManager.startOfDay(DateTime.now()), TimeOfDay(hour: 6, minute: 0)))),
-           ClockLabel.fromTime(
-              time: TimeOfDay(hour: 12, minute: 0), text: DateFormat.j(WidgetsBinding.instance.platformDispatcher.locale.toString()).format(TimeManager.addTimeOfDay(TimeManager.startOfDay(DateTime.now()), TimeOfDay(hour: 12, minute: 0)))),
-           ClockLabel.fromTime(
-              time: TimeOfDay(hour: 18, minute: 0), text: DateFormat.j(WidgetsBinding.instance.platformDispatcher.locale.toString()).format(TimeManager.addTimeOfDay(TimeManager.startOfDay(DateTime.now()), TimeOfDay(hour: 18, minute: 0)))),
-        ]
-	);
+              time: TimeOfDay(hour: 0, minute: 0),
+              text: DateFormat.j(WidgetsBinding
+                      .instance.platformDispatcher.locale
+                      .toString())
+                  .format(TimeManager.addTimeOfDay(
+                      TimeManager.startOfDay(DateTime.now()),
+                      TimeOfDay(hour: 0, minute: 0)))),
+          ClockLabel.fromTime(
+              time: TimeOfDay(hour: 6, minute: 0),
+              text: DateFormat.j(WidgetsBinding
+                      .instance.platformDispatcher.locale
+                      .toString())
+                  .format(TimeManager.addTimeOfDay(
+                      TimeManager.startOfDay(DateTime.now()),
+                      TimeOfDay(hour: 6, minute: 0)))),
+          ClockLabel.fromTime(
+              time: TimeOfDay(hour: 12, minute: 0),
+              text: DateFormat.j(WidgetsBinding
+                      .instance.platformDispatcher.locale
+                      .toString())
+                  .format(TimeManager.addTimeOfDay(
+                      TimeManager.startOfDay(DateTime.now()),
+                      TimeOfDay(hour: 12, minute: 0)))),
+          ClockLabel.fromTime(
+              time: TimeOfDay(hour: 18, minute: 0),
+              text: DateFormat.j(WidgetsBinding
+                      .instance.platformDispatcher.locale
+                      .toString())
+                  .format(TimeManager.addTimeOfDay(
+                      TimeManager.startOfDay(DateTime.now()),
+                      TimeOfDay(hour: 18, minute: 0)))),
+        ]);
     if (range != null) {
       await TimeManager.setReminderTimeRange(range);
       if (ConfigManager.instance.getField('dailyReminders')) {
@@ -629,14 +654,7 @@ class _SettingsPageState extends State<SettingsPage> {
               body: ListView(
                 padding: const EdgeInsets.all(8),
                 children: [
-                  const Row(
-                    children: [
-                      Text(
-                        "Appearance",
-                        style: TextStyle(fontSize: 24),
-                      ),
-                    ],
-                  ),
+                  SettingsHeader(text: "Appearance"),
                   Padding(
                     padding: const EdgeInsets.only(top: 8.0),
                     child: Column(
@@ -759,15 +777,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                 })
                           ])),
                   const Divider(),
-                  if (Platform.isAndroid)
-                    const Row(
-                      children: [
-                        Text(
-                          "Notifications",
-                          style: TextStyle(fontSize: 24),
-                        ),
-                      ],
-                    ),
+                  if (Platform.isAndroid) SettingsHeader(text: "Notifications"),
                   if (Platform.isAndroid)
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -862,49 +872,22 @@ class _SettingsPageState extends State<SettingsPage> {
                       ],
                     ),
                   if (Platform.isAndroid) const Divider(),
-                  const Row(
-                    children: [
-                      Text(
-                        "Templates",
-                        style: TextStyle(fontSize: 24),
-                      ),
-                    ],
+                  SettingsHeader(text: "Templates"),
+                  SettingsDropdown<int>(
+                    title: "Default Template",
+                    settingsKey: "defaultTemplate",
+                    options: _buildDefaultTemplateDropdownItems(),
+                    onChanged: (int? newValue) {
+                      setState(() {
+                        ConfigManager.instance
+                            .setField("defaultTemplate", newValue);
+                      });
+                    },
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 8.0),
                     child: Column(
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              "Default Template",
-                              style: TextStyle(fontSize: 18),
-                            ),
-                            if (!isLoading)
-                              SizedBox(
-                                width: 200,
-                                child: DropdownButton<int>(
-                                  underline: Container(),
-                                  isDense: true,
-                                  isExpanded: true,
-                                  borderRadius: BorderRadius.circular(20),
-                                  padding: const EdgeInsets.only(
-                                      left: 8, right: 4, top: 4, bottom: 4),
-                                  hint: const Text('Select a template'),
-                                  value: ConfigManager.instance
-                                      .getField("defaultTemplate"),
-                                  items: _buildDefaultTemplateDropdownItems(),
-                                  onChanged: (int? newValue) {
-                                    setState(() {
-                                      ConfigManager.instance.setField(
-                                          "defaultTemplate", newValue);
-                                    });
-                                  },
-                                ),
-                              ),
-                          ],
-                        ),
                         Padding(
                           padding: const EdgeInsets.only(top: 8.0),
                           child: Row(
@@ -924,66 +907,29 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   ),
                   const Divider(),
-                  const Row(
-                    children: [
-                      Text(
-                        "Storage",
-                        style: TextStyle(fontSize: 24),
-                      ),
-                    ],
-                  ),
+                  SettingsHeader(text: "Storage"),
+                  SettingsDropdown<int>(
+                      title: "Image Quality",
+                      settingsKey: "imageQuality",
+                      options: [
+                        DropdownMenuItem<int>(
+                            value: 100, child: Text("No Compression")),
+                        DropdownMenuItem<int>(value: 90, child: Text("High")),
+                        DropdownMenuItem<int>(value: 75, child: Text("Medium")),
+                        DropdownMenuItem<int>(value: 50, child: Text("Low")),
+                      ],
+                      onChanged: (int? newValue) {
+                        setState(() {
+                          ConfigManager.instance
+                              .setField("imageQuality", newValue);
+                        });
+                      }),
                   Padding(
                     padding: const EdgeInsets.only(top: 8.0),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 8.0),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    "Image Quality",
-                                    style: TextStyle(fontSize: 18),
-                                  ),
-                                ],
-                              ),
-                              DropdownButton<int>(
-                                underline: Container(),
-                                isDense: true,
-                                isExpanded: false,
-                                borderRadius: BorderRadius.circular(20),
-                                padding: const EdgeInsets.only(
-                                    left: 8, right: 4, top: 4, bottom: 4),
-                                value: ConfigManager.instance
-                                    .getField("imageQuality"),
-                                items: [
-                                  DropdownMenuItem<int>(
-                                      value: 100,
-                                      child: Text("No Compression")),
-                                  DropdownMenuItem<int>(
-                                      value: 90, child: Text("High")),
-                                  DropdownMenuItem<int>(
-                                      value: 75, child: Text("Medium")),
-                                  DropdownMenuItem<int>(
-                                      value: 50, child: Text("Low")),
-                                ],
-                                onChanged: (int? newValue) {
-                                  setState(() {
-                                    ConfigManager.instance
-                                        .setField("imageQuality", newValue);
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
                         const Text(
                           "Log Folder",
                           style: TextStyle(fontSize: 18),
@@ -1204,14 +1150,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   ),
                   const Divider(),
-                  const Row(
-                    children: [
-                      Text(
-                        "About",
-                        style: TextStyle(fontSize: 24),
-                      ),
-                    ],
-                  ),
+                  SettingsHeader(text: "About"),
                   Padding(
                     padding: const EdgeInsets.only(top: 8.0),
                     child: Column(
