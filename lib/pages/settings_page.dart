@@ -6,6 +6,8 @@ import 'package:daily_you/stats_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/settings_dropdown.dart';
 import 'package:daily_you/widgets/settings_header.dart';
+import 'package:daily_you/widgets/settings_icon_action.dart';
+import 'package:daily_you/widgets/settings_toggle.dart';
 import 'package:daily_you/widgets/template_manager.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
@@ -632,43 +634,24 @@ class _SettingsPageState extends State<SettingsPage> {
                           ConfigManager.instance.setField("theme", newValue);
                         });
                       }),
-                  Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text(
-                                  "Use System Accent Color",
-                                  style: TextStyle(fontSize: 18),
-                                ),
-                                Switch(
-                                    value: ConfigManager.instance
-                                        .getField('followSystemColor'),
-                                    onChanged: (value) {
-                                      setState(() {
-                                        ConfigManager.instance.setField(
-                                            'followSystemColor', value);
-                                        themeProvider.updateAccentColor();
-                                      });
-                                    })
-                              ]),
-                          if (!ConfigManager.instance
-                              .getField('followSystemColor'))
-                            ElevatedButton.icon(
-                              icon: const Icon(
-                                Icons.color_lens_rounded,
-                              ),
-                              label: const Text("Custom Accent Color"),
-                              onPressed: () async {
-                                _showAccentColorPopup(themeProvider);
-                              },
-                            ),
-                        ],
-                      )),
+                  SettingsToggle(
+                      title: "Use System Accent Color",
+                      settingsKey: "followSystemColor",
+                      onChanged: (value) {
+                        setState(() {
+                          ConfigManager.instance
+                              .setField('followSystemColor', value);
+                          themeProvider.updateAccentColor();
+                        });
+                      }),
+                  if (!ConfigManager.instance.getField('followSystemColor'))
+                    SettingsIconAction(
+                      title: "Custom Accent Color",
+                      icon: Icon(Icons.colorize_rounded),
+                      onPressed: () async {
+                        _showAccentColorPopup(themeProvider);
+                      },
+                    ),
                   Padding(
                     padding: const EdgeInsets.only(top: 8.0),
                     child: Column(
