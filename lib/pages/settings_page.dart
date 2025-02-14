@@ -652,150 +652,93 @@ class _SettingsPageState extends State<SettingsPage> {
                         _showAccentColorPopup(themeProvider);
                       },
                     ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Change Mood Icons",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                moodIconButton(-2, "Very Sad Icon"),
-                                moodIconButton(-1, "Sad Icon"),
-                                moodIconButton(0, "Neutral Icon"),
-                                moodIconButton(1, "Happy Icon"),
-                                moodIconButton(2, "Very Happy Icon"),
-                                moodIconButton(null, "Unknown Mood Icon"),
-                              ],
-                            ),
-                            IconButton(
-                                onPressed: _resetMoodIcons,
-                                icon: const Icon(Icons.refresh_rounded))
-                          ],
-                        )
-                      ],
-                    ),
+                  SettingsToggle(
+                      title: "Show Markdown Toolbar",
+                      settingsKey: "useMarkdownToolbar",
+                      onChanged: (value) {
+                        setState(() {
+                          ConfigManager.instance
+                              .setField("useMarkdownToolbar", value);
+                        });
+                      }),
+                  const Text(
+                    "Change Mood Icons",
+                    style: TextStyle(fontSize: 16),
                   ),
-                  Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              "Show Markdown Toolbar",
-                              style: TextStyle(fontSize: 18),
-                            ),
-                            Switch(
-                                value: ConfigManager.instance
-                                    .getField('useMarkdownToolbar'),
-                                onChanged: (value) async {
-                                  await ConfigManager.instance
-                                      .setField('useMarkdownToolbar', value);
-                                  setState(() {});
-                                })
-                          ])),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          moodIconButton(-2, "Very Sad Icon"),
+                          moodIconButton(-1, "Sad Icon"),
+                          moodIconButton(0, "Neutral Icon"),
+                          moodIconButton(1, "Happy Icon"),
+                          moodIconButton(2, "Very Happy Icon"),
+                          moodIconButton(null, "Unknown Mood Icon"),
+                        ],
+                      ),
+                      IconButton(
+                          onPressed: _resetMoodIcons,
+                          icon: const Icon(Icons.refresh_rounded))
+                    ],
+                  ),
                   const Divider(),
                   if (Platform.isAndroid) SettingsHeader(text: "Notifications"),
                   if (Platform.isAndroid)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  "Daily Reminders",
-                                  style: TextStyle(fontSize: 18),
-                                ),
-                                Text(
-                                  "Allow app to run in background for best results",
-                                  style: TextStyle(fontSize: 14),
-                                ),
-                              ],
-                            ),
-                            Switch(
-                                value: ConfigManager.instance
-                                    .getField('dailyReminders'),
-                                onChanged: (value) async {
-                                  if (await NotificationManager.instance
-                                      .hasNotificationPermission()) {
-                                    if (value) {
-                                      await NotificationManager.instance
-                                          .startScheduledDailyReminders();
-                                    } else {
-                                      await NotificationManager.instance
-                                          .stopDailyReminders();
-                                    }
-                                    await ConfigManager.instance
-                                        .setField('dailyReminders', value);
-                                    setState(() {});
-                                  }
-                                }),
-                          ],
-                        ),
-                        if (ConfigManager.instance.getField('dailyReminders'))
-                          ConfigManager.instance.getField('setReminderTime')
-                              ? ElevatedButton.icon(
-                                  icon: const Icon(Icons.schedule_rounded),
-                                  onPressed: () async {
-                                    _selectTime(context);
-                                  },
-                                  label: Text(TimeManager.timeOfDayString(
-                                      TimeManager.scheduledReminderTime())))
-                              : ElevatedButton.icon(
-                                  icon: const Icon(Icons.timelapse_rounded),
-                                  onPressed: () async {
-                                    _selectTimeRange(context);
-                                  },
-                                  label: Text(TimeManager.timeRangeString(
-                                      TimeManager.getReminderTimeRange()))),
-                        if (ConfigManager.instance.getField('dailyReminders'))
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    "Set Reminder Time",
-                                    style: TextStyle(fontSize: 18),
-                                  ),
-                                  Text(
-                                    "Pick a set time for the reminder to occur",
-                                    style: TextStyle(fontSize: 14),
-                                  ),
-                                ],
-                              ),
-                              Switch(
-                                  value: ConfigManager.instance
-                                      .getField('setReminderTime'),
-                                  onChanged: (value) async {
-                                    await ConfigManager.instance
-                                        .setField('setReminderTime', value);
-                                    await NotificationManager.instance
-                                        .stopDailyReminders();
-                                    await NotificationManager.instance
-                                        .startScheduledDailyReminders();
-                                    setState(() {});
-                                  }),
-                            ],
-                          ),
-                      ],
-                    ),
+                    SettingsToggle(
+                        title: "Daily Reminders",
+                        hint: "Allow app to run in background for best results",
+                        settingsKey: "dailyReminders",
+                        onChanged: (value) async {
+                          if (await NotificationManager.instance
+                              .hasNotificationPermission()) {
+                            if (value) {
+                              await NotificationManager.instance
+                                  .startScheduledDailyReminders();
+                            } else {
+                              await NotificationManager.instance
+                                  .stopDailyReminders();
+                            }
+                            await ConfigManager.instance
+                                .setField('dailyReminders', value);
+                            setState(() {});
+                          }
+                        }),
+                  if (Platform.isAndroid &&
+                      ConfigManager.instance.getField('dailyReminders'))
+                    ConfigManager.instance.getField('setReminderTime')
+                        ? SettingsIconAction(
+                            title: "Reminder Time",
+                            hint: TimeManager.timeOfDayString(
+                                TimeManager.scheduledReminderTime()),
+                            icon: Icon(Icons.schedule_rounded),
+                            onPressed: () async {
+                              _selectTime(context);
+                            })
+                        : SettingsIconAction(
+                            title: "Reminder Time",
+                            hint: TimeManager.timeRangeString(
+                                TimeManager.getReminderTimeRange()),
+                            icon: Icon(Icons.timelapse_rounded),
+                            onPressed: () async {
+                              _selectTimeRange(context);
+                            }),
+                  if (Platform.isAndroid &&
+                      ConfigManager.instance.getField('dailyReminders'))
+                    SettingsToggle(
+                        title: "Set Reminder Time",
+                        hint: "Pick a set time for the reminder to occur",
+                        settingsKey: 'setReminderTime',
+                        onChanged: (value) async {
+                          await ConfigManager.instance
+                              .setField('setReminderTime', value);
+                          await NotificationManager.instance
+                              .stopDailyReminders();
+                          await NotificationManager.instance
+                              .startScheduledDailyReminders();
+                          setState(() {});
+                        }),
                   if (Platform.isAndroid) const Divider(),
                   SettingsHeader(text: "Templates"),
                   if (!isLoading)
@@ -810,28 +753,10 @@ class _SettingsPageState extends State<SettingsPage> {
                         });
                       },
                     ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              ElevatedButton.icon(
-                                icon: const Icon(Icons.edit_document),
-                                label: const Text("Manage Templates"),
-                                onPressed: () {
-                                  _showTemplateManagementPopup(context);
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  SettingsIconAction(
+                      title: 'Manage Templates',
+                      icon: Icon(Icons.edit_document),
+                      onPressed: () => _showTemplateManagementPopup(context)),
                   const Divider(),
                   SettingsHeader(text: "Storage"),
                   SettingsDropdown<int>(
@@ -850,305 +775,147 @@ class _SettingsPageState extends State<SettingsPage> {
                               .setField("imageQuality", newValue);
                         });
                       }),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Log Folder",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        FutureBuilder(
-                            future:
-                                EntriesDatabase.instance.getInternalDbPath(),
-                            builder: (context, snapshot) {
-                              if (snapshot.hasData && snapshot.data != null) {
-                                if (EntriesDatabase.instance
-                                    .usingExternalDb()) {
-                                  return Text(ConfigManager.instance
-                                      .getField('externalDbUri'));
-                                }
-                                return Text(snapshot.data!);
+                  FutureBuilder(
+                      future: EntriesDatabase.instance.getInternalDbPath(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData && snapshot.data != null) {
+                          var folderText = snapshot.data!;
+                          if (EntriesDatabase.instance.usingExternalDb()) {
+                            folderText = ConfigManager.instance
+                                .getField('externalDbUri');
+                          }
+                          return SettingsIconAction(
+                            title: 'Log Folder',
+                            hint: folderText,
+                            icon: Icon(Icons.folder_rounded),
+                            secondaryIcon: Icon(Icons.refresh_rounded),
+                            onPressed: () async {
+                              if (Platform.isAndroid &&
+                                  !await requestStoragePermission()) {
+                                return;
                               }
-                              return const Text("...");
-                            }),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            ElevatedButton.icon(
-                              icon: const Icon(
-                                Icons.folder_copy_rounded,
-                              ),
-                              label: const Text("Change Log Folder..."),
-                              onPressed: () async {
-                                if (Platform.isAndroid &&
-                                    !await requestStoragePermission()) {
-                                  return;
-                                }
-                                await _showChangeLogFolderWarning(context);
-                              },
-                            ),
-                            IconButton(
-                                onPressed: () async {
-                                  EntriesDatabase.instance
-                                      .resetDatabaseLocation();
-                                  setState(() {});
-                                },
-                                icon: const Icon(Icons.refresh_rounded))
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Image Folder",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        FutureBuilder(
-                            future: EntriesDatabase.instance
-                                .getInternalImgDatabasePath(),
-                            builder: (context, snapshot) {
-                              if (snapshot.hasData && snapshot.data != null) {
-                                if (EntriesDatabase.instance
-                                    .usingExternalImg()) {
-                                  return Text(ConfigManager.instance
-                                      .getField('externalImgUri'));
-                                }
-                                return Text(snapshot.data!);
+                              await _showChangeLogFolderWarning(context);
+                            },
+                            onSecondaryPressed: () async {
+                              EntriesDatabase.instance.resetDatabaseLocation();
+                              setState(() {});
+                            },
+                          );
+                        }
+                        return const SizedBox();
+                      }),
+                  FutureBuilder(
+                      future:
+                          EntriesDatabase.instance.getInternalImgDatabasePath(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData && snapshot.data != null) {
+                          var folderText = snapshot.data!;
+                          if (EntriesDatabase.instance.usingExternalImg()) {
+                            folderText = ConfigManager.instance
+                                .getField('externalImgUri');
+                          }
+                          return SettingsIconAction(
+                            title: 'Image Folder',
+                            hint: folderText,
+                            icon: Icon(Icons.folder_rounded),
+                            secondaryIcon: Icon(Icons.refresh_rounded),
+                            onPressed: () async {
+                              if (Platform.isAndroid &&
+                                  !await requestPhotosPermission()) {
+                                return;
                               }
-                              return const Text("...");
-                            }),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            ElevatedButton.icon(
-                              icon: const Icon(
-                                Icons.folder_copy_rounded,
-                              ),
-                              label: const Text("Change Image Folder..."),
-                              onPressed: () async {
-                                if (Platform.isAndroid &&
-                                    !await requestPhotosPermission()) {
-                                  return;
-                                }
-                                await _showChangeImgFolderWarning(context);
-                              },
-                            ),
-                            IconButton(
-                                onPressed: () async {
-                                  setState(() {
-                                    EntriesDatabase.instance
-                                        .resetImageFolderLocation();
-                                  });
-                                },
-                                icon: const Icon(Icons.refresh_rounded))
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Export",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        Row(
-                          children: [
-                            ElevatedButton.icon(
-                              icon: const Icon(
-                                Icons.upload_rounded,
-                              ),
-                              label: const Text("Export Logs..."),
-                              onPressed: () async {
-                                if (Platform.isAndroid &&
-                                    !await requestStoragePermission()) {
-                                  return;
-                                }
-                                _showExportSelectionPopup();
-                              },
-                            ),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            ElevatedButton.icon(
-                              icon: const Icon(
-                                Icons.photo,
-                              ),
-                              label: const Text("Export Images..."),
-                              onPressed: () async {
-                                if (Platform.isAndroid &&
-                                    !await requestPhotosPermission()) {
-                                  return;
-                                }
-                                await EntriesDatabase.instance.exportImages();
-                              },
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Import",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        Row(
-                          children: [
-                            ElevatedButton.icon(
-                              icon: const Icon(
-                                Icons.download_rounded,
-                              ),
-                              label: const Text("Import Logs..."),
-                              onPressed: () async {
-                                if (Platform.isAndroid &&
-                                    !await requestStoragePermission()) {
-                                  return;
-                                }
-                                _showImportSelectionPopup();
-                              },
-                            ),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            ElevatedButton.icon(
-                              icon: const Icon(
-                                Icons.photo,
-                              ),
-                              label: const Text("Import Images..."),
-                              onPressed: () async {
-                                if (Platform.isAndroid &&
-                                    !await requestPhotosPermission()) {
-                                  return;
-                                }
-                                setState(() {
-                                  isSyncing = true;
-                                });
-                                await EntriesDatabase.instance.importImages();
-                                setState(() {
-                                  isSyncing = false;
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Delete All",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        ElevatedButton.icon(
-                          icon: const Icon(
-                            Icons.delete_forever_rounded,
-                          ),
-                          label: const Text("Delete All Logs..."),
-                          onPressed: () async {
-                            _showDeleteEntriesPopup();
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
+                              await _showChangeImgFolderWarning(context);
+                            },
+                            onSecondaryPressed: () async {
+                              EntriesDatabase.instance
+                                  .resetImageFolderLocation();
+                              setState(() {});
+                            },
+                          );
+                        }
+                        return const SizedBox();
+                      }),
+                  SettingsIconAction(
+                      title: "Export Logs",
+                      icon: Icon(Icons.upload_rounded),
+                      onPressed: () async {
+                        if (Platform.isAndroid &&
+                            !await requestStoragePermission()) {
+                          return;
+                        }
+                        _showExportSelectionPopup();
+                      }),
+                  SettingsIconAction(
+                      title: "Export Images",
+                      icon: Icon(Icons.photo),
+                      onPressed: () async {
+                        if (Platform.isAndroid &&
+                            !await requestPhotosPermission()) {
+                          return;
+                        }
+                        await EntriesDatabase.instance.exportImages();
+                      }),
+                  SettingsIconAction(
+                      title: "Import Logs",
+                      icon: Icon(Icons.download_rounded),
+                      onPressed: () async {
+                        if (Platform.isAndroid &&
+                            !await requestStoragePermission()) {
+                          return;
+                        }
+                        _showImportSelectionPopup();
+                      }),
+                  SettingsIconAction(
+                      title: "Import Images",
+                      icon: Icon(Icons.photo),
+                      onPressed: () async {
+                        if (Platform.isAndroid &&
+                            !await requestPhotosPermission()) {
+                          return;
+                        }
+                        setState(() {
+                          isSyncing = true;
+                        });
+                        await EntriesDatabase.instance.importImages();
+                        setState(() {
+                          isSyncing = false;
+                        });
+                      }),
+                  SettingsIconAction(
+                      title: "Delete All Logs",
+                      icon: Icon(Icons.delete_forever_rounded),
+                      onPressed: () => _showDeleteEntriesPopup()),
                   const Divider(),
                   SettingsHeader(text: "About"),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Version",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        ElevatedButton.icon(
-                          icon: const Icon(
-                            Icons.new_releases_rounded,
-                          ),
-                          label: Text(versionString),
-                          onPressed: () async {
-                            await launchUrl(
-                                Uri.https(
-                                    "github.com", "/Demizo/Daily_You/releases"),
-                                mode: LaunchMode.externalApplication);
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "License",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        ElevatedButton.icon(
-                          icon: const Icon(Icons.gavel_rounded),
-                          label: const Text("GPL v3"),
-                          onPressed: () async {
-                            await launchUrl(
-                                Uri.https("github.com",
-                                    "/Demizo/Daily_You/blob/master/LICENSE.txt"),
-                                mode: LaunchMode.externalApplication);
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Source Code",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        ElevatedButton.icon(
-                          icon: const Icon(
-                            Icons.code_rounded,
-                          ),
-                          label: const Text("Github"),
-                          onPressed: () async {
-                            await launchUrl(
-                                Uri.https("github.com", "/Demizo/Daily_You"),
-                                mode: LaunchMode.externalApplication);
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
+                  SettingsIconAction(
+                      title: "Version",
+                      hint: versionString,
+                      icon: Icon(Icons.open_in_new_rounded),
+                      onPressed: () async {
+                        await launchUrl(
+                            Uri.https(
+                                "github.com", "/Demizo/Daily_You/releases"),
+                            mode: LaunchMode.externalApplication);
+                      }),
+                  SettingsIconAction(
+                      title: "License",
+                      hint: "GPL-3.0",
+                      icon: Icon(Icons.open_in_new_rounded),
+                      onPressed: () async {
+                        await launchUrl(
+                            Uri.https("github.com",
+                                "/Demizo/Daily_You/blob/master/LICENSE.txt"),
+                            mode: LaunchMode.externalApplication);
+                      }),
+                  SettingsIconAction(
+                      title: "Source Code",
+                      hint: "Github",
+                      icon: Icon(Icons.open_in_new_rounded),
+                      onPressed: () async {
+                        await launchUrl(
+                            Uri.https("github.com", "/Demizo/Daily_You"),
+                            mode: LaunchMode.externalApplication);
+                      }),
                 ],
               ),
             ),

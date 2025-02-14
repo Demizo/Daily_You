@@ -11,7 +11,8 @@ class SettingsHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: TextStyle(fontSize: 16, color: Theme.of(context).primaryColor),
+      style:
+          TextStyle(fontSize: 16, color: Theme.of(context).colorScheme.primary),
     );
   }
 }

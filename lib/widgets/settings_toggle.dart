@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 
 class SettingsToggle extends StatelessWidget {
   final String title;
+  final String? hint;
   final String settingsKey;
   final Function(bool) onChanged;
 
   const SettingsToggle({
     super.key,
     required this.title,
+    this.hint,
     required this.settingsKey,
     required this.onChanged,
   });
@@ -19,9 +21,19 @@ class SettingsToggle extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Expanded(
-          child: Text(
-            title,
-            style: TextStyle(fontSize: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(fontSize: 16),
+              ),
+              if (hint != null)
+                Text(
+                  hint!,
+                  style: TextStyle(fontSize: 14),
+                ),
+            ],
           ),
         ),
         Switch(
