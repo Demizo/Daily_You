@@ -14,6 +14,7 @@ import 'package:daily_you/layouts/mobile_scaffold.dart';
 import 'package:daily_you/layouts/responsive_layout.dart';
 import 'package:daily_you/theme_mode_provider.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:time_range_picker/time_range_picker.dart';
 import 'config_manager.dart';
@@ -45,9 +46,15 @@ void callbackDispatcher() async {
       android: androidPlatformChannelSpecifics,
     );
 
-    //TODO: Need a way to localize notification text
-    await flutterLocalNotificationsPlugin.show(
-        0, 'Log Today!', 'Take your daily log...', platformChannelSpecifics);
+    // Localized notification text is stored in SharedPreferences upon startup
+    var prefs = await SharedPreferences.getInstance();
+    var title = prefs.getString('dailyReminderTitle');
+    var description = prefs.getString('dailyReminderDescription');
+
+    if (title != null && description != null) {
+      await flutterLocalNotificationsPlugin.show(
+          0, title, description, platformChannelSpecifics);
+    }
   }
   EntriesDatabase.instance.close();
   setAlarm(firstSet: false);

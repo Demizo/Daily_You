@@ -1,7 +1,14 @@
 {
   "appTitle": "Daily You",
 
+  "dailyReminderTitle": "Log Today!",
+  "dailyReminderDescription": "Take your daily log...",
+
+
+
   "pageHomeTitle": "Home",
+
+
 
   "flashbacksTitle": "Flashbacks",
   "flaskbacksEmpty": "No Flashbacks Yet...",
@@ -14,7 +21,9 @@
 
 
   "pageGalleryTitle": "Gallery",
-  
+
+
+
   "searchLogsHint": "Search Logs...",
   "logCount": "{count, plural, one{{count} log} other{{count} logs}}",
   "noLogs": "No Logs...",
@@ -25,6 +34,8 @@
 
 
   "pageStatisticsTitle": "Statistics",
+
+
 
   "statisticsRangeOneMonth": "1 Month",
   "statisticsRangeSixMonths": "6 Months",

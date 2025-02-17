@@ -1,6 +1,7 @@
 import 'package:daily_you/entries_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LaunchPage extends StatefulWidget {
   final Widget nextPage;
@@ -16,7 +17,16 @@ class _LaunchPageState extends State<LaunchPage> {
   @override
   void initState() {
     super.initState();
+    _storeLocalizedNotificationStrings();
     _checkDatabaseConnection();
+  }
+
+  _storeLocalizedNotificationStrings() async {
+    var prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+        'dailyReminderTitle', AppLocalizations.of(context)!.dailyReminderTitle);
+    await prefs.setString('dailyReminderDescription',
+        AppLocalizations.of(context)!.dailyReminderDescription);
   }
 
   _checkDatabaseConnection() async {
