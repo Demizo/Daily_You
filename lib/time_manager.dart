@@ -55,14 +55,18 @@ class TimeManager {
   }
 
   static Future<void> setReminderTimeRange(TimeRange range) async {
-    await ConfigManager.instance.setField('reminderStartHour', range.startTime.hour);
-    await ConfigManager.instance.setField('reminderStartMinute', range.startTime.minute);
-    await ConfigManager.instance.setField('reminderEndHour', range.endTime.hour);
-    await ConfigManager.instance.setField('reminderEndMinute', range.endTime.minute);
+    await ConfigManager.instance
+        .setField('reminderStartHour', range.startTime.hour);
+    await ConfigManager.instance
+        .setField('reminderStartMinute', range.startTime.minute);
+    await ConfigManager.instance
+        .setField('reminderEndHour', range.endTime.hour);
+    await ConfigManager.instance
+        .setField('reminderEndMinute', range.endTime.minute);
   }
 
   static String timeRangeString(TimeRange timeRange) {
-    return 'Between ${timeOfDayString(timeRange.startTime)} and ${timeOfDayString(timeRange.endTime)}';
+    return '${timeOfDayString(timeRange.startTime)} - ${timeOfDayString(timeRange.endTime)}';
   }
 
   static String timeOfDayString(TimeOfDay timeOfDay) {

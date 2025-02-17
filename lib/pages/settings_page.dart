@@ -11,6 +11,7 @@ import 'package:daily_you/widgets/settings_toggle.dart';
 import 'package:daily_you/widgets/template_manager.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:intl/intl.dart';
@@ -176,7 +177,24 @@ class _SettingsPageState extends State<SettingsPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Choose Accent Color'),
+          actions: [
+            TextButton(
+              child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+              onPressed: () async {
+                Navigator.pop(context);
+              },
+            ),
+            TextButton(
+              child: Text(MaterialLocalizations.of(context).okButtonLabel),
+              onPressed: () async {
+                setState(() {
+                  themeProvider.accentColor = accentColor;
+                  themeProvider.updateAccentColor();
+                });
+                Navigator.pop(context);
+              },
+            ),
+          ],
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -189,30 +207,6 @@ class _SettingsPageState extends State<SettingsPage> {
                   onColorChanged: (color) {
                     accentColor = color;
                   }),
-              const SizedBox(
-                height: 8,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    child: const Text("Cancel"),
-                    onPressed: () async {
-                      Navigator.pop(context);
-                    },
-                  ),
-                  TextButton(
-                    child: const Text("Save"),
-                    onPressed: () async {
-                      setState(() {
-                        themeProvider.accentColor = accentColor;
-                        themeProvider.updateAccentColor();
-                      });
-                      Navigator.pop(context);
-                    },
-                  ),
-                ],
-              ),
             ],
           ),
         );
@@ -220,59 +214,52 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  void _showMoodEmojiPopup(int? value, String title) {
+  void _showMoodEmojiPopup(int? value) {
     String newEmoji = '';
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(title),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                inputFormatters: [
-                  LengthLimitingTextInputFormatter(1), // Limit to one character
-                ],
-                onChanged: (value) {
-                  newEmoji = value;
-                },
-                decoration: const InputDecoration(
-                  hintText: 'Enter an icon...',
-                ),
-              ),
-              const SizedBox(
-                height: 8,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    child: const Text("Cancel"),
-                    onPressed: () async {
-                      Navigator.pop(context);
-                    },
-                  ),
-                  TextButton(
-                    child: const Text("Save"),
-                    onPressed: () async {
-                      if (newEmoji.isNotEmpty) {
-                        if (value != null) {
-                          await ConfigManager.instance.setField(
-                              ConfigManager.moodValueFieldMapping[value]!,
-                              newEmoji);
-                        } else {
-                          await ConfigManager.instance
-                              .setField('noMoodIcon', newEmoji);
-                        }
-                        setState(() {});
-                      }
-                      Navigator.pop(context);
-                    },
-                  ),
-                ],
-              ),
+          title: Center(
+            child: MoodIcon(
+              moodValue: value,
+              size: 32,
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+              onPressed: () async {
+                Navigator.pop(context);
+              },
+            ),
+            TextButton(
+              child: Text(MaterialLocalizations.of(context).okButtonLabel),
+              onPressed: () async {
+                if (newEmoji.isNotEmpty) {
+                  if (value != null) {
+                    await ConfigManager.instance.setField(
+                        ConfigManager.moodValueFieldMapping[value]!, newEmoji);
+                  } else {
+                    await ConfigManager.instance
+                        .setField('noMoodIcon', newEmoji);
+                  }
+                  setState(() {});
+                }
+                Navigator.pop(context);
+              },
+            ),
+          ],
+          content: TextField(
+            inputFormatters: [
+              LengthLimitingTextInputFormatter(1), // Limit to one character
             ],
+            onChanged: (value) {
+              newEmoji = value;
+            },
+            decoration: InputDecoration(
+              hintText: AppLocalizations.of(context)!.moodIconPrompt,
+            ),
           ),
         );
       },
@@ -286,7 +273,7 @@ class _SettingsPageState extends State<SettingsPage> {
     setState(() {});
   }
 
-  Widget moodIconButton(int? index, String title) {
+  Widget moodIconButton(int? index) {
     return GestureDetector(
       child: Card(
           child: Padding(
@@ -295,7 +282,7 @@ class _SettingsPageState extends State<SettingsPage> {
             constraints: const BoxConstraints(minWidth: 30),
             child: Center(child: MoodIcon(moodValue: index, size: 24))),
       )),
-      onTap: () => _showMoodEmojiPopup(index, title),
+      onTap: () => _showMoodEmojiPopup(index),
     );
   }
 
@@ -593,24 +580,34 @@ class _SettingsPageState extends State<SettingsPage> {
             )))
           : Scaffold(
               appBar: AppBar(
-                title: const Text("Settings"),
+                title: Text(AppLocalizations.of(context)!.pageSettingsTitle),
               ),
               body: ListView(
                 padding: const EdgeInsets.all(8),
                 children: [
-                  SettingsHeader(text: "Appearance"),
+                  SettingsHeader(
+                      text: AppLocalizations.of(context)!
+                          .settingsAppearanceTitle),
                   SettingsDropdown<String>(
-                      title: "Theme",
+                      title: AppLocalizations.of(context)!.settingsTheme,
                       settingsKey: "theme",
                       options: [
                         DropdownMenuItem<String>(
-                            value: "system", child: Text("System")),
+                            value: "system",
+                            child: Text(
+                                AppLocalizations.of(context)!.themeSystem)),
                         DropdownMenuItem<String>(
-                            value: "dark", child: Text("Dark")),
+                            value: "dark",
+                            child:
+                                Text(AppLocalizations.of(context)!.themeDark)),
                         DropdownMenuItem<String>(
-                            value: "light", child: Text("Light")),
+                            value: "light",
+                            child:
+                                Text(AppLocalizations.of(context)!.themeLight)),
                         DropdownMenuItem<String>(
-                            value: "amoled", child: Text("AMOLED")),
+                            value: "amoled",
+                            child: Text(
+                                AppLocalizations.of(context)!.themeAmoled)),
                       ],
                       onChanged: (String? newValue) {
                         ThemeMode themeMode = ThemeMode.system;
@@ -635,7 +632,8 @@ class _SettingsPageState extends State<SettingsPage> {
                         });
                       }),
                   SettingsToggle(
-                      title: "Use System Accent Color",
+                      title: AppLocalizations.of(context)!
+                          .settingsUseSystemAccentColor,
                       settingsKey: "followSystemColor",
                       onChanged: (value) {
                         setState(() {
@@ -646,14 +644,16 @@ class _SettingsPageState extends State<SettingsPage> {
                       }),
                   if (!ConfigManager.instance.getField('followSystemColor'))
                     SettingsIconAction(
-                      title: "Custom Accent Color",
+                      title: AppLocalizations.of(context)!
+                          .settingsCustomAccentColor,
                       icon: Icon(Icons.colorize_rounded),
                       onPressed: () async {
                         _showAccentColorPopup(themeProvider);
                       },
                     ),
                   SettingsToggle(
-                      title: "Show Markdown Toolbar",
+                      title: AppLocalizations.of(context)!
+                          .settingsShowMarkdownToolbar,
                       settingsKey: "useMarkdownToolbar",
                       onChanged: (value) {
                         setState(() {
@@ -661,8 +661,8 @@ class _SettingsPageState extends State<SettingsPage> {
                               .setField("useMarkdownToolbar", value);
                         });
                       }),
-                  const Text(
-                    "Change Mood Icons",
+                  Text(
+                    AppLocalizations.of(context)!.settingsChangeMoodIcons,
                     style: TextStyle(fontSize: 16),
                   ),
                   Row(
@@ -670,12 +670,12 @@ class _SettingsPageState extends State<SettingsPage> {
                     children: [
                       Row(
                         children: [
-                          moodIconButton(-2, "Very Sad Icon"),
-                          moodIconButton(-1, "Sad Icon"),
-                          moodIconButton(0, "Neutral Icon"),
-                          moodIconButton(1, "Happy Icon"),
-                          moodIconButton(2, "Very Happy Icon"),
-                          moodIconButton(null, "Unknown Mood Icon"),
+                          moodIconButton(-2),
+                          moodIconButton(-1),
+                          moodIconButton(0),
+                          moodIconButton(1),
+                          moodIconButton(2),
+                          moodIconButton(null),
                         ],
                       ),
                       IconButton(
@@ -684,11 +684,15 @@ class _SettingsPageState extends State<SettingsPage> {
                     ],
                   ),
                   const Divider(),
-                  if (Platform.isAndroid) SettingsHeader(text: "Notifications"),
+                  if (Platform.isAndroid)
+                    SettingsHeader(
+                        text: AppLocalizations.of(context)!
+                            .settingsNotificationsTitle),
                   if (Platform.isAndroid)
                     SettingsToggle(
-                        title: "Daily Reminders",
-                        hint: "Allow app to run in background for best results",
+                        title: AppLocalizations.of(context)!.dailyReminderTitle,
+                        hint: AppLocalizations.of(context)!
+                            .dailyReminderDescription,
                         settingsKey: "dailyReminders",
                         onChanged: (value) async {
                           if (await NotificationManager.instance
@@ -709,7 +713,8 @@ class _SettingsPageState extends State<SettingsPage> {
                       ConfigManager.instance.getField('dailyReminders'))
                     ConfigManager.instance.getField('setReminderTime')
                         ? SettingsIconAction(
-                            title: "Reminder Time",
+                            title: AppLocalizations.of(context)!
+                                .settingsReminderTime,
                             hint: TimeManager.timeOfDayString(
                                 TimeManager.scheduledReminderTime()),
                             icon: Icon(Icons.schedule_rounded),
@@ -717,7 +722,8 @@ class _SettingsPageState extends State<SettingsPage> {
                               _selectTime(context);
                             })
                         : SettingsIconAction(
-                            title: "Reminder Time",
+                            title: AppLocalizations.of(context)!
+                                .settingsReminderTime,
                             hint: TimeManager.timeRangeString(
                                 TimeManager.getReminderTimeRange()),
                             icon: Icon(Icons.timelapse_rounded),
@@ -727,8 +733,10 @@ class _SettingsPageState extends State<SettingsPage> {
                   if (Platform.isAndroid &&
                       ConfigManager.instance.getField('dailyReminders'))
                     SettingsToggle(
-                        title: "Set Reminder Time",
-                        hint: "Pick a set time for the reminder to occur",
+                        title: AppLocalizations.of(context)!
+                            .settingsFixedReminderTimeTitle,
+                        hint: AppLocalizations.of(context)!
+                            .settingsFixedReminderTimeDescription,
                         settingsKey: 'setReminderTime',
                         onChanged: (value) async {
                           await ConfigManager.instance

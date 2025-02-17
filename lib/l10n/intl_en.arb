@@ -63,5 +63,33 @@
 
 
 
+  "pageSettingsTitle": "Settings",
+
+
+
+  "settingsAppearanceTitle": "Appearance",
+
+  "settingsTheme": "Theme",
+  "themeSystem": "System",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "themeAmoled": "AMOLED",
+
+  "settingsUseSystemAccentColor": "Use System Accent Color",
+  "settingsCustomAccentColor": "Custom Accent Color",
+  "settingsShowMarkdownToolbar": "Show Markdown Toolbar",
+  "settingsChangeMoodIcons": "Change Mood Icons",
+  "moodIconPrompt": "Enter an icon",
+
+
+  "settingsNotificationsTitle": "Notifications",
+  
+  "settingsDailyReminderTitle": "Daily Reminder",
+  "settingsDailyReminderDescription": "Allow app to run in background for best results",
+  "settingsReminderTime": "Reminder Time",
+  "settingsFixedReminderTimeTitle": "Fixed Reminder Time",
+  "settingsFixedReminderTimeDescription": "Pick a fixed time for the reminder",
+
+
   "tagMoodTitle": "Mood"
 }
