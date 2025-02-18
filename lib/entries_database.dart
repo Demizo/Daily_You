@@ -22,7 +22,8 @@ class EntriesDatabase {
 
   static Database? _database;
 
-  final FileBytesCache imageCache = FileBytesCache(maxCacheSize: 100 * 1024 * 1024);
+  final FileBytesCache imageCache =
+      FileBytesCache(maxCacheSize: 100 * 1024 * 1024);
   final imgFetchScheduler = ParallelScheduler(5);
 
   EntriesDatabase._init();
@@ -63,7 +64,6 @@ CREATE TABLE $templatesTable (
   ${TemplatesFields.timeModified} DATETIME NOT NULL DEFAULT (DATETIME('now'))
 )
 ''');
-    await createDefaultTemplates();
     await db.execute('''
 CREATE TABLE $imagesTable (
     ${EntryImageFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -89,7 +89,6 @@ CREATE TABLE $templatesTable (
   ${TemplatesFields.timeModified} DATETIME NOT NULL DEFAULT (DATETIME('now'))
 )
 ''');
-      await createDefaultTemplates();
     }
     if (oldVersion <= 2) {
       await db.execute('''
@@ -143,35 +142,6 @@ DROP TABLE old_entries;
   }
 
   // Template Methods
-  Future createDefaultTemplates() async {
-    await createTemplate(Template(
-        name: "High/Low",
-        text: '''
-### High
-- 
-
-### Low
-- 
-''',
-        timeCreate: DateTime.now(),
-        timeModified: DateTime.now()));
-    await createTemplate(Template(
-        name: "Quote",
-        text: '''
-### Quote of the day...
-> ""
-''',
-        timeCreate: DateTime.now(),
-        timeModified: DateTime.now()));
-    await createTemplate(Template(
-        name: "List",
-        text: '''
-- 
-- 
-- ''',
-        timeCreate: DateTime.now(),
-        timeModified: DateTime.now()));
-  }
 
   Future<Template> createTemplate(Template template) async {
     final db = _database!;
@@ -309,8 +279,10 @@ DROP TABLE old_entries;
     }
     // Fetch local copy if present
     var internalDir = await getInternalImgDatabasePath();
-    bytes = await imgFetchScheduler.run(() => FileLayer.getFileBytes(internalDir,
-        name: imageName, useExternalPath: false)).result;
+    bytes = await imgFetchScheduler
+        .run(() => FileLayer.getFileBytes(internalDir,
+            name: imageName, useExternalPath: false))
+        .result;
     // Attempt to fetch file externally
     if (bytes == null && usingExternalImg()) {
       // Get and cache external image
@@ -796,7 +768,7 @@ DROP TABLE old_entries;
     StatsProvider.instance.updateSyncStats(0, 0);
     final picker = ImagePicker();
     final pickedFiles = await picker.pickMultiImage(
-	imageQuality: ConfigManager.instance.getField('imageQuality'));
+        imageQuality: ConfigManager.instance.getField('imageQuality'));
 
     List<String> externalImages = List.empty(growable: true);
     if (usingExternalImg()) {
