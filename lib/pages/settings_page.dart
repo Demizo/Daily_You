@@ -531,19 +531,23 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  List<DropdownMenuItem<int>> _buildDefaultTemplateDropdownItems() {
+  List<DropdownMenuItem<int>> _buildDefaultTemplateDropdownItems(
+      BuildContext context) {
     var dropdownItems = _templates.map((Template template) {
       return DropdownMenuItem<int>(
         value: template.id,
-        child: Text(
-          template.name,
-          overflow: TextOverflow.ellipsis,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: 180),
+          child: Text(
+            template.name,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
       );
     }).toList();
-    dropdownItems.add(const DropdownMenuItem<int>(
+    dropdownItems.add(DropdownMenuItem<int>(
       value: -1,
-      child: Text("None"),
+      child: Text(AppLocalizations.of(context)!.noTemplateTitle),
     ));
     return dropdownItems;
   }
@@ -748,12 +752,15 @@ class _SettingsPageState extends State<SettingsPage> {
                           setState(() {});
                         }),
                   if (Platform.isAndroid) const Divider(),
-                  SettingsHeader(text: "Templates"),
+                  SettingsHeader(
+                      text:
+                          AppLocalizations.of(context)!.settingsTemplatesTitle),
                   if (!isLoading)
                     SettingsDropdown<int>(
-                      title: "Default Template",
+                      title:
+                          AppLocalizations.of(context)!.settingsDefaultTemplate,
                       settingsKey: "defaultTemplate",
-                      options: _buildDefaultTemplateDropdownItems(),
+                      options: _buildDefaultTemplateDropdownItems(context),
                       onChanged: (int? newValue) {
                         setState(() {
                           ConfigManager.instance
@@ -762,7 +769,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       },
                     ),
                   SettingsIconAction(
-                      title: 'Manage Templates',
+                      title: AppLocalizations.of(context)!.manageTemplates,
                       icon: Icon(Icons.edit_document),
                       onPressed: () => _showTemplateManagementPopup(context)),
                   const Divider(),

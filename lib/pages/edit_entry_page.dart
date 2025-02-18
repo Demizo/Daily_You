@@ -80,26 +80,23 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(AppLocalizations.of(context)!.deleteLogTitle),
-	  actions: [
-	    TextButton(
-	      child: Text(MaterialLocalizations.of(context).deleteButtonTooltip),
-                    onPressed: () async {
-                      await deleteEntry(id);
-                      Navigator.of(context).popUntil((route) => route.isFirst);
-                    },
-	      
-	    ),
-	    TextButton(
-	      child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
-                    onPressed: () async {
-                      Navigator.pop(context);
-                    },
-	      
-	    ) 
-	  ],
-          content:
-              Text(AppLocalizations.of(context)!.deleteLogDescription),
-          
+          actions: [
+            TextButton(
+              child:
+                  Text(MaterialLocalizations.of(context).deleteButtonTooltip),
+              onPressed: () async {
+                await deleteEntry(id);
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              },
+            ),
+            TextButton(
+              child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+              onPressed: () async {
+                Navigator.pop(context);
+              },
+            )
+          ],
+          content: Text(AppLocalizations.of(context)!.deleteLogDescription),
         );
       },
     );
@@ -153,9 +150,15 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
                 StatefulBuilder(
                   builder: (context, setState) => EntryMoodPicker(
                       date: widget.entry != null
-                          ? DateFormat.yMMMEd(WidgetsBinding.instance.platformDispatcher.locale.toString()).format(widget.entry!.timeCreate)
-                          : DateFormat.yMMMEd(WidgetsBinding.instance.platformDispatcher.locale.toString()).format(
-                              widget.overrideCreateDate ?? DateTime.now()),
+                          ? DateFormat.yMMMEd(WidgetsBinding
+                                  .instance.platformDispatcher.locale
+                                  .toString())
+                              .format(widget.entry!.timeCreate)
+                          : DateFormat.yMMMEd(WidgetsBinding
+                                  .instance.platformDispatcher.locale
+                                  .toString())
+                              .format(
+                                  widget.overrideCreateDate ?? DateTime.now()),
                       moodValue: mood,
                       onChangedMood: (mood) =>
                           {setState(() => this.mood = mood)}),

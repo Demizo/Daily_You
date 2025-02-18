@@ -2,6 +2,8 @@ import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:daily_you/widgets/entry_text_edit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class EditTemplate extends StatefulWidget {
   final Template? template;
@@ -54,7 +56,6 @@ class _EditTemplateState extends State<EditTemplate> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(widget.template == null ? 'Add Template' : 'Edit Template'),
       content: SizedBox(
         width: double.maxFinite,
         child: Column(
@@ -63,28 +64,41 @@ class _EditTemplateState extends State<EditTemplate> {
             Card(
               child: Padding(
                 padding: const EdgeInsets.only(
-                    left: 8.0, right: 8.0, bottom: 8.0, top: 4.0),
+                  left: 8.0,
+                  right: 8.0,
+                ),
                 child: TextField(
                   controller: _nameController,
-                  decoration: null,
+                  maxLines: 1,
+                  textCapitalization: TextCapitalization.words,
+                  spellCheckConfiguration: SpellCheckConfiguration(
+                      spellCheckService: DefaultSpellCheckService()),
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    hintText: AppLocalizations.of(context)!.titleHint,
+                  ),
                 ),
               ),
             ),
             EntryTextEditor(
-                text: templateText,
-                onChangedText: (text) => {templateText = text}),
+              text: templateText,
+              onChangedText: (text) => {templateText = text},
+              showTemplatesButton: false,
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 TextButton(
-                  child: const Text('Discard'),
+                  child:
+                      Text(MaterialLocalizations.of(context).cancelButtonLabel),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
                 ),
                 TextButton(
                   onPressed: _saveTemplate,
-                  child: const Text('Save'),
+                  child:
+                      Text(MaterialLocalizations.of(context).saveButtonLabel),
                 ),
               ],
             )
