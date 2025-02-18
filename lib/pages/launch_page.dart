@@ -1,4 +1,5 @@
 import 'package:daily_you/entries_database.dart';
+import 'package:daily_you/stats_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -32,7 +33,13 @@ class _LaunchPageState extends State<LaunchPage> {
   _checkDatabaseConnection() async {
     //Initialize Database
     if (await EntriesDatabase.instance.initDB()) {
-      await _nextPage();
+      if (EntriesDatabase.instance.usingExternalImg()) {
+        if (await EntriesDatabase.instance.hasImgUriPermission()) {
+          await _nextPage();
+        }
+      } else {
+        await _nextPage();
+      }
     }
 
     setState(() {
@@ -46,6 +53,7 @@ class _LaunchPageState extends State<LaunchPage> {
   }
 
   Future<void> _nextPage() async {
+    await StatsProvider.instance.updateStats();
     await Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => widget.nextPage));
   }

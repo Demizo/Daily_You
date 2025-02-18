@@ -26,8 +26,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   bool listView = true;
-
-  bool isLoading = false;
   String searchText = '';
   bool sortOrderAsc = true;
   bool firstLoad = true;
@@ -37,17 +35,13 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     String viewMode = ConfigManager.instance.getField('homePageViewMode');
     listView = viewMode == 'list';
-    refreshEntries();
+    _checkForNotificationLaunch();
   }
 
   Future<void> logToday() async {
-    var newEntry = await Navigator.of(context).push(MaterialPageRoute(
+    await Navigator.of(context).push(MaterialPageRoute(
       builder: (context) => const AddEditEntryPage(),
     ));
-
-    if (newEntry != null) {
-      await refreshEntries();
-    }
   }
 
   Future<void> setViewMode() async {
@@ -55,45 +49,21 @@ class _HomePageState extends State<HomePage> {
     await ConfigManager.instance.setField('homePageViewMode', viewMode);
   }
 
-  Future<void> uriErrorPopup(String folderType) async {
-    await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-              title: const Text("Error:"),
-              content: Text(
-                  "Can't access the $folderType folder! Go to settings, backup your logs and images, then reset the your external folder locations!"));
-        });
-  }
-
-  Future refreshEntries() async {
-    if (firstLoad) setState(() => isLoading = true);
-    if (await ConfigManager.instance.getField("useExternalDb") &&
-        !await EntriesDatabase.instance.hasDbUriPermission()) {
-      uriErrorPopup("Log");
-    }
-
-    if (await ConfigManager.instance.getField("useExternalImg") &&
-        !await EntriesDatabase.instance.hasImgUriPermission()) {
-      uriErrorPopup("Image");
-    }
-
-    await StatsProvider.instance.updateStats();
-    firstLoad = false;
-
-    if (Platform.isAndroid) {
-      var launchDetails = await NotificationManager.instance.notifications
-          .getNotificationAppLaunchDetails();
-      if (NotificationManager.instance.justLaunched &&
-          launchDetails?.notificationResponse?.id == 0 &&
-          await EntriesDatabase.instance.getEntryForDate(DateTime.now()) ==
-              null) {
-        NotificationManager.instance.justLaunched = false;
-        await logToday();
+  Future _checkForNotificationLaunch() async {
+    if (firstLoad) {
+      firstLoad = false;
+      if (Platform.isAndroid) {
+        var launchDetails = await NotificationManager.instance.notifications
+            .getNotificationAppLaunchDetails();
+        if (NotificationManager.instance.justLaunched &&
+            launchDetails?.notificationResponse?.id == 0 &&
+            await EntriesDatabase.instance.getEntryForDate(DateTime.now()) ==
+                null) {
+          NotificationManager.instance.justLaunched = false;
+          await logToday();
+        }
       }
     }
-
-    setState(() => isLoading = false);
   }
 
   @override
@@ -110,80 +80,75 @@ class _HomePageState extends State<HomePage> {
     }
 
     return Center(
-      child: isLoading
-          ? const SizedBox()
-          : Stack(alignment: Alignment.topCenter, children: [
-              buildEntries(context, flashbacks),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  if (todayEntry == null)
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                      	crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          if (Platform.isAndroid)
-                            IconButton(
-                              icon: const Icon(
-                                Icons.camera_alt_rounded,
-                                size: 24,
-                              ),
-                              onPressed: () async {
-                                await Navigator.of(context)
-                                    .push(MaterialPageRoute(
-                                  builder: (context) => const AddEditEntryPage(
-                                    openCamera: true,
-                                  ),
-                                ));
-                              },
-                              style: ElevatedButton.styleFrom(
-                                padding: const EdgeInsets.all(8),
-                                backgroundColor:
-                                    Theme.of(context).colorScheme.primary,
-                                foregroundColor:
-                                    Theme.of(context).colorScheme.surface,
-                                elevation: 3,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(80.0),
-                                ),
-                              ),
+      child: Stack(alignment: Alignment.topCenter, children: [
+        buildEntries(context, flashbacks),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            if (todayEntry == null)
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    if (Platform.isAndroid)
+                      IconButton(
+                        icon: const Icon(
+                          Icons.camera_alt_rounded,
+                          size: 24,
+                        ),
+                        onPressed: () async {
+                          await Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => const AddEditEntryPage(
+                              openCamera: true,
                             ),
-                          IconButton(
-                            icon: Icon(
-                              Icons.add_rounded,
-                              color: Theme.of(context).colorScheme.surface,
-                              size: 36,
-                            ),
-                            onPressed: () async {
-                              await Navigator.of(context)
-                                  .push(MaterialPageRoute(
-                                builder: (context) => const AddEditEntryPage(),
-                              ));
-                            },
-                            style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.all(12),
-                              backgroundColor:
-                                  Theme.of(context).colorScheme.primary,
-                              foregroundColor:
-                                  Theme.of(context).colorScheme.surface,
-                              elevation: 3,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(80.0),
-                              ),
-                            ),
+                          ));
+                        },
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.all(8),
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primary,
+                          foregroundColor:
+                              Theme.of(context).colorScheme.surface,
+                          elevation: 3,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(80.0),
                           ),
-                        ],
+                        ),
+                      ),
+                    IconButton(
+                      icon: Icon(
+                        Icons.add_rounded,
+                        color: Theme.of(context).colorScheme.surface,
+                        size: 28,
+                      ),
+                      onPressed: () async {
+                        await Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => const AddEditEntryPage(),
+                        ));
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.all(16),
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        foregroundColor: Theme.of(context).colorScheme.surface,
+                        elevation: 3,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(80.0),
+                        ),
                       ),
                     ),
-                ],
+                  ],
+                ),
               ),
-            ]),
+          ],
+        ),
+      ]),
     );
   }
 
-  Widget buildEntries(BuildContext context, List<Flashback> flashbacks) => ListView(children: [
+  Widget buildEntries(BuildContext context, List<Flashback> flashbacks) =>
+      ListView(children: [
         const Center(
             child: SizedBox(height: 430, width: 400, child: EntryCalendar())),
         Card(
@@ -210,7 +175,7 @@ class _HomePageState extends State<HomePage> {
         flashbacks.isEmpty
             ? Center(
                 child: Text(
-		  AppLocalizations.of(context)!.flaskbacksEmpty,
+                  AppLocalizations.of(context)!.flaskbacksEmpty,
                   style: TextStyle(
                       fontSize: 18, color: Theme.of(context).disabledColor),
                 ),
