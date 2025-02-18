@@ -94,11 +94,44 @@
 
 
   "settingsTemplatesTitle": "Templates",
+
   "settingsDefaultTemplate": "Default Template",
   "manageTemplates": "Manage Templates",
   "addTemplate": "Add a Template",
   "newTemplate": "New Template",
   "noTemplateTitle": "None",
   "noTemplatesDescription": "No templates created yet...",
+
+
+  "settingsStorageTitle": "Storage",
+
+  "settingsImageQuality": "Image Quality",
+  "imageQualityHigh": "High",
+  "imageQualityMedium": "Medium",
+  "imageQualityLow": "Low",
+  "imageQualityNoCompression": "No Compression",
+
+  "settingsLogFolder": "Log Folder",
+  "warningTitle": "Warning",
+  "logFolderWarningDescription": "If the selected folder already contains a 'daily_you.db' file, it will be used to overwrite your existing logs!",
+  "errorTitle": "Error",
+  "logFolderErrorDescription": "Failed to change log folder!",
+  "imageFolderErrorDescription": "Failed to change image folder!",
+  "settingsImageFolder": "Image Folder",
+
+  "settingsExport": "Export",
+  "exportLogs": "Export Logs",
+  "exportImages": "Export Images",
+
+  "settingsImport": "Import",
+
+  "importLogs": "Import Logs",
+  "importImages": "Import Images",
+  
+  "logFormatTitle": "Choose Format",
+  "formatOneShot": "OneShot",
+
+  "settingsDeleteAllLogsTitle": "Delete All Logs",
+  "settingsDeleteAllLogsDescription": "Do you want to delete all of your logs?",
   "tagMoodTitle": "Mood"
 }

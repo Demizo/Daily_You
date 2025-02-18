@@ -83,18 +83,24 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
-  Future<void> _showChangeLogFolderWarning(BuildContext context) async {
+  Future<void> _showChangeLogFolderWarning() async {
     bool confirmed = false;
     await showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Warning:'),
-          content: const Text(
-              "Backup your logs and images before changing the log folder! If the selected directory already contains \"daily_you.db\", it will be used to overwrite your current logs!"),
+          title: Text(AppLocalizations.of(context)!.warningTitle),
+          content:
+              Text(AppLocalizations.of(context)!.logFolderWarningDescription),
           actions: [
-            ElevatedButton(
-              child: const Text("Ok"),
+            TextButton(
+              child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+              onPressed: () async {
+                Navigator.pop(context);
+              },
+            ),
+            TextButton(
+              child: Text(MaterialLocalizations.of(context).okButtonLabel),
               onPressed: () async {
                 confirmed = true;
                 Navigator.pop(context);
@@ -117,57 +123,50 @@ class _SettingsPageState extends State<SettingsPage> {
         await showDialog(
             context: context,
             builder: (BuildContext context) {
-              return const AlertDialog(
-                  title: Text("Error:"),
-                  content: Text("Permission Denied: Log folder not changed!"));
+              return AlertDialog(
+                  title: Text(AppLocalizations.of(context)!.errorTitle),
+                  actions: [
+                    TextButton(
+                      child:
+                          Text(MaterialLocalizations.of(context).okButtonLabel),
+                      onPressed: () async {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                  content: Text(
+                      AppLocalizations.of(context)!.logFolderErrorDescription));
             });
       }
-
-      setState(() {});
     }
   }
 
-  Future<void> _showChangeImgFolderWarning(BuildContext context) async {
-    bool confirmed = false;
-    await showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Warning:'),
-          content: const Text(
-              "Backup your images before changing the image folder!"),
-          actions: [
-            ElevatedButton(
-              child: const Text("Ok"),
-              onPressed: () async {
-                confirmed = true;
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        );
-      },
-    );
-    if (confirmed) {
-      setState(() {
-        isSyncing = true;
-      });
-      bool locationSet = await EntriesDatabase.instance.selectImageFolder();
-      setState(() {
-        isSyncing = false;
-      });
-      if (!locationSet) {
-        await showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return const AlertDialog(
-                  title: Text("Error:"),
-                  content:
-                      Text("Permission Denied: Image folder not changed!"));
-            });
-      }
-
-      setState(() {});
+  Future<void> _attemptImageFolderChange() async {
+    setState(() {
+      isSyncing = true;
+    });
+    bool locationSet = await EntriesDatabase.instance.selectImageFolder();
+    setState(() {
+      isSyncing = false;
+    });
+    if (!locationSet) {
+      await showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+                title: Text(AppLocalizations.of(context)!.errorTitle),
+                actions: [
+                  TextButton(
+                    child:
+                        Text(MaterialLocalizations.of(context).okButtonLabel),
+                    onPressed: () async {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+                content: Text(
+                    AppLocalizations.of(context)!.imageFolderErrorDescription));
+          });
     }
   }
 
@@ -291,16 +290,53 @@ class _SettingsPageState extends State<SettingsPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Import Logs From:'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text("This will NOT modify existing logs..."),
-              const SizedBox(
-                height: 8,
-              ),
               ListTile(
-                  title: const Text('Daily You'),
+                  title: Text(AppLocalizations.of(context)!.importLogs),
+                  onTap: () async {
+                    Navigator.pop(context);
+                    if (Platform.isAndroid &&
+                        !await requestStoragePermission()) {
+                      return;
+                    }
+                    _showImportLogsFormatPopup();
+                  }),
+              ListTile(
+                  title: Text(AppLocalizations.of(context)!.importImages),
+                  onTap: () async {
+                    Navigator.pop(context);
+                    if (Platform.isAndroid &&
+                        !await requestPhotosPermission()) {
+                      return;
+                    }
+                    setState(() {
+                      isSyncing = true;
+                    });
+                    await EntriesDatabase.instance.importImages();
+                    setState(() {
+                      isSyncing = false;
+                    });
+                  }),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showImportLogsFormatPopup() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(AppLocalizations.of(context)!.logFormatTitle),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                  title: Text(AppLocalizations.of(context)!.appTitle),
                   onTap: () async {
                     Navigator.pop(context);
                     setState(() {
@@ -312,7 +348,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     });
                   }),
               ListTile(
-                  title: const Text('OneShot'),
+                  title: Text(AppLocalizations.of(context)!.formatOneShot),
                   onTap: () async {
                     Navigator.pop(context);
                     setState(() {
@@ -335,15 +371,28 @@ class _SettingsPageState extends State<SettingsPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Choose Export Format:'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                  title: const Text('Daily You'),
+                  title: Text(AppLocalizations.of(context)!.exportLogs),
                   onTap: () async {
                     Navigator.pop(context);
+                    if (Platform.isAndroid &&
+                        !await requestStoragePermission()) {
+                      return;
+                    }
                     await EntriesDatabase.instance.exportToJson();
+                  }),
+              ListTile(
+                  title: Text(AppLocalizations.of(context)!.exportImages),
+                  onTap: () async {
+                    Navigator.pop(context);
+                    if (Platform.isAndroid &&
+                        !await requestPhotosPermission()) {
+                      return;
+                    }
+                    await EntriesDatabase.instance.exportImages();
                   }),
             ],
           ),
@@ -357,74 +406,25 @@ class _SettingsPageState extends State<SettingsPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Delete All Logs?'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text("Do you want to delete all of your logs?"),
-              const SizedBox(
-                height: 8,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton.icon(
-                    icon: Icon(
-                      Icons.delete_rounded,
-                      color: Theme.of(context).colorScheme.primary,
-                      size: 24,
-                    ),
-                    label: const Padding(
-                      padding: EdgeInsets.all(2.0),
-                      child: Text(
-                        "Delete All",
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
-                    onPressed: () async {
-                      Navigator.pop(context);
-                      await EntriesDatabase.instance.deleteAllEntries();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.all(12),
-                      backgroundColor: Theme.of(context).colorScheme.surface,
-                      foregroundColor: Theme.of(context).colorScheme.primary,
-                      elevation: 3,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.0),
-                      ),
-                    ),
-                  ),
-                  ElevatedButton.icon(
-                    icon: Icon(
-                      Icons.cancel_rounded,
-                      color: Theme.of(context).colorScheme.surface,
-                      size: 24,
-                    ),
-                    label: const Padding(
-                      padding: EdgeInsets.all(2.0),
-                      child: Text(
-                        "Cancel",
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
-                    onPressed: () async {
-                      Navigator.pop(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.all(12),
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      foregroundColor: Theme.of(context).colorScheme.surface,
-                      elevation: 3,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.0),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+          title: Text(AppLocalizations.of(context)!.settingsDeleteAllLogsTitle),
+          actions: [
+            TextButton(
+              child:
+                  Text(MaterialLocalizations.of(context).deleteButtonTooltip),
+              onPressed: () async {
+                Navigator.pop(context);
+                await EntriesDatabase.instance.deleteAllEntries();
+              },
+            ),
+            TextButton(
+              child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+              onPressed: () async {
+                Navigator.pop(context);
+              },
+            )
+          ],
+          content: Text(
+              AppLocalizations.of(context)!.settingsDeleteAllLogsDescription),
         );
       },
     );
@@ -773,16 +773,28 @@ class _SettingsPageState extends State<SettingsPage> {
                       icon: Icon(Icons.edit_document),
                       onPressed: () => _showTemplateManagementPopup(context)),
                   const Divider(),
-                  SettingsHeader(text: "Storage"),
+                  SettingsHeader(
+                      text: AppLocalizations.of(context)!.settingsStorageTitle),
                   SettingsDropdown<int>(
-                      title: "Image Quality",
+                      title: AppLocalizations.of(context)!.settingsImageQuality,
                       settingsKey: "imageQuality",
                       options: [
                         DropdownMenuItem<int>(
-                            value: 100, child: Text("No Compression")),
-                        DropdownMenuItem<int>(value: 90, child: Text("High")),
-                        DropdownMenuItem<int>(value: 75, child: Text("Medium")),
-                        DropdownMenuItem<int>(value: 50, child: Text("Low")),
+                            value: 100,
+                            child: Text(AppLocalizations.of(context)!
+                                .imageQualityNoCompression)),
+                        DropdownMenuItem<int>(
+                            value: 90,
+                            child: Text(AppLocalizations.of(context)!
+                                .imageQualityHigh)),
+                        DropdownMenuItem<int>(
+                            value: 75,
+                            child: Text(AppLocalizations.of(context)!
+                                .imageQualityMedium)),
+                        DropdownMenuItem<int>(
+                            value: 50,
+                            child: Text(
+                                AppLocalizations.of(context)!.imageQualityLow)),
                       ],
                       onChanged: (int? newValue) {
                         setState(() {
@@ -800,7 +812,8 @@ class _SettingsPageState extends State<SettingsPage> {
                                 .getField('externalDbUri');
                           }
                           return SettingsIconAction(
-                            title: 'Log Folder',
+                            title:
+                                AppLocalizations.of(context)!.settingsLogFolder,
                             hint: folderText,
                             icon: Icon(Icons.folder_rounded),
                             secondaryIcon: Icon(Icons.refresh_rounded),
@@ -809,7 +822,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                   !await requestStoragePermission()) {
                                 return;
                               }
-                              await _showChangeLogFolderWarning(context);
+                              await _showChangeLogFolderWarning();
                             },
                             onSecondaryPressed: () async {
                               EntriesDatabase.instance.resetDatabaseLocation();
@@ -830,7 +843,8 @@ class _SettingsPageState extends State<SettingsPage> {
                                 .getField('externalImgUri');
                           }
                           return SettingsIconAction(
-                            title: 'Image Folder',
+                            title: AppLocalizations.of(context)!
+                                .settingsImageFolder,
                             hint: folderText,
                             icon: Icon(Icons.folder_rounded),
                             secondaryIcon: Icon(Icons.refresh_rounded),
@@ -839,7 +853,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                   !await requestPhotosPermission()) {
                                 return;
                               }
-                              await _showChangeImgFolderWarning(context);
+                              await _attemptImageFolderChange();
                             },
                             onSecondaryPressed: () async {
                               EntriesDatabase.instance
@@ -851,50 +865,16 @@ class _SettingsPageState extends State<SettingsPage> {
                         return const SizedBox();
                       }),
                   SettingsIconAction(
-                      title: "Export Logs",
+                      title: AppLocalizations.of(context)!.settingsExport,
                       icon: Icon(Icons.upload_rounded),
                       onPressed: () async {
-                        if (Platform.isAndroid &&
-                            !await requestStoragePermission()) {
-                          return;
-                        }
                         _showExportSelectionPopup();
                       }),
                   SettingsIconAction(
-                      title: "Export Images",
-                      icon: Icon(Icons.photo),
-                      onPressed: () async {
-                        if (Platform.isAndroid &&
-                            !await requestPhotosPermission()) {
-                          return;
-                        }
-                        await EntriesDatabase.instance.exportImages();
-                      }),
-                  SettingsIconAction(
-                      title: "Import Logs",
+                      title: AppLocalizations.of(context)!.settingsImport,
                       icon: Icon(Icons.download_rounded),
                       onPressed: () async {
-                        if (Platform.isAndroid &&
-                            !await requestStoragePermission()) {
-                          return;
-                        }
                         _showImportSelectionPopup();
-                      }),
-                  SettingsIconAction(
-                      title: "Import Images",
-                      icon: Icon(Icons.photo),
-                      onPressed: () async {
-                        if (Platform.isAndroid &&
-                            !await requestPhotosPermission()) {
-                          return;
-                        }
-                        setState(() {
-                          isSyncing = true;
-                        });
-                        await EntriesDatabase.instance.importImages();
-                        setState(() {
-                          isSyncing = false;
-                        });
                       }),
                   SettingsIconAction(
                       title: "Delete All Logs",
