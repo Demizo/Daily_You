@@ -1,5 +1,6 @@
 import 'package:daily_you/config_manager.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:time_range_picker/time_range_picker.dart';
 
 class TimeManager {
@@ -70,7 +71,9 @@ class TimeManager {
   }
 
   static String timeOfDayString(TimeOfDay timeOfDay) {
-    return '${timeOfDay.hourOfPeriod}:${timeOfDay.minute.toString().padLeft(2, '0')} ${timeOfDay.period.name.toUpperCase()}';
+    return DateFormat.jm(
+            WidgetsBinding.instance.platformDispatcher.locale.toString())
+        .format(addTimeOfDay(startOfDay(DateTime.now()), timeOfDay));
   }
 
   static int datesExactMonthDiff(DateTime date1, DateTime date2) {

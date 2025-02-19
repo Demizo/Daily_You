@@ -454,6 +454,8 @@ class _SettingsPageState extends State<SettingsPage> {
     TimeRange currentRange = TimeManager.getReminderTimeRange();
     TimeRange? range = await showTimeRangePicker(
         context: context,
+        toText: "",
+        fromText: "",
         use24HourFormat: ConfigManager.instance.is24HourFormat(),
         start: currentRange.startTime,
         end: currentRange.endTime,
@@ -881,9 +883,10 @@ class _SettingsPageState extends State<SettingsPage> {
                       icon: Icon(Icons.delete_forever_rounded),
                       onPressed: () => _showDeleteEntriesPopup()),
                   const Divider(),
-                  SettingsHeader(text: "About"),
+                  SettingsHeader(
+                      text: AppLocalizations.of(context)!.settingsAboutTitle),
                   SettingsIconAction(
-                      title: "Version",
+                      title: AppLocalizations.of(context)!.settingsVersion,
                       hint: versionString,
                       icon: Icon(Icons.open_in_new_rounded),
                       onPressed: () async {
@@ -893,8 +896,8 @@ class _SettingsPageState extends State<SettingsPage> {
                             mode: LaunchMode.externalApplication);
                       }),
                   SettingsIconAction(
-                      title: "License",
-                      hint: "GPL-3.0",
+                      title: AppLocalizations.of(context)!.settingsLicense,
+                      hint: AppLocalizations.of(context)!.licenseGPLv3,
                       icon: Icon(Icons.open_in_new_rounded),
                       onPressed: () async {
                         await launchUrl(
@@ -903,8 +906,8 @@ class _SettingsPageState extends State<SettingsPage> {
                             mode: LaunchMode.externalApplication);
                       }),
                   SettingsIconAction(
-                      title: "Source Code",
-                      hint: "Github",
+                      title: AppLocalizations.of(context)!.settingsSourceCode,
+                      hint: "github.com/Demizo/Daily_You",
                       icon: Icon(Icons.open_in_new_rounded),
                       onPressed: () async {
                         await launchUrl(

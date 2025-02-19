@@ -2,6 +2,7 @@ import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/stats_provider.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 
@@ -91,7 +92,7 @@ class _MoodByMonthChartState extends State<MoodByMonthChart> {
                       color: Theme.of(context).disabledColor,
                     ),
                     Text(
-                      "Not enough data...",
+                      AppLocalizations.of(context)!.statisticsNotEnoughData,
                       style: TextStyle(
                           fontSize: 18, color: Theme.of(context).disabledColor),
                     )
@@ -111,7 +112,7 @@ class _MoodByMonthChartState extends State<MoodByMonthChart> {
                         Theme.of(context).colorScheme.primary,
                         currentData,
                         currentPageKeys,
-			context)),
+                        context)),
                   ),
                 ),
               ],
@@ -155,8 +156,8 @@ class _MoodByMonthChartState extends State<MoodByMonthChart> {
     });
   }
 
-  LineChartData _buildLineChartData(
-      Color color, Map<String, double?> data, List<String> keys, BuildContext context) {
+  LineChartData _buildLineChartData(Color color, Map<String, double?> data,
+      List<String> keys, BuildContext context) {
     List<FlSpot?> spots = keys.asMap().entries.map((entry) {
       int index = entry.key;
       String key = entry.value;
@@ -194,9 +195,9 @@ class _MoodByMonthChartState extends State<MoodByMonthChart> {
             showTitles: true,
             getTitlesWidget: (value, _) => Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text(_formatMonth(value >= 0 && value < keys.length
-                  ? keys[value.toInt()]
-                  : '', context)),
+              child: Text(_formatMonth(
+                  value >= 0 && value < keys.length ? keys[value.toInt()] : '',
+                  context)),
             ),
             interval: 1,
             reservedSize: 36,
@@ -241,13 +242,15 @@ class _MoodByMonthChartState extends State<MoodByMonthChart> {
 
   String _formatMonth(String dateKey, BuildContext context) {
     DateTime date = DateFormat('yyyy-MM').parse(dateKey);
-    return DateFormat('MMM', WidgetsBinding.instance.platformDispatcher.locale.toString())
+    return DateFormat(
+            'MMM', WidgetsBinding.instance.platformDispatcher.locale.toString())
         .format(date); // Return shorthand month (e.g., "Jan")
   }
 
   String _formatMonthYear(String dateKey, BuildContext context) {
     DateTime date = DateFormat('yyyy-MM').parse(dateKey);
-    return DateFormat('MMM yyyy', WidgetsBinding.instance.platformDispatcher.locale.toString())
+    return DateFormat('MMM yyyy',
+            WidgetsBinding.instance.platformDispatcher.locale.toString())
         .format(date); // Return shorthand month (e.g., "Jan")
   }
 

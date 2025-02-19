@@ -37,6 +37,7 @@
 
 
 
+  "statisticsNotEnoughData": "Not enough data...",
   "statisticsRangeOneMonth": "1 Month",
   "statisticsRangeSixMonths": "6 Months",
   "statisticsRangeOneYear": "1 Year",
@@ -112,19 +113,17 @@
   "imageQualityNoCompression": "No Compression",
 
   "settingsLogFolder": "Log Folder",
+  "settingsImageFolder": "Image Folder",
   "warningTitle": "Warning",
   "logFolderWarningDescription": "If the selected folder already contains a 'daily_you.db' file, it will be used to overwrite your existing logs!",
   "errorTitle": "Error",
   "logFolderErrorDescription": "Failed to change log folder!",
   "imageFolderErrorDescription": "Failed to change image folder!",
-  "settingsImageFolder": "Image Folder",
 
   "settingsExport": "Export",
   "exportLogs": "Export Logs",
   "exportImages": "Export Images",
-
   "settingsImport": "Import",
-
   "importLogs": "Import Logs",
   "importImages": "Import Images",
   
@@ -133,5 +132,16 @@
 
   "settingsDeleteAllLogsTitle": "Delete All Logs",
   "settingsDeleteAllLogsDescription": "Do you want to delete all of your logs?",
+
+  
+  "settingsAboutTitle": "About",
+
+  "settingsVersion": "Version",
+  "settingsLicense": "License",
+  "licenseGPLv3": "GPL-3.0",
+  "settingsSourceCode": "Source Code",
+
+
+
   "tagMoodTitle": "Mood"
 }
