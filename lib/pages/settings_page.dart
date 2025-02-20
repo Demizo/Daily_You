@@ -667,9 +667,13 @@ class _SettingsPageState extends State<SettingsPage> {
                               .setField("useMarkdownToolbar", value);
                         });
                       }),
-                  Text(
-                    AppLocalizations.of(context)!.settingsChangeMoodIcons,
-                    style: TextStyle(fontSize: 16),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Text(
+                      AppLocalizations.of(context)!.settingsChangeMoodIcons,
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                    ),
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,

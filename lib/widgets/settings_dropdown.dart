@@ -17,26 +17,29 @@ class SettingsDropdown<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Expanded(
-          child: Text(
-            title,
-            style: TextStyle(fontSize: 16),
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Text(
+              title,
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            ),
           ),
-        ),
-        DropdownButton<T>(
-            underline: Container(),
-            elevation: 1,
-            isDense: false,
-            isExpanded: false,
-            alignment: AlignmentDirectional.centerEnd,
-            borderRadius: BorderRadius.circular(20),
-            value: ConfigManager.instance.getField(settingsKey),
-            items: options,
-            onChanged: onChanged),
-      ],
+          DropdownButton<T>(
+              underline: Container(),
+              elevation: 1,
+              isDense: true,
+              isExpanded: false,
+              alignment: AlignmentDirectional.centerEnd,
+              borderRadius: BorderRadius.circular(20),
+              value: ConfigManager.instance.getField(settingsKey),
+              items: options,
+              onChanged: onChanged),
+        ],
+      ),
     );
   }
 }
