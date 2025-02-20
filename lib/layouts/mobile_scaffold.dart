@@ -19,7 +19,6 @@ class MobileScaffold extends StatefulWidget {
 
 class _MobileScaffoldState extends State<MobileScaffold> {
   int currentIndex = 0;
-  bool isLoading = false;
 
   final List<Widget> pages = [
     const HomePage(),
@@ -27,11 +26,14 @@ class _MobileScaffoldState extends State<MobileScaffold> {
     const StatsPage(),
   ];
 
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final List<String> appBarsTitles = [AppLocalizations.of(context)!.pageHomeTitle, AppLocalizations.of(context)!.pageGalleryTitle, AppLocalizations.of(context)!.pageStatisticsTitle];
+    final List<String> appBarsTitles = [
+      AppLocalizations.of(context)!.pageHomeTitle,
+      AppLocalizations.of(context)!.pageGalleryTitle,
+      AppLocalizations.of(context)!.pageStatisticsTitle
+    ];
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(title: Text(appBarsTitles[currentIndex]), actions: [
@@ -57,28 +59,20 @@ class _MobileScaffoldState extends State<MobileScaffold> {
         IconButton(
           icon: const Icon(Icons.settings_rounded),
           onPressed: () async {
-            setState(() {
-              isLoading = true;
-            });
             await Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => const SettingsPage(),
             ));
-            setState(() {
-              isLoading = false;
-            });
           },
         )
       ]),
-      body: isLoading
-          ? const Center(child: SizedBox())
-          : AnimatedSwitcher(
-              duration: const Duration(milliseconds: 200),
-              transitionBuilder: (Widget child, Animation<double> animation) {
-                return FadeTransition(opacity: animation, child: child);
-              },
-              switchInCurve: Curves.easeIn,
-              switchOutCurve: Curves.easeOut,
-              child: pages[currentIndex]),
+      body: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 200),
+          transitionBuilder: (Widget child, Animation<double> animation) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          switchInCurve: Curves.easeIn,
+          switchOutCurve: Curves.easeOut,
+          child: pages[currentIndex]),
       bottomNavigationBar: NavigationBar(
         labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
         selectedIndex: currentIndex,
