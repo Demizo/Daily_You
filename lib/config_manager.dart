@@ -42,7 +42,7 @@ class ConfigManager {
     'reminderEndHour': 21,
     'reminderEndMinute': 0,
     'defaultTemplate': -1,
-    'imageQuality': 100,
+    'imageQuality': 90,
   };
 
   static final moodValueFieldMapping = {
@@ -97,7 +97,6 @@ class ConfigManager {
     for (String key in _defaultConfig.keys) {
       if (!_config.containsKey(key)) {
         _config[key] = _defaultConfig[key];
-
       }
     }
 
@@ -114,7 +113,10 @@ class ConfigManager {
   }
 
   int getFirstDayOfWeekIndex() {
-    return DateFormat.yMd(WidgetsBinding.instance.platformDispatcher.locale.toString()).dateSymbols.FIRSTDAYOFWEEK;
+    return DateFormat.yMd(
+            WidgetsBinding.instance.platformDispatcher.locale.toString())
+        .dateSymbols
+        .FIRSTDAYOFWEEK;
   }
 
   // Read the contents of the config file
