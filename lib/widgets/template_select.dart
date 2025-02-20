@@ -2,6 +2,7 @@ import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:daily_you/widgets/template_manager.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TemplateSelect extends StatefulWidget {
   final Function(Template template) onTemplatesSelected;
@@ -41,13 +42,10 @@ class _TemplateSelectDialogState extends State<TemplateSelect> {
 
   Widget _buildTemplatesList() {
     if (_templates.isEmpty) {
-      return const Row(
+      return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Text("No templates created..."),
-          ),
+          Text(AppLocalizations.of(context)!.noTemplatesDescription),
         ],
       );
     } else {
@@ -58,7 +56,14 @@ class _TemplateSelectDialogState extends State<TemplateSelect> {
           final template = _templates[index];
           return Card(
             child: ListTile(
-              title: Text(template.name),
+              title: Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Text(
+                  template.name,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              contentPadding: EdgeInsets.zero,
               trailing: IconButton(
                 icon: const Icon(Icons.add_rounded),
                 onPressed: () {
@@ -76,18 +81,18 @@ class _TemplateSelectDialogState extends State<TemplateSelect> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Add a Template'),
+      title: Text(AppLocalizations.of(context)!.addTemplate),
       content: SizedBox(width: double.maxFinite, child: _buildTemplatesList()),
       actions: [
         TextButton.icon(
           icon: const Icon(Icons.edit_document),
-          label: const Text("Manage Templates"),
+          label: Text(AppLocalizations.of(context)!.manageTemplates),
           onPressed: () {
             _showTemplateManagementPopup(context);
           },
         ),
         TextButton(
-          child: const Text('Cancel'),
+          child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
           onPressed: () {
             Navigator.of(context).pop();
           },

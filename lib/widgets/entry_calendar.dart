@@ -14,18 +14,16 @@ class EntryCalendar extends StatelessWidget {
   Widget build(BuildContext context) {
     final statsProvider = Provider.of<StatsProvider>(context);
     return TableCalendar(
+      locale: WidgetsBinding.instance.platformDispatcher.locale.toString(),
       rowHeight: 57,
       sixWeekMonthsEnforced: true,
+      startingDayOfWeek: StartingDayOfWeek.values[ConfigManager.instance.getFirstDayOfWeekIndex()],
       availableCalendarFormats: const {
         CalendarFormat.month: 'Month',
       },
       focusedDay: statsProvider.selectedDate,
       lastDay: DateTime.now(),
       firstDay: DateTime.utc(2000),
-      startingDayOfWeek:
-          ConfigManager.instance.getField('startingDayOfWeek') == 'sunday'
-              ? StartingDayOfWeek.sunday
-              : StartingDayOfWeek.monday,
       onPageChanged: (DateTime date) => statsProvider.selectedDate = date,
       calendarBuilders: CalendarBuilders(
         headerTitleBuilder: (context, date) {
@@ -34,7 +32,7 @@ class EntryCalendar extends StatelessWidget {
             children: [
               GestureDetector(
                 child: Text(
-                  DateFormat("MMMM y").format(date).toString(),
+                  DateFormat("MMMM y", WidgetsBinding.instance.platformDispatcher.locale.toString()).format(date).toString(),
                   style: const TextStyle(fontSize: 18),
                 ),
                 onTap: () async {

@@ -5,13 +5,16 @@ import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/notification_manager.dart';
+import 'package:daily_you/pages/launch_page.dart';
 import 'package:daily_you/stats_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:daily_you/layouts/mobile_scaffold.dart';
 import 'package:daily_you/layouts/responsive_layout.dart';
 import 'package:daily_you/theme_mode_provider.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:time_range_picker/time_range_picker.dart';
 import 'config_manager.dart';
@@ -44,8 +47,15 @@ void callbackDispatcher() async {
       android: androidPlatformChannelSpecifics,
     );
 
-    await flutterLocalNotificationsPlugin.show(
-        0, 'Log Today!', 'Take your daily log...', platformChannelSpecifics);
+    // Localized notification text is stored in SharedPreferences upon startup
+    var prefs = await SharedPreferences.getInstance();
+    var title = prefs.getString('dailyReminderTitle');
+    var description = prefs.getString('dailyReminderDescription');
+
+    if (title != null && description != null) {
+      await flutterLocalNotificationsPlugin.show(
+          0, title, description, platformChannelSpecifics);
+    }
   }
   EntriesDatabase.instance.close();
   setAlarm(firstSet: false);
@@ -146,41 +156,9 @@ class MainApp extends StatefulWidget {
 }
 
 class _MainAppState extends State<MainApp> {
-  bool canReachDatabase = false;
-  bool isLoading = true;
-
   @override
   void initState() {
     super.initState();
-    _checkDatabaseConnection();
-  }
-
-  Future<void> uriErrorPopup(String folderType) async {
-    await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-              title: const Text("Error:"),
-              content: Text(
-                  "Can't access the $folderType folder! Go to settings, backup your logs and images, then reset the your external folder locations!"));
-        });
-  }
-
-  _checkDatabaseConnection() async {
-    //Initialize Database
-    canReachDatabase = await EntriesDatabase.instance.initDB();
-
-    setState(() {
-      isLoading = false;
-    });
-  }
-
-  _forceLocalDatabase() async {
-    canReachDatabase =
-        await EntriesDatabase.instance.initDB(forceWithoutSync: true);
-    setState(() {
-      canReachDatabase;
-    });
   }
 
   @override
@@ -192,9 +170,13 @@ class _MainAppState extends State<MainApp> {
           FocusManager.instance.primaryFocus?.unfocus();
         },
         child: MaterialApp(
+            onGenerateTitle: (context) =>
+                AppLocalizations.of(context)!.appTitle,
             title: 'Daily You',
             themeMode: themeModeProvider.themeMode,
             debugShowCheckedModeBanner: false,
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             theme: ThemeData(
               useMaterial3: true,
               colorScheme: ColorScheme.fromSeed(
@@ -231,56 +213,11 @@ class _MainAppState extends State<MainApp> {
                         seedColor: themeModeProvider.accentColor,
                         brightness: Brightness.dark),
                   ),
-            home: isLoading
-                ? const Scaffold(body: SizedBox())
-                : canReachDatabase
-                    ? const ResponsiveLayout(
-                        mobileScaffold: MobileScaffold(),
-                        tabletScaffold: MobileScaffold(),
-                        desktopScaffold: MobileScaffold(),
-                      )
-                    : Scaffold(
-                        extendBody: true,
-                        backgroundColor: themeModeProvider.accentColor,
-                        body: Center(
-                          child: Card(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  "Error",
-                                  style: TextStyle(
-                                      fontSize: 36,
-                                      fontWeight: FontWeight.bold,
-                                      color: themeModeProvider.accentColor),
-                                ),
-                                const Text(
-                                  "Can't access your external storage location!",
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                const Padding(
-                                  padding: EdgeInsets.all(
-                                    32.0,
-                                  ),
-                                  child: Text(
-                                    """
-If you are using network storage make sure the service is online and you have network access.
-
-Otherwise, the app may have lost permissions for the external folder. Go to settings, and reselect the external folder to grant access.
-          
-Warning, changes will not be synced until restore access to the external storage location!""",
-                                    style: TextStyle(fontSize: 16),
-                                  ),
-                                ),
-                                TextButton(
-                                    onPressed: _forceLocalDatabase,
-                                    child: const Text(
-                                        "Continue With Local Database")),
-                              ],
-                            ),
-                          ),
-                        ))));
+            home: LaunchPage(
+                nextPage: ResponsiveLayout(
+              mobileScaffold: MobileScaffold(),
+              tabletScaffold: MobileScaffold(),
+              desktopScaffold: MobileScaffold(),
+            ))));
   }
 }

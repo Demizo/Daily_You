@@ -4,15 +4,17 @@ import 'package:daily_you/config_manager.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:daily_you/widgets/template_select.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/services.dart';
 import 'package:markdown_toolbar/markdown_toolbar.dart';
 
 class EntryTextEditor extends StatefulWidget {
   final String text;
   final ValueChanged<String> onChangedText;
+  final bool showTemplatesButton;
 
   const EntryTextEditor(
-      {super.key, this.text = '', required this.onChangedText});
+      {super.key, this.text = '', required this.onChangedText, this.showTemplatesButton = true});
 
   @override
   State<EntryTextEditor> createState() => _EntryTextEditorState();
@@ -113,6 +115,7 @@ class _EntryTextEditorState extends State<EntryTextEditor> {
                   )
                 : entryTextField(),
           )),
+	  if (widget.showTemplatesButton)
           Padding(
             padding: const EdgeInsets.all(2.0),
             child: IconButton(
@@ -139,9 +142,9 @@ class _EntryTextEditorState extends State<EntryTextEditor> {
           spellCheckService: DefaultSpellCheckService()),
       textCapitalization: TextCapitalization.sentences,
       style: const TextStyle(fontSize: 16),
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
         border: InputBorder.none,
-        hintText: 'Type something... (supports markdown)',
+        hintText: AppLocalizations.of(context)!.writeSomethingHint,
       ),
     );
   }

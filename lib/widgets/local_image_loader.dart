@@ -20,7 +20,7 @@ class LocalImageLoader extends StatelessWidget {
             return const Center(child: SizedBox());
           } else if (snapshot.hasError) {
             // Handle any error that occurred while fetching the image path
-            return Text('Error: ${snapshot.error}');
+            return Text('${snapshot.error}');
           } else if (snapshot.hasData) {
             // Render the card with the fetched image path
 
@@ -35,17 +35,10 @@ class LocalImageLoader extends StatelessWidget {
                     StackTrace? stackTrace) {
                   // Image failed to load, display a different widget
                   return const Center(
-                    child: Column(
-                      children: [
-                        Expanded(
-                            child: Center(
-                                child: Icon(
-                          Icons.question_mark_rounded,
-                          size: 70,
-                        ))),
-                        Text('Image failed to load'),
-                      ],
-                    ),
+                    child: Icon(
+		      Icons.warning_rounded,
+                      size: 36,
+                    )
                   );
                 },
               ),
@@ -53,25 +46,10 @@ class LocalImageLoader extends StatelessWidget {
           } else {
             // Image not found
             return const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Center(
-                      child: Icon(
-                    Icons.question_mark_rounded,
-                    size: 70,
-                  )),
-                  Text(
-                    'Image not found!',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
-                  ),
-                  Text(
-                    'Check your image folder in settings...',
-                    textAlign: TextAlign.center,
-                  )
-                ],
-              ),
+	      child: Icon(
+		Icons.image_search_rounded,
+		size: 36,
+	      ),
             );
           }
         });

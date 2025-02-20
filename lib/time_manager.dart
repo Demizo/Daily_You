@@ -1,5 +1,6 @@
 import 'package:daily_you/config_manager.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:time_range_picker/time_range_picker.dart';
 
 class TimeManager {
@@ -55,18 +56,24 @@ class TimeManager {
   }
 
   static Future<void> setReminderTimeRange(TimeRange range) async {
-    await ConfigManager.instance.setField('reminderStartHour', range.startTime.hour);
-    await ConfigManager.instance.setField('reminderStartMinute', range.startTime.minute);
-    await ConfigManager.instance.setField('reminderEndHour', range.endTime.hour);
-    await ConfigManager.instance.setField('reminderEndMinute', range.endTime.minute);
+    await ConfigManager.instance
+        .setField('reminderStartHour', range.startTime.hour);
+    await ConfigManager.instance
+        .setField('reminderStartMinute', range.startTime.minute);
+    await ConfigManager.instance
+        .setField('reminderEndHour', range.endTime.hour);
+    await ConfigManager.instance
+        .setField('reminderEndMinute', range.endTime.minute);
   }
 
   static String timeRangeString(TimeRange timeRange) {
-    return 'Between ${timeOfDayString(timeRange.startTime)} and ${timeOfDayString(timeRange.endTime)}';
+    return '${timeOfDayString(timeRange.startTime)} - ${timeOfDayString(timeRange.endTime)}';
   }
 
   static String timeOfDayString(TimeOfDay timeOfDay) {
-    return '${timeOfDay.hourOfPeriod}:${timeOfDay.minute.toString().padLeft(2, '0')} ${timeOfDay.period.name.toUpperCase()}';
+    return DateFormat.jm(
+            WidgetsBinding.instance.platformDispatcher.locale.toString())
+        .format(addTimeOfDay(startOfDay(DateTime.now()), timeOfDay));
   }
 
   static int datesExactMonthDiff(DateTime date1, DateTime date2) {

@@ -6,6 +6,7 @@ import 'package:daily_you/widgets/mood_totals_chart.dart';
 import 'package:daily_you/widgets/stat_range_selector.dart';
 import 'package:daily_you/widgets/streak_card.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 class StatsPage extends StatelessWidget {
@@ -30,19 +31,19 @@ class StatsPage extends StatelessWidget {
           child: Wrap(
             children: [
               StreakCard(
-                title: "Current Streak ",
+                title: AppLocalizations.of(context)!.streakCurrent,
                 number: statsProvider.currentStreak,
                 isVisible: true,
                 icon: Icons.bolt,
               ),
               StreakCard(
-                  title: "Longest Streak ",
+                  title: AppLocalizations.of(context)!.streakLongest,
                   number: statsProvider.longestStreak,
                   isVisible:
                       statsProvider.longestStreak > statsProvider.currentStreak,
                   icon: Icons.history_rounded),
               StreakCard(
-                  title: "Days since a Bad Day ",
+                  title: AppLocalizations.of(context)!.streakSinceBadDay,
                   number: statsProvider.daysSinceBadDay ?? -1,
                   isVisible: statsProvider.daysSinceBadDay != null &&
                       statsProvider.daysSinceBadDay! > 3,
@@ -58,25 +59,23 @@ class StatsPage extends StatelessWidget {
             ),
           ),
         ),
-        const Center(
+        Center(
           child: Text(
-            "Mood Summary",
-            style: TextStyle(fontSize: 18),
+            AppLocalizations.of(context)!.chartSummaryTitle(AppLocalizations.of(context)!.tagMoodTitle),
+            style: const TextStyle(fontSize: 18),
           ),
         ),
         MoodTotalsChart(
           moodCounts: statsProvider.moodTotals,
         ),
-        const Center(
+        Center(
           child: Text(
-            "Mood By Day",
-            style: TextStyle(fontSize: 18),
+            AppLocalizations.of(context)!.chartByDayTitle(AppLocalizations.of(context)!.tagMoodTitle),
+            style: const TextStyle(fontSize: 18),
           ),
         ),
         MoodByDayChart(
           averageMood: statsProvider.getMoodsByDay(),
-          startOnSunday:
-              ConfigManager.instance.getField('startingDayOfWeek') == 'sunday',
         ),
       ],
     );

@@ -7,6 +7,7 @@ import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/local_image_loader.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/models/entry.dart';
@@ -78,74 +79,24 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Delete Log?'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text("Do you want to delete this log?"),
-              const SizedBox(
-                height: 8,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton.icon(
-                    icon: Icon(
-                      Icons.delete_rounded,
-                      color: Theme.of(context).colorScheme.primary,
-                      size: 24,
-                    ),
-                    label: const Padding(
-                      padding: EdgeInsets.all(2.0),
-                      child: Text(
-                        "Delete",
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
-                    onPressed: () async {
-                      await deleteEntry(id);
-                      Navigator.of(context).popUntil((route) => route.isFirst);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.all(12),
-                      backgroundColor: Theme.of(context).colorScheme.surface,
-                      foregroundColor: Theme.of(context).colorScheme.primary,
-                      elevation: 3,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.0),
-                      ),
-                    ),
-                  ),
-                  ElevatedButton.icon(
-                    icon: Icon(
-                      Icons.cancel_rounded,
-                      color: Theme.of(context).colorScheme.surface,
-                      size: 24,
-                    ),
-                    label: const Padding(
-                      padding: EdgeInsets.all(2.0),
-                      child: Text(
-                        "Cancel",
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
-                    onPressed: () async {
-                      Navigator.pop(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.all(12),
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      foregroundColor: Theme.of(context).colorScheme.surface,
-                      elevation: 3,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.0),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+          title: Text(AppLocalizations.of(context)!.deleteLogTitle),
+          actions: [
+            TextButton(
+              child:
+                  Text(MaterialLocalizations.of(context).deleteButtonTooltip),
+              onPressed: () async {
+                await deleteEntry(id);
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              },
+            ),
+            TextButton(
+              child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+              onPressed: () async {
+                Navigator.pop(context);
+              },
+            )
+          ],
+          content: Text(AppLocalizations.of(context)!.deleteLogDescription),
         );
       },
     );
@@ -199,9 +150,15 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
                 StatefulBuilder(
                   builder: (context, setState) => EntryMoodPicker(
                       date: widget.entry != null
-                          ? DateFormat.yMMMEd().format(widget.entry!.timeCreate)
-                          : DateFormat.yMMMEd().format(
-                              widget.overrideCreateDate ?? DateTime.now()),
+                          ? DateFormat.yMMMEd(WidgetsBinding
+                                  .instance.platformDispatcher.locale
+                                  .toString())
+                              .format(widget.entry!.timeCreate)
+                          : DateFormat.yMMMEd(WidgetsBinding
+                                  .instance.platformDispatcher.locale
+                                  .toString())
+                              .format(
+                                  widget.overrideCreateDate ?? DateTime.now()),
                       moodValue: mood,
                       onChangedMood: (mood) =>
                           {setState(() => this.mood = mood)}),

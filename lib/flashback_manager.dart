@@ -1,11 +1,13 @@
 import 'dart:math';
 
+import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/flashback.dart';
 import 'package:daily_you/time_manager.dart';
 
 class FlashbackManager {
-  static List<Flashback> getFlashbacks(List<Entry> entries) {
+  static List<Flashback> getFlashbacks(BuildContext context, List<Entry> entries) {
     List<Flashback> flashbacksList = List.empty(growable: true);
     Map<String, Entry> flashbacks = {};
 
@@ -20,23 +22,22 @@ class FlashbackManager {
           entry.timeCreate.month == DateTime.now().month &&
           entry.timeCreate.year != DateTime.now().year) {
         var yearsAgo = DateTime.now().year - entry.timeCreate.year;
-        var yearLabel = yearsAgo == 1 ? '1 Year Ago' : '$yearsAgo Years Ago';
-        flashbacks.putIfAbsent(yearLabel, () => entry);
+        flashbacks.putIfAbsent(AppLocalizations.of(context)!.flashbackYear(yearsAgo), () => entry);
         continue;
       }
       if (TimeManager.datesExactMonthDiff(entry.timeCreate, DateTime.now()) ==
           6) {
-        flashbacks.putIfAbsent('6 Months Ago', () => entry);
+        flashbacks.putIfAbsent(AppLocalizations.of(context)!.flashbackMonth(6), () => entry);
         continue;
       }
       if (TimeManager.datesExactMonthDiff(entry.timeCreate, DateTime.now()) ==
           1) {
-        flashbacks.putIfAbsent('1 Month Ago', () => entry);
+        flashbacks.putIfAbsent(AppLocalizations.of(context)!.flashbackMonth(1), () => entry);
         continue;
       }
       if (TimeManager.isSameDay(
           entry.timeCreate, DateTime.now().subtract(const Duration(days: 7)))) {
-        flashbacks.putIfAbsent('1 Week Ago', () => entry);
+        flashbacks.putIfAbsent(AppLocalizations.of(context)!.flashbackWeek(1), () => entry);
         continue;
       }
       if (entry.mood == 1 || entry.mood == 2) {
@@ -56,7 +57,7 @@ class FlashbackManager {
       while (index < happyEntries.length) {
         Entry randomEntry = happyEntries[random.nextInt(happyEntries.length)];
         if (flashbacks.containsValue(randomEntry)) continue;
-        flashbacks.putIfAbsent('A Happy Day', () => randomEntry);
+        flashbacks.putIfAbsent(AppLocalizations.of(context)!.flashbackGoodDay, () => randomEntry);
         break;
       }
 
@@ -66,7 +67,7 @@ class FlashbackManager {
       while (index < entries.length) {
         Entry randomEntry = entries[random.nextInt(entries.length)];
         if (flashbacks.containsValue(randomEntry)) continue;
-        flashbacks.putIfAbsent('A Random Day', () => randomEntry);
+        flashbacks.putIfAbsent(AppLocalizations.of(context)!.flashbackRandomDay, () => randomEntry);
         break;
       }
     }

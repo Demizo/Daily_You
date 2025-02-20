@@ -4,11 +4,17 @@ import 'package:daily_you/models/template.dart';
 import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/stats_provider.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:daily_you/widgets/settings_dropdown.dart';
+import 'package:daily_you/widgets/settings_header.dart';
+import 'package:daily_you/widgets/settings_icon_action.dart';
+import 'package:daily_you/widgets/settings_toggle.dart';
 import 'package:daily_you/widgets/template_manager.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:intl/intl.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -77,18 +83,24 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
-  Future<void> _showChangeLogFolderWarning(BuildContext context) async {
+  Future<void> _showChangeLogFolderWarning() async {
     bool confirmed = false;
     await showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Warning:'),
-          content: const Text(
-              "Backup your logs and images before changing the log folder! If the selected directory already contains \"daily_you.db\", it will be used to overwrite your current logs!"),
+          title: Text(AppLocalizations.of(context)!.warningTitle),
+          content:
+              Text(AppLocalizations.of(context)!.logFolderWarningDescription),
           actions: [
-            ElevatedButton(
-              child: const Text("Ok"),
+            TextButton(
+              child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+              onPressed: () async {
+                Navigator.pop(context);
+              },
+            ),
+            TextButton(
+              child: Text(MaterialLocalizations.of(context).okButtonLabel),
               onPressed: () async {
                 confirmed = true;
                 Navigator.pop(context);
@@ -111,108 +123,51 @@ class _SettingsPageState extends State<SettingsPage> {
         await showDialog(
             context: context,
             builder: (BuildContext context) {
-              return const AlertDialog(
-                  title: Text("Error:"),
-                  content: Text("Permission Denied: Log folder not changed!"));
+              return AlertDialog(
+                  title: Text(AppLocalizations.of(context)!.errorTitle),
+                  actions: [
+                    TextButton(
+                      child:
+                          Text(MaterialLocalizations.of(context).okButtonLabel),
+                      onPressed: () async {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                  content: Text(
+                      AppLocalizations.of(context)!.logFolderErrorDescription));
             });
       }
-
-      setState(() {});
     }
   }
 
-  Future<void> _showChangeImgFolderWarning(BuildContext context) async {
-    bool confirmed = false;
-    await showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Warning:'),
-          content: const Text(
-              "Backup your images before changing the image folder!"),
-          actions: [
-            ElevatedButton(
-              child: const Text("Ok"),
-              onPressed: () async {
-                confirmed = true;
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        );
-      },
-    );
-    if (confirmed) {
-      setState(() {
-        isSyncing = true;
-      });
-      bool locationSet = await EntriesDatabase.instance.selectImageFolder();
-      setState(() {
-        isSyncing = false;
-      });
-      if (!locationSet) {
-        await showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return const AlertDialog(
-                  title: Text("Error:"),
-                  content:
-                      Text("Permission Denied: Image folder not changed!"));
-            });
-      }
-
-      setState(() {});
+  Future<void> _attemptImageFolderChange() async {
+    setState(() {
+      isSyncing = true;
+    });
+    bool locationSet = await EntriesDatabase.instance.selectImageFolder();
+    setState(() {
+      isSyncing = false;
+    });
+    if (!locationSet) {
+      await showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+                title: Text(AppLocalizations.of(context)!.errorTitle),
+                actions: [
+                  TextButton(
+                    child:
+                        Text(MaterialLocalizations.of(context).okButtonLabel),
+                    onPressed: () async {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+                content: Text(
+                    AppLocalizations.of(context)!.imageFolderErrorDescription));
+          });
     }
-  }
-
-  void _showThemeSelectionPopup(ThemeModeProvider themeModeProvider) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Select Theme'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                title: const Text('Follow System'),
-                onTap: () async {
-                  await ConfigManager.instance.setField('theme', 'system');
-                  setState(() {
-                    _updateTheme(themeModeProvider, ThemeMode.system);
-                  });
-                },
-              ),
-              ListTile(
-                title: const Text('Dark Theme'),
-                onTap: () async {
-                  await ConfigManager.instance.setField('theme', 'dark');
-                  setState(() {
-                    _updateTheme(themeModeProvider, ThemeMode.dark);
-                  });
-                },
-              ),
-              ListTile(
-                  title: const Text('Light Theme'),
-                  onTap: () async {
-                    await ConfigManager.instance.setField('theme', 'light');
-                    setState(() {
-                      _updateTheme(themeModeProvider, ThemeMode.light);
-                    });
-                  }),
-              ListTile(
-                  title: const Text('AMOLED'),
-                  onTap: () async {
-                    await ConfigManager.instance.setField('theme', 'amoled');
-                    setState(() {
-                      _updateTheme(themeModeProvider, ThemeMode.dark);
-                    });
-                  }),
-            ],
-          ),
-        );
-      },
-    );
   }
 
   void _showAccentColorPopup(ThemeModeProvider themeProvider) {
@@ -221,7 +176,24 @@ class _SettingsPageState extends State<SettingsPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Choose Accent Color'),
+          actions: [
+            TextButton(
+              child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+              onPressed: () async {
+                Navigator.pop(context);
+              },
+            ),
+            TextButton(
+              child: Text(MaterialLocalizations.of(context).okButtonLabel),
+              onPressed: () async {
+                setState(() {
+                  themeProvider.accentColor = accentColor;
+                  themeProvider.updateAccentColor();
+                });
+                Navigator.pop(context);
+              },
+            ),
+          ],
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -234,30 +206,6 @@ class _SettingsPageState extends State<SettingsPage> {
                   onColorChanged: (color) {
                     accentColor = color;
                   }),
-              const SizedBox(
-                height: 8,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    child: const Text("Cancel"),
-                    onPressed: () async {
-                      Navigator.pop(context);
-                    },
-                  ),
-                  TextButton(
-                    child: const Text("Save"),
-                    onPressed: () async {
-                      setState(() {
-                        themeProvider.accentColor = accentColor;
-                        themeProvider.updateAccentColor();
-                      });
-                      Navigator.pop(context);
-                    },
-                  ),
-                ],
-              ),
             ],
           ),
         );
@@ -265,59 +213,52 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  void _showMoodEmojiPopup(int? value, String title) {
+  void _showMoodEmojiPopup(int? value) {
     String newEmoji = '';
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(title),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                inputFormatters: [
-                  LengthLimitingTextInputFormatter(1), // Limit to one character
-                ],
-                onChanged: (value) {
-                  newEmoji = value;
-                },
-                decoration: const InputDecoration(
-                  hintText: 'Enter an icon...',
-                ),
-              ),
-              const SizedBox(
-                height: 8,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    child: const Text("Cancel"),
-                    onPressed: () async {
-                      Navigator.pop(context);
-                    },
-                  ),
-                  TextButton(
-                    child: const Text("Save"),
-                    onPressed: () async {
-                      if (newEmoji.isNotEmpty) {
-                        if (value != null) {
-                          await ConfigManager.instance.setField(
-                              ConfigManager.moodValueFieldMapping[value]!,
-                              newEmoji);
-                        } else {
-                          await ConfigManager.instance
-                              .setField('noMoodIcon', newEmoji);
-                        }
-                        setState(() {});
-                      }
-                      Navigator.pop(context);
-                    },
-                  ),
-                ],
-              ),
+          title: Center(
+            child: MoodIcon(
+              moodValue: value,
+              size: 32,
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+              onPressed: () async {
+                Navigator.pop(context);
+              },
+            ),
+            TextButton(
+              child: Text(MaterialLocalizations.of(context).okButtonLabel),
+              onPressed: () async {
+                if (newEmoji.isNotEmpty) {
+                  if (value != null) {
+                    await ConfigManager.instance.setField(
+                        ConfigManager.moodValueFieldMapping[value]!, newEmoji);
+                  } else {
+                    await ConfigManager.instance
+                        .setField('noMoodIcon', newEmoji);
+                  }
+                  setState(() {});
+                }
+                Navigator.pop(context);
+              },
+            ),
+          ],
+          content: TextField(
+            inputFormatters: [
+              LengthLimitingTextInputFormatter(1), // Limit to one character
             ],
+            onChanged: (value) {
+              newEmoji = value;
+            },
+            decoration: InputDecoration(
+              hintText: AppLocalizations.of(context)!.moodIconPrompt,
+            ),
           ),
         );
       },
@@ -331,7 +272,7 @@ class _SettingsPageState extends State<SettingsPage> {
     setState(() {});
   }
 
-  Widget moodIconButton(int? index, String title) {
+  Widget moodIconButton(int? index) {
     return GestureDetector(
       child: Card(
           child: Padding(
@@ -340,7 +281,7 @@ class _SettingsPageState extends State<SettingsPage> {
             constraints: const BoxConstraints(minWidth: 30),
             child: Center(child: MoodIcon(moodValue: index, size: 24))),
       )),
-      onTap: () => _showMoodEmojiPopup(index, title),
+      onTap: () => _showMoodEmojiPopup(index),
     );
   }
 
@@ -349,16 +290,53 @@ class _SettingsPageState extends State<SettingsPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Import Logs From:'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text("This will NOT modify existing logs..."),
-              const SizedBox(
-                height: 8,
-              ),
               ListTile(
-                  title: const Text('Daily You'),
+                  title: Text(AppLocalizations.of(context)!.importLogs),
+                  onTap: () async {
+                    Navigator.pop(context);
+                    if (Platform.isAndroid &&
+                        !await requestStoragePermission()) {
+                      return;
+                    }
+                    _showImportLogsFormatPopup();
+                  }),
+              ListTile(
+                  title: Text(AppLocalizations.of(context)!.importImages),
+                  onTap: () async {
+                    Navigator.pop(context);
+                    if (Platform.isAndroid &&
+                        !await requestPhotosPermission()) {
+                      return;
+                    }
+                    setState(() {
+                      isSyncing = true;
+                    });
+                    await EntriesDatabase.instance.importImages();
+                    setState(() {
+                      isSyncing = false;
+                    });
+                  }),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showImportLogsFormatPopup() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(AppLocalizations.of(context)!.logFormatTitle),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                  title: Text(AppLocalizations.of(context)!.appTitle),
                   onTap: () async {
                     Navigator.pop(context);
                     setState(() {
@@ -370,7 +348,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     });
                   }),
               ListTile(
-                  title: const Text('OneShot'),
+                  title: Text(AppLocalizations.of(context)!.formatOneShot),
                   onTap: () async {
                     Navigator.pop(context);
                     setState(() {
@@ -393,15 +371,28 @@ class _SettingsPageState extends State<SettingsPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Choose Export Format:'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                  title: const Text('Daily You'),
+                  title: Text(AppLocalizations.of(context)!.exportLogs),
                   onTap: () async {
                     Navigator.pop(context);
+                    if (Platform.isAndroid &&
+                        !await requestStoragePermission()) {
+                      return;
+                    }
                     await EntriesDatabase.instance.exportToJson();
+                  }),
+              ListTile(
+                  title: Text(AppLocalizations.of(context)!.exportImages),
+                  onTap: () async {
+                    Navigator.pop(context);
+                    if (Platform.isAndroid &&
+                        !await requestPhotosPermission()) {
+                      return;
+                    }
+                    await EntriesDatabase.instance.exportImages();
                   }),
             ],
           ),
@@ -415,85 +406,28 @@ class _SettingsPageState extends State<SettingsPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Delete All Logs?'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text("Do you want to delete all of your logs?"),
-              const SizedBox(
-                height: 8,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton.icon(
-                    icon: Icon(
-                      Icons.delete_rounded,
-                      color: Theme.of(context).colorScheme.primary,
-                      size: 24,
-                    ),
-                    label: const Padding(
-                      padding: EdgeInsets.all(2.0),
-                      child: Text(
-                        "Delete All",
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
-                    onPressed: () async {
-                      Navigator.pop(context);
-                      await EntriesDatabase.instance.deleteAllEntries();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.all(12),
-                      backgroundColor: Theme.of(context).colorScheme.surface,
-                      foregroundColor: Theme.of(context).colorScheme.primary,
-                      elevation: 3,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.0),
-                      ),
-                    ),
-                  ),
-                  ElevatedButton.icon(
-                    icon: Icon(
-                      Icons.cancel_rounded,
-                      color: Theme.of(context).colorScheme.surface,
-                      size: 24,
-                    ),
-                    label: const Padding(
-                      padding: EdgeInsets.all(2.0),
-                      child: Text(
-                        "Cancel",
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
-                    onPressed: () async {
-                      Navigator.pop(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.all(12),
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      foregroundColor: Theme.of(context).colorScheme.surface,
-                      elevation: 3,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.0),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+          title: Text(AppLocalizations.of(context)!.settingsDeleteAllLogsTitle),
+          actions: [
+            TextButton(
+              child:
+                  Text(MaterialLocalizations.of(context).deleteButtonTooltip),
+              onPressed: () async {
+                Navigator.pop(context);
+                await EntriesDatabase.instance.deleteAllEntries();
+              },
+            ),
+            TextButton(
+              child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+              onPressed: () async {
+                Navigator.pop(context);
+              },
+            )
+          ],
+          content: Text(
+              AppLocalizations.of(context)!.settingsDeleteAllLogsDescription),
         );
       },
     );
-  }
-
-  void _updateTheme(ThemeModeProvider themeModeProvider, ThemeMode mode) {
-    themeModeProvider.themeMode = mode;
-    // setState(() {
-    //   currentThemeMode = mode;
-    // });
-    Navigator.pop(context); // Close the popup
   }
 
   Future<void> _selectTime(BuildContext context) async {
@@ -520,7 +454,9 @@ class _SettingsPageState extends State<SettingsPage> {
     TimeRange currentRange = TimeManager.getReminderTimeRange();
     TimeRange? range = await showTimeRangePicker(
         context: context,
-        use24HourFormat: false,
+        toText: "",
+        fromText: "",
+        use24HourFormat: ConfigManager.instance.is24HourFormat(),
         start: currentRange.startTime,
         end: currentRange.endTime,
         ticks: 24,
@@ -534,13 +470,37 @@ class _SettingsPageState extends State<SettingsPage> {
         autoAdjustLabels: false,
         labels: [
           ClockLabel.fromTime(
-              time: TimeOfDay(hour: 0, minute: 0), text: "12 AM"),
+              time: TimeOfDay(hour: 0, minute: 0),
+              text: DateFormat.j(WidgetsBinding
+                      .instance.platformDispatcher.locale
+                      .toString())
+                  .format(TimeManager.addTimeOfDay(
+                      TimeManager.startOfDay(DateTime.now()),
+                      TimeOfDay(hour: 0, minute: 0)))),
           ClockLabel.fromTime(
-              time: TimeOfDay(hour: 6, minute: 6), text: "6 AM"),
+              time: TimeOfDay(hour: 6, minute: 0),
+              text: DateFormat.j(WidgetsBinding
+                      .instance.platformDispatcher.locale
+                      .toString())
+                  .format(TimeManager.addTimeOfDay(
+                      TimeManager.startOfDay(DateTime.now()),
+                      TimeOfDay(hour: 6, minute: 0)))),
           ClockLabel.fromTime(
-              time: TimeOfDay(hour: 12, minute: 0), text: "12 PM"),
+              time: TimeOfDay(hour: 12, minute: 0),
+              text: DateFormat.j(WidgetsBinding
+                      .instance.platformDispatcher.locale
+                      .toString())
+                  .format(TimeManager.addTimeOfDay(
+                      TimeManager.startOfDay(DateTime.now()),
+                      TimeOfDay(hour: 12, minute: 0)))),
           ClockLabel.fromTime(
-              time: TimeOfDay(hour: 18, minute: 6), text: "6 PM"),
+              time: TimeOfDay(hour: 18, minute: 0),
+              text: DateFormat.j(WidgetsBinding
+                      .instance.platformDispatcher.locale
+                      .toString())
+                  .format(TimeManager.addTimeOfDay(
+                      TimeManager.startOfDay(DateTime.now()),
+                      TimeOfDay(hour: 18, minute: 0)))),
         ]);
     if (range != null) {
       await TimeManager.setReminderTimeRange(range);
@@ -573,19 +533,23 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  List<DropdownMenuItem<int>> _buildDefaultTemplateDropdownItems() {
+  List<DropdownMenuItem<int>> _buildDefaultTemplateDropdownItems(
+      BuildContext context) {
     var dropdownItems = _templates.map((Template template) {
       return DropdownMenuItem<int>(
         value: template.id,
-        child: Text(
-          template.name,
-          overflow: TextOverflow.ellipsis,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: 180),
+          child: Text(
+            template.name,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
       );
     }).toList();
-    dropdownItems.add(const DropdownMenuItem<int>(
+    dropdownItems.add(DropdownMenuItem<int>(
       value: -1,
-      child: Text("None"),
+      child: Text(AppLocalizations.of(context)!.noTemplateTitle),
     ));
     return dropdownItems;
   }
@@ -622,693 +586,338 @@ class _SettingsPageState extends State<SettingsPage> {
             )))
           : Scaffold(
               appBar: AppBar(
-                title: const Text("Settings"),
+                title: Text(AppLocalizations.of(context)!.pageSettingsTitle),
               ),
               body: ListView(
                 padding: const EdgeInsets.all(8),
                 children: [
-                  const Row(
-                    children: [
-                      Text(
-                        "Appearance",
-                        style: TextStyle(fontSize: 24),
-                      ),
-                    ],
-                  ),
+                  SettingsHeader(
+                      text: AppLocalizations.of(context)!
+                          .settingsAppearanceTitle),
+                  SettingsDropdown<String>(
+                      title: AppLocalizations.of(context)!.settingsTheme,
+                      settingsKey: "theme",
+                      options: [
+                        DropdownMenuItem<String>(
+                            value: "system",
+                            child: Text(
+                                AppLocalizations.of(context)!.themeSystem)),
+                        DropdownMenuItem<String>(
+                            value: "dark",
+                            child:
+                                Text(AppLocalizations.of(context)!.themeDark)),
+                        DropdownMenuItem<String>(
+                            value: "light",
+                            child:
+                                Text(AppLocalizations.of(context)!.themeLight)),
+                        DropdownMenuItem<String>(
+                            value: "amoled",
+                            child: Text(
+                                AppLocalizations.of(context)!.themeAmoled)),
+                      ],
+                      onChanged: (String? newValue) {
+                        ThemeMode themeMode = ThemeMode.system;
+                        switch (newValue) {
+                          case "system":
+                            themeMode = ThemeMode.system;
+                            break;
+                          case "light":
+                            themeMode = ThemeMode.light;
+                            break;
+                          case "dark":
+                          case "amoled":
+                            themeMode = ThemeMode.dark;
+                            break;
+                          default:
+                            themeMode = ThemeMode.system;
+                            break;
+                        }
+                        setState(() {
+                          themeProvider.themeMode = themeMode;
+                          ConfigManager.instance.setField("theme", newValue);
+                        });
+                      }),
+                  SettingsToggle(
+                      title: AppLocalizations.of(context)!
+                          .settingsUseSystemAccentColor,
+                      settingsKey: "followSystemColor",
+                      onChanged: (value) {
+                        setState(() {
+                          ConfigManager.instance
+                              .setField('followSystemColor', value);
+                          themeProvider.updateAccentColor();
+                        });
+                      }),
+                  if (!ConfigManager.instance.getField('followSystemColor'))
+                    SettingsIconAction(
+                      title: AppLocalizations.of(context)!
+                          .settingsCustomAccentColor,
+                      icon: Icon(Icons.colorize_rounded),
+                      onPressed: () async {
+                        _showAccentColorPopup(themeProvider);
+                      },
+                    ),
+                  SettingsToggle(
+                      title: AppLocalizations.of(context)!
+                          .settingsShowMarkdownToolbar,
+                      settingsKey: "useMarkdownToolbar",
+                      onChanged: (value) {
+                        setState(() {
+                          ConfigManager.instance
+                              .setField("useMarkdownToolbar", value);
+                        });
+                      }),
                   Padding(
                     padding: const EdgeInsets.only(top: 8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Theme",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        ElevatedButton.icon(
-                          icon: Icon(
-                            themeProvider.themeMode == ThemeMode.system
-                                ? Icons.brightness_medium
-                                : themeProvider.themeMode == ThemeMode.light
-                                    ? Icons.brightness_high
-                                    : Icons.brightness_2_rounded,
-                          ),
-                          label: themeProvider.themeMode == ThemeMode.system
-                              ? const Text("System")
-                              : themeProvider.themeMode == ThemeMode.light
-                                  ? const Text("Light")
-                                  : (ConfigManager.instance.getField('theme') ==
-                                          'amoled')
-                                      ? const Text("AMOLED")
-                                      : const Text("Dark"),
-                          onPressed: () async {
-                            await ConfigManager.instance
-                                .setField('theme', 'system');
-                            _showThemeSelectionPopup(themeProvider);
-                          },
-                        ),
-                      ],
+                    child: Text(
+                      AppLocalizations.of(context)!.settingsChangeMoodIcons,
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                     ),
                   ),
-                  Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
                         children: [
-                          Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text(
-                                  "Use System Accent Color",
-                                  style: TextStyle(fontSize: 18),
-                                ),
-                                Switch(
-                                    value: ConfigManager.instance
-                                        .getField('followSystemColor'),
-                                    onChanged: (value) {
-                                      setState(() {
-                                        ConfigManager.instance.setField(
-                                            'followSystemColor', value);
-                                        themeProvider.updateAccentColor();
-                                      });
-                                    })
-                              ]),
-                          if (!ConfigManager.instance
-                              .getField('followSystemColor'))
-                            ElevatedButton.icon(
-                              icon: const Icon(
-                                Icons.color_lens_rounded,
-                              ),
-                              label: const Text("Custom Accent Color"),
-                              onPressed: () async {
-                                _showAccentColorPopup(themeProvider);
-                              },
-                            ),
+                          moodIconButton(-2),
+                          moodIconButton(-1),
+                          moodIconButton(0),
+                          moodIconButton(1),
+                          moodIconButton(2),
+                          moodIconButton(null),
                         ],
-                      )),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Change Mood Icons",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                moodIconButton(-2, "Very Sad Icon"),
-                                moodIconButton(-1, "Sad Icon"),
-                                moodIconButton(0, "Neutral Icon"),
-                                moodIconButton(1, "Happy Icon"),
-                                moodIconButton(2, "Very Happy Icon"),
-                                moodIconButton(null, "Unknown Mood Icon"),
-                              ],
-                            ),
-                            IconButton(
-                                onPressed: _resetMoodIcons,
-                                icon: const Icon(Icons.refresh_rounded))
-                          ],
-                        )
-                      ],
-                    ),
+                      ),
+                      IconButton(
+                          onPressed: _resetMoodIcons,
+                          icon: const Icon(Icons.refresh_rounded))
+                    ],
                   ),
-                  Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              "Start Calendar Week on Monday",
-                              style: TextStyle(fontSize: 18),
-                            ),
-                            Switch(
-                                value: ConfigManager.instance
-                                        .getField('startingDayOfWeek') !=
-                                    'sunday',
-                                onChanged: (value) {
-                                  if (value) {
-                                    setState(() {
-                                      ConfigManager.instance.setField(
-                                          'startingDayOfWeek', 'monday');
-                                    });
-                                  } else {
-                                    setState(() {
-                                      ConfigManager.instance.setField(
-                                          'startingDayOfWeek', 'sunday');
-                                    });
-                                  }
-                                })
-                          ])),
-                  Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              "Show Markdown Toolbar",
-                              style: TextStyle(fontSize: 18),
-                            ),
-                            Switch(
-                                value: ConfigManager.instance
-                                    .getField('useMarkdownToolbar'),
-                                onChanged: (value) async {
-                                  await ConfigManager.instance
-                                      .setField('useMarkdownToolbar', value);
-                                  setState(() {});
-                                })
-                          ])),
                   const Divider(),
                   if (Platform.isAndroid)
-                    const Row(
-                      children: [
-                        Text(
-                          "Notifications",
-                          style: TextStyle(fontSize: 24),
-                        ),
-                      ],
-                    ),
+                    SettingsHeader(
+                        text: AppLocalizations.of(context)!
+                            .settingsNotificationsTitle),
                   if (Platform.isAndroid)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  "Daily Reminders",
-                                  style: TextStyle(fontSize: 18),
-                                ),
-                                Text(
-                                  "Allow app to run in background for best results",
-                                  style: TextStyle(fontSize: 14),
-                                ),
-                              ],
-                            ),
-                            Switch(
-                                value: ConfigManager.instance
-                                    .getField('dailyReminders'),
-                                onChanged: (value) async {
-                                  if (await NotificationManager.instance
-                                      .hasNotificationPermission()) {
-                                    if (value) {
-                                      await NotificationManager.instance
-                                          .startScheduledDailyReminders();
-                                    } else {
-                                      await NotificationManager.instance
-                                          .stopDailyReminders();
-                                    }
-                                    await ConfigManager.instance
-                                        .setField('dailyReminders', value);
-                                    setState(() {});
-                                  }
-                                }),
-                          ],
-                        ),
-                        if (ConfigManager.instance.getField('dailyReminders'))
-                          ConfigManager.instance.getField('setReminderTime')
-                              ? ElevatedButton.icon(
-                                  icon: const Icon(Icons.schedule_rounded),
-                                  onPressed: () async {
-                                    _selectTime(context);
-                                  },
-                                  label: Text(TimeManager.timeOfDayString(
-                                      TimeManager.scheduledReminderTime())))
-                              : ElevatedButton.icon(
-                                  icon: const Icon(Icons.timelapse_rounded),
-                                  onPressed: () async {
-                                    _selectTimeRange(context);
-                                  },
-                                  label: Text(TimeManager.timeRangeString(
-                                      TimeManager.getReminderTimeRange()))),
-                        if (ConfigManager.instance.getField('dailyReminders'))
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    "Set Reminder Time",
-                                    style: TextStyle(fontSize: 18),
-                                  ),
-                                  Text(
-                                    "Pick a set time for the reminder to occur",
-                                    style: TextStyle(fontSize: 14),
-                                  ),
-                                ],
-                              ),
-                              Switch(
-                                  value: ConfigManager.instance
-                                      .getField('setReminderTime'),
-                                  onChanged: (value) async {
-                                    await ConfigManager.instance
-                                        .setField('setReminderTime', value);
-                                    await NotificationManager.instance
-                                        .stopDailyReminders();
-                                    await NotificationManager.instance
-                                        .startScheduledDailyReminders();
-                                    setState(() {});
-                                  }),
-                            ],
-                          ),
-                      ],
-                    ),
+                    SettingsToggle(
+                        title: AppLocalizations.of(context)!.dailyReminderTitle,
+                        hint: AppLocalizations.of(context)!
+                            .dailyReminderDescription,
+                        settingsKey: "dailyReminders",
+                        onChanged: (value) async {
+                          if (await NotificationManager.instance
+                              .hasNotificationPermission()) {
+                            if (value) {
+                              await NotificationManager.instance
+                                  .startScheduledDailyReminders();
+                            } else {
+                              await NotificationManager.instance
+                                  .stopDailyReminders();
+                            }
+                            await ConfigManager.instance
+                                .setField('dailyReminders', value);
+                            setState(() {});
+                          }
+                        }),
+                  if (Platform.isAndroid &&
+                      ConfigManager.instance.getField('dailyReminders'))
+                    ConfigManager.instance.getField('setReminderTime')
+                        ? SettingsIconAction(
+                            title: AppLocalizations.of(context)!
+                                .settingsReminderTime,
+                            hint: TimeManager.timeOfDayString(
+                                TimeManager.scheduledReminderTime()),
+                            icon: Icon(Icons.schedule_rounded),
+                            onPressed: () async {
+                              _selectTime(context);
+                            })
+                        : SettingsIconAction(
+                            title: AppLocalizations.of(context)!
+                                .settingsReminderTime,
+                            hint: TimeManager.timeRangeString(
+                                TimeManager.getReminderTimeRange()),
+                            icon: Icon(Icons.timelapse_rounded),
+                            onPressed: () async {
+                              _selectTimeRange(context);
+                            }),
+                  if (Platform.isAndroid &&
+                      ConfigManager.instance.getField('dailyReminders'))
+                    SettingsToggle(
+                        title: AppLocalizations.of(context)!
+                            .settingsFixedReminderTimeTitle,
+                        hint: AppLocalizations.of(context)!
+                            .settingsFixedReminderTimeDescription,
+                        settingsKey: 'setReminderTime',
+                        onChanged: (value) async {
+                          await ConfigManager.instance
+                              .setField('setReminderTime', value);
+                          await NotificationManager.instance
+                              .stopDailyReminders();
+                          await NotificationManager.instance
+                              .startScheduledDailyReminders();
+                          setState(() {});
+                        }),
                   if (Platform.isAndroid) const Divider(),
-                  const Row(
-                    children: [
-                      Text(
-                        "Templates",
-                        style: TextStyle(fontSize: 24),
-                      ),
-                    ],
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              "Default Template",
-                              style: TextStyle(fontSize: 18),
-                            ),
-                            if (!isLoading)
-                              SizedBox(
-                                width: 200,
-                                child: DropdownButton<int>(
-                                  underline: Container(),
-                                  isDense: true,
-                                  isExpanded: true,
-                                  borderRadius: BorderRadius.circular(20),
-                                  padding: const EdgeInsets.only(
-                                      left: 8, right: 4, top: 4, bottom: 4),
-                                  hint: const Text('Select a template'),
-                                  value: ConfigManager.instance
-                                      .getField("defaultTemplate"),
-                                  items: _buildDefaultTemplateDropdownItems(),
-                                  onChanged: (int? newValue) {
-                                    setState(() {
-                                      ConfigManager.instance.setField(
-                                          "defaultTemplate", newValue);
-                                    });
-                                  },
-                                ),
-                              ),
-                          ],
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              ElevatedButton.icon(
-                                icon: const Icon(Icons.edit_document),
-                                label: const Text("Manage Templates"),
-                                onPressed: () {
-                                  _showTemplateManagementPopup(context);
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+                  SettingsHeader(
+                      text:
+                          AppLocalizations.of(context)!.settingsTemplatesTitle),
+                  if (!isLoading)
+                    SettingsDropdown<int>(
+                      title:
+                          AppLocalizations.of(context)!.settingsDefaultTemplate,
+                      settingsKey: "defaultTemplate",
+                      options: _buildDefaultTemplateDropdownItems(context),
+                      onChanged: (int? newValue) {
+                        setState(() {
+                          ConfigManager.instance
+                              .setField("defaultTemplate", newValue);
+                        });
+                      },
                     ),
-                  ),
+                  SettingsIconAction(
+                      title: AppLocalizations.of(context)!.manageTemplates,
+                      icon: Icon(Icons.edit_document),
+                      onPressed: () => _showTemplateManagementPopup(context)),
                   const Divider(),
-                  const Row(
-                    children: [
-                      Text(
-                        "Storage",
-                        style: TextStyle(fontSize: 24),
-                      ),
-                    ],
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 8.0),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    "Image Quality",
-                                    style: TextStyle(fontSize: 18),
-                                  ),
-                                ],
-                              ),
-                              DropdownButton<int>(
-                                underline: Container(),
-                                isDense: true,
-                                isExpanded: false,
-                                borderRadius: BorderRadius.circular(20),
-                                padding: const EdgeInsets.only(
-                                    left: 8, right: 4, top: 4, bottom: 4),
-                                value: ConfigManager.instance
-                                    .getField("imageQuality"),
-                                items: [
-                                  DropdownMenuItem<int>(
-                                      value: 100,
-                                      child: Text("No Compression")),
-                                  DropdownMenuItem<int>(
-                                      value: 90, child: Text("High")),
-                                  DropdownMenuItem<int>(
-                                      value: 75, child: Text("Medium")),
-                                  DropdownMenuItem<int>(
-                                      value: 50, child: Text("Low")),
-                                ],
-                                onChanged: (int? newValue) {
-                                  setState(() {
-                                    ConfigManager.instance
-                                        .setField("imageQuality", newValue);
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                        const Text(
-                          "Log Folder",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        FutureBuilder(
-                            future:
-                                EntriesDatabase.instance.getInternalDbPath(),
-                            builder: (context, snapshot) {
-                              if (snapshot.hasData && snapshot.data != null) {
-                                if (EntriesDatabase.instance
-                                    .usingExternalDb()) {
-                                  return Text(ConfigManager.instance
-                                      .getField('externalDbUri'));
-                                }
-                                return Text(snapshot.data!);
+                  SettingsHeader(
+                      text: AppLocalizations.of(context)!.settingsStorageTitle),
+                  SettingsDropdown<int>(
+                      title: AppLocalizations.of(context)!.settingsImageQuality,
+                      settingsKey: "imageQuality",
+                      options: [
+                        DropdownMenuItem<int>(
+                            value: 100,
+                            child: Text(AppLocalizations.of(context)!
+                                .imageQualityNoCompression)),
+                        DropdownMenuItem<int>(
+                            value: 90,
+                            child: Text(AppLocalizations.of(context)!
+                                .imageQualityHigh)),
+                        DropdownMenuItem<int>(
+                            value: 75,
+                            child: Text(AppLocalizations.of(context)!
+                                .imageQualityMedium)),
+                        DropdownMenuItem<int>(
+                            value: 50,
+                            child: Text(
+                                AppLocalizations.of(context)!.imageQualityLow)),
+                      ],
+                      onChanged: (int? newValue) {
+                        setState(() {
+                          ConfigManager.instance
+                              .setField("imageQuality", newValue);
+                        });
+                      }),
+                  FutureBuilder(
+                      future: EntriesDatabase.instance.getInternalDbPath(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData && snapshot.data != null) {
+                          var folderText = snapshot.data!;
+                          if (EntriesDatabase.instance.usingExternalDb()) {
+                            folderText = ConfigManager.instance
+                                .getField('externalDbUri');
+                          }
+                          return SettingsIconAction(
+                            title:
+                                AppLocalizations.of(context)!.settingsLogFolder,
+                            hint: folderText,
+                            icon: Icon(Icons.folder_rounded),
+                            secondaryIcon: Icon(Icons.refresh_rounded),
+                            onPressed: () async {
+                              if (Platform.isAndroid &&
+                                  !await requestStoragePermission()) {
+                                return;
                               }
-                              return const Text("...");
-                            }),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            ElevatedButton.icon(
-                              icon: const Icon(
-                                Icons.folder_copy_rounded,
-                              ),
-                              label: const Text("Change Log Folder..."),
-                              onPressed: () async {
-                                if (Platform.isAndroid &&
-                                    !await requestStoragePermission()) {
-                                  return;
-                                }
-                                await _showChangeLogFolderWarning(context);
-                              },
-                            ),
-                            IconButton(
-                                onPressed: () async {
-                                  EntriesDatabase.instance
-                                      .resetDatabaseLocation();
-                                  setState(() {});
-                                },
-                                icon: const Icon(Icons.refresh_rounded))
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Image Folder",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        FutureBuilder(
-                            future: EntriesDatabase.instance
-                                .getInternalImgDatabasePath(),
-                            builder: (context, snapshot) {
-                              if (snapshot.hasData && snapshot.data != null) {
-                                if (EntriesDatabase.instance
-                                    .usingExternalImg()) {
-                                  return Text(ConfigManager.instance
-                                      .getField('externalImgUri'));
-                                }
-                                return Text(snapshot.data!);
+                              await _showChangeLogFolderWarning();
+                            },
+                            onSecondaryPressed: () async {
+                              EntriesDatabase.instance.resetDatabaseLocation();
+                              setState(() {});
+                            },
+                          );
+                        }
+                        return const SizedBox();
+                      }),
+                  FutureBuilder(
+                      future:
+                          EntriesDatabase.instance.getInternalImgDatabasePath(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData && snapshot.data != null) {
+                          var folderText = snapshot.data!;
+                          if (EntriesDatabase.instance.usingExternalImg()) {
+                            folderText = ConfigManager.instance
+                                .getField('externalImgUri');
+                          }
+                          return SettingsIconAction(
+                            title: AppLocalizations.of(context)!
+                                .settingsImageFolder,
+                            hint: folderText,
+                            icon: Icon(Icons.folder_rounded),
+                            secondaryIcon: Icon(Icons.refresh_rounded),
+                            onPressed: () async {
+                              if (Platform.isAndroid &&
+                                  !await requestPhotosPermission()) {
+                                return;
                               }
-                              return const Text("...");
-                            }),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            ElevatedButton.icon(
-                              icon: const Icon(
-                                Icons.folder_copy_rounded,
-                              ),
-                              label: const Text("Change Image Folder..."),
-                              onPressed: () async {
-                                if (Platform.isAndroid &&
-                                    !await requestPhotosPermission()) {
-                                  return;
-                                }
-                                await _showChangeImgFolderWarning(context);
-                              },
-                            ),
-                            IconButton(
-                                onPressed: () async {
-                                  setState(() {
-                                    EntriesDatabase.instance
-                                        .resetImageFolderLocation();
-                                  });
-                                },
-                                icon: const Icon(Icons.refresh_rounded))
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Export",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        Row(
-                          children: [
-                            ElevatedButton.icon(
-                              icon: const Icon(
-                                Icons.upload_rounded,
-                              ),
-                              label: const Text("Export Logs..."),
-                              onPressed: () async {
-                                if (Platform.isAndroid &&
-                                    !await requestStoragePermission()) {
-                                  return;
-                                }
-                                _showExportSelectionPopup();
-                              },
-                            ),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            ElevatedButton.icon(
-                              icon: const Icon(
-                                Icons.photo,
-                              ),
-                              label: const Text("Export Images..."),
-                              onPressed: () async {
-                                if (Platform.isAndroid &&
-                                    !await requestPhotosPermission()) {
-                                  return;
-                                }
-                                await EntriesDatabase.instance.exportImages();
-                              },
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Import",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        Row(
-                          children: [
-                            ElevatedButton.icon(
-                              icon: const Icon(
-                                Icons.download_rounded,
-                              ),
-                              label: const Text("Import Logs..."),
-                              onPressed: () async {
-                                if (Platform.isAndroid &&
-                                    !await requestStoragePermission()) {
-                                  return;
-                                }
-                                _showImportSelectionPopup();
-                              },
-                            ),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            ElevatedButton.icon(
-                              icon: const Icon(
-                                Icons.photo,
-                              ),
-                              label: const Text("Import Images..."),
-                              onPressed: () async {
-                                if (Platform.isAndroid &&
-                                    !await requestPhotosPermission()) {
-                                  return;
-                                }
-                                setState(() {
-                                  isSyncing = true;
-                                });
-                                await EntriesDatabase.instance.importImages();
-                                setState(() {
-                                  isSyncing = false;
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Delete All",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        ElevatedButton.icon(
-                          icon: const Icon(
-                            Icons.delete_forever_rounded,
-                          ),
-                          label: const Text("Delete All Logs..."),
-                          onPressed: () async {
-                            _showDeleteEntriesPopup();
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
+                              await _attemptImageFolderChange();
+                            },
+                            onSecondaryPressed: () async {
+                              EntriesDatabase.instance
+                                  .resetImageFolderLocation();
+                              setState(() {});
+                            },
+                          );
+                        }
+                        return const SizedBox();
+                      }),
+                  SettingsIconAction(
+                      title: AppLocalizations.of(context)!.settingsExport,
+                      icon: Icon(Icons.upload_rounded),
+                      onPressed: () async {
+                        _showExportSelectionPopup();
+                      }),
+                  SettingsIconAction(
+                      title: AppLocalizations.of(context)!.settingsImport,
+                      icon: Icon(Icons.download_rounded),
+                      onPressed: () async {
+                        _showImportSelectionPopup();
+                      }),
+                  SettingsIconAction(
+                      title: "Delete All Logs",
+                      icon: Icon(Icons.delete_forever_rounded),
+                      onPressed: () => _showDeleteEntriesPopup()),
                   const Divider(),
-                  const Row(
-                    children: [
-                      Text(
-                        "About",
-                        style: TextStyle(fontSize: 24),
-                      ),
-                    ],
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Version",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        ElevatedButton.icon(
-                          icon: const Icon(
-                            Icons.new_releases_rounded,
-                          ),
-                          label: Text(versionString),
-                          onPressed: () async {
-                            await launchUrl(
-                                Uri.https(
-                                    "github.com", "/Demizo/Daily_You/releases"),
-                                mode: LaunchMode.externalApplication);
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "License",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        ElevatedButton.icon(
-                          icon: const Icon(Icons.gavel_rounded),
-                          label: const Text("GPL v3"),
-                          onPressed: () async {
-                            await launchUrl(
-                                Uri.https("github.com",
-                                    "/Demizo/Daily_You/blob/master/LICENSE.txt"),
-                                mode: LaunchMode.externalApplication);
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Source Code",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        ElevatedButton.icon(
-                          icon: const Icon(
-                            Icons.code_rounded,
-                          ),
-                          label: const Text("Github"),
-                          onPressed: () async {
-                            await launchUrl(
-                                Uri.https("github.com", "/Demizo/Daily_You"),
-                                mode: LaunchMode.externalApplication);
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
+                  SettingsHeader(
+                      text: AppLocalizations.of(context)!.settingsAboutTitle),
+                  SettingsIconAction(
+                      title: AppLocalizations.of(context)!.settingsVersion,
+                      hint: versionString,
+                      icon: Icon(Icons.open_in_new_rounded),
+                      onPressed: () async {
+                        await launchUrl(
+                            Uri.https(
+                                "github.com", "/Demizo/Daily_You/releases"),
+                            mode: LaunchMode.externalApplication);
+                      }),
+                  SettingsIconAction(
+                      title: AppLocalizations.of(context)!.settingsLicense,
+                      hint: AppLocalizations.of(context)!.licenseGPLv3,
+                      icon: Icon(Icons.open_in_new_rounded),
+                      onPressed: () async {
+                        await launchUrl(
+                            Uri.https("github.com",
+                                "/Demizo/Daily_You/blob/master/LICENSE.txt"),
+                            mode: LaunchMode.externalApplication);
+                      }),
+                  SettingsIconAction(
+                      title: AppLocalizations.of(context)!.settingsSourceCode,
+                      hint: "github.com/Demizo/Daily_You",
+                      icon: Icon(Icons.open_in_new_rounded),
+                      onPressed: () async {
+                        await launchUrl(
+                            Uri.https("github.com", "/Demizo/Daily_You"),
+                            mode: LaunchMode.externalApplication);
+                      }),
                 ],
               ),
             ),
