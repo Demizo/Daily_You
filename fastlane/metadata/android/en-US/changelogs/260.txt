@@ -1,0 +1,9 @@
+Daily You v2.6.0 has arrived! Here are the changes:
+
+• Settings page revamped
+• Added localization for times and dates
+• Choose starting day of week based on system preference
+• Changed default image quality to high
+• Added basic translation support
+• Various performance and UI improvements
+• Fixed notifications not showing when external storage cannot be reached

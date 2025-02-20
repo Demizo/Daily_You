@@ -1,0 +1,9 @@
+Daily You v2.6.0 ist da! Hier sind die Änderungen:
+
+• Einstellungsseite überarbeitet
+• Lokalisierung für Uhrzeiten und Daten hinzugefügt
+• Starttag der Woche basierend auf Systemeinstellungen auswählen
+• Standardbildqualität auf hoch geändert
+• Grundlegende Übersetzungsunterstützung hinzugefügt
+• Verschiedene Leistungs- und UI-Verbesserungen
+• Benachrichtigungen wurden behoben, die nicht angezeigt wurden, wenn externer Speicher nicht erreichbar ist
