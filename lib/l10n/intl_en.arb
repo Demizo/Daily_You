@@ -78,6 +78,8 @@
   "themeDark": "Dark",
   "themeAmoled": "AMOLED",
 
+  "settingsFirstDayOfWeek": "First Day Of Week",
+
   "settingsUseSystemAccentColor": "Use System Accent Color",
   "settingsCustomAccentColor": "Custom Accent Color",
   "settingsShowMarkdownToolbar": "Show Markdown Toolbar",

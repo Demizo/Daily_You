@@ -76,6 +76,31 @@ class TimeManager {
         .format(addTimeOfDay(startOfDay(DateTime.now()), timeOfDay));
   }
 
+  static final Map<int, String> dayOfWeekIndexMapping = {
+    0: 'monday',
+    1: 'tuesday',
+    2: 'wednesday',
+    3: 'thursday',
+    4: 'friday',
+    5: 'saturday',
+    6: 'sunday',
+  };
+
+  static List<String> daysOfWeekLabels() {
+    final now = DateTime.now();
+    final formatter = DateFormat.E(
+        WidgetsBinding.instance.platformDispatcher.locale.toString());
+
+    List<String> days = List.generate(7, (index) {
+      final day = now
+          .subtract(Duration(days: now.weekday - 1))
+          .add(Duration(days: index));
+      return formatter.format(day); // Gets localized short name
+    });
+
+    return days;
+  }
+
   static int datesExactMonthDiff(DateTime date1, DateTime date2) {
     if (date1.day != date2.day) return -1;
     // Check if the year and month components are the same

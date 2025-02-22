@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:convert';
+import 'package:daily_you/time_manager.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -21,6 +22,7 @@ class ConfigManager {
     'externalDbUri': '',
     'useExternalImg': false,
     'externalImgUri': '',
+    'startingDayOfWeek': 'system',
     'useMarkdownToolbar': true,
     'homePageViewMode': 'list',
     'calendarViewMode': 'image',
@@ -113,10 +115,16 @@ class ConfigManager {
   }
 
   int getFirstDayOfWeekIndex() {
-    return DateFormat.yMd(
-            WidgetsBinding.instance.platformDispatcher.locale.toString())
-        .dateSymbols
-        .FIRSTDAYOFWEEK;
+    final startingDay = getField("startingDayOfWeek");
+    if (startingDay == 'system') {
+      return DateFormat.yMd(
+              WidgetsBinding.instance.platformDispatcher.locale.toString())
+          .dateSymbols
+          .FIRSTDAYOFWEEK;
+    } else {
+      return TimeManager.dayOfWeekIndexMapping.keys.firstWhere(
+          (k) => TimeManager.dayOfWeekIndexMapping[k] == startingDay);
+    }
   }
 
   // Read the contents of the config file
