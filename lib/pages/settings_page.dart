@@ -554,6 +554,27 @@ class _SettingsPageState extends State<SettingsPage> {
     return dropdownItems;
   }
 
+  List<DropdownMenuItem<String>> _buildFirstDayOfWeekDropdownItems(
+      BuildContext context) {
+    final dayLabels = TimeManager.daysOfWeekLabels();
+    List<DropdownMenuItem<String>> dropdownItems = List.empty(growable: true);
+    dropdownItems.add(DropdownMenuItem<String>(
+      value: "system",
+      child: Text(AppLocalizations.of(context)!.themeSystem),
+    ));
+
+    var dropdownDays = List.generate(7, (index) {
+      return DropdownMenuItem<String>(
+        value: TimeManager.dayOfWeekIndexMapping[index],
+        child: Text(
+          dayLabels[index],
+        ),
+      );
+    });
+    dropdownItems.addAll(dropdownDays);
+    return dropdownItems;
+  }
+
   @override
   Widget build(BuildContext context) {
     final statsProvider = Provider.of<StatsProvider>(context);
@@ -657,6 +678,17 @@ class _SettingsPageState extends State<SettingsPage> {
                         _showAccentColorPopup(themeProvider);
                       },
                     ),
+                  SettingsDropdown<String>(
+                      title:
+                          AppLocalizations.of(context)!.settingsFirstDayOfWeek,
+                      settingsKey: "startingDayOfWeek",
+                      options: _buildFirstDayOfWeekDropdownItems(context),
+                      onChanged: (String? newValue) async {
+                        await ConfigManager.instance
+                            .setField("startingDayOfWeek", newValue);
+                        setState(() {});
+                        statsProvider.updateStats();
+                      }),
                   SettingsToggle(
                       title: AppLocalizations.of(context)!
                           .settingsShowMarkdownToolbar,
