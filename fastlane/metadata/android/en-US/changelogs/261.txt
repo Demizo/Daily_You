@@ -1,0 +1,3 @@
+Daily You v2.6.1 has arrived! Here are the changes:
+
+• Restored ability to customize the first day of the week
