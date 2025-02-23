@@ -23,14 +23,12 @@ Daily You is an app made to store memories of the passing days. Log each day and
 <img width="200" src="https://github.com/Demizo/Daily_You/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/Screenshot_3.png" alt="app screenshot">
 </p>
 
-## Installation
-### Android
-<a href="https://apt.izzysoft.de/fdroid/index/apk/com.demizo.daily_you/"><img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png" alt="Get it on IzzyOnDroid" height="100"></a>
+## Download 
 
-Or download the latest APK from [releases](https://github.com/Demizo/Daily_You/releases).
+[![Downloads](https://img.shields.io/github/downloads/Demizo/Daily_You/total)](https://github.com/Demizo/Daily_You/releases)
 
-### Linux (Beta)
-Download the latest Appimage from [releases](https://github.com/Demizo/Daily_You/releases). [AppImageLauncher](https://github.com/TheAssassin/AppImageLauncher) recommended.
+[<img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png" height="80">](https://apt.izzysoft.de/fdroid/index/apk/com.demizo.daily_you)
+[<img src="https://github.com/machiav3lli/oandbackupx/blob/034b226cea5c1b30eb4f6a6f313e4dadcbb0ece4/badge_github.png" alt="Get it on GitHub" height="80">](https://github.com/Demizo/Daily_You/releases/latest)
 
 ## Migrate From Another App
 Are you coming from another app? Daily You supports migration from other apps! If the app you use isn't listed below feel free to request it. **Note:** Imports from some apps may not be one-to-one since Daily You likely has different features/limitations.
@@ -40,7 +38,10 @@ Within OneShot's settings, entries can be exported as a JSON file. The JSON file
 Daylio has a very different set of features from Daily You and as such lacks a one-to-one import. Steps, as well as a helper script, for migrating from Daylio are provided in this repo [daylio-to-daily-you](https://github.com/Demizo/daylio-to-daily-you).
 
 ## Contributing
-### Translation
+### Translation 
+
+[![Translation](https://hosted.weblate.org/widget/daily-you/svg-badge.svg)](https://hosted.weblate.org/engage/daily-you/)
+
 Daily You uses [Weblate](https://weblate.org) to easily manage translation. If you would like to help translate the app, please visit [the Daily You project on Weblate](https://hosted.weblate.org/projects/daily-you/), thank you!
 
 ## Development
