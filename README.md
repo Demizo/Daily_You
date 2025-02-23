@@ -38,6 +38,11 @@ Are you coming from another app? Daily You supports migration from other apps! I
 Within OneShot's settings, entries can be exported as a JSON file. The JSON file can be directly imported into Daily You by going to `Settings > Import Logs... > OneShot`. Images can be imported by using the `Import Images` option and selecting all of your OneShot photos. Alternatively, you can set your `Image Folder` to be the same folder where OneShot saved its images.
 ### Daylio
 Daylio has a very different set of features from Daily You and as such lacks a one-to-one import. Steps, as well as a helper script, for migrating from Daylio are provided in this repo [daylio-to-daily-you](https://github.com/Demizo/daylio-to-daily-you).
+
+## Contributing
+### Translation
+Daily You uses [Weblate](https://weblate.org) to easily manage translation. If you would like to help translate the app, please visit [the Daily You project on Weblate](https://hosted.weblate.org/projects/daily-you/), thank you!
+
 ## Development
 Daily You is built using Flutter.
 - Clone the repo
