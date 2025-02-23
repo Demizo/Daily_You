@@ -2,4 +2,3 @@ Daily You v1.1.2 ist angekommen! Hier sind die Highlights:
 
 • Fotolöschungsbestätigung hinzugefügt.
 • Behoben das sich Bilder nicht löschen lassen konnten.
-
