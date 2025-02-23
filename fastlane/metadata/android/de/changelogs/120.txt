@@ -2,4 +2,3 @@ Daily You v1.2.0 ist angekommen! Hier sind die Highlights:
 
 • Mehr Sortier-/Filteroptionen der Gallery hinzugefügt.
 • Änderung des Wochentagsanfang im Kalender hinzugefügt.
-
