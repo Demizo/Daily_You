@@ -24,6 +24,7 @@ class EntriesDatabase {
   static final EntriesDatabase instance = EntriesDatabase._init();
 
   static Database? _database;
+  Database? get database => _database;
 
   final FileBytesCache imageCache =
       FileBytesCache(maxCacheSize: 10 * 1024 * 1024);
@@ -80,12 +81,13 @@ CREATE TABLE $imagesTable (
     await db.execute('''
 CREATE TABLE $tagsTable (
   ${TagsFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-  ${TagsFields.name} TEXT NOT NULL,
+  ${TagsFields.name} TEXT NOT NULL UNIQUE,
+  ${TagsFields.type} TEXT NOT NULL,
   ${TagsFields.timeCreate} DATETIME NOT NULL DEFAULT (DATETIME('now')),
   ${TagsFields.timeModified} DATETIME NOT NULL DEFAULT (DATETIME('now'))
 )
 ''');
-    await createDefaultTags();
+    await Tag.createDefaultTags();
     await db.execute('''
 CREATE TABLE $entryTagsTable (
     ${EntryTagsFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -168,12 +170,13 @@ DROP TABLE old_entries;
       await db.execute('''
 CREATE TABLE $tagsTable (
   ${TagsFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-  ${TagsFields.name} TEXT NOT NULL,
+  ${TagsFields.name} TEXT NOT NULL UNIQUE,
+  ${TagsFields.type} TEXT NOT NULL,
   ${TagsFields.timeCreate} DATETIME NOT NULL DEFAULT (DATETIME('now')),
   ${TagsFields.timeModified} DATETIME NOT NULL DEFAULT (DATETIME('now'))
 )
 ''');
-      await createDefaultTags();
+      await Tag.createDefaultTags();
       await db.execute('''
 CREATE TABLE $entryTagsTable (
     ${EntryTagsFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -187,80 +190,6 @@ CREATE TABLE $entryTagsTable (
 )
 ''');
     }
-  }
-
-  // Tag Methods
-  Future createDefaultTags() async {
-    await createTag(Tag(
-        name: "Favorite",
-        timeCreate: DateTime.now(),
-        timeModified: DateTime.now()));
-
-    await createTag(Tag(
-        name: "Mood",
-        timeCreate: DateTime.now(),
-        timeModified: DateTime.now()));
-  }
-
-  Future<Tag> createTag(Tag tag) async {
-    final db = _database!;
-
-    final id = await db.insert(tagsTable, tag.toJson());
-    if (usingExternalDb()) await updateExternalDatabase();
-    return tag.copy(id: id);
-  }
-
-  Future<Tag?> getTag(int id) async {
-    final db = _database!;
-
-    final maps = await db.query(
-      tagsTable,
-      columns: TagsFields.values,
-      where: '${TagsFields.id} = ?',
-      whereArgs: [id],
-    );
-
-    if (maps.isNotEmpty) {
-      return Tag.fromJson(maps.first);
-    } else {
-      return null;
-    }
-  }
-
-  Future<List<Tag>> getAllTags() async {
-    final db = _database!;
-
-    final result =
-        await db.query(tagsTable, orderBy: '${TagsFields.name} DESC');
-
-    return result.map((json) => Tag.fromJson(json)).toList();
-  }
-
-  Future<int> updateTag(Tag tag) async {
-    final db = _database!;
-
-    final id = await db.update(
-      tagsTable,
-      tag.toJson(),
-      where: '${TagsFields.id} = ?',
-      whereArgs: [tag.id],
-    );
-
-    if (usingExternalDb()) await updateExternalDatabase();
-    return id;
-  }
-
-  Future<int> deleteTag(int id) async {
-    final db = _database!;
-
-    final removedId = await db.delete(
-      tagsTable,
-      where: '${TagsFields.id} = ?',
-      whereArgs: [id],
-    );
-
-    if (usingExternalDb()) await updateExternalDatabase();
-    return removedId;
   }
 
   // Template Methods
