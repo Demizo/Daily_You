@@ -2,4 +2,3 @@ Daily You v1.1.2 has arrived! Here are the highlights:
 
 • Added delete confirmation for photos.
 • Fixed photos not deleting.
-
