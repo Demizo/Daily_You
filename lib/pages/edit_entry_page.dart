@@ -349,7 +349,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
 
     if (Platform.isAndroid &&
         TimeManager.isSameDay(DateTime.now(), newEntry.timeCreate)) {
-      await NotificationManager.instance.notifications.cancel(0);
+      await NotificationManager.instance.dismissReminderNotification();
     }
     var entry = await EntriesDatabase.instance.create(newEntry);
     await saveOrUpdateImage(entry.id!);

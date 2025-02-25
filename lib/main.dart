@@ -81,7 +81,6 @@ void main() async {
     await NotificationManager.instance.init();
 
     await AndroidAlarmManager.initialize();
-    await NotificationManager.instance.dismissReminderNotification();
   }
 
   runApp(MultiProvider(providers: [
