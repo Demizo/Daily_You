@@ -587,22 +587,14 @@ class _SettingsPageState extends State<SettingsPage> {
                   child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
-                  "Syncing...",
-                  style: TextStyle(fontSize: 22),
-                ),
-                const Text(
-                  "Do not close the app! This may take awhile...",
-                  style: TextStyle(fontSize: 18),
-                ),
+                const CircularProgressIndicator(),
                 statsProvider.totalEntries == 0
-                    ? const Text("Loading...")
+                    ? Container()
                     : Text(
-                        "Synced ${statsProvider.syncedEntries} out of ${statsProvider.totalEntries}"),
+                        "${statsProvider.syncedEntries}/${statsProvider.totalEntries}"),
                 const SizedBox(
                   height: 10,
                 ),
-                const CircularProgressIndicator(),
               ],
             )))
           : Scaffold(
