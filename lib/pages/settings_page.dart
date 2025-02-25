@@ -38,6 +38,7 @@ class _SettingsPageState extends State<SettingsPage> {
   List<Template> _templates = [];
   bool isLoading = true;
   String versionString = "0.0.0";
+  int versionTapCount = 0;
 
   @override
   void initState() {
@@ -577,6 +578,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final Color pinkAccentColor = const Color(0xffff00d5);
     final statsProvider = Provider.of<StatsProvider>(context);
     final themeProvider = Provider.of<ThemeModeProvider>(context);
     return PopScope(
@@ -913,16 +915,41 @@ class _SettingsPageState extends State<SettingsPage> {
                   const Divider(),
                   SettingsHeader(
                       text: AppLocalizations.of(context)!.settingsAboutTitle),
-                  SettingsIconAction(
-                      title: AppLocalizations.of(context)!.settingsVersion,
-                      hint: versionString,
-                      icon: Icon(Icons.open_in_new_rounded),
-                      onPressed: () async {
-                        await launchUrl(
-                            Uri.https(
-                                "github.com", "/Demizo/Daily_You/releases"),
-                            mode: LaunchMode.externalApplication);
-                      }),
+                  GestureDetector(
+                    child: SettingsIconAction(
+                        title: AppLocalizations.of(context)!.settingsVersion,
+                        hint: versionString,
+                        icon: Icon(Icons.open_in_new_rounded),
+                        onPressed: () async {
+                          await launchUrl(
+                              Uri.https(
+                                  "github.com", "/Demizo/Daily_You/releases"),
+                              mode: LaunchMode.externalApplication);
+                        }),
+                    onTap: () async {
+                      versionTapCount += 1;
+                      if (versionTapCount > 5) {
+                        versionTapCount = 0;
+
+                        await ConfigManager.instance
+                            .setField("followSystemColor", false);
+
+                        setState(() {
+                          themeProvider.accentColor = pinkAccentColor;
+                          themeProvider.updateAccentColor();
+                        });
+
+                        await showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Center(child: Text("❤️❤️❤️")),
+                            );
+                          },
+                        );
+                      }
+                    },
+                  ),
                   SettingsIconAction(
                       title: AppLocalizations.of(context)!.settingsLicense,
                       hint: AppLocalizations.of(context)!.licenseGPLv3,
