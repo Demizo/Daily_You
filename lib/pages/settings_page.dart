@@ -997,6 +997,12 @@ class _SettingsPageState extends State<SettingsPage> {
                         _showImportSelectionPopup();
                       }),
                   SettingsIconAction(
+                      title: "Zip Backup!!!",
+                      icon: Icon(Icons.backup_rounded),
+                      onPressed: () async {
+                        await EntriesDatabase.instance.exportToZip();
+                      }),
+                  SettingsIconAction(
                       title: AppLocalizations.of(context)!
                           .settingsDeleteAllLogsTitle,
                       icon: Icon(Icons.delete_forever_rounded),

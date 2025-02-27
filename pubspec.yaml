@@ -50,6 +50,9 @@ dependencies:
   time_range_picker: ^2.3.0
   package_info_plus: ^8.1.3
   shared_preferences: ^2.5.2
+  saf_util: ^0.6.2
+  saf_stream: ^0.11.1
+  archive: ^4.0.3
 dev_dependencies:
   flutter_lints: ^5.0.0
 

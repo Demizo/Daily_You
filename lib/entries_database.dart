@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:archive/archive_io.dart';
 import 'package:daily_you/file_bytes_cache.dart';
 import 'package:daily_you/file_layer.dart';
 import 'package:daily_you/models/image.dart';
@@ -8,6 +9,7 @@ import 'package:daily_you/stats_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/template.dart';
+import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:media_scanner/media_scanner.dart';
 import 'package:schedulers/schedulers.dart';
@@ -924,6 +926,79 @@ DROP TABLE old_entries;
     }
     if (usingExternalImg()) await syncImageFolder(true);
     StatsProvider.instance.updateStats();
+    return true;
+  }
+
+  Future<bool> exportToZip() async {
+    String? savePath = await FileLayer.pickDirectory();
+    if (savePath == null) return false;
+
+    var tempDir = await getTemporaryDirectory();
+
+    final exportedZipName =
+        "daily_you_backup_${DateTime.now().toIso8601String().replaceAll(':', '-')}.zip";
+
+    // Create archive
+    await compute(createArchive, [
+      join(tempDir.path, exportedZipName),
+      await getInternalDbPath(),
+      await getInternalImgDatabasePath()
+    ]);
+
+    // Save archive
+    var readStream = await FileLayer.readFileStream(tempDir.path,
+        name: exportedZipName, useExternalPath: false);
+    var writeStream =
+        await FileLayer.openFileWriteStream(savePath, exportedZipName);
+
+    if (writeStream == null || readStream == null) return false;
+
+    await for (List<int> chunk in readStream) {
+      await FileLayer.writeFileWriteStreamChunk(
+          writeStream, Uint8List.fromList(chunk));
+    }
+    await FileLayer.closeFileWriteStream(writeStream);
+
+    // Delete temp files
+    await File(join(tempDir.path, exportedZipName)).delete();
+
+    await cleanupOldBackups(savePath, 2);
+
+    return true;
+  }
+
+  Future<void> createArchive(List<String> args) async {
+    var encoder = ZipFileEncoder();
+    encoder.createWithStream(OutputFileStream(args[0]));
+    await encoder.addFile(File(args[1]));
+    await encoder.addDirectory(Directory(args[2]));
+    await encoder.close();
+  }
+
+  Future<bool> cleanupOldBackups(String uri, int numberToKeep) async {
+    var existingFiles = await FileLayer.listFiles(uri);
+
+    var backups = existingFiles
+        .where((file) =>
+            file.startsWith('daily_you_backup_') && file.endsWith('.zip'))
+        .toList();
+
+    var fileDates = await Future.wait(backups.map((file) async {
+      return (
+        file,
+        await FileLayer.getFileModifiedTime(uri, name: file) ?? DateTime.now()
+      );
+    }));
+
+    // Sort by modified date (newest first)
+    fileDates.sort((a, b) => b.$2.compareTo(a.$2));
+
+    if (fileDates.length > numberToKeep) {
+      for (var i = numberToKeep; i < fileDates.length; i++) {
+        await FileLayer.deleteFile(uri, name: fileDates[i].$1);
+      }
+    }
+
     return true;
   }
 }
