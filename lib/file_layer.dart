@@ -53,6 +53,24 @@ class FileLayer {
     }
   }
 
+  static Future<bool> exists(String uri,
+      {String? name, useExternalPath = true}) async {
+    if (Platform.isAndroid && useExternalPath) {
+      if (name != null) {
+        var target = await saf.child(Uri.parse(uri), name);
+        return await target?.exists() ?? false;
+      } else {
+        return await saf.exists(Uri.parse(uri)) ?? false;
+      }
+    } else {
+      if (name != null) {
+        return await File(join(uri, name)).exists();
+      } else {
+        return await Directory(uri).exists();
+      }
+    }
+  }
+
   static Future<Uint8List?> getFileBytes(String uri,
       {String? name, bool useExternalPath = true}) async {
     if (Platform.isAndroid && useExternalPath) {

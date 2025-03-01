@@ -540,21 +540,28 @@ DROP TABLE old_entries;
   }
 
   Future<bool> syncDatabase({bool forceOverwrite = false}) async {
-    var externalBytes = await FileLayer.getFileBytes(
+    // Check if external database exists
+    var externalExists = await FileLayer.exists(
         ConfigManager.instance.getField('externalDbUri'),
         name: "daily_you.db");
 
-    if (externalBytes == null) {
-      // Export internal DB
+    if (!externalExists) {
       var bytes = await FileLayer.getFileBytes(await getInternalDbPath(),
           useExternalPath: false);
       if (bytes == null) return false;
+
+      // Export internal DB
       var externalDbPath = await FileLayer.createFile(
           ConfigManager.instance.getField('externalDbUri'),
           "daily_you.db",
           bytes);
       return externalDbPath != null;
     } else if (forceOverwrite || await isExternalDbNewer()) {
+      var externalBytes = await FileLayer.getFileBytes(
+          ConfigManager.instance.getField('externalDbUri'),
+          name: "daily_you.db");
+      if (externalBytes == null) return false;
+
       // Overwrite internal DB
       return await FileLayer.writeFileBytes(
           await getInternalDbPath(), externalBytes,
@@ -573,7 +580,7 @@ DROP TABLE old_entries;
     var externalModifiedTime = await FileLayer.getFileModifiedTime(
             ConfigManager.instance.getField('externalDbUri'),
             name: "daily_you.db") ??
-        DateTime.now();
+        internalModifiedTime;
 
     return externalModifiedTime.isAfter(internalModifiedTime);
   }
