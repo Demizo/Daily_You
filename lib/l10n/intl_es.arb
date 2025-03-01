@@ -152,5 +152,7 @@
   "titleHint": "Título…",
   "@titleHint": {},
   "noTemplatesDescription": "Aún no se han creado plantillas…",
-  "@noTemplatesDescription": {}
+  "@noTemplatesDescription": {},
+  "formatOneShot": "OneShot",
+  "@formatOneShot": {}
 }
