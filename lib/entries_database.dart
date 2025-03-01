@@ -962,8 +962,6 @@ DROP TABLE old_entries;
     // Delete temp files
     await File(join(tempDir.path, exportedZipName)).delete();
 
-    await cleanupOldBackups(savePath, 2);
-
     return true;
   }
 
@@ -973,32 +971,5 @@ DROP TABLE old_entries;
     await encoder.addFile(File(args[1]));
     await encoder.addDirectory(Directory(args[2]));
     await encoder.close();
-  }
-
-  Future<bool> cleanupOldBackups(String uri, int numberToKeep) async {
-    var existingFiles = await FileLayer.listFiles(uri);
-
-    var backups = existingFiles
-        .where((file) =>
-            file.startsWith('daily_you_backup_') && file.endsWith('.zip'))
-        .toList();
-
-    var fileDates = await Future.wait(backups.map((file) async {
-      return (
-        file,
-        await FileLayer.getFileModifiedTime(uri, name: file) ?? DateTime.now()
-      );
-    }));
-
-    // Sort by modified date (newest first)
-    fileDates.sort((a, b) => b.$2.compareTo(a.$2));
-
-    if (fileDates.length > numberToKeep) {
-      for (var i = numberToKeep; i < fileDates.length; i++) {
-        await FileLayer.deleteFile(uri, name: fileDates[i].$1);
-      }
-    }
-
-    return true;
   }
 }
