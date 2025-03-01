@@ -53,6 +53,7 @@ dependencies:
   saf_util: ^0.6.2
   saf_stream: ^0.11.1
   archive: ^4.0.3
+  mime: ^2.0.0
 dev_dependencies:
   flutter_lints: ^5.0.0
 

@@ -31,16 +31,17 @@ class FileLayer {
     }
   }
 
-  static Future<String?> pickFile() async {
+  static Future<String?> pickFile(
+      {List<String>? mimeTypes, List<String>? allowedExtensions}) async {
     if (Platform.isAndroid) {
       // Android
-      var pickedFile = await SafUtil().pickFile();
+      var pickedFile = await SafUtil().pickFile(mimeTypes: mimeTypes);
       return pickedFile?.uri;
     } else {
       // Desktop
       FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
-        allowedExtensions: ['json'],
+        allowedExtensions: allowedExtensions,
       );
       if (result == null) return null;
       return result.files.first.path;
@@ -121,9 +122,7 @@ class FileLayer {
     } else {
       // Desktop
       var targetFile = File(join(uri, name));
-      return await targetFile.exists()
-          ? FileLayerWriteStream(useSaf: false, sink: targetFile.openWrite())
-          : null;
+      return FileLayerWriteStream(useSaf: false, sink: targetFile.openWrite());
     }
   }
 
@@ -172,6 +171,27 @@ class FileLayer {
       // Desktop
       var targetFile = File(join(uri, name));
       return await targetFile.exists() ? await targetFile.lastModified() : null;
+    }
+  }
+
+  static Future<int?> getFileSize(String uri,
+      {String? name, useExternalPath = true}) async {
+    if (Platform.isAndroid && useExternalPath) {
+      // Android
+      if (name != null) {
+        // Find file in directory
+        var targetFile =
+            await saf.child(Uri.parse(uri), name, requiresWriteAccess: true);
+        return targetFile?.size;
+      } else {
+        // Get the file directly
+        var targetFile = await saf.fromTreeUri(Uri.parse(uri));
+        return targetFile?.size;
+      }
+    } else {
+      // Desktop
+      var targetFile = File(join(uri, name));
+      return await targetFile.exists() ? await targetFile.length() : null;
     }
   }
 

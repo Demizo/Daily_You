@@ -12,6 +12,7 @@ import 'package:daily_you/models/template.dart';
 import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:media_scanner/media_scanner.dart';
+import 'package:mime/mime.dart';
 import 'package:schedulers/schedulers.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
@@ -722,7 +723,8 @@ DROP TABLE old_entries;
 
   Future<bool> importFromOneShot() async {
     StatsProvider.instance.updateSyncStats(0, 0);
-    var selectedFile = await FileLayer.pickFile();
+    var selectedFile = await FileLayer.pickFile(
+        allowedExtensions: ['json'], mimeTypes: ['application/json']);
     if (selectedFile == null) return false;
     var bytes = await FileLayer.getFileBytes(selectedFile);
     if (bytes == null) return false;
@@ -885,7 +887,8 @@ DROP TABLE old_entries;
 
   Future<bool> importFromJson() async {
     StatsProvider.instance.updateSyncStats(0, 0);
-    var selectedFile = await FileLayer.pickFile();
+    var selectedFile = await FileLayer.pickFile(
+        allowedExtensions: ['json'], mimeTypes: ['application/json']);
     if (selectedFile == null) return false;
     var bytes = await FileLayer.getFileBytes(selectedFile);
     if (bytes == null) return false;
@@ -929,7 +932,7 @@ DROP TABLE old_entries;
     return true;
   }
 
-  Future<bool> exportToZip() async {
+  Future<bool> backupToZip(void Function(String) updateProgress) async {
     String? savePath = await FileLayer.pickDirectory();
     if (savePath == null) return false;
 
@@ -939,13 +942,15 @@ DROP TABLE old_entries;
         "daily_you_backup_${DateTime.now().toIso8601String().replaceAll(':', '-')}.zip";
 
     // Create archive
-    await compute(createArchive, [
+    updateProgress("Creating backup...");
+    await compute(encodeArchive, [
       join(tempDir.path, exportedZipName),
       await getInternalDbPath(),
       await getInternalImgDatabasePath()
     ]);
 
     // Save archive
+    updateProgress("Transferring backup...");
     var readStream = await FileLayer.readFileStream(tempDir.path,
         name: exportedZipName, useExternalPath: false);
     var writeStream =
@@ -960,16 +965,115 @@ DROP TABLE old_entries;
     await FileLayer.closeFileWriteStream(writeStream);
 
     // Delete temp files
+    updateProgress("Cleaning up...");
     await File(join(tempDir.path, exportedZipName)).delete();
 
     return true;
   }
 
-  Future<void> createArchive(List<String> args) async {
+  Future<bool> restoreFromZip(void Function(String) updateProgress) async {
+    var importSuccessful = true;
+
+    String? archive = await FileLayer.pickFile(
+        allowedExtensions: ['zip'], mimeTypes: ['application/zip']);
+
+    if (archive == null) return false;
+
+    var tempDir = await getTemporaryDirectory();
+
+    final tempZipName = "temp_backup.zip";
+
+    // Import archive
+    updateProgress("Transferring backup 0%");
+    var readStream =
+        await FileLayer.readFileStream(archive, useExternalPath: true);
+    var writeStream = await FileLayer.openFileWriteStream(
+        tempDir.path, tempZipName,
+        useExternalPath: false);
+
+    if (writeStream == null || readStream == null) return false;
+
+    final archiveSize = await FileLayer.getFileSize(archive);
+    if (archiveSize == null) return false;
+
+    var transferredSize = 0;
+    await for (List<int> chunk in readStream) {
+      await FileLayer.writeFileWriteStreamChunk(
+          writeStream, Uint8List.fromList(chunk));
+      transferredSize += chunk.length;
+      var percent = (transferredSize / archiveSize) * 100;
+      updateProgress("Transferring backup ${percent.round()}%");
+    }
+    await FileLayer.closeFileWriteStream(writeStream);
+
+    // Import archive
+    final restoreFolder = Directory(join(tempDir.path, "Restore"));
+    if (await restoreFolder.exists() == false) {
+      await restoreFolder.create();
+    }
+
+    updateProgress("Restoring backup...");
+    await compute(
+        decodeArchive, [join(tempDir.path, tempZipName), restoreFolder.path]);
+
+    final tempDb = File(join(restoreFolder.path, 'daily_you.db'));
+    if (await tempDb.exists()) {
+      // Import database
+      await _database!.close();
+      await File(await getInternalDbPath())
+          .writeAsBytes(await tempDb.readAsBytes());
+      await initDB();
+
+      // Import images. These will be garbage collected after import
+      if (await Directory(join(restoreFolder.path, "Images")).exists()) {
+        var files = Directory(join(restoreFolder.path, "Images")).list();
+        final internalImagePath = await getInternalImgDatabasePath();
+        await for (FileSystemEntity fileEntity in files) {
+          if (fileEntity is File) {
+            await File(join(internalImagePath, basename(fileEntity.path)))
+                .writeAsBytes(await fileEntity.readAsBytes());
+          }
+        }
+        if (usingExternalImg()) await syncImageFolder(true);
+      }
+
+      await StatsProvider.instance.updateStats();
+    } else {
+      importSuccessful = false;
+    }
+
+    // Delete temp files
+    updateProgress("Cleaning up...");
+    await File(join(tempDir.path, tempZipName)).delete();
+    if (await restoreFolder.exists()) {
+      await restoreFolder.delete(recursive: true);
+    }
+
+    return importSuccessful;
+  }
+
+  Future<void> encodeArchive(List<String> args) async {
     var encoder = ZipFileEncoder();
     encoder.createWithStream(OutputFileStream(args[0]));
     await encoder.addFile(File(args[1]));
     await encoder.addDirectory(Directory(args[2]));
     await encoder.close();
+  }
+
+  Future<void> decodeArchive(List<String> args) async {
+    var decoder = ZipDecoder().decodeStream(InputFileStream(args[0]));
+    for (final entry in decoder) {
+      if (entry.isFile) {
+        final bytes = entry.readBytes();
+        if (bytes == null) continue;
+        final parent = Directory(File(join(args[1], entry.name)).parent.path);
+        if (await parent.exists() == false) {
+          await parent.create(recursive: true);
+        }
+        await File(join(args[1], entry.name)).writeAsBytes(bytes);
+      } else {
+        await Directory(join(args[1], entry.name)).create(recursive: true);
+      }
+    }
   }
 }

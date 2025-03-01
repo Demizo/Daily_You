@@ -46,6 +46,81 @@ class _SettingsPageState extends State<SettingsPage> {
     _loadTemplates();
   }
 
+  void showLoadingDialog(
+      BuildContext context, ValueNotifier<String> messageNotifier) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return PopScope(
+          canPop: false,
+          child: Dialog(
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularProgressIndicator(),
+                  const SizedBox(height: 20),
+                  ValueListenableBuilder<String>(
+                    valueListenable: messageNotifier,
+                    builder: (context, message, child) {
+                      return Text(message, textAlign: TextAlign.center);
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> startExport(BuildContext context) async {
+    ValueNotifier<String> messageNotifier = ValueNotifier<String>("");
+
+    showLoadingDialog(context, messageNotifier);
+
+    bool success = await EntriesDatabase.instance.backupToZip((msg) {
+      messageNotifier.value = msg;
+    });
+
+    Navigator.of(context).pop();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        content: Text(
+          success ? "Export successful!" : "Export failed.",
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+        ),
+      ),
+    );
+  }
+
+  Future<void> startImport(BuildContext context) async {
+    ValueNotifier<String> messageNotifier = ValueNotifier<String>("");
+
+    showLoadingDialog(context, messageNotifier);
+
+    bool success = await EntriesDatabase.instance.restoreFromZip((msg) {
+      messageNotifier.value = msg;
+    });
+
+    Navigator.of(context).pop();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        content: Text(
+          success ? "Import successful!" : "Import failed.",
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+        ),
+      ),
+    );
+  }
+
   Future<bool> requestStoragePermission() async {
     DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
     AndroidDeviceInfo androidInfo = await deviceInfoPlugin.androidInfo;
@@ -1000,7 +1075,13 @@ class _SettingsPageState extends State<SettingsPage> {
                       title: "Zip Backup!!!",
                       icon: Icon(Icons.backup_rounded),
                       onPressed: () async {
-                        await EntriesDatabase.instance.exportToZip();
+                        await startExport(context);
+                      }),
+                  SettingsIconAction(
+                      title: "Zip Restore!!!",
+                      icon: Icon(Icons.restore_rounded),
+                      onPressed: () async {
+                        await startImport(context);
                       }),
                   SettingsIconAction(
                       title: AppLocalizations.of(context)!
