@@ -1,0 +1,8 @@
+Daily You v2.6.2 has arrived! Here are the changes:
+
+• Added support for translation contributions via Weblate
+• Updated translations
+• Added the ability to download or share individual images
+• Stopped dismissing the reminder notification on app launch. It will now wait for an entry to be made
+• Optimized launch time when using an externally synced folder
+• Minor UI improvements
