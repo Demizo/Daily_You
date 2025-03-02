@@ -1,7 +1,7 @@
 {
   "flashbackYear": "{count, plural, one{{count} 年前} other{{count} 年前}}",
   "@flashbackYear": {},
-  "appTitle": "日迹心语",
+  "appTitle": "Daily You日迹心语",
   "@appTitle": {},
   "flashbackWeek": "{count, plural, one {{count} 周前} other {{count} 周前}}",
   "@flashbackWeek": {},
