@@ -174,5 +174,13 @@
   "imageQualityMedium": "Среднее",
   "@imageQualityMedium": {},
   "deletePhotoDescription": "Вы хотите удалить это фото?",
-  "@deletePhotoDescription": {}
+  "@deletePhotoDescription": {},
+  "flashbackYear": "{count, plural, one{{count} Год назад} other{{count} Лет назад}}",
+  "@flashbackYear": {},
+  "logCount": "{count, plural, one{{count} запись} other{{count} записей}}",
+  "@logCount": {},
+  "streakCurrent": "Подряд",
+  "@streakCurrent": {},
+  "streakLongest": "Макс. подряд",
+  "@streakLongest": {}
 }
