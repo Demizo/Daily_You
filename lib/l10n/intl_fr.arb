@@ -1,1 +1,20 @@
-{}
+{
+  "dailyReminderTitle": "Enregistre ta journée !",
+  "@dailyReminderTitle": {},
+  "flashbackGoodDay": "Une bonne journée",
+  "@flashbackGoodDay": {},
+  "searchLogsHint": "Rechercher dans les enregistrements",
+  "@searchLogsHint": {},
+  "dailyReminderDescription": "N'oublie pas d'enregistrer ta journée…",
+  "@dailyReminderDescription": {},
+  "pageHomeTitle": "Accueil",
+  "@pageHomeTitle": {},
+  "flashbackRandomDay": "Une journée au hasard",
+  "@flashbackRandomDay": {},
+  "pageGalleryTitle": "Galerie",
+  "@pageGalleryTitle": {},
+  "noLogs": "Pas d'enregistrements…",
+  "@noLogs": {},
+  "sortDateTitle": "Date",
+  "@sortDateTitle": {}
+}
