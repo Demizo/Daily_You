@@ -184,5 +184,7 @@
   "importLogs": "Importar entradas",
   "@importLogs": {},
   "importImages": "Importar imágenes",
-  "@importImages": {}
+  "@importImages": {},
+  "exportImages": "Exportar imágenes",
+  "@exportImages": {}
 }
