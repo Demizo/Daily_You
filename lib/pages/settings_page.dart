@@ -693,6 +693,17 @@ class _SettingsPageState extends State<SettingsPage> {
                               .setField("useMarkdownToolbar", value);
                         });
                       }),
+                  if (Platform.isAndroid)
+                    SettingsToggle(
+                        title: AppLocalizations.of(context)!
+                            .settingsPreferFrontCamera,
+                        settingsKey: "useFrontCamera",
+                        onChanged: (value) {
+                          setState(() {
+                            ConfigManager.instance
+                                .setField("useFrontCamera", value);
+                          });
+                        }),
                   Padding(
                     padding: const EdgeInsets.only(top: 8.0),
                     child: Text(

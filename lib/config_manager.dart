@@ -45,6 +45,7 @@ class ConfigManager {
     'reminderEndMinute': 0,
     'defaultTemplate': -1,
     'imageQuality': 90,
+    'useFrontCamera': false,
   };
 
   static final moodValueFieldMapping = {
