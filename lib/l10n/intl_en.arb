@@ -99,6 +99,8 @@
   "@settingsCustomAccentColor": {},
   "settingsShowMarkdownToolbar": "Show Markdown Toolbar",
   "@settingsShowMarkdownToolbar": {},
+  "settingsPreferFrontCamera": "Prefer front camera",
+  "@settingsPreferFrontCamera": {},
   "settingsChangeMoodIcons": "Change Mood Icons",
   "@settingsChangeMoodIcons": {},
   "moodIconPrompt": "Enter an icon",

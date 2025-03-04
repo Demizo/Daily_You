@@ -30,23 +30,22 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(AppLocalizations.of(context)!.deletePhotoTitle),
-	  actions: [
-	    TextButton(
-	      child: Text(MaterialLocalizations.of(context).deleteButtonTooltip),
-                    onPressed: () async {
-                      widget.onChangedImage(null);
-                      Navigator.pop(context);
-                    },
-	      
-	    ),
-	    TextButton(
-	      child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
-                    onPressed: () async {
-                      Navigator.pop(context);
-                    },
-	      
-	    ) 
-	  ],
+          actions: [
+            TextButton(
+              child:
+                  Text(MaterialLocalizations.of(context).deleteButtonTooltip),
+              onPressed: () async {
+                widget.onChangedImage(null);
+                Navigator.pop(context);
+              },
+            ),
+            TextButton(
+              child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+              onPressed: () async {
+                Navigator.pop(context);
+              },
+            )
+          ],
           content: Text(AppLocalizations.of(context)!.deletePhotoDescription),
         );
       },
@@ -63,10 +62,13 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
 
   Future<void> _takePicture() async {
     final picker = ImagePicker();
+    final cameraDirection = ConfigManager.instance.getField('useFrontCamera')
+        ? CameraDevice.front
+        : CameraDevice.rear;
     final pickedFile = await picker.pickImage(
-      source: ImageSource.camera,
-      imageQuality: ConfigManager.instance.getField('imageQuality')
-    );
+        source: ImageSource.camera,
+        preferredCameraDevice: cameraDirection,
+        imageQuality: ConfigManager.instance.getField('imageQuality'));
 
     if (pickedFile != null) {
       await saveImage(pickedFile);
@@ -76,9 +78,8 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
   Future<void> _choosePicture() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: ConfigManager.instance.getField('imageQuality')
-    );
+        source: ImageSource.gallery,
+        imageQuality: ConfigManager.instance.getField('imageQuality'));
 
     if (pickedFile != null) {
       await saveImage(pickedFile);
