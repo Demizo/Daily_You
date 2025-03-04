@@ -1,4 +1,24 @@
 {
   "appTitle": "Daily You",
-  "@appTitle": {}
+  "@appTitle": {},
+  "pageGalleryTitle": "Galerie",
+  "@pageGalleryTitle": {},
+  "flashbackGoodDay": "Ein Guter Tag",
+  "@flashbackGoodDay": {},
+  "pageHomeTitle": "Haus",
+  "@pageHomeTitle": {},
+  "flashbackRandomDay": "Ein Zufälliger Tag",
+  "@flashbackRandomDay": {},
+  "sortDateTitle": "Datum",
+  "@sortDateTitle": {},
+  "pageStatisticsTitle": "Statistiken",
+  "@pageStatisticsTitle": {},
+  "statisticsNotEnoughData": "Nicht genügend Daten…",
+  "@statisticsNotEnoughData": {},
+  "statisticsRangeOneMonth": "1 Monat",
+  "@statisticsRangeOneMonth": {},
+  "statisticsRangeSixMonths": "6 Monate",
+  "@statisticsRangeSixMonths": {},
+  "statisticsRangeOneYear": "1 Jahr",
+  "@statisticsRangeOneYear": {}
 }
