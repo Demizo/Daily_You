@@ -17,7 +17,9 @@ class EntryCalendar extends StatelessWidget {
       locale: WidgetsBinding.instance.platformDispatcher.locale.toString(),
       rowHeight: 57,
       sixWeekMonthsEnforced: true,
-      startingDayOfWeek: StartingDayOfWeek.values[ConfigManager.instance.getFirstDayOfWeekIndex()],
+      startingDayOfWeek: StartingDayOfWeek
+          .values[ConfigManager.instance.getFirstDayOfWeekIndex()],
+      availableGestures: AvailableGestures.horizontalSwipe,
       availableCalendarFormats: const {
         CalendarFormat.month: 'Month',
       },
@@ -32,7 +34,12 @@ class EntryCalendar extends StatelessWidget {
             children: [
               GestureDetector(
                 child: Text(
-                  DateFormat("MMMM y", WidgetsBinding.instance.platformDispatcher.locale.toString()).format(date).toString(),
+                  DateFormat(
+                          "MMMM y",
+                          WidgetsBinding.instance.platformDispatcher.locale
+                              .toString())
+                      .format(date)
+                      .toString(),
                   style: const TextStyle(fontSize: 18),
                 ),
                 onTap: () async {
@@ -43,10 +50,11 @@ class EntryCalendar extends StatelessWidget {
                     firstDate: DateTime.utc(2000),
                     lastDate: DateTime.now(),
                   );
-                  if (pickedDate != null && pickedDate != statsProvider.selectedDate) {
-                      statsProvider.selectedDate = pickedDate;
-		      // Update now to jump to the selected day on the calendar
-		      statsProvider.forceUpdate();
+                  if (pickedDate != null &&
+                      pickedDate != statsProvider.selectedDate) {
+                    statsProvider.selectedDate = pickedDate;
+                    // Update now to jump to the selected day on the calendar
+                    statsProvider.forceUpdate();
                   }
                 },
               ),
@@ -73,7 +81,6 @@ class EntryCalendar extends StatelessWidget {
     );
   }
 }
-
 
 class CalendarViewModeSelector extends StatelessWidget {
   const CalendarViewModeSelector({
