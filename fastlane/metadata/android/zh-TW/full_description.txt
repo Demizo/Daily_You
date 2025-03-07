@@ -1,0 +1,1 @@
+<p><i>Daily You</i> 是一款用來儲存回憶的應用程式，讓你記錄你的每一天，回顧過去的精彩瞬間。<i>Daily You</i> 支援離線使用及外部儲存位置，靈感來自 ptrLx 的 <a href="https://github.com/ptrLx/OneShot" target="_blank" rel="nofollow noopener">OneShot</a>。</p><p><br><b>功能：</b></p><ul><li>每日紀錄</li><li>紀錄心情</li><li>照片回憶</li><li>支援 Markdown 語法</li><li>通知提醒</li><li>搜尋過去的紀錄</li></ul>
