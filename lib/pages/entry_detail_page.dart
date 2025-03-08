@@ -236,28 +236,17 @@ class EntryDetails extends StatelessWidget {
                 ),
               ),
             ),
-            entry.text.isNotEmpty
-                ? Card(
-                    child: Padding(
-                        padding: const EdgeInsets.only(
-                            left: 8, top: 4, bottom: 4, right: 8),
-                        child: MarkdownBlock(
-                          config: theme.brightness == Brightness.light
-                              ? MarkdownConfig.defaultConfig
-                              : MarkdownConfig.darkConfig,
-                          data: entry.text,
-                        )))
-                : Card(
-                    child: Padding(
+            if (entry.text.isNotEmpty)
+              Card(
+                  child: Padding(
                       padding: const EdgeInsets.only(
                           left: 8, top: 4, bottom: 4, right: 8),
-                      child: Text(
-                        "No text for this log...\n\n",
-                        style:
-                            TextStyle(color: theme.disabledColor, fontSize: 18),
-                      ),
-                    ),
-                  ),
+                      child: MarkdownBlock(
+                        config: theme.brightness == Brightness.light
+                            ? MarkdownConfig.defaultConfig
+                            : MarkdownConfig.darkConfig,
+                        data: entry.text,
+                      ))),
             Padding(
               padding:
                   const EdgeInsets.only(left: 8, top: 4, bottom: 4, right: 8),
