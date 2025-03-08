@@ -41,10 +41,10 @@ class StatsProvider with ChangeNotifier {
   };
 
   DateTime selectedDate = DateTime.now();
+
   void forceUpdate() {
     notifyListeners();
   }
-
 
   List<Entry> entries = List.empty();
   List<EntryImage> images = List.empty();
@@ -122,6 +122,10 @@ class StatsProvider with ChangeNotifier {
     }
 
     return averageMoodsByDay;
+  }
+
+  int getIndexOfEntry(int entryId) {
+    return entries.indexWhere((entry) => entry.id == entryId);
   }
 
   List<Entry> getEntriesInRange() {
