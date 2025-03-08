@@ -31,20 +31,20 @@ class StatsPage extends StatelessWidget {
           child: Wrap(
             children: [
               StreakCard(
-                title: AppLocalizations.of(context)!.streakCurrent,
-                number: statsProvider.currentStreak,
+                title: AppLocalizations.of(context)!
+                    .streakCurrent(statsProvider.currentStreak),
                 isVisible: true,
                 icon: Icons.bolt,
               ),
               StreakCard(
-                  title: AppLocalizations.of(context)!.streakLongest,
-                  number: statsProvider.longestStreak,
+                  title: AppLocalizations.of(context)!
+                      .streakLongest(statsProvider.longestStreak),
                   isVisible:
                       statsProvider.longestStreak > statsProvider.currentStreak,
                   icon: Icons.history_rounded),
               StreakCard(
-                  title: AppLocalizations.of(context)!.streakSinceBadDay,
-                  number: statsProvider.daysSinceBadDay ?? -1,
+                  title: AppLocalizations.of(context)!
+                      .streakSinceBadDay(statsProvider.daysSinceBadDay ?? 0),
                   isVisible: statsProvider.daysSinceBadDay != null &&
                       statsProvider.daysSinceBadDay! > 3,
                   icon: Icons.timeline_rounded),
@@ -61,7 +61,8 @@ class StatsPage extends StatelessWidget {
         ),
         Center(
           child: Text(
-            AppLocalizations.of(context)!.chartSummaryTitle(AppLocalizations.of(context)!.tagMoodTitle),
+            AppLocalizations.of(context)!
+                .chartSummaryTitle(AppLocalizations.of(context)!.tagMoodTitle),
             style: const TextStyle(fontSize: 18),
           ),
         ),
@@ -70,7 +71,8 @@ class StatsPage extends StatelessWidget {
         ),
         Center(
           child: Text(
-            AppLocalizations.of(context)!.chartByDayTitle(AppLocalizations.of(context)!.tagMoodTitle),
+            AppLocalizations.of(context)!
+                .chartByDayTitle(AppLocalizations.of(context)!.tagMoodTitle),
             style: const TextStyle(fontSize: 18),
           ),
         ),

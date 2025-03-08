@@ -3,18 +3,27 @@ import 'package:flutter/material.dart';
 class StreakCard extends StatelessWidget {
   final bool isVisible;
   final String title;
-  final int number;
   final IconData icon;
 
   const StreakCard(
       {super.key,
       this.isVisible = false,
       this.title = "",
-      this.number = -1,
       this.icon = Icons.bolt});
 
   @override
   Widget build(BuildContext context) {
+    // Find the number to style it
+    final RegExp regex = RegExp(r'\d+');
+    final match = regex.firstMatch(title);
+
+    if (match == null) {
+      return Container();
+    }
+
+    final int numberStart = match.start;
+    final int numberEnd = match.end;
+
     return isVisible
         ? Card(
             child: Padding(
@@ -30,17 +39,27 @@ class StreakCard extends StatelessWidget {
                       size: 20,
                     ),
                   ),
-                  Text(title,
-                      style: TextStyle(
-                          fontSize: 16,
-                          color: Theme.of(context).colorScheme.secondary)),
                   Padding(
-                    padding: const EdgeInsets.only(left: 6.0, right: 6.0),
-                    child: Text(number.toString(),
+                    padding: const EdgeInsets.only(right: 4.0),
+                    child: Text.rich(TextSpan(children: [
+                      TextSpan(
+                          text: title.substring(0, numberStart),
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: Theme.of(context).colorScheme.secondary)),
+                      TextSpan(
+                        text: title.substring(numberStart, numberEnd),
                         style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.primary)),
+                            color: Theme.of(context).colorScheme.primary),
+                      ),
+                      TextSpan(
+                          text: title.substring(numberEnd),
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: Theme.of(context).colorScheme.secondary)),
+                    ])),
                   ),
                 ],
               ),
