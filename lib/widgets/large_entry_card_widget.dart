@@ -1,5 +1,6 @@
 import 'package:daily_you/models/image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
@@ -21,7 +22,9 @@ class LargeEntryCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final time = DateFormat.yMMMd(WidgetsBinding.instance.platformDispatcher.locale.toString()).format(entry.timeCreate);
+    final time = DateFormat.yMMMd(
+            WidgetsBinding.instance.platformDispatcher.locale.toString())
+        .format(entry.timeCreate);
     return Card(
       clipBehavior: Clip.antiAlias,
       child: Row(
@@ -84,7 +87,7 @@ class LargeEntryCardWidget extends StatelessWidget {
                                   : MarkdownConfig.darkConfig,
                               data: entry.text)
                           : Text(
-                              "No text for this log...",
+                              AppLocalizations.of(context)!.writeSomethingHint,
                               style: TextStyle(
                                   color: theme.disabledColor, fontSize: 16),
                             ))
