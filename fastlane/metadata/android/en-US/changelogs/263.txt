@@ -1,0 +1,6 @@
+Daily You v2.6.3 has arrived! Here are the changes:
+
+• Added the ability to swipe between entries
+• Updated translations
+• Prevent calendar from blocking vertical scrolling
+• Minor UI improvements
