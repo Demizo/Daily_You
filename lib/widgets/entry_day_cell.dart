@@ -61,7 +61,9 @@ class EntryDayCell extends StatelessWidget {
           ),
           onTap: () async {
             await Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => EntryDetailPage(entryId: entry.id!),
+              builder: (context) => EntryDetailPage(
+                index: statsProvider.getIndexOfEntry(entry.id!),
+              ),
             ));
           },
         );
@@ -106,7 +108,8 @@ class EntryDayCell extends StatelessWidget {
           ),
           onTap: () async {
             await Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => EntryDetailPage(entryId: entry.id!),
+              builder: (context) => EntryDetailPage(
+                  index: statsProvider.getIndexOfEntry(entry.id!)),
             ));
           },
         );

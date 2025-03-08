@@ -196,8 +196,9 @@ class _HomePageState extends State<HomePage> {
                   return GestureDetector(
                       onTap: () async {
                         await Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) =>
-                              EntryDetailPage(entryId: flashback.entry.id!),
+                          builder: (context) => EntryDetailPage(
+                              index: StatsProvider.instance
+                                  .getIndexOfEntry(flashback.entry.id!)),
                         ));
                       },
                       child: listView

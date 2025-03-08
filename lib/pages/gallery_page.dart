@@ -1,5 +1,6 @@
 import 'package:daily_you/config_manager.dart';
 import 'package:daily_you/models/image.dart';
+import 'package:daily_you/stats_provider.dart';
 import 'package:daily_you/widgets/large_entry_card_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -90,7 +91,8 @@ class _GalleryPageState extends State<GalleryPage> {
                         onChanged: (value) => setState(() {
                           switchOrderBy(value!);
                         }),
-                        title: Text(AppLocalizations.of(context)!.sortDateTitle),
+                        title:
+                            Text(AppLocalizations.of(context)!.sortDateTitle),
                       ),
                       RadioListTile<int>(
                         value: 1,
@@ -107,7 +109,8 @@ class _GalleryPageState extends State<GalleryPage> {
                         onChanged: (value) => setState(() {
                           switchSortOrder(value!);
                         }),
-                        title: Text(AppLocalizations.of(context)!.sortOrderAscendingTitle),
+                        title: Text(AppLocalizations.of(context)!
+                            .sortOrderAscendingTitle),
                       ),
                       RadioListTile<bool>(
                         value: false,
@@ -115,7 +118,8 @@ class _GalleryPageState extends State<GalleryPage> {
                         onChanged: (value) => setState(() {
                           switchSortOrder(value!);
                         }),
-                        title: Text(AppLocalizations.of(context)!.sortOrderDescendingTitle),
+                        title: Text(AppLocalizations.of(context)!
+                            .sortOrderDescendingTitle),
                       ),
                     ],
                   ),
@@ -144,7 +148,8 @@ class _GalleryPageState extends State<GalleryPage> {
                         trailing: [
                           Padding(
                             padding: const EdgeInsets.only(right: 8.0),
-                            child: Text(AppLocalizations.of(context)!.logCount(entryCount)),
+                            child: Text(AppLocalizations.of(context)!
+                                .logCount(entryCount)),
                           ),
                           IconButton(
                               onPressed: () async {
@@ -178,7 +183,7 @@ class _GalleryPageState extends State<GalleryPage> {
   Widget buildEntries() => entries.isEmpty
       ? Center(
           child: Text(
-	    AppLocalizations.of(context)!.noLogs,
+            AppLocalizations.of(context)!.noLogs,
           ),
         )
       : GridView.builder(
@@ -196,7 +201,8 @@ class _GalleryPageState extends State<GalleryPage> {
             return GestureDetector(
               onTap: () async {
                 await Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => EntryDetailPage(entryId: entry.id!),
+                  builder: (context) => EntryDetailPage(
+                      index: StatsProvider.instance.getIndexOfEntry(entry.id!)),
                 ));
 
                 refreshEntries();
