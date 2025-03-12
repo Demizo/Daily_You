@@ -306,8 +306,19 @@ DROP TABLE old_entries;
     if (await getImgBytes(imageName) != null) {
       return imageName;
     }
-    final newImageName =
+
+    var newImageName =
         "daily_you_${currTime.month}_${currTime.day}_${currTime.year}-${currTime.hour}.${currTime.minute}.${currTime.second}.jpg";
+
+    // Ensure unique name
+    int index = 1;
+    while (await FileLayer.exists(await getInternalImgDatabasePath(),
+        name: newImageName, useExternalPath: false)) {
+      newImageName =
+          "daily_you_${currTime.month}_${currTime.day}_${currTime.year}-${currTime.hour}.${currTime.minute}.${currTime.second}_$index.jpg";
+      index += 1;
+    }
+
     if (usingExternalImg()) {
       FileLayer.createFile(
           await getExternalImgDatabasePath(), newImageName, bytes,

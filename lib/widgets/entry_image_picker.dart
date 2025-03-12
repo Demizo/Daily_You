@@ -10,7 +10,7 @@ import 'local_image_loader.dart';
 
 class EntryImagePicker extends StatefulWidget {
   final String? imgPath;
-  final ValueChanged<String?> onChangedImage;
+  final ValueChanged<List<String>?> onChangedImage;
   final bool openCamera;
 
   const EntryImagePicker(
@@ -30,23 +30,22 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(AppLocalizations.of(context)!.deletePhotoTitle),
-	  actions: [
-	    TextButton(
-	      child: Text(MaterialLocalizations.of(context).deleteButtonTooltip),
-                    onPressed: () async {
-                      widget.onChangedImage(null);
-                      Navigator.pop(context);
-                    },
-	      
-	    ),
-	    TextButton(
-	      child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
-                    onPressed: () async {
-                      Navigator.pop(context);
-                    },
-	      
-	    ) 
-	  ],
+          actions: [
+            TextButton(
+              child:
+                  Text(MaterialLocalizations.of(context).deleteButtonTooltip),
+              onPressed: () async {
+                widget.onChangedImage(null);
+                Navigator.pop(context);
+              },
+            ),
+            TextButton(
+              child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+              onPressed: () async {
+                Navigator.pop(context);
+              },
+            )
+          ],
           content: Text(AppLocalizations.of(context)!.deletePhotoDescription),
         );
       },
@@ -64,9 +63,8 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
   Future<void> _takePicture() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(
-      source: ImageSource.camera,
-      imageQuality: ConfigManager.instance.getField('imageQuality')
-    );
+        source: ImageSource.camera,
+        imageQuality: ConfigManager.instance.getField('imageQuality'));
 
     if (pickedFile != null) {
       await saveImage(pickedFile);
@@ -75,14 +73,24 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
 
   Future<void> _choosePicture() async {
     final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: ConfigManager.instance.getField('imageQuality')
-    );
+    final pickedFiles = await picker.pickMultiImage(
+        imageQuality: ConfigManager.instance.getField('imageQuality'));
 
-    if (pickedFile != null) {
-      await saveImage(pickedFile);
+    List<String> newImages = List.empty(growable: true);
+    for (var file in pickedFiles) {
+      var imageName = await EntriesDatabase.instance
+          .createImg(file.name, await file.readAsBytes());
+      if (imageName != null) {
+        newImages.add(imageName);
+      }
+      // Delete picked file from cache
+      if (Platform.isAndroid) {
+        await File(file.path).delete();
+      }
     }
+    setState(() {
+      widget.onChangedImage(newImages);
+    });
   }
 
   Future<void> clearImage() async {
@@ -94,7 +102,7 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
         .createImg(pickedFile.name, await pickedFile.readAsBytes());
     if (imageName == null) return;
     setState(() {
-      widget.onChangedImage(imageName);
+      widget.onChangedImage([imageName]);
     });
     // Delete picked file from cache
     if (Platform.isAndroid) {
