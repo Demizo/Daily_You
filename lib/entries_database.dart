@@ -740,6 +740,7 @@ DROP TABLE old_entries;
       }
     }
     if (usingExternalImg()) await syncImageFolder(true);
+    StatsProvider.instance.updateStats();
     return true;
   }
 
@@ -811,6 +812,7 @@ DROP TABLE old_entries;
       imported += 1;
       StatsProvider.instance.updateSyncStats(pickedFiles.length, imported);
     }
+    StatsProvider.instance.updateStats();
     return true;
   }
 
@@ -904,6 +906,7 @@ DROP TABLE old_entries;
       }
     }
     if (usingExternalImg()) await syncImageFolder(true);
+    StatsProvider.instance.updateStats();
     return true;
   }
 }
