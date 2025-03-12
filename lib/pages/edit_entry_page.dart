@@ -117,9 +117,11 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
                   EntryImagePicker(
                       imgPath: null,
                       openCamera: widget.openCamera && !_openedCamera,
-                      onChangedImage: (imgPath) {
+                      onChangedImage: (imgPaths) {
                         _openedCamera = true;
-                        addLocalImage(imgPath);
+                        if (imgPaths != null) {
+                          addLocalImage(imgPaths);
+                        }
                       }),
                 if (currentImages.isNotEmpty)
                   SizedBox(
@@ -138,8 +140,11 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
                             return EntryImagePicker(
                                 imgPath: null,
                                 openCamera: false,
-                                onChangedImage: (imgPath) =>
-                                    addLocalImage(imgPath));
+                                onChangedImage: (imgPaths) {
+                                  if (imgPaths != null) {
+                                    addLocalImage(imgPaths);
+                                  }
+                                });
                           } else {
                             return _buildDraggableListItem(index - 1);
                           }
@@ -404,8 +409,8 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
     });
   }
 
-  void addLocalImage(String? imgPath) {
-    if (imgPath != null) {
+  void addLocalImage(List<String> imgPaths) {
+    for (var imgPath in imgPaths) {
       currentImages.add(EntryImage(
           entryId: widget.entry?.id,
           imgPath: imgPath,
