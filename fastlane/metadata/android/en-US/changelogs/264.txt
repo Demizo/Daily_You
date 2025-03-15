@@ -1,0 +1,5 @@
+Daily You v2.6.4 has arrived! Here are the changes:
+
+• Allow for multi-select when adding images to an entry
+• Fixed imported logs not appearing immediately
+• Updated translations
