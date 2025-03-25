@@ -9,7 +9,8 @@
         android:label="Daily You"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
-		android:roundIcon="@mipmap/ic_launcher_rounded">
+	android:roundIcon="@mipmap/ic_launcher_rounded"
+	android:localeConfig="@xml/locales_config">
         <service
             android:name="dev.fluttercommunity.plus.androidalarmmanager.AlarmService"
             android:permission="android.permission.BIND_JOB_SERVICE"
