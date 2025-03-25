@@ -1,0 +1,5 @@
+Daily You v2.6.5 has arrived! Here are the changes:
+
+• Support Android's per-app language feature
+• Fixed imported images not appearing
+• Updated translations
