@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
+import 'dart:isolate';
 import 'package:archive/archive_io.dart';
 import 'package:daily_you/file_bytes_cache.dart';
 import 'package:daily_you/file_layer.dart';
@@ -12,7 +12,6 @@ import 'package:daily_you/models/template.dart';
 import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:media_scanner/media_scanner.dart';
-import 'package:mime/mime.dart';
 import 'package:schedulers/schedulers.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
@@ -942,25 +941,48 @@ DROP TABLE old_entries;
         "daily_you_backup_${DateTime.now().toIso8601String().replaceAll(':', '-')}.zip";
 
     // Create archive
-    updateProgress("Creating backup...");
-    await compute(encodeArchive, [
-      join(tempDir.path, exportedZipName),
-      await getInternalDbPath(),
-      await getInternalImgDatabasePath()
-    ]);
+    updateProgress("Creating backup 0%");
+    var rxPort = ReceivePort();
+
+    rxPort.listen((data) {
+      var percent = data as double;
+      updateProgress("Creating backup ${percent.round()}%");
+    });
+
+    await compute(
+      encodeArchive,
+      [
+        join(tempDir.path, exportedZipName),
+        await getInternalDbPath(),
+        await getInternalImgDatabasePath(),
+        rxPort.sendPort
+      ],
+    );
+
+    rxPort.close();
 
     // Save archive
-    updateProgress("Transferring backup...");
+    updateProgress("Transferring backup 0%");
+
     var readStream = await FileLayer.readFileStream(tempDir.path,
         name: exportedZipName, useExternalPath: false);
     var writeStream =
         await FileLayer.openFileWriteStream(savePath, exportedZipName);
 
+    //TODO split this
     if (writeStream == null || readStream == null) return false;
+
+    final archiveSize = await FileLayer.getFileSize(tempDir.path,
+        name: exportedZipName, useExternalPath: false);
+    if (archiveSize == null || archiveSize == 0) return false;
+    var transferredSize = 0;
 
     await for (List<int> chunk in readStream) {
       await FileLayer.writeFileWriteStreamChunk(
           writeStream, Uint8List.fromList(chunk));
+      transferredSize += chunk.length;
+      var percent = (transferredSize / archiveSize) * 100;
+      updateProgress("Transferring backup ${percent.round()}%");
     }
     await FileLayer.closeFileWriteStream(writeStream);
 
@@ -987,14 +1009,14 @@ DROP TABLE old_entries;
     updateProgress("Transferring backup 0%");
     var readStream =
         await FileLayer.readFileStream(archive, useExternalPath: true);
+    if (readStream == null) return false;
     var writeStream = await FileLayer.openFileWriteStream(
         tempDir.path, tempZipName,
         useExternalPath: false);
-
-    if (writeStream == null || readStream == null) return false;
+    if (writeStream == null) return false;
 
     final archiveSize = await FileLayer.getFileSize(archive);
-    if (archiveSize == null) return false;
+    if (archiveSize == null || archiveSize == 0) return false;
 
     var transferredSize = 0;
     await for (List<int> chunk in readStream) {
@@ -1052,11 +1074,14 @@ DROP TABLE old_entries;
     return importSuccessful;
   }
 
-  Future<void> encodeArchive(List<String> args) async {
+  Future<void> encodeArchive(List<dynamic> args) async {
+    SendPort sendPort = args[3];
     var encoder = ZipFileEncoder();
     encoder.createWithStream(OutputFileStream(args[0]));
     await encoder.addFile(File(args[1]));
-    await encoder.addDirectory(Directory(args[2]));
+    await encoder.addDirectory(Directory(args[2]), onProgress: (progress) {
+      sendPort.send(progress * 100);
+    });
     await encoder.close();
   }
 
