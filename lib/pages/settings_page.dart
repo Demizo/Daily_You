@@ -909,7 +909,8 @@ class _SettingsPageState extends State<SettingsPage> {
                         _showImportSelectionPopup();
                       }),
                   SettingsIconAction(
-                      title: "Delete All Logs",
+                      title: AppLocalizations.of(context)!
+                          .settingsDeleteAllLogsTitle,
                       icon: Icon(Icons.delete_forever_rounded),
                       onPressed: () => _showDeleteEntriesPopup()),
                   const Divider(),
