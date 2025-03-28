@@ -402,30 +402,115 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  void _showDeleteEntriesPopup() {
+  void _showLoadingStatus(
+      BuildContext context, ValueNotifier<String> messageNotifier) {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
+      barrierDismissible: false,
+      builder: (context) {
+        return PopScope(
+          canPop: false,
+          child: Dialog(
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularProgressIndicator(),
+                  const SizedBox(height: 20),
+                  ValueListenableBuilder<String>(
+                    valueListenable: messageNotifier,
+                    builder: (context, message, child) {
+                      return Text(message, textAlign: TextAlign.center);
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _deleteAllLogs(BuildContext context) async {
+    ValueNotifier<String> messageNotifier = ValueNotifier<String>("");
+
+    _showLoadingStatus(context, messageNotifier);
+
+    await Future.delayed(Duration(seconds: 3));
+
+    Navigator.of(context).pop();
+  }
+
+  void _showDeleteAllLogsDialog(
+      BuildContext context, String requiredText, VoidCallback onConfirm) {
+    ThemeData theme = Theme.of(context);
+    final TextEditingController controller = TextEditingController();
+    final ValueNotifier<bool> isButtonEnabled = ValueNotifier(false);
+
+    showDialog(
+      context: context,
+      builder: (context) {
         return AlertDialog(
           title: Text(AppLocalizations.of(context)!.settingsDeleteAllLogsTitle),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(AppLocalizations.of(context)!
+                  .settingsDeleteAllLogsDescription),
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Text(AppLocalizations.of(context)!
+                    .settingsDeleteAllLogsPrompt(requiredText)),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                    child: TextField(
+                      decoration: InputDecoration(
+                          hintStyle: TextStyle(fontStyle: FontStyle.italic),
+                          hintText: requiredText,
+                          border: InputBorder.none),
+                      controller: controller,
+                      onChanged: (value) {
+                        isButtonEnabled.value = value.toLowerCase().trim() ==
+                            requiredText.toLowerCase().trim();
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
           actions: [
             TextButton(
-              child:
-                  Text(MaterialLocalizations.of(context).deleteButtonTooltip),
-              onPressed: () async {
-                Navigator.pop(context);
-                await EntriesDatabase.instance.deleteAllEntries();
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+            ),
+            ValueListenableBuilder<bool>(
+              valueListenable: isButtonEnabled,
+              builder: (context, isEnabled, child) {
+                return TextButton(
+                  onPressed: isEnabled
+                      ? () {
+                          Navigator.of(context).pop();
+                          onConfirm();
+                        }
+                      : null,
+                  child: Text(
+                      style: TextStyle(
+                          color: isEnabled ? null : theme.disabledColor),
+                      MaterialLocalizations.of(context).deleteButtonTooltip),
+                );
               },
             ),
-            TextButton(
-              child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
-              onPressed: () async {
-                Navigator.pop(context);
-              },
-            )
           ],
-          content: Text(
-              AppLocalizations.of(context)!.settingsDeleteAllLogsDescription),
         );
       },
     );
@@ -912,7 +997,11 @@ class _SettingsPageState extends State<SettingsPage> {
                       title: AppLocalizations.of(context)!
                           .settingsDeleteAllLogsTitle,
                       icon: Icon(Icons.delete_forever_rounded),
-                      onPressed: () => _showDeleteEntriesPopup()),
+                      onPressed: () => _showDeleteAllLogsDialog(
+                          context,
+                          AppLocalizations.of(context)!
+                              .settingsDeleteAllLogsTitle,
+                          () => _deleteAllLogs(context))),
                   const Divider(),
                   SettingsHeader(
                       text: AppLocalizations.of(context)!.settingsAboutTitle),

@@ -175,6 +175,8 @@
   "@settingsDeleteAllLogsTitle": {},
   "settingsDeleteAllLogsDescription": "Do you want to delete all of your logs?",
   "@settingsDeleteAllLogsDescription": {},
+  "settingsDeleteAllLogsPrompt": "Enter '{prompt}' to confirm. This cannot be undone!",
+  "@settingsDeleteAllLogsPrompt": {},
   "settingsAboutTitle": "About",
   "@settingsAboutTitle": {},
   "settingsVersion": "Version",
