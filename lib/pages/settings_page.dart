@@ -438,7 +438,9 @@ class _SettingsPageState extends State<SettingsPage> {
 
     _showLoadingStatus(context, messageNotifier);
 
-    await Future.delayed(Duration(seconds: 3));
+    await EntriesDatabase.instance.deleteAllEntries((msg) {
+      messageNotifier.value = msg;
+    });
 
     Navigator.of(context).pop();
   }

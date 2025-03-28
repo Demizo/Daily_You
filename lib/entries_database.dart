@@ -240,7 +240,7 @@ DROP TABLE old_entries;
     return entryImage.copy(id: id);
   }
 
-  Future<int> removeImg(EntryImage entryImage) async {
+  Future<int> removeImg(EntryImage entryImage, {updateData = true}) async {
     final db = _database!;
 
     // Delete image
@@ -252,8 +252,10 @@ DROP TABLE old_entries;
       where: '${EntryImageFields.id} = ?',
       whereArgs: [entryImage.id],
     );
-    await StatsProvider.instance.updateStats();
-    if (usingExternalDb()) await updateExternalDatabase();
+    if (updateData) {
+      await StatsProvider.instance.updateStats();
+      if (usingExternalDb()) await updateExternalDatabase();
+    }
     return removedId;
   }
 
@@ -432,13 +434,18 @@ DROP TABLE old_entries;
     return removedId;
   }
 
-  Future<void> deleteAllEntries() async {
+  Future<void> deleteAllEntries(Function(String) updateStatus) async {
+    updateStatus("0%");
     final entries = await getAllEntries();
+    var processedEntries = 0;
     for (Entry entry in entries) {
       var images = await getImagesForEntry(entry.id!);
       for (final image in images) {
-        await removeImg(image);
+        // Don't update data until everything is deleted
+        await removeImg(image, updateData: false);
       }
+      processedEntries += 1;
+      updateStatus("${((processedEntries / entries.length) * 100).round()}%");
     }
     final db = _database!;
 
