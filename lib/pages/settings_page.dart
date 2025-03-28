@@ -813,9 +813,10 @@ class _SettingsPageState extends State<SettingsPage> {
                             .settingsNotificationsTitle),
                   if (Platform.isAndroid)
                     SettingsToggle(
-                        title: AppLocalizations.of(context)!.dailyReminderTitle,
+                        title: AppLocalizations.of(context)!
+                            .settingsDailyReminderTitle,
                         hint: AppLocalizations.of(context)!
-                            .dailyReminderDescription,
+                            .settingsDailyReminderDescription,
                         settingsKey: "dailyReminders",
                         onChanged: (value) async {
                           if (await NotificationManager.instance
