@@ -1,7 +1,7 @@
 {
   "flashbackYear": "{count, plural, one{{count} 年前} other{{count} 年前}}",
   "@flashbackYear": {},
-  "appTitle": "日迹心语",
+  "appTitle": "Daily You",
   "@appTitle": {},
   "flashbackWeek": "{count, plural, one {{count} 周前} other {{count} 周前}}",
   "@flashbackWeek": {},
@@ -186,5 +186,7 @@
   "tagMoodTitle": "心情",
   "@tagMoodTitle": {},
   "noLogs": "暂无日迹…",
-  "@noLogs": {}
+  "@noLogs": {},
+  "settingsDeleteAllLogsPrompt": "请输入“{prompt}”以确认继续删除，此操作无法撤销！",
+  "@settingsDeleteAllLogsPrompt": {}
 }
