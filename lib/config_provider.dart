@@ -12,7 +12,10 @@ class ConfigProvider with ChangeNotifier {
 
   StatsRange statsRange = StatsRange.month;
 
+  bool dailyReminders = ConfigManager.instance.getField('dailyReminders');
+
   Future<void> updateConfig() async {
+    dailyReminders = ConfigManager.instance.getField('dailyReminders');
     calendarViewMode = ConfigManager.instance.getField('calendarViewMode');
     notifyListeners();
   }

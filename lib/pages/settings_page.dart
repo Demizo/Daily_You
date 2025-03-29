@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/import_utils.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:daily_you/notification_manager.dart';
@@ -873,6 +874,8 @@ class _SettingsPageState extends State<SettingsPage> {
                             }
                             await ConfigManager.instance
                                 .setField('dailyReminders', value);
+                            // TODO: The config manager should be changed to a provider
+                            await ConfigProvider.instance.updateConfig();
                             setState(() {});
                           }
                         }),
