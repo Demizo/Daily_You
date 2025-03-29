@@ -5,11 +5,13 @@ import 'package:daily_you/file_layer.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/stats_provider.dart';
+import 'package:intl/intl.dart';
 
 enum ImportFormat {
   none,
   dailyYouJson,
   oneShot,
+  pixels,
 }
 
 class ImportUtils {
@@ -126,6 +128,60 @@ class ImportUtils {
                   imgPath: entry['relativePath'],
                   imgRank: 0,
                   timeCreate: DateTime.now()),
+              updateStatsAndSync: false);
+        }
+      }
+      processedEntries += 1;
+      updateStatus("${((processedEntries / totalEntries) * 100).round()}%");
+    }
+
+    // Sync and update stats
+    if (EntriesDatabase.instance.usingExternalDb()) {
+      await EntriesDatabase.instance.syncDatabase();
+    }
+    if (EntriesDatabase.instance.usingExternalImg()) {
+      await EntriesDatabase.instance.syncImageFolder(true);
+    }
+    StatsProvider.instance.updateStats();
+
+    return true;
+  }
+
+  static Future<bool> importFromPixels(Function(String) updateStatus) async {
+    updateStatus("0%");
+
+    var selectedFile = await FileLayer.pickFile(
+        allowedExtensions: ['json'], mimeTypes: ['application/json']);
+    if (selectedFile == null) return false;
+
+    var bytes = await FileLayer.getFileBytes(selectedFile);
+    if (bytes == null) return false;
+    final jsonData = json.decode(utf8.decode(bytes.toList()));
+
+    final totalEntries = jsonData.length;
+    var processedEntries = 0;
+
+    for (var entry in jsonData) {
+      // Skip non-mood entries
+      if (entry['type'] == 'Mood') {
+        DateTime timeCreated = DateFormat("yyyy-MM-dd").parse(entry['date']);
+        DateTime timeModified = DateTime.now();
+
+        // Skip if the day already has an entry
+        if (await EntriesDatabase.instance.getEntryForDate(timeCreated) ==
+            null) {
+          int avgMood =
+              (entry['scores'] as List<dynamic>).reduce((a, b) => a + b) ~/
+                  entry['scores'].length;
+          // Convert mood from 1-5 scale to -2 to 2 scale
+          int mappedMood = avgMood - 3;
+
+          await EntriesDatabase.instance.addEntry(
+              Entry(
+                  text: entry['notes'] ?? '',
+                  mood: mappedMood,
+                  timeCreate: timeCreated,
+                  timeModified: timeModified),
               updateStatsAndSync: false);
         }
       }

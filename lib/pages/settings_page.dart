@@ -296,7 +296,10 @@ class _SettingsPageState extends State<SettingsPage> {
           title: Text(AppLocalizations.of(context)!.logFormatTitle),
           content: Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Text(AppLocalizations.of(context)!.logFormatDescription),
+              Divider(),
               ListTile(
                   title: Text(AppLocalizations.of(context)!.formatDailyYouJson),
                   onTap: () {
@@ -307,6 +310,12 @@ class _SettingsPageState extends State<SettingsPage> {
                   title: Text(AppLocalizations.of(context)!.formatOneShot),
                   onTap: () {
                     chosenFormat = ImportFormat.oneShot;
+                    Navigator.of(context).pop();
+                  }),
+              ListTile(
+                  title: Text(AppLocalizations.of(context)!.formatPixels),
+                  onTap: () {
+                    chosenFormat = ImportFormat.pixels;
                     Navigator.of(context).pop();
                   }),
             ],
@@ -326,6 +335,10 @@ class _SettingsPageState extends State<SettingsPage> {
         });
       } else if (chosenFormat == ImportFormat.oneShot) {
         await ImportUtils.importFromOneShot((status) {
+          statusNotifier.value = status;
+        });
+      } else if (chosenFormat == ImportFormat.pixels) {
+        await ImportUtils.importFromPixels((status) {
           statusNotifier.value = status;
         });
       }
