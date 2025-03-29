@@ -10,6 +10,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:media_scanner/media_scanner.dart';
 import 'package:schedulers/schedulers.dart';
@@ -931,7 +933,8 @@ DROP TABLE old_entries;
     return true;
   }
 
-  Future<bool> backupToZip(void Function(String) updateProgress) async {
+  Future<bool> backupToZip(
+      BuildContext context, void Function(String) updateProgress) async {
     String? savePath = await FileLayer.pickDirectory();
     if (savePath == null) return false;
 
@@ -941,12 +944,13 @@ DROP TABLE old_entries;
         "daily_you_backup_${DateTime.now().toIso8601String().replaceAll(':', '-')}.zip";
 
     // Create archive
-    updateProgress("Creating backup 0%");
+    updateProgress(AppLocalizations.of(context)!.creatingBackupStatus("0"));
     var rxPort = ReceivePort();
 
     rxPort.listen((data) {
       var percent = data as double;
-      updateProgress("Creating backup ${percent.round()}%");
+      updateProgress(AppLocalizations.of(context)!
+          .creatingBackupStatus("${percent.round()}"));
     });
 
     await compute(
@@ -962,15 +966,14 @@ DROP TABLE old_entries;
     rxPort.close();
 
     // Save archive
-    updateProgress("Transferring backup 0%");
+    updateProgress(AppLocalizations.of(context)!.tranferStatus("0"));
 
     var readStream = await FileLayer.readFileStream(tempDir.path,
         name: exportedZipName, useExternalPath: false);
+    if (readStream == null) return false;
     var writeStream =
         await FileLayer.openFileWriteStream(savePath, exportedZipName);
-
-    //TODO split this
-    if (writeStream == null || readStream == null) return false;
+    if (writeStream == null) return false;
 
     final archiveSize = await FileLayer.getFileSize(tempDir.path,
         name: exportedZipName, useExternalPath: false);
@@ -982,18 +985,19 @@ DROP TABLE old_entries;
           writeStream, Uint8List.fromList(chunk));
       transferredSize += chunk.length;
       var percent = (transferredSize / archiveSize) * 100;
-      updateProgress("Transferring backup ${percent.round()}%");
+      updateProgress(
+          AppLocalizations.of(context)!.tranferStatus("${percent.round()}"));
     }
     await FileLayer.closeFileWriteStream(writeStream);
 
     // Delete temp files
-    updateProgress("Cleaning up...");
     await File(join(tempDir.path, exportedZipName)).delete();
 
     return true;
   }
 
-  Future<bool> restoreFromZip(void Function(String) updateProgress) async {
+  Future<bool> restoreFromZip(
+      BuildContext context, void Function(String) updateProgress) async {
     var importSuccessful = true;
 
     String? archive = await FileLayer.pickFile(
@@ -1006,7 +1010,7 @@ DROP TABLE old_entries;
     final tempZipName = "temp_backup.zip";
 
     // Import archive
-    updateProgress("Transferring backup 0%");
+    updateProgress(AppLocalizations.of(context)!.tranferStatus("0"));
     var readStream =
         await FileLayer.readFileStream(archive, useExternalPath: true);
     if (readStream == null) return false;
@@ -1024,7 +1028,8 @@ DROP TABLE old_entries;
           writeStream, Uint8List.fromList(chunk));
       transferredSize += chunk.length;
       var percent = (transferredSize / archiveSize) * 100;
-      updateProgress("Transferring backup ${percent.round()}%");
+      updateProgress(
+          AppLocalizations.of(context)!.tranferStatus("${percent.round()}"));
     }
     await FileLayer.closeFileWriteStream(writeStream);
 
@@ -1034,7 +1039,7 @@ DROP TABLE old_entries;
       await restoreFolder.create();
     }
 
-    updateProgress("Restoring backup...");
+    updateProgress(AppLocalizations.of(context)!.restoringBackupStatus);
     await compute(
         decodeArchive, [join(tempDir.path, tempZipName), restoreFolder.path]);
 
@@ -1065,7 +1070,6 @@ DROP TABLE old_entries;
     }
 
     // Delete temp files
-    updateProgress("Cleaning up...");
     await File(join(tempDir.path, tempZipName)).delete();
     if (await restoreFolder.exists()) {
       await restoreFolder.delete(recursive: true);
