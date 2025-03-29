@@ -327,7 +327,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   void _showLoadingStatus(
-      BuildContext context, ValueNotifier<String> messageNotifier) {
+      BuildContext context, ValueNotifier<String> statusNotifier) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -343,7 +343,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   CircularProgressIndicator(),
                   const SizedBox(height: 20),
                   ValueListenableBuilder<String>(
-                    valueListenable: messageNotifier,
+                    valueListenable: statusNotifier,
                     builder: (context, message, child) {
                       return Text(message, textAlign: TextAlign.center);
                     },
@@ -358,24 +358,25 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> _deleteAllLogs(BuildContext context) async {
-    ValueNotifier<String> messageNotifier = ValueNotifier<String>("");
+    ValueNotifier<String> statusNotifier = ValueNotifier<String>("");
 
-    _showLoadingStatus(context, messageNotifier);
+    _showLoadingStatus(context, statusNotifier);
 
-    await EntriesDatabase.instance.deleteAllEntries((msg) {
-      messageNotifier.value = msg;
+    await EntriesDatabase.instance.deleteAllEntries((status) {
+      statusNotifier.value = status;
     });
 
     Navigator.of(context).pop();
   }
 
   Future<void> _backupData(BuildContext context) async {
-    ValueNotifier<String> messageNotifier = ValueNotifier<String>("");
+    ValueNotifier<String> statusNotifier = ValueNotifier<String>("");
 
-    _showLoadingStatus(context, messageNotifier);
+    _showLoadingStatus(context, statusNotifier);
 
-    bool success = await EntriesDatabase.instance.backupToZip(context, (msg) {
-      messageNotifier.value = msg;
+    bool success =
+        await EntriesDatabase.instance.backupToZip(context, (status) {
+      statusNotifier.value = status;
     });
 
     Navigator.of(context).pop();
@@ -402,13 +403,13 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> _restoreData(BuildContext context) async {
-    ValueNotifier<String> messageNotifier = ValueNotifier<String>("");
+    ValueNotifier<String> statusNotifier = ValueNotifier<String>("");
 
-    _showLoadingStatus(context, messageNotifier);
+    _showLoadingStatus(context, statusNotifier);
 
     bool success =
-        await EntriesDatabase.instance.restoreFromZip(context, (msg) {
-      messageNotifier.value = msg;
+        await EntriesDatabase.instance.restoreFromZip(context, (status) {
+      statusNotifier.value = status;
     });
 
     Navigator.of(context).pop();

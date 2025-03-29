@@ -818,7 +818,7 @@ DROP TABLE old_entries;
   }
 
   Future<bool> backupToZip(
-      BuildContext context, void Function(String) updateProgress) async {
+      BuildContext context, void Function(String) updateStatus) async {
     String? savePath = await FileLayer.pickDirectory();
     if (savePath == null) return false;
 
@@ -828,12 +828,12 @@ DROP TABLE old_entries;
         "daily_you_backup_${DateTime.now().toIso8601String().replaceAll(':', '-')}.zip";
 
     // Create archive
-    updateProgress(AppLocalizations.of(context)!.creatingBackupStatus("0"));
+    updateStatus(AppLocalizations.of(context)!.creatingBackupStatus("0"));
     var rxPort = ReceivePort();
 
     rxPort.listen((data) {
       var percent = data as double;
-      updateProgress(AppLocalizations.of(context)!
+      updateStatus(AppLocalizations.of(context)!
           .creatingBackupStatus("${percent.round()}"));
     });
 
@@ -850,7 +850,11 @@ DROP TABLE old_entries;
     rxPort.close();
 
     // Save archive
-    updateProgress(AppLocalizations.of(context)!.tranferStatus("0"));
+    updateStatus(AppLocalizations.of(context)!.tranferStatus("0"));
+
+    final archiveSize = await FileLayer.getFileSize(tempDir.path,
+        name: exportedZipName, useExternalPath: false);
+    if (archiveSize == null || archiveSize == 0) return false;
 
     var readStream = await FileLayer.readFileStream(tempDir.path,
         name: exportedZipName, useExternalPath: false);
@@ -859,9 +863,6 @@ DROP TABLE old_entries;
         await FileLayer.openFileWriteStream(savePath, exportedZipName);
     if (writeStream == null) return false;
 
-    final archiveSize = await FileLayer.getFileSize(tempDir.path,
-        name: exportedZipName, useExternalPath: false);
-    if (archiveSize == null || archiveSize == 0) return false;
     var transferredSize = 0;
 
     await for (List<int> chunk in readStream) {
@@ -869,19 +870,20 @@ DROP TABLE old_entries;
           writeStream, Uint8List.fromList(chunk));
       transferredSize += chunk.length;
       var percent = (transferredSize / archiveSize) * 100;
-      updateProgress(
+      updateStatus(
           AppLocalizations.of(context)!.tranferStatus("${percent.round()}"));
     }
     await FileLayer.closeFileWriteStream(writeStream);
 
     // Delete temp files
+    updateStatus(AppLocalizations.of(context)!.cleanUpStatus);
     await File(join(tempDir.path, exportedZipName)).delete();
 
     return true;
   }
 
   Future<bool> restoreFromZip(
-      BuildContext context, void Function(String) updateProgress) async {
+      BuildContext context, void Function(String) updateStatus) async {
     var importSuccessful = true;
 
     String? archive = await FileLayer.pickFile(
@@ -894,7 +896,11 @@ DROP TABLE old_entries;
     final tempZipName = "temp_backup.zip";
 
     // Import archive
-    updateProgress(AppLocalizations.of(context)!.tranferStatus("0"));
+    updateStatus(AppLocalizations.of(context)!.tranferStatus("0"));
+
+    final archiveSize = await FileLayer.getFileSize(archive);
+    if (archiveSize == null || archiveSize == 0) return false;
+
     var readStream =
         await FileLayer.readFileStream(archive, useExternalPath: true);
     if (readStream == null) return false;
@@ -903,16 +909,14 @@ DROP TABLE old_entries;
         useExternalPath: false);
     if (writeStream == null) return false;
 
-    final archiveSize = await FileLayer.getFileSize(archive);
-    if (archiveSize == null || archiveSize == 0) return false;
-
     var transferredSize = 0;
+
     await for (List<int> chunk in readStream) {
       await FileLayer.writeFileWriteStreamChunk(
           writeStream, Uint8List.fromList(chunk));
       transferredSize += chunk.length;
       var percent = (transferredSize / archiveSize) * 100;
-      updateProgress(
+      updateStatus(
           AppLocalizations.of(context)!.tranferStatus("${percent.round()}"));
     }
     await FileLayer.closeFileWriteStream(writeStream);
@@ -923,13 +927,13 @@ DROP TABLE old_entries;
       await restoreFolder.create();
     }
 
-    updateProgress(AppLocalizations.of(context)!.restoringBackupStatus("0"));
+    updateStatus(AppLocalizations.of(context)!.restoringBackupStatus("0"));
 
     var rxPort = ReceivePort();
 
     rxPort.listen((data) {
       var percent = data as double;
-      updateProgress(AppLocalizations.of(context)!
+      updateStatus(AppLocalizations.of(context)!
           .restoringBackupStatus("${percent.round()}"));
     });
 
@@ -948,6 +952,8 @@ DROP TABLE old_entries;
 
       // Import images. These will be garbage collected after import
       if (await Directory(join(restoreFolder.path, "Images")).exists()) {
+        // Also show cleanup status here since images may take awhile
+        updateStatus(AppLocalizations.of(context)!.cleanUpStatus);
         var files = Directory(join(restoreFolder.path, "Images")).list();
         final internalImagePath = await getInternalImgDatabasePath();
         await for (FileSystemEntity fileEntity in files) {
@@ -966,6 +972,7 @@ DROP TABLE old_entries;
     }
 
     // Delete temp files
+    updateStatus(AppLocalizations.of(context)!.cleanUpStatus);
     await File(join(tempDir.path, tempZipName)).delete();
     if (await restoreFolder.exists()) {
       await restoreFolder.delete(recursive: true);

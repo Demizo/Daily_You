@@ -171,6 +171,8 @@
   "@creatingBackupStatus": {},
   "restoringBackupStatus": "Restoring Backup… {percent}%",
   "@restoringBackupStatus": {},
+  "cleanUpStatus": "Cleaning Up…",
+  "@cleanUpStatus": {},
   "settingsExport": "Export",
   "@settingsExport": {},
   "exportLogs": "Export Logs",
