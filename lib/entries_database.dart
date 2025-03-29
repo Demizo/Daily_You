@@ -1036,15 +1036,26 @@ DROP TABLE old_entries;
     }
     await FileLayer.closeFileWriteStream(writeStream);
 
-    // Import archive
+    // Restore archive
     final restoreFolder = Directory(join(tempDir.path, "Restore"));
     if (await restoreFolder.exists() == false) {
       await restoreFolder.create();
     }
 
-    updateProgress(AppLocalizations.of(context)!.restoringBackupStatus);
-    await compute(
-        decodeArchive, [join(tempDir.path, tempZipName), restoreFolder.path]);
+    updateProgress(AppLocalizations.of(context)!.restoringBackupStatus("0"));
+
+    var rxPort = ReceivePort();
+
+    rxPort.listen((data) {
+      var percent = data as double;
+      updateProgress(AppLocalizations.of(context)!
+          .restoringBackupStatus("${percent.round()}"));
+    });
+
+    await compute(decodeArchive,
+        [join(tempDir.path, tempZipName), restoreFolder.path, rxPort.sendPort]);
+
+    rxPort.close();
 
     final tempDb = File(join(restoreFolder.path, 'daily_you.db'));
     if (await tempDb.exists()) {
@@ -1093,8 +1104,14 @@ DROP TABLE old_entries;
     await encoder.close();
   }
 
-  Future<void> decodeArchive(List<String> args) async {
+  Future<void> decodeArchive(List<dynamic> args) async {
+    SendPort sendPort = args[2];
     var decoder = ZipDecoder().decodeStream(InputFileStream(args[0]));
+
+    // Track number of files for progress indication
+    var totalFileCount = decoder.numberOfFiles();
+    var processedFileCount = 0;
+
     for (final entry in decoder) {
       if (entry.isFile) {
         final bytes = entry.readBytes();
@@ -1104,6 +1121,10 @@ DROP TABLE old_entries;
           await parent.create(recursive: true);
         }
         await File(join(args[1], entry.name)).writeAsBytes(bytes);
+
+        // Updates status
+        processedFileCount += 1;
+        sendPort.send((processedFileCount / totalFileCount) * 100);
       } else {
         await Directory(join(args[1], entry.name)).create(recursive: true);
       }

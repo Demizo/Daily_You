@@ -169,7 +169,7 @@
   "@tranferStatus": {},
   "creatingBackupStatus": "Creating Backup… {percent}%",
   "@creatingBackupStatus": {},
-  "restoringBackupStatus": "Restoring Backup…",
+  "restoringBackupStatus": "Restoring Backup… {percent}%",
   "@restoringBackupStatus": {},
   "settingsExport": "Export",
   "@settingsExport": {},
