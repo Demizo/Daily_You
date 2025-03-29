@@ -656,18 +656,21 @@ DROP TABLE old_entries;
     }
 
     if (garbageCollect) {
-      return await garbageCollectImages(entryImages);
+      return await garbageCollectImages();
     }
     return true;
   }
 
-  Future<bool> garbageCollectImages(List<String> entryImages) async {
+  Future<bool> garbageCollectImages() async {
+    var entryImages = await getAllEntryImages();
+    var entryImageNames =
+        entryImages.map((entryImage) => entryImage.imgPath).toList();
     // Get all internal photos
     var internalImages = Directory(await getInternalImgDatabasePath()).list();
     await for (FileSystemEntity fileEntity in internalImages) {
       if (fileEntity is File) {
         // Delete any that aren't used
-        if (!entryImages.contains(basename(fileEntity.path))) {
+        if (!entryImageNames.contains(basename(fileEntity.path))) {
           await File(fileEntity.path).delete();
         }
       }
@@ -1061,7 +1064,8 @@ DROP TABLE old_entries;
                 .writeAsBytes(await fileEntity.readAsBytes());
           }
         }
-        if (usingExternalImg()) await syncImageFolder(true);
+        if (usingExternalImg()) await syncImageFolder(false);
+        await garbageCollectImages();
       }
 
       await StatsProvider.instance.updateStats();
