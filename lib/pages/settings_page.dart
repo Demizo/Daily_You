@@ -291,47 +291,6 @@ class _SettingsPageState extends State<SettingsPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                  title: Text(AppLocalizations.of(context)!.importLogs),
-                  onTap: () async {
-                    Navigator.pop(context);
-                    if (Platform.isAndroid &&
-                        !await requestStoragePermission()) {
-                      return;
-                    }
-                    _showImportLogsFormatPopup();
-                  }),
-              ListTile(
-                  title: Text(AppLocalizations.of(context)!.importImages),
-                  onTap: () async {
-                    Navigator.pop(context);
-                    if (Platform.isAndroid &&
-                        !await requestPhotosPermission()) {
-                      return;
-                    }
-                    setState(() {
-                      isSyncing = true;
-                    });
-                    await EntriesDatabase.instance.importImages();
-                    setState(() {
-                      isSyncing = false;
-                    });
-                  }),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  void _showImportLogsFormatPopup() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
           title: Text(AppLocalizations.of(context)!.logFormatTitle),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -359,41 +318,6 @@ class _SettingsPageState extends State<SettingsPage> {
                     setState(() {
                       isSyncing = false;
                     });
-                  }),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  void _showExportSelectionPopup() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                  title: Text(AppLocalizations.of(context)!.exportLogs),
-                  onTap: () async {
-                    Navigator.pop(context);
-                    if (Platform.isAndroid &&
-                        !await requestStoragePermission()) {
-                      return;
-                    }
-                    await EntriesDatabase.instance.exportToJson();
-                  }),
-              ListTile(
-                  title: Text(AppLocalizations.of(context)!.exportImages),
-                  onTap: () async {
-                    Navigator.pop(context);
-                    if (Platform.isAndroid &&
-                        !await requestPhotosPermission()) {
-                      return;
-                    }
-                    await EntriesDatabase.instance.exportImages();
                   }),
             ],
           ),
@@ -1082,18 +1006,6 @@ class _SettingsPageState extends State<SettingsPage> {
                         return const SizedBox();
                       }),
                   SettingsIconAction(
-                      title: AppLocalizations.of(context)!.settingsExport,
-                      icon: Icon(Icons.upload_rounded),
-                      onPressed: () async {
-                        _showExportSelectionPopup();
-                      }),
-                  SettingsIconAction(
-                      title: AppLocalizations.of(context)!.settingsImport,
-                      icon: Icon(Icons.download_rounded),
-                      onPressed: () async {
-                        _showImportSelectionPopup();
-                      }),
-                  SettingsIconAction(
                       title: AppLocalizations.of(context)!.settingsBackup,
                       icon: Icon(Icons.backup_rounded),
                       onPressed: () async {
@@ -1104,6 +1016,12 @@ class _SettingsPageState extends State<SettingsPage> {
                       icon: Icon(Icons.restore_rounded),
                       onPressed: () async {
                         await _showRestoreWarning();
+                      }),
+                  SettingsIconAction(
+                      title: AppLocalizations.of(context)!.settingsImport,
+                      icon: Icon(Icons.download_rounded),
+                      onPressed: () async {
+                        _showImportSelectionPopup();
                       }),
                   SettingsIconAction(
                       title: AppLocalizations.of(context)!
