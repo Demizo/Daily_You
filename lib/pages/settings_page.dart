@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:daily_you/import_utils.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/stats_provider.dart';
@@ -286,124 +287,68 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  void _showImportSelectionPopup() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                  title: Text(AppLocalizations.of(context)!.importLogs),
-                  onTap: () async {
-                    Navigator.pop(context);
-                    if (Platform.isAndroid &&
-                        !await requestStoragePermission()) {
-                      return;
-                    }
-                    _showImportLogsFormatPopup();
-                  }),
-              ListTile(
-                  title: Text(AppLocalizations.of(context)!.importImages),
-                  onTap: () async {
-                    Navigator.pop(context);
-                    if (Platform.isAndroid &&
-                        !await requestPhotosPermission()) {
-                      return;
-                    }
-                    setState(() {
-                      isSyncing = true;
-                    });
-                    await EntriesDatabase.instance.importImages();
-                    setState(() {
-                      isSyncing = false;
-                    });
-                  }),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  void _showImportLogsFormatPopup() {
-    showDialog(
+  Future<void> _showImportSelectionPopup() async {
+    ImportFormat chosenFormat = ImportFormat.none;
+    await showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(AppLocalizations.of(context)!.logFormatTitle),
           content: Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Text(AppLocalizations.of(context)!.logFormatDescription),
+              Divider(),
               ListTile(
-                  title: Text(AppLocalizations.of(context)!.appTitle),
-                  onTap: () async {
-                    Navigator.pop(context);
-                    setState(() {
-                      isSyncing = true;
-                    });
-                    await EntriesDatabase.instance.importFromJson();
-                    setState(() {
-                      isSyncing = false;
-                    });
+                  title: Text(AppLocalizations.of(context)!.formatDailyYouJson),
+                  onTap: () {
+                    chosenFormat = ImportFormat.dailyYouJson;
+                    Navigator.of(context).pop();
                   }),
               ListTile(
                   title: Text(AppLocalizations.of(context)!.formatOneShot),
-                  onTap: () async {
-                    Navigator.pop(context);
-                    setState(() {
-                      isSyncing = true;
-                    });
-                    await EntriesDatabase.instance.importFromOneShot();
-                    setState(() {
-                      isSyncing = false;
-                    });
+                  onTap: () {
+                    chosenFormat = ImportFormat.oneShot;
+                    Navigator.of(context).pop();
+                  }),
+              ListTile(
+                  title: Text(AppLocalizations.of(context)!.formatPixels),
+                  onTap: () {
+                    chosenFormat = ImportFormat.pixels;
+                    Navigator.of(context).pop();
                   }),
             ],
           ),
         );
       },
     );
-  }
 
-  void _showExportSelectionPopup() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                  title: Text(AppLocalizations.of(context)!.exportLogs),
-                  onTap: () async {
-                    Navigator.pop(context);
-                    if (Platform.isAndroid &&
-                        !await requestStoragePermission()) {
-                      return;
-                    }
-                    await EntriesDatabase.instance.exportToJson();
-                  }),
-              ListTile(
-                  title: Text(AppLocalizations.of(context)!.exportImages),
-                  onTap: () async {
-                    Navigator.pop(context);
-                    if (Platform.isAndroid &&
-                        !await requestPhotosPermission()) {
-                      return;
-                    }
-                    await EntriesDatabase.instance.exportImages();
-                  }),
-            ],
-          ),
-        );
-      },
-    );
+    if (chosenFormat != ImportFormat.none) {
+      ValueNotifier<String> statusNotifier = ValueNotifier<String>("");
+
+      _showLoadingStatus(context, statusNotifier);
+
+      if (chosenFormat == ImportFormat.dailyYouJson) {
+        await ImportUtils.importFromJson((status) {
+          statusNotifier.value = status;
+        });
+      } else if (chosenFormat == ImportFormat.oneShot) {
+        await ImportUtils.importFromOneShot((status) {
+          statusNotifier.value = status;
+        });
+      } else if (chosenFormat == ImportFormat.pixels) {
+        await ImportUtils.importFromPixels((status) {
+          statusNotifier.value = status;
+        });
+      }
+
+      Navigator.of(context).pop();
+    }
   }
 
   void _showLoadingStatus(
-      BuildContext context, ValueNotifier<String> messageNotifier) {
+      BuildContext context, ValueNotifier<String> statusNotifier) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -419,7 +364,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   CircularProgressIndicator(),
                   const SizedBox(height: 20),
                   ValueListenableBuilder<String>(
-                    valueListenable: messageNotifier,
+                    valueListenable: statusNotifier,
                     builder: (context, message, child) {
                       return Text(message, textAlign: TextAlign.center);
                     },
@@ -434,15 +379,113 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> _deleteAllLogs(BuildContext context) async {
-    ValueNotifier<String> messageNotifier = ValueNotifier<String>("");
+    ValueNotifier<String> statusNotifier = ValueNotifier<String>("");
 
-    _showLoadingStatus(context, messageNotifier);
+    _showLoadingStatus(context, statusNotifier);
 
-    await EntriesDatabase.instance.deleteAllEntries((msg) {
-      messageNotifier.value = msg;
+    await EntriesDatabase.instance.deleteAllEntries((status) {
+      statusNotifier.value = status;
     });
 
     Navigator.of(context).pop();
+  }
+
+  Future<void> _backupData(BuildContext context) async {
+    ValueNotifier<String> statusNotifier = ValueNotifier<String>("");
+
+    _showLoadingStatus(context, statusNotifier);
+
+    bool success =
+        await EntriesDatabase.instance.backupToZip(context, (status) {
+      statusNotifier.value = status;
+    });
+
+    Navigator.of(context).pop();
+
+    if (!success) {
+      await showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+                title: Text(AppLocalizations.of(context)!.errorTitle),
+                actions: [
+                  TextButton(
+                    child:
+                        Text(MaterialLocalizations.of(context).okButtonLabel),
+                    onPressed: () async {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+                content:
+                    Text(AppLocalizations.of(context)!.backupErrorDescription));
+          });
+    }
+  }
+
+  Future<void> _restoreData(BuildContext context) async {
+    ValueNotifier<String> statusNotifier = ValueNotifier<String>("");
+
+    _showLoadingStatus(context, statusNotifier);
+
+    bool success =
+        await EntriesDatabase.instance.restoreFromZip(context, (status) {
+      statusNotifier.value = status;
+    });
+
+    Navigator.of(context).pop();
+
+    if (!success) {
+      await showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+                title: Text(AppLocalizations.of(context)!.errorTitle),
+                actions: [
+                  TextButton(
+                    child:
+                        Text(MaterialLocalizations.of(context).okButtonLabel),
+                    onPressed: () async {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+                content: Text(
+                    AppLocalizations.of(context)!.restoreErrorDescription));
+          });
+    }
+  }
+
+  Future<void> _showRestoreWarning() async {
+    bool confirmed = false;
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(AppLocalizations.of(context)!.warningTitle),
+          content: Text(
+              AppLocalizations.of(context)!.settingsRestorePromptDescription),
+          actions: [
+            TextButton(
+              child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+              onPressed: () async {
+                Navigator.pop(context);
+              },
+            ),
+            TextButton(
+              child: Text(MaterialLocalizations.of(context).okButtonLabel),
+              onPressed: () async {
+                confirmed = true;
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+    if (confirmed) {
+      await _restoreData(context);
+    }
   }
 
   void _showDeleteAllLogsDialog(
@@ -985,16 +1028,22 @@ class _SettingsPageState extends State<SettingsPage> {
                         return const SizedBox();
                       }),
                   SettingsIconAction(
-                      title: AppLocalizations.of(context)!.settingsExport,
-                      icon: Icon(Icons.upload_rounded),
+                      title: AppLocalizations.of(context)!.settingsBackup,
+                      icon: Icon(Icons.backup_rounded),
                       onPressed: () async {
-                        _showExportSelectionPopup();
+                        await _backupData(context);
+                      }),
+                  SettingsIconAction(
+                      title: AppLocalizations.of(context)!.settingsRestore,
+                      icon: Icon(Icons.restore_rounded),
+                      onPressed: () async {
+                        await _showRestoreWarning();
                       }),
                   SettingsIconAction(
                       title: AppLocalizations.of(context)!.settingsImport,
                       icon: Icon(Icons.download_rounded),
                       onPressed: () async {
-                        _showImportSelectionPopup();
+                        await _showImportSelectionPopup();
                       }),
                   SettingsIconAction(
                       title: AppLocalizations.of(context)!

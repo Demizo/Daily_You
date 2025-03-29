@@ -356,7 +356,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
         TimeManager.isSameDay(DateTime.now(), newEntry.timeCreate)) {
       await NotificationManager.instance.dismissReminderNotification();
     }
-    var entry = await EntriesDatabase.instance.create(newEntry);
+    var entry = await EntriesDatabase.instance.addEntry(newEntry);
     await saveOrUpdateImage(entry.id!);
     Navigator.of(context).pop(entry);
   }
