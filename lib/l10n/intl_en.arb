@@ -187,6 +187,8 @@
   "@importImages": {},
   "logFormatTitle": "Choose Format",
   "@logFormatTitle": {},
+  "formatDailyYouJson": "Daily You JSON",
+  "@formatDailyYouJson": {},
   "formatOneShot": "OneShot",
   "@formatOneShot": {},
   "settingsDeleteAllLogsTitle": "Delete All Logs",

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:daily_you/import_utils.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/stats_provider.dart';
@@ -286,8 +287,9 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  void _showImportSelectionPopup() {
-    showDialog(
+  Future<void> _showImportSelectionPopup() async {
+    ImportFormat chosenFormat = ImportFormat.none;
+    await showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -296,34 +298,40 @@ class _SettingsPageState extends State<SettingsPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                  title: Text(AppLocalizations.of(context)!.appTitle),
-                  onTap: () async {
-                    Navigator.pop(context);
-                    setState(() {
-                      isSyncing = true;
-                    });
-                    await EntriesDatabase.instance.importFromJson();
-                    setState(() {
-                      isSyncing = false;
-                    });
+                  title: Text(AppLocalizations.of(context)!.formatDailyYouJson),
+                  onTap: () {
+                    chosenFormat = ImportFormat.dailyYouJson;
+                    Navigator.of(context).pop();
                   }),
               ListTile(
                   title: Text(AppLocalizations.of(context)!.formatOneShot),
-                  onTap: () async {
-                    Navigator.pop(context);
-                    setState(() {
-                      isSyncing = true;
-                    });
-                    await EntriesDatabase.instance.importFromOneShot();
-                    setState(() {
-                      isSyncing = false;
-                    });
+                  onTap: () {
+                    chosenFormat = ImportFormat.oneShot;
+                    Navigator.of(context).pop();
                   }),
             ],
           ),
         );
       },
     );
+
+    if (chosenFormat != ImportFormat.none) {
+      ValueNotifier<String> statusNotifier = ValueNotifier<String>("");
+
+      _showLoadingStatus(context, statusNotifier);
+
+      if (chosenFormat == ImportFormat.dailyYouJson) {
+        await ImportUtils.importFromJson((status) {
+          statusNotifier.value = status;
+        });
+      } else if (chosenFormat == ImportFormat.oneShot) {
+        await ImportUtils.importFromOneShot((status) {
+          statusNotifier.value = status;
+        });
+      }
+
+      Navigator.of(context).pop();
+    }
   }
 
   void _showLoadingStatus(
@@ -1022,7 +1030,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       title: AppLocalizations.of(context)!.settingsImport,
                       icon: Icon(Icons.download_rounded),
                       onPressed: () async {
-                        _showImportSelectionPopup();
+                        await _showImportSelectionPopup();
                       }),
                   SettingsIconAction(
                       title: AppLocalizations.of(context)!

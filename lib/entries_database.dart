@@ -235,12 +235,17 @@ DROP TABLE old_entries;
     return entryImages;
   }
 
-  Future<EntryImage> addImg(EntryImage entryImage) async {
+  Future<EntryImage> addImg(EntryImage entryImage,
+      {updateStatsAndSync = true}) async {
     final db = _database!;
 
     final id = await db.insert(imagesTable, entryImage.toJson());
-    await StatsProvider.instance.updateStats();
-    if (usingExternalDb()) await updateExternalDatabase();
+
+    if (updateStatsAndSync) {
+      await StatsProvider.instance.updateStats();
+      if (usingExternalDb()) await updateExternalDatabase();
+    }
+
     return entryImage.copy(id: id);
   }
 
@@ -353,12 +358,15 @@ DROP TABLE old_entries;
   }
 
   // Entry Methods
-  Future<Entry> create(Entry entry) async {
+  Future<Entry> addEntry(Entry entry, {updateStatsAndSync = true}) async {
     final db = _database!;
 
     final id = await db.insert(entriesTable, entry.toJson());
-    await StatsProvider.instance.updateStats();
-    if (usingExternalDb()) await updateExternalDatabase();
+
+    if (updateStatsAndSync) {
+      await StatsProvider.instance.updateStats();
+      if (usingExternalDb()) await updateExternalDatabase();
+    }
     return entry.copy(id: id);
   }
 
@@ -723,98 +731,6 @@ DROP TABLE old_entries;
     }
 
     return '';
-  }
-
-  Future<bool> importFromOneShot() async {
-    StatsProvider.instance.updateSyncStats(0, 0);
-    var selectedFile = await FileLayer.pickFile(
-        allowedExtensions: ['json'], mimeTypes: ['application/json']);
-    if (selectedFile == null) return false;
-    var bytes = await FileLayer.getFileBytes(selectedFile);
-    if (bytes == null) return false;
-    final jsonData = json.decode(utf8.decode(bytes.toList()));
-
-    final happinessMapping = {
-      "VERY_SAD": -2,
-      "SAD": -1,
-      "NEUTRAL": 0,
-      "HAPPY": 1,
-      "VERY_HAPPY": 2,
-    };
-
-    final db = _database!;
-
-    for (var entry in jsonData) {
-      final createdTimestamp = entry['created'];
-      final createdDateTime =
-          DateTime.fromMillisecondsSinceEpoch(createdTimestamp * 1000)
-              .toIso8601String();
-      final modifiedDateTime = DateTime.now().toUtc().toIso8601String();
-
-      final happinessText = entry['happiness'];
-      final mood = happinessMapping[happinessText];
-
-      // Skip if the day already has an entry
-      if (await getEntryForDate(DateTime.parse(createdDateTime)) == null) {
-        await db.insert('entries', {
-          'text': entry['textContent'],
-          'img_path': entry['relativePath'],
-          'mood': mood,
-          'time_create': createdDateTime,
-          'time_modified': modifiedDateTime,
-        });
-      }
-    }
-    if (usingExternalImg()) await syncImageFolder(true);
-    StatsProvider.instance.updateStats();
-    return true;
-  }
-
-  Future<bool> importFromJson() async {
-    StatsProvider.instance.updateSyncStats(0, 0);
-    var selectedFile = await FileLayer.pickFile(
-        allowedExtensions: ['json'], mimeTypes: ['application/json']);
-    if (selectedFile == null) return false;
-    var bytes = await FileLayer.getFileBytes(selectedFile);
-    if (bytes == null) return false;
-    final jsonData = json.decode(utf8.decode(bytes.toList()));
-
-    final db = _database!;
-
-    for (var entry in jsonData) {
-      // Skip if the day already has an entry
-      if (await getEntryForDate(DateTime.parse(entry['timeCreated'])) == null) {
-        int id = await db.insert(entriesTable, {
-          'text': entry['text'],
-          'mood': entry['mood'],
-          'time_create': entry['timeCreated'],
-          'time_modified': entry['timeModified'],
-        });
-        // Support old imgPath field
-        if (entry['imgPath'] != null) {
-          EntryImage image = EntryImage(
-              entryId: id,
-              imgPath: entry['imgPath'],
-              imgRank: 0,
-              timeCreate: DateTime.now());
-          await addImg(image);
-        }
-        // Import images
-        if (entry['images'] != null) {
-          for (var img in entry['images']) {
-            await db.insert(imagesTable, {
-              EntryImageFields.entryId: id,
-              EntryImageFields.imgPath: img['imgPath'],
-              EntryImageFields.imgRank: img['imgRank'],
-              EntryImageFields.timeCreate: img['timeCreated'],
-            });
-          }
-        }
-      }
-    }
-    if (usingExternalImg()) await syncImageFolder(true);
-    StatsProvider.instance.updateStats();
-    return true;
   }
 
   Future<bool> backupToZip(
