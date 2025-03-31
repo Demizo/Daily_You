@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:daily_you/config_manager.dart';
+import 'package:daily_you/config_provider.dart';
 import 'package:system_theme/system_theme.dart';
 
 class ThemeModeProvider with ChangeNotifier {
@@ -17,15 +17,15 @@ class ThemeModeProvider with ChangeNotifier {
   }
 
   set accentColor(Color color) {
-    ConfigManager.instance.setField('accentColor', color.value);
+    ConfigProvider.instance.set(ConfigKey.accentColor, color.value);
     _accentColor = color;
   }
 
   void updateAccentColor() {
-    if (ConfigManager.instance.getField('followSystemColor')) {
+    if (ConfigProvider.instance.get(ConfigKey.followSystemColor)) {
       _accentColor = SystemTheme.accentColor.accent;
     } else {
-      _accentColor = Color(ConfigManager.instance.getField('accentColor'));
+      _accentColor = Color(ConfigProvider.instance.get(ConfigKey.accentColor));
     }
     notifyListeners();
   }
@@ -33,13 +33,13 @@ class ThemeModeProvider with ChangeNotifier {
   Future<void> initializeThemeFromConfig() async {
     await SystemTheme.accentColor.load();
     SystemTheme.fallbackColor = _accentColor;
-    if (ConfigManager.instance.getField('followSystemColor')) {
+    if (ConfigProvider.instance.get(ConfigKey.followSystemColor)) {
       _accentColor = SystemTheme.accentColor.accent;
     } else {
-      _accentColor = Color(ConfigManager.instance.getField('accentColor'));
+      _accentColor = Color(ConfigProvider.instance.get(ConfigKey.accentColor));
     }
 
-    final configTheme = ConfigManager.instance.getField('theme');
+    final configTheme = ConfigProvider.instance.get(ConfigKey.theme);
     if (configTheme == 'dark' || configTheme == 'amoled') {
       _themeMode = ThemeMode.dark;
     } else if (configTheme == 'light') {

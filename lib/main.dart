@@ -17,12 +17,11 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:time_range_picker/time_range_picker.dart';
-import 'config_manager.dart';
 import 'package:provider/provider.dart';
 
 @pragma('vm:entry-point')
 void callbackDispatcher() async {
-  await ConfigManager.instance.init();
+  await ConfigProvider.instance.init();
   // Skip syncing for the alarm background task
   await EntriesDatabase.instance.initDB(forceWithoutSync: true);
   if (await EntriesDatabase.instance.getEntryForDate(DateTime.now()) == null) {
@@ -70,13 +69,12 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Create the config file if it doesn't exist
-  await ConfigManager.instance.init();
-  await ConfigProvider.instance.updateConfig();
+  await ConfigProvider.instance.init();
 
   final themeProvider = ThemeModeProvider();
   await themeProvider.initializeThemeFromConfig();
 
-  //TODO: Notification only supported on android
+  // Notification only supported on android
   if (Platform.isAndroid) {
     await NotificationManager.instance.init();
 
@@ -99,7 +97,7 @@ void main() async {
 Future<void> setAlarm({bool firstSet = false}) async {
   DateTime dayToRemind = TimeManager.startOfNextDay();
   if (firstSet) {
-    if (ConfigManager.instance.getField('setReminderTime')) {
+    if (ConfigProvider.instance.get(ConfigKey.setReminderTime)) {
       if (TimeOfDay.now().hour < TimeManager.scheduledReminderTime().hour) {
         dayToRemind = TimeManager.startOfDay(DateTime.now());
       } else if (TimeOfDay.now().hour ==
@@ -120,7 +118,7 @@ Future<void> setAlarm({bool firstSet = false}) async {
   }
 
   DateTime reminderDateTime;
-  if (ConfigManager.instance.getField('setReminderTime')) {
+  if (ConfigProvider.instance.get(ConfigKey.setReminderTime)) {
     reminderDateTime = TimeManager.addTimeOfDay(
         dayToRemind, TimeManager.scheduledReminderTime());
   } else {
@@ -130,6 +128,7 @@ Future<void> setAlarm({bool firstSet = false}) async {
       timeRange.startTime = TimeOfDay.now();
     }
 
+    // TODO if the end time is a lower hour than the start time this fails
     int randomHour =
         (random.nextInt(timeRange.endTime.hour - timeRange.startTime.hour + 1) +
             timeRange.startTime.hour);
@@ -182,36 +181,37 @@ class _MainAppState extends State<MainApp> {
                   seedColor: themeModeProvider.accentColor,
                   brightness: Brightness.light),
             ),
-            darkTheme: (ConfigManager.instance.getField('theme') == 'amoled')
-                ? ThemeData(
-                    useMaterial3: true,
-                    colorScheme: ColorScheme.fromSeed(
-                      seedColor: themeModeProvider.accentColor,
-                      brightness: Brightness.dark,
-                      surfaceContainerLowest: Colors.black,
-                      surfaceContainerLow: Colors.black,
-                      surfaceContainerHighest: Colors.black,
-                      surfaceContainerHigh: Colors.black,
-                      surfaceBright: Colors.black,
-                      surfaceDim: Colors.black,
-                      surface: Colors.black,
-                      surfaceContainer: Colors.black,
-                      onSurface: Colors.white,
-                      surfaceTint: Colors.black,
-                      primaryContainer: Colors.black,
-                      secondaryContainer: Colors.black,
-                      tertiaryContainer: Colors.black,
-                      inverseSurface: Colors.black,
-                      inversePrimary: Colors.black,
-                      scrim: Colors.black,
-                    ),
-                    scaffoldBackgroundColor: Colors.black)
-                : ThemeData(
-                    useMaterial3: true,
-                    colorScheme: ColorScheme.fromSeed(
-                        seedColor: themeModeProvider.accentColor,
-                        brightness: Brightness.dark),
-                  ),
+            darkTheme:
+                (ConfigProvider.instance.get(ConfigKey.theme) == 'amoled')
+                    ? ThemeData(
+                        useMaterial3: true,
+                        colorScheme: ColorScheme.fromSeed(
+                          seedColor: themeModeProvider.accentColor,
+                          brightness: Brightness.dark,
+                          surfaceContainerLowest: Colors.black,
+                          surfaceContainerLow: Colors.black,
+                          surfaceContainerHighest: Colors.black,
+                          surfaceContainerHigh: Colors.black,
+                          surfaceBright: Colors.black,
+                          surfaceDim: Colors.black,
+                          surface: Colors.black,
+                          surfaceContainer: Colors.black,
+                          onSurface: Colors.white,
+                          surfaceTint: Colors.black,
+                          primaryContainer: Colors.black,
+                          secondaryContainer: Colors.black,
+                          tertiaryContainer: Colors.black,
+                          inverseSurface: Colors.black,
+                          inversePrimary: Colors.black,
+                          scrim: Colors.black,
+                        ),
+                        scaffoldBackgroundColor: Colors.black)
+                    : ThemeData(
+                        useMaterial3: true,
+                        colorScheme: ColorScheme.fromSeed(
+                            seedColor: themeModeProvider.accentColor,
+                            brightness: Brightness.dark),
+                      ),
             home: LaunchPage(
                 nextPage: ResponsiveLayout(
               mobileScaffold: MobileScaffold(),

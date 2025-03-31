@@ -1,4 +1,4 @@
-import 'package:daily_you/config_manager.dart';
+import 'package:daily_you/config_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:time_range_picker/time_range_picker.dart';
@@ -40,30 +40,30 @@ class TimeManager {
 
   static TimeOfDay scheduledReminderTime() {
     return TimeOfDay(
-        hour: ConfigManager.instance.getField('scheduledReminderHour'),
-        minute: ConfigManager.instance.getField('scheduledReminderMinute'));
+        hour: ConfigProvider.instance.get(ConfigKey.scheduledReminderHour),
+        minute: ConfigProvider.instance.get(ConfigKey.scheduledReminderMinute));
   }
 
   static TimeRange getReminderTimeRange() {
     TimeOfDay startTime = TimeOfDay(
-        hour: ConfigManager.instance.getField('reminderStartHour'),
-        minute: ConfigManager.instance.getField('reminderStartMinute'));
+        hour: ConfigProvider.instance.get(ConfigKey.reminderStartHour),
+        minute: ConfigProvider.instance.get(ConfigKey.reminderStartMinute));
     TimeOfDay endTime = TimeOfDay(
-        hour: ConfigManager.instance.getField('reminderEndHour'),
-        minute: ConfigManager.instance.getField('reminderEndMinute'));
+        hour: ConfigProvider.instance.get(ConfigKey.reminderEndHour),
+        minute: ConfigProvider.instance.get(ConfigKey.reminderEndMinute));
 
     return TimeRange(startTime: startTime, endTime: endTime);
   }
 
   static Future<void> setReminderTimeRange(TimeRange range) async {
-    await ConfigManager.instance
-        .setField('reminderStartHour', range.startTime.hour);
-    await ConfigManager.instance
-        .setField('reminderStartMinute', range.startTime.minute);
-    await ConfigManager.instance
-        .setField('reminderEndHour', range.endTime.hour);
-    await ConfigManager.instance
-        .setField('reminderEndMinute', range.endTime.minute);
+    await ConfigProvider.instance
+        .set(ConfigKey.reminderStartHour, range.startTime.hour);
+    await ConfigProvider.instance
+        .set(ConfigKey.reminderStartMinute, range.startTime.minute);
+    await ConfigProvider.instance
+        .set(ConfigKey.reminderEndHour, range.endTime.hour);
+    await ConfigProvider.instance
+        .set(ConfigKey.reminderEndMinute, range.endTime.minute);
   }
 
   static String timeRangeString(TimeRange timeRange) {

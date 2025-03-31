@@ -1,5 +1,6 @@
-import 'package:daily_you/config_manager.dart';
+import 'package:daily_you/config_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class SettingsToggle extends StatelessWidget {
   final String title;
@@ -17,6 +18,7 @@ class SettingsToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final configProvider = Provider.of<ConfigProvider>(context);
     return Padding(
       padding: const EdgeInsets.only(top: 4.0, bottom: 4.0),
       child: Row(
@@ -38,9 +40,7 @@ class SettingsToggle extends StatelessWidget {
               ],
             ),
           ),
-          Switch(
-              value: ConfigManager.instance.getField(settingsKey),
-              onChanged: onChanged)
+          Switch(value: configProvider.get(settingsKey), onChanged: onChanged)
         ],
       ),
     );

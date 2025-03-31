@@ -1,4 +1,3 @@
-import 'package:daily_you/config_manager.dart';
 import 'package:daily_you/stats_provider.dart';
 import 'package:daily_you/widgets/mood_by_day_chart.dart';
 import 'package:daily_you/widgets/mood_by_month_chart.dart';

@@ -34,7 +34,7 @@ class EntryDayCell extends StatelessWidget {
       image = images.isNotEmpty ? images.first : null;
     }
 
-    bool showMood = configProvider.calendarViewMode == 'mood';
+    bool showMood = configProvider.get(ConfigKey.calendarViewMode) == 'mood';
 
     if (entry != null) {
       if (showMood) {

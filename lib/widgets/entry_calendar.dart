@@ -1,4 +1,3 @@
-import 'package:daily_you/config_manager.dart';
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/stats_provider.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +17,7 @@ class EntryCalendar extends StatelessWidget {
       rowHeight: 57,
       sixWeekMonthsEnforced: true,
       startingDayOfWeek: StartingDayOfWeek
-          .values[ConfigManager.instance.getFirstDayOfWeekIndex()],
+          .values[ConfigProvider.instance.getFirstDayOfWeekIndex()],
       availableGestures: AvailableGestures.horizontalSwipe,
       availableCalendarFormats: const {
         CalendarFormat.month: 'Month',
@@ -88,11 +87,10 @@ class CalendarViewModeSelector extends StatelessWidget {
   });
 
   Future<void> setViewMode() async {
-    String viewMode = ConfigManager.instance.getField('calendarViewMode');
+    String viewMode = ConfigProvider.instance.get(ConfigKey.calendarViewMode);
     bool showMood = viewMode == 'mood';
     viewMode = showMood ? 'image' : 'mood';
-    await ConfigManager.instance.setField('calendarViewMode', viewMode);
-    await ConfigProvider.instance.updateConfig();
+    await ConfigProvider.instance.set(ConfigKey.calendarViewMode, viewMode);
   }
 
   @override
@@ -102,7 +100,7 @@ class CalendarViewModeSelector extends StatelessWidget {
         onPressed: () async {
           await setViewMode();
         },
-        icon: configProvider.calendarViewMode == "mood"
+        icon: configProvider.get(ConfigKey.calendarViewMode) == "mood"
             ? const Icon(Icons.image_rounded)
             : const Icon(Icons.mood_rounded));
   }

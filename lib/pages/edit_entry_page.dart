@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:daily_you/config_manager.dart';
+import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/time_manager.dart';
@@ -61,7 +61,8 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
   }
 
   Future _loadTemplate() async {
-    var defaultTemplateId = ConfigManager.instance.getField("defaultTemplate");
+    var defaultTemplateId =
+        ConfigProvider.instance.get(ConfigKey.defaultTemplate);
     if (defaultTemplateId != -1) {
       var defaultTemplate =
           await EntriesDatabase.instance.getTemplate(defaultTemplateId);

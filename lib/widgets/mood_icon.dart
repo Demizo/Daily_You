@@ -1,4 +1,4 @@
-import 'package:daily_you/config_manager.dart';
+import 'package:daily_you/config_provider.dart';
 import 'package:flutter/material.dart';
 
 class MoodIcon extends StatefulWidget {
@@ -16,11 +16,11 @@ class MoodIcon extends StatefulWidget {
 
   static String getMoodIcon(int? moodValue) {
     String? moodIcon;
-    if (ConfigManager.moodValueFieldMapping[moodValue] != null) {
-      moodIcon = ConfigManager.instance
-          .getField(ConfigManager.moodValueFieldMapping[moodValue]!);
+    if (ConfigProvider.moodValueFieldMapping[moodValue] != null) {
+      moodIcon = ConfigProvider.instance
+          .get(ConfigProvider.moodValueFieldMapping[moodValue]!);
     }
-    return moodIcon ?? ConfigManager.instance.getField('noMoodIcon');
+    return moodIcon ?? ConfigProvider.instance.get(ConfigKey.noMoodIcon);
   }
 }
 

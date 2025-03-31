@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:daily_you/config_manager.dart';
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/notification_manager.dart';
 import 'package:flutter/material.dart';
@@ -42,20 +41,19 @@ class _MobileScaffoldState extends State<MobileScaffold> {
       appBar: AppBar(title: Text(appBarsTitles[currentIndex]), actions: [
         if (Platform.isAndroid)
           IconButton(
-            icon: configProvider.dailyReminders
+            icon: configProvider.get(ConfigKey.dailyReminders)
                 ? const Icon(Icons.notifications)
                 : const Icon(Icons.notifications_off_rounded),
             onPressed: () async {
               if (await NotificationManager.instance
                   .hasNotificationPermission()) {
-                var value = !configProvider.dailyReminders;
+                var value = !configProvider.get(ConfigKey.dailyReminders);
                 if (value) {
                   NotificationManager.instance.startScheduledDailyReminders();
                 } else {
                   NotificationManager.instance.stopDailyReminders();
                 }
-                await ConfigManager.instance.setField('dailyReminders', value);
-                ConfigProvider.instance.updateConfig();
+                await configProvider.set(ConfigKey.dailyReminders, value);
               }
             },
           ),

@@ -1,4 +1,4 @@
-import 'package:daily_you/config_manager.dart';
+import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/stats_provider.dart';
 import 'package:daily_you/widgets/large_entry_card_widget.dart';
@@ -31,7 +31,8 @@ class _GalleryPageState extends State<GalleryPage> {
   @override
   void initState() {
     super.initState();
-    String viewMode = ConfigManager.instance.getField('galleryPageViewMode');
+    String viewMode =
+        ConfigProvider.instance.get(ConfigKey.galleryPageViewMode);
     listView = viewMode == 'list';
     refreshEntries();
   }
@@ -58,7 +59,7 @@ class _GalleryPageState extends State<GalleryPage> {
 
   Future<void> setViewMode() async {
     var viewMode = listView ? 'list' : 'grid';
-    await ConfigManager.instance.setField('galleryPageViewMode', viewMode);
+    await ConfigProvider.instance.set(ConfigKey.galleryPageViewMode, viewMode);
   }
 
   void filterEntries(String query) {
