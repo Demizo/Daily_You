@@ -95,52 +95,48 @@ void main() async {
 }
 
 Future<void> setAlarm({bool firstSet = false}) async {
-  DateTime dayToRemind = TimeManager.startOfNextDay();
-  if (firstSet) {
-    if (ConfigProvider.instance.get(ConfigKey.setReminderTime)) {
-      if (TimeOfDay.now().hour < TimeManager.scheduledReminderTime().hour) {
-        dayToRemind = TimeManager.startOfDay(DateTime.now());
-      } else if (TimeOfDay.now().hour ==
-              TimeManager.scheduledReminderTime().hour &&
-          TimeOfDay.now().minute < TimeManager.scheduledReminderTime().minute) {
-        dayToRemind = TimeManager.startOfDay(DateTime.now());
-      } else {
-        dayToRemind = TimeManager.startOfNextDay();
-      }
-    } else {
-      TimeOfDay endTime = TimeManager.getReminderTimeRange().endTime;
-      if ((TimeOfDay.now().hour < endTime.hour) ||
-          ((TimeOfDay.now().hour == endTime.hour) &&
-              (TimeOfDay.now().minute < endTime.minute))) {
-        dayToRemind = TimeManager.startOfDay(DateTime.now());
-      }
-    }
-  }
+  DateTime referenceTime = TimeManager.startOfDay(DateTime.now());
+  Duration currentTime = DateTime.now().difference(referenceTime);
 
-  DateTime reminderDateTime;
+  Duration reminderTime;
   if (ConfigProvider.instance.get(ConfigKey.setReminderTime)) {
-    reminderDateTime = TimeManager.addTimeOfDay(
-        dayToRemind, TimeManager.scheduledReminderTime());
+    reminderTime = TimeManager.addTimeOfDay(
+            referenceTime, TimeManager.scheduledReminderTime())
+        .difference(referenceTime);
+    if (!firstSet || reminderTime <= currentTime) {
+      reminderTime += Duration(days: 1);
+    }
   } else {
     final random = Random();
     TimeRange timeRange = TimeManager.getReminderTimeRange();
-    if (TimeManager.isSameDay(dayToRemind, DateTime.now())) {
-      timeRange.startTime = TimeOfDay.now();
+
+    Duration startTime =
+        TimeManager.addTimeOfDay(referenceTime, timeRange.startTime)
+            .difference(referenceTime);
+    Duration endTime =
+        TimeManager.addTimeOfDay(referenceTime, timeRange.endTime)
+            .difference(referenceTime);
+
+    if (endTime < startTime) {
+      // Extend end time to next day
+      endTime += Duration(days: 1);
     }
 
-    // TODO if the end time is a lower hour than the start time this fails
-    int randomHour =
-        (random.nextInt(timeRange.endTime.hour - timeRange.startTime.hour + 1) +
-            timeRange.startTime.hour);
-    int randomMinute = timeRange.endTime.hour > timeRange.startTime.hour
-        ? (random.nextInt(60))
-        : (random.nextInt(
-                timeRange.endTime.minute - timeRange.startTime.minute + 1) +
-            timeRange.startTime.minute);
-    TimeOfDay randomTime = TimeOfDay(hour: randomHour, minute: randomMinute);
+    // Make alarm today if possible
+    if (firstSet && (startTime < currentTime) && (endTime > currentTime)) {
+      startTime = currentTime;
+    }
 
-    reminderDateTime = TimeManager.addTimeOfDay(dayToRemind, randomTime);
+    int randomTimeInMinutes =
+        random.nextInt(endTime.inMinutes - startTime.inMinutes + 1);
+    reminderTime = startTime + Duration(minutes: randomTimeInMinutes);
+
+    if (!firstSet || (reminderTime <= currentTime)) {
+      reminderTime += Duration(days: 1);
+    }
   }
+
+  DateTime reminderDateTime = DateTime.now().add(reminderTime - currentTime);
 
   await AndroidAlarmManager.oneShotAt(reminderDateTime, 0, callbackDispatcher,
       allowWhileIdle: true, exact: true, rescheduleOnReboot: true);
