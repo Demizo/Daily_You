@@ -19,7 +19,7 @@ class StatsProvider with ChangeNotifier {
   int _longestStreak = 0;
   int get longestStreak => _longestStreak;
 
-  int? _daysSinceBadDay = null;
+  int? _daysSinceBadDay;
   int? get daysSinceBadDay => _daysSinceBadDay;
 
   int totalEntries = 0;
@@ -175,7 +175,7 @@ class StatsProvider with ChangeNotifier {
     var isFirstStreak = true;
     var activeStreak = 0;
 
-    var prevEntry = null;
+    Entry? prevEntry;
 
     bool mostRecentBadDay = true;
     for (Entry entry in entries) {
@@ -200,7 +200,9 @@ class StatsProvider with ChangeNotifier {
                     .difference(
                         TimeManager.startOfDay(entries.first.timeCreate))
                     .inDays <=
-                1) _currentStreak = activeStreak;
+                1) {
+          _currentStreak = activeStreak;
+        }
         isFirstStreak = false;
         activeStreak = 1;
       } else {

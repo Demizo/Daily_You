@@ -1,10 +1,12 @@
 import 'dart:io';
 
+import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/import_utils.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/stats_provider.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:daily_you/widgets/mood_icon.dart';
 import 'package:daily_you/widgets/settings_dropdown.dart';
 import 'package:daily_you/widgets/settings_header.dart';
 import 'package:daily_you/widgets/settings_icon_action.dart';
@@ -23,9 +25,6 @@ import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/theme_mode_provider.dart';
 import 'package:time_range_picker/time_range_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-import '../config_manager.dart';
-import '../widgets/mood_icon.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -173,7 +172,8 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   void _showAccentColorPopup(ThemeModeProvider themeProvider) {
-    Color accentColor = Color(ConfigManager.instance.getField('accentColor'));
+    Color accentColor =
+        Color(ConfigProvider.instance.get(ConfigKey.accentColor));
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -188,10 +188,8 @@ class _SettingsPageState extends State<SettingsPage> {
             TextButton(
               child: Text(MaterialLocalizations.of(context).okButtonLabel),
               onPressed: () async {
-                setState(() {
-                  themeProvider.accentColor = accentColor;
-                  themeProvider.updateAccentColor();
-                });
+                themeProvider.accentColor = accentColor;
+                themeProvider.updateAccentColor();
                 Navigator.pop(context);
               },
             ),
@@ -204,7 +202,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   labelTypes: const [ColorLabelType.rgb, ColorLabelType.hex],
                   paletteType: PaletteType.hueWheel,
                   pickerColor:
-                      Color(ConfigManager.instance.getField('accentColor')),
+                      Color(ConfigProvider.instance.get(ConfigKey.accentColor)),
                   onColorChanged: (color) {
                     accentColor = color;
                   }),
@@ -239,13 +237,12 @@ class _SettingsPageState extends State<SettingsPage> {
               onPressed: () async {
                 if (newEmoji.isNotEmpty) {
                   if (value != null) {
-                    await ConfigManager.instance.setField(
-                        ConfigManager.moodValueFieldMapping[value]!, newEmoji);
+                    await ConfigProvider.instance.set(
+                        ConfigProvider.moodValueFieldMapping[value]!, newEmoji);
                   } else {
-                    await ConfigManager.instance
-                        .setField('noMoodIcon', newEmoji);
+                    await ConfigProvider.instance
+                        .set(ConfigKey.noMoodIcon, newEmoji);
                   }
-                  setState(() {});
                 }
                 Navigator.pop(context);
               },
@@ -268,10 +265,9 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   _resetMoodIcons() async {
-    for (var mood in ConfigManager.defaultMoodIconFieldMapping.entries) {
-      await ConfigManager.instance.setField(mood.key, mood.value);
+    for (var mood in ConfigProvider.defaultMoodIconFieldMapping.entries) {
+      await ConfigProvider.instance.set(mood.key, mood.value);
     }
-    setState(() {});
   }
 
   Widget moodIconButton(int? index) {
@@ -568,12 +564,11 @@ class _SettingsPageState extends State<SettingsPage> {
     );
 
     if (picked != null) {
-      await ConfigManager.instance
-          .setField('scheduledReminderHour', picked.hour);
-      await ConfigManager.instance
-          .setField('scheduledReminderMinute', picked.minute);
-      setState(() {});
-      if (ConfigManager.instance.getField('dailyReminders')) {
+      await ConfigProvider.instance
+          .set(ConfigKey.scheduledReminderHour, picked.hour);
+      await ConfigProvider.instance
+          .set(ConfigKey.scheduledReminderMinute, picked.minute);
+      if (ConfigProvider.instance.get(ConfigKey.dailyReminders)) {
         await NotificationManager.instance.stopDailyReminders();
         await NotificationManager.instance.startScheduledDailyReminders();
       }
@@ -587,7 +582,7 @@ class _SettingsPageState extends State<SettingsPage> {
         context: context,
         toText: "",
         fromText: "",
-        use24HourFormat: ConfigManager.instance.is24HourFormat(),
+        use24HourFormat: ConfigProvider.instance.is24HourFormat(),
         start: currentRange.startTime,
         end: currentRange.endTime,
         ticks: 24,
@@ -635,11 +630,10 @@ class _SettingsPageState extends State<SettingsPage> {
         ]);
     if (range != null) {
       await TimeManager.setReminderTimeRange(range);
-      if (ConfigManager.instance.getField('dailyReminders')) {
+      if (ConfigProvider.instance.get(ConfigKey.dailyReminders)) {
         await NotificationManager.instance.stopDailyReminders();
         await NotificationManager.instance.startScheduledDailyReminders();
       }
-      setState(() {});
     }
   }
 
@@ -711,6 +705,8 @@ class _SettingsPageState extends State<SettingsPage> {
     final Color pinkAccentColor = const Color(0xffff00d5);
     final statsProvider = Provider.of<StatsProvider>(context);
     final themeProvider = Provider.of<ThemeModeProvider>(context);
+    final configProvider = Provider.of<ConfigProvider>(context);
+
     return PopScope(
       canPop: !isSyncing,
       child: isSyncing
@@ -741,7 +737,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           .settingsAppearanceTitle),
                   SettingsDropdown<String>(
                       title: AppLocalizations.of(context)!.settingsTheme,
-                      settingsKey: "theme",
+                      settingsKey: ConfigKey.theme,
                       options: [
                         DropdownMenuItem<String>(
                             value: "system",
@@ -777,23 +773,18 @@ class _SettingsPageState extends State<SettingsPage> {
                             themeMode = ThemeMode.system;
                             break;
                         }
-                        setState(() {
-                          themeProvider.themeMode = themeMode;
-                          ConfigManager.instance.setField("theme", newValue);
-                        });
+                        themeProvider.themeMode = themeMode;
+                        configProvider.set(ConfigKey.theme, newValue);
                       }),
                   SettingsToggle(
                       title: AppLocalizations.of(context)!
                           .settingsUseSystemAccentColor,
-                      settingsKey: "followSystemColor",
+                      settingsKey: ConfigKey.followSystemColor,
                       onChanged: (value) {
-                        setState(() {
-                          ConfigManager.instance
-                              .setField('followSystemColor', value);
-                          themeProvider.updateAccentColor();
-                        });
+                        configProvider.set(ConfigKey.followSystemColor, value);
+                        themeProvider.updateAccentColor();
                       }),
-                  if (!ConfigManager.instance.getField('followSystemColor'))
+                  if (!configProvider.get(ConfigKey.followSystemColor))
                     SettingsIconAction(
                       title: AppLocalizations.of(context)!
                           .settingsCustomAccentColor,
@@ -805,23 +796,19 @@ class _SettingsPageState extends State<SettingsPage> {
                   SettingsDropdown<String>(
                       title:
                           AppLocalizations.of(context)!.settingsFirstDayOfWeek,
-                      settingsKey: "startingDayOfWeek",
+                      settingsKey: ConfigKey.startingDayOfWeek,
                       options: _buildFirstDayOfWeekDropdownItems(context),
                       onChanged: (String? newValue) async {
-                        await ConfigManager.instance
-                            .setField("startingDayOfWeek", newValue);
-                        setState(() {});
+                        await configProvider.set(
+                            ConfigKey.startingDayOfWeek, newValue);
                         statsProvider.updateStats();
                       }),
                   SettingsToggle(
                       title: AppLocalizations.of(context)!
                           .settingsShowMarkdownToolbar,
-                      settingsKey: "useMarkdownToolbar",
+                      settingsKey: ConfigKey.useMarkdownToolbar,
                       onChanged: (value) {
-                        setState(() {
-                          ConfigManager.instance
-                              .setField("useMarkdownToolbar", value);
-                        });
+                        configProvider.set(ConfigKey.useMarkdownToolbar, value);
                       }),
                   Padding(
                     padding: const EdgeInsets.only(top: 8.0),
@@ -860,7 +847,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             .settingsDailyReminderTitle,
                         hint: AppLocalizations.of(context)!
                             .settingsDailyReminderDescription,
-                        settingsKey: "dailyReminders",
+                        settingsKey: ConfigKey.dailyReminders,
                         onChanged: (value) async {
                           if (await NotificationManager.instance
                               .hasNotificationPermission()) {
@@ -871,14 +858,13 @@ class _SettingsPageState extends State<SettingsPage> {
                               await NotificationManager.instance
                                   .stopDailyReminders();
                             }
-                            await ConfigManager.instance
-                                .setField('dailyReminders', value);
-                            setState(() {});
+                            await configProvider.set(
+                                ConfigKey.dailyReminders, value);
                           }
                         }),
                   if (Platform.isAndroid &&
-                      ConfigManager.instance.getField('dailyReminders'))
-                    ConfigManager.instance.getField('setReminderTime')
+                      configProvider.get(ConfigKey.dailyReminders))
+                    configProvider.get(ConfigKey.setReminderTime)
                         ? SettingsIconAction(
                             title: AppLocalizations.of(context)!
                                 .settingsReminderTime,
@@ -898,21 +884,20 @@ class _SettingsPageState extends State<SettingsPage> {
                               _selectTimeRange(context);
                             }),
                   if (Platform.isAndroid &&
-                      ConfigManager.instance.getField('dailyReminders'))
+                      configProvider.get(ConfigKey.dailyReminders))
                     SettingsToggle(
                         title: AppLocalizations.of(context)!
                             .settingsFixedReminderTimeTitle,
                         hint: AppLocalizations.of(context)!
                             .settingsFixedReminderTimeDescription,
-                        settingsKey: 'setReminderTime',
+                        settingsKey: ConfigKey.setReminderTime,
                         onChanged: (value) async {
-                          await ConfigManager.instance
-                              .setField('setReminderTime', value);
+                          await configProvider.set(
+                              ConfigKey.setReminderTime, value);
                           await NotificationManager.instance
                               .stopDailyReminders();
                           await NotificationManager.instance
                               .startScheduledDailyReminders();
-                          setState(() {});
                         }),
                   if (Platform.isAndroid) const Divider(),
                   SettingsHeader(
@@ -922,13 +907,10 @@ class _SettingsPageState extends State<SettingsPage> {
                     SettingsDropdown<int>(
                       title:
                           AppLocalizations.of(context)!.settingsDefaultTemplate,
-                      settingsKey: "defaultTemplate",
+                      settingsKey: ConfigKey.defaultTemplate,
                       options: _buildDefaultTemplateDropdownItems(context),
                       onChanged: (int? newValue) {
-                        setState(() {
-                          ConfigManager.instance
-                              .setField("defaultTemplate", newValue);
-                        });
+                        configProvider.set(ConfigKey.defaultTemplate, newValue);
                       },
                     ),
                   SettingsIconAction(
@@ -940,7 +922,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       text: AppLocalizations.of(context)!.settingsStorageTitle),
                   SettingsDropdown<int>(
                       title: AppLocalizations.of(context)!.settingsImageQuality,
-                      settingsKey: "imageQuality",
+                      settingsKey: ConfigKey.imageQuality,
                       options: [
                         DropdownMenuItem<int>(
                             value: 100,
@@ -960,10 +942,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                 AppLocalizations.of(context)!.imageQualityLow)),
                       ],
                       onChanged: (int? newValue) {
-                        setState(() {
-                          ConfigManager.instance
-                              .setField("imageQuality", newValue);
-                        });
+                        configProvider.set(ConfigKey.imageQuality, newValue);
                       }),
                   FutureBuilder(
                       future: EntriesDatabase.instance.getInternalDbPath(),
@@ -971,8 +950,8 @@ class _SettingsPageState extends State<SettingsPage> {
                         if (snapshot.hasData && snapshot.data != null) {
                           var folderText = snapshot.data!;
                           if (EntriesDatabase.instance.usingExternalDb()) {
-                            folderText = ConfigManager.instance
-                                .getField('externalDbUri');
+                            folderText =
+                                configProvider.get(ConfigKey.externalDbUri);
                           }
                           return SettingsIconAction(
                             title:
@@ -989,7 +968,6 @@ class _SettingsPageState extends State<SettingsPage> {
                             },
                             onSecondaryPressed: () async {
                               EntriesDatabase.instance.resetDatabaseLocation();
-                              setState(() {});
                             },
                           );
                         }
@@ -1002,8 +980,8 @@ class _SettingsPageState extends State<SettingsPage> {
                         if (snapshot.hasData && snapshot.data != null) {
                           var folderText = snapshot.data!;
                           if (EntriesDatabase.instance.usingExternalImg()) {
-                            folderText = ConfigManager.instance
-                                .getField('externalImgUri');
+                            folderText =
+                                configProvider.get(ConfigKey.externalImgUri);
                           }
                           return SettingsIconAction(
                             title: AppLocalizations.of(context)!
@@ -1021,7 +999,6 @@ class _SettingsPageState extends State<SettingsPage> {
                             onSecondaryPressed: () async {
                               EntriesDatabase.instance
                                   .resetImageFolderLocation();
-                              setState(() {});
                             },
                           );
                         }
@@ -1073,13 +1050,11 @@ class _SettingsPageState extends State<SettingsPage> {
                       if (versionTapCount > 5) {
                         versionTapCount = 0;
 
-                        await ConfigManager.instance
-                            .setField("followSystemColor", false);
+                        await configProvider.set(
+                            ConfigKey.followSystemColor, false);
 
-                        setState(() {
-                          themeProvider.accentColor = pinkAccentColor;
-                          themeProvider.updateAccentColor();
-                        });
+                        themeProvider.accentColor = pinkAccentColor;
+                        themeProvider.updateAccentColor();
 
                         await showDialog(
                           context: context,

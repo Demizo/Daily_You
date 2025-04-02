@@ -1,5 +1,6 @@
-import 'package:daily_you/config_manager.dart';
+import 'package:daily_you/config_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class SettingsDropdown<T> extends StatelessWidget {
   final String title;
@@ -17,6 +18,7 @@ class SettingsDropdown<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final configProvider = Provider.of<ConfigProvider>(context);
     return Padding(
       padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
       child: Row(
@@ -35,7 +37,7 @@ class SettingsDropdown<T> extends StatelessWidget {
               isExpanded: false,
               alignment: AlignmentDirectional.centerEnd,
               borderRadius: BorderRadius.circular(20),
-              value: ConfigManager.instance.getField(settingsKey),
+              value: configProvider.get(settingsKey),
               items: options,
               onChanged: onChanged),
         ],

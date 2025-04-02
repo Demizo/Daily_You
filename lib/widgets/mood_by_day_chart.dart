@@ -1,9 +1,8 @@
-import 'package:daily_you/config_manager.dart';
+import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:intl/intl.dart';
 
 class MoodByDayChart extends StatelessWidget {
   final Map<String, double> averageMood;
@@ -101,7 +100,7 @@ class MoodByDayChart extends StatelessWidget {
 
   List<MapEntry<String, double>> _getOrderedDays() {
     List<MapEntry<String, double>> days = averageMood.entries.toList();
-    final startingDayIndex = ConfigManager.instance.getFirstDayOfWeekIndex();
+    final startingDayIndex = ConfigProvider.instance.getFirstDayOfWeekIndex();
     days = days.sublist(startingDayIndex)
       ..addAll(days.sublist(0, startingDayIndex));
     return days;
@@ -110,7 +109,7 @@ class MoodByDayChart extends StatelessWidget {
   String _getDayLabel(int index) {
     var days = TimeManager.daysOfWeekLabels();
 
-    final startingDayIndex = ConfigManager.instance.getFirstDayOfWeekIndex();
+    final startingDayIndex = ConfigProvider.instance.getFirstDayOfWeekIndex();
     days = days.sublist(startingDayIndex)
       ..addAll(days.sublist(0, startingDayIndex));
 

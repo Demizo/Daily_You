@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:daily_you/config_manager.dart';
+import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/flashback_manager.dart';
 import 'package:daily_you/models/flashback.dart';
 import 'package:daily_you/notification_manager.dart';
@@ -33,7 +33,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    String viewMode = ConfigManager.instance.getField('homePageViewMode');
+    String viewMode = ConfigProvider.instance.get(ConfigKey.homePageViewMode);
     listView = viewMode == 'list';
     _checkForNotificationLaunch();
   }
@@ -46,7 +46,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> setViewMode() async {
     var viewMode = listView ? 'list' : 'grid';
-    await ConfigManager.instance.setField('homePageViewMode', viewMode);
+    await ConfigProvider.instance.set(ConfigKey.homePageViewMode, viewMode);
   }
 
   Future _checkForNotificationLaunch() async {

@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:daily_you/config_manager.dart';
+import 'package:daily_you/config_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:image_picker/image_picker.dart';
@@ -64,7 +64,7 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(
         source: ImageSource.camera,
-        imageQuality: ConfigManager.instance.getField('imageQuality'));
+        imageQuality: ConfigProvider.instance.get(ConfigKey.imageQuality));
 
     if (pickedFile != null) {
       await saveImage(pickedFile);
@@ -74,7 +74,7 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
   Future<void> _choosePicture() async {
     final picker = ImagePicker();
     final pickedFiles = await picker.pickMultiImage(
-        imageQuality: ConfigManager.instance.getField('imageQuality'));
+        imageQuality: ConfigProvider.instance.get(ConfigKey.imageQuality));
 
     List<String> newImages = List.empty(growable: true);
     for (var file in pickedFiles) {

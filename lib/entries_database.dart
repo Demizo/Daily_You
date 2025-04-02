@@ -1,7 +1,9 @@
-import 'dart:convert';
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 import 'dart:isolate';
 import 'package:archive/archive_io.dart';
+import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/file_bytes_cache.dart';
 import 'package:daily_you/file_layer.dart';
 import 'package:daily_you/models/image.dart';
@@ -12,14 +14,11 @@ import 'package:daily_you/models/template.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:media_scanner/media_scanner.dart';
 import 'package:schedulers/schedulers.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
-
-import 'config_manager.dart';
 
 class EntriesDatabase {
   static final EntriesDatabase instance = EntriesDatabase._init();
@@ -476,11 +475,11 @@ DROP TABLE old_entries;
   }
 
   bool usingExternalDb() {
-    return ConfigManager.instance.getField('useExternalDb') ?? false;
+    return ConfigProvider.instance.get(ConfigKey.useExternalDb) ?? false;
   }
 
   bool usingExternalImg() {
-    return ConfigManager.instance.getField('useExternalImg') ?? false;
+    return ConfigProvider.instance.get(ConfigKey.useExternalImg) ?? false;
   }
 
   Future<String> getInternalImgDatabasePath() async {
@@ -504,7 +503,7 @@ DROP TABLE old_entries;
   }
 
   Future<String> getExternalImgDatabasePath() async {
-    final rootImgPath = ConfigManager.instance.getField('externalImgUri');
+    final rootImgPath = ConfigProvider.instance.get(ConfigKey.externalImgUri);
     return rootImgPath;
   }
 
@@ -524,7 +523,7 @@ DROP TABLE old_entries;
   // Ensure external folders can be accessed if in use
   Future<bool> hasDbUriPermission() async {
     return FileLayer.hasPermission(
-        await ConfigManager.instance.getField('externalDbUri'));
+        await ConfigProvider.instance.get(ConfigKey.externalDbUri));
   }
 
   Future<bool> hasImgUriPermission() async {
@@ -537,11 +536,12 @@ DROP TABLE old_entries;
     if (selectedDirectory == null) return false;
 
     // Save old external path
-    var oldExternalPath = ConfigManager.instance.getField('externalDbUri');
+    var oldExternalPath = ConfigProvider.instance.get(ConfigKey.externalDbUri);
     var oldUseExternalPath = usingExternalDb();
 
-    await ConfigManager.instance.setField('externalDbUri', selectedDirectory);
-    await ConfigManager.instance.setField('useExternalDb', true);
+    await ConfigProvider.instance
+        .set(ConfigKey.externalDbUri, selectedDirectory);
+    await ConfigProvider.instance.set(ConfigKey.useExternalDb, true);
     // Sync with external folder
     var synced = await syncDatabase(forceOverwrite: true);
     if (synced) {
@@ -553,9 +553,10 @@ DROP TABLE old_entries;
       return true;
     } else {
       // Restore state after failure
-      await ConfigManager.instance.setField('externalDbUri', oldExternalPath);
-      await ConfigManager.instance
-          .setField('useExternalDb', oldUseExternalPath);
+      await ConfigProvider.instance
+          .set(ConfigKey.externalDbUri, oldExternalPath);
+      await ConfigProvider.instance
+          .set(ConfigKey.useExternalDb, oldUseExternalPath);
       return false;
     }
   }
@@ -565,14 +566,14 @@ DROP TABLE old_entries;
         useExternalPath: false);
     if (bytes == null) return false;
     return await FileLayer.writeFileBytes(
-        ConfigManager.instance.getField('externalDbUri'), bytes,
+        ConfigProvider.instance.get(ConfigKey.externalDbUri), bytes,
         name: "daily_you.db");
   }
 
   Future<bool> syncDatabase({bool forceOverwrite = false}) async {
     // Check if external database exists
     var externalExists = await FileLayer.exists(
-        ConfigManager.instance.getField('externalDbUri'),
+        ConfigProvider.instance.get(ConfigKey.externalDbUri),
         name: "daily_you.db");
 
     if (!externalExists) {
@@ -582,13 +583,13 @@ DROP TABLE old_entries;
 
       // Export internal DB
       var externalDbPath = await FileLayer.createFile(
-          ConfigManager.instance.getField('externalDbUri'),
+          ConfigProvider.instance.get(ConfigKey.externalDbUri),
           "daily_you.db",
           bytes);
       return externalDbPath != null;
     } else if (forceOverwrite || await isExternalDbNewer()) {
       var externalBytes = await FileLayer.getFileBytes(
-          ConfigManager.instance.getField('externalDbUri'),
+          ConfigProvider.instance.get(ConfigKey.externalDbUri),
           name: "daily_you.db");
       if (externalBytes == null) return false;
 
@@ -608,7 +609,7 @@ DROP TABLE old_entries;
         DateTime.now();
 
     var externalModifiedTime = await FileLayer.getFileModifiedTime(
-            ConfigManager.instance.getField('externalDbUri'),
+            ConfigProvider.instance.get(ConfigKey.externalDbUri),
             name: "daily_you.db") ??
         internalModifiedTime;
 
@@ -688,7 +689,7 @@ DROP TABLE old_entries;
 
   void resetDatabaseLocation() async {
     await _database!.close();
-    await ConfigManager.instance.setField('useExternalDb', false);
+    await ConfigProvider.instance.set(ConfigKey.useExternalDb, false);
     await initDB();
     await StatsProvider.instance.updateStats();
   }
@@ -698,26 +699,28 @@ DROP TABLE old_entries;
     if (selectedDirectory == null) return false;
 
     // Save Old Settings
-    var oldExternalImgUri = ConfigManager.instance.getField('externalImgUri');
+    var oldExternalImgUri =
+        ConfigProvider.instance.get(ConfigKey.externalImgUri);
     var oldUseExternalImg = usingExternalImg();
 
-    await ConfigManager.instance.setField('externalImgUri', selectedDirectory);
-    await ConfigManager.instance.setField('useExternalImg', true);
+    await ConfigProvider.instance
+        .set(ConfigKey.externalImgUri, selectedDirectory);
+    await ConfigProvider.instance.set(ConfigKey.useExternalImg, true);
     var synced = await syncImageFolder(true);
     if (synced) {
       return true;
     } else {
       // Restore Settings
-      await ConfigManager.instance
-          .setField('externalImgUri', oldExternalImgUri);
-      await ConfigManager.instance
-          .setField('useExternalImg', oldUseExternalImg);
+      await ConfigProvider.instance
+          .set(ConfigKey.externalImgUri, oldExternalImgUri);
+      await ConfigProvider.instance
+          .set(ConfigKey.useExternalImg, oldUseExternalImg);
       return false;
     }
   }
 
   void resetImageFolderLocation() async {
-    await ConfigManager.instance.setField('useExternalImg', false);
+    await ConfigProvider.instance.set(ConfigKey.useExternalImg, false);
   }
 
   Future<String> getFilePath() async {

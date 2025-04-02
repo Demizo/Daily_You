@@ -1,12 +1,13 @@
 import 'dart:io';
 
-import 'package:daily_you/config_manager.dart';
+import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:daily_you/widgets/template_select.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/services.dart';
 import 'package:markdown_toolbar/markdown_toolbar.dart';
+import 'package:provider/provider.dart';
 
 class EntryTextEditor extends StatefulWidget {
   final String text;
@@ -14,7 +15,10 @@ class EntryTextEditor extends StatefulWidget {
   final bool showTemplatesButton;
 
   const EntryTextEditor(
-      {super.key, this.text = '', required this.onChangedText, this.showTemplatesButton = true});
+      {super.key,
+      this.text = '',
+      required this.onChangedText,
+      this.showTemplatesButton = true});
 
   @override
   State<EntryTextEditor> createState() => _EntryTextEditorState();
@@ -65,6 +69,7 @@ class _EntryTextEditorState extends State<EntryTextEditor> {
 
   @override
   Widget build(BuildContext context) {
+    final configProvider = Provider.of<ConfigProvider>(context);
     final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,7 +77,7 @@ class _EntryTextEditorState extends State<EntryTextEditor> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            if (ConfigManager.instance.getField('useMarkdownToolbar'))
+            if (configProvider.get(ConfigKey.useMarkdownToolbar))
               Padding(
                 padding:
                     const EdgeInsets.only(left: 4, top: 6, bottom: 0, right: 8),
@@ -115,16 +120,16 @@ class _EntryTextEditorState extends State<EntryTextEditor> {
                   )
                 : entryTextField(),
           )),
-	  if (widget.showTemplatesButton)
-          Padding(
-            padding: const EdgeInsets.all(2.0),
-            child: IconButton(
-                onPressed: () => _showTemplateSelectPopup(context),
-                icon: Icon(
-                  Icons.description_rounded,
-                  color: theme.disabledColor,
-                )),
-          ),
+          if (widget.showTemplatesButton)
+            Padding(
+              padding: const EdgeInsets.all(2.0),
+              child: IconButton(
+                  onPressed: () => _showTemplateSelectPopup(context),
+                  icon: Icon(
+                    Icons.description_rounded,
+                    color: theme.disabledColor,
+                  )),
+            ),
         ])
       ],
     );

@@ -17,12 +17,11 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:time_range_picker/time_range_picker.dart';
-import 'config_manager.dart';
 import 'package:provider/provider.dart';
 
 @pragma('vm:entry-point')
 void callbackDispatcher() async {
-  await ConfigManager.instance.init();
+  await ConfigProvider.instance.init();
   // Skip syncing for the alarm background task
   await EntriesDatabase.instance.initDB(forceWithoutSync: true);
   if (await EntriesDatabase.instance.getEntryForDate(DateTime.now()) == null) {
@@ -70,13 +69,12 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Create the config file if it doesn't exist
-  await ConfigManager.instance.init();
-  await ConfigProvider.instance.updateConfig();
+  await ConfigProvider.instance.init();
 
   final themeProvider = ThemeModeProvider();
   await themeProvider.initializeThemeFromConfig();
 
-  //TODO: Notification only supported on android
+  // Notification only supported on android
   if (Platform.isAndroid) {
     await NotificationManager.instance.init();
 
@@ -97,51 +95,48 @@ void main() async {
 }
 
 Future<void> setAlarm({bool firstSet = false}) async {
-  DateTime dayToRemind = TimeManager.startOfNextDay();
-  if (firstSet) {
-    if (ConfigManager.instance.getField('setReminderTime')) {
-      if (TimeOfDay.now().hour < TimeManager.scheduledReminderTime().hour) {
-        dayToRemind = TimeManager.startOfDay(DateTime.now());
-      } else if (TimeOfDay.now().hour ==
-              TimeManager.scheduledReminderTime().hour &&
-          TimeOfDay.now().minute < TimeManager.scheduledReminderTime().minute) {
-        dayToRemind = TimeManager.startOfDay(DateTime.now());
-      } else {
-        dayToRemind = TimeManager.startOfNextDay();
-      }
-    } else {
-      TimeOfDay endTime = TimeManager.getReminderTimeRange().endTime;
-      if ((TimeOfDay.now().hour < endTime.hour) ||
-          ((TimeOfDay.now().hour == endTime.hour) &&
-              (TimeOfDay.now().minute < endTime.minute))) {
-        dayToRemind = TimeManager.startOfDay(DateTime.now());
-      }
-    }
-  }
+  DateTime referenceTime = TimeManager.startOfDay(DateTime.now());
+  Duration currentTime = DateTime.now().difference(referenceTime);
 
-  DateTime reminderDateTime;
-  if (ConfigManager.instance.getField('setReminderTime')) {
-    reminderDateTime = TimeManager.addTimeOfDay(
-        dayToRemind, TimeManager.scheduledReminderTime());
+  Duration reminderTime;
+  if (ConfigProvider.instance.get(ConfigKey.setReminderTime)) {
+    reminderTime = TimeManager.addTimeOfDay(
+            referenceTime, TimeManager.scheduledReminderTime())
+        .difference(referenceTime);
+    if (!firstSet || reminderTime <= currentTime) {
+      reminderTime += Duration(days: 1);
+    }
   } else {
     final random = Random();
     TimeRange timeRange = TimeManager.getReminderTimeRange();
-    if (TimeManager.isSameDay(dayToRemind, DateTime.now())) {
-      timeRange.startTime = TimeOfDay.now();
+
+    Duration startTime =
+        TimeManager.addTimeOfDay(referenceTime, timeRange.startTime)
+            .difference(referenceTime);
+    Duration endTime =
+        TimeManager.addTimeOfDay(referenceTime, timeRange.endTime)
+            .difference(referenceTime);
+
+    if (endTime < startTime) {
+      // Extend end time to next day
+      endTime += Duration(days: 1);
     }
 
-    int randomHour =
-        (random.nextInt(timeRange.endTime.hour - timeRange.startTime.hour + 1) +
-            timeRange.startTime.hour);
-    int randomMinute = timeRange.endTime.hour > timeRange.startTime.hour
-        ? (random.nextInt(60))
-        : (random.nextInt(
-                timeRange.endTime.minute - timeRange.startTime.minute + 1) +
-            timeRange.startTime.minute);
-    TimeOfDay randomTime = TimeOfDay(hour: randomHour, minute: randomMinute);
+    // Make alarm today if possible
+    if (firstSet && (startTime < currentTime) && (endTime > currentTime)) {
+      startTime = currentTime;
+    }
 
-    reminderDateTime = TimeManager.addTimeOfDay(dayToRemind, randomTime);
+    int randomTimeInMinutes =
+        random.nextInt(endTime.inMinutes - startTime.inMinutes + 1);
+    reminderTime = startTime + Duration(minutes: randomTimeInMinutes);
+
+    if (!firstSet || (reminderTime <= currentTime)) {
+      reminderTime += Duration(days: 1);
+    }
   }
+
+  DateTime reminderDateTime = DateTime.now().add(reminderTime - currentTime);
 
   await AndroidAlarmManager.oneShotAt(reminderDateTime, 0, callbackDispatcher,
       allowWhileIdle: true, exact: true, rescheduleOnReboot: true);
@@ -182,36 +177,37 @@ class _MainAppState extends State<MainApp> {
                   seedColor: themeModeProvider.accentColor,
                   brightness: Brightness.light),
             ),
-            darkTheme: (ConfigManager.instance.getField('theme') == 'amoled')
-                ? ThemeData(
-                    useMaterial3: true,
-                    colorScheme: ColorScheme.fromSeed(
-                      seedColor: themeModeProvider.accentColor,
-                      brightness: Brightness.dark,
-                      surfaceContainerLowest: Colors.black,
-                      surfaceContainerLow: Colors.black,
-                      surfaceContainerHighest: Colors.black,
-                      surfaceContainerHigh: Colors.black,
-                      surfaceBright: Colors.black,
-                      surfaceDim: Colors.black,
-                      surface: Colors.black,
-                      surfaceContainer: Colors.black,
-                      onSurface: Colors.white,
-                      surfaceTint: Colors.black,
-                      primaryContainer: Colors.black,
-                      secondaryContainer: Colors.black,
-                      tertiaryContainer: Colors.black,
-                      inverseSurface: Colors.black,
-                      inversePrimary: Colors.black,
-                      scrim: Colors.black,
-                    ),
-                    scaffoldBackgroundColor: Colors.black)
-                : ThemeData(
-                    useMaterial3: true,
-                    colorScheme: ColorScheme.fromSeed(
-                        seedColor: themeModeProvider.accentColor,
-                        brightness: Brightness.dark),
-                  ),
+            darkTheme:
+                (ConfigProvider.instance.get(ConfigKey.theme) == 'amoled')
+                    ? ThemeData(
+                        useMaterial3: true,
+                        colorScheme: ColorScheme.fromSeed(
+                          seedColor: themeModeProvider.accentColor,
+                          brightness: Brightness.dark,
+                          surfaceContainerLowest: Colors.black,
+                          surfaceContainerLow: Colors.black,
+                          surfaceContainerHighest: Colors.black,
+                          surfaceContainerHigh: Colors.black,
+                          surfaceBright: Colors.black,
+                          surfaceDim: Colors.black,
+                          surface: Colors.black,
+                          surfaceContainer: Colors.black,
+                          onSurface: Colors.white,
+                          surfaceTint: Colors.black,
+                          primaryContainer: Colors.black,
+                          secondaryContainer: Colors.black,
+                          tertiaryContainer: Colors.black,
+                          inverseSurface: Colors.black,
+                          inversePrimary: Colors.black,
+                          scrim: Colors.black,
+                        ),
+                        scaffoldBackgroundColor: Colors.black)
+                    : ThemeData(
+                        useMaterial3: true,
+                        colorScheme: ColorScheme.fromSeed(
+                            seedColor: themeModeProvider.accentColor,
+                            brightness: Brightness.dark),
+                      ),
             home: LaunchPage(
                 nextPage: ResponsiveLayout(
               mobileScaffold: MobileScaffold(),

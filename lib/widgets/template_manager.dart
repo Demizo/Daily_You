@@ -1,4 +1,4 @@
-import 'package:daily_you/config_manager.dart';
+import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:daily_you/widgets/edit_template.dart';
@@ -77,10 +77,11 @@ class _TemplateManagementDialogState extends State<TemplateManager> {
                     onPressed: () async {
                       await EntriesDatabase.instance
                           .deleteTemplate(template.id!);
-                      if (ConfigManager.instance.getField("defaultTemplate") ==
+                      if (ConfigProvider.instance
+                              .get(ConfigKey.defaultTemplate) ==
                           template.id!) {
-                        await ConfigManager.instance
-                            .setField("defaultTemplate", -1);
+                        await ConfigProvider.instance
+                            .set(ConfigKey.defaultTemplate, -1);
                       }
                       _loadTemplates();
                       widget.onTemplatesUpdated();
