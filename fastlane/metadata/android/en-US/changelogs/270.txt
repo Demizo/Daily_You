@@ -1,0 +1,10 @@
+Daily You v2.7.0 has arrived! Here are the changes:
+
+• Revamped Export/Import to single file Backup/Restore
+• Updated import options
+• Added option to import from Pixels
+• Added strict confirmation to Delete All Logs option
+• Fixed notifications not occurring when time range spanned over midnight
+• Fixed some UI elements not updating after settings changes
+• Minor back-end and UI improvements
+• Updated translations
