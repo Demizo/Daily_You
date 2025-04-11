@@ -170,7 +170,11 @@ class _MainAppState extends State<MainApp> {
             themeMode: themeModeProvider.themeMode,
             debugShowCheckedModeBanner: false,
             localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
+            supportedLocales: [
+              Locale("en"),
+              ...AppLocalizations.supportedLocales
+                  .where((locale) => locale.languageCode != "en")
+            ],
             theme: ThemeData(
               useMaterial3: true,
               colorScheme: ColorScheme.fromSeed(
