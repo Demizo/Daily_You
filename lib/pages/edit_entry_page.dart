@@ -60,6 +60,12 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
     }
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+    _scrollController.dispose();
+  }
+
   Future _loadTemplate() async {
     var defaultTemplateId =
         ConfigProvider.instance.get(ConfigKey.defaultTemplate);
@@ -140,8 +146,9 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
                           if (index == 0) {
                             return EntryImagePicker(
                                 imgPath: null,
-                                openCamera: false,
+                                openCamera: widget.openCamera && !_openedCamera,
                                 onChangedImage: (imgPaths) {
+                                  _openedCamera = true;
                                   if (imgPaths != null) {
                                     addLocalImage(imgPaths);
                                   }
