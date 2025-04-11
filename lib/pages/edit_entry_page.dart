@@ -60,6 +60,12 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
     }
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+    _scrollController.dispose();
+  }
+
   Future _loadTemplate() async {
     var defaultTemplateId =
         ConfigProvider.instance.get(ConfigKey.defaultTemplate);

@@ -15,6 +15,7 @@ import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/pages/entry_detail_page.dart';
 import 'package:daily_you/pages/edit_entry_page.dart';
 import 'package:provider/provider.dart';
+import 'package:scroll_to_hide/scroll_to_hide.dart';
 import '../widgets/entry_card_widget.dart';
 
 class HomePage extends StatefulWidget {
@@ -29,6 +30,7 @@ class _HomePageState extends State<HomePage> {
   String searchText = '';
   bool sortOrderAsc = true;
   bool firstLoad = true;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -36,6 +38,12 @@ class _HomePageState extends State<HomePage> {
     String viewMode = ConfigProvider.instance.get(ConfigKey.homePageViewMode);
     listView = viewMode == 'list';
     _checkForNotificationLaunch();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _scrollController.dispose();
   }
 
   Future<void> logToday() async {
@@ -80,68 +88,41 @@ class _HomePageState extends State<HomePage> {
     }
 
     return Center(
-      child: Stack(alignment: Alignment.topCenter, children: [
+      child: Stack(alignment: Alignment.bottomCenter, children: [
         buildEntries(context, flashbacks),
-        Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  if (Platform.isAndroid)
-                    IconButton(
-                      icon: const Icon(
-                        Icons.camera_alt_rounded,
-                        size: 24,
-                      ),
-                      onPressed: () async {
-                        await Navigator.of(context).push(
-                          MaterialPageRoute(
-                              builder: (context) => AddEditEntryPage(
-                                  entry: todayEntry,
-                                  openCamera: true,
-                                  images: todayEntry == null
-                                      ? []
-                                      : StatsProvider.instance.images
-                                          .where((img) =>
-                                              img.entryId == todayEntry!.id!)
-                                          .toList())),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.all(8),
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                        foregroundColor: Theme.of(context).colorScheme.surface,
-                        elevation: 3,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(80.0),
-                        ),
-                      ),
-                    ),
+        Padding(
+          padding: const EdgeInsets.only(right: 8.0),
+          child: ScrollToHide(
+            height: 68,
+            duration: Duration(milliseconds: 200),
+            hideDirection: Axis.vertical,
+            scrollController: _scrollController,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                if (Platform.isAndroid)
                   IconButton(
-                    icon: Icon(
-                      todayEntry == null
-                          ? Icons.add_rounded
-                          : Icons.edit_rounded,
-                      color: Theme.of(context).colorScheme.surface,
-                      size: 28,
+                    icon: const Icon(
+                      Icons.camera_alt_rounded,
+                      size: 24,
                     ),
                     onPressed: () async {
-                      await Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => AddEditEntryPage(
-                              entry: todayEntry,
-                              images: todayEntry == null
-                                  ? []
-                                  : StatsProvider.instance.images
-                                      .where((img) =>
-                                          img.entryId == todayEntry!.id!)
-                                      .toList())));
+                      await Navigator.of(context).push(
+                        MaterialPageRoute(
+                            builder: (context) => AddEditEntryPage(
+                                entry: todayEntry,
+                                openCamera: true,
+                                images: todayEntry == null
+                                    ? []
+                                    : StatsProvider.instance.images
+                                        .where((img) =>
+                                            img.entryId == todayEntry!.id!)
+                                        .toList())),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(8),
                       backgroundColor: Theme.of(context).colorScheme.primary,
                       foregroundColor: Theme.of(context).colorScheme.surface,
                       elevation: 3,
@@ -150,17 +131,43 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                   ),
-                ],
-              ),
+                IconButton(
+                  icon: Icon(
+                    todayEntry == null ? Icons.add_rounded : Icons.edit_rounded,
+                    color: Theme.of(context).colorScheme.surface,
+                    size: 28,
+                  ),
+                  onPressed: () async {
+                    await Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => AddEditEntryPage(
+                            entry: todayEntry,
+                            images: todayEntry == null
+                                ? []
+                                : StatsProvider.instance.images
+                                    .where(
+                                        (img) => img.entryId == todayEntry!.id!)
+                                    .toList())));
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.all(16),
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Theme.of(context).colorScheme.surface,
+                    elevation: 3,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(80.0),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ]),
     );
   }
 
   Widget buildEntries(BuildContext context, List<Flashback> flashbacks) =>
-      ListView(children: [
+      ListView(controller: _scrollController, children: [
         const Center(
             child: SizedBox(height: 430, width: 400, child: EntryCalendar())),
         Card(
