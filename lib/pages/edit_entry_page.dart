@@ -140,8 +140,9 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
                           if (index == 0) {
                             return EntryImagePicker(
                                 imgPath: null,
-                                openCamera: false,
+                                openCamera: widget.openCamera && !_openedCamera,
                                 onChangedImage: (imgPaths) {
+                                  _openedCamera = true;
                                   if (imgPaths != null) {
                                     addLocalImage(imgPaths);
                                   }

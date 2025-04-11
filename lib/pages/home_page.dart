@@ -85,51 +85,34 @@ class _HomePageState extends State<HomePage> {
         Column(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            if (todayEntry == null)
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    if (Platform.isAndroid)
-                      IconButton(
-                        icon: const Icon(
-                          Icons.camera_alt_rounded,
-                          size: 24,
-                        ),
-                        onPressed: () async {
-                          await Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => const AddEditEntryPage(
-                              openCamera: true,
-                            ),
-                          ));
-                        },
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.all(8),
-                          backgroundColor:
-                              Theme.of(context).colorScheme.primary,
-                          foregroundColor:
-                              Theme.of(context).colorScheme.surface,
-                          elevation: 3,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(80.0),
-                          ),
-                        ),
-                      ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  if (Platform.isAndroid)
                     IconButton(
-                      icon: Icon(
-                        Icons.add_rounded,
-                        color: Theme.of(context).colorScheme.surface,
-                        size: 28,
+                      icon: const Icon(
+                        Icons.camera_alt_rounded,
+                        size: 24,
                       ),
                       onPressed: () async {
-                        await Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => const AddEditEntryPage(),
-                        ));
+                        await Navigator.of(context).push(
+                          MaterialPageRoute(
+                              builder: (context) => AddEditEntryPage(
+                                  entry: todayEntry,
+                                  openCamera: true,
+                                  images: todayEntry == null
+                                      ? []
+                                      : StatsProvider.instance.images
+                                          .where((img) =>
+                                              img.entryId == todayEntry!.id!)
+                                          .toList())),
+                        );
                       },
                       style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(8),
                         backgroundColor: Theme.of(context).colorScheme.primary,
                         foregroundColor: Theme.of(context).colorScheme.surface,
                         elevation: 3,
@@ -138,9 +121,38 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  IconButton(
+                    icon: Icon(
+                      todayEntry == null
+                          ? Icons.add_rounded
+                          : Icons.edit_rounded,
+                      color: Theme.of(context).colorScheme.surface,
+                      size: 28,
+                    ),
+                    onPressed: () async {
+                      await Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => AddEditEntryPage(
+                              entry: todayEntry,
+                              images: todayEntry == null
+                                  ? []
+                                  : StatsProvider.instance.images
+                                      .where((img) =>
+                                          img.entryId == todayEntry!.id!)
+                                      .toList())));
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.all(16),
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      foregroundColor: Theme.of(context).colorScheme.surface,
+                      elevation: 3,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(80.0),
+                      ),
+                    ),
+                  ),
+                ],
               ),
+            ),
           ],
         ),
       ]),
