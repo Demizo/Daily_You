@@ -26,7 +26,6 @@ dependencies:
   system_theme: ^3.1.2
   url_launcher: ^6.1.12
   icons_launcher: ^3.0.0
-  photo_view: ^0.15.0
   flutter_local_notifications: ^18.0.1
   android_alarm_manager_plus: ^4.0.5
   flutter_colorpicker: ^1.0.3
@@ -55,6 +54,7 @@ dependencies:
   archive: ^4.0.5
   mime: ^2.0.0
   scroll_to_hide: ^2.2.0
+  extended_image: ^9.1.0
 dev_dependencies:
   flutter_lints: ^5.0.0
 

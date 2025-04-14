@@ -179,8 +179,10 @@ class EntryDetails extends StatelessWidget {
                               null) {
                             await Navigator.of(context).push(MaterialPageRoute(
                               fullscreenDialog: true,
-                              builder: (context) =>
-                                  ImageViewPage(imgName: images[index].imgPath),
+                              builder: (context) => ImageViewPage(
+                                images: images,
+                                index: index,
+                              ),
                             ));
                           }
                         },
@@ -206,8 +208,10 @@ class EntryDetails extends StatelessWidget {
                       null) {
                     await Navigator.of(context).push(MaterialPageRoute(
                       fullscreenDialog: true,
-                      builder: (context) =>
-                          ImageViewPage(imgName: images.first.imgPath),
+                      builder: (context) => ImageViewPage(
+                        images: images,
+                        index: 0,
+                      ),
                     ));
                   }
                 },
