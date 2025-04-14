@@ -1,0 +1,8 @@
+Daily You v2.7.1 has arrived! Here are the changes:
+
+• Quick action buttons on the home screen now remain after an entry has been created
+• Quick action buttons now auto-hide when scrolling
+• Added the ability to swipe between images in the full image viewer
+• Fixed app not falling back to English when the system language is not supported
+• Minor UI improvements
+• Updated translations
