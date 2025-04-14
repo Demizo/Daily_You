@@ -140,7 +140,7 @@ class _GalleryPageState extends State<GalleryPage> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.only(
-                          top: 4, bottom: 8, left: 3, right: 3),
+                          top: 4, bottom: 8, left: 8, right: 8),
                       child: SearchBar(
                         leading: const Padding(
                           padding: EdgeInsets.all(8.0),
