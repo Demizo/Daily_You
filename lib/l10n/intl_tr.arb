@@ -186,5 +186,11 @@
   "settingsSourceCode": "Kaynak kodu",
   "@settingsSourceCode": {},
   "tagMoodTitle": "Ruh hali",
-  "@tagMoodTitle": {}
+  "@tagMoodTitle": {},
+  "backupErrorDescription": "Yedekleme oluşturulamadı!",
+  "@backupErrorDescription": {},
+  "restoreErrorDescription": "Yedekleme geri yüklenemedi!",
+  "@restoreErrorDescription": {},
+  "settingsBackup": "Yedekle",
+  "@settingsBackup": {}
 }
