@@ -410,14 +410,6 @@ DROP TABLE old_entries;
     return result.map((json) => Entry.fromJson(json)).toList();
   }
 
-  Future<List<Entry>> getAllEntriesSorted(String orderBy, String order) async {
-    final db = _database!;
-
-    final result = await db.query(entriesTable, orderBy: '$orderBy $order');
-
-    return result.map((json) => Entry.fromJson(json)).toList();
-  }
-
   Future<int> updateEntry(Entry entry) async {
     final db = _database!;
 

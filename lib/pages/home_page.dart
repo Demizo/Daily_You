@@ -216,6 +216,7 @@ class _HomePageState extends State<HomePage> {
                       onTap: () async {
                         await Navigator.of(context).push(MaterialPageRoute(
                           builder: (context) => EntryDetailPage(
+                              filtered: false,
                               index: StatsProvider.instance
                                   .getIndexOfEntry(flashback.entry.id!)),
                         ));

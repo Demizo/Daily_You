@@ -7,6 +7,10 @@ import 'package:daily_you/widgets/stat_range_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+enum OrderBy { date, mood }
+
+enum SortOrder { ascending, descending }
+
 class StatsProvider with ChangeNotifier {
   static final StatsProvider instance = StatsProvider._init();
 
@@ -51,8 +55,40 @@ class StatsProvider with ChangeNotifier {
 
   StatsRange statsRange = StatsRange.month;
 
+  // Used for filtered searches on the gallery page
+  List<Entry> filteredEntries = List.empty();
+  String searchText = "";
+  OrderBy orderBy = OrderBy.date;
+  SortOrder sortOrder = SortOrder.descending;
+
+  List<Entry> filterEntries(List<Entry> entries) {
+    if (searchText.length > 2) {
+      entries = entries
+          .where((entry) =>
+              entry.text.toLowerCase().contains(searchText.toLowerCase()))
+          .toList();
+    }
+
+    // Ordering by date is the default
+    if (orderBy == OrderBy.mood) {
+      entries.sort((a, b) {
+        var aValue = a.mood ?? -999;
+        var bValue = b.mood ?? -999;
+        return bValue.compareTo(aValue);
+      });
+    }
+
+    // Sorting is descending by default
+    if (sortOrder == SortOrder.ascending) {
+      entries = entries.reversed.toList();
+    }
+
+    return entries;
+  }
+
   Future<void> updateStats() async {
     entries = await EntriesDatabase.instance.getAllEntries();
+    filteredEntries = filterEntries(entries);
     images = await EntriesDatabase.instance.getAllEntryImages();
     await getStreaks();
     await getMoodCounts();

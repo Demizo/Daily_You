@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/stats_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -15,11 +16,10 @@ import 'package:share_plus/share_plus.dart';
 
 class EntryDetailPage extends StatefulWidget {
   final int index;
+  final bool filtered;
 
-  const EntryDetailPage({
-    super.key,
-    required this.index,
-  });
+  const EntryDetailPage(
+      {super.key, required this.index, required this.filtered});
 
   @override
   State<EntryDetailPage> createState() => _EntryDetailPageState();
@@ -47,30 +47,37 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
   @override
   Widget build(BuildContext context) {
     final statsProvider = Provider.of<StatsProvider>(context);
+
+    var entries =
+        widget.filtered ? statsProvider.filteredEntries : statsProvider.entries;
+
     return Scaffold(
         appBar: AppBar(
-          actions: [shareButton(context), editButton(context)],
+          actions: [
+            shareButton(context, entries),
+            editButton(context, entries)
+          ],
         ),
         body: PageView.builder(
             hitTestBehavior: HitTestBehavior.translucent,
             controller: _pageController,
             reverse: true,
-            itemCount: statsProvider.entries.length,
+            itemCount: entries.length,
             onPageChanged: (int newIndex) {
               _currentPageNotifier.value = newIndex;
             },
             itemBuilder: (context, index) {
-              return EntryDetails(index: index);
+              return EntryDetails(entries: entries, index: index);
             }));
   }
 
-  Widget editButton(BuildContext context) {
+  Widget editButton(BuildContext context, List<Entry> entries) {
     return ValueListenableBuilder(
         valueListenable: _currentPageNotifier,
         builder: (context, currentIndex, child) {
           final statsProvider = Provider.of<StatsProvider>(context);
 
-          var entry = statsProvider.entries[currentIndex];
+          var entry = entries[currentIndex];
           var images = statsProvider.images
               .where((img) => img.entryId == entry.id!)
               .toList();
@@ -87,13 +94,13 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
         });
   }
 
-  Widget shareButton(BuildContext context) {
+  Widget shareButton(BuildContext context, List<Entry> entries) {
     return ValueListenableBuilder(
         valueListenable: _currentPageNotifier,
         builder: (context, currentIndex, child) {
           final statsProvider = Provider.of<StatsProvider>(context);
 
-          var entry = statsProvider.entries[currentIndex];
+          var entry = entries[currentIndex];
           var images = statsProvider.images
               .where((img) => img.entryId == entry.id!)
               .toList();
@@ -136,16 +143,18 @@ class EntryDetails extends StatelessWidget {
   const EntryDetails({
     super.key,
     required this.index,
+    required this.entries,
   });
 
   final int index;
+  final List<Entry> entries;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final statsProvider = Provider.of<StatsProvider>(context);
 
-    var entry = statsProvider.entries[index];
+    var entry = entries[index];
     var images =
         statsProvider.images.where((img) => img.entryId == entry.id!).toList();
 
