@@ -7,6 +7,7 @@ import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/stats_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/entry_calendar.dart';
+import 'package:daily_you/widgets/hiding_widget.dart';
 import 'package:daily_you/widgets/large_entry_card_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -90,13 +91,12 @@ class _HomePageState extends State<HomePage> {
     return Center(
       child: Stack(alignment: Alignment.bottomCenter, children: [
         buildEntries(context, flashbacks),
-        Padding(
-          padding: const EdgeInsets.only(right: 8.0),
-          child: ScrollToHide(
-            height: 68,
-            duration: Duration(milliseconds: 200),
-            hideDirection: Axis.vertical,
-            scrollController: _scrollController,
+        HidingWidget(
+          duration: Duration(milliseconds: 200),
+          hideDirection: HideDirection.down,
+          scrollController: _scrollController,
+          child: Padding(
+            padding: const EdgeInsets.only(right: 8.0, bottom: 8.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.center,

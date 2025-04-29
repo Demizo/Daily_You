@@ -1,6 +1,7 @@
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/stats_provider.dart';
+import 'package:daily_you/widgets/hiding_widget.dart';
 import 'package:daily_you/widgets/large_entry_card_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -20,6 +21,8 @@ class GalleryPage extends StatefulWidget {
 class _GalleryPageState extends State<GalleryPage> {
   bool listView = false;
   final TextEditingController _searchController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+  late final FocusNode _focusNode = FocusNode();
 
   @override
   void initState() {
@@ -33,6 +36,8 @@ class _GalleryPageState extends State<GalleryPage> {
   @override
   void dispose() {
     _searchController.dispose();
+    _scrollController.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -115,71 +120,78 @@ class _GalleryPageState extends State<GalleryPage> {
         Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Padding(
-              padding:
-                  const EdgeInsets.only(top: 4, bottom: 8, left: 8, right: 8),
-              child: SearchBar(
-                controller: _searchController,
-                leading: const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Icon(Icons.search_rounded),
-                ),
-                trailing: [
-                  AnimatedSwitcher(
-                    duration: Duration(milliseconds: 500),
-                    transitionBuilder:
-                        (Widget child, Animation<double> animation) {
-                      return RotationTransition(
-                        turns: animation,
-                        child: ScaleTransition(
-                          scale: animation,
-                          child: child,
-                        ),
-                      );
-                    },
-                    child: _searchController.text.isNotEmpty
-                        ? IconButton(
-                            visualDensity: VisualDensity(
-                                horizontal: VisualDensity.minimumDensity),
-                            key: ValueKey('clearButton'),
-                            icon: Icon(Icons.clear),
-                            onPressed: () {
-                              _searchController.clear();
-                              statsProvider.searchText = "";
-                              statsProvider.updateStats();
-                              setState(() {});
-                            },
-                          )
-                        : SizedBox.shrink(
-                            key: ValueKey('empty')), // Empty widget
+            HidingWidget(
+              focusNode: _focusNode,
+              scrollController: _scrollController,
+              duration: Duration(milliseconds: 200),
+              hideDirection: HideDirection.up,
+              child: Padding(
+                padding:
+                    const EdgeInsets.only(top: 4, bottom: 8, left: 8, right: 8),
+                child: SearchBar(
+                  focusNode: _focusNode,
+                  controller: _searchController,
+                  leading: const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Icon(Icons.search_rounded),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: Text(AppLocalizations.of(context)!
-                        .logCount(statsProvider.filteredEntries.length)),
-                  ),
-                  IconButton(
-                      onPressed: () async {
-                        listView = !listView;
-                        await setViewMode();
-                        setState(() {});
+                  trailing: [
+                    AnimatedSwitcher(
+                      duration: Duration(milliseconds: 500),
+                      transitionBuilder:
+                          (Widget child, Animation<double> animation) {
+                        return RotationTransition(
+                          turns: animation,
+                          child: ScaleTransition(
+                            scale: animation,
+                            child: child,
+                          ),
+                        );
                       },
-                      icon: listView
-                          ? const Icon(Icons.grid_view_rounded)
-                          : const Icon(Icons.view_list_rounded)),
-                  IconButton(
-                      icon: const Icon(Icons.sort_rounded),
-                      onPressed: () => _showSortSelectionPopup(context)),
-                ],
-                hintText: AppLocalizations.of(context)!.searchLogsHint,
-                padding: WidgetStateProperty.all(
-                    const EdgeInsets.only(left: 4, right: 4)),
-                elevation: WidgetStateProperty.all(1),
-                onChanged: (queryText) => EasyDebounce.debounce(
-                    'search-debounce', const Duration(milliseconds: 300), () {
-                  statsProvider.searchText = queryText;
-                  statsProvider.updateStats();
-                }),
+                      child: _searchController.text.isNotEmpty
+                          ? IconButton(
+                              visualDensity: VisualDensity(
+                                  horizontal: VisualDensity.minimumDensity),
+                              key: ValueKey('clearButton'),
+                              icon: Icon(Icons.clear),
+                              onPressed: () {
+                                _searchController.clear();
+                                statsProvider.searchText = "";
+                                statsProvider.updateStats();
+                                setState(() {});
+                              },
+                            )
+                          : SizedBox.shrink(
+                              key: ValueKey('empty')), // Empty widget
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: Text(AppLocalizations.of(context)!
+                          .logCount(statsProvider.filteredEntries.length)),
+                    ),
+                    IconButton(
+                        onPressed: () async {
+                          listView = !listView;
+                          await setViewMode();
+                          setState(() {});
+                        },
+                        icon: listView
+                            ? const Icon(Icons.grid_view_rounded)
+                            : const Icon(Icons.view_list_rounded)),
+                    IconButton(
+                        icon: const Icon(Icons.sort_rounded),
+                        onPressed: () => _showSortSelectionPopup(context)),
+                  ],
+                  hintText: AppLocalizations.of(context)!.searchLogsHint,
+                  padding: WidgetStateProperty.all(
+                      const EdgeInsets.only(left: 4, right: 4)),
+                  elevation: WidgetStateProperty.all(1),
+                  onChanged: (queryText) => EasyDebounce.debounce(
+                      'search-debounce', const Duration(milliseconds: 300), () {
+                    statsProvider.searchText = queryText;
+                    statsProvider.updateStats();
+                  }),
+                ),
               ),
             ),
           ],
@@ -198,6 +210,7 @@ class _GalleryPageState extends State<GalleryPage> {
             ),
           )
         : GridView.builder(
+            controller: _scrollController,
             padding: const EdgeInsets.only(top: 70),
             physics: const ScrollPhysics(),
             shrinkWrap: true,
