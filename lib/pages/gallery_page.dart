@@ -137,13 +137,32 @@ class _GalleryPageState extends State<GalleryPage> {
                   ),
                   trailing: [
                     AnimatedSwitcher(
-                      duration: Duration(milliseconds: 500),
+                      duration: Duration(milliseconds: 300),
                       transitionBuilder:
                           (Widget child, Animation<double> animation) {
+                        final rotationAnimation =
+                            Tween<double>(begin: 0.0, end: 0.5).animate(
+                          CurvedAnimation(
+                              parent: animation, curve: Curves.easeOut),
+                        );
+
+                        final scaleAnimation = TweenSequence([
+                          TweenSequenceItem(
+                            tween: Tween<double>(begin: 0.0, end: 1.1)
+                                .chain(CurveTween(curve: Curves.easeOut)),
+                            weight: 50,
+                          ),
+                          TweenSequenceItem(
+                            tween: Tween<double>(begin: 1.1, end: 1.0)
+                                .chain(CurveTween(curve: Curves.easeIn)),
+                            weight: 50,
+                          ),
+                        ]).animate(animation);
+
                         return RotationTransition(
-                          turns: animation,
+                          turns: rotationAnimation,
                           child: ScaleTransition(
-                            scale: animation,
+                            scale: scaleAnimation,
                             child: child,
                           ),
                         );
