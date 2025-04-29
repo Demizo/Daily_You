@@ -125,6 +125,34 @@ class _GalleryPageState extends State<GalleryPage> {
                   child: Icon(Icons.search_rounded),
                 ),
                 trailing: [
+                  AnimatedSwitcher(
+                    duration: Duration(milliseconds: 500),
+                    transitionBuilder:
+                        (Widget child, Animation<double> animation) {
+                      return RotationTransition(
+                        turns: animation,
+                        child: ScaleTransition(
+                          scale: animation,
+                          child: child,
+                        ),
+                      );
+                    },
+                    child: _searchController.text.isNotEmpty
+                        ? IconButton(
+                            visualDensity: VisualDensity(
+                                horizontal: VisualDensity.minimumDensity),
+                            key: ValueKey('clearButton'),
+                            icon: Icon(Icons.clear),
+                            onPressed: () {
+                              _searchController.clear();
+                              statsProvider.searchText = "";
+                              statsProvider.updateStats();
+                              setState(() {});
+                            },
+                          )
+                        : SizedBox.shrink(
+                            key: ValueKey('empty')), // Empty widget
+                  ),
                   Padding(
                     padding: const EdgeInsets.only(right: 8.0),
                     child: Text(AppLocalizations.of(context)!
@@ -145,10 +173,10 @@ class _GalleryPageState extends State<GalleryPage> {
                 ],
                 hintText: AppLocalizations.of(context)!.searchLogsHint,
                 padding: WidgetStateProperty.all(
-                    const EdgeInsets.only(left: 8, right: 8)),
+                    const EdgeInsets.only(left: 4, right: 4)),
                 elevation: WidgetStateProperty.all(1),
                 onChanged: (queryText) => EasyDebounce.debounce(
-                    'search-debounce', const Duration(milliseconds: 500), () {
+                    'search-debounce', const Duration(milliseconds: 300), () {
                   statsProvider.searchText = queryText;
                   statsProvider.updateStats();
                 }),
