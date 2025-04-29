@@ -16,7 +16,6 @@ import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/pages/entry_detail_page.dart';
 import 'package:daily_you/pages/edit_entry_page.dart';
 import 'package:provider/provider.dart';
-import 'package:scroll_to_hide/scroll_to_hide.dart';
 import '../widgets/entry_card_widget.dart';
 
 class HomePage extends StatefulWidget {
