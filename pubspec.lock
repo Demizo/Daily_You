@@ -689,14 +689,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.1"
-  scroll_to_hide:
-    dependency: "direct main"
-    description:
-      name: scroll_to_hide
-      sha256: "006dcfea9a21e10adc51365c9079abfd0d3d4cf380f0927c460cb61f3f25f8a7"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.2.0"
   scroll_to_index:
     dependency: transitive
     description:

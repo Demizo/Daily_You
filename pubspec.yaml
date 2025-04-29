@@ -53,7 +53,6 @@ dependencies:
   saf_stream: ^0.11.1
   archive: ^4.0.5
   mime: ^2.0.0
-  scroll_to_hide: ^2.2.0
   extended_image: ^9.1.0
 dev_dependencies:
   flutter_lints: ^5.0.0
