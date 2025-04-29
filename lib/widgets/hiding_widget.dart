@@ -55,12 +55,20 @@ class _HidingWidgetState extends State<HidingWidget>
   }
 
   void _listen() {
+    if (!mounted) return;
+
     if (widget.focusNode == null || !widget.focusNode!.hasFocus) {
       final direction = widget.scrollController.position.userScrollDirection;
       if (direction == ScrollDirection.forward) {
-        _controller.reverse(); // Show
+        if (_controller.status != AnimationStatus.reverse &&
+            _controller.status != AnimationStatus.dismissed) {
+          _controller.reverse();
+        }
       } else if (direction == ScrollDirection.reverse) {
-        _controller.forward(); // Hide
+        if (_controller.status != AnimationStatus.forward &&
+            _controller.status != AnimationStatus.completed) {
+          _controller.forward();
+        }
       }
     }
   }
