@@ -899,6 +899,18 @@ class _SettingsPageState extends State<SettingsPage> {
                           await NotificationManager.instance
                               .startScheduledDailyReminders();
                         }),
+                  if (Platform.isAndroid &&
+                      configProvider.get(ConfigKey.dailyReminders))
+                    SettingsToggle(
+                        title: AppLocalizations.of(context)!
+                            .settingsAlwaysSendReminderTitle,
+                        hint: AppLocalizations.of(context)!
+                            .settingsAlwaysSendReminderDescription,
+                        settingsKey: ConfigKey.alwaysRemind,
+                        onChanged: (value) async {
+                          await configProvider.set(
+                              ConfigKey.alwaysRemind, value);
+                        }),
                   if (Platform.isAndroid) const Divider(),
                   SettingsHeader(
                       text:

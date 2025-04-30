@@ -256,4 +256,16 @@ class StatsProvider with ChangeNotifier {
       prevEntry = entry;
     }
   }
+
+  Entry? getEntryForToday() {
+    Entry? todayEntry;
+    if (entries.isNotEmpty && TimeManager.isToday(entries.first.timeCreate)) {
+      todayEntry = entries.first;
+    }
+    return todayEntry;
+  }
+
+  List<EntryImage> getImagesForEntry(Entry entry) {
+    return images.where((img) => img.entryId == entry.id!).toList();
+  }
 }

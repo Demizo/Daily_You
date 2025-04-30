@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/flashback_manager.dart';
 import 'package:daily_you/models/flashback.dart';
+import 'package:daily_you/models/image.dart';
 import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/stats_provider.dart';
 import 'package:daily_you/time_manager.dart';
@@ -46,10 +47,13 @@ class _HomePageState extends State<HomePage> {
     _scrollController.dispose();
   }
 
-  Future<void> logToday() async {
-    await Navigator.of(context).push(MaterialPageRoute(
-      builder: (context) => const AddEditEntryPage(),
-    ));
+  Future<void> addOrEditTodayEntry(
+      Entry? todayEntry, List<EntryImage> todayImages, bool openCamera) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+          builder: (context) => AddEditEntryPage(
+              entry: todayEntry, openCamera: openCamera, images: todayImages)),
+    );
   }
 
   Future<void> setViewMode() async {
@@ -63,12 +67,15 @@ class _HomePageState extends State<HomePage> {
       if (Platform.isAndroid) {
         var launchDetails = await NotificationManager.instance.notifications
             .getNotificationAppLaunchDetails();
+
         if (NotificationManager.instance.justLaunched &&
-            launchDetails?.notificationResponse?.id == 0 &&
-            await EntriesDatabase.instance.getEntryForDate(DateTime.now()) ==
-                null) {
+            launchDetails?.notificationResponse?.id == 0) {
           NotificationManager.instance.justLaunched = false;
-          await logToday();
+          Entry? todayEntry = StatsProvider.instance.getEntryForToday();
+          List<EntryImage> todayImages = todayEntry != null
+              ? StatsProvider.instance.getImagesForEntry(todayEntry)
+              : [];
+          await addOrEditTodayEntry(todayEntry, todayImages, false);
         }
       }
     }
@@ -77,15 +84,12 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final statsProvider = Provider.of<StatsProvider>(context);
-    Entry? todayEntry;
+    Entry? todayEntry = statsProvider.getEntryForToday();
+    List<EntryImage> todayImages =
+        todayEntry != null ? statsProvider.getImagesForEntry(todayEntry) : [];
 
     List<Flashback> flashbacks =
-        FlashbackManager.getFlashbacks(context, StatsProvider.instance.entries);
-
-    var entries = statsProvider.entries;
-    if (entries.isNotEmpty && TimeManager.isToday(entries.first.timeCreate)) {
-      todayEntry = entries.first;
-    }
+        FlashbackManager.getFlashbacks(context, statsProvider.entries);
 
     return Center(
       child: Stack(alignment: Alignment.bottomCenter, children: [
@@ -107,18 +111,7 @@ class _HomePageState extends State<HomePage> {
                       size: 24,
                     ),
                     onPressed: () async {
-                      await Navigator.of(context).push(
-                        MaterialPageRoute(
-                            builder: (context) => AddEditEntryPage(
-                                entry: todayEntry,
-                                openCamera: true,
-                                images: todayEntry == null
-                                    ? []
-                                    : StatsProvider.instance.images
-                                        .where((img) =>
-                                            img.entryId == todayEntry!.id!)
-                                        .toList())),
-                      );
+                      await addOrEditTodayEntry(todayEntry, todayImages, true);
                     },
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.all(8),
@@ -137,15 +130,7 @@ class _HomePageState extends State<HomePage> {
                     size: 28,
                   ),
                   onPressed: () async {
-                    await Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => AddEditEntryPage(
-                            entry: todayEntry,
-                            images: todayEntry == null
-                                ? []
-                                : StatsProvider.instance.images
-                                    .where(
-                                        (img) => img.entryId == todayEntry!.id!)
-                                    .toList())));
+                    await addOrEditTodayEntry(todayEntry, todayImages, false);
                   },
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.all(16),

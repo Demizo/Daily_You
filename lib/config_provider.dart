@@ -39,6 +39,7 @@ class ConfigKey {
   static const String reminderEndMinute = "reminderEndMinute";
   static const String defaultTemplate = "defaultTemplate";
   static const String imageQuality = "imageQuality";
+  static const String alwaysRemind = "alwaysRemind";
 }
 
 class ConfigProvider with ChangeNotifier {
@@ -79,6 +80,7 @@ class ConfigProvider with ChangeNotifier {
     ConfigKey.reminderEndMinute: 0,
     ConfigKey.defaultTemplate: -1,
     ConfigKey.imageQuality: 90,
+    ConfigKey.alwaysRemind: false,
   };
 
   static final moodValueFieldMapping = {
