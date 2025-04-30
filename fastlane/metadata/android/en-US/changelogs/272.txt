@@ -1,0 +1,8 @@
+Daily You v2.7.2 has arrived! Here are the changes:
+
+• Added an option to send reminders even if a log for the day has already been started
+• The search bar now automatically hides when scrolling
+• Search filters now persist while the app is open 
+• Added a button to clear the search text
+• Minor UI improvements
+• Updated translations
