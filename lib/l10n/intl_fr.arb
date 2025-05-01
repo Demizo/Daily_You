@@ -208,5 +208,9 @@
   "logFormatDescription": "Le format d’un autre application peut ne pas prendre en charge toutes les fonctionnalités. Cela n’affectera pas les journaux existants !",
   "@logFormatDescription": {},
   "settingsDeleteAllLogsPrompt": "Écrivez '{prompt}' pour confirmer. Cette action est irréversible !",
-  "@settingsDeleteAllLogsPrompt": {}
+  "@settingsDeleteAllLogsPrompt": {},
+  "settingsAlwaysSendReminderTitle": "Toujours envoyer un rappel",
+  "@settingsAlwaysSendReminderTitle": {},
+  "settingsAlwaysSendReminderDescription": "Envoyer un rappel même une entrée est déjà commencée",
+  "@settingsAlwaysSendReminderDescription": {}
 }
