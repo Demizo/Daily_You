@@ -31,14 +31,14 @@ void callbackDispatcher() async {
 
     await flutterLocalNotificationsPlugin.initialize(
         const InitializationSettings(
-            android: AndroidInitializationSettings('@mipmap/ic_reminder_icon'),
+            android: AndroidInitializationSettings('@drawable/ic_notification'),
             linux:
                 LinuxInitializationSettings(defaultActionName: 'Log Today')));
 
     var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
       'daily_you_reminder',
       'Log Reminder',
-      icon: '@mipmap/ic_reminder_icon',
+      icon: '@drawable/ic_notification',
       importance: Importance.defaultImportance,
       priority: Priority.defaultPriority,
     );

@@ -67,6 +67,7 @@ icons_launcher:
     android:
       enable: true
       image_path: "assets/logo_rectangle.png"
+      notification_image: "assets/logo_notification.png"
       adaptive_background_image: "assets/logo_background.png"
       adaptive_foreground_image: "assets/logo_foreground.png"
       adaptive_round_image: "assets/logo.png"

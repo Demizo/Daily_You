@@ -9,7 +9,7 @@
         android:label="Daily You"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
-	android:roundIcon="@mipmap/ic_launcher_rounded"
+	android:roundIcon="@mipmap/ic_launcher_round"
 	android:localeConfig="@xml/locales_config">
         <service
             android:name="dev.fluttercommunity.plus.androidalarmmanager.AlarmService"
@@ -61,6 +61,6 @@
             android:value="2" />
         <meta-data
           android:name="com.google.firebase.messaging.default_notification_icon"
-          android:resource="@mipmap/ic_reminder_icon" />
+          android:resource="@drawable/ic_notification" />
     </application>
 </manifest>

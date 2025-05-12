@@ -33,7 +33,7 @@ class NotificationManager {
     _notifications = flutterLocalNotificationsPlugin;
 
     await _notifications!.initialize(const InitializationSettings(
-        android: AndroidInitializationSettings('@mipmap/ic_reminder_icon'),
+        android: AndroidInitializationSettings('@drawable/ic_notification'),
         linux: LinuxInitializationSettings(defaultActionName: 'Log Today')));
   }
 
@@ -71,13 +71,15 @@ class NotificationManager {
   }
 
   Future<void> dismissReminderNotification() async {
-    var activeNotifications = await NotificationManager.instance.notifications.getActiveNotifications();
+    var activeNotifications = await NotificationManager.instance.notifications
+        .getActiveNotifications();
     for (var notif in activeNotifications) {
       if (notif.id == 0) {
-	await NotificationManager.instance.notifications.cancel(0);
+        await NotificationManager.instance.notifications.cancel(0);
       }
     }
   }
+
   Future<void> stopDailyReminders() async {
     await AndroidAlarmManager.cancel(0);
     await dismissReminderNotification();
