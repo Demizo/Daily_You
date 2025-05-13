@@ -1029,7 +1029,8 @@ class _SettingsPageState extends State<SettingsPage> {
                         await _showRestoreWarning();
                       }),
                   SettingsIconAction(
-                      title: AppLocalizations.of(context)!.settingsImport,
+                      title: AppLocalizations.of(context)!
+                          .settingsImportFromAnotherApp,
                       icon: Icon(Icons.download_rounded),
                       onPressed: () async {
                         await _showImportSelectionPopup();

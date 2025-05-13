@@ -185,6 +185,8 @@
   "@exportImages": {},
   "settingsImport": "Import",
   "@settingsImport": {},
+  "settingsImportFromAnotherApp": "Import From Another App",
+  "@settingsImportFromAnotherApp": {},
   "importLogs": "Import Logs",
   "@importLogs": {},
   "importImages": "Import Images",
