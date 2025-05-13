@@ -1,3 +1,4 @@
+import 'package:daily_you/widgets/punch_scale.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
 
@@ -23,7 +24,10 @@ class _EntryMoodPickerState extends State<EntryMoodPicker> {
     return GestureDetector(
       child: Column(
         children: [
-          MoodIcon(moodValue: index, size: 24),
+          PunchScale(
+            trigger: index == _mood,
+            child: MoodIcon(moodValue: index, size: 24),
+          ),
           SizedBox(
             height: 24,
             child: Radio(
