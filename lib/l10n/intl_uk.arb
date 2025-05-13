@@ -208,5 +208,7 @@
   "settingsAlwaysSendReminderTitle": "Завжди надсилати нагадування",
   "@settingsAlwaysSendReminderTitle": {},
   "settingsAlwaysSendReminderDescription": "Надсилати нагадування, навіть якщо ведення журналу вже розпочато",
-  "@settingsAlwaysSendReminderDescription": {}
+  "@settingsAlwaysSendReminderDescription": {},
+  "settingsImportFromAnotherApp": "Імпорт з іншої програми",
+  "@settingsImportFromAnotherApp": {}
 }
