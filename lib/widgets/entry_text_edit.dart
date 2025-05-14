@@ -142,7 +142,7 @@ class _EntryTextEditorState extends State<EntryTextEditor> {
       focusNode: _focusNode,
       scrollController: _scrollController,
       minLines: 5,
-      maxLines: 10,
+      maxLines: widget.showTemplatesButton ? null : 10,
       spellCheckConfiguration: SpellCheckConfiguration(
           spellCheckService: DefaultSpellCheckService()),
       textCapitalization: TextCapitalization.sentences,
