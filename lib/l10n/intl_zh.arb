@@ -212,5 +212,7 @@
   "settingsAlwaysSendReminderTitle": "总是发送提醒",
   "@settingsAlwaysSendReminderTitle": {},
   "settingsAlwaysSendReminderDescription": "即使日志已经开始，也发送提醒",
-  "@settingsAlwaysSendReminderDescription": {}
+  "@settingsAlwaysSendReminderDescription": {},
+  "settingsImportFromAnotherApp": "从其他应用程序导入",
+  "@settingsImportFromAnotherApp": {}
 }
