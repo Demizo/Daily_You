@@ -208,5 +208,7 @@
   "settingsAlwaysSendReminderTitle": "Send altid påmindelse",
   "@settingsAlwaysSendReminderTitle": {},
   "settingsAlwaysSendReminderDescription": "Send påmindelse, selvom en log allerede er startet",
-  "@settingsAlwaysSendReminderDescription": {}
+  "@settingsAlwaysSendReminderDescription": {},
+  "settingsImportFromAnotherApp": "Importér fra en anden app",
+  "@settingsImportFromAnotherApp": {}
 }
