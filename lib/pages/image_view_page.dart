@@ -71,7 +71,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
                       initGestureConfigHandler: (state) {
                         return GestureConfig(
                             minScale: 0.5,
-                            maxScale: 4,
+                            maxScale: 10,
                             initialScale: 1,
                             inPageView: true);
                       },
