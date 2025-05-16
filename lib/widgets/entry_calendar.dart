@@ -6,11 +6,21 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-class EntryCalendar extends StatelessWidget {
+class EntryCalendar extends StatefulWidget {
   const EntryCalendar({super.key});
 
   @override
+  State<EntryCalendar> createState() => _EntryCalendarState();
+}
+
+class _EntryCalendarState extends State<EntryCalendar>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     final statsProvider = Provider.of<StatsProvider>(context);
     return TableCalendar(
       locale: WidgetsBinding.instance.platformDispatcher.locale.toString(),
