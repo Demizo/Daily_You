@@ -119,6 +119,8 @@
   "@settingsAlwaysSendReminderTitle": {},
   "settingsAlwaysSendReminderDescription": "Send reminder even if a log was already started",
   "@settingsAlwaysSendReminderDescription": {},
+  "settingsCustomizeNotificationTitle": "Customize Notifications",
+  "@settingsCustomizeNotificationTitle": {},
   "settingsTemplatesTitle": "Templates",
   "@settingsTemplatesTitle": {},
   "settingsDefaultTemplate": "Default Template",

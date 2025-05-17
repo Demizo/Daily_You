@@ -922,6 +922,14 @@ class _SettingsPageState extends State<SettingsPage> {
                           await configProvider.set(
                               ConfigKey.alwaysRemind, value);
                         }),
+                  if (Platform.isAndroid &&
+                      configProvider.get(ConfigKey.dailyReminders))
+                    SettingsIconAction(
+                        title: AppLocalizations.of(context)!
+                            .settingsCustomizeNotificationTitle,
+                        icon: Icon(Icons.edit_notifications_rounded),
+                        onPressed: () => AppSettings.openAppSettings(
+                            type: AppSettingsType.notification)),
                   if (Platform.isAndroid) const Divider(),
                   SettingsHeader(
                       text:
