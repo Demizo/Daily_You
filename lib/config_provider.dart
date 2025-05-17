@@ -69,7 +69,7 @@ class ConfigProvider with ChangeNotifier {
     ConfigKey.verySadIcon: '😔',
     ConfigKey.noMoodIcon: '?',
     ConfigKey.followSystemColor: true,
-    ConfigKey.accentColor: 0xff01d3ef,
+    ConfigKey.accentColor: 0xff62A0EA,
     ConfigKey.dailyReminders: false,
     ConfigKey.setReminderTime: false,
     ConfigKey.scheduledReminderHour: 12,
