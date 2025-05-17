@@ -207,6 +207,8 @@
   "@settingsDeleteAllLogsDescription": {},
   "settingsDeleteAllLogsPrompt": "Enter '{prompt}' to confirm. This cannot be undone!",
   "@settingsDeleteAllLogsPrompt": {},
+  "settingsLanguageTitle": "Language",
+  "@settingsLanguageTitle": {},
   "settingsAboutTitle": "About",
   "@settingsAboutTitle": {},
   "settingsVersion": "Version",

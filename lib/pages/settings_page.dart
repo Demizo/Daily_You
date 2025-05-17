@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:app_settings/app_settings.dart';
 import 'package:daily_you/config_provider.dart';
+import 'package:daily_you/device_info_service.dart';
 import 'package:daily_you/import_utils.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:daily_you/notification_manager.dart';
@@ -776,6 +778,15 @@ class _SettingsPageState extends State<SettingsPage> {
                         themeProvider.themeMode = themeMode;
                         configProvider.set(ConfigKey.theme, newValue);
                       }),
+                  if (Platform.isAndroid &&
+                      DeviceInfoService().androidSdk != null &&
+                      DeviceInfoService().androidSdk! >= 33)
+                    SettingsIconAction(
+                        title:
+                            AppLocalizations.of(context)!.settingsLanguageTitle,
+                        icon: Icon(Icons.language_rounded),
+                        onPressed: () => AppSettings.openAppSettings(
+                            type: AppSettingsType.appLocale)),
                   SettingsToggle(
                       title: AppLocalizations.of(context)!
                           .settingsUseSystemAccentColor,

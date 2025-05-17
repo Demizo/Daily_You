@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:daily_you/config_provider.dart';
+import 'package:daily_you/device_info_service.dart';
 import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/pages/launch_page.dart';
@@ -74,6 +75,9 @@ void main() async {
 
   final themeProvider = ThemeModeProvider();
   await themeProvider.initializeThemeFromConfig();
+
+  // Get current device info
+  await DeviceInfoService().init();
 
   // Notification only supported on android
   if (Platform.isAndroid) {
