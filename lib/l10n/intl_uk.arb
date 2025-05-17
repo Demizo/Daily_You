@@ -210,5 +210,9 @@
   "settingsAlwaysSendReminderDescription": "Надсилати нагадування, навіть якщо ведення журналу вже розпочато",
   "@settingsAlwaysSendReminderDescription": {},
   "settingsImportFromAnotherApp": "Імпорт з іншої програми",
-  "@settingsImportFromAnotherApp": {}
+  "@settingsImportFromAnotherApp": {},
+  "settingsLanguageTitle": "Мова",
+  "@settingsLanguageTitle": {},
+  "settingsCustomizeNotificationTitle": "Налаштувати сповіщення",
+  "@settingsCustomizeNotificationTitle": {}
 }
