@@ -214,5 +214,9 @@
   "settingsAlwaysSendReminderDescription": "即使日記已經開始，仍需發送提醒",
   "@settingsAlwaysSendReminderDescription": {},
   "settingsImportFromAnotherApp": "從其他應用程式匯入",
-  "@settingsImportFromAnotherApp": {}
+  "@settingsImportFromAnotherApp": {},
+  "settingsCustomizeNotificationTitle": "自訂通知",
+  "@settingsCustomizeNotificationTitle": {},
+  "settingsLanguageTitle": "語言",
+  "@settingsLanguageTitle": {}
 }
