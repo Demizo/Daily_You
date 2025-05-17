@@ -8,7 +8,7 @@ class ThemeModeProvider with ChangeNotifier {
   ThemeMode _themeMode = ThemeMode.system;
   ThemeMode get themeMode => _themeMode;
 
-  Color _accentColor = const Color(0xff01d3ef);
+  Color _accentColor = const Color(0xff62A0EA);
   Color get accentColor => _accentColor;
 
   set themeMode(ThemeMode value) {
