@@ -204,5 +204,11 @@
   "licenseGPLv3": "GPL-3.0",
   "@licenseGPLv3": {},
   "settingsSourceCode": "Kildekode",
-  "@settingsSourceCode": {}
+  "@settingsSourceCode": {},
+  "settingsAlwaysSendReminderTitle": "Send altid påmindelse",
+  "@settingsAlwaysSendReminderTitle": {},
+  "settingsAlwaysSendReminderDescription": "Send påmindelse, selvom en log allerede er startet",
+  "@settingsAlwaysSendReminderDescription": {},
+  "settingsImportFromAnotherApp": "Importér fra en anden app",
+  "@settingsImportFromAnotherApp": {}
 }
