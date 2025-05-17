@@ -36,9 +36,14 @@ void callbackDispatcher() async {
             linux:
                 LinuxInitializationSettings(defaultActionName: 'Log Today')));
 
-    var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
+    // Localized notification text is stored in SharedPreferences upon startup
+    var prefs = await SharedPreferences.getInstance();
+    var title = prefs.getString('dailyReminderTitle');
+    var description = prefs.getString('dailyReminderDescription');
+
+    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
       'daily_you_reminder',
-      'Log Reminder',
+      title ?? "Log Today!",
       icon: '@drawable/ic_notification',
       importance: Importance.defaultImportance,
       priority: Priority.defaultPriority,
@@ -47,11 +52,6 @@ void callbackDispatcher() async {
     var platformChannelSpecifics = NotificationDetails(
       android: androidPlatformChannelSpecifics,
     );
-
-    // Localized notification text is stored in SharedPreferences upon startup
-    var prefs = await SharedPreferences.getInstance();
-    var title = prefs.getString('dailyReminderTitle');
-    var description = prefs.getString('dailyReminderDescription');
 
     if (title != null && description != null) {
       await flutterLocalNotificationsPlugin.show(
