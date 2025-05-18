@@ -212,5 +212,11 @@
   "settingsAlwaysSendReminderTitle": "Toujours envoyer un rappel",
   "@settingsAlwaysSendReminderTitle": {},
   "settingsAlwaysSendReminderDescription": "Envoyer un rappel même une entrée est déjà commencée",
-  "@settingsAlwaysSendReminderDescription": {}
+  "@settingsAlwaysSendReminderDescription": {},
+  "settingsImportFromAnotherApp": "Import d’une autre application",
+  "@settingsImportFromAnotherApp": {},
+  "settingsLanguageTitle": "Langue",
+  "@settingsLanguageTitle": {},
+  "settingsCustomizeNotificationTitle": "Personnaliser les notifications",
+  "@settingsCustomizeNotificationTitle": {}
 }
