@@ -20,7 +20,8 @@ class SettingsDropdown<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     final configProvider = Provider.of<ConfigProvider>(context);
     return Padding(
-      padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+      padding:
+          const EdgeInsets.only(top: 8.0, bottom: 8.0, left: 16.0, right: 16.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
