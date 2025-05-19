@@ -214,5 +214,15 @@
   "settingsLanguageTitle": "Мова",
   "@settingsLanguageTitle": {},
   "settingsCustomizeNotificationTitle": "Налаштувати сповіщення",
-  "@settingsCustomizeNotificationTitle": {}
+  "@settingsCustomizeNotificationTitle": {},
+  "settingsTranslateCallToAction": "Кожен повинен мати доступ до щоденника!",
+  "@settingsTranslateCallToAction": {},
+  "settingsHelpTranslate": "Допомога з перекладом",
+  "@settingsHelpTranslate": {},
+  "settingsMadeWithLove": "Зроблено з ❤️",
+  "@settingsMadeWithLove": {},
+  "settingsBackupRestoreTitle": "Резервне копіювання та відновлення",
+  "@settingsBackupRestoreTitle": {},
+  "settingsConsiderSupporting": "розглянути можливість підтримки",
+  "@settingsConsiderSupporting": {}
 }
