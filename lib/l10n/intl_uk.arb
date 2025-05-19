@@ -204,5 +204,15 @@
   "settingsBackup": "Резервна копія",
   "@settingsBackup": {},
   "imageQualityLow": "Низька",
-  "@imageQualityLow": {}
+  "@imageQualityLow": {},
+  "settingsAlwaysSendReminderTitle": "Завжди надсилати нагадування",
+  "@settingsAlwaysSendReminderTitle": {},
+  "settingsAlwaysSendReminderDescription": "Надсилати нагадування, навіть якщо ведення журналу вже розпочато",
+  "@settingsAlwaysSendReminderDescription": {},
+  "settingsImportFromAnotherApp": "Імпорт з іншої програми",
+  "@settingsImportFromAnotherApp": {},
+  "settingsLanguageTitle": "Мова",
+  "@settingsLanguageTitle": {},
+  "settingsCustomizeNotificationTitle": "Налаштувати сповіщення",
+  "@settingsCustomizeNotificationTitle": {}
 }
