@@ -1,0 +1,11 @@
+Daily You v2.8.0 has arrived! This one is all about polish:
+
+• Refreshed app icon and branding
+• Added an animation to the mood picker
+• Reorganized settings into separate pages
+• Added app language setting on supported devices
+• Added customize notifications option
+• Removed limit on visible lines when editing log text
+• Fixed notification not dismissing when editing the current day's entry
+• Minor UI fixes and improvements
+• Updated translations
