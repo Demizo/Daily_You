@@ -218,5 +218,15 @@
   "settingsCustomizeNotificationTitle": "自訂通知",
   "@settingsCustomizeNotificationTitle": {},
   "settingsLanguageTitle": "語言",
-  "@settingsLanguageTitle": {}
+  "@settingsLanguageTitle": {},
+  "settingsTranslateCallToAction": "每個人都應該有權使用日記！",
+  "@settingsTranslateCallToAction": {},
+  "settingsHelpTranslate": "協助翻譯",
+  "@settingsHelpTranslate": {},
+  "settingsConsiderSupporting": "考慮支持",
+  "@settingsConsiderSupporting": {},
+  "settingsMadeWithLove": "用❤️製作",
+  "@settingsMadeWithLove": {},
+  "settingsBackupRestoreTitle": "備份與還原",
+  "@settingsBackupRestoreTitle": {}
 }
