@@ -42,7 +42,7 @@ Join a community that believes **your journal should be yours**, not a product.
 [<img src="https://github.com/machiav3lli/oandbackupx/blob/034b226cea5c1b30eb4f6a6f313e4dadcbb0ece4/badge_github.png" alt="Get it on GitHub" height="80">](https://github.com/Demizo/Daily_You/releases/latest)
 
 ## Migrate From Another App
-Are you coming from another app? **Daily You** supports migrating from other apps. Simply go to `Settings>Import` and select your previous app. Feel free to request any apps not currently listed. **Note:** Imports from some apps may not be one-to-one since **Daily You** may have different features.
+Are you coming from another app? **Daily You** supports migrating from other apps. Simply go to `Settings > Backup & Restore > Import From Another App` and select your previous app. Feel free to request any apps not currently listed. **Note:** Imports from some apps may not be one-to-one since **Daily You** may have different features.
 
 ## Languages 
 Everyone should have access to a journal! **Daily You** uses [Weblate](https://weblate.org) to easily manage translations. If you would like to help translate the app, please visit [the Daily You project on Weblate](https://hosted.weblate.org/projects/daily-you/), thank you!
