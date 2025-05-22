@@ -61,6 +61,7 @@ class _MobileScaffoldState extends State<MobileScaffold> {
           icon: const Icon(Icons.settings_rounded),
           onPressed: () async {
             await Navigator.of(context).push(MaterialPageRoute(
+              allowSnapshotting: false,
               builder: (context) => const SettingsPage(),
             ));
           },

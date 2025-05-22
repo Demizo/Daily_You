@@ -30,6 +30,7 @@ class SettingsCategory extends StatelessWidget {
       minVerticalPadding: 18,
       onTap: () async {
         await Navigator.of(context).push(MaterialPageRoute(
+          allowSnapshotting: false,
           builder: (context) => page,
         ));
       },

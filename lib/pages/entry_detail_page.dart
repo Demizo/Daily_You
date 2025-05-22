@@ -86,6 +86,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
               icon: const Icon(Icons.edit_rounded),
               onPressed: () async {
                 await Navigator.of(context).push(MaterialPageRoute(
+                  allowSnapshotting: false,
                   fullscreenDialog: true,
                   builder: (context) =>
                       AddEditEntryPage(entry: entry, images: images),
@@ -187,6 +188,7 @@ class EntryDetails extends StatelessWidget {
                                   .getImgBytes(images[index].imgPath) !=
                               null) {
                             await Navigator.of(context).push(MaterialPageRoute(
+                              allowSnapshotting: false,
                               fullscreenDialog: true,
                               builder: (context) => ImageViewPage(
                                 images: images,
@@ -216,6 +218,7 @@ class EntryDetails extends StatelessWidget {
                           .getImgBytes(images.first.imgPath) !=
                       null) {
                     await Navigator.of(context).push(MaterialPageRoute(
+                      allowSnapshotting: false,
                       fullscreenDialog: true,
                       builder: (context) => ImageViewPage(
                         images: images,

@@ -54,8 +54,8 @@ class _LaunchPageState extends State<LaunchPage> {
 
   Future<void> _nextPage() async {
     await StatsProvider.instance.updateStats();
-    await Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => widget.nextPage));
+    await Navigator.of(context).pushReplacement(MaterialPageRoute(
+        builder: (context) => widget.nextPage, allowSnapshotting: false));
   }
 
   @override

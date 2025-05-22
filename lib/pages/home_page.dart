@@ -51,6 +51,7 @@ class _HomePageState extends State<HomePage> {
       Entry? todayEntry, List<EntryImage> todayImages, bool openCamera) async {
     await Navigator.of(context).push(
       MaterialPageRoute(
+          allowSnapshotting: false,
           builder: (context) => AddEditEntryPage(
               entry: todayEntry, openCamera: openCamera, images: todayImages)),
     );
@@ -199,6 +200,7 @@ class _HomePageState extends State<HomePage> {
                   return GestureDetector(
                       onTap: () async {
                         await Navigator.of(context).push(MaterialPageRoute(
+                          allowSnapshotting: false,
                           builder: (context) => EntryDetailPage(
                               filtered: false,
                               index: StatsProvider.instance

@@ -244,6 +244,7 @@ class _GalleryPageState extends State<GalleryPage> {
               return GestureDetector(
                 onTap: () async {
                   await Navigator.of(context).push(MaterialPageRoute(
+                      allowSnapshotting: false,
                       builder: (context) => EntryDetailPage(
                             filtered: true,
                             index: index,
