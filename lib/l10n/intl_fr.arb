@@ -191,7 +191,7 @@
   "@restoringBackupStatus": {},
   "backupErrorDescription": "Échec de la création de la sauvegarde !",
   "@backupErrorDescription": {},
-  "restoreErrorDescription": "Échec de la création de la sauvegarde !",
+  "restoreErrorDescription": "Échec de la restauration de la sauvegarde !",
   "@restoreErrorDescription": {},
   "settingsBackup": "Sauvegarde",
   "@settingsBackup": {},
@@ -218,5 +218,15 @@
   "settingsLanguageTitle": "Langue",
   "@settingsLanguageTitle": {},
   "settingsCustomizeNotificationTitle": "Personnaliser les notifications",
-  "@settingsCustomizeNotificationTitle": {}
+  "@settingsCustomizeNotificationTitle": {},
+  "settingsBackupRestoreTitle": "Sauvegarde et restauration",
+  "@settingsBackupRestoreTitle": {},
+  "settingsHelpTranslate": "Aider à traduire",
+  "@settingsHelpTranslate": {},
+  "settingsMadeWithLove": "Fait avec ❤️",
+  "@settingsMadeWithLove": {},
+  "settingsConsiderSupporting": "pensez à soutenir",
+  "@settingsConsiderSupporting": {},
+  "settingsTranslateCallToAction": "Tout le monde devrait avoir accès à un journal !",
+  "@settingsTranslateCallToAction": {}
 }

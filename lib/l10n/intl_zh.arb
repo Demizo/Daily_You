@@ -214,5 +214,19 @@
   "settingsAlwaysSendReminderDescription": "即使日志已经开始，也发送提醒",
   "@settingsAlwaysSendReminderDescription": {},
   "settingsImportFromAnotherApp": "从其他应用程序导入",
-  "@settingsImportFromAnotherApp": {}
+  "@settingsImportFromAnotherApp": {},
+  "settingsCustomizeNotificationTitle": "自定义通知",
+  "@settingsCustomizeNotificationTitle": {},
+  "settingsBackupRestoreTitle": "备份与恢复",
+  "@settingsBackupRestoreTitle": {},
+  "settingsHelpTranslate": "协助翻译",
+  "@settingsHelpTranslate": {},
+  "settingsLanguageTitle": "语言",
+  "@settingsLanguageTitle": {},
+  "settingsMadeWithLove": "用❤️制作",
+  "@settingsMadeWithLove": {},
+  "settingsConsiderSupporting": "考虑支持",
+  "@settingsConsiderSupporting": {},
+  "settingsTranslateCallToAction": "每个人都应该有权使用日记！",
+  "@settingsTranslateCallToAction": {}
 }
