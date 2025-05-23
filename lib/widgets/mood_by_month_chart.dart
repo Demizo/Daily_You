@@ -195,12 +195,17 @@ class _MoodByMonthChartState extends State<MoodByMonthChart> {
             showTitles: true,
             getTitlesWidget: (value, _) => Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text(_formatMonth(
-                  value >= 0 && value < keys.length ? keys[value.toInt()] : '',
-                  context)),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(_formatMonth(
+                    value >= 0 && value < keys.length
+                        ? keys[value.toInt()]
+                        : '',
+                    context)),
+              ),
             ),
             interval: 1,
-            reservedSize: 36,
+            reservedSize: 38,
           )),
           leftTitles: AxisTitles(
             sideTitles: SideTitles(
