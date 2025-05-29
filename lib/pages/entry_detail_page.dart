@@ -203,8 +203,7 @@ class EntryDetails extends StatelessWidget {
             if (images.isNotEmpty && images.length == 1)
               GestureDetector(
                 child: Center(
-                  child: Container(
-                    alignment: Alignment.center,
+                  child: SizedBox(
                     height: 220,
                     width: 220,
                     child: Card(
