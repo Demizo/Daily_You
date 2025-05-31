@@ -17,6 +17,7 @@ import 'package:daily_you/theme_mode_provider.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:statsfl/statsfl.dart';
 import 'package:time_range_picker/time_range_picker.dart';
 import 'package:provider/provider.dart';
 
@@ -164,64 +165,67 @@ class _MainAppState extends State<MainApp> {
   Widget build(BuildContext context) {
     final themeModeProvider = Provider.of<ThemeModeProvider>(context);
 
-    return GestureDetector(
-        onTap: () {
-          FocusManager.instance.primaryFocus?.unfocus();
-        },
-        child: MaterialApp(
-            onGenerateTitle: (context) =>
-                AppLocalizations.of(context)!.appTitle,
-            title: 'Daily You',
-            themeMode: themeModeProvider.themeMode,
-            debugShowCheckedModeBanner: false,
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: [
-              Locale("en"),
-              ...AppLocalizations.supportedLocales
-                  .where((locale) => locale.languageCode != "en")
-            ],
-            theme: ThemeData(
-              useMaterial3: true,
-              colorScheme: ColorScheme.fromSeed(
-                  seedColor: themeModeProvider.accentColor,
-                  brightness: Brightness.light),
-            ),
-            darkTheme:
-                (ConfigProvider.instance.get(ConfigKey.theme) == 'amoled')
-                    ? ThemeData(
-                        useMaterial3: true,
-                        colorScheme: ColorScheme.fromSeed(
-                          seedColor: themeModeProvider.accentColor,
-                          brightness: Brightness.dark,
-                          surfaceContainerLowest: Colors.black,
-                          surfaceContainerLow: Colors.black,
-                          surfaceContainerHighest: Colors.black,
-                          surfaceContainerHigh: Colors.black,
-                          surfaceBright: Colors.black,
-                          surfaceDim: Colors.black,
-                          surface: Colors.black,
-                          surfaceContainer: Colors.black,
-                          onSurface: Colors.white,
-                          surfaceTint: Colors.black,
-                          primaryContainer: Colors.black,
-                          secondaryContainer: Colors.black,
-                          tertiaryContainer: Colors.black,
-                          inverseSurface: Colors.black,
-                          inversePrimary: Colors.black,
-                          scrim: Colors.black,
-                        ),
-                        scaffoldBackgroundColor: Colors.black)
-                    : ThemeData(
-                        useMaterial3: true,
-                        colorScheme: ColorScheme.fromSeed(
+    return StatsFl(
+      isEnabled: false,
+      child: GestureDetector(
+          onTap: () {
+            FocusManager.instance.primaryFocus?.unfocus();
+          },
+          child: MaterialApp(
+              onGenerateTitle: (context) =>
+                  AppLocalizations.of(context)!.appTitle,
+              title: 'Daily You',
+              themeMode: themeModeProvider.themeMode,
+              debugShowCheckedModeBanner: false,
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: [
+                Locale("en"),
+                ...AppLocalizations.supportedLocales
+                    .where((locale) => locale.languageCode != "en")
+              ],
+              theme: ThemeData(
+                useMaterial3: true,
+                colorScheme: ColorScheme.fromSeed(
+                    seedColor: themeModeProvider.accentColor,
+                    brightness: Brightness.light),
+              ),
+              darkTheme:
+                  (ConfigProvider.instance.get(ConfigKey.theme) == 'amoled')
+                      ? ThemeData(
+                          useMaterial3: true,
+                          colorScheme: ColorScheme.fromSeed(
                             seedColor: themeModeProvider.accentColor,
-                            brightness: Brightness.dark),
-                      ),
-            home: LaunchPage(
-                nextPage: ResponsiveLayout(
-              mobileScaffold: MobileScaffold(),
-              tabletScaffold: MobileScaffold(),
-              desktopScaffold: MobileScaffold(),
-            ))));
+                            brightness: Brightness.dark,
+                            surfaceContainerLowest: Colors.black,
+                            surfaceContainerLow: Colors.black,
+                            surfaceContainerHighest: Colors.black,
+                            surfaceContainerHigh: Colors.black,
+                            surfaceBright: Colors.black,
+                            surfaceDim: Colors.black,
+                            surface: Colors.black,
+                            surfaceContainer: Colors.black,
+                            onSurface: Colors.white,
+                            surfaceTint: Colors.black,
+                            primaryContainer: Colors.black,
+                            secondaryContainer: Colors.black,
+                            tertiaryContainer: Colors.black,
+                            inverseSurface: Colors.black,
+                            inversePrimary: Colors.black,
+                            scrim: Colors.black,
+                          ),
+                          scaffoldBackgroundColor: Colors.black)
+                      : ThemeData(
+                          useMaterial3: true,
+                          colorScheme: ColorScheme.fromSeed(
+                              seedColor: themeModeProvider.accentColor,
+                              brightness: Brightness.dark),
+                        ),
+              home: LaunchPage(
+                  nextPage: ResponsiveLayout(
+                mobileScaffold: MobileScaffold(),
+                tabletScaffold: MobileScaffold(),
+                desktopScaffold: MobileScaffold(),
+              )))),
+    );
   }
 }

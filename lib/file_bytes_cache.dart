@@ -33,7 +33,9 @@ class FileBytesCache {
     }
 
     // Evict least recently used items if necessary
-    while (_currentSize + valueSize > maxCacheSize) {
+    while (_cache.length > 1 &&
+        _usageOrder.length > 1 &&
+        (_currentSize + valueSize > maxCacheSize)) {
       final oldestKey = _usageOrder.removeAt(0); // Remove least recently used
       _currentSize -= _cache[oldestKey]!.lengthInBytes;
       _cache.remove(oldestKey);
@@ -55,4 +57,3 @@ class FileBytesCache {
 
   int get itemCount => _cache.length;
 }
-

@@ -83,7 +83,7 @@ class EntryDayCell extends StatelessWidget {
                             clipBehavior: Clip.antiAlias,
                             child: LocalImageLoader(
                               imagePath: image.imgPath,
-                              cacheSize: 100,
+                              cacheSize: 80,
                             )),
                       )
                     : Icon(
