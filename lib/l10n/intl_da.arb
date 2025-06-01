@@ -210,5 +210,19 @@
   "settingsAlwaysSendReminderDescription": "Send påmindelse, selvom en log allerede er startet",
   "@settingsAlwaysSendReminderDescription": {},
   "settingsImportFromAnotherApp": "Importér fra en anden app",
-  "@settingsImportFromAnotherApp": {}
+  "@settingsImportFromAnotherApp": {},
+  "settingsCustomizeNotificationTitle": "Tilpas meddelelser",
+  "@settingsCustomizeNotificationTitle": {},
+  "settingsLanguageTitle": "Sprog",
+  "@settingsLanguageTitle": {},
+  "settingsBackupRestoreTitle": "Sikkerhedskopiering og gendannelse",
+  "@settingsBackupRestoreTitle": {},
+  "settingsTranslateCallToAction": "Alle burde have adgang til en dagbog!",
+  "@settingsTranslateCallToAction": {},
+  "settingsHelpTranslate": "Hjælp med at oversætte",
+  "@settingsHelpTranslate": {},
+  "settingsMadeWithLove": "Lavet med ❤️",
+  "@settingsMadeWithLove": {},
+  "settingsConsiderSupporting": "overvej at støtte",
+  "@settingsConsiderSupporting": {}
 }
