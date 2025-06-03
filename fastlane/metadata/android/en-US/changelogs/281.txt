@@ -1,0 +1,6 @@
+Daily You v2.8.1 has arrived! This one is all about optimization:
+
+• Faster image loading and reduced cache sizes
+• Stopped animations from lingering when navigating between pages
+• Minor UI fixes and improvements
+• Updated translations
