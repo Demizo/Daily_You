@@ -15,7 +15,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:media_scanner/media_scanner.dart';
-import 'package:schedulers/schedulers.dart';
+import 'package:pool/pool.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
@@ -26,8 +26,8 @@ class EntriesDatabase {
   static Database? _database;
 
   final FileBytesCache imageCache =
-      FileBytesCache(maxCacheSize: 100 * 1024 * 1024);
-  final imgFetchScheduler = ParallelScheduler(5);
+      FileBytesCache(maxCacheSize: 10 * 1024 * 1024);
+  final Pool imgFetchPool = Pool(3);
 
   EntriesDatabase._init();
 
@@ -289,10 +289,10 @@ DROP TABLE old_entries;
     }
     // Fetch local copy if present
     var internalDir = await getInternalImgDatabasePath();
-    bytes = await imgFetchScheduler
-        .run(() => FileLayer.getFileBytes(internalDir,
-            name: imageName, useExternalPath: false))
-        .result;
+    bytes = await imgFetchPool.withResource(() => FileLayer.getFileBytes(
+        internalDir,
+        name: imageName,
+        useExternalPath: false));
     // Attempt to fetch file externally
     if (bytes == null && usingExternalImg()) {
       // Get and cache external image
