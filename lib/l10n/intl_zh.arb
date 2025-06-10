@@ -105,7 +105,7 @@
   "@settingsNotificationsTitle": {},
   "settingsDailyReminderTitle": "每日提醒",
   "@settingsDailyReminderTitle": {},
-  "settingsDailyReminderDescription": "允许应用在后台运行以获得最佳效果",
+  "settingsDailyReminderDescription": "每天一次温和的提醒",
   "@settingsDailyReminderDescription": {},
   "settingsReminderTime": "提醒时间",
   "@settingsReminderTime": {},
@@ -228,5 +228,9 @@
   "settingsConsiderSupporting": "考虑支持",
   "@settingsConsiderSupporting": {},
   "settingsTranslateCallToAction": "每个人都应该有权使用日记！",
-  "@settingsTranslateCallToAction": {}
+  "@settingsTranslateCallToAction": {},
+  "settingsDailyReminderOnboarding": "开启每日提醒，保持自己的连贯性！",
+  "@settingsDailyReminderOnboarding": {},
+  "settingsNotificationsPermissionsPrompt": "为了按时发送提醒，应用将请求通知权限。",
+  "@settingsNotificationsPermissionsPrompt": {}
 }
