@@ -15,10 +15,8 @@ class NotificationSettings extends StatefulWidget {
 
   @override
   State<NotificationSettings> createState() => _NotificationSettingsState();
-}
 
-class _NotificationSettingsState extends State<NotificationSettings> {
-  Future<void> _selectTime(BuildContext context) async {
+  static Future<void> _selectTime(BuildContext context) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: TimeManager.scheduledReminderTime(),
@@ -36,7 +34,7 @@ class _NotificationSettingsState extends State<NotificationSettings> {
     }
   }
 
-  Future<void> _selectTimeRange(BuildContext context) async {
+  static Future<void> _selectTimeRange(BuildContext context) async {
     ThemeData theme = Theme.of(context);
     TimeRange currentRange = TimeManager.getReminderTimeRange();
     TimeRange? range = await showTimeRangePicker(
@@ -98,6 +96,59 @@ class _NotificationSettingsState extends State<NotificationSettings> {
     }
   }
 
+  static List<Widget> buildCoreReminderSettings(BuildContext context) {
+    final configProvider = Provider.of<ConfigProvider>(context);
+    return [
+      SettingsToggle(
+          title: AppLocalizations.of(context)!.settingsDailyReminderTitle,
+          hint: AppLocalizations.of(context)!.settingsDailyReminderDescription,
+          settingsKey: ConfigKey.dailyReminders,
+          onChanged: (value) async {
+            if (await NotificationManager.instance
+                .hasNotificationPermission()) {
+              if (value) {
+                await NotificationManager.instance
+                    .startScheduledDailyReminders();
+              } else {
+                await NotificationManager.instance.stopDailyReminders();
+              }
+              await configProvider.set(ConfigKey.dailyReminders, value);
+            }
+          }),
+      if (configProvider.get(ConfigKey.dailyReminders))
+        configProvider.get(ConfigKey.setReminderTime)
+            ? SettingsIconAction(
+                title: AppLocalizations.of(context)!.settingsReminderTime,
+                hint: TimeManager.timeOfDayString(
+                    TimeManager.scheduledReminderTime()),
+                icon: Icon(Icons.schedule_rounded),
+                onPressed: () async {
+                  _selectTime(context);
+                })
+            : SettingsIconAction(
+                title: AppLocalizations.of(context)!.settingsReminderTime,
+                hint: TimeManager.timeRangeString(
+                    TimeManager.getReminderTimeRange()),
+                icon: Icon(Icons.timelapse_rounded),
+                onPressed: () async {
+                  _selectTimeRange(context);
+                }),
+      if (configProvider.get(ConfigKey.dailyReminders))
+        SettingsToggle(
+            title: AppLocalizations.of(context)!.settingsFixedReminderTimeTitle,
+            hint: AppLocalizations.of(context)!
+                .settingsFixedReminderTimeDescription,
+            settingsKey: ConfigKey.setReminderTime,
+            onChanged: (value) async {
+              await configProvider.set(ConfigKey.setReminderTime, value);
+              await NotificationManager.instance.stopDailyReminders();
+              await NotificationManager.instance.startScheduledDailyReminders();
+            }),
+    ];
+  }
+}
+
+class _NotificationSettingsState extends State<NotificationSettings> {
   @override
   void initState() {
     super.initState();
@@ -113,54 +164,7 @@ class _NotificationSettingsState extends State<NotificationSettings> {
       ),
       body: ListView(
         children: [
-          SettingsToggle(
-              title: AppLocalizations.of(context)!.settingsDailyReminderTitle,
-              hint: AppLocalizations.of(context)!
-                  .settingsDailyReminderDescription,
-              settingsKey: ConfigKey.dailyReminders,
-              onChanged: (value) async {
-                if (await NotificationManager.instance
-                    .hasNotificationPermission()) {
-                  if (value) {
-                    await NotificationManager.instance
-                        .startScheduledDailyReminders();
-                  } else {
-                    await NotificationManager.instance.stopDailyReminders();
-                  }
-                  await configProvider.set(ConfigKey.dailyReminders, value);
-                }
-              }),
-          if (configProvider.get(ConfigKey.dailyReminders))
-            configProvider.get(ConfigKey.setReminderTime)
-                ? SettingsIconAction(
-                    title: AppLocalizations.of(context)!.settingsReminderTime,
-                    hint: TimeManager.timeOfDayString(
-                        TimeManager.scheduledReminderTime()),
-                    icon: Icon(Icons.schedule_rounded),
-                    onPressed: () async {
-                      _selectTime(context);
-                    })
-                : SettingsIconAction(
-                    title: AppLocalizations.of(context)!.settingsReminderTime,
-                    hint: TimeManager.timeRangeString(
-                        TimeManager.getReminderTimeRange()),
-                    icon: Icon(Icons.timelapse_rounded),
-                    onPressed: () async {
-                      _selectTimeRange(context);
-                    }),
-          if (configProvider.get(ConfigKey.dailyReminders))
-            SettingsToggle(
-                title: AppLocalizations.of(context)!
-                    .settingsFixedReminderTimeTitle,
-                hint: AppLocalizations.of(context)!
-                    .settingsFixedReminderTimeDescription,
-                settingsKey: ConfigKey.setReminderTime,
-                onChanged: (value) async {
-                  await configProvider.set(ConfigKey.setReminderTime, value);
-                  await NotificationManager.instance.stopDailyReminders();
-                  await NotificationManager.instance
-                      .startScheduledDailyReminders();
-                }),
+          ...NotificationSettings.buildCoreReminderSettings(context),
           if (configProvider.get(ConfigKey.dailyReminders))
             SettingsToggle(
                 title: AppLocalizations.of(context)!

@@ -40,6 +40,8 @@ class ConfigKey {
   static const String defaultTemplate = "defaultTemplate";
   static const String imageQuality = "imageQuality";
   static const String alwaysRemind = "alwaysRemind";
+  static const String dismissedNotificationOnboarding =
+      "dismissedNotificationOnboarding";
 }
 
 class ConfigProvider with ChangeNotifier {
@@ -81,6 +83,7 @@ class ConfigProvider with ChangeNotifier {
     ConfigKey.defaultTemplate: -1,
     ConfigKey.imageQuality: 90,
     ConfigKey.alwaysRemind: false,
+    ConfigKey.dismissedNotificationOnboarding: false,
   };
 
   static final moodValueFieldMapping = {

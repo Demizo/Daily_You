@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:daily_you/config_provider.dart';
-import 'package:daily_you/notification_manager.dart';
+import 'package:daily_you/pages/settings/notification_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:daily_you/pages/statistics_page.dart';
@@ -27,6 +27,46 @@ class _MobileScaffoldState extends State<MobileScaffold> {
     const StatsPage(),
   ];
 
+  void _showNotificationOnboardingPopup() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        final configProvider = Provider.of<ConfigProvider>(context);
+        return AlertDialog(
+          actions: [
+            TextButton(
+              onPressed: () async {
+                await configProvider.set(
+                    ConfigKey.dismissedNotificationOnboarding, true);
+                Navigator.of(context).pop();
+              },
+              child: Text(MaterialLocalizations.of(context).closeButtonLabel),
+            ),
+          ],
+          content: Column(mainAxisSize: MainAxisSize.min, children: [
+            Center(
+                child: Icon(
+              Icons.notifications_on_rounded,
+              color: Theme.of(context).colorScheme.onSurface,
+              size: 40,
+            )),
+            SizedBox(
+              height: 12,
+            ),
+            Text(AppLocalizations.of(context)!.settingsDailyReminderOnboarding),
+            SizedBox(
+              height: 8,
+            ),
+            Text(AppLocalizations.of(context)!
+                .settingsNotificationsPermissionsPrompt),
+            Divider(),
+            ...NotificationSettings.buildCoreReminderSettings(context),
+          ]),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -39,22 +79,13 @@ class _MobileScaffoldState extends State<MobileScaffold> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(title: Text(appBarsTitles[currentIndex]), actions: [
-        if (Platform.isAndroid)
+        if (Platform.isAndroid &&
+            !configProvider.get(ConfigKey.dailyReminders) &&
+            !configProvider.get(ConfigKey.dismissedNotificationOnboarding))
           IconButton(
-            icon: configProvider.get(ConfigKey.dailyReminders)
-                ? const Icon(Icons.notifications)
-                : const Icon(Icons.notifications_off_rounded),
+            icon: const Icon(Icons.notifications_off_rounded),
             onPressed: () async {
-              if (await NotificationManager.instance
-                  .hasNotificationPermission()) {
-                var value = !configProvider.get(ConfigKey.dailyReminders);
-                if (value) {
-                  NotificationManager.instance.startScheduledDailyReminders();
-                } else {
-                  NotificationManager.instance.stopDailyReminders();
-                }
-                await configProvider.set(ConfigKey.dailyReminders, value);
-              }
+              _showNotificationOnboardingPopup();
             },
           ),
         IconButton(
