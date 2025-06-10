@@ -224,5 +224,9 @@
   "settingsBackupRestoreTitle": "Резервне копіювання та відновлення",
   "@settingsBackupRestoreTitle": {},
   "settingsConsiderSupporting": "розглянути можливість підтримки",
-  "@settingsConsiderSupporting": {}
+  "@settingsConsiderSupporting": {},
+  "settingsNotificationsPermissionsPrompt": "Для надсилання нагадування у випадковий момент або у вибраний вами час буде запрошено дозвіл на «запланування будильників».",
+  "@settingsNotificationsPermissionsPrompt": {},
+  "settingsDailyReminderOnboarding": "Увімкніть щоденні нагадування, щоб залишатися послідовним!",
+  "@settingsDailyReminderOnboarding": {}
 }
