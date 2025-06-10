@@ -40,5 +40,7 @@
   "settingsAppearanceTitle": "المظهر",
   "@settingsAppearanceTitle": {},
   "settingsFirstDayOfWeek": "أول يوم في الأسبوع",
-  "@settingsFirstDayOfWeek": {}
+  "@settingsFirstDayOfWeek": {},
+  "dailyReminderDescription": "خذ سجل يومياتك…",
+  "@dailyReminderDescription": {}
 }
