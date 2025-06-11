@@ -1,0 +1,6 @@
+Daily You v2.8.2 has arrived! Here are the changes:
+
+• Replaced notification quick toggle with a setup prompt
+• Fixed backup and restore stuck at 0%
+• Minor UI fixes and improvements
+• Updated translations
