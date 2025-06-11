@@ -228,5 +228,7 @@
   "settingsConsiderSupporting": "unterstützen",
   "@settingsConsiderSupporting": {},
   "settingsTranslateCallToAction": "Jede*r sollte das Recht auf ein Eintrag haben!",
-  "@settingsTranslateCallToAction": {}
+  "@settingsTranslateCallToAction": {},
+  "settingsDailyReminderOnboarding": "Aktivieren Sie tägliche Erinnerungen um Konstant Einträge zu machen!",
+  "@settingsDailyReminderOnboarding": {}
 }
