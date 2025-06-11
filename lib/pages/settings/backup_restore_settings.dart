@@ -1,4 +1,4 @@
-import 'package:daily_you/entries_database.dart';
+import 'package:daily_you/backup_restore_utils.dart';
 import 'package:daily_you/import_utils.dart';
 import 'package:daily_you/widgets/settings_icon_action.dart';
 import 'package:flutter/material.dart';
@@ -57,7 +57,7 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
     if (chosenFormat != ImportFormat.none) {
       ValueNotifier<String> statusNotifier = ValueNotifier<String>("");
 
-      EntriesDatabase.instance.showLoadingStatus(context, statusNotifier);
+      BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
 
       if (chosenFormat == ImportFormat.dailyYouJson) {
         await ImportUtils.importFromJson((status) {
@@ -80,10 +80,9 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
   Future<void> _backupData(BuildContext context) async {
     ValueNotifier<String> statusNotifier = ValueNotifier<String>("");
 
-    EntriesDatabase.instance.showLoadingStatus(context, statusNotifier);
+    BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
 
-    bool success =
-        await EntriesDatabase.instance.backupToZip(context, (status) {
+    bool success = await BackupRestoreUtils.backupToZip(context, (status) {
       statusNotifier.value = status;
     });
 
@@ -113,10 +112,9 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
   Future<void> _restoreData(BuildContext context) async {
     ValueNotifier<String> statusNotifier = ValueNotifier<String>("");
 
-    EntriesDatabase.instance.showLoadingStatus(context, statusNotifier);
+    BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
 
-    bool success =
-        await EntriesDatabase.instance.restoreFromZip(context, (status) {
+    bool success = await BackupRestoreUtils.restoreFromZip(context, (status) {
       statusNotifier.value = status;
     });
 

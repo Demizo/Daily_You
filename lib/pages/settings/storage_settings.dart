@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:daily_you/backup_restore_utils.dart';
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/stats_provider.dart';
@@ -226,7 +227,7 @@ class _StorageSettingsState extends State<StorageSettings> {
   Future<void> _deleteAllLogs(BuildContext context) async {
     ValueNotifier<String> statusNotifier = ValueNotifier<String>("");
 
-    EntriesDatabase.instance.showLoadingStatus(context, statusNotifier);
+    BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
 
     await EntriesDatabase.instance.deleteAllEntries((status) {
       statusNotifier.value = status;
