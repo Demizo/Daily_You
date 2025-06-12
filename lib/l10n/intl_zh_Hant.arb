@@ -79,7 +79,7 @@
   "@settingsNotificationsTitle": {},
   "settingsDailyReminderTitle": "每日提醒",
   "@settingsDailyReminderTitle": {},
-  "settingsDailyReminderDescription": "允許應用程式在背景運行以獲得最佳的使用體驗",
+  "settingsDailyReminderDescription": "每日的溫馨提醒",
   "@settingsDailyReminderDescription": {},
   "settingsReminderTime": "提醒時間",
   "@settingsReminderTime": {},
@@ -228,5 +228,9 @@
   "settingsMadeWithLove": "用❤️製作",
   "@settingsMadeWithLove": {},
   "settingsBackupRestoreTitle": "備份與還原",
-  "@settingsBackupRestoreTitle": {}
+  "@settingsBackupRestoreTitle": {},
+  "settingsDailyReminderOnboarding": "開啟每日提醒，助你持之以恆！",
+  "@settingsDailyReminderOnboarding": {},
+  "settingsNotificationsPermissionsPrompt": "為了在隨機或您設定的時間發送提醒，系統將請求「排程鬧鐘」權限。",
+  "@settingsNotificationsPermissionsPrompt": {}
 }
