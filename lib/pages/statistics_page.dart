@@ -47,6 +47,12 @@ class StatsPage extends StatelessWidget {
                   isVisible: statsProvider.daysSinceBadDay != null &&
                       statsProvider.daysSinceBadDay! > 3,
                   icon: Icons.timeline_rounded),
+              StreakCard(
+                title: AppLocalizations.of(context)!
+                    .logCount(statsProvider.entries.length),
+                isVisible: true,
+                icon: Icons.description_rounded,
+              ),
             ],
           ),
         ),
