@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class StreakCard extends StatelessWidget {
   final bool isVisible;
@@ -21,6 +22,7 @@ class StreakCard extends StatelessWidget {
       return Container();
     }
 
+    final formatter = NumberFormat('#,###');
     final int numberStart = match.start;
     final int numberEnd = match.end;
 
@@ -48,7 +50,8 @@ class StreakCard extends StatelessWidget {
                               fontSize: 16,
                               color: Theme.of(context).colorScheme.secondary)),
                       TextSpan(
-                        text: title.substring(numberStart, numberEnd),
+                        text: formatter.format(
+                            int.parse(title.substring(numberStart, numberEnd))),
                         style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,

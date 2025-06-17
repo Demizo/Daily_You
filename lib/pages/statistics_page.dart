@@ -51,7 +51,13 @@ class StatsPage extends StatelessWidget {
                 title: AppLocalizations.of(context)!
                     .logCount(statsProvider.entries.length),
                 isVisible: true,
-                icon: Icons.description_rounded,
+                icon: Icons.description_outlined,
+              ),
+              StreakCard(
+                title: AppLocalizations.of(context)!
+                    .wordCount(statsProvider.wordCount),
+                isVisible: statsProvider.wordCount > 100,
+                icon: Icons.sort_rounded,
               ),
             ],
           ),

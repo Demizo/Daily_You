@@ -27,6 +27,8 @@
   "@searchLogsHint": {},
   "logCount": "{count, plural, one{{count} log} other{{count} logs}}",
   "@logCount": {},
+  "wordCount": "{count, plural, one{{count} word} other{{count} words}}",
+  "@wordCount": {},
   "noLogs": "No Logs…",
   "@noLogs": {},
   "sortDateTitle": "Date",

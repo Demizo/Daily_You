@@ -55,6 +55,8 @@ class StatsProvider with ChangeNotifier {
 
   StatsRange statsRange = StatsRange.month;
 
+  int wordCount = 0;
+
   // Used for filtered searches on the gallery page
   List<Entry> filteredEntries = List.empty();
   String searchText = "";
@@ -90,9 +92,18 @@ class StatsProvider with ChangeNotifier {
     entries = await EntriesDatabase.instance.getAllEntries();
     filteredEntries = filterEntries(entries);
     images = await EntriesDatabase.instance.getAllEntryImages();
+    getWordCount();
     await getStreaks();
     await getMoodCounts();
     notifyListeners();
+  }
+
+  void getWordCount() {
+    wordCount = 0;
+    for (var entry in entries) {
+      final RegExp regex = RegExp(r'\w+');
+      wordCount += regex.allMatches(entry.text).length;
+    }
   }
 
   Future<void> getMoodCounts() async {
