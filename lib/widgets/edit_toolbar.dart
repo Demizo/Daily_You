@@ -62,28 +62,11 @@ class EditToolbar extends StatelessWidget {
             ),
             if (configProvider.get(ConfigKey.useMarkdownToolbar))
               Expanded(
-                child: ShaderMask(
-                  shaderCallback: (bounds) => const LinearGradient(
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                    colors: [
-                      Colors.transparent,
-                      Colors.black,
-                      Colors.black,
-                      Colors.transparent,
-                    ],
-                    stops: [0.0, 0.04, 0.96, 1.0],
-                  ).createShader(bounds),
-                  blendMode: BlendMode.dstIn,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 6.0, right: 6.0),
-                      child: MarkdownToolbar(
-                        controller: controller,
-                        focusNode: focusNode,
-                      ),
-                    ),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: MarkdownToolbar(
+                    controller: controller,
+                    focusNode: focusNode,
                   ),
                 ),
               ),
