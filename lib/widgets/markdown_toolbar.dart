@@ -91,8 +91,14 @@ class _MarkdownToolbarState extends State<MarkdownToolbar> {
   void _wrapSelection(String left, [String? right]) {
     final text = widget.controller.text;
     final selection = widget.controller.selection;
-    final start = selection.start;
-    final end = selection.end;
+    var start = selection.start;
+    var end = selection.end;
+
+    // Text has not been selected yet, use the end of the text
+    if (start == -1 && end == -1) {
+      start = widget.controller.text.length;
+      end = widget.controller.text.length;
+    }
 
     final before = text.substring(0, start);
     final selected = text.substring(start, end);
@@ -112,13 +118,15 @@ class _MarkdownToolbarState extends State<MarkdownToolbar> {
   void _insertLinePrefix(String prefix) {
     final lines = widget.controller.text.split('\n');
     final selection = widget.controller.selection;
-    final start = selection.start;
+    var start = selection.start;
 
-    final currentLineIndex = widget.controller.text
-            .substring(0, selection.baseOffset)
-            .split('\n')
-            .length -
-        1;
+    // Text has not been selected yet, use the end of the text
+    if (start == -1) {
+      start = widget.controller.text.length;
+    }
+
+    final currentLineIndex =
+        widget.controller.text.substring(0, start).split('\n').length - 1;
 
     lines[currentLineIndex] = '$prefix ${lines[currentLineIndex]}';
     final newText = lines.join('\n');

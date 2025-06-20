@@ -61,9 +61,6 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
     } else {
       loadingTemplate = false;
     }
-    _focusNode.addListener(() {
-      setState(() {});
-    });
     _textEditingController
         .addListener(() => text = _textEditingController.text);
   }
@@ -198,15 +195,14 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
               ),
             ),
           ),
-          if (_focusNode.hasFocus)
-            SafeArea(
-              top: false,
-              child: EditToolbar(
-                controller: _textEditingController,
-                focusNode: _focusNode,
-                showTemplatesButton: true,
-              ),
+          SafeArea(
+            top: false,
+            child: EditToolbar(
+              controller: _textEditingController,
+              focusNode: _focusNode,
+              showTemplatesButton: true,
             ),
+          ),
         ]),
       );
 
