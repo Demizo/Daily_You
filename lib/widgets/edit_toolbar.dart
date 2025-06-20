@@ -9,11 +9,13 @@ class EditToolbar extends StatelessWidget {
   const EditToolbar({
     super.key,
     required this.controller,
+    required this.undoController,
     required this.focusNode,
     required this.showTemplatesButton,
   });
 
   final TextEditingController controller;
+  final UndoHistoryController undoController;
   final FocusNode focusNode;
   final bool showTemplatesButton;
 
@@ -70,36 +72,45 @@ class EditToolbar extends StatelessWidget {
                   ),
                 ),
               ),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                    padding: EdgeInsets.zero,
-                    visualDensity: VisualDensity.compact,
-                    onPressed: () => {},
-                    icon: Icon(
-                      Icons.undo_rounded,
-                      size: 24,
-                    )),
-                IconButton(
-                    padding: EdgeInsets.zero,
-                    visualDensity: VisualDensity.compact,
-                    onPressed: () => {},
-                    icon: Icon(
-                      Icons.redo_rounded,
-                      size: 24,
-                    )),
-                if (showTemplatesButton)
-                  IconButton(
-                      padding: EdgeInsets.zero,
-                      visualDensity: VisualDensity.compact,
-                      onPressed: () => _showTemplateSelectPopup(context),
-                      icon: Icon(
-                        Icons.note_add_rounded,
-                        size: 24,
-                      )),
-              ],
-            )
+            ValueListenableBuilder<UndoHistoryValue>(
+                valueListenable: undoController,
+                builder: (BuildContext context, UndoHistoryValue value,
+                    Widget? child) {
+                  return Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                          padding: EdgeInsets.zero,
+                          visualDensity: VisualDensity.compact,
+                          onPressed: value.canUndo
+                              ? () => {undoController.undo()}
+                              : null,
+                          icon: Icon(
+                            Icons.undo_rounded,
+                            size: 24,
+                          )),
+                      IconButton(
+                          padding: EdgeInsets.zero,
+                          visualDensity: VisualDensity.compact,
+                          onPressed: value.canRedo
+                              ? () => {undoController.redo()}
+                              : null,
+                          icon: Icon(
+                            Icons.redo_rounded,
+                            size: 24,
+                          )),
+                      if (showTemplatesButton)
+                        IconButton(
+                            padding: EdgeInsets.zero,
+                            visualDensity: VisualDensity.compact,
+                            onPressed: () => _showTemplateSelectPopup(context),
+                            icon: Icon(
+                              Icons.note_add_rounded,
+                              size: 24,
+                            )),
+                    ],
+                  );
+                })
           ],
         ),
       ],

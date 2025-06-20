@@ -47,6 +47,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
   bool _openedCamera = false;
   final FocusNode _focusNode = FocusNode();
   final TextEditingController _textEditingController = TextEditingController();
+  final UndoHistoryController _undoController = UndoHistoryController();
 
   @override
   void initState() {
@@ -70,6 +71,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
     _scrollController.dispose();
     _focusNode.dispose();
     _textEditingController.dispose();
+    _undoController.dispose();
     super.dispose();
   }
 
@@ -187,9 +189,11 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
                   if (!loadingTemplate)
                     StatefulBuilder(
                         builder: (context, setState) => EntryTextEditor(
-                            text: text,
-                            focusNode: _focusNode,
-                            textEditingController: _textEditingController)),
+                              text: text,
+                              focusNode: _focusNode,
+                              textEditingController: _textEditingController,
+                              undoHistoryController: _undoController,
+                            )),
                   const SizedBox(height: 16),
                 ],
               ),
@@ -199,6 +203,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
             top: false,
             child: EditToolbar(
               controller: _textEditingController,
+              undoController: _undoController,
               focusNode: _focusNode,
               showTemplatesButton: true,
             ),

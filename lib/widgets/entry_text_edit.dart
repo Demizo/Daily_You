@@ -10,12 +10,14 @@ class EntryTextEditor extends StatefulWidget {
   final bool showTemplatesButton;
   final FocusNode focusNode;
   final TextEditingController textEditingController;
+  final UndoHistoryController undoHistoryController;
 
   const EntryTextEditor({
     super.key,
     this.text = '',
     required this.focusNode,
     required this.textEditingController,
+    required this.undoHistoryController,
     this.showTemplatesButton = true,
   });
 
@@ -68,6 +70,7 @@ class _EntryTextEditorState extends State<EntryTextEditor> {
     return TextField(
       scrollPadding: EdgeInsets.zero,
       controller: widget.textEditingController,
+      undoController: widget.undoHistoryController,
       focusNode: widget.focusNode,
       scrollController: _scrollController,
       minLines: 5,

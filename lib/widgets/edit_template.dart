@@ -21,6 +21,7 @@ class _EditTemplateState extends State<EditTemplate> {
   late String templateText;
   final FocusNode _focusNode = FocusNode();
   final TextEditingController _textEditingController = TextEditingController();
+  final UndoHistoryController _undoController = UndoHistoryController();
 
   @override
   void initState() {
@@ -40,6 +41,7 @@ class _EditTemplateState extends State<EditTemplate> {
     _nameController.dispose();
     _focusNode.dispose();
     _textEditingController.dispose();
+    _undoController.dispose();
     super.dispose();
   }
 
@@ -104,6 +106,7 @@ class _EditTemplateState extends State<EditTemplate> {
                     text: templateText,
                     focusNode: _focusNode,
                     textEditingController: _textEditingController,
+                    undoHistoryController: _undoController,
                     showTemplatesButton: false,
                   ),
                 ],
@@ -114,6 +117,7 @@ class _EditTemplateState extends State<EditTemplate> {
             top: false,
             child: EditToolbar(
               controller: _textEditingController,
+              undoController: _undoController,
               focusNode: _focusNode,
               showTemplatesButton: false,
             ),
