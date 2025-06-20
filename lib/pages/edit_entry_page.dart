@@ -214,7 +214,9 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
   Widget saveButton() {
     return IconButton(
       icon: const Icon(Icons.check),
-      onPressed: addOrUpdateNote,
+      onPressed: () async {
+        await addOrUpdateNote();
+      },
     );
   }
 
@@ -351,7 +353,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
     });
   }
 
-  void addOrUpdateNote() async {
+  Future<void> addOrUpdateNote() async {
     final isUpdating = widget.entry != null;
 
     if (isUpdating) {

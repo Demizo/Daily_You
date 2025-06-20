@@ -65,7 +65,9 @@ class _EditTemplateState extends State<EditTemplate> {
   Widget saveButton() {
     return IconButton(
       icon: const Icon(Icons.check),
-      onPressed: _saveTemplate,
+      onPressed: () async {
+        await _saveTemplate();
+      },
     );
   }
 
