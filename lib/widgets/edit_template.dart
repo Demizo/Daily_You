@@ -1,5 +1,6 @@
 import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/models/template.dart';
+import 'package:daily_you/widgets/edit_toolbar.dart';
 import 'package:daily_you/widgets/entry_text_edit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -18,6 +19,8 @@ class EditTemplate extends StatefulWidget {
 class _EditTemplateState extends State<EditTemplate> {
   late TextEditingController _nameController;
   late String templateText;
+  final FocusNode _focusNode = FocusNode();
+  final TextEditingController _textEditingController = TextEditingController();
 
   @override
   void initState() {
@@ -28,11 +31,15 @@ class _EditTemplateState extends State<EditTemplate> {
     } else {
       templateText = "";
     }
+    _textEditingController
+        .addListener(() => templateText = _textEditingController.text);
   }
 
   @override
   void dispose() {
     _nameController.dispose();
+    _focusNode.dispose();
+    _textEditingController.dispose();
     super.dispose();
   }
 
@@ -80,9 +87,14 @@ class _EditTemplateState extends State<EditTemplate> {
                 ),
               ),
             ),
+            EditToolbar(
+                controller: _textEditingController,
+                focusNode: _focusNode,
+                showTemplatesButton: false),
             EntryTextEditor(
               text: templateText,
-              onChangedText: (text) => {templateText = text},
+              focusNode: _focusNode,
+              textEditingController: _textEditingController,
               showTemplatesButton: false,
             ),
             Row(

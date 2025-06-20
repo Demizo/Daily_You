@@ -5,6 +5,7 @@ import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:daily_you/widgets/edit_toolbar.dart';
 import 'package:daily_you/widgets/local_image_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -44,6 +45,8 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
   Timer? _autoScrollTimer;
   Offset _draggingOffset = Offset.zero;
   bool _openedCamera = false;
+  final FocusNode _focusNode = FocusNode();
+  final TextEditingController _textEditingController = TextEditingController();
 
   @override
   void initState() {
@@ -58,12 +61,19 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
     } else {
       loadingTemplate = false;
     }
+    _focusNode.addListener(() {
+      setState(() {});
+    });
+    _textEditingController
+        .addListener(() => text = _textEditingController.text);
   }
 
   @override
   void dispose() {
-    super.dispose();
     _scrollController.dispose();
+    _focusNode.dispose();
+    _textEditingController.dispose();
+    super.dispose();
   }
 
   Future _loadTemplate() async {
@@ -114,80 +124,90 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
         appBar: AppBar(
           actions: [if (widget.entry != null) deleteButton(), saveButton()],
         ),
-        body: Center(
-          child: Container(
-            constraints: BoxConstraints.loose(const Size.fromWidth(800)),
-            child: ListView(
-              padding: const EdgeInsets.only(left: 8, right: 8),
-              children: [
-                if (currentImages.isEmpty)
-                  EntryImagePicker(
-                      imgPath: null,
-                      openCamera: widget.openCamera && !_openedCamera,
-                      onChangedImage: (imgPaths) {
-                        _openedCamera = true;
-                        if (imgPaths != null) {
-                          addLocalImage(imgPaths);
-                        }
-                      }),
-                if (currentImages.isNotEmpty)
-                  SizedBox(
-                    height: 220,
-                    child: Listener(
-                      onPointerMove: _handlePointerMove,
-                      onPointerDown: _handlePointerDown,
-                      onPointerUp: _handlePointerUp,
-                      child: ListView.builder(
-                        controller: _scrollController,
-                        shrinkWrap: true,
-                        scrollDirection: Axis.horizontal,
-                        itemCount: currentImages.length + 1,
-                        itemBuilder: (context, index) {
-                          if (index == 0) {
-                            return EntryImagePicker(
-                                imgPath: null,
-                                openCamera: widget.openCamera && !_openedCamera,
-                                onChangedImage: (imgPaths) {
-                                  _openedCamera = true;
-                                  if (imgPaths != null) {
-                                    addLocalImage(imgPaths);
-                                  }
-                                });
-                          } else {
-                            return _buildDraggableListItem(index - 1);
+        body: Column(children: [
+          Expanded(
+            child: Container(
+              constraints: BoxConstraints.loose(const Size.fromWidth(800)),
+              child: ListView(
+                padding: const EdgeInsets.only(left: 8, right: 8),
+                children: [
+                  if (currentImages.isEmpty)
+                    EntryImagePicker(
+                        imgPath: null,
+                        openCamera: widget.openCamera && !_openedCamera,
+                        onChangedImage: (imgPaths) {
+                          _openedCamera = true;
+                          if (imgPaths != null) {
+                            addLocalImage(imgPaths);
                           }
-                        },
+                        }),
+                  if (currentImages.isNotEmpty)
+                    SizedBox(
+                      height: 220,
+                      child: Listener(
+                        onPointerMove: _handlePointerMove,
+                        onPointerDown: _handlePointerDown,
+                        onPointerUp: _handlePointerUp,
+                        child: ListView.builder(
+                          controller: _scrollController,
+                          shrinkWrap: true,
+                          scrollDirection: Axis.horizontal,
+                          itemCount: currentImages.length + 1,
+                          itemBuilder: (context, index) {
+                            if (index == 0) {
+                              return EntryImagePicker(
+                                  imgPath: null,
+                                  openCamera:
+                                      widget.openCamera && !_openedCamera,
+                                  onChangedImage: (imgPaths) {
+                                    _openedCamera = true;
+                                    if (imgPaths != null) {
+                                      addLocalImage(imgPaths);
+                                    }
+                                  });
+                            } else {
+                              return _buildDraggableListItem(index - 1);
+                            }
+                          },
+                        ),
                       ),
                     ),
-                  ),
-                StatefulBuilder(
-                  builder: (context, setState) => EntryMoodPicker(
-                      date: widget.entry != null
-                          ? DateFormat.yMMMEd(WidgetsBinding
-                                  .instance.platformDispatcher.locale
-                                  .toString())
-                              .format(widget.entry!.timeCreate)
-                          : DateFormat.yMMMEd(WidgetsBinding
-                                  .instance.platformDispatcher.locale
-                                  .toString())
-                              .format(
-                                  widget.overrideCreateDate ?? DateTime.now()),
-                      moodValue: mood,
-                      onChangedMood: (mood) =>
-                          {setState(() => this.mood = mood)}),
-                ),
-                if (!loadingTemplate)
                   StatefulBuilder(
-                    builder: (context, setState) => EntryTextEditor(
-                        text: text,
-                        onChangedText: (text) =>
-                            setState(() => this.text = text)),
+                    builder: (context, setState) => EntryMoodPicker(
+                        date: widget.entry != null
+                            ? DateFormat.yMMMEd(WidgetsBinding
+                                    .instance.platformDispatcher.locale
+                                    .toString())
+                                .format(widget.entry!.timeCreate)
+                            : DateFormat.yMMMEd(WidgetsBinding
+                                    .instance.platformDispatcher.locale
+                                    .toString())
+                                .format(
+                                    widget.overrideCreateDate ?? DateTime.now()),
+                        moodValue: mood,
+                        onChangedMood: (mood) => {setState(() => this.mood = mood)}),
                   ),
-                const SizedBox(height: 16),
-              ],
+                  if (!loadingTemplate)
+                    StatefulBuilder(
+                        builder: (context, setState) => EntryTextEditor(
+                            text: text,
+                            focusNode: _focusNode,
+                            textEditingController: _textEditingController)),
+                  const SizedBox(height: 16),
+                ],
+              ),
             ),
           ),
-        ),
+          if (_focusNode.hasFocus)
+            SafeArea(
+              top: false,
+              child: EditToolbar(
+                controller: _textEditingController,
+                focusNode: _focusNode,
+                showTemplatesButton: true,
+              ),
+            ),
+        ]),
       );
 
   Widget saveButton() {
