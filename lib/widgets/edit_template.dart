@@ -60,62 +60,65 @@ class _EditTemplateState extends State<EditTemplate> {
     Navigator.of(context).pop();
   }
 
+  Widget saveButton() {
+    return IconButton(
+      icon: const Icon(Icons.check),
+      onPressed: _saveTemplate,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      content: SizedBox(
-        width: double.maxFinite,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.only(
-                  left: 8.0,
-                  right: 8.0,
-                ),
-                child: TextField(
-                  controller: _nameController,
-                  maxLines: 1,
-                  textCapitalization: TextCapitalization.words,
-                  spellCheckConfiguration: SpellCheckConfiguration(
-                      spellCheckService: DefaultSpellCheckService()),
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    hintText: AppLocalizations.of(context)!.titleHint,
+    return Scaffold(
+      appBar: AppBar(
+        actions: [saveButton()],
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: Container(
+              constraints: BoxConstraints.loose(const Size.fromWidth(800)),
+              child: ListView(
+                padding: const EdgeInsets.only(left: 8, right: 8),
+                children: [
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                        left: 8.0,
+                        right: 8.0,
+                      ),
+                      child: TextField(
+                        controller: _nameController,
+                        maxLines: 1,
+                        textCapitalization: TextCapitalization.words,
+                        spellCheckConfiguration: SpellCheckConfiguration(
+                            spellCheckService: DefaultSpellCheckService()),
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: AppLocalizations.of(context)!.titleHint,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                  EntryTextEditor(
+                    text: templateText,
+                    focusNode: _focusNode,
+                    textEditingController: _textEditingController,
+                    showTemplatesButton: false,
+                  ),
+                ],
               ),
             ),
-            EditToolbar(
-                controller: _textEditingController,
-                focusNode: _focusNode,
-                showTemplatesButton: false),
-            EntryTextEditor(
-              text: templateText,
+          ),
+          SafeArea(
+            top: false,
+            child: EditToolbar(
+              controller: _textEditingController,
               focusNode: _focusNode,
-              textEditingController: _textEditingController,
               showTemplatesButton: false,
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  child:
-                      Text(MaterialLocalizations.of(context).cancelButtonLabel),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-                TextButton(
-                  onPressed: _saveTemplate,
-                  child:
-                      Text(MaterialLocalizations.of(context).saveButtonLabel),
-                ),
-              ],
-            )
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
