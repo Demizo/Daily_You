@@ -82,21 +82,23 @@ class EditToolbar extends StatelessWidget {
                       IconButton(
                           padding: EdgeInsets.zero,
                           visualDensity: VisualDensity.compact,
-                          onPressed: value.canUndo
-                              ? () => {undoController.undo()}
-                              : null,
+                          onPressed: () => {undoController.undo()},
                           icon: Icon(
                             Icons.undo_rounded,
+                            color: value.canUndo
+                                ? null
+                                : Theme.of(context).disabledColor,
                             size: 24,
                           )),
                       IconButton(
                           padding: EdgeInsets.zero,
                           visualDensity: VisualDensity.compact,
-                          onPressed: value.canRedo
-                              ? () => {undoController.redo()}
-                              : null,
+                          onPressed: () => {undoController.redo()},
                           icon: Icon(
                             Icons.redo_rounded,
+                            color: value.canRedo
+                                ? null
+                                : Theme.of(context).disabledColor,
                             size: 24,
                           )),
                       if (showTemplatesButton)
