@@ -7,7 +7,9 @@ import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/file_bytes_cache.dart';
 import 'package:daily_you/file_layer.dart';
 import 'package:daily_you/models/image.dart';
+import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/stats_provider.dart';
+import 'package:daily_you/time_manager.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/template.dart';
@@ -367,6 +369,33 @@ DROP TABLE old_entries;
       if (usingExternalDb()) await updateExternalDatabase();
     }
     return entry.copy(id: id);
+  }
+
+  Future<Entry> createNewEntry(DateTime? timeCreate) async {
+    var text = "";
+
+    var defaultTemplateId =
+        ConfigProvider.instance.get(ConfigKey.defaultTemplate);
+    if (defaultTemplateId != -1) {
+      var defaultTemplate = await getTemplate(defaultTemplateId);
+      if (defaultTemplate != null) {
+        text = defaultTemplate.text ?? "";
+      }
+    }
+
+    final newEntry = Entry(
+      text: text,
+      mood: null,
+      timeCreate: timeCreate ?? DateTime.now(),
+      timeModified: DateTime.now(),
+    );
+
+    if (Platform.isAndroid &&
+        TimeManager.isSameDay(DateTime.now(), newEntry.timeCreate)) {
+      await NotificationManager.instance.dismissReminderNotification();
+    }
+
+    return await addEntry(newEntry);
   }
 
   Future<Entry?> getEntry(int id) async {

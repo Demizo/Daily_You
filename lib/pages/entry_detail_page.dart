@@ -87,7 +87,6 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
               onPressed: () async {
                 await Navigator.of(context).push(MaterialPageRoute(
                   allowSnapshotting: false,
-                  fullscreenDialog: true,
                   builder: (context) =>
                       AddEditEntryPage(entry: entry, images: images),
                 ));
