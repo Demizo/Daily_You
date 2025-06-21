@@ -177,7 +177,7 @@ class _MarkdownToolbarState extends State<MarkdownToolbar> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: EdgeInsets.only(top: 4, bottom: 4),
+      margin: EdgeInsets.only(top: 4, bottom: 4, right: 4),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

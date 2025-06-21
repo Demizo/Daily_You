@@ -76,41 +76,52 @@ class EditToolbar extends StatelessWidget {
                 valueListenable: undoController,
                 builder: (BuildContext context, UndoHistoryValue value,
                     Widget? child) {
-                  return Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                          padding: EdgeInsets.zero,
-                          visualDensity: VisualDensity.compact,
-                          onPressed: () => {undoController.undo()},
-                          icon: Icon(
-                            Icons.undo_rounded,
-                            color: value.canUndo
-                                ? null
-                                : Theme.of(context).disabledColor,
-                            size: 24,
-                          )),
-                      IconButton(
-                          padding: EdgeInsets.zero,
-                          visualDensity: VisualDensity.compact,
-                          onPressed: () => {undoController.redo()},
-                          icon: Icon(
-                            Icons.redo_rounded,
-                            color: value.canRedo
-                                ? null
-                                : Theme.of(context).disabledColor,
-                            size: 24,
-                          )),
-                      if (showTemplatesButton)
+                  return IntrinsicHeight(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (configProvider.get(ConfigKey.useMarkdownToolbar))
+                          VerticalDivider(
+                            width: 0,
+                            thickness: 2,
+                          ),
+                        SizedBox(
+                          width: 8,
+                        ),
                         IconButton(
                             padding: EdgeInsets.zero,
                             visualDensity: VisualDensity.compact,
-                            onPressed: () => _showTemplateSelectPopup(context),
+                            onPressed: () => {undoController.undo()},
                             icon: Icon(
-                              Icons.note_add_rounded,
+                              Icons.undo_rounded,
+                              color: value.canUndo
+                                  ? null
+                                  : Theme.of(context).disabledColor,
                               size: 24,
                             )),
-                    ],
+                        IconButton(
+                            padding: EdgeInsets.zero,
+                            visualDensity: VisualDensity.compact,
+                            onPressed: () => {undoController.redo()},
+                            icon: Icon(
+                              Icons.redo_rounded,
+                              color: value.canRedo
+                                  ? null
+                                  : Theme.of(context).disabledColor,
+                              size: 24,
+                            )),
+                        if (showTemplatesButton)
+                          IconButton(
+                              padding: EdgeInsets.zero,
+                              visualDensity: VisualDensity.compact,
+                              onPressed: () =>
+                                  _showTemplateSelectPopup(context),
+                              icon: Icon(
+                                Icons.note_add_rounded,
+                                size: 24,
+                              )),
+                      ],
+                    ),
                   );
                 })
           ],
