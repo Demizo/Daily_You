@@ -39,7 +39,6 @@ dependencies:
       ref: support_gradle_8
   device_info_plus: ^11.2.0
   fl_chart: ^0.66.2
-  markdown_toolbar: ^0.5.0
   markdown_widget: ^2.3.2+3
 
   intl: ^0.19.0

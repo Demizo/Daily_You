@@ -30,19 +30,17 @@ class _TemplateManagementDialogState extends State<TemplateManager> {
     });
   }
 
-  void _showEditTemplatePopup(BuildContext context, Template? template) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return EditTemplate(
-          template: template,
-          onTemplateSaved: () {
-            _loadTemplates();
-            widget.onTemplatesUpdated();
-          },
-        );
-      },
-    );
+  void _showEditTemplatePopup(BuildContext context, Template? template) async {
+    await Navigator.of(context).push(MaterialPageRoute(
+        allowSnapshotting: false,
+        fullscreenDialog: true,
+        builder: (context) => EditTemplate(
+              template: template,
+              onTemplateSaved: () {
+                _loadTemplates();
+                widget.onTemplatesUpdated();
+              },
+            )));
   }
 
   Widget _buildTemplatesList() {
