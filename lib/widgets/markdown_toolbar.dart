@@ -182,23 +182,23 @@ class _MarkdownToolbarState extends State<MarkdownToolbar> {
         mainAxisSize: MainAxisSize.min,
         children: [
           _buildButton(
-            icon: Icons.text_fields,
+            icon: Icons.text_fields_rounded,
             onPressed: _showHeaderDialog,
           ),
           _buildButton(
-            icon: Icons.format_bold,
+            icon: Icons.format_bold_rounded,
             onPressed: () => _wrapSelection('**'),
           ),
           _buildButton(
-            icon: Icons.format_italic,
+            icon: Icons.format_italic_rounded,
             onPressed: () => _wrapSelection('_'),
           ),
           _buildButton(
-            icon: Icons.format_strikethrough,
+            icon: Icons.format_strikethrough_rounded,
             onPressed: () => _wrapSelection('~~'),
           ),
           _buildButton(
-            icon: Icons.format_list_bulleted,
+            icon: Icons.format_list_bulleted_rounded,
             onPressed: () => _insertLinePrefix('-'),
           ),
           _buildButton(
@@ -206,7 +206,7 @@ class _MarkdownToolbarState extends State<MarkdownToolbar> {
             onPressed: () => _wrapSelection('[', ']()'),
           ),
           _buildButton(
-            icon: Icons.format_quote,
+            icon: Icons.format_quote_rounded,
             onPressed: () => _insertLinePrefix('>'),
           ),
         ],
