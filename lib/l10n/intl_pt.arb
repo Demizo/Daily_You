@@ -1,1 +1,6 @@
-{}
+{
+  "settingsLicense": "Licença",
+  "@settingsLicense": {},
+  "licenseGPLv3": "GPL-3.0",
+  "@licenseGPLv3": {}
+}
