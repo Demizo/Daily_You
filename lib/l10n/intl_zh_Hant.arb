@@ -232,5 +232,7 @@
   "settingsDailyReminderOnboarding": "開啟每日提醒，助你持之以恆！",
   "@settingsDailyReminderOnboarding": {},
   "settingsNotificationsPermissionsPrompt": "為了在隨機或您設定的時間發送提醒，系統將請求「排程鬧鐘」權限。",
-  "@settingsNotificationsPermissionsPrompt": {}
+  "@settingsNotificationsPermissionsPrompt": {},
+  "wordCount": "{count, plural, one{{count} 個字} other{{count} 個字}}",
+  "@wordCount": {}
 }
