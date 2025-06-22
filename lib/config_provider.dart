@@ -38,10 +38,19 @@ class ConfigKey {
   static const String reminderEndHour = "reminderEndHour";
   static const String reminderEndMinute = "reminderEndMinute";
   static const String defaultTemplate = "defaultTemplate";
-  static const String imageQuality = "imageQuality";
+  static const String imageQualityLevel = "imageQualityLevel";
   static const String alwaysRemind = "alwaysRemind";
   static const String dismissedNotificationOnboarding =
       "dismissedNotificationOnboarding";
+  // DEPRECATED
+  static const String imageQuality = "imageQuality";
+}
+
+class ImageQuality {
+  static final String noCompression = "noCompression";
+  static final String high = "high";
+  static final String medium = "medium";
+  static final String low = "low";
 }
 
 class ConfigProvider with ChangeNotifier {
@@ -81,7 +90,7 @@ class ConfigProvider with ChangeNotifier {
     ConfigKey.reminderEndHour: 21,
     ConfigKey.reminderEndMinute: 0,
     ConfigKey.defaultTemplate: -1,
-    ConfigKey.imageQuality: 90,
+    ConfigKey.imageQualityLevel: ImageQuality.medium,
     ConfigKey.alwaysRemind: false,
     ConfigKey.dismissedNotificationOnboarding: false,
   };
@@ -101,6 +110,20 @@ class ConfigProvider with ChangeNotifier {
     ConfigKey.sadIcon: '😕',
     ConfigKey.verySadIcon: '😔',
     ConfigKey.noMoodIcon: '?',
+  };
+
+  static final imageQualityCompressionMapping = {
+    ImageQuality.noCompression: 100,
+    ImageQuality.high: 90,
+    ImageQuality.medium: 80,
+    ImageQuality.low: 75,
+  };
+
+  static final imageQualityMaxSizeMapping = {
+    ImageQuality.noCompression: null,
+    ImageQuality.high: 2100.0,
+    ImageQuality.medium: 1600.0,
+    ImageQuality.low: 1024.0,
   };
 
   dynamic get(String field) {
@@ -140,6 +163,17 @@ class ConfigProvider with ChangeNotifier {
       if (!_config.containsKey(key)) {
         _config[key] = _defaultConfig[key];
       }
+    }
+
+    // Remove old config keys
+    List<String> oldKeys = List.empty(growable: true);
+    for (String key in _config.keys) {
+      if (!_defaultConfig.containsKey(key)) {
+        oldKeys.add(key);
+      }
+    }
+    for (String key in oldKeys) {
+      _config.remove(key);
     }
 
     await writeConfig();

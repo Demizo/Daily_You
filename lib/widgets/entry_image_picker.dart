@@ -62,9 +62,12 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
 
   Future<void> _takePicture() async {
     final picker = ImagePicker();
+    final quality = ConfigProvider.instance.get(ConfigKey.imageQualityLevel);
     final pickedFile = await picker.pickImage(
         source: ImageSource.camera,
-        imageQuality: ConfigProvider.instance.get(ConfigKey.imageQuality));
+        maxWidth: ConfigProvider.imageQualityMaxSizeMapping[quality],
+        maxHeight: ConfigProvider.imageQualityMaxSizeMapping[quality],
+        imageQuality: ConfigProvider.imageQualityCompressionMapping[quality]);
 
     if (pickedFile != null) {
       await saveImage(pickedFile);
@@ -73,8 +76,11 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
 
   Future<void> _choosePicture() async {
     final picker = ImagePicker();
+    final quality = ConfigProvider.instance.get(ConfigKey.imageQualityLevel);
     final pickedFiles = await picker.pickMultiImage(
-        imageQuality: ConfigProvider.instance.get(ConfigKey.imageQuality));
+        maxWidth: ConfigProvider.imageQualityMaxSizeMapping[quality],
+        maxHeight: ConfigProvider.imageQualityMaxSizeMapping[quality],
+        imageQuality: ConfigProvider.imageQualityCompressionMapping[quality]);
 
     List<String> newImages = List.empty(growable: true);
     for (var file in pickedFiles) {

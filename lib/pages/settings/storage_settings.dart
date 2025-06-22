@@ -267,30 +267,33 @@ class _StorageSettingsState extends State<StorageSettings> {
                 ),
                 body: ListView(
                   children: [
-                    SettingsDropdown<int>(
+                    SettingsDropdown<String>(
                         title:
                             AppLocalizations.of(context)!.settingsImageQuality,
-                        settingsKey: ConfigKey.imageQuality,
+                        settingsKey: ConfigKey.imageQualityLevel,
                         options: [
-                          DropdownMenuItem<int>(
-                              value: 100,
+                          DropdownMenuItem<String>(
+                              value: ImageQuality.noCompression,
                               child: Text(AppLocalizations.of(context)!
                                   .imageQualityNoCompression)),
-                          DropdownMenuItem<int>(
-                              value: 90,
+                          DropdownMenuItem<String>(
+                              value: ImageQuality.high,
                               child: Text(AppLocalizations.of(context)!
                                   .imageQualityHigh)),
-                          DropdownMenuItem<int>(
-                              value: 75,
+                          DropdownMenuItem<String>(
+                              value: ImageQuality.medium,
                               child: Text(AppLocalizations.of(context)!
                                   .imageQualityMedium)),
-                          DropdownMenuItem<int>(
-                              value: 50,
+                          DropdownMenuItem<String>(
+                              value: ImageQuality.low,
                               child: Text(AppLocalizations.of(context)!
                                   .imageQualityLow)),
                         ],
-                        onChanged: (int? newValue) {
-                          configProvider.set(ConfigKey.imageQuality, newValue);
+                        onChanged: (String? newValue) {
+                          if (newValue != null) {
+                            configProvider.set(
+                                ConfigKey.imageQualityLevel, newValue);
+                          }
                         }),
                     FutureBuilder(
                         future: EntriesDatabase.instance.getInternalDbPath(),
