@@ -7,7 +7,7 @@ class LocalImageLoader extends StatelessWidget {
   final int cacheSize;
 
   const LocalImageLoader(
-      {super.key, required this.imagePath, this.cacheSize = 400});
+      {super.key, required this.imagePath, this.cacheSize = 500});
 
   @override
   Widget build(BuildContext context) {
