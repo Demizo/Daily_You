@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/time_manager.dart';
@@ -33,13 +32,14 @@ class AddEditEntryPage extends StatefulWidget {
   State<AddEditEntryPage> createState() => _AddEditEntryPageState();
 }
 
-class _AddEditEntryPageState extends State<AddEditEntryPage> {
-  late int id;
-  late String text;
-  late int? mood;
+class _AddEditEntryPageState extends State<AddEditEntryPage>
+    with WidgetsBindingObserver {
+  late Entry _entry;
+  int id = -1;
+  String text = "";
+  int? mood;
   late List<EntryImage> currentImages;
-  bool entryChanged = false;
-  bool loadingTemplate = true;
+  bool _loadingEntry = true;
   final ScrollController _scrollController = ScrollController();
   bool _isDragging = false;
   Timer? _autoScrollTimer;
@@ -48,26 +48,39 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
   final FocusNode _focusNode = FocusNode();
   final TextEditingController _textEditingController = TextEditingController();
   final UndoHistoryController _undoController = UndoHistoryController();
+  bool _deletingEntry = false;
+
+  Future<void> _initEntry() async {
+    if (widget.entry == null) {
+      _entry = await EntriesDatabase.instance
+          .createNewEntry(widget.overrideCreateDate ?? DateTime.now());
+    } else {
+      _entry = widget.entry!;
+    }
+    id = _entry.id ?? -1;
+    mood = _entry.mood;
+    text = _entry.text;
+    _textEditingController
+        .addListener(() => text = _textEditingController.text);
+    setState(() {
+      _loadingEntry = false;
+    });
+  }
 
   @override
   void initState() {
     super.initState();
-    id = widget.entry?.id ?? -1;
-    mood = widget.entry?.mood;
-    text = widget.entry?.text ?? '';
+    WidgetsBinding.instance.addObserver(this);
     currentImages = List.empty(growable: true);
-    currentImages.addAll(widget.images);
-    if (widget.entry == null) {
-      _loadTemplate();
-    } else {
-      loadingTemplate = false;
+    for (var image in widget.images) {
+      currentImages.add(image.copy());
     }
-    _textEditingController
-        .addListener(() => text = _textEditingController.text);
+    _initEntry();
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _scrollController.dispose();
     _focusNode.dispose();
     _textEditingController.dispose();
@@ -75,19 +88,11 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
     super.dispose();
   }
 
-  Future _loadTemplate() async {
-    var defaultTemplateId =
-        ConfigProvider.instance.get(ConfigKey.defaultTemplate);
-    if (defaultTemplateId != -1) {
-      var defaultTemplate =
-          await EntriesDatabase.instance.getTemplate(defaultTemplateId);
-      if (defaultTemplate != null) {
-        text = defaultTemplate.text ?? '';
-      }
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.hidden) {
+      _saveEntry();
     }
-    setState(() {
-      loadingTemplate = false;
-    });
   }
 
   void _showDeleteEntryPopup() {
@@ -101,8 +106,9 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
               child:
                   Text(MaterialLocalizations.of(context).deleteButtonTooltip),
               onPressed: () async {
-                await deleteEntry(id);
+                _deletingEntry = true;
                 Navigator.of(context).popUntil((route) => route.isFirst);
+                await _deleteEntry(id);
               },
             ),
             TextButton(
@@ -119,108 +125,100 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          actions: [if (widget.entry != null) deleteButton(), saveButton()],
-        ),
-        body: Column(children: [
-          Expanded(
-            child: Container(
-              constraints: BoxConstraints.loose(const Size.fromWidth(800)),
-              child: ListView(
-                padding: const EdgeInsets.only(left: 8, right: 8),
-                children: [
-                  if (currentImages.isEmpty)
-                    EntryImagePicker(
-                        imgPath: null,
-                        openCamera: widget.openCamera && !_openedCamera,
-                        onChangedImage: (imgPaths) {
-                          _openedCamera = true;
-                          if (imgPaths != null) {
-                            addLocalImage(imgPaths);
-                          }
-                        }),
-                  if (currentImages.isNotEmpty)
-                    SizedBox(
-                      height: 220,
-                      child: Listener(
-                        onPointerMove: _handlePointerMove,
-                        onPointerDown: _handlePointerDown,
-                        onPointerUp: _handlePointerUp,
-                        child: ListView.builder(
-                          controller: _scrollController,
-                          shrinkWrap: true,
-                          scrollDirection: Axis.horizontal,
-                          itemCount: currentImages.length + 1,
-                          itemBuilder: (context, index) {
-                            if (index == 0) {
-                              return EntryImagePicker(
-                                  imgPath: null,
-                                  openCamera:
-                                      widget.openCamera && !_openedCamera,
-                                  onChangedImage: (imgPaths) {
-                                    _openedCamera = true;
-                                    if (imgPaths != null) {
-                                      addLocalImage(imgPaths);
-                                    }
-                                  });
-                            } else {
-                              return _buildDraggableListItem(index - 1);
-                            }
-                          },
+  Widget build(BuildContext context) => _loadingEntry
+      ? Scaffold()
+      : PopScope(
+          onPopInvokedWithResult: (didPop, result) async {
+            if (!_deletingEntry) {
+              await _saveEntry();
+            }
+          },
+          child: Scaffold(
+            appBar: AppBar(actions: [_deleteButton()]),
+            body: Column(children: [
+              Expanded(
+                child: Container(
+                  constraints: BoxConstraints.loose(const Size.fromWidth(800)),
+                  child: ListView(
+                    padding: const EdgeInsets.only(left: 8, right: 8),
+                    children: [
+                      if (currentImages.isEmpty)
+                        EntryImagePicker(
+                            imgPath: null,
+                            openCamera: widget.openCamera && !_openedCamera,
+                            onChangedImage: (imgPaths) {
+                              _openedCamera = true;
+                              if (imgPaths != null) {
+                                _addLocalImage(imgPaths);
+                              }
+                            }),
+                      if (currentImages.isNotEmpty)
+                        SizedBox(
+                          height: 220,
+                          child: Listener(
+                            onPointerMove: _handlePointerMove,
+                            onPointerDown: _handlePointerDown,
+                            onPointerUp: _handlePointerUp,
+                            child: ListView.builder(
+                              controller: _scrollController,
+                              shrinkWrap: true,
+                              scrollDirection: Axis.horizontal,
+                              itemCount: currentImages.length + 1,
+                              itemBuilder: (context, index) {
+                                if (index == 0) {
+                                  return EntryImagePicker(
+                                      imgPath: null,
+                                      openCamera:
+                                          widget.openCamera && !_openedCamera,
+                                      onChangedImage: (imgPaths) {
+                                        _openedCamera = true;
+                                        if (imgPaths != null) {
+                                          _addLocalImage(imgPaths);
+                                        }
+                                      });
+                                } else {
+                                  return _buildDraggableListItem(index - 1);
+                                }
+                              },
+                            ),
+                          ),
                         ),
+                      StatefulBuilder(
+                        builder: (context, setState) => EntryMoodPicker(
+                            date: DateFormat.yMMMEd(WidgetsBinding
+                                    .instance.platformDispatcher.locale
+                                    .toString())
+                                .format(_entry.timeCreate),
+                            moodValue: mood,
+                            onChangedMood: (mood) =>
+                                {setState(() => this.mood = mood)}),
                       ),
-                    ),
-                  StatefulBuilder(
-                    builder: (context, setState) => EntryMoodPicker(
-                        date: widget.entry != null
-                            ? DateFormat.yMMMEd(WidgetsBinding
-                                    .instance.platformDispatcher.locale
-                                    .toString())
-                                .format(widget.entry!.timeCreate)
-                            : DateFormat.yMMMEd(WidgetsBinding
-                                    .instance.platformDispatcher.locale
-                                    .toString())
-                                .format(
-                                    widget.overrideCreateDate ?? DateTime.now()),
-                        moodValue: mood,
-                        onChangedMood: (mood) => {setState(() => this.mood = mood)}),
+                      StatefulBuilder(
+                          builder: (context, setState) => EntryTextEditor(
+                                text: text,
+                                focusNode: _focusNode,
+                                textEditingController: _textEditingController,
+                                undoHistoryController: _undoController,
+                              )),
+                      const SizedBox(height: 16),
+                    ],
                   ),
-                  if (!loadingTemplate)
-                    StatefulBuilder(
-                        builder: (context, setState) => EntryTextEditor(
-                              text: text,
-                              focusNode: _focusNode,
-                              textEditingController: _textEditingController,
-                              undoHistoryController: _undoController,
-                            )),
-                  const SizedBox(height: 16),
-                ],
+                ),
               ),
-            ),
+              SafeArea(
+                top: false,
+                child: EditToolbar(
+                  controller: _textEditingController,
+                  undoController: _undoController,
+                  focusNode: _focusNode,
+                  showTemplatesButton: true,
+                ),
+              ),
+            ]),
           ),
-          SafeArea(
-            top: false,
-            child: EditToolbar(
-              controller: _textEditingController,
-              undoController: _undoController,
-              focusNode: _focusNode,
-              showTemplatesButton: true,
-            ),
-          ),
-        ]),
-      );
+        );
 
-  Widget saveButton() {
-    return IconButton(
-      icon: const Icon(Icons.check),
-      onPressed: () async {
-        await addOrUpdateNote();
-      },
-    );
-  }
-
-  Widget deleteButton() => IconButton(
+  Widget _deleteButton() => IconButton(
         icon: const Icon(Icons.delete),
         onPressed: () => _showDeleteEntryPopup(),
       );
@@ -269,7 +267,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
           for (int i = 0; i < currentImages.length; i++) {
             currentImages[i].imgRank = currentImages.length - 1 - i;
           }
-          sortImages();
+          _sortImages();
           setState(() {
             currentImages;
           });
@@ -307,7 +305,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
             openCamera: false,
             onChangedImage: (imgPath) {
               if (imgPath == null) {
-                removeLocalImage(index);
+                _removeLocalImage(index);
               }
             }),
         const Padding(
@@ -353,18 +351,8 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
     });
   }
 
-  Future<void> addOrUpdateNote() async {
-    final isUpdating = widget.entry != null;
-
-    if (isUpdating) {
-      await updateEntry();
-    } else {
-      await addEntry();
-    }
-  }
-
-  Future updateEntry() async {
-    final updatedEntry = widget.entry!.copy(
+  Future<void> _saveEntry() async {
+    final updatedEntry = _entry.copy(
       text: text,
       mood: mood,
       timeModified: DateTime.now(),
@@ -374,30 +362,13 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
         TimeManager.isSameDay(DateTime.now(), updatedEntry.timeCreate)) {
       await NotificationManager.instance.dismissReminderNotification();
     }
-
-    var entry = await EntriesDatabase.instance.updateEntry(updatedEntry);
-    await saveOrUpdateImage(widget.entry!.id!);
-    Navigator.of(context).pop(entry);
-  }
-
-  Future addEntry() async {
-    final newEntry = Entry(
-      text: text,
-      mood: mood,
-      timeCreate: widget.overrideCreateDate ?? DateTime.now(),
-      timeModified: DateTime.now(),
-    );
-
-    if (Platform.isAndroid &&
-        TimeManager.isSameDay(DateTime.now(), newEntry.timeCreate)) {
-      await NotificationManager.instance.dismissReminderNotification();
+    if (updatedEntry.text != _entry.text || updatedEntry.mood != _entry.mood) {
+      await EntriesDatabase.instance.updateEntry(updatedEntry);
     }
-    var entry = await EntriesDatabase.instance.addEntry(newEntry);
-    await saveOrUpdateImage(entry.id!);
-    Navigator.of(context).pop(entry);
+    await _saveOrUpdateImage(id);
   }
 
-  Future deleteEntry(int id) async {
+  Future _deleteEntry(int id) async {
     // Delete entry images
     var entryImages = await EntriesDatabase.instance.getImagesForEntry(id);
     for (EntryImage image in entryImages) {
@@ -408,7 +379,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
     await EntriesDatabase.instance.deleteEntry(id);
   }
 
-  Future saveOrUpdateImage(int entryId) async {
+  Future _saveOrUpdateImage(int entryId) async {
     // Add images
     for (EntryImage currentImage in currentImages) {
       currentImage.entryId = entryId;
@@ -427,13 +398,13 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
       if (matchingImage == null) {
         // Delete image
         await EntriesDatabase.instance.removeImg(existingImage);
-      } else {
+      } else if (matchingImage.imgRank != existingImage.imgRank) {
         await EntriesDatabase.instance.updateImg(matchingImage);
       }
     }
   }
 
-  void sortImages() {
+  void _sortImages() {
     currentImages.sort((a, b) {
       if (a.imgRank == b.imgRank) {
         return 0;
@@ -445,27 +416,27 @@ class _AddEditEntryPageState extends State<AddEditEntryPage> {
     });
   }
 
-  void addLocalImage(List<String> imgPaths) {
+  void _addLocalImage(List<String> imgPaths) {
     for (var imgPath in imgPaths) {
       currentImages.add(EntryImage(
-          entryId: widget.entry?.id,
+          entryId: id,
           imgPath: imgPath,
           imgRank: currentImages.length,
           timeCreate: DateTime.now()));
-      sortImages();
+      _sortImages();
     }
     setState(() {
       currentImages;
     });
   }
 
-  void removeLocalImage(int index) {
+  void _removeLocalImage(int index) {
     currentImages.remove(currentImages[index]);
     // Update ranks
     for (int i = 0; i < currentImages.length; i++) {
       currentImages[i].imgRank = currentImages.length - 1 - i;
     }
-    sortImages();
+    _sortImages();
     setState(() {
       currentImages;
     });
