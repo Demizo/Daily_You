@@ -228,5 +228,9 @@
   "settingsConsiderSupporting": "pensez à soutenir",
   "@settingsConsiderSupporting": {},
   "settingsTranslateCallToAction": "Tout le monde devrait avoir accès à un journal !",
-  "@settingsTranslateCallToAction": {}
+  "@settingsTranslateCallToAction": {},
+  "settingsDailyReminderOnboarding": "Activer le rappel quotidien pour être consistant !",
+  "@settingsDailyReminderOnboarding": {},
+  "wordCount": "{count, plural, one{{count} mot} other{{count} mots}}",
+  "@wordCount": {}
 }
