@@ -232,5 +232,7 @@
   "settingsDailyReminderOnboarding": "开启每日提醒，保持自己的连贯性！",
   "@settingsDailyReminderOnboarding": {},
   "settingsNotificationsPermissionsPrompt": "为了按时发送提醒，应用将请求通知权限。",
-  "@settingsNotificationsPermissionsPrompt": {}
+  "@settingsNotificationsPermissionsPrompt": {},
+  "wordCount": "{count, plural, one{{count} 个字} other{{count} 个字}}",
+  "@wordCount": {}
 }

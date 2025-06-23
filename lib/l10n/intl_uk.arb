@@ -228,5 +228,7 @@
   "settingsNotificationsPermissionsPrompt": "Для надсилання нагадування у випадковий момент або у вибраний вами час буде запрошено дозвіл на «запланування будильників».",
   "@settingsNotificationsPermissionsPrompt": {},
   "settingsDailyReminderOnboarding": "Увімкніть щоденні нагадування, щоб залишатися послідовним!",
-  "@settingsDailyReminderOnboarding": {}
+  "@settingsDailyReminderOnboarding": {},
+  "wordCount": "{count, plural, one{{count} слово} other{{count} слова}}",
+  "@wordCount": {}
 }
