@@ -1,0 +1,11 @@
+Daily You v2.9.0 has arrived! This one is all about the writing experience:
+
+• Logs now save automatically
+• Revamped the editor toolbar
+• Smarter markdown support with automatic bullet points
+• Added undo and redo buttons
+• Added log count and word count (for supported languages) to the stats page
+• Image quality setting now affects image dimensions
+• Increased image thumbnail quality
+• Minor UI improvements
+• Updated translations

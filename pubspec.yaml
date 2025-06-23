@@ -1,7 +1,7 @@
 name: daily_you
 description: Every day is worth remembering...
 publish_to: 'none'
-version: 2.8.2
+version: 2.9.0
 
 environment:
   sdk: '>=3.0.0'
