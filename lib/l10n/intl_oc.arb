@@ -144,5 +144,7 @@
   "cleanUpStatus": "Netejatge…",
   "@cleanUpStatus": {},
   "importImages": "Importar los imatges",
-  "@importImages": {}
+  "@importImages": {},
+  "wordCount": "{count, plural, one{{count} mot} other{{count} mots}}",
+  "@wordCount": {}
 }
