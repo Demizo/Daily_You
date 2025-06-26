@@ -56,7 +56,10 @@ Everyone should have access to a journal! **Daily You** uses [Weblate](https://w
 ## Support The App
 **Daily You** is _free forever_ since everyone deserves a journal that is truly their own. If you find yourself enjoying the app, please consider supporting its continued development.
 
+<p>
+<a href="https://liberapay.com/Daily-You/donate"><img alt="Donate using Liberapay" height="56" src="https://liberapay.com/assets/widgets/donate.svg"></a>
 <a href="https://buymeacoffee.com/demizo"><img alt="Buy me a Coffee" height="56" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/donate/buymeacoffee-singular_vector.svg"></a>
+</p>
 
 ## Development
 The full development environment is defined using [Nix](https://nixos.org/). Simply, install the [Nix Package Manager](https://nixos.org/download/), clone the repository, enter the project directory, and run `nix develop`, that's it! Alternatively, **Daily You** is built using Flutter. You can directly [install Flutter](https://docs.flutter.dev/get-started/install), clone the repository, enter the project directory, and run `flutter pub get`.
