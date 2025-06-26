@@ -1,15 +1,24 @@
 import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/file_layer.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/stats_provider.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:html2md/html2md.dart' as html2md;
 
 enum ImportFormat {
   none,
   dailyYouJson,
+  diarium,
   myBrain,
   oneShot,
   pixels,
@@ -205,104 +214,112 @@ class ImportUtils {
   static Future<bool> importFromMyBrain(Function(String) updateStatus) async {
     updateStatus("0%");
 
-    var selectedFile = await FileLayer.pickFile(
-        allowedExtensions: ['json'], mimeTypes: ['application/json']);
-    if (selectedFile == null) return false;
+    bool success = true;
 
-    var bytes = await FileLayer.getFileBytes(selectedFile);
-    if (bytes == null) return false;
-    final jsonData = json.decode(utf8.decode(bytes.toList()));
+    try {
+      var selectedFile = await FileLayer.pickFile(
+          allowedExtensions: ['json'], mimeTypes: ['application/json']);
+      if (selectedFile == null) return false;
 
-    final moodMap = {
-      'TERRIBLE': -2,
-      'BAD': -1,
-      'OKAY': 0,
-      'GOOD': 1,
-      'AWESOME': 2,
-    };
+      var bytes = await FileLayer.getFileBytes(selectedFile);
+      if (bytes == null) return false;
+      final jsonData = json.decode(utf8.decode(bytes.toList()));
 
-    // Group entries by date (yyyy-MM-dd)
-    Map<String, List<Map<String, dynamic>>> groupedByDay = {};
+      final moodMap = {
+        'TERRIBLE': -2,
+        'BAD': -1,
+        'OKAY': 0,
+        'GOOD': 1,
+        'AWESOME': 2,
+      };
 
-    for (var entry in jsonData) {
-      final date = DateTime.fromMillisecondsSinceEpoch(entry['createdDate'],
-          isUtc: true);
-      final dateKey =
-          "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+      // Group entries by date (yyyy-MM-dd)
+      Map<String, List<Map<String, dynamic>>> groupedByDay = {};
 
-      groupedByDay.putIfAbsent(dateKey, () => []).add(entry);
-    }
-
-    final totalDays = groupedByDay.length;
-    var processedDays = 0;
-
-    for (var entryList in groupedByDay.values) {
-      final contents = <String>[];
-      final moods = <int>[];
-      DateTime? earliestCreated;
-      DateTime? latestModified;
-
-      for (var entry in entryList) {
-        final title = entry['title'];
-        final content = entry['content'];
-        if (title != null) {
-          contents.add("# $title");
-        }
-        if (content != null) {
-          contents.add(content);
-        }
-
-        int? mappedMood;
-        final mood = entry['mood'];
-        if (mood != null) {
-          mappedMood = moodMap[entry['mood']];
-        }
-
-        if (mappedMood != null) {
-          moods.add(mappedMood);
-        }
-
-        final created = DateTime.fromMillisecondsSinceEpoch(
-            entry['createdDate'],
+      for (var entry in jsonData['diary']) {
+        final date = DateTime.fromMillisecondsSinceEpoch(entry['createdDate'],
             isUtc: true);
-        final updated = DateTime.fromMillisecondsSinceEpoch(
-            entry['updatedDate'],
-            isUtc: true);
+        final dateKey =
+            "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
 
-        if (earliestCreated == null || created.isBefore(earliestCreated)) {
-          earliestCreated = created;
+        groupedByDay.putIfAbsent(dateKey, () => []).add(entry);
+      }
+
+      final totalDays = groupedByDay.length;
+      var processedDays = 0;
+
+      for (var entryList in groupedByDay.values) {
+        final contents = <String>[];
+        final moods = <int>[];
+        DateTime? earliestCreated;
+        DateTime? latestModified;
+
+        for (var entry in entryList) {
+          final title = entry['title'];
+          final content = entry['content'];
+          if (title != null) {
+            contents.add("# $title");
+          }
+          if (content != null) {
+            contents.add(content);
+          }
+
+          int? mappedMood;
+          final mood = entry['mood'];
+          if (mood != null) {
+            mappedMood = moodMap[entry['mood']];
+          }
+
+          if (mappedMood != null) {
+            moods.add(mappedMood);
+          }
+
+          final created = DateTime.fromMillisecondsSinceEpoch(
+              entry['createdDate'],
+              isUtc: true);
+          final updated = DateTime.fromMillisecondsSinceEpoch(
+              entry['updatedDate'],
+              isUtc: true);
+
+          if (earliestCreated == null || created.isBefore(earliestCreated)) {
+            earliestCreated = created;
+          }
+
+          if (latestModified == null || updated.isAfter(latestModified)) {
+            latestModified = updated;
+          }
         }
 
-        if (latestModified == null || updated.isAfter(latestModified)) {
-          latestModified = updated;
+        int? averageMood;
+        if (moods.isNotEmpty) {
+          averageMood = (moods.reduce((a, b) => a + b) / moods.length).round();
         }
-      }
+        String? combinedText;
+        if (contents.isNotEmpty) {
+          combinedText = contents.join("\n\n");
+        }
 
-      int? averageMood;
-      if (moods.isNotEmpty) {
-        averageMood = (moods.reduce((a, b) => a + b) / moods.length).round();
-      }
-      String? combinedText;
-      if (contents.isNotEmpty) {
-        combinedText = contents.join("\n\n");
-      }
+        // Only add if there’s no entry already on this date
+        if (await EntriesDatabase.instance.getEntryForDate(earliestCreated!) ==
+            null) {
+          await EntriesDatabase.instance.addEntry(
+            Entry(
+              text: combinedText ?? '',
+              mood: averageMood,
+              timeCreate: earliestCreated,
+              timeModified: latestModified!,
+            ),
+            updateStatsAndSync: false,
+          );
+        }
 
-      // Only add if there’s no entry already on this date
-      if (await EntriesDatabase.instance.getEntryForDate(earliestCreated!) ==
-          null) {
-        await EntriesDatabase.instance.addEntry(
-          Entry(
-            text: combinedText ?? '',
-            mood: averageMood,
-            timeCreate: earliestCreated,
-            timeModified: latestModified!,
-          ),
-          updateStatsAndSync: false,
-        );
+        processedDays += 1;
+        updateStatus("${((processedDays / totalDays) * 100).round()}%");
       }
-
-      processedDays += 1;
-      updateStatus("${((processedDays / totalDays) * 100).round()}%");
+    } catch (e) {
+      updateStatus("$e");
+      await Future.delayed(Duration(seconds: 5));
+      success = false;
     }
 
     // Sync and update stats
@@ -314,6 +331,200 @@ class ImportUtils {
     }
     StatsProvider.instance.updateStats();
 
-    return true;
+    return success;
+  }
+
+  static DateTime diariumIdToDateTime(int ticks) {
+    const int ticksAtUnixEpoch = 621355968000000000;
+    final usSinceEpoch = ((ticks - ticksAtUnixEpoch) / 10).round();
+    return DateTime.fromMicrosecondsSinceEpoch(usSinceEpoch, isUtc: true);
+  }
+
+  static Future<bool> importFromDiarium(
+      BuildContext context, Function(String) updateStatus) async {
+    updateStatus("0%");
+
+    var tempDir = await getTemporaryDirectory();
+    final tempDbName = "temp_diarium.db";
+    Database? db;
+    bool success = true;
+
+    try {
+      final dbPath = await FileLayer.pickFile();
+      if (dbPath == null) return false;
+
+      updateStatus(AppLocalizations.of(context)!.tranferStatus("0"));
+
+      final dbSize = await FileLayer.getFileSize(dbPath);
+      if (dbSize == null || dbSize == 0) return false;
+
+      var readStream =
+          await FileLayer.readFileStream(dbPath, useExternalPath: true);
+      if (readStream == null) return false;
+      var writeStream = await FileLayer.openFileWriteStream(
+          tempDir.path, tempDbName,
+          useExternalPath: false);
+      if (writeStream == null) return false;
+
+      var transferredSize = 0;
+
+      await for (List<int> chunk in readStream) {
+        await FileLayer.writeFileWriteStreamChunk(
+            writeStream, Uint8List.fromList(chunk));
+        transferredSize += chunk.length;
+        var percent = (transferredSize / dbSize) * 100;
+        updateStatus(
+            AppLocalizations.of(context)!.tranferStatus("${percent.round()}"));
+      }
+      await FileLayer.closeFileWriteStream(writeStream);
+
+      db = await openDatabase(join(tempDir.path, tempDbName), readOnly: true);
+
+      final entries = await db.rawQuery('SELECT * FROM Entries');
+      final media = await db.rawQuery('SELECT * FROM Media WHERE Type = 0');
+
+      // Group entries by date key (yyyy-MM-dd)
+      final Map<String, List<Map<String, Object?>>> entriesByDate = {};
+      final Map<int, DateTime> idToTimestamp = {};
+
+      for (final entry in entries) {
+        final id = entry['DiaryEntryId'] as int;
+        final timestamp = diariumIdToDateTime(id);
+        idToTimestamp[id] = timestamp;
+
+        final dateKey =
+            "${timestamp.year}-${timestamp.month.toString().padLeft(2, '0')}-${timestamp.day.toString().padLeft(2, '0')}";
+        entriesByDate.putIfAbsent(dateKey, () => []).add(entry);
+      }
+
+      final mediaByEntryId = <int, List<Map<String, Object?>>>{};
+      for (final item in media) {
+        final entryId = item['DiaryEntryId'] as int;
+        mediaByEntryId.putIfAbsent(entryId, () => []).add(item);
+      }
+
+      final totalDays = entriesByDate.length;
+      int processedDays = 0;
+
+      for (final dayEntries in entriesByDate.values) {
+        // Sort chronologically by ID/timestamp
+        dayEntries.sort((a, b) =>
+            (a['DiaryEntryId'] as int).compareTo(b['DiaryEntryId'] as int));
+
+        final texts = <String>[];
+        final moods = <int>[];
+        DateTime? earliest, latest;
+
+        final images = <Map<String, dynamic>>[];
+
+        for (final entry in dayEntries) {
+          final id = entry['DiaryEntryId'] as int;
+          final heading = entry['Heading'] as String? ?? '';
+          var body = entry['Text'] as String? ?? '';
+          if (body.isNotEmpty) {
+            // Convert to markdown
+            body = html2md.convert(body);
+          }
+
+          final rating = entry['Rating'] as int?;
+
+          if (rating != null) {
+            // Convert to range of -2 to 2
+            moods.add(rating.clamp(1, 5) - 3);
+          }
+
+          if (heading.isNotEmpty) {
+            texts.add("# $heading");
+          }
+          if (body.isNotEmpty) {
+            texts.add(body);
+          }
+
+          final created = idToTimestamp[id]!;
+          if (earliest == null || created.isBefore(earliest)) {
+            earliest = created;
+          }
+          if (latest == null || created.isAfter(latest)) latest = created;
+
+          // Collect media for this entry
+          for (final img in mediaByEntryId[id] ?? []) {
+            final data = img['Data'] as Uint8List?;
+            // Daily You uses a ranking system rather than indexes. The highest rank is shown first
+            final rank =
+                mediaByEntryId[id]!.length - 1 - img['Index'] as int? ?? 0;
+            if (data != null) {
+              images.add({
+                'data': data,
+                'rank': rank,
+              });
+            }
+          }
+        }
+
+        // Compose final text & mood
+        final combinedText = texts.join('\n\n');
+        final averageMood = moods.isNotEmpty
+            ? (moods.reduce((a, b) => a + b) / moods.length).round()
+            : null;
+
+        // Skip day if it already has an entry
+        if (await EntriesDatabase.instance.getEntryForDate(earliest!) == null) {
+          final addedEntry = await EntriesDatabase.instance.addEntry(
+            Entry(
+              text: combinedText,
+              mood: averageMood,
+              timeCreate: earliest,
+              timeModified: latest!,
+            ),
+            updateStatsAndSync: false,
+          );
+
+          for (final img in images) {
+            final newImage = await EntriesDatabase.instance.createImg(
+              null,
+              img['data'],
+            );
+
+            if (newImage != null) {
+              await EntriesDatabase.instance.addImg(
+                EntryImage(
+                  id: null,
+                  entryId: addedEntry.id!,
+                  imgPath: newImage,
+                  imgRank: img['rank'],
+                  timeCreate: earliest,
+                ),
+                updateStatsAndSync: false,
+              );
+            }
+          }
+        }
+
+        processedDays++;
+        updateStatus("${((processedDays / totalDays) * 100).round()}%");
+      }
+    } catch (e) {
+      updateStatus("$e");
+      await Future.delayed(Duration(seconds: 5));
+      success = false;
+    }
+
+    updateStatus(AppLocalizations.of(context)!.cleanUpStatus);
+
+    if (EntriesDatabase.instance.usingExternalDb()) {
+      await EntriesDatabase.instance.syncDatabase();
+    }
+    // Images were created externally as they were added. No need to sync with external image folder
+    StatsProvider.instance.updateStats();
+
+    if (db != null && db.isOpen) {
+      await db.close();
+    }
+
+    if (await File(join(tempDir.path, tempDbName)).exists()) {
+      await File(join(tempDir.path, tempDbName)).delete();
+    }
+
+    return success;
   }
 }

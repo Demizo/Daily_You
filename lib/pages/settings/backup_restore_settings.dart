@@ -37,6 +37,12 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
                     Navigator.of(context).pop();
                   }),
               ListTile(
+                  title: Text(AppLocalizations.of(context)!.formatDiarium),
+                  onTap: () {
+                    chosenFormat = ImportFormat.diarium;
+                    Navigator.of(context).pop();
+                  }),
+              ListTile(
                   title: Text(AppLocalizations.of(context)!.formatMyBrain),
                   onTap: () {
                     chosenFormat = ImportFormat.myBrain;
@@ -67,6 +73,10 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
 
       if (chosenFormat == ImportFormat.dailyYouJson) {
         await ImportUtils.importFromJson((status) {
+          statusNotifier.value = status;
+        });
+      } else if (chosenFormat == ImportFormat.diarium) {
+        await ImportUtils.importFromDiarium(context, (status) {
           statusNotifier.value = status;
         });
       } else if (chosenFormat == ImportFormat.myBrain) {

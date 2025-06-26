@@ -308,10 +308,11 @@ DROP TABLE old_entries;
     return bytes;
   }
 
-  Future<String?> createImg(String imageName, Uint8List bytes) async {
+  Future<String?> createImg(String? imageName, Uint8List bytes) async {
     final currTime = DateTime.now();
+
     // Don't make a copy of files already in the folder
-    if (await getImgBytes(imageName) != null) {
+    if (imageName != null && await getImgBytes(imageName) != null) {
       return imageName;
     }
 
