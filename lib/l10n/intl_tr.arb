@@ -109,7 +109,7 @@
   "@settingsReminderTime": {},
   "settingsFixedReminderTimeTitle": "Sabit hatırlatma zamanı",
   "@settingsFixedReminderTimeTitle": {},
-  "settingsDailyReminderDescription": "En iyi sonuçlar için uygulamanın arka planda çalışmasına izin verin",
+  "settingsDailyReminderDescription": "Her gün nazik bir hatırlatma",
   "@settingsDailyReminderDescription": {},
   "settingsTemplatesTitle": "Şablonlar",
   "@settingsTemplatesTitle": {},
@@ -228,5 +228,9 @@
   "settingsLanguageTitle": "Dil",
   "@settingsLanguageTitle": {},
   "settingsHelpTranslate": "Çeviri yardımı",
-  "@settingsHelpTranslate": {}
+  "@settingsHelpTranslate": {},
+  "wordCount": "{count, plural, one{{count} sözcük} other{{count} sözcük}}",
+  "@wordCount": {},
+  "settingsDailyReminderOnboarding": "Süreklilik için günlük hatırlatıcıları etkinleştirin!",
+  "@settingsDailyReminderOnboarding": {}
 }
