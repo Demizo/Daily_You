@@ -10,6 +10,7 @@ import 'package:intl/intl.dart';
 enum ImportFormat {
   none,
   dailyYouJson,
+  myBrain,
   oneShot,
   pixels,
 }
@@ -187,6 +188,121 @@ class ImportUtils {
       }
       processedEntries += 1;
       updateStatus("${((processedEntries / totalEntries) * 100).round()}%");
+    }
+
+    // Sync and update stats
+    if (EntriesDatabase.instance.usingExternalDb()) {
+      await EntriesDatabase.instance.syncDatabase();
+    }
+    if (EntriesDatabase.instance.usingExternalImg()) {
+      await EntriesDatabase.instance.syncImageFolder(true);
+    }
+    StatsProvider.instance.updateStats();
+
+    return true;
+  }
+
+  static Future<bool> importFromMyBrain(Function(String) updateStatus) async {
+    updateStatus("0%");
+
+    var selectedFile = await FileLayer.pickFile(
+        allowedExtensions: ['json'], mimeTypes: ['application/json']);
+    if (selectedFile == null) return false;
+
+    var bytes = await FileLayer.getFileBytes(selectedFile);
+    if (bytes == null) return false;
+    final jsonData = json.decode(utf8.decode(bytes.toList()));
+
+    final moodMap = {
+      'TERRIBLE': -2,
+      'BAD': -1,
+      'OKAY': 0,
+      'GOOD': 1,
+      'AWESOME': 2,
+    };
+
+    // Group entries by date (yyyy-MM-dd)
+    Map<String, List<Map<String, dynamic>>> groupedByDay = {};
+
+    for (var entry in jsonData) {
+      final date = DateTime.fromMillisecondsSinceEpoch(entry['createdDate'],
+          isUtc: true);
+      final dateKey =
+          "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+
+      groupedByDay.putIfAbsent(dateKey, () => []).add(entry);
+    }
+
+    final totalDays = groupedByDay.length;
+    var processedDays = 0;
+
+    for (var entryList in groupedByDay.values) {
+      final contents = <String>[];
+      final moods = <int>[];
+      DateTime? earliestCreated;
+      DateTime? latestModified;
+
+      for (var entry in entryList) {
+        final title = entry['title'];
+        final content = entry['content'];
+        if (title != null) {
+          contents.add("# $title");
+        }
+        if (content != null) {
+          contents.add(content);
+        }
+
+        int? mappedMood;
+        final mood = entry['mood'];
+        if (mood != null) {
+          mappedMood = moodMap[entry['mood']];
+        }
+
+        if (mappedMood != null) {
+          moods.add(mappedMood);
+        }
+
+        final created = DateTime.fromMillisecondsSinceEpoch(
+            entry['createdDate'],
+            isUtc: true);
+        final updated = DateTime.fromMillisecondsSinceEpoch(
+            entry['updatedDate'],
+            isUtc: true);
+
+        if (earliestCreated == null || created.isBefore(earliestCreated)) {
+          earliestCreated = created;
+        }
+
+        if (latestModified == null || updated.isAfter(latestModified)) {
+          latestModified = updated;
+        }
+      }
+
+      int? averageMood;
+      if (moods.isNotEmpty) {
+        averageMood = (moods.reduce((a, b) => a + b) / moods.length).round();
+      }
+      String? combinedText;
+      if (contents.isNotEmpty) {
+        combinedText = contents.join("\n\n");
+      }
+
+      // Only add if there’s no entry already on this date
+      if (await EntriesDatabase.instance.getEntryForDate(earliestCreated!) ==
+          null) {
+        await EntriesDatabase.instance.addEntry(
+          Entry(
+            text: combinedText ?? '',
+            mood: averageMood,
+            timeCreate: earliestCreated,
+            timeModified: latestModified!,
+          ),
+          updateStatsAndSync: false,
+        );
+      }
+
+      processedDays += 1;
+      updateStatus("${((processedDays / totalDays) * 100).round()}%");
     }
 
     // Sync and update stats

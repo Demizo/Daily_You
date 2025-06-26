@@ -211,6 +211,8 @@
   "@logFormatDescription": {},
   "formatDailyYouJson": "Daily You (JSON)",
   "@formatDailyYouJson": {},
+  "formatMyBrain": "My Brain",
+  "@formatMyBrain": {},
   "formatOneShot": "OneShot",
   "@formatOneShot": {},
   "formatPixels": "Pixels",
