@@ -319,15 +319,16 @@ DROP TABLE old_entries;
       return imageName;
     }
 
-    var newImageName =
-        "daily_you_${currTime.month}_${currTime.day}_${currTime.year}-${currTime.hour}.${currTime.minute}.${currTime.second}.jpg";
+    final timestamp =
+        currTime.toIso8601String().split('.').first.replaceAll(':', '-');
+
+    var newImageName = "daily_you_$timestamp.jpg";
 
     // Ensure unique name
     int index = 1;
     while (await FileLayer.exists(await getInternalImgDatabasePath(),
         name: newImageName, useExternalPath: false)) {
-      newImageName =
-          "daily_you_${currTime.month}_${currTime.day}_${currTime.year}-${currTime.hour}.${currTime.minute}.${currTime.second}_$index.jpg";
+      newImageName = "daily_you_${timestamp}_$index.jpg";
       index += 1;
     }
 
