@@ -52,8 +52,11 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
 
   Future<void> _initEntry() async {
     if (widget.entry == null) {
-      _entry = await EntriesDatabase.instance
-          .createNewEntry(widget.overrideCreateDate ?? DateTime.now());
+      var createTime =
+          (TimeManager.isToday(widget.overrideCreateDate ?? DateTime.now()))
+              ? DateTime.now()
+              : (widget.overrideCreateDate ?? DateTime.now());
+      _entry = await EntriesDatabase.instance.createNewEntry(createTime);
     } else {
       _entry = widget.entry!;
     }
