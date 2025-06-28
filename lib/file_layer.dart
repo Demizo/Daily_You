@@ -281,4 +281,62 @@ class FileLayer {
     }
     return fileNames;
   }
+
+  static Future<bool> copyFromExternalLocation(
+      String externalFile, String internalFolder, String outputFile,
+      {Function(double percent)? onProgress}) async {
+    final fileSize = await FileLayer.getFileSize(externalFile);
+    if (fileSize == null || fileSize == 0) return false;
+
+    var readStream =
+        await FileLayer.readFileStream(externalFile, useExternalPath: true);
+    if (readStream == null) return false;
+    var writeStream = await FileLayer.openFileWriteStream(
+        internalFolder, outputFile,
+        useExternalPath: false);
+    if (writeStream == null) return false;
+
+    var transferredSize = 0;
+
+    await for (List<int> chunk in readStream) {
+      await FileLayer.writeFileWriteStreamChunk(
+          writeStream, Uint8List.fromList(chunk));
+      transferredSize += chunk.length;
+      var percent = (transferredSize / fileSize) * 100;
+      if (onProgress != null) {
+        onProgress(percent);
+      }
+    }
+    await FileLayer.closeFileWriteStream(writeStream);
+    return true;
+  }
+
+  static Future<bool> copyToExternalLocation(
+      String localFile, String externalFolder, String outputFile,
+      {Function(double percent)? onProgress}) async {
+    final fileSize =
+        await FileLayer.getFileSize(localFile, useExternalPath: false);
+    if (fileSize == null || fileSize == 0) return false;
+
+    var readStream =
+        await FileLayer.readFileStream(localFile, useExternalPath: false);
+    if (readStream == null) return false;
+    var writeStream =
+        await FileLayer.openFileWriteStream(externalFolder, outputFile);
+    if (writeStream == null) return false;
+
+    var transferredSize = 0;
+
+    await for (List<int> chunk in readStream) {
+      await FileLayer.writeFileWriteStreamChunk(
+          writeStream, Uint8List.fromList(chunk));
+      transferredSize += chunk.length;
+      var percent = (transferredSize / fileSize) * 100;
+      if (onProgress != null) {
+        onProgress(percent);
+      }
+    }
+    await FileLayer.closeFileWriteStream(writeStream);
+    return true;
+  }
 }

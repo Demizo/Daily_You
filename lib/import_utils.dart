@@ -353,33 +353,15 @@ class ImportUtils {
       final dbPath = await FileLayer.pickFile();
       if (dbPath == null) return false;
 
+      // Transfer DB to local storage
       updateStatus(AppLocalizations.of(context)!.tranferStatus("0"));
-
-      final dbSize = await FileLayer.getFileSize(dbPath);
-      if (dbSize == null || dbSize == 0) return false;
-
-      var readStream =
-          await FileLayer.readFileStream(dbPath, useExternalPath: true);
-      if (readStream == null) return false;
-      var writeStream = await FileLayer.openFileWriteStream(
-          tempDir.path, tempDbName,
-          useExternalPath: false);
-      if (writeStream == null) return false;
-
-      var transferredSize = 0;
-
-      await for (List<int> chunk in readStream) {
-        await FileLayer.writeFileWriteStreamChunk(
-            writeStream, Uint8List.fromList(chunk));
-        transferredSize += chunk.length;
-        var percent = (transferredSize / dbSize) * 100;
+      await FileLayer.copyFromExternalLocation(dbPath, tempDir.path, tempDbName,
+          onProgress: (percent) {
         updateStatus(
             AppLocalizations.of(context)!.tranferStatus("${percent.round()}"));
-      }
-      await FileLayer.closeFileWriteStream(writeStream);
+      });
 
       db = await openDatabase(join(tempDir.path, tempDbName), readOnly: true);
-
       final entries = await db.rawQuery('SELECT * FROM Entries');
       final media = await db.rawQuery('SELECT * FROM Media WHERE Type = 0');
 
