@@ -50,6 +50,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   final TextEditingController _textEditingController = TextEditingController();
   final UndoHistoryController _undoController = UndoHistoryController();
   bool _deletingEntry = false;
+  bool _savingEntry = false;
 
   Future<void> _initEntry() async {
     if (widget.entry == null) {
@@ -356,20 +357,28 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   }
 
   Future<void> _saveEntry() async {
-    final updatedEntry = _entry.copy(
-      text: text,
-      mood: mood,
-      timeModified: DateTime.now(),
-    );
+    // Saving is guarded since quickly entering and exiting the app could trigger
+    // multiple async saves.
+    if (_savingEntry == false) {
+      _savingEntry = true;
 
-    if (Platform.isAndroid &&
-        TimeManager.isSameDay(DateTime.now(), updatedEntry.timeCreate)) {
-      await NotificationManager.instance.dismissReminderNotification();
+      final updatedEntry = _entry.copy(
+        text: text,
+        mood: mood,
+        timeModified: DateTime.now(),
+      );
+
+      if (Platform.isAndroid &&
+          TimeManager.isSameDay(DateTime.now(), updatedEntry.timeCreate)) {
+        await NotificationManager.instance.dismissReminderNotification();
+      }
+      if (updatedEntry.text != _entry.text ||
+          updatedEntry.mood != _entry.mood) {
+        await EntriesDatabase.instance.updateEntry(updatedEntry);
+      }
+      await _saveOrUpdateImage(id);
+      _savingEntry = false;
     }
-    if (updatedEntry.text != _entry.text || updatedEntry.mood != _entry.mood) {
-      await EntriesDatabase.instance.updateEntry(updatedEntry);
-    }
-    await _saveOrUpdateImage(id);
   }
 
   Future _deleteEntry(int id) async {
