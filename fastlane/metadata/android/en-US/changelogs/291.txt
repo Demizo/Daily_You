@@ -1,0 +1,6 @@
+Daily You v2.9.1 has arrived! Here are the changes:
+
+• Fixed auto-save leading to duplicate images
+• Fixed inaccurate time of day when adding today's entry from the calendar
+• Updated image name format to be more sortable
+• Updated translations
