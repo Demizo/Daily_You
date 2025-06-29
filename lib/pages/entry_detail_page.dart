@@ -78,9 +78,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
           final statsProvider = Provider.of<StatsProvider>(context);
 
           var entry = entries[currentIndex];
-          var images = statsProvider.images
-              .where((img) => img.entryId == entry.id!)
-              .toList();
+          var images = statsProvider.getImagesForEntry(entry);
 
           return IconButton(
               icon: const Icon(Icons.edit_rounded),
