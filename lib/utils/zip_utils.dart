@@ -77,12 +77,15 @@ class ZipUtils {
       if (entry.isFile) {
         final bytes = entry.readBytes();
         if (bytes == null) continue;
-        final parent =
-            Directory(File(join(args["outputFolder"], entry.name)).parent.path);
-        if (await parent.exists() == false) {
-          await parent.create(recursive: true);
+        // Fix for Zip encodings that place / at the start of files paths.
+        // All Zip paths should be relative
+        String fileName = entry.name;
+        if (fileName.startsWith('/')) {
+          fileName = fileName.substring(1);
         }
-        await File(join(args["outputFolder"], entry.name)).writeAsBytes(bytes);
+        final file = File(join(args["outputFolder"], fileName));
+        await file.create(recursive: true);
+        await file.writeAsBytes(bytes);
 
         // Updates status
         processedFileCount += 1;
