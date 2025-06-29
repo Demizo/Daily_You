@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/notification_manager.dart';
+import 'package:daily_you/stats_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/edit_toolbar.dart';
 import 'package:daily_you/widgets/local_image_loader.dart';
@@ -383,18 +384,17 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   }
 
   Future _saveOrUpdateImage(int entryId) async {
+    final savedImages = StatsProvider.instance.getImagesForEntry(_entry);
     // Add images
     for (EntryImage currentImage in currentImages) {
       currentImage.entryId = entryId;
       if (currentImage.id == null ||
-          widget.images
-              .where((image) => image.id == currentImage.id!)
-              .isEmpty) {
+          savedImages.where((image) => image.id == currentImage.id!).isEmpty) {
         await EntriesDatabase.instance.addImg(currentImage);
       }
     }
     // Update images
-    for (EntryImage existingImage in widget.images) {
+    for (EntryImage existingImage in savedImages) {
       EntryImage? matchingImage = currentImages
           .where((image) => image.id == existingImage.id!)
           .firstOrNull;
@@ -405,6 +405,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
         await EntriesDatabase.instance.updateImg(matchingImage);
       }
     }
+    currentImages = StatsProvider.instance.getImagesForEntry(_entry);
   }
 
   void _sortImages() {
