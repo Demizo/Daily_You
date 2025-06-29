@@ -275,11 +275,13 @@ class ImportUtils {
           }
 
           final created = DateTime.fromMillisecondsSinceEpoch(
-              entry['createdDate'],
-              isUtc: true);
+                  entry['createdDate'],
+                  isUtc: true)
+              .toLocal();
           final updated = DateTime.fromMillisecondsSinceEpoch(
-              entry['updatedDate'],
-              isUtc: true);
+                  entry['updatedDate'],
+                  isUtc: true)
+              .toLocal();
 
           if (earliestCreated == null || created.isBefore(earliestCreated)) {
             earliestCreated = created;
@@ -337,7 +339,7 @@ class ImportUtils {
   static DateTime diariumIdToDateTime(int ticks) {
     const int ticksAtUnixEpoch = 621355968000000000;
     final usSinceEpoch = ((ticks - ticksAtUnixEpoch) / 10).round();
-    return DateTime.fromMicrosecondsSinceEpoch(usSinceEpoch, isUtc: true);
+    return DateTime.fromMicrosecondsSinceEpoch(usSinceEpoch, isUtc: false);
   }
 
   static Future<bool> importFromDiarium(
