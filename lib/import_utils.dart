@@ -467,6 +467,7 @@ class ImportUtils {
             final newImage = await EntriesDatabase.instance.createImg(
               null,
               img['data'],
+              currTime: earliest,
             );
 
             if (newImage != null) {
