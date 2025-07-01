@@ -232,5 +232,7 @@
   "wordCount": "{count, plural, one{{count} sözcük} other{{count} sözcük}}",
   "@wordCount": {},
   "settingsDailyReminderOnboarding": "Süreklilik için günlük hatırlatıcıları etkinleştirin!",
-  "@settingsDailyReminderOnboarding": {}
+  "@settingsDailyReminderOnboarding": {},
+  "settingsNotificationsPermissionsPrompt": "'Takvim alarmları' izninden bildirimi rastgele bir anda veya tercih ettiğiniz zamanda göndermesi isteyecektir.",
+  "@settingsNotificationsPermissionsPrompt": {}
 }
