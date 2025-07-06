@@ -1,7 +1,14 @@
+import 'dart:io';
+
 import 'package:app_settings/app_settings.dart';
+import 'package:daily_you/config_provider.dart';
+import 'package:daily_you/device_info_service.dart';
+import 'package:daily_you/language_option.dart';
+import 'package:daily_you/widgets/settings_dropdown.dart';
 import 'package:daily_you/widgets/settings_icon_action.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class LanguageSettings extends StatefulWidget {
@@ -19,6 +26,7 @@ class _LanguageSettingsState extends State<LanguageSettings> {
 
   @override
   Widget build(BuildContext context) {
+    ConfigProvider configProvider = Provider.of(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.settingsLanguageTitle),
@@ -26,11 +34,33 @@ class _LanguageSettingsState extends State<LanguageSettings> {
       ),
       body: ListView(
         children: [
-          SettingsIconAction(
+          SettingsDropdown<LanguageOption?>(
               title: AppLocalizations.of(context)!.settingsLanguageTitle,
-              icon: Icon(Icons.language_rounded),
-              onPressed: () =>
-                  AppSettings.openAppSettings(type: AppSettingsType.appLocale)),
+              value: LanguageOption.fromJsonOrNull(
+                  configProvider.get(ConfigKey.overrideLanguage)),
+              options: [
+                DropdownMenuItem(
+                    value: null,
+                    child: Text(AppLocalizations.of(context)!.themeSystem)),
+                for (var locale in AppLocalizations.supportedLocales
+                    .where((locale) => locale.toLanguageTag() != "pt"))
+                  DropdownMenuItem(
+                      value: LanguageOption.fromLocale(locale),
+                      child:
+                          Text(LanguageOption.fromLocale(locale).displayName()))
+              ],
+              onChanged: (LanguageOption? newValue) {
+                configProvider.set(
+                    ConfigKey.overrideLanguage, newValue?.toJson());
+              }),
+          if (Platform.isAndroid &&
+              DeviceInfoService().androidSdk != null &&
+              DeviceInfoService().androidSdk! >= 33)
+            SettingsIconAction(
+                title: AppLocalizations.of(context)!.settingsSystemLanguage,
+                icon: Icon(Icons.language_rounded),
+                onPressed: () => AppSettings.openAppSettings(
+                    type: AppSettingsType.appLocale)),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,

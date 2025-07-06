@@ -1,5 +1,6 @@
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/stats_provider.dart';
+import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -247,15 +248,13 @@ class _MoodByMonthChartState extends State<MoodByMonthChart> {
 
   String _formatMonth(String dateKey, BuildContext context) {
     DateTime date = DateFormat('yyyy-MM').parse(dateKey);
-    return DateFormat(
-            'MMM', WidgetsBinding.instance.platformDispatcher.locale.toString())
+    return DateFormat('MMM', TimeManager.currentLocale(context))
         .format(date); // Return shorthand month (e.g., "Jan")
   }
 
   String _formatMonthYear(String dateKey, BuildContext context) {
     DateTime date = DateFormat('yyyy-MM').parse(dateKey);
-    return DateFormat('MMM yyyy',
-            WidgetsBinding.instance.platformDispatcher.locale.toString())
+    return DateFormat('MMM yyyy', TimeManager.currentLocale(context))
         .format(date); // Return shorthand month (e.g., "Jan")
   }
 

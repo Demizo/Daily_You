@@ -1,5 +1,6 @@
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/stats_provider.dart';
+import 'package:daily_you/time_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/widgets/entry_day_cell.dart';
 import 'package:intl/intl.dart';
@@ -23,11 +24,11 @@ class _EntryCalendarState extends State<EntryCalendar>
     super.build(context);
     final statsProvider = Provider.of<StatsProvider>(context);
     return TableCalendar(
-      locale: WidgetsBinding.instance.platformDispatcher.locale.toString(),
+      locale: TimeManager.currentLocale(context),
       rowHeight: 57,
       sixWeekMonthsEnforced: true,
       startingDayOfWeek: StartingDayOfWeek
-          .values[ConfigProvider.instance.getFirstDayOfWeekIndex()],
+          .values[ConfigProvider.instance.getFirstDayOfWeekIndex(context)],
       availableGestures: AvailableGestures.horizontalSwipe,
       availableCalendarFormats: const {
         CalendarFormat.month: 'Month',
@@ -43,10 +44,7 @@ class _EntryCalendarState extends State<EntryCalendar>
             children: [
               GestureDetector(
                 child: Text(
-                  DateFormat(
-                          "MMMM y",
-                          WidgetsBinding.instance.platformDispatcher.locale
-                              .toString())
+                  DateFormat("MMMM y", TimeManager.currentLocale(context))
                       .format(date)
                       .toString(),
                   style: const TextStyle(fontSize: 18),

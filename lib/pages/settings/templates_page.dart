@@ -78,7 +78,7 @@ class _TemplateSettingsState extends State<TemplateSettings> {
           if (!isLoading)
             SettingsDropdown<int>(
               title: AppLocalizations.of(context)!.settingsDefaultTemplate,
-              settingsKey: ConfigKey.defaultTemplate,
+              value: configProvider.get(ConfigKey.defaultTemplate),
               options: _buildDefaultTemplateDropdownItems(context),
               onChanged: (int? newValue) {
                 configProvider.set(ConfigKey.defaultTemplate, newValue);

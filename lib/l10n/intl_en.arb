@@ -223,6 +223,8 @@
   "@settingsDeleteAllLogsPrompt": {},
   "settingsLanguageTitle": "Language",
   "@settingsLanguageTitle": {},
+  "settingsSystemLanguage": "System Language Settings",
+  "@settingsSystemLanguage": {},
   "settingsAboutTitle": "About",
   "@settingsAboutTitle": {},
   "settingsVersion": "Version",

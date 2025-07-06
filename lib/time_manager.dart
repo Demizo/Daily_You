@@ -66,13 +66,12 @@ class TimeManager {
         .set(ConfigKey.reminderEndMinute, range.endTime.minute);
   }
 
-  static String timeRangeString(TimeRange timeRange) {
-    return '${timeOfDayString(timeRange.startTime)} - ${timeOfDayString(timeRange.endTime)}';
+  static String timeRangeString(BuildContext context, TimeRange timeRange) {
+    return '${timeOfDayString(context, timeRange.startTime)} - ${timeOfDayString(context, timeRange.endTime)}';
   }
 
-  static String timeOfDayString(TimeOfDay timeOfDay) {
-    return DateFormat.jm(
-            WidgetsBinding.instance.platformDispatcher.locale.toString())
+  static String timeOfDayString(BuildContext context, TimeOfDay timeOfDay) {
+    return DateFormat.jm(TimeManager.currentLocale(context))
         .format(addTimeOfDay(startOfDay(DateTime.now()), timeOfDay));
   }
 
@@ -86,10 +85,9 @@ class TimeManager {
     6: 'sunday',
   };
 
-  static List<String> daysOfWeekLabels() {
+  static List<String> daysOfWeekLabels(BuildContext context) {
     final now = DateTime.now();
-    final formatter = DateFormat.E(
-        WidgetsBinding.instance.platformDispatcher.locale.toString());
+    final formatter = DateFormat.E(TimeManager.currentLocale(context));
 
     List<String> days = List.generate(7, (index) {
       final day = now
@@ -113,5 +111,13 @@ class TimeManager {
 
     // If the absolute difference is 1, they are a month apart
     return monthDiff.abs();
+  }
+
+  static String currentLocale(BuildContext context) {
+    final platformLocale = Localizations.localeOf(context);
+    if (platformLocale.languageCode == "oc") {
+      return Locale("fr").toString();
+    }
+    return platformLocale.toString();
   }
 }

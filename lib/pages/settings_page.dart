@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:daily_you/device_info_service.dart';
 import 'package:daily_you/pages/settings/about_settings.dart';
 import 'package:daily_you/pages/settings/appearance_settings.dart';
 import 'package:daily_you/pages/settings/backup_restore_settings.dart';
@@ -86,13 +85,10 @@ class _SettingsPageState extends State<SettingsPage> {
               title: AppLocalizations.of(context)!.settingsAppearanceTitle,
               icon: Icons.palette_rounded,
               page: AppearanceSettings()),
-          if (Platform.isAndroid &&
-              DeviceInfoService().androidSdk != null &&
-              DeviceInfoService().androidSdk! >= 33)
-            SettingsCategory(
-                title: AppLocalizations.of(context)!.settingsLanguageTitle,
-                icon: Icons.language_rounded,
-                page: LanguageSettings()),
+          SettingsCategory(
+              title: AppLocalizations.of(context)!.settingsLanguageTitle,
+              icon: Icons.language_rounded,
+              page: LanguageSettings()),
           if (Platform.isAndroid)
             SettingsCategory(
                 title: AppLocalizations.of(context)!.settingsNotificationsTitle,

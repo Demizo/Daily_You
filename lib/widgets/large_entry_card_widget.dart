@@ -1,4 +1,5 @@
 import 'package:daily_you/models/image.dart';
+import 'package:daily_you/time_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
@@ -22,8 +23,7 @@ class LargeEntryCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final time = DateFormat.yMMMd(
-            WidgetsBinding.instance.platformDispatcher.locale.toString())
+    final time = DateFormat.yMMMd(TimeManager.currentLocale(context))
         .format(entry.timeCreate);
     return Card(
       clipBehavior: Clip.antiAlias,

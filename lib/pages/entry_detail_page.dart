@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/stats_provider.dart';
+import 'package:daily_you/time_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -113,7 +114,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
                     sharedText = "${MoodIcon.getMoodIcon(entry.mood)} ";
                   }
                   sharedText =
-                      "$sharedText${DateFormat.yMMMEd(WidgetsBinding.instance.platformDispatcher.locale.toString()).format(entry.timeCreate)}\n${entry.text}";
+                      "$sharedText${DateFormat.yMMMEd(TimeManager.currentLocale(context)).format(entry.timeCreate)}\n${entry.text}";
 
                   if (images.isNotEmpty) {
                     // Share Image
@@ -261,7 +262,7 @@ class EntryDetails extends StatelessWidget {
               padding:
                   const EdgeInsets.only(left: 8, top: 4, bottom: 4, right: 8),
               child: Text(
-                "${AppLocalizations.of(context)!.lastModified}: ${DateFormat.yMMMEd(WidgetsBinding.instance.platformDispatcher.locale.toString()).format(entry.timeModified)} ${DateFormat.jm(WidgetsBinding.instance.platformDispatcher.locale.toString()).format(entry.timeModified)}",
+                "${AppLocalizations.of(context)!.lastModified}: ${DateFormat.yMMMEd(TimeManager.currentLocale(context)).format(entry.timeModified)} ${DateFormat.jm(TimeManager.currentLocale(context)).format(entry.timeModified)}",
                 style: TextStyle(fontSize: 12, color: theme.disabledColor),
               ),
             ),

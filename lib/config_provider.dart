@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
+import 'package:daily_you/language_option.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -42,6 +43,7 @@ class ConfigKey {
   static const String alwaysRemind = "alwaysRemind";
   static const String dismissedNotificationOnboarding =
       "dismissedNotificationOnboarding";
+  static const String overrideLanguage = "overrideLanguage";
   // DEPRECATED
   static const String imageQuality = "imageQuality";
 }
@@ -93,6 +95,7 @@ class ConfigProvider with ChangeNotifier {
     ConfigKey.imageQualityLevel: ImageQuality.medium,
     ConfigKey.alwaysRemind: false,
     ConfigKey.dismissedNotificationOnboarding: false,
+    ConfigKey.overrideLanguage: null,
   };
 
   static final moodValueFieldMapping = {
@@ -202,16 +205,24 @@ class ConfigProvider with ChangeNotifier {
     return !formattedTime.contains(RegExp(r'[A-Za-z]'));
   }
 
-  int getFirstDayOfWeekIndex() {
+  int getFirstDayOfWeekIndex(BuildContext context) {
     final startingDay = get("startingDayOfWeek");
     if (startingDay == 'system') {
-      return DateFormat.yMd(
-              WidgetsBinding.instance.platformDispatcher.locale.toString())
+      return DateFormat.yMd(TimeManager.currentLocale(context))
           .dateSymbols
           .FIRSTDAYOFWEEK;
     } else {
       return TimeManager.dayOfWeekIndexMapping.keys.firstWhere(
           (k) => TimeManager.dayOfWeekIndexMapping[k] == startingDay);
     }
+  }
+
+  Locale? getOverrideLanguage() {
+    LanguageOption? currentOverride =
+        LanguageOption.fromJsonOrNull(get(ConfigKey.overrideLanguage));
+    if (currentOverride != null) {
+      return currentOverride.toLocale();
+    }
+    return null;
   }
 }
