@@ -2,9 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-class OcMaterialLocalizationsDelegate
+class CustomMaterialLocalizationsDelegate
     extends LocalizationsDelegate<MaterialLocalizations> {
-  const OcMaterialLocalizationsDelegate();
+  const CustomMaterialLocalizationsDelegate();
 
   @override
   bool isSupported(Locale locale) {
@@ -25,9 +25,9 @@ class OcMaterialLocalizationsDelegate
   bool shouldReload(covariant LocalizationsDelegate old) => false;
 }
 
-class OcCupertinoLocalizationsDelegate
+class CustomCupertinoLocalizationsDelegate
     extends LocalizationsDelegate<CupertinoLocalizations> {
-  const OcCupertinoLocalizationsDelegate();
+  const CustomCupertinoLocalizationsDelegate();
 
   @override
   bool isSupported(Locale locale) {
@@ -48,9 +48,9 @@ class OcCupertinoLocalizationsDelegate
   bool shouldReload(covariant LocalizationsDelegate old) => false;
 }
 
-class OcWidgetsLocalizationsDelegate
+class CustomWidgetsLocalizationsDelegate
     extends LocalizationsDelegate<WidgetsLocalizations> {
-  const OcWidgetsLocalizationsDelegate();
+  const CustomWidgetsLocalizationsDelegate();
 
   @override
   bool isSupported(Locale locale) {

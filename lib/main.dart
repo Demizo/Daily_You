@@ -181,9 +181,9 @@ class _MainAppState extends State<MainApp> {
               debugShowCheckedModeBanner: false,
               localizationsDelegates: <LocalizationsDelegate<dynamic>>[
                 AppLocalizations.delegate,
-                OcMaterialLocalizationsDelegate(),
-                OcCupertinoLocalizationsDelegate(),
-                OcWidgetsLocalizationsDelegate(),
+                CustomMaterialLocalizationsDelegate(),
+                CustomCupertinoLocalizationsDelegate(),
+                CustomWidgetsLocalizationsDelegate(),
               ],
               locale: configProvider.getOverrideLanguage(),
               supportedLocales: [
