@@ -98,7 +98,7 @@ class _HomePageState extends State<HomePage> {
           hideDirection: HideDirection.down,
           scrollController: _scrollController,
           child: Padding(
-            padding: const EdgeInsets.only(right: 8.0, bottom: 8.0),
+            padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.center,
