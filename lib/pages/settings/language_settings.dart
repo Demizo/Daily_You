@@ -34,8 +34,21 @@ class _LanguageSettingsState extends State<LanguageSettings> {
       ),
       body: ListView(
         children: [
+          if (Platform.isAndroid &&
+              DeviceInfoService().androidSdk != null &&
+              DeviceInfoService().androidSdk! >= 33)
+            SettingsIconAction(
+                title: AppLocalizations.of(context)!.settingsAppLanguageTitle,
+                icon: Icon(Icons.language_rounded),
+                onPressed: () => AppSettings.openAppSettings(
+                    type: AppSettingsType.appLocale)),
           SettingsDropdown<LanguageOption?>(
-              title: AppLocalizations.of(context)!.settingsLanguageTitle,
+              title: (Platform.isAndroid &&
+                      DeviceInfoService().androidSdk != null &&
+                      DeviceInfoService().androidSdk! >= 33)
+                  ? AppLocalizations.of(context)!
+                      .settingsOverrideAppLanguageTitle
+                  : AppLocalizations.of(context)!.settingsAppLanguageTitle,
               value: LanguageOption.fromJsonOrNull(
                   configProvider.get(ConfigKey.overrideLanguage)),
               options: [
@@ -53,34 +66,30 @@ class _LanguageSettingsState extends State<LanguageSettings> {
                 configProvider.set(
                     ConfigKey.overrideLanguage, newValue?.toJson());
               }),
-          if (Platform.isAndroid &&
-              DeviceInfoService().androidSdk != null &&
-              DeviceInfoService().androidSdk! >= 33)
-            SettingsIconAction(
-                title: AppLocalizations.of(context)!.settingsSystemLanguage,
-                icon: Icon(Icons.language_rounded),
-                onPressed: () => AppSettings.openAppSettings(
-                    type: AppSettingsType.appLocale)),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(AppLocalizations.of(context)!.settingsTranslateCallToAction),
-              ElevatedButton.icon(
-                icon: Icon(Icons.translate_rounded),
-                label:
-                    Text(AppLocalizations.of(context)!.settingsHelpTranslate),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  foregroundColor: Theme.of(context).colorScheme.surface,
-                ),
-                onPressed: () async {
-                  await launchUrl(
-                      Uri.https("hosted.weblate.org", "/projects/daily-you"),
-                      mode: LaunchMode.externalApplication);
-                },
-              )
-            ],
+          Padding(
+            padding: const EdgeInsets.only(top: 16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(AppLocalizations.of(context)!
+                    .settingsTranslateCallToAction),
+                ElevatedButton.icon(
+                  icon: Icon(Icons.translate_rounded),
+                  label:
+                      Text(AppLocalizations.of(context)!.settingsHelpTranslate),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Theme.of(context).colorScheme.surface,
+                  ),
+                  onPressed: () async {
+                    await launchUrl(
+                        Uri.https("hosted.weblate.org", "/projects/daily-you"),
+                        mode: LaunchMode.externalApplication);
+                  },
+                )
+              ],
+            ),
           )
         ],
       ),
