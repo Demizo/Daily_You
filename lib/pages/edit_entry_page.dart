@@ -190,9 +190,8 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                         ),
                       StatefulBuilder(
                         builder: (context, setState) => EntryMoodPicker(
-                            date: DateFormat.yMMMEd(WidgetsBinding
-                                    .instance.platformDispatcher.locale
-                                    .toString())
+                            date: DateFormat.yMMMEd(
+                                    TimeManager.currentLocale(context))
                                 .format(_entry.timeCreate),
                             moodValue: mood,
                             onChangedMood: (mood) =>

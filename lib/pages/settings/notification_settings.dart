@@ -56,34 +56,26 @@ class NotificationSettings extends StatefulWidget {
         labels: [
           ClockLabel.fromTime(
               time: TimeOfDay(hour: 0, minute: 0),
-              text: DateFormat.j(WidgetsBinding
-                      .instance.platformDispatcher.locale
-                      .toString())
-                  .format(TimeManager.addTimeOfDay(
+              text: DateFormat.j(TimeManager.currentLocale(context)).format(
+                  TimeManager.addTimeOfDay(
                       TimeManager.startOfDay(DateTime.now()),
                       TimeOfDay(hour: 0, minute: 0)))),
           ClockLabel.fromTime(
               time: TimeOfDay(hour: 6, minute: 0),
-              text: DateFormat.j(WidgetsBinding
-                      .instance.platformDispatcher.locale
-                      .toString())
-                  .format(TimeManager.addTimeOfDay(
+              text: DateFormat.j(TimeManager.currentLocale(context)).format(
+                  TimeManager.addTimeOfDay(
                       TimeManager.startOfDay(DateTime.now()),
                       TimeOfDay(hour: 6, minute: 0)))),
           ClockLabel.fromTime(
               time: TimeOfDay(hour: 12, minute: 0),
-              text: DateFormat.j(WidgetsBinding
-                      .instance.platformDispatcher.locale
-                      .toString())
-                  .format(TimeManager.addTimeOfDay(
+              text: DateFormat.j(TimeManager.currentLocale(context)).format(
+                  TimeManager.addTimeOfDay(
                       TimeManager.startOfDay(DateTime.now()),
                       TimeOfDay(hour: 12, minute: 0)))),
           ClockLabel.fromTime(
               time: TimeOfDay(hour: 18, minute: 0),
-              text: DateFormat.j(WidgetsBinding
-                      .instance.platformDispatcher.locale
-                      .toString())
-                  .format(TimeManager.addTimeOfDay(
+              text: DateFormat.j(TimeManager.currentLocale(context)).format(
+                  TimeManager.addTimeOfDay(
                       TimeManager.startOfDay(DateTime.now()),
                       TimeOfDay(hour: 18, minute: 0)))),
         ]);

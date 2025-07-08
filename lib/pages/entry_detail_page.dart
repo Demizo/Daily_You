@@ -233,9 +233,7 @@ class EntryDetails extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      DateFormat.yMMMEd(WidgetsBinding
-                              .instance.platformDispatcher.locale
-                              .toString())
+                      DateFormat.yMMMEd(TimeManager.currentLocale(context))
                           .format(entry.timeCreate),
                       style: const TextStyle(fontSize: 16),
                     ),
