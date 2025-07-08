@@ -1,8 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:io';
-import 'dart:isolate';
-import 'package:archive/archive_io.dart';
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/file_bytes_cache.dart';
 import 'package:daily_you/file_layer.dart';
@@ -14,8 +12,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:media_scanner/media_scanner.dart';
 import 'package:pool/pool.dart';
 import 'package:sqflite/sqflite.dart';

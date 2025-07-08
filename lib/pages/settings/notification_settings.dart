@@ -56,34 +56,26 @@ class NotificationSettings extends StatefulWidget {
         labels: [
           ClockLabel.fromTime(
               time: TimeOfDay(hour: 0, minute: 0),
-              text: DateFormat.j(WidgetsBinding
-                      .instance.platformDispatcher.locale
-                      .toString())
-                  .format(TimeManager.addTimeOfDay(
+              text: DateFormat.j(TimeManager.currentLocale(context)).format(
+                  TimeManager.addTimeOfDay(
                       TimeManager.startOfDay(DateTime.now()),
                       TimeOfDay(hour: 0, minute: 0)))),
           ClockLabel.fromTime(
               time: TimeOfDay(hour: 6, minute: 0),
-              text: DateFormat.j(WidgetsBinding
-                      .instance.platformDispatcher.locale
-                      .toString())
-                  .format(TimeManager.addTimeOfDay(
+              text: DateFormat.j(TimeManager.currentLocale(context)).format(
+                  TimeManager.addTimeOfDay(
                       TimeManager.startOfDay(DateTime.now()),
                       TimeOfDay(hour: 6, minute: 0)))),
           ClockLabel.fromTime(
               time: TimeOfDay(hour: 12, minute: 0),
-              text: DateFormat.j(WidgetsBinding
-                      .instance.platformDispatcher.locale
-                      .toString())
-                  .format(TimeManager.addTimeOfDay(
+              text: DateFormat.j(TimeManager.currentLocale(context)).format(
+                  TimeManager.addTimeOfDay(
                       TimeManager.startOfDay(DateTime.now()),
                       TimeOfDay(hour: 12, minute: 0)))),
           ClockLabel.fromTime(
               time: TimeOfDay(hour: 18, minute: 0),
-              text: DateFormat.j(WidgetsBinding
-                      .instance.platformDispatcher.locale
-                      .toString())
-                  .format(TimeManager.addTimeOfDay(
+              text: DateFormat.j(TimeManager.currentLocale(context)).format(
+                  TimeManager.addTimeOfDay(
                       TimeManager.startOfDay(DateTime.now()),
                       TimeOfDay(hour: 18, minute: 0)))),
         ]);
@@ -120,7 +112,7 @@ class NotificationSettings extends StatefulWidget {
             ? SettingsIconAction(
                 title: AppLocalizations.of(context)!.settingsReminderTime,
                 hint: TimeManager.timeOfDayString(
-                    TimeManager.scheduledReminderTime()),
+                    context, TimeManager.scheduledReminderTime()),
                 icon: Icon(Icons.schedule_rounded),
                 onPressed: () async {
                   _selectTime(context);
@@ -128,7 +120,7 @@ class NotificationSettings extends StatefulWidget {
             : SettingsIconAction(
                 title: AppLocalizations.of(context)!.settingsReminderTime,
                 hint: TimeManager.timeRangeString(
-                    TimeManager.getReminderTimeRange()),
+                    context, TimeManager.getReminderTimeRange()),
                 icon: Icon(Icons.timelapse_rounded),
                 onPressed: () async {
                   _selectTimeRange(context);

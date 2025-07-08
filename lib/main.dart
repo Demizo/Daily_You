@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:daily_you/config_provider.dart';
+import 'package:daily_you/custom_locale_delegates.dart';
 import 'package:daily_you/device_info_service.dart';
 import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/notification_manager.dart';
@@ -164,6 +165,7 @@ class _MainAppState extends State<MainApp> {
   @override
   Widget build(BuildContext context) {
     final themeModeProvider = Provider.of<ThemeModeProvider>(context);
+    final configProvider = Provider.of<ConfigProvider>(context);
 
     return StatsFl(
       isEnabled: false,
@@ -177,12 +179,21 @@ class _MainAppState extends State<MainApp> {
               title: 'Daily You',
               themeMode: themeModeProvider.themeMode,
               debugShowCheckedModeBanner: false,
-              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              localizationsDelegates: <LocalizationsDelegate<dynamic>>[
+                AppLocalizations.delegate,
+                CustomMaterialLocalizationsDelegate(),
+                CustomCupertinoLocalizationsDelegate(),
+                CustomWidgetsLocalizationsDelegate(),
+              ],
+              locale: configProvider.getOverrideLanguage(),
               supportedLocales: [
                 Locale("en"),
                 ...AppLocalizations.supportedLocales
                     .where((locale) => locale.languageCode != "en")
               ],
+              localeResolutionCallback: (locale, supportedLocales) {
+                return configProvider.getOverrideLanguage();
+              },
               theme: ThemeData(
                 useMaterial3: true,
                 colorScheme: ColorScheme.fromSeed(

@@ -270,7 +270,7 @@ class _StorageSettingsState extends State<StorageSettings> {
                     SettingsDropdown<String>(
                         title:
                             AppLocalizations.of(context)!.settingsImageQuality,
-                        settingsKey: ConfigKey.imageQualityLevel,
+                        value: configProvider.get(ConfigKey.imageQualityLevel),
                         options: [
                           DropdownMenuItem<String>(
                               value: ImageQuality.noCompression,

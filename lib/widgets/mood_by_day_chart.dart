@@ -22,7 +22,8 @@ class MoodByDayChart extends StatelessWidget {
                 alignment: BarChartAlignment.spaceAround,
                 maxY: 2,
                 minY: -2,
-                barGroups: _getBarGroups(Theme.of(context).colorScheme.primary),
+                barGroups: _getBarGroups(
+                    context, Theme.of(context).colorScheme.primary),
                 titlesData: FlTitlesData(
                   leftTitles: AxisTitles(
                       sideTitles: SideTitles(
@@ -43,7 +44,7 @@ class MoodByDayChart extends StatelessWidget {
                     showTitles: true,
                     reservedSize: 36,
                     getTitlesWidget: (double value, _) {
-                      return Text(_getDayLabel(value.toInt()));
+                      return Text(_getDayLabel(context, value.toInt()));
                     },
                   )),
                   rightTitles: const AxisTitles(),
@@ -79,8 +80,8 @@ class MoodByDayChart extends StatelessWidget {
     );
   }
 
-  List<BarChartGroupData> _getBarGroups(Color color) {
-    List<MapEntry<String, double>> orderedDays = _getOrderedDays();
+  List<BarChartGroupData> _getBarGroups(BuildContext context, Color color) {
+    List<MapEntry<String, double>> orderedDays = _getOrderedDays(context);
     return orderedDays.asMap().entries.map((entry) {
       int index = entry.key;
       double mood = entry.value.value;
@@ -98,18 +99,20 @@ class MoodByDayChart extends StatelessWidget {
     }).toList();
   }
 
-  List<MapEntry<String, double>> _getOrderedDays() {
+  List<MapEntry<String, double>> _getOrderedDays(BuildContext context) {
     List<MapEntry<String, double>> days = averageMood.entries.toList();
-    final startingDayIndex = ConfigProvider.instance.getFirstDayOfWeekIndex();
+    final startingDayIndex =
+        ConfigProvider.instance.getFirstDayOfWeekIndex(context);
     days = days.sublist(startingDayIndex)
       ..addAll(days.sublist(0, startingDayIndex));
     return days;
   }
 
-  String _getDayLabel(int index) {
-    var days = TimeManager.daysOfWeekLabels();
+  String _getDayLabel(BuildContext context, int index) {
+    var days = TimeManager.daysOfWeekLabels(context);
 
-    final startingDayIndex = ConfigProvider.instance.getFirstDayOfWeekIndex();
+    final startingDayIndex =
+        ConfigProvider.instance.getFirstDayOfWeekIndex(context);
     days = days.sublist(startingDayIndex)
       ..addAll(days.sublist(0, startingDayIndex));
 

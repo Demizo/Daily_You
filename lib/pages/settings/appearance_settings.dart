@@ -139,7 +139,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
 
   List<DropdownMenuItem<String>> _buildFirstDayOfWeekDropdownItems(
       BuildContext context) {
-    final dayLabels = TimeManager.daysOfWeekLabels();
+    final dayLabels = TimeManager.daysOfWeekLabels(context);
     List<DropdownMenuItem<String>> dropdownItems = List.empty(growable: true);
     dropdownItems.add(DropdownMenuItem<String>(
       value: "system",
@@ -173,7 +173,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
         children: [
           SettingsDropdown<String>(
               title: AppLocalizations.of(context)!.settingsTheme,
-              settingsKey: ConfigKey.theme,
+              value: configProvider.get(ConfigKey.theme),
               options: [
                 DropdownMenuItem<String>(
                     value: "system",
@@ -225,7 +225,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
             ),
           SettingsDropdown<String>(
               title: AppLocalizations.of(context)!.settingsFirstDayOfWeek,
-              settingsKey: ConfigKey.startingDayOfWeek,
+              value: configProvider.get(ConfigKey.startingDayOfWeek),
               options: _buildFirstDayOfWeekDropdownItems(context),
               onChanged: (String? newValue) async {
                 await configProvider.set(ConfigKey.startingDayOfWeek, newValue);
