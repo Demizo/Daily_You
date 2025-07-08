@@ -234,5 +234,9 @@
   "wordCount": "{count, plural, one{{count} mot} other{{count} mots}}",
   "@wordCount": {},
   "settingsNotificationsPermissionsPrompt": "On demandera l'autorisation « alarme planifiée » pour envoyer un rappel à un moment au hasard ou au moment que vous souhaitez.",
-  "@settingsNotificationsPermissionsPrompt": {}
+  "@settingsNotificationsPermissionsPrompt": {},
+  "settingsAppLanguageTitle": "Ajouter une langue",
+  "@settingsAppLanguageTitle": {},
+  "settingsOverrideAppLanguageTitle": "Surcharger la langue de l'application",
+  "@settingsOverrideAppLanguageTitle": {}
 }
