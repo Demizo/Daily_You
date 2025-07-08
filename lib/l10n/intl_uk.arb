@@ -230,5 +230,9 @@
   "settingsDailyReminderOnboarding": "Увімкніть щоденні нагадування, щоб залишатися послідовним!",
   "@settingsDailyReminderOnboarding": {},
   "wordCount": "{count, plural, one{{count} слово} other{{count} слова}}",
-  "@wordCount": {}
+  "@wordCount": {},
+  "settingsAppLanguageTitle": "Мова програми",
+  "@settingsAppLanguageTitle": {},
+  "settingsOverrideAppLanguageTitle": "Перевизначити мову програми",
+  "@settingsOverrideAppLanguageTitle": {}
 }
