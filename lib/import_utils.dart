@@ -681,8 +681,8 @@ class ImportUtils {
         processedDays++;
         updateStatus("${((processedDays / totalDays) * 100).round()}%");
       }
-    } catch (e, stackTrace) {
-      updateStatus("$e $stackTrace");
+    } catch (e) {
+      updateStatus("$e");
       await Future.delayed(Duration(seconds: 5));
       success = false;
     }

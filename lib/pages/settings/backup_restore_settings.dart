@@ -1,5 +1,6 @@
 import 'package:daily_you/backup_restore_utils.dart';
 import 'package:daily_you/import_utils.dart';
+import 'package:daily_you/utils/export_utils.dart';
 import 'package:daily_you/widgets/settings_icon_action.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -99,6 +100,47 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
         });
       } else if (chosenFormat == ImportFormat.pixels) {
         await ImportUtils.importFromPixels((status) {
+          statusNotifier.value = status;
+        });
+      }
+
+      Navigator.of(context).pop();
+    }
+  }
+
+  Future<void> _showExportSelectionPopup() async {
+    ExportFormat chosenFormat = ExportFormat.none;
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(AppLocalizations.of(context)!.logFormatTitle),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(AppLocalizations.of(context)!
+                  .settingsExportFormatDescription),
+              Divider(),
+              ListTile(
+                  title: Text(AppLocalizations.of(context)!.formatMarkdown),
+                  onTap: () {
+                    chosenFormat = ExportFormat.markdown;
+                    Navigator.of(context).pop();
+                  }),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (chosenFormat != ExportFormat.none) {
+      ValueNotifier<String> statusNotifier = ValueNotifier<String>("");
+
+      BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
+
+      if (chosenFormat == ExportFormat.markdown) {
+        await ExportUtils.exportToMarkdown(context, (status) {
           statusNotifier.value = status;
         });
       }
@@ -213,12 +255,6 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
       body: ListView(
         children: [
           SettingsIconAction(
-              title: AppLocalizations.of(context)!.settingsImportFromAnotherApp,
-              icon: Icon(Icons.download_rounded),
-              onPressed: () async {
-                await _showImportSelectionPopup();
-              }),
-          SettingsIconAction(
               title: AppLocalizations.of(context)!.settingsBackup,
               icon: Icon(Icons.backup_rounded),
               onPressed: () async {
@@ -229,6 +265,23 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
               icon: Icon(Icons.restore_rounded),
               onPressed: () async {
                 await _showRestoreWarning();
+              }),
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+            child: Divider(),
+          ),
+          SettingsIconAction(
+              title: AppLocalizations.of(context)!.settingsImportFromAnotherApp,
+              icon: Icon(Icons.download_rounded),
+              onPressed: () async {
+                await _showImportSelectionPopup();
+              }),
+          SettingsIconAction(
+              title:
+                  AppLocalizations.of(context)!.settingsExportToAnotherFormat,
+              icon: Icon(Icons.upload_rounded),
+              onPressed: () async {
+                await _showExportSelectionPopup();
               }),
         ],
       ),
