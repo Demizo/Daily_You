@@ -141,9 +141,9 @@
   "@imageQualityLow": {},
   "imageQualityNoCompression": "无损",
   "@imageQualityNoCompression": {},
-  "settingsLogFolder": "当前日迹存储目录",
+  "settingsLogFolder": "日迹存储目录",
   "@settingsLogFolder": {},
-  "settingsImageFolder": "图片目录",
+  "settingsImageFolder": "图片存储目录",
   "@settingsImageFolder": {},
   "warningTitle": "警告",
   "@warningTitle": {},
@@ -227,7 +227,7 @@
   "@settingsMadeWithLove": {},
   "settingsConsiderSupporting": "考虑支持",
   "@settingsConsiderSupporting": {},
-  "settingsTranslateCallToAction": "每个人都应该有权使用日记！",
+  "settingsTranslateCallToAction": "每个人都应该有权使用日迹！",
   "@settingsTranslateCallToAction": {},
   "settingsDailyReminderOnboarding": "开启每日提醒，保持自己的连贯性！",
   "@settingsDailyReminderOnboarding": {},
@@ -235,6 +235,8 @@
   "@settingsNotificationsPermissionsPrompt": {},
   "wordCount": "{count, plural, one{{count} 个字} other{{count} 个字}}",
   "@wordCount": {},
-  "settingsAppLanguageTitle": "应用语言",
-  "@settingsAppLanguageTitle": {}
+  "settingsAppLanguageTitle": "应用程序语言",
+  "@settingsAppLanguageTitle": {},
+  "settingsOverrideAppLanguageTitle": "覆盖应用程序语言",
+  "@settingsOverrideAppLanguageTitle": {}
 }
