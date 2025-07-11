@@ -50,7 +50,7 @@ class ExportUtils {
           final bytes =
               await EntriesDatabase.instance.getImgBytes(image.imgPath);
           if (bytes != null) {
-            noteBody.writeln('![](images/${image.imgPath})');
+            noteBody.writeln('![](Images/${image.imgPath})');
 
             await FileLayer.createFile(
                 tempExportImageFolder.path, image.imgPath, bytes,
@@ -82,8 +82,7 @@ class ExportUtils {
       await ZipUtils.compress(
           join(tempDir.path, exportedZipName), [], [tempExportFolder.path],
           onProgress: (percent) {
-        updateStatus(AppLocalizations.of(context)!
-            .creatingBackupStatus("(2/2) ${percent.round()}"));
+        updateStatus("(2/2) ${percent.round()}%");
       });
 
       // Save archive
