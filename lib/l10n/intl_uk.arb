@@ -17,7 +17,7 @@
   "@restoringBackupStatus": {},
   "exportLogs": "Експортувати записи",
   "@exportLogs": {},
-  "logFormatDescription": "Формат іншого додатку може не підтримувати всі функції. Це не вплине на існуючі записи!",
+  "logFormatDescription": "Формат іншої програми може не підтримувати всі функції. Будь ласка, повідомляйте про будь-які проблеми, оскільки формати сторонніх розробників можуть змінитися будь-коли. Це не вплине на існуючі журнали!",
   "@logFormatDescription": {},
   "tagMoodTitle": "Настрій",
   "@tagMoodTitle": {},
@@ -234,5 +234,11 @@
   "settingsAppLanguageTitle": "Мова програми",
   "@settingsAppLanguageTitle": {},
   "settingsOverrideAppLanguageTitle": "Перевизначити мову програми",
-  "@settingsOverrideAppLanguageTitle": {}
+  "@settingsOverrideAppLanguageTitle": {},
+  "settingsExportToAnotherFormat": "Експорт в інший формат",
+  "@settingsExportToAnotherFormat": {},
+  "settingsExportFormatDescription": "Це не слід використовувати як резервний варіант!",
+  "@settingsExportFormatDescription": {},
+  "formatMarkdown": "Уцінка",
+  "@formatMarkdown": {}
 }
