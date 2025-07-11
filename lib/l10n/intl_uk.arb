@@ -197,7 +197,7 @@
   "@restoreErrorDescription": {},
   "settingsRestore": "Відновити резервну копію",
   "@settingsRestore": {},
-  "settingsDeleteAllLogsDescription": "Ви дійсно хочете видалити ВСІ записи журналу?..",
+  "settingsDeleteAllLogsDescription": "Ви дійсно хочете видалити ВСІ записи журналу?",
   "@settingsDeleteAllLogsDescription": {},
   "settingsImageQuality": "Якість світлин",
   "@settingsImageQuality": {},
@@ -239,6 +239,6 @@
   "@settingsExportToAnotherFormat": {},
   "settingsExportFormatDescription": "Це не слід використовувати як резервний варіант!",
   "@settingsExportFormatDescription": {},
-  "formatMarkdown": "Уцінка",
+  "formatMarkdown": "Markdown",
   "@formatMarkdown": {}
 }
