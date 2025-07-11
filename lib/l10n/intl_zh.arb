@@ -241,7 +241,7 @@
   "@settingsOverrideAppLanguageTitle": {},
   "settingsExportToAnotherFormat": "导出为另一种格式",
   "@settingsExportToAnotherFormat": {},
-  "settingsExportFormatDescription": "这不应该作为备份！",
+  "settingsExportFormatDescription": "这不应该被用作备份！",
   "@settingsExportFormatDescription": {},
   "formatMarkdown": "Markdown",
   "@formatMarkdown": {}
