@@ -234,5 +234,9 @@
   "settingsNotificationsPermissionsPrompt": "為了在隨機或您設定的時間發送提醒，系統將請求「排程鬧鐘」權限。",
   "@settingsNotificationsPermissionsPrompt": {},
   "wordCount": "{count, plural, one{{count} 個字} other{{count} 個字}}",
-  "@wordCount": {}
+  "@wordCount": {},
+  "settingsAppLanguageTitle": "應用程式語言",
+  "@settingsAppLanguageTitle": {},
+  "settingsOverrideAppLanguageTitle": "覆寫應用程式語言",
+  "@settingsOverrideAppLanguageTitle": {}
 }

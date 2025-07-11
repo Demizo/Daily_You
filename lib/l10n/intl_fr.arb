@@ -153,7 +153,7 @@
   "@settingsImport": {},
   "settingsNotificationsTitle": "Notifications",
   "@settingsNotificationsTitle": {},
-  "settingsDailyReminderDescription": "Autoriser l'application à fonctionner en arrière-plan pour de meilleurs résultats",
+  "settingsDailyReminderDescription": "Un simple rappel tous les jours",
   "@settingsDailyReminderDescription": {},
   "settingsTemplatesTitle": "Modèles",
   "@settingsTemplatesTitle": {},
@@ -232,5 +232,11 @@
   "settingsDailyReminderOnboarding": "Activer le rappel quotidien pour être consistant !",
   "@settingsDailyReminderOnboarding": {},
   "wordCount": "{count, plural, one{{count} mot} other{{count} mots}}",
-  "@wordCount": {}
+  "@wordCount": {},
+  "settingsNotificationsPermissionsPrompt": "On demandera l'autorisation « alarme planifiée » pour envoyer un rappel à un moment au hasard ou au moment que vous souhaitez.",
+  "@settingsNotificationsPermissionsPrompt": {},
+  "settingsAppLanguageTitle": "Ajouter une langue",
+  "@settingsAppLanguageTitle": {},
+  "settingsOverrideAppLanguageTitle": "Surcharger la langue de l'application",
+  "@settingsOverrideAppLanguageTitle": {}
 }
