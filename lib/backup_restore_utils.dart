@@ -1,11 +1,9 @@
 import 'dart:io';
-import 'dart:isolate';
 
-import 'package:archive/archive_io.dart';
 import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/file_layer.dart';
 import 'package:daily_you/stats_provider.dart';
-import 'package:flutter/foundation.dart';
+import 'package:daily_you/utils/zip_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:path/path.dart';
@@ -24,51 +22,23 @@ class BackupRestoreUtils {
 
     // Create archive
     updateStatus(AppLocalizations.of(context)!.creatingBackupStatus("0"));
-    var rxPort = ReceivePort();
-
-    rxPort.listen((data) {
-      var percent = data as double;
+    await ZipUtils.compress(join(tempDir.path, exportedZipName), [
+      await EntriesDatabase.instance.getInternalDbPath()
+    ], [
+      await EntriesDatabase.instance.getInternalImgDatabasePath()
+    ], onProgress: (percent) {
       updateStatus(AppLocalizations.of(context)!
           .creatingBackupStatus("${percent.round()}"));
     });
 
-    await compute(
-      encodeArchive,
-      [
-        join(tempDir.path, exportedZipName),
-        await EntriesDatabase.instance.getInternalDbPath(),
-        await EntriesDatabase.instance.getInternalImgDatabasePath(),
-        rxPort.sendPort
-      ],
-    );
-
-    rxPort.close();
-
     // Save archive
     updateStatus(AppLocalizations.of(context)!.tranferStatus("0"));
-
-    final archiveSize = await FileLayer.getFileSize(tempDir.path,
-        name: exportedZipName, useExternalPath: false);
-    if (archiveSize == null || archiveSize == 0) return false;
-
-    var readStream = await FileLayer.readFileStream(tempDir.path,
-        name: exportedZipName, useExternalPath: false);
-    if (readStream == null) return false;
-    var writeStream =
-        await FileLayer.openFileWriteStream(savePath, exportedZipName);
-    if (writeStream == null) return false;
-
-    var transferredSize = 0;
-
-    await for (List<int> chunk in readStream) {
-      await FileLayer.writeFileWriteStreamChunk(
-          writeStream, Uint8List.fromList(chunk));
-      transferredSize += chunk.length;
-      var percent = (transferredSize / archiveSize) * 100;
+    await FileLayer.copyToExternalLocation(
+        join(tempDir.path, exportedZipName), savePath, exportedZipName,
+        onProgress: (percent) {
       updateStatus(
           AppLocalizations.of(context)!.tranferStatus("${percent.round()}"));
-    }
-    await FileLayer.closeFileWriteStream(writeStream);
+    });
 
     // Delete temp files
     updateStatus(AppLocalizations.of(context)!.cleanUpStatus);
@@ -92,50 +62,22 @@ class BackupRestoreUtils {
 
     // Import archive
     updateStatus(AppLocalizations.of(context)!.tranferStatus("0"));
-
-    final archiveSize = await FileLayer.getFileSize(archive);
-    if (archiveSize == null || archiveSize == 0) return false;
-
-    var readStream =
-        await FileLayer.readFileStream(archive, useExternalPath: true);
-    if (readStream == null) return false;
-    var writeStream = await FileLayer.openFileWriteStream(
-        tempDir.path, tempZipName,
-        useExternalPath: false);
-    if (writeStream == null) return false;
-
-    var transferredSize = 0;
-
-    await for (List<int> chunk in readStream) {
-      await FileLayer.writeFileWriteStreamChunk(
-          writeStream, Uint8List.fromList(chunk));
-      transferredSize += chunk.length;
-      var percent = (transferredSize / archiveSize) * 100;
+    await FileLayer.copyFromExternalLocation(archive, tempDir.path, tempZipName,
+        onProgress: (percent) {
       updateStatus(
           AppLocalizations.of(context)!.tranferStatus("${percent.round()}"));
-    }
-    await FileLayer.closeFileWriteStream(writeStream);
+    });
 
     // Restore archive
-    final restoreFolder = Directory(join(tempDir.path, "Restore"));
-    if (await restoreFolder.exists() == false) {
-      await restoreFolder.create();
-    }
-
     updateStatus(AppLocalizations.of(context)!.restoringBackupStatus("0"));
+    final restoreFolder = Directory(join(tempDir.path, "Restore"));
+    await restoreFolder.create(recursive: true);
 
-    var rxPort = ReceivePort();
-
-    rxPort.listen((data) {
-      var percent = data as double;
+    await ZipUtils.extract(join(tempDir.path, tempZipName), restoreFolder.path,
+        onProgress: (percent) {
       updateStatus(AppLocalizations.of(context)!
           .restoringBackupStatus("${percent.round()}"));
     });
-
-    await compute(decodeArchive,
-        [join(tempDir.path, tempZipName), restoreFolder.path, rxPort.sendPort]);
-
-    rxPort.close();
 
     final tempDb = File(join(restoreFolder.path, 'daily_you.db'));
     if (await tempDb.exists()) {
@@ -177,44 +119,6 @@ class BackupRestoreUtils {
     }
 
     return importSuccessful;
-  }
-
-  static Future<void> encodeArchive(List<dynamic> args) async {
-    SendPort sendPort = args[3];
-    var encoder = ZipFileEncoder();
-    encoder.createWithStream(OutputFileStream(args[0]));
-    await encoder.addFile(File(args[1]));
-    await encoder.addDirectory(Directory(args[2]), onProgress: (progress) {
-      sendPort.send(progress * 100);
-    });
-    await encoder.close();
-  }
-
-  static Future<void> decodeArchive(List<dynamic> args) async {
-    SendPort sendPort = args[2];
-    var decoder = ZipDecoder().decodeStream(InputFileStream(args[0]));
-
-    // Track number of files for progress indication
-    var totalFileCount = decoder.numberOfFiles();
-    var processedFileCount = 0;
-
-    for (final entry in decoder) {
-      if (entry.isFile) {
-        final bytes = entry.readBytes();
-        if (bytes == null) continue;
-        final parent = Directory(File(join(args[1], entry.name)).parent.path);
-        if (await parent.exists() == false) {
-          await parent.create(recursive: true);
-        }
-        await File(join(args[1], entry.name)).writeAsBytes(bytes);
-
-        // Updates status
-        processedFileCount += 1;
-        sendPort.send((processedFileCount / totalFileCount) * 100);
-      } else {
-        await Directory(join(args[1], entry.name)).create(recursive: true);
-      }
-    }
   }
 
   static void showLoadingStatus(
