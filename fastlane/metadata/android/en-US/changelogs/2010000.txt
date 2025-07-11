@@ -1,0 +1,7 @@
+Daily You v2.10.0 has arrived! This one is all about preserving memories:
+
+• Added an in-app language selector
+• Added Daylio, Diarium, and My Brain import options
+• Added a Markdown export option
+• Minor UI fixes
+• Updated translations
