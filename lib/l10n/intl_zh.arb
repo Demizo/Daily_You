@@ -193,7 +193,7 @@
   "@backupErrorDescription": {},
   "settingsRestorePromptDescription": "恢复备份将覆盖您现有的数据！",
   "@settingsRestorePromptDescription": {},
-  "logFormatDescription": "另一个应用的格式可能无法支持所有功能。但这不会影响现有的日迹！",
+  "logFormatDescription": "其他应用的格式可能无法支持所有功能。若遇到任何问题请及时反馈，因为第三方格式可能随时发生变化。不过这一点不会影响现有的日迹！",
   "@logFormatDescription": {},
   "restoreErrorDescription": "恢复备份失败！",
   "@restoreErrorDescription": {},
@@ -238,5 +238,11 @@
   "settingsAppLanguageTitle": "应用程序语言",
   "@settingsAppLanguageTitle": {},
   "settingsOverrideAppLanguageTitle": "覆盖应用程序语言",
-  "@settingsOverrideAppLanguageTitle": {}
+  "@settingsOverrideAppLanguageTitle": {},
+  "settingsExportToAnotherFormat": "导出为另一种格式",
+  "@settingsExportToAnotherFormat": {},
+  "settingsExportFormatDescription": "这不应该作为备份！",
+  "@settingsExportFormatDescription": {},
+  "formatMarkdown": "Markdown",
+  "@formatMarkdown": {}
 }
