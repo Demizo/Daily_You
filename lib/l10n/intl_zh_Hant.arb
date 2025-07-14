@@ -201,7 +201,7 @@
   "@restoringBackupStatus": {},
   "cleanUpStatus": "正在清理…",
   "@cleanUpStatus": {},
-  "logFormatDescription": "其他應用程式的格式可能不支援所有功能，但這不會影響現有日誌！",
+  "logFormatDescription": "其他應用程式的格式可能不支援所有功能，且第三方格式可能隨時發生變化，發現任何問題請向我們回報。這並不會影響現有日誌！",
   "@logFormatDescription": {},
   "settingsBackup": "備份",
   "@settingsBackup": {},
@@ -241,6 +241,8 @@
   "@settingsOverrideAppLanguageTitle": {},
   "settingsExportToAnotherFormat": "匯出為其他格式",
   "@settingsExportToAnotherFormat": {},
-  "settingsExportFormatDescription": "這不應該被用來作備份之用！",
-  "@settingsExportFormatDescription": {}
+  "settingsExportFormatDescription": "這不應該被用來備份！",
+  "@settingsExportFormatDescription": {},
+  "formatMarkdown": "Markdown",
+  "@formatMarkdown": {}
 }
