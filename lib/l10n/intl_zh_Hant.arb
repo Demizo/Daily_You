@@ -238,5 +238,9 @@
   "settingsAppLanguageTitle": "應用程式語言",
   "@settingsAppLanguageTitle": {},
   "settingsOverrideAppLanguageTitle": "覆寫應用程式語言",
-  "@settingsOverrideAppLanguageTitle": {}
+  "@settingsOverrideAppLanguageTitle": {},
+  "settingsExportToAnotherFormat": "匯出為其他格式",
+  "@settingsExportToAnotherFormat": {},
+  "settingsExportFormatDescription": "這不應該被用來作備份之用！",
+  "@settingsExportFormatDescription": {}
 }
