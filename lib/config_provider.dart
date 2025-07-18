@@ -44,6 +44,7 @@ class ConfigKey {
   static const String dismissedNotificationOnboarding =
       "dismissedNotificationOnboarding";
   static const String overrideLanguage = "overrideLanguage";
+  static const String showFlashbacks = "showFlashbacks";
   // DEPRECATED
   static const String imageQuality = "imageQuality";
 }
@@ -96,6 +97,7 @@ class ConfigProvider with ChangeNotifier {
     ConfigKey.alwaysRemind: false,
     ConfigKey.dismissedNotificationOnboarding: false,
     ConfigKey.overrideLanguage: null,
+    ConfigKey.showFlashbacks: true,
   };
 
   static final moodValueFieldMapping = {

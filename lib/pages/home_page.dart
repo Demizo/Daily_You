@@ -82,6 +82,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final configProvider = Provider.of<ConfigProvider>(context);
     final statsProvider = Provider.of<StatsProvider>(context);
     Entry? todayEntry = statsProvider.getEntryForToday();
     List<EntryImage> todayImages =
@@ -92,7 +93,7 @@ class _HomePageState extends State<HomePage> {
 
     return Center(
       child: Stack(alignment: Alignment.bottomCenter, children: [
-        buildEntries(context, flashbacks),
+        buildEntries(context, configProvider, flashbacks),
         HidingWidget(
           duration: Duration(milliseconds: 200),
           hideDirection: HideDirection.down,
@@ -149,79 +150,84 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget buildEntries(BuildContext context, List<Flashback> flashbacks) =>
+  Widget buildEntries(BuildContext context, ConfigProvider configProvider,
+          List<Flashback> flashbacks) =>
       ListView(controller: _scrollController, children: [
         const Center(
             child: SizedBox(height: 430, width: 400, child: EntryCalendar())),
-        Card(
-          child:
-              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Text(
-                AppLocalizations.of(context)!.flashbacksTitle,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.normal),
-              ),
-            ),
-            IconButton(
-                onPressed: () async {
-                  listView = !listView;
-                  await setViewMode();
-                  setState(() {});
-                },
-                icon: listView
-                    ? const Icon(Icons.grid_view_rounded)
-                    : const Icon(Icons.view_list_rounded)),
-          ]),
-        ),
-        flashbacks.isEmpty
-            ? Center(
-                child: Text(
-                  AppLocalizations.of(context)!.flaskbacksEmpty,
-                  style: TextStyle(
-                      fontSize: 18, color: Theme.of(context).disabledColor),
-                ),
-              )
-            : GridView.builder(
-                padding: const EdgeInsets.only(bottom: 80),
-                physics: const ScrollPhysics(),
-                shrinkWrap: true,
-                gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                  maxCrossAxisExtent: listView ? 500 : 300,
-                  crossAxisSpacing: 1.0, // Spacing between columns
-                  mainAxisSpacing: 1.0, // Spacing between rows
-                  childAspectRatio: listView ? 2.0 : 1.0,
-                ),
-                itemCount: flashbacks.length,
-                itemBuilder: (context, index) {
-                  final flashback = flashbacks[index];
-                  return GestureDetector(
-                      onTap: () async {
-                        await Navigator.of(context).push(MaterialPageRoute(
-                          allowSnapshotting: false,
-                          builder: (context) => EntryDetailPage(
-                              filtered: false,
-                              index: StatsProvider.instance
-                                  .getIndexOfEntry(flashback.entry.id!)),
-                        ));
+        if (configProvider.get(ConfigKey.showFlashbacks))
+          Card(
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text(
+                      AppLocalizations.of(context)!.flashbacksTitle,
+                      style: TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.normal),
+                    ),
+                  ),
+                  IconButton(
+                      onPressed: () async {
+                        listView = !listView;
+                        await setViewMode();
+                        setState(() {});
                       },
-                      child: listView
-                          ? LargeEntryCardWidget(
-                              title: flashback.title,
-                              entry: flashback.entry,
-                              images: StatsProvider.instance.images
-                                  .where((img) =>
-                                      img.entryId == flashback.entry.id!)
-                                  .toList())
-                          : EntryCardWidget(
-                              title: flashback.title,
-                              entry: flashback.entry,
-                              images: StatsProvider.instance.images
-                                  .where((img) =>
-                                      img.entryId == flashback.entry.id!)
-                                  .toList(),
-                            ));
-                },
-              ),
+                      icon: listView
+                          ? const Icon(Icons.grid_view_rounded)
+                          : const Icon(Icons.view_list_rounded)),
+                ]),
+          ),
+        if (configProvider.get(ConfigKey.showFlashbacks))
+          flashbacks.isEmpty
+              ? Center(
+                  child: Text(
+                    AppLocalizations.of(context)!.flaskbacksEmpty,
+                    style: TextStyle(
+                        fontSize: 18, color: Theme.of(context).disabledColor),
+                  ),
+                )
+              : GridView.builder(
+                  padding: const EdgeInsets.only(bottom: 80),
+                  physics: const ScrollPhysics(),
+                  shrinkWrap: true,
+                  gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                    maxCrossAxisExtent: listView ? 500 : 300,
+                    crossAxisSpacing: 1.0, // Spacing between columns
+                    mainAxisSpacing: 1.0, // Spacing between rows
+                    childAspectRatio: listView ? 2.0 : 1.0,
+                  ),
+                  itemCount: flashbacks.length,
+                  itemBuilder: (context, index) {
+                    final flashback = flashbacks[index];
+                    return GestureDetector(
+                        onTap: () async {
+                          await Navigator.of(context).push(MaterialPageRoute(
+                            allowSnapshotting: false,
+                            builder: (context) => EntryDetailPage(
+                                filtered: false,
+                                index: StatsProvider.instance
+                                    .getIndexOfEntry(flashback.entry.id!)),
+                          ));
+                        },
+                        child: listView
+                            ? LargeEntryCardWidget(
+                                title: flashback.title,
+                                entry: flashback.entry,
+                                images: StatsProvider.instance.images
+                                    .where((img) =>
+                                        img.entryId == flashback.entry.id!)
+                                    .toList())
+                            : EntryCardWidget(
+                                title: flashback.title,
+                                entry: flashback.entry,
+                                images: StatsProvider.instance.images
+                                    .where((img) =>
+                                        img.entryId == flashback.entry.id!)
+                                    .toList(),
+                              ));
+                  },
+                ),
       ]);
 }

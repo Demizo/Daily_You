@@ -101,6 +101,8 @@
   "@settingsCustomAccentColor": {},
   "settingsShowMarkdownToolbar": "Show Markdown Toolbar",
   "@settingsShowMarkdownToolbar": {},
+  "settingsShowFlashbacks": "Show Flashbacks",
+  "@settingsShowFlashbacks": {},
   "settingsChangeMoodIcons": "Change Mood Icons",
   "@settingsChangeMoodIcons": {},
   "moodIconPrompt": "Enter an icon",
