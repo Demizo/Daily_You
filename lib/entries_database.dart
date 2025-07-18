@@ -69,7 +69,7 @@ CREATE TABLE $templatesTable (
 CREATE TABLE $imagesTable (
     ${EntryImageFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     ${EntryImageFields.entryId} INTEGER NOT NULL,
-    ${EntryImageFields.imgPath} TEXT NOY NULL,
+    ${EntryImageFields.imgPath} TEXT NOT NULL,
     ${EntryImageFields.imgRank} INTEGER NOT NULL,
     ${EntryImageFields.timeCreate} DATETIME NOT NULL DEFAULT (DATETIME('now')),
     FOREIGN KEY (${EntryImageFields.entryId}) REFERENCES $entriesTable (id)
@@ -96,7 +96,7 @@ CREATE TABLE $templatesTable (
 CREATE TABLE $imagesTable (
     ${EntryImageFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     ${EntryImageFields.entryId} INTEGER NOT NULL,
-    ${EntryImageFields.imgPath} TEXT NOY NULL,
+    ${EntryImageFields.imgPath} TEXT NOT NULL,
     ${EntryImageFields.imgRank} INTEGER NOT NULL,
     ${EntryImageFields.timeCreate} DATETIME NOT NULL DEFAULT (DATETIME('now')),
     FOREIGN KEY (${EntryImageFields.entryId}) REFERENCES $entriesTable (id)
