@@ -237,12 +237,6 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
               onChanged: (value) {
                 configProvider.set(ConfigKey.useMarkdownToolbar, value);
               }),
-          SettingsToggle(
-              title: AppLocalizations.of(context)!.settingsShowFlashbacks,
-              settingsKey: ConfigKey.showFlashbacks,
-              onChanged: (value) {
-                configProvider.set(ConfigKey.showFlashbacks, value);
-              }),
           Padding(
             padding: const EdgeInsets.only(top: 8.0, left: 16.0),
             child: Text(

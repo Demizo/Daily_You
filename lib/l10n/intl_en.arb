@@ -9,6 +9,8 @@
   "@pageHomeTitle": {},
   "flashbacksTitle": "Flashbacks",
   "@flashbacksTitle": {},
+  "settingsFlashbacksExcludeBadDays": "Exclude bad days",
+  "@settingsFlashbacksExcludeBadDays": {},
   "flaskbacksEmpty": "No Flashbacks Yet…",
   "@flaskbacksEmpty": {},
   "flashbackGoodDay": "A Good Day",

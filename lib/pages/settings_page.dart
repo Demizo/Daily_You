@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:daily_you/pages/settings/about_settings.dart';
 import 'package:daily_you/pages/settings/appearance_settings.dart';
 import 'package:daily_you/pages/settings/backup_restore_settings.dart';
+import 'package:daily_you/pages/settings/flashback_settings.dart';
 import 'package:daily_you/pages/settings/language_settings.dart';
 import 'package:daily_you/pages/settings/notification_settings.dart';
 import 'package:daily_you/pages/settings/storage_settings.dart';
@@ -94,6 +95,10 @@ class _SettingsPageState extends State<SettingsPage> {
                 title: AppLocalizations.of(context)!.settingsNotificationsTitle,
                 icon: Icons.notifications_rounded,
                 page: NotificationSettings()),
+          SettingsCategory(
+              title: AppLocalizations.of(context)!.flashbacksTitle,
+              icon: Icons.history_rounded,
+              page: FlashbackSettings()),
           SettingsCategory(
               title: AppLocalizations.of(context)!.settingsTemplatesTitle,
               icon: Icons.description_rounded,
