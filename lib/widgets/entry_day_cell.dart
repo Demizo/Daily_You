@@ -1,6 +1,7 @@
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/stats_provider.dart';
+import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/local_image_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
@@ -157,7 +158,8 @@ class EntryDayCell extends StatelessWidget {
           await Navigator.of(context).push(MaterialPageRoute(
             allowSnapshotting: false,
             builder: (context) => AddEditEntryPage(
-              overrideCreateDate: date,
+              overrideCreateDate: TimeManager.currentTimeOnDifferentDate(date)
+                  .copyWith(isUtc: false),
             ),
           ));
         },
