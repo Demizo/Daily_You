@@ -49,11 +49,13 @@ class ExportUtils {
         for (EntryImage image in images) {
           final bytes =
               await EntriesDatabase.instance.getImgBytes(image.imgPath);
+          final prettyName =
+              "image_${DateFormat("yyyy-MM-dd", TimeManager.currentLocale(context)).format(entry.timeCreate)}_${image.imgRank}.jpg";
           if (bytes != null) {
-            noteBody.writeln('![](Images/${image.imgPath})');
+            noteBody.writeln('![](Images/$prettyName)');
 
             await FileLayer.createFile(
-                tempExportImageFolder.path, image.imgPath, bytes,
+                tempExportImageFolder.path, prettyName, bytes,
                 useExternalPath: false);
           }
         }
@@ -65,11 +67,9 @@ class ExportUtils {
         noteBody.writeln(
             "$moodText${DateFormat.yMMMEd(TimeManager.currentLocale(context)).format(entry.timeCreate)}\n${entry.text}");
 
-        final timestamp = entry.timeCreate
-            .toIso8601String()
-            .split('.')
-            .first
-            .replaceAll(':', '-');
+        final timestamp =
+            DateFormat("yyyy-MM-dd", TimeManager.currentLocale(context))
+                .format(entry.timeCreate);
         await FileLayer.createFile(tempExportFolder.path, "log_$timestamp.md",
             utf8.encode(noteBody.toString()),
             useExternalPath: false);
