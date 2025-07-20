@@ -57,7 +57,8 @@ void callbackDispatcher() async {
 
     if (title != null && description != null) {
       await flutterLocalNotificationsPlugin.show(
-          0, title, description, platformChannelSpecifics);
+          0, title, description, platformChannelSpecifics,
+          payload: DateTime.now().toIso8601String());
     }
   }
   EntriesDatabase.instance.close();
