@@ -240,5 +240,9 @@
   "settingsExportFormatDescription": "Це не слід використовувати як резервний варіант!",
   "@settingsExportFormatDescription": {},
   "formatMarkdown": "Markdown",
-  "@formatMarkdown": {}
+  "@formatMarkdown": {},
+  "settingsFlashbacksExcludeBadDays": "Виключити погані дні",
+  "@settingsFlashbacksExcludeBadDays": {},
+  "settingsShowFlashbacks": "Показати флешбеки",
+  "@settingsShowFlashbacks": {}
 }
