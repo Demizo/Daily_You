@@ -44,6 +44,15 @@ class ConfigKey {
   static const String dismissedNotificationOnboarding =
       "dismissedNotificationOnboarding";
   static const String overrideLanguage = "overrideLanguage";
+  static const String showFlashbacks = "showFlashbacks";
+  static const String excludeBadDaysFromFlashbacks =
+      "excludeBadDaysFromFlashbacks";
+  static const String showflashbackYearsAgo = "showflashbackYearsAgo";
+  static const String showflashback6MonthsAgo = "showflashback6MonthsAgo";
+  static const String showflashback1MonthAgo = "showflashback1MonthAgo";
+  static const String showflashback1WeekAgo = "showflashback1WeekAgo";
+  static const String showflashbackGoodDay = "showflashbackGoodDay";
+  static const String showflashbackRandomDay = "showflashbackRandomDay";
   // DEPRECATED
   static const String imageQuality = "imageQuality";
 }
@@ -96,6 +105,14 @@ class ConfigProvider with ChangeNotifier {
     ConfigKey.alwaysRemind: false,
     ConfigKey.dismissedNotificationOnboarding: false,
     ConfigKey.overrideLanguage: null,
+    ConfigKey.showFlashbacks: true,
+    ConfigKey.excludeBadDaysFromFlashbacks: false,
+    ConfigKey.showflashbackYearsAgo: true,
+    ConfigKey.showflashback6MonthsAgo: true,
+    ConfigKey.showflashback1MonthAgo: true,
+    ConfigKey.showflashback1WeekAgo: true,
+    ConfigKey.showflashbackGoodDay: true,
+    ConfigKey.showflashbackRandomDay: true,
   };
 
   static final moodValueFieldMapping = {
