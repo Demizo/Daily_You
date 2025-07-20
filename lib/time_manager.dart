@@ -38,6 +38,10 @@ class TimeManager {
         .add(Duration(hours: timeOfDay.hour, minutes: timeOfDay.minute));
   }
 
+  static DateTime currentTimeOnDifferentDate(DateTime targetDate) {
+    return addTimeOfDay(startOfDay(targetDate), TimeOfDay.now());
+  }
+
   static TimeOfDay scheduledReminderTime() {
     return TimeOfDay(
         hour: ConfigProvider.instance.get(ConfigKey.scheduledReminderHour),

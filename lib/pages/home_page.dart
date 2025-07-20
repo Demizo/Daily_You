@@ -1,11 +1,13 @@
 import 'dart:io';
 
 import 'package:daily_you/config_provider.dart';
+import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/flashback_manager.dart';
 import 'package:daily_you/models/flashback.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/stats_provider.dart';
+import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/entry_calendar.dart';
 import 'package:daily_you/widgets/hiding_widget.dart';
 import 'package:daily_you/widgets/large_entry_card_widget.dart';
@@ -70,11 +72,28 @@ class _HomePageState extends State<HomePage> {
         if (NotificationManager.instance.justLaunched &&
             launchDetails?.notificationResponse?.id == 0) {
           NotificationManager.instance.justLaunched = false;
-          Entry? todayEntry = StatsProvider.instance.getEntryForToday();
-          List<EntryImage> todayImages = todayEntry != null
-              ? StatsProvider.instance.getImagesForEntry(todayEntry)
+
+          DateTime targetDate = DateTime.tryParse(
+                  launchDetails?.notificationResponse?.payload ?? "") ??
+              DateTime.now();
+          Entry? entry =
+              await EntriesDatabase.instance.getEntryForDate(targetDate);
+          List<EntryImage> entryImages = entry != null
+              ? StatsProvider.instance.getImagesForEntry(entry)
               : [];
-          await addOrEditTodayEntry(todayEntry, todayImages, false);
+
+          await Navigator.of(context).push(
+            MaterialPageRoute(
+                allowSnapshotting: false,
+                builder: (context) => AddEditEntryPage(
+                      entry: entry,
+                      openCamera: false,
+                      images: entryImages,
+                      overrideCreateDate: TimeManager.isToday(targetDate)
+                          ? DateTime.now()
+                          : TimeManager.currentTimeOnDifferentDate(targetDate),
+                    )),
+          );
         }
       }
     }
