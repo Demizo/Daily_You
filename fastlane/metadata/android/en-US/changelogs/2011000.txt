@@ -1,0 +1,8 @@
+Daily You v2.11.0 has arrived! This one is all about the past:
+
+• Added flashback settings
+• Added the ability to exclude bad days from flashbacks
+• Notifications now open the log for the day they arrived
+• Improved file naming for Markdown exports
+• Minor fixes
+• Updated translations
