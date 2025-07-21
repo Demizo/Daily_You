@@ -31,7 +31,7 @@
   "@logCount": {},
   "statisticsRangeAllTime": "Historique complet",
   "@statisticsRangeAllTime": {},
-  "chartSummaryTitle": "Résumé de {tag}",
+  "chartSummaryTitle": "Résumé {tag}",
   "@chartSummaryTitle": {},
   "writeSomethingHint": "Écrivez quelque chose…",
   "@writeSomethingHint": {},
