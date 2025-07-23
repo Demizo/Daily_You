@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/stats_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
+import 'package:flutter/services.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LaunchPage extends StatefulWidget {
@@ -31,6 +35,18 @@ class _LaunchPageState extends State<LaunchPage> {
   }
 
   _checkDatabaseConnection() async {
+    try {
+      final LocalAuthentication auth = LocalAuthentication();
+      final bool didAuthenticate = await auth.authenticate(
+          options: AuthenticationOptions(stickyAuth: true),
+          localizedReason: 'Please Authenticate');
+      if (!didAuthenticate) {
+        exit(0);
+      }
+    } on PlatformException {
+      exit(0);
+    }
+
     //Initialize Database
     if (await EntriesDatabase.instance.initDB()) {
       if (EntriesDatabase.instance.usingExternalImg()) {
