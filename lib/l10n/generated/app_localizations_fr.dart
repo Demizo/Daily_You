@@ -471,6 +471,24 @@ class AppLocalizationsFr extends AppLocalizations {
       'Surcharger la langue de l\'application';
 
   @override
+  String get settingsSecurityTitle => 'Security';
+
+  @override
+  String get settingsSecurityUsePassword => 'Use Password';
+
+  @override
+  String get settingsSecuritySetPassword => 'Set Password';
+
+  @override
+  String get settingsSecurityPassword => 'Password';
+
+  @override
+  String get settingsSecurityConfirmPassword => 'Confirm Password';
+
+  @override
+  String get settingsSecurityBiometricUnlock => 'Biometric Unlock';
+
+  @override
   String get settingsAboutTitle => 'À propos';
 
   @override

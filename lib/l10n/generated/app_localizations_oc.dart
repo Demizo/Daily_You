@@ -463,6 +463,24 @@ class AppLocalizationsOc extends AppLocalizations {
   String get settingsOverrideAppLanguageTitle => 'Override App Language';
 
   @override
+  String get settingsSecurityTitle => 'Security';
+
+  @override
+  String get settingsSecurityUsePassword => 'Use Password';
+
+  @override
+  String get settingsSecuritySetPassword => 'Set Password';
+
+  @override
+  String get settingsSecurityPassword => 'Password';
+
+  @override
+  String get settingsSecurityConfirmPassword => 'Confirm Password';
+
+  @override
+  String get settingsSecurityBiometricUnlock => 'Biometric Unlock';
+
+  @override
   String get settingsAboutTitle => 'A prepaus';
 
   @override
