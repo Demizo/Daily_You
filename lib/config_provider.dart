@@ -53,6 +53,8 @@ class ConfigKey {
   static const String showflashback1WeekAgo = "showflashback1WeekAgo";
   static const String showflashbackGoodDay = "showflashbackGoodDay";
   static const String showflashbackRandomDay = "showflashbackRandomDay";
+  static const String usePassword = "usePassword";
+  static const String biometricUnlock = "biometricUnlock";
   // DEPRECATED
   static const String imageQuality = "imageQuality";
 }
@@ -113,6 +115,8 @@ class ConfigProvider with ChangeNotifier {
     ConfigKey.showflashback1WeekAgo: true,
     ConfigKey.showflashbackGoodDay: true,
     ConfigKey.showflashbackRandomDay: true,
+    ConfigKey.usePassword: false,
+    ConfigKey.biometricUnlock: false
   };
 
   static final moodValueFieldMapping = {

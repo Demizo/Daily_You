@@ -858,6 +858,42 @@ abstract class AppLocalizations {
   /// **'Override App Language'**
   String get settingsOverrideAppLanguageTitle;
 
+  /// No description provided for @settingsSecurityTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Security'**
+  String get settingsSecurityTitle;
+
+  /// No description provided for @settingsSecurityUsePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Use Password'**
+  String get settingsSecurityUsePassword;
+
+  /// No description provided for @settingsSecuritySetPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Set Password'**
+  String get settingsSecuritySetPassword;
+
+  /// No description provided for @settingsSecurityPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get settingsSecurityPassword;
+
+  /// No description provided for @settingsSecurityConfirmPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Password'**
+  String get settingsSecurityConfirmPassword;
+
+  /// No description provided for @settingsSecurityBiometricUnlock.
+  ///
+  /// In en, this message translates to:
+  /// **'Biometric Unlock'**
+  String get settingsSecurityBiometricUnlock;
+
   /// No description provided for @settingsAboutTitle.
   ///
   /// In en, this message translates to:
