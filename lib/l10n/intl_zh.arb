@@ -244,5 +244,9 @@
   "settingsExportFormatDescription": "这不应该被用作备份！",
   "@settingsExportFormatDescription": {},
   "formatMarkdown": "Markdown",
-  "@formatMarkdown": {}
+  "@formatMarkdown": {},
+  "settingsFlashbacksExcludeBadDays": "排除糟糕的日子",
+  "@settingsFlashbacksExcludeBadDays": {},
+  "settingsShowFlashbacks": "显示往昔重现",
+  "@settingsShowFlashbacks": {}
 }
