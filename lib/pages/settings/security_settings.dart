@@ -1,8 +1,12 @@
 import 'package:daily_you/config_provider.dart';
+import 'package:daily_you/device_info_service.dart';
+import 'package:daily_you/widgets/auth_popup.dart';
 import 'package:daily_you/widgets/settings_icon_action.dart';
 import 'package:daily_you/widgets/settings_toggle.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
+import 'package:flutter/services.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:provider/provider.dart';
 
 class SecuritySettings extends StatefulWidget {
@@ -21,6 +25,7 @@ class SecuritySettingsPageState extends State<SecuritySettings> {
   @override
   Widget build(BuildContext context) {
     final configProvider = Provider.of<ConfigProvider>(context);
+    final LocalAuthentication auth = LocalAuthentication();
 
     return Scaffold(
       appBar: AppBar(
@@ -32,22 +37,74 @@ class SecuritySettingsPageState extends State<SecuritySettings> {
           SettingsToggle(
               title: AppLocalizations.of(context)!.settingsSecurityUsePassword,
               settingsKey: ConfigKey.usePassword,
-              onChanged: (value) {
-                configProvider.set(ConfigKey.usePassword, value);
+              onChanged: (value) async {
+                if (!configProvider.get(ConfigKey.usePassword)) {
+                  // Set a password
+                  bool setPassword = false;
+                  await showDialog(
+                      context: context,
+                      builder: (context) => AuthPopup(
+                            mode: AuthPopupMode.setPassword,
+                            title: 'Set Password',
+                            showBiometrics: false,
+                            dismissable: true,
+                            onSuccess: () {
+                              setPassword = true;
+                            },
+                          ));
+                  await configProvider.set(ConfigKey.usePassword, setPassword);
+                } else {
+                  // Disable password
+                  await showDialog(
+                      context: context,
+                      builder: (context) => AuthPopup(
+                            mode: AuthPopupMode.unlock,
+                            title: 'Enter Password',
+                            showBiometrics: false,
+                            dismissable: true,
+                            onSuccess: () {
+                              configProvider.set(ConfigKey.usePassword, false);
+                            },
+                          ));
+                }
               }),
           if (configProvider.get(ConfigKey.usePassword))
             SettingsIconAction(
                 title:
                     AppLocalizations.of(context)!.settingsSecuritySetPassword,
                 icon: Icon(Icons.key_rounded),
-                onPressed: () {}),
-          SettingsToggle(
-              title:
-                  AppLocalizations.of(context)!.settingsSecurityBiometricUnlock,
-              settingsKey: ConfigKey.biometricUnlock,
-              onChanged: (value) {
-                configProvider.set(ConfigKey.biometricUnlock, value);
-              }),
+                onPressed: () async {
+                  await showDialog(
+                      context: context,
+                      builder: (context) => AuthPopup(
+                            mode: AuthPopupMode.changePassword,
+                            title: 'Change Password',
+                            showBiometrics: false,
+                            dismissable: true,
+                            onSuccess: () {},
+                          ));
+                }),
+          if (configProvider.get(ConfigKey.usePassword) &&
+              (DeviceInfoService().supportsBiometrics ?? false))
+            SettingsToggle(
+                title: AppLocalizations.of(context)!
+                    .settingsSecurityBiometricUnlock,
+                settingsKey: ConfigKey.biometricUnlock,
+                onChanged: (value) async {
+                  bool success = true;
+                  try {
+                    final bool didAuthenticate = await auth.authenticate(
+                        options: AuthenticationOptions(stickyAuth: false),
+                        localizedReason: 'Please Authenticate');
+                    success = didAuthenticate;
+                  } on PlatformException {
+                    success = false;
+                  }
+
+                  if (success) {
+                    configProvider.set(ConfigKey.biometricUnlock, value);
+                  }
+                }),
         ],
       ),
     );

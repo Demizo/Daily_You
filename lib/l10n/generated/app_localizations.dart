@@ -894,6 +894,12 @@ abstract class AppLocalizations {
   /// **'Biometric Unlock'**
   String get settingsSecurityBiometricUnlock;
 
+  /// No description provided for @unlockAppPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock the app'**
+  String get unlockAppPrompt;
+
   /// No description provided for @settingsAboutTitle.
   ///
   /// In en, this message translates to:

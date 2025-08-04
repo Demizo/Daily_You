@@ -1,7 +1,9 @@
 import 'dart:io';
 
+import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/stats_provider.dart';
+import 'package:daily_you/widgets/auth_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:flutter/services.dart';
@@ -35,18 +37,6 @@ class _LaunchPageState extends State<LaunchPage> {
   }
 
   _checkDatabaseConnection() async {
-    try {
-      final LocalAuthentication auth = LocalAuthentication();
-      final bool didAuthenticate = await auth.authenticate(
-          options: AuthenticationOptions(stickyAuth: true),
-          localizedReason: 'Please Authenticate');
-      if (!didAuthenticate) {
-        exit(0);
-      }
-    } on PlatformException {
-      exit(0);
-    }
-
     //Initialize Database
     if (await EntriesDatabase.instance.initDB()) {
       if (EntriesDatabase.instance.usingExternalImg()) {
@@ -69,6 +59,18 @@ class _LaunchPageState extends State<LaunchPage> {
   }
 
   Future<void> _nextPage() async {
+    if (await ConfigProvider.instance.get(ConfigKey.usePassword)) {
+      await showDialog(
+          context: context,
+          builder: (context) => AuthPopup(
+                mode: AuthPopupMode.unlock,
+                title: 'Unlock App',
+                showBiometrics:
+                    ConfigProvider.instance.get(ConfigKey.biometricUnlock),
+                dismissable: false,
+                onSuccess: () {},
+              ));
+    }
     await StatsProvider.instance.updateStats();
     await Navigator.of(context).pushReplacement(MaterialPageRoute(
         builder: (context) => widget.nextPage, allowSnapshotting: false));

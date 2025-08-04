@@ -487,6 +487,9 @@ class AppLocalizationsUk extends AppLocalizations {
   String get settingsSecurityBiometricUnlock => 'Biometric Unlock';
 
   @override
+  String get unlockAppPrompt => 'Unlock the app';
+
+  @override
   String get settingsAboutTitle => 'Про нас';
 
   @override

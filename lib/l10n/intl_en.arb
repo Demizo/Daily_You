@@ -255,6 +255,8 @@
   "@settingsSecurityConfirmPassword": {},
   "settingsSecurityBiometricUnlock": "Biometric Unlock",
   "@settingsSecurityBiometricUnlock": {},
+  "unlockAppPrompt": "Unlock the app",
+  "@unlockAppPrompt": {},
   "settingsAboutTitle": "About",
   "@settingsAboutTitle": {},
   "settingsVersion": "Version",
