@@ -64,7 +64,7 @@ class _LaunchPageState extends State<LaunchPage> {
           context: context,
           builder: (context) => AuthPopup(
                 mode: AuthPopupMode.unlock,
-                title: 'Unlock App',
+                title: AppLocalizations.of(context)!.unlockAppPrompt,
                 showBiometrics:
                     ConfigProvider.instance.get(ConfigKey.biometricUnlock),
                 dismissable: false,

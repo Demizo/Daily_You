@@ -35,7 +35,8 @@ class SecuritySettingsPageState extends State<SecuritySettings> {
       body: ListView(
         children: [
           SettingsToggle(
-              title: AppLocalizations.of(context)!.settingsSecurityUsePassword,
+              title:
+                  AppLocalizations.of(context)!.settingsSecurityRequirePassword,
               settingsKey: ConfigKey.usePassword,
               onChanged: (value) async {
                 if (!configProvider.get(ConfigKey.usePassword)) {
@@ -45,7 +46,8 @@ class SecuritySettingsPageState extends State<SecuritySettings> {
                       context: context,
                       builder: (context) => AuthPopup(
                             mode: AuthPopupMode.setPassword,
-                            title: 'Set Password',
+                            title: AppLocalizations.of(context)!
+                                .settingsSecuritySetPassword,
                             showBiometrics: false,
                             dismissable: true,
                             onSuccess: () {
@@ -59,7 +61,8 @@ class SecuritySettingsPageState extends State<SecuritySettings> {
                       context: context,
                       builder: (context) => AuthPopup(
                             mode: AuthPopupMode.unlock,
-                            title: 'Enter Password',
+                            title: AppLocalizations.of(context)!
+                                .settingsSecurityEnterPassword,
                             showBiometrics: false,
                             dismissable: true,
                             onSuccess: () {
@@ -70,15 +73,16 @@ class SecuritySettingsPageState extends State<SecuritySettings> {
               }),
           if (configProvider.get(ConfigKey.usePassword))
             SettingsIconAction(
-                title:
-                    AppLocalizations.of(context)!.settingsSecuritySetPassword,
-                icon: Icon(Icons.key_rounded),
+                title: AppLocalizations.of(context)!
+                    .settingsSecurityChangePassword,
+                icon: Icon(Icons.edit_rounded),
                 onPressed: () async {
                   await showDialog(
                       context: context,
                       builder: (context) => AuthPopup(
                             mode: AuthPopupMode.changePassword,
-                            title: 'Change Password',
+                            title: AppLocalizations.of(context)!
+                                .settingsSecurityChangePassword,
                             showBiometrics: false,
                             dismissable: true,
                             onSuccess: () {},
@@ -94,8 +98,10 @@ class SecuritySettingsPageState extends State<SecuritySettings> {
                   bool success = true;
                   try {
                     final bool didAuthenticate = await auth.authenticate(
-                        options: AuthenticationOptions(stickyAuth: false),
-                        localizedReason: 'Please Authenticate');
+                        options: AuthenticationOptions(
+                            stickyAuth: false, biometricOnly: true),
+                        localizedReason:
+                            AppLocalizations.of(context)!.unlockAppPrompt);
                     success = didAuthenticate;
                   } on PlatformException {
                     success = false;
