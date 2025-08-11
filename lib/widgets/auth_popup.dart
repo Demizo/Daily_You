@@ -33,14 +33,29 @@ class _AuthPopupState extends State<AuthPopup> {
   final _oldController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmController = TextEditingController();
+  final _passwordFocusNode = FocusNode();
+
   bool _isLoading = false;
   String? _error;
+  bool _showPassword = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Auto-focus password field in unlock mode
+    if (widget.mode == AuthPopupMode.unlock && !widget.showBiometrics) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _passwordFocusNode.requestFocus();
+      });
+    }
+  }
 
   @override
   void dispose() {
     _oldController.dispose();
     _passwordController.dispose();
     _confirmController.dispose();
+    _passwordFocusNode.dispose();
     super.dispose();
   }
 
@@ -169,7 +184,8 @@ class _AuthPopupState extends State<AuthPopup> {
                   padding: const EdgeInsets.all(8.0),
                   child: TextFormField(
                     controller: _oldController,
-                    obscureText: true,
+                    obscureText: !_showPassword,
+                    autocorrect: false,
                     decoration: InputDecoration(
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(12.0)),
@@ -186,7 +202,9 @@ class _AuthPopupState extends State<AuthPopup> {
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
                   controller: _passwordController,
-                  obscureText: true,
+                  focusNode: _passwordFocusNode,
+                  obscureText: !_showPassword,
+                  autocorrect: false,
                   decoration: InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(12.0)),
@@ -203,7 +221,8 @@ class _AuthPopupState extends State<AuthPopup> {
                   padding: const EdgeInsets.all(8.0),
                   child: TextFormField(
                     controller: _confirmController,
-                    obscureText: true,
+                    obscureText: !_showPassword,
+                    autocorrect: false,
                     decoration: InputDecoration(
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(12.0)),
@@ -229,15 +248,26 @@ class _AuthPopupState extends State<AuthPopup> {
                 ),
               Padding(
                 padding: const EdgeInsets.only(top: 8.0, left: 8.0, right: 8.0),
-                child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                  _isLoading
-                      ? const CircularProgressIndicator()
-                      : IconButton.filled(
-                          onPressed: _handleSubmit,
-                          icon: Icon(Icons.check_rounded),
-                          iconSize: 28,
-                        ),
-                ]),
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                          icon: Icon(!_showPassword
+                              ? Icons.visibility_rounded
+                              : Icons.visibility_off_rounded),
+                          onPressed: () {
+                            setState(() {
+                              _showPassword = !_showPassword;
+                            });
+                          }),
+                      _isLoading
+                          ? const CircularProgressIndicator()
+                          : IconButton.filled(
+                              onPressed: _handleSubmit,
+                              icon: Icon(Icons.check_rounded),
+                              iconSize: 28,
+                            ),
+                    ]),
               )
             ],
           ),
