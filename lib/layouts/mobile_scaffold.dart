@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/pages/settings/notification_settings.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/pages/statistics_page.dart';
 import 'package:daily_you/pages/gallery_page.dart';
 import 'package:daily_you/pages/home_page.dart';

@@ -62,5 +62,9 @@
         <meta-data
           android:name="com.google.firebase.messaging.default_notification_icon"
           android:resource="@drawable/ic_notification" />
+	<!-- TODO This is a temporary fix since text shadows cause lots of lag with the impeller renderer -->
+	<meta-data
+	  android:name="io.flutter.embedding.android.EnableImpeller"
+	  android:value="false" />
     </application>
 </manifest>

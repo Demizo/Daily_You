@@ -3,7 +3,7 @@ import 'package:daily_you/import_utils.dart';
 import 'package:daily_you/utils/export_utils.dart';
 import 'package:daily_you/widgets/settings_icon_action.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:daily_you/l10n/generated/app_localizations.dart';
 
 class BackupRestoreSettings extends StatefulWidget {
   const BackupRestoreSettings({super.key});

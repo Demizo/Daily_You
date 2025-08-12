@@ -4,7 +4,7 @@ import 'package:daily_you/widgets/edit_toolbar.dart';
 import 'package:daily_you/widgets/entry_text_edit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:daily_you/l10n/generated/app_localizations.dart';
 
 class EditTemplate extends StatefulWidget {
   final Template? template;

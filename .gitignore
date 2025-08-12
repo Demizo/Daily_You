@@ -53,3 +53,4 @@ appimage-build
 
 # direnv
 .direnv/
+android/app/.cxx/

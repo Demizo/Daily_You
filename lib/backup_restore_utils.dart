@@ -5,7 +5,7 @@ import 'package:daily_you/file_layer.dart';
 import 'package:daily_you/stats_provider.dart';
 import 'package:daily_you/utils/zip_utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 

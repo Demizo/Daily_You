@@ -3,7 +3,7 @@ import 'package:daily_you/stats_provider.dart';
 import 'package:daily_you/widgets/hiding_widget.dart';
 import 'package:daily_you/widgets/large_entry_card_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/widgets/entry_card_widget.dart';
 import 'package:daily_you/pages/entry_detail_page.dart';
 import 'package:easy_debounce/easy_debounce.dart';

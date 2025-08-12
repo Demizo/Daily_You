@@ -5,7 +5,7 @@ import 'package:daily_you/widgets/mood_totals_chart.dart';
 import 'package:daily_you/widgets/stat_range_selector.dart';
 import 'package:daily_you/widgets/streak_card.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 class StatsPage extends StatelessWidget {
