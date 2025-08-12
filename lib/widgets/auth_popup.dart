@@ -38,6 +38,7 @@ class _AuthPopupState extends State<AuthPopup> {
   bool _isLoading = false;
   String? _error;
   bool _showPassword = false;
+  bool _biometricsPrompted = false;
 
   @override
   void initState() {
@@ -85,7 +86,8 @@ class _AuthPopupState extends State<AuthPopup> {
     bool success = false;
     try {
       final bool didAuthenticate = await auth.authenticate(
-          options: AuthenticationOptions(stickyAuth: true, biometricOnly: true),
+          options:
+              AuthenticationOptions(stickyAuth: false, biometricOnly: true),
           localizedReason: AppLocalizations.of(context)!.unlockAppPrompt);
       success = didAuthenticate;
     } on PlatformException {
@@ -156,7 +158,8 @@ class _AuthPopupState extends State<AuthPopup> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.showBiometrics) {
+    if (widget.showBiometrics && !_biometricsPrompted) {
+      _biometricsPrompted = true;
       _handleBiometric();
     }
     return PopScope(
