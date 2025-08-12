@@ -95,21 +95,39 @@ class SecuritySettingsPageState extends State<SecuritySettings> {
                     .settingsSecurityBiometricUnlock,
                 settingsKey: ConfigKey.biometricUnlock,
                 onChanged: (value) async {
-                  bool success = true;
-                  try {
-                    final bool didAuthenticate = await auth.authenticate(
-                        options: AuthenticationOptions(
-                            stickyAuth: false, biometricOnly: true),
-                        localizedReason:
-                            AppLocalizations.of(context)!.unlockAppPrompt);
-                    success = didAuthenticate;
-                  } on PlatformException {
-                    success = false;
-                  }
+                  await showDialog(
+                      context: context,
+                      builder: (context) => AuthPopup(
+                            mode: AuthPopupMode.unlock,
+                            title: AppLocalizations.of(context)!
+                                .settingsSecurityEnterPassword,
+                            showBiometrics: false,
+                            dismissable: true,
+                            onSuccess: () async {
+                              bool success = true;
+                              // Only require biometric authentication when enabling biometric unlock
+                              if (value == true) {
+                                try {
+                                  final bool didAuthenticate =
+                                      await auth.authenticate(
+                                          options: AuthenticationOptions(
+                                              stickyAuth: false,
+                                              biometricOnly: true),
+                                          localizedReason:
+                                              AppLocalizations.of(context)!
+                                                  .unlockAppPrompt);
+                                  success = didAuthenticate;
+                                } on PlatformException {
+                                  success = false;
+                                }
+                              }
 
-                  if (success) {
-                    configProvider.set(ConfigKey.biometricUnlock, value);
-                  }
+                              if (success) {
+                                configProvider.set(
+                                    ConfigKey.biometricUnlock, value);
+                              }
+                            },
+                          ));
                 }),
         ],
       ),
