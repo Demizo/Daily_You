@@ -1,10 +1,10 @@
+import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 enum AuthPopupMode { unlock, setPassword, changePassword }
 
@@ -60,20 +60,17 @@ class _AuthPopupState extends State<AuthPopup> {
     super.dispose();
   }
 
-  static const _passwordKey = 'app_password_hash';
-
   Future<String> _hashPassword(String password) async {
     return sha256.convert(utf8.encode(password)).toString();
   }
 
   Future<void> savePassword(String password) async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setString(_passwordKey, await _hashPassword(password));
+    await ConfigProvider.instance
+        .set(ConfigKey.passwordHash, await _hashPassword(password));
   }
 
   Future<bool> validatePassword(String password) async {
-    final prefs = await SharedPreferences.getInstance();
-    final storedHash = prefs.getString(_passwordKey);
+    final storedHash = ConfigProvider.instance.get(ConfigKey.passwordHash);
     if (storedHash == null) return false;
     return storedHash == await _hashPassword(password);
   }

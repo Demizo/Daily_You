@@ -1,13 +1,9 @@
-import 'dart:io';
-
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/stats_provider.dart';
 import 'package:daily_you/widgets/auth_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
-import 'package:flutter/services.dart';
-import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LaunchPage extends StatefulWidget {
@@ -59,7 +55,7 @@ class _LaunchPageState extends State<LaunchPage> {
   }
 
   Future<void> _nextPage() async {
-    if (await ConfigProvider.instance.get(ConfigKey.usePassword)) {
+    if (await ConfigProvider.instance.get(ConfigKey.requirePassword)) {
       await showDialog(
           context: context,
           builder: (context) => AuthPopup(

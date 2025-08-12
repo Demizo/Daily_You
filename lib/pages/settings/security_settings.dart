@@ -37,9 +37,9 @@ class SecuritySettingsPageState extends State<SecuritySettings> {
           SettingsToggle(
               title:
                   AppLocalizations.of(context)!.settingsSecurityRequirePassword,
-              settingsKey: ConfigKey.usePassword,
+              settingsKey: ConfigKey.requirePassword,
               onChanged: (value) async {
-                if (!configProvider.get(ConfigKey.usePassword)) {
+                if (!configProvider.get(ConfigKey.requirePassword)) {
                   // Set a password
                   bool setPassword = false;
                   await showDialog(
@@ -54,7 +54,8 @@ class SecuritySettingsPageState extends State<SecuritySettings> {
                               setPassword = true;
                             },
                           ));
-                  await configProvider.set(ConfigKey.usePassword, setPassword);
+                  await configProvider.set(
+                      ConfigKey.requirePassword, setPassword);
                 } else {
                   // Disable password
                   await showDialog(
@@ -66,12 +67,13 @@ class SecuritySettingsPageState extends State<SecuritySettings> {
                             showBiometrics: false,
                             dismissable: true,
                             onSuccess: () {
-                              configProvider.set(ConfigKey.usePassword, false);
+                              configProvider.set(
+                                  ConfigKey.requirePassword, false);
                             },
                           ));
                 }
               }),
-          if (configProvider.get(ConfigKey.usePassword))
+          if (configProvider.get(ConfigKey.requirePassword))
             SettingsIconAction(
                 title: AppLocalizations.of(context)!
                     .settingsSecurityChangePassword,
@@ -88,7 +90,7 @@ class SecuritySettingsPageState extends State<SecuritySettings> {
                             onSuccess: () {},
                           ));
                 }),
-          if (configProvider.get(ConfigKey.usePassword) &&
+          if (configProvider.get(ConfigKey.requirePassword) &&
               (DeviceInfoService().supportsBiometrics ?? false))
             SettingsToggle(
                 title: AppLocalizations.of(context)!

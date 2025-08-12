@@ -9,6 +9,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ConfigKey {
   static const String configVersion = "configVersion";
@@ -53,8 +54,10 @@ class ConfigKey {
   static const String showflashback1WeekAgo = "showflashback1WeekAgo";
   static const String showflashbackGoodDay = "showflashbackGoodDay";
   static const String showflashbackRandomDay = "showflashbackRandomDay";
-  static const String usePassword = "usePassword";
+  // Secure Configuration Values
+  static const String requirePassword = "requirePassword";
   static const String biometricUnlock = "biometricUnlock";
+  static const String passwordHash = "passwordHash";
   // DEPRECATED
   static const String imageQuality = "imageQuality";
 }
@@ -115,9 +118,15 @@ class ConfigProvider with ChangeNotifier {
     ConfigKey.showflashback1WeekAgo: true,
     ConfigKey.showflashbackGoodDay: true,
     ConfigKey.showflashbackRandomDay: true,
-    ConfigKey.usePassword: false,
-    ConfigKey.biometricUnlock: false
   };
+
+  final Map<String, dynamic> _secureConfig = {
+    ConfigKey.requirePassword: false,
+    ConfigKey.biometricUnlock: false,
+    ConfigKey.passwordHash: ""
+  };
+
+  bool _isSecureKey(String key) => _secureConfig.containsKey(key);
 
   static final moodValueFieldMapping = {
     2: ConfigKey.veryHappyIcon,
@@ -157,7 +166,14 @@ class ConfigProvider with ChangeNotifier {
   Future<void> set(String field, dynamic value) async {
     _config[field] = value;
     notifyListeners();
-    await writeConfig();
+
+    if (_isSecureKey(field)) {
+      final prefs = await SharedPreferences.getInstance();
+      // Store as JSON for type safety
+      await prefs.setString(field, json.encode(value));
+    } else {
+      await writeConfig();
+    }
   }
 
   Future<void> init() async {
@@ -175,13 +191,13 @@ class ConfigProvider with ChangeNotifier {
       await configFile.create();
       await configFile.writeAsString('{}');
     }
-    await poplulateDefaults();
+
     await readConfig();
+    await loadSecureConfig();
+    await poplulateDefaults();
   }
 
   Future<void> poplulateDefaults() async {
-    await readConfig();
-
     // Set default config data
     for (String key in _defaultConfig.keys) {
       if (!_config.containsKey(key)) {
@@ -189,10 +205,10 @@ class ConfigProvider with ChangeNotifier {
       }
     }
 
-    // Remove old config keys
-    List<String> oldKeys = List.empty(growable: true);
+    // Remove old keys
+    List<String> oldKeys = [];
     for (String key in _config.keys) {
-      if (!_defaultConfig.containsKey(key)) {
+      if (!_defaultConfig.containsKey(key) && !_secureConfig.containsKey(key)) {
         oldKeys.add(key);
       }
     }
@@ -201,6 +217,23 @@ class ConfigProvider with ChangeNotifier {
     }
 
     await writeConfig();
+  }
+
+  Future<void> loadSecureConfig() async {
+    final prefs = await SharedPreferences.getInstance();
+    for (final key in _secureConfig.keys) {
+      if (prefs.containsKey(key)) {
+        try {
+          _config[key] = json.decode(prefs.getString(key)!);
+        } catch (_) {
+          _config[key] = prefs.getString(key); // fallback to raw
+        }
+      } else {
+        _config[key] = _secureConfig[key];
+        // Store as JSON for type safety
+        await prefs.setString(key, json.encode(_secureConfig[key]));
+      }
+    }
   }
 
   Future<void> readConfig() async {
@@ -214,8 +247,12 @@ class ConfigProvider with ChangeNotifier {
   }
 
   Future<void> writeConfig() async {
+    // Don't write secure configurations to the config file
+    final filteredConfig = Map<String, dynamic>.from(_config)
+      ..removeWhere((key, _) => _isSecureKey(key));
+
     final configFile = File(configFilePath);
-    await configFile.writeAsString(json.encode(_config));
+    await configFile.writeAsString(json.encode(filteredConfig));
   }
 
   bool is24HourFormat() {
