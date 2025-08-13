@@ -469,6 +469,45 @@ class AppLocalizationsUk extends AppLocalizations {
   String get settingsOverrideAppLanguageTitle => 'Перевизначити мову програми';
 
   @override
+  String get settingsSecurityTitle => 'Security';
+
+  @override
+  String get settingsSecurityRequirePassword => 'Require Password';
+
+  @override
+  String get settingsSecurityEnterPassword => 'Enter Password';
+
+  @override
+  String get settingsSecuritySetPassword => 'Set Password';
+
+  @override
+  String get settingsSecurityChangePassword => 'Change Password';
+
+  @override
+  String get settingsSecurityPassword => 'Password';
+
+  @override
+  String get settingsSecurityConfirmPassword => 'Confirm Password';
+
+  @override
+  String get settingsSecurityOldPassword => 'Old Password';
+
+  @override
+  String get settingsSecurityIncorrectPassword => 'Incorrect Password';
+
+  @override
+  String get settingsSecurityPasswordsDoNotMatch => 'Passwords do not match';
+
+  @override
+  String get requiredPrompt => 'Required';
+
+  @override
+  String get settingsSecurityBiometricUnlock => 'Biometric Unlock';
+
+  @override
+  String get unlockAppPrompt => 'Unlock the app';
+
+  @override
   String get settingsAboutTitle => 'Про нас';
 
   @override

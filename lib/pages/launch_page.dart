@@ -1,5 +1,7 @@
+import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/stats_provider.dart';
+import 'package:daily_you/widgets/auth_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -53,6 +55,18 @@ class _LaunchPageState extends State<LaunchPage> {
   }
 
   Future<void> _nextPage() async {
+    if (await ConfigProvider.instance.get(ConfigKey.requirePassword)) {
+      await showDialog(
+          context: context,
+          builder: (context) => AuthPopup(
+                mode: AuthPopupMode.unlock,
+                title: AppLocalizations.of(context)!.unlockAppPrompt,
+                showBiometrics:
+                    ConfigProvider.instance.get(ConfigKey.biometricUnlock),
+                dismissable: false,
+                onSuccess: () {},
+              ));
+    }
     await StatsProvider.instance.updateStats();
     await Navigator.of(context).pushReplacement(MaterialPageRoute(
         builder: (context) => widget.nextPage, allowSnapshotting: false));

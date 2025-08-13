@@ -858,6 +858,84 @@ abstract class AppLocalizations {
   /// **'Override App Language'**
   String get settingsOverrideAppLanguageTitle;
 
+  /// No description provided for @settingsSecurityTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Security'**
+  String get settingsSecurityTitle;
+
+  /// No description provided for @settingsSecurityRequirePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Require Password'**
+  String get settingsSecurityRequirePassword;
+
+  /// No description provided for @settingsSecurityEnterPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter Password'**
+  String get settingsSecurityEnterPassword;
+
+  /// No description provided for @settingsSecuritySetPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Set Password'**
+  String get settingsSecuritySetPassword;
+
+  /// No description provided for @settingsSecurityChangePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Password'**
+  String get settingsSecurityChangePassword;
+
+  /// No description provided for @settingsSecurityPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get settingsSecurityPassword;
+
+  /// No description provided for @settingsSecurityConfirmPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Password'**
+  String get settingsSecurityConfirmPassword;
+
+  /// No description provided for @settingsSecurityOldPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Old Password'**
+  String get settingsSecurityOldPassword;
+
+  /// No description provided for @settingsSecurityIncorrectPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect Password'**
+  String get settingsSecurityIncorrectPassword;
+
+  /// No description provided for @settingsSecurityPasswordsDoNotMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match'**
+  String get settingsSecurityPasswordsDoNotMatch;
+
+  /// No description provided for @requiredPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Required'**
+  String get requiredPrompt;
+
+  /// No description provided for @settingsSecurityBiometricUnlock.
+  ///
+  /// In en, this message translates to:
+  /// **'Biometric Unlock'**
+  String get settingsSecurityBiometricUnlock;
+
+  /// No description provided for @unlockAppPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock the app'**
+  String get unlockAppPrompt;
+
   /// No description provided for @settingsAboutTitle.
   ///
   /// In en, this message translates to:
