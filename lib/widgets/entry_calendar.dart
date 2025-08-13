@@ -1,6 +1,9 @@
 import 'package:daily_you/config_provider.dart';
+import 'package:daily_you/models/entry.dart';
+import 'package:daily_you/pages/entry_detail_page.dart';
 import 'package:daily_you/stats_provider.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:daily_you/widgets/year_month_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/widgets/entry_day_cell.dart';
 import 'package:intl/intl.dart';
@@ -42,6 +45,34 @@ class _EntryCalendarState extends State<EntryCalendar>
           return Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              IconButton(
+                  onPressed: () async {
+                    DateTime? pickedDate = await showDatePicker(
+                      initialDatePickerMode: DatePickerMode.year,
+                      context: context,
+                      initialDate: statsProvider.selectedDate,
+                      firstDate: DateTime.utc(2000),
+                      lastDate: DateTime.now(),
+                    );
+                    if (pickedDate != null &&
+                        pickedDate != statsProvider.selectedDate) {
+                      statsProvider.selectedDate = pickedDate;
+                      // Update now to jump to the selected day on the calendar
+                      statsProvider.forceUpdate();
+                      Entry? pickedEntry =
+                          statsProvider.getEntryForDate(pickedDate);
+                      if (pickedEntry != null) {
+                        await Navigator.of(context).push(MaterialPageRoute(
+                          allowSnapshotting: false,
+                          builder: (context) => EntryDetailPage(
+                              filtered: false,
+                              index: statsProvider
+                                  .getIndexOfEntry(pickedEntry.id!)),
+                        ));
+                      }
+                    }
+                  },
+                  icon: Icon(Icons.event_rounded)),
               GestureDetector(
                 child: Text(
                   DateFormat("MMMM y", TimeManager.currentLocale(context))
@@ -50,21 +81,23 @@ class _EntryCalendarState extends State<EntryCalendar>
                   style: const TextStyle(fontSize: 18),
                 ),
                 onTap: () async {
-                  DateTime? pickedDate = await showDatePicker(
-                    initialDatePickerMode: DatePickerMode.year,
-                    context: context,
-                    initialDate: statsProvider.selectedDate,
-                    firstDate: DateTime.utc(2000),
-                    lastDate: DateTime.now(),
-                  );
-                  if (pickedDate != null &&
-                      pickedDate != statsProvider.selectedDate) {
-                    statsProvider.selectedDate = pickedDate;
+                  final selectedDate = await showYearMonthPicker(context);
+                  if (selectedDate != null) {
+                    statsProvider.selectedDate = selectedDate;
                     // Update now to jump to the selected day on the calendar
                     statsProvider.forceUpdate();
                   }
                 },
               ),
+              if (!TimeManager.isSameMonth(
+                  statsProvider.selectedDate, DateTime.now()))
+                IconButton(
+                    onPressed: () async {
+                      statsProvider.selectedDate = DateTime.now();
+                      // Update now to jump to today on the calendar
+                      statsProvider.forceUpdate();
+                    },
+                    icon: Icon(Icons.upcoming_rounded)),
               const CalendarViewModeSelector(),
             ],
           );

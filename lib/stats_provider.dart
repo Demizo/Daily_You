@@ -276,6 +276,19 @@ class StatsProvider with ChangeNotifier {
     return todayEntry;
   }
 
+  Entry? getEntryForDate(DateTime date) {
+    //Search each entry for one on the date
+    for (var entry in entries) {
+      if (entry.timeCreate.day == date.day &&
+          entry.timeCreate.month == date.month &&
+          entry.timeCreate.year == date.year) {
+        return entry;
+      }
+    }
+
+    return null;
+  }
+
   List<EntryImage> getImagesForEntry(Entry entry) {
     return images.where((img) => img.entryId == entry.id!).toList();
   }
