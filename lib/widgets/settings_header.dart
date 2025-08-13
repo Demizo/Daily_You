@@ -9,10 +9,13 @@ class SettingsHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      text,
-      style:
-          TextStyle(fontSize: 16, color: Theme.of(context).colorScheme.primary),
+    return Padding(
+      padding: const EdgeInsets.only(top: 16.0),
+      child: Text(
+        text,
+        style: TextStyle(
+            fontSize: 16, color: Theme.of(context).colorScheme.primary),
+      ),
     );
   }
 }
