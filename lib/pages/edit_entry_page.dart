@@ -51,6 +51,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   final UndoHistoryController _undoController = UndoHistoryController();
   bool _deletingEntry = false;
   bool _savingEntry = false;
+  bool _newEntry = false;
 
   Future<void> _initEntry() async {
     if (widget.entry == null) {
@@ -59,6 +60,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
               ? DateTime.now()
               : (widget.overrideCreateDate ?? DateTime.now());
       _entry = await EntriesDatabase.instance.createNewEntry(createTime);
+      _newEntry = true;
     } else {
       _entry = widget.entry!;
     }
@@ -135,7 +137,22 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
       : PopScope(
           onPopInvokedWithResult: (didPop, result) async {
             if (!_deletingEntry) {
-              await _saveEntry();
+              if (_newEntry) {
+                final updatedEntry = _entry.copy(
+                  text: text,
+                  mood: mood,
+                  timeModified: DateTime.now(),
+                );
+                if (updatedEntry.text == _entry.text &&
+                    updatedEntry.mood == _entry.mood &&
+                    currentImages.isEmpty) {
+                  await _deleteEntry(id);
+                } else {
+                  await _saveEntry();
+                }
+              } else {
+                await _saveEntry();
+              }
             }
           },
           child: Scaffold(
