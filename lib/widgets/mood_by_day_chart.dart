@@ -44,7 +44,15 @@ class MoodByDayChart extends StatelessWidget {
                     showTitles: true,
                     reservedSize: 36,
                     getTitlesWidget: (double value, _) {
-                      return Text(_getDayLabel(context, value.toInt()));
+                      return SizedBox(
+                        width: 36,
+                        child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: Text(_getDayLabel(context, value.toInt())),
+                            )),
+                      );
                     },
                   )),
                   rightTitles: const AxisTitles(),
