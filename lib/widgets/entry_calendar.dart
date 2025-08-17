@@ -28,9 +28,11 @@ class _EntryCalendarState extends State<EntryCalendar>
   Widget build(BuildContext context) {
     super.build(context);
     final statsProvider = Provider.of<StatsProvider>(context);
+    final theme = Theme.of(context);
     return TableCalendar(
       locale: TimeManager.currentLocale(context),
       rowHeight: 57,
+      daysOfWeekHeight: 24,
       sixWeekMonthsEnforced: true,
       startingDayOfWeek: StartingDayOfWeek
           .values[ConfigProvider.instance.getFirstDayOfWeekIndex(context)],
@@ -43,11 +45,28 @@ class _EntryCalendarState extends State<EntryCalendar>
       firstDay: DateTime.utc(2000),
       onPageChanged: (DateTime date) => statsProvider.selectedDate = date,
       headerStyle: HeaderStyle(
+          leftChevronIcon: Icon(Icons.chevron_left,
+              color: theme.colorScheme.onSurfaceVariant),
           leftChevronPadding: EdgeInsets.all(8),
           leftChevronMargin: EdgeInsets.only(left: 8),
+          rightChevronIcon: Icon(Icons.chevron_right,
+              color: theme.colorScheme.onSurfaceVariant),
           rightChevronPadding: EdgeInsets.all(8),
           rightChevronMargin: EdgeInsets.only(right: 8)),
       calendarBuilders: CalendarBuilders(
+        dowBuilder: (context, date) {
+          return FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Center(
+              child: Text(
+                DateFormat("E", TimeManager.currentLocale(context))
+                    .format(date)
+                    .toString(),
+                style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
+              ),
+            ),
+          );
+        },
         headerTitleBuilder: (context, date) {
           return Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -98,7 +117,7 @@ class _EntryCalendarState extends State<EntryCalendar>
                       icon: SvgPicture.asset(
                         'assets/icons/calendar_event.svg',
                         colorFilter: ColorFilter.mode(
-                            Theme.of(context).colorScheme.onSurfaceVariant,
+                            theme.colorScheme.onSurfaceVariant,
                             BlendMode.srcIn),
                         width: 24,
                         height: 24,
@@ -159,9 +178,7 @@ class _EntryCalendarState extends State<EntryCalendar>
                             icon: SvgPicture.asset(
                               'assets/icons/calendar_latest.svg',
                               colorFilter: ColorFilter.mode(
-                                  Theme.of(context)
-                                      .colorScheme
-                                      .onSurfaceVariant,
+                                  theme.colorScheme.onSurfaceVariant,
                                   BlendMode.srcIn),
                               width: 24,
                               height: 24,

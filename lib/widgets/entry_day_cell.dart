@@ -40,26 +40,29 @@ class EntryDayCell extends StatelessWidget {
     if (entry != null) {
       if (showMood || image == null) {
         // Show mood
-        return GestureDetector(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                '${date.day}',
-                style: const TextStyle(fontSize: 16),
-              ),
-              MoodIcon(moodValue: entry.mood)
-            ],
+        return FittedBox(
+          fit: BoxFit.scaleDown,
+          child: GestureDetector(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  '${date.day}',
+                  style: const TextStyle(fontSize: 16),
+                ),
+                MoodIcon(moodValue: entry.mood)
+              ],
+            ),
+            onTap: () async {
+              await Navigator.of(context).push(MaterialPageRoute(
+                allowSnapshotting: false,
+                builder: (context) => EntryDetailPage(
+                  filtered: false,
+                  index: statsProvider.getIndexOfEntry(entry.id!),
+                ),
+              ));
+            },
           ),
-          onTap: () async {
-            await Navigator.of(context).push(MaterialPageRoute(
-              allowSnapshotting: false,
-              builder: (context) => EntryDetailPage(
-                filtered: false,
-                index: statsProvider.getIndexOfEntry(entry.id!),
-              ),
-            ));
-          },
         );
       } else {
         // Show image
@@ -102,21 +105,12 @@ class EntryDayCell extends StatelessWidget {
     } else {
       // No entry
       return GestureDetector(
-        child: Container(
-          alignment: Alignment.center,
-          child: isSameDay(date, DateTime.now())
-              ? Stack(
-                  alignment: Alignment.topCenter,
+        child: isSameDay(date, DateTime.now())
+            ? FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Column(
-                      children: [
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        Icon(Icons.add_rounded,
-                            color: Theme.of(context).colorScheme.primary),
-                      ],
-                    ),
                     Text(
                       '${date.day}',
                       style: TextStyle(
@@ -124,12 +118,14 @@ class EntryDayCell extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                           color: Theme.of(context).colorScheme.primary),
                     ),
+                    Icon(Icons.add_rounded,
+                        color: Theme.of(context).colorScheme.primary),
                   ],
-                )
-              : Center(
-                  child: Text('${date.day}', style: TextStyle(fontSize: 16)),
                 ),
-        ),
+              )
+            : Center(
+                child: Text('${date.day}', style: TextStyle(fontSize: 16)),
+              ),
         onTap: () async {
           await Navigator.of(context).push(MaterialPageRoute(
             allowSnapshotting: false,
