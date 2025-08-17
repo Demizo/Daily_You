@@ -1,0 +1,9 @@
+Daily You v2.12.0 has arrived! This one is all about privacy:
+
+• Celebrating 2 years of Daily You!
+• Added the ability to lock the app with a password
+• Added the option for biometric unlock on supported devices
+• Revamped the calendar to provide more controls and reduce visual noise
+• New logs will now be automatically discarded if no edits were made
+• Minor visual fixes and improvements
+• Updated translations
