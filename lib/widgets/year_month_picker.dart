@@ -1,3 +1,4 @@
+import 'package:daily_you/widgets/settings_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -22,56 +23,102 @@ Future<DateTime?> showYearMonthPicker(
   return showDialog<DateTime>(
     context: context,
     builder: (BuildContext context) {
-      return AlertDialog(
-        content: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Year Dropdown
-            DropdownMenu<int>(
-              initialSelection: selectedYear,
-              dropdownMenuEntries: years
-                  .map((y) => DropdownMenuEntry<int>(
-                        value: y,
-                        label: y.toString(),
-                      ))
-                  .toList(),
-              onSelected: (value) {
-                if (value != null) {
-                  selectedYear = value;
-                }
-              },
-            ),
-            const SizedBox(height: 16),
-            // Month Dropdown
-            DropdownMenu<int>(
-              initialSelection: selectedMonth,
-              dropdownMenuEntries: List.generate(
-                12,
-                (i) => DropdownMenuEntry<int>(
-                  value: i + 1,
-                  label: months[i],
-                ),
+      return StatefulBuilder(
+        builder: (BuildContext context, setState) => AlertDialog(
+          content: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Year Dropdown
+              DropdownButton<int>(
+                underline: Container(),
+                elevation: 1,
+                isDense: false,
+                isExpanded: false,
+                alignment: AlignmentDirectional.centerEnd,
+                borderRadius: BorderRadius.circular(20),
+                value: selectedYear,
+                items: years
+                    .map((y) => DropdownMenuItem<int>(
+                          value: y,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: y == selectedYear
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
+                                ),
+                                y.toString()),
+                          ),
+                        ))
+                    .toList(),
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() {
+                      selectedYear = value;
+                      if (selectedYear == DateTime.now().year &&
+                          selectedMonth > DateTime.now().month) {
+                        selectedMonth = DateTime.now().month;
+                      }
+                    });
+                  }
+                },
               ),
-              onSelected: (value) {
-                if (value != null) {
-                  selectedMonth = value;
-                }
+              const SizedBox(height: 16),
+              // Month Dropdown
+              DropdownButton<int>(
+                underline: Container(),
+                elevation: 1,
+                isDense: false,
+                isExpanded: false,
+                alignment: AlignmentDirectional.centerEnd,
+                borderRadius: BorderRadius.circular(20),
+                value: selectedMonth,
+                items: List.generate(
+                  selectedYear == DateTime.now().year
+                      ? DateTime.now().month
+                      : 12,
+                  (i) => DropdownMenuItem<int>(
+                    value: i + 1,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: i + 1 == selectedMonth
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                          ),
+                          months[i]),
+                    ),
+                  ),
+                ),
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() {
+                      selectedMonth = value;
+                    });
+                  }
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context), // cancel
+              child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(
+                    context, DateTime(selectedYear, selectedMonth, 1));
               },
+              child: Text(MaterialLocalizations.of(context).okButtonLabel),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context), // cancel
-            child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context, DateTime(selectedYear, selectedMonth, 1));
-            },
-            child: Text(MaterialLocalizations.of(context).okButtonLabel),
-          ),
-        ],
       );
     },
   );
