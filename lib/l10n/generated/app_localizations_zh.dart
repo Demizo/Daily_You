@@ -24,7 +24,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get flashbacksTitle => '往昔重现';
 
   @override
-  String get settingsFlashbacksExcludeBadDays => 'Exclude bad days';
+  String get settingsFlashbacksExcludeBadDays => '排除糟糕的日子';
 
   @override
   String get flaskbacksEmpty => '暂无回忆…';
@@ -231,7 +231,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsShowMarkdownToolbar => '显示 Markdown 工具栏';
 
   @override
-  String get settingsShowFlashbacks => 'Show Flashbacks';
+  String get settingsShowFlashbacks => '显示往昔重现';
 
   @override
   String get settingsChangeMoodIcons => '更改心情图标';

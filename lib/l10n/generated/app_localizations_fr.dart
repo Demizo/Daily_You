@@ -25,7 +25,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get flashbacksTitle => 'Souvenirs';
 
   @override
-  String get settingsFlashbacksExcludeBadDays => 'Exclude bad days';
+  String get settingsFlashbacksExcludeBadDays => 'Exclure les mauvais jours';
 
   @override
   String get flaskbacksEmpty => 'Pas encore de souvenirs…';
@@ -236,7 +236,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'Afficher la barre d\'outils Markdown';
 
   @override
-  String get settingsShowFlashbacks => 'Show Flashbacks';
+  String get settingsShowFlashbacks => 'Afficher les réviviscence';
 
   @override
   String get settingsChangeMoodIcons => 'Modifier les icônes d\'humeur';
@@ -389,11 +389,11 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settingsExport => 'Exporter';
 
   @override
-  String get settingsExportToAnotherFormat => 'Export To Another Format';
+  String get settingsExportToAnotherFormat => 'Exporter dans un autre format';
 
   @override
   String get settingsExportFormatDescription =>
-      'This should not be used as a backup!';
+      'Ne doit pas être utilisé comme sauvegarde !';
 
   @override
   String get exportLogs => 'Exporter les enregistrements';
@@ -425,7 +425,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get logFormatDescription =>
-      'Le format d’un autre application peut ne pas prendre en charge toutes les fonctionnalités. Cela n’affectera pas les journaux existants !';
+      'Le format d’un autre application peut ne pas prendre en charge toutes les fonctionnalités. Merci de signaler tout problème étant donné que les formats tiers peuvent changer avec le temps. Cela n’affectera pas les journaux existants !';
 
   @override
   String get formatDailyYouJson => 'Daily You (JSON)';
@@ -471,43 +471,44 @@ class AppLocalizationsFr extends AppLocalizations {
       'Surcharger la langue de l\'application';
 
   @override
-  String get settingsSecurityTitle => 'Security';
+  String get settingsSecurityTitle => 'Sécurité';
 
   @override
-  String get settingsSecurityRequirePassword => 'Require Password';
+  String get settingsSecurityRequirePassword => 'Exiger un mot de passe';
 
   @override
-  String get settingsSecurityEnterPassword => 'Enter Password';
+  String get settingsSecurityEnterPassword => 'Entrer le mot de passe';
 
   @override
-  String get settingsSecuritySetPassword => 'Set Password';
+  String get settingsSecuritySetPassword => 'Définir le mot de passe';
 
   @override
-  String get settingsSecurityChangePassword => 'Change Password';
+  String get settingsSecurityChangePassword => 'Modifier le mot de passe';
 
   @override
-  String get settingsSecurityPassword => 'Password';
+  String get settingsSecurityPassword => 'Mot de passe';
 
   @override
-  String get settingsSecurityConfirmPassword => 'Confirm Password';
+  String get settingsSecurityConfirmPassword => 'Confirmer le mot de passe';
 
   @override
-  String get settingsSecurityOldPassword => 'Old Password';
+  String get settingsSecurityOldPassword => 'Ancien mot de passe';
 
   @override
-  String get settingsSecurityIncorrectPassword => 'Incorrect Password';
+  String get settingsSecurityIncorrectPassword => 'Mot de passe incorrect';
 
   @override
-  String get settingsSecurityPasswordsDoNotMatch => 'Passwords do not match';
+  String get settingsSecurityPasswordsDoNotMatch =>
+      'Les mots de passe sont différents';
 
   @override
-  String get requiredPrompt => 'Required';
+  String get requiredPrompt => 'Requis';
 
   @override
-  String get settingsSecurityBiometricUnlock => 'Biometric Unlock';
+  String get settingsSecurityBiometricUnlock => 'Déverrouillage biométrique';
 
   @override
-  String get unlockAppPrompt => 'Unlock the app';
+  String get unlockAppPrompt => 'Déverrouiller l\'application';
 
   @override
   String get settingsAboutTitle => 'À propos';

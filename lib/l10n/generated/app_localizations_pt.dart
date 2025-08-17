@@ -12,36 +12,36 @@ class AppLocalizationsPt extends AppLocalizations {
   String get appTitle => 'Daily You';
 
   @override
-  String get dailyReminderTitle => 'Log Today!';
+  String get dailyReminderTitle => 'Registe hoje!';
 
   @override
-  String get dailyReminderDescription => 'Take your daily log…';
+  String get dailyReminderDescription => 'Faça o seu registo diário…';
 
   @override
-  String get pageHomeTitle => 'Home';
+  String get pageHomeTitle => 'Início';
 
   @override
-  String get flashbacksTitle => 'Flashbacks';
+  String get flashbacksTitle => 'Recordações';
 
   @override
-  String get settingsFlashbacksExcludeBadDays => 'Exclude bad days';
+  String get settingsFlashbacksExcludeBadDays => 'Excluir dias maus';
 
   @override
-  String get flaskbacksEmpty => 'No Flashbacks Yet…';
+  String get flaskbacksEmpty => 'Ainda sem recordações…';
 
   @override
-  String get flashbackGoodDay => 'A Good Day';
+  String get flashbackGoodDay => 'Um Bom Dia';
 
   @override
-  String get flashbackRandomDay => 'A Random Day';
+  String get flashbackRandomDay => 'Um Dia Aleatório';
 
   @override
   String flashbackWeek(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count Weeks Ago',
-      one: '$count Week Ago',
+      other: '$count Semanas Atrás',
+      one: '$count Semana Atrás',
     );
     return '$_temp0';
   }
@@ -51,8 +51,8 @@ class AppLocalizationsPt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count Months Ago',
-      one: '$count Month Ago',
+      other: '$count Meses Atrás',
+      one: '$count Mês Atrás',
     );
     return '$_temp0';
   }
@@ -62,25 +62,25 @@ class AppLocalizationsPt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count Years Ago',
-      one: '$count Year Ago',
+      other: '$count Anos Atrás',
+      one: '$count Ano Atrás',
     );
     return '$_temp0';
   }
 
   @override
-  String get pageGalleryTitle => 'Gallery';
+  String get pageGalleryTitle => 'Galeria';
 
   @override
-  String get searchLogsHint => 'Search Logs…';
+  String get searchLogsHint => 'Procurar registos…';
 
   @override
   String logCount(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count logs',
-      one: '$count log',
+      other: '$count registos',
+      one: '$count registo',
     );
     return '$_temp0';
   }
@@ -97,43 +97,43 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get noLogs => 'No Logs…';
+  String get noLogs => 'Sem Registos…';
 
   @override
-  String get sortDateTitle => 'Date';
+  String get sortDateTitle => 'Data';
 
   @override
-  String get sortOrderAscendingTitle => 'Ascending';
+  String get sortOrderAscendingTitle => 'Ascendente';
 
   @override
-  String get sortOrderDescendingTitle => 'Descending';
+  String get sortOrderDescendingTitle => 'Descendente';
 
   @override
-  String get pageStatisticsTitle => 'Statistics';
+  String get pageStatisticsTitle => 'Estatísticas';
 
   @override
-  String get statisticsNotEnoughData => 'Not enough data…';
+  String get statisticsNotEnoughData => 'Sem dados suficientes…';
 
   @override
-  String get statisticsRangeOneMonth => '1 Month';
+  String get statisticsRangeOneMonth => '1 Mês';
 
   @override
-  String get statisticsRangeSixMonths => '6 Months';
+  String get statisticsRangeSixMonths => '6 Meses';
 
   @override
-  String get statisticsRangeOneYear => '1 Year';
+  String get statisticsRangeOneYear => '1 Ano';
 
   @override
-  String get statisticsRangeAllTime => 'All Time';
+  String get statisticsRangeAllTime => 'Todo o histórico';
 
   @override
   String chartSummaryTitle(Object tag) {
-    return '$tag Summary';
+    return 'Resumo de $tag';
   }
 
   @override
   String chartByDayTitle(Object tag) {
-    return '$tag By Day';
+    return '$tag Por Dia';
   }
 
   @override
@@ -141,7 +141,7 @@ class AppLocalizationsPt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Current Streak $count',
+      other: 'Sequência Atual $count',
     );
     return '$_temp0';
   }
@@ -151,7 +151,7 @@ class AppLocalizationsPt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Longest Streak $count',
+      other: 'Sequência Mais Longa $count',
     );
     return '$_temp0';
   }
@@ -161,230 +161,233 @@ class AppLocalizationsPt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Days Since a Bad Day $count',
+      other: 'Dias Desde um Dia Ruim $count',
     );
     return '$_temp0';
   }
 
   @override
   String get errorExternalStorageAccessTitle =>
-      'Can\'t Access External Storage';
+      'Não é possível aceder armazenamento externo';
 
   @override
   String get errorExternalStorageAccessDescription =>
-      'If you are using network storage make sure the service is online and you have network access.\n\nOtherwise, the app may have lost permissions for the external folder. Go to settings, and reselect the external folder to grant access.\n\nWarning, changes will not be synced until you restore access to the external storage location!';
+      'Se usar o armazenamento em rede, certifique-se que o serviço está online e que tenha acesso à rede.\n\nCaso contrário, a app pode ter perdido permissões para a pasta externa. Vá em configurações e selecione novamente a pasta externa para permitir o acesso.\n\nAtenção: as modificações não serão sincronizadas até restaurar o acesso ao local do armazenamento externo!';
 
   @override
   String get errorExternalStorageAccessContinue =>
-      'Continue With Local Database';
+      'Continuar com a base de dados local';
 
   @override
-  String get lastModified => 'Modified';
+  String get lastModified => 'Modificado';
 
   @override
-  String get writeSomethingHint => 'Write something…';
+  String get writeSomethingHint => 'Escreva alguma coisa…';
 
   @override
-  String get titleHint => 'Title…';
+  String get titleHint => 'Título…';
 
   @override
-  String get deleteLogTitle => 'Delete Log';
+  String get deleteLogTitle => 'Apagar Registo';
 
   @override
-  String get deleteLogDescription => 'Do you want to delete this log?';
+  String get deleteLogDescription => 'Quer apagar este registo?';
 
   @override
-  String get deletePhotoTitle => 'Delete Photo';
+  String get deletePhotoTitle => 'Remover Foto';
 
   @override
-  String get deletePhotoDescription => 'Do you want to delete this photo?';
+  String get deletePhotoDescription => 'Quer apagar esta foto?';
 
   @override
-  String get pageSettingsTitle => 'Settings';
+  String get pageSettingsTitle => 'Configurações';
 
   @override
-  String get settingsAppearanceTitle => 'Appearance';
+  String get settingsAppearanceTitle => 'Aparência';
 
   @override
-  String get settingsTheme => 'Theme';
+  String get settingsTheme => 'Tema';
 
   @override
-  String get themeSystem => 'System';
+  String get themeSystem => 'Sistema';
 
   @override
-  String get themeLight => 'Light';
+  String get themeLight => 'Claro';
 
   @override
-  String get themeDark => 'Dark';
+  String get themeDark => 'Escuro';
 
   @override
   String get themeAmoled => 'AMOLED';
 
   @override
-  String get settingsFirstDayOfWeek => 'First Day Of Week';
+  String get settingsFirstDayOfWeek => 'Primeiro Dia da Semana';
 
   @override
-  String get settingsUseSystemAccentColor => 'Use System Accent Color';
+  String get settingsUseSystemAccentColor => 'Usar Cores do Sistema';
 
   @override
-  String get settingsCustomAccentColor => 'Custom Accent Color';
+  String get settingsCustomAccentColor => 'Cor Personalizada';
 
   @override
-  String get settingsShowMarkdownToolbar => 'Show Markdown Toolbar';
+  String get settingsShowMarkdownToolbar =>
+      'Mostrar Barra de Ferramentas Markdown';
 
   @override
-  String get settingsShowFlashbacks => 'Show Flashbacks';
+  String get settingsShowFlashbacks => 'Mostrar recordações';
 
   @override
-  String get settingsChangeMoodIcons => 'Change Mood Icons';
+  String get settingsChangeMoodIcons => 'Alterar Ícones de Humor';
 
   @override
-  String get moodIconPrompt => 'Enter an icon';
+  String get moodIconPrompt => 'Insira um ícone';
 
   @override
-  String get settingsNotificationsTitle => 'Notifications';
+  String get settingsNotificationsTitle => 'Notificações';
 
   @override
   String get settingsDailyReminderOnboarding =>
-      'Enable daily reminders to keep yourself consistent!';
+      'Ativar lembretes diários para deixá-lo consistente!';
 
   @override
   String get settingsNotificationsPermissionsPrompt =>
-      'The \'schedule alarms\' permission will be requested to send the reminder at a random moment or at your preferred time.';
+      'A permissão \"Agendar Alarmes\" será solicitada para mandar lembretes a um momento aleatório ou ao seu tempo preferido.';
 
   @override
-  String get settingsDailyReminderTitle => 'Daily Reminder';
+  String get settingsDailyReminderTitle => 'Lembrete Diário';
 
   @override
-  String get settingsDailyReminderDescription => 'A gentle reminder each day';
+  String get settingsDailyReminderDescription => 'Um lembrete suave cada dia';
 
   @override
-  String get settingsReminderTime => 'Reminder Time';
+  String get settingsReminderTime => 'Hora do Lembrete';
 
   @override
-  String get settingsFixedReminderTimeTitle => 'Fixed Reminder Time';
+  String get settingsFixedReminderTimeTitle => 'Hora do Lembrete Fixa';
 
   @override
   String get settingsFixedReminderTimeDescription =>
-      'Pick a fixed time for the reminder';
+      'Escolha uma hora fixa para o lembrete';
 
   @override
-  String get settingsAlwaysSendReminderTitle => 'Always Send Reminder';
+  String get settingsAlwaysSendReminderTitle => 'Sempre mandar um lembrete';
 
   @override
   String get settingsAlwaysSendReminderDescription =>
-      'Send reminder even if a log was already started';
+      'Mandar um lembrete mesmo se um registo já foi começado';
 
   @override
-  String get settingsCustomizeNotificationTitle => 'Customize Notifications';
+  String get settingsCustomizeNotificationTitle => 'Customizar Notificações';
 
   @override
-  String get settingsTemplatesTitle => 'Templates';
+  String get settingsTemplatesTitle => 'Modelos';
 
   @override
-  String get settingsDefaultTemplate => 'Default Template';
+  String get settingsDefaultTemplate => 'Modelo Padrão';
 
   @override
-  String get manageTemplates => 'Manage Templates';
+  String get manageTemplates => 'Gerir Modelos';
 
   @override
-  String get addTemplate => 'Add a Template';
+  String get addTemplate => 'Adicionar Modelo';
 
   @override
-  String get newTemplate => 'New Template';
+  String get newTemplate => 'Novo Modelo';
 
   @override
-  String get noTemplateTitle => 'None';
+  String get noTemplateTitle => 'Nenhum';
 
   @override
-  String get noTemplatesDescription => 'No templates created yet…';
+  String get noTemplatesDescription => 'Nenhum modelo criado ainda…';
 
   @override
-  String get settingsStorageTitle => 'Storage';
+  String get settingsStorageTitle => 'Armazenamento';
 
   @override
-  String get settingsImageQuality => 'Image Quality';
+  String get settingsImageQuality => 'Qualidade da Imagem';
 
   @override
-  String get imageQualityHigh => 'High';
+  String get imageQualityHigh => 'Alta';
 
   @override
-  String get imageQualityMedium => 'Medium';
+  String get imageQualityMedium => 'Média';
 
   @override
-  String get imageQualityLow => 'Low';
+  String get imageQualityLow => 'Baixa';
 
   @override
-  String get imageQualityNoCompression => 'No Compression';
+  String get imageQualityNoCompression => 'Sem Compressão';
 
   @override
-  String get settingsLogFolder => 'Log Folder';
+  String get settingsLogFolder => 'Pasta de Registos';
 
   @override
-  String get settingsImageFolder => 'Image Folder';
+  String get settingsImageFolder => 'Pasta de Imagens';
 
   @override
-  String get warningTitle => 'Warning';
+  String get warningTitle => 'Aviso';
 
   @override
   String get logFolderWarningDescription =>
-      'If the selected folder already contains a \'daily_you.db\' file, it will be used to overwrite your existing logs!';
+      'Se a pasta selecionada já contiver um ficheiro \'daily_you.db\', ele será usado para substituir os seus registos existentes!';
 
   @override
-  String get errorTitle => 'Error';
+  String get errorTitle => 'Erro';
 
   @override
-  String get logFolderErrorDescription => 'Failed to change log folder!';
+  String get logFolderErrorDescription =>
+      'Não foi possível alterar a pasta de registos!';
 
   @override
-  String get imageFolderErrorDescription => 'Failed to change image folder!';
+  String get imageFolderErrorDescription =>
+      'Não foi possível alterar a pasta de imagens!';
 
   @override
-  String get backupErrorDescription => 'Failed to create backup!';
+  String get backupErrorDescription => 'Não foi possível criar backup!';
 
   @override
-  String get restoreErrorDescription => 'Failed to restore backup!';
+  String get restoreErrorDescription => 'Não foi possível restaurar backup!';
 
   @override
-  String get settingsBackupRestoreTitle => 'Backup & Restore';
+  String get settingsBackupRestoreTitle => 'Backup e Restaurar';
 
   @override
   String get settingsBackup => 'Backup';
 
   @override
-  String get settingsRestore => 'Restore';
+  String get settingsRestore => 'Restaurar';
 
   @override
   String get settingsRestorePromptDescription =>
-      'Restoring a backup will overwrite your existing data!';
+      'Restaurar um backup irá sobrescrever os seus dados atuais!';
 
   @override
   String tranferStatus(Object percent) {
-    return 'Transferring… $percent%';
+    return 'A transferir… $percent%';
   }
 
   @override
   String creatingBackupStatus(Object percent) {
-    return 'Creating Backup… $percent%';
+    return 'A criar um backup… $percent%';
   }
 
   @override
   String restoringBackupStatus(Object percent) {
-    return 'Restoring Backup… $percent%';
+    return 'A restaurar o backup… $percent%';
   }
 
   @override
-  String get cleanUpStatus => 'Cleaning Up…';
+  String get cleanUpStatus => 'A limpar…';
 
   @override
   String get settingsExport => 'Export';
 
   @override
-  String get settingsExportToAnotherFormat => 'Export To Another Format';
+  String get settingsExportToAnotherFormat => 'Exportar para outro formato';
 
   @override
   String get settingsExportFormatDescription =>
-      'This should not be used as a backup!';
+      'Isto não deve ser usado como backup!';
 
   @override
   String get exportLogs => 'Export Logs';
@@ -396,14 +399,14 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settingsImport => 'Import';
 
   @override
-  String get settingsImportFromAnotherApp => 'Import From Another App';
+  String get settingsImportFromAnotherApp => 'Importar de outra app';
 
   @override
   String get settingsTranslateCallToAction =>
-      'Everyone should have access to a journal!';
+      'Todos devem ter acesso a um diário!';
 
   @override
-  String get settingsHelpTranslate => 'Help Translate';
+  String get settingsHelpTranslate => 'Ajude a Traduzir';
 
   @override
   String get importLogs => 'Import Logs';
@@ -412,11 +415,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get importImages => 'Import Images';
 
   @override
-  String get logFormatTitle => 'Choose Format';
+  String get logFormatTitle => 'Escolher Formato';
 
   @override
   String get logFormatDescription =>
-      'Another app\'s format may not support all features. Please report any issues since third party formats may change at any time. This will not impact existing logs!';
+      'O formato de outra app pode não suportar todas as funcionalidades. Por favor, informe quaisquer problemas, pois os formatos de terceiros podem mudar a qualquer momento. Isto não irá impactar os registos existentes!';
 
   @override
   String get formatDailyYouJson => 'Daily You (JSON)';
@@ -440,25 +443,25 @@ class AppLocalizationsPt extends AppLocalizations {
   String get formatMarkdown => 'Markdown';
 
   @override
-  String get settingsDeleteAllLogsTitle => 'Delete All Logs';
+  String get settingsDeleteAllLogsTitle => 'Apagar Todos os Registos';
 
   @override
   String get settingsDeleteAllLogsDescription =>
-      'Do you want to delete all of your logs?';
+      'Quer apagar todos os seus registos?';
 
   @override
   String settingsDeleteAllLogsPrompt(Object prompt) {
-    return 'Enter \'$prompt\' to confirm. This cannot be undone!';
+    return 'Digite \'$prompt\' para confirmar. Isto não pode ser desfeito!';
   }
 
   @override
-  String get settingsLanguageTitle => 'Language';
+  String get settingsLanguageTitle => 'Idioma';
 
   @override
-  String get settingsAppLanguageTitle => 'App Language';
+  String get settingsAppLanguageTitle => 'Idioma da app';
 
   @override
-  String get settingsOverrideAppLanguageTitle => 'Override App Language';
+  String get settingsOverrideAppLanguageTitle => 'Substituir língua da app';
 
   @override
   String get settingsSecurityTitle => 'Security';
@@ -500,10 +503,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get unlockAppPrompt => 'Unlock the app';
 
   @override
-  String get settingsAboutTitle => 'About';
+  String get settingsAboutTitle => 'Sobre';
 
   @override
-  String get settingsVersion => 'Version';
+  String get settingsVersion => 'Versão';
 
   @override
   String get settingsLicense => 'Licença';
@@ -512,16 +515,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get licenseGPLv3 => 'GPL-3.0';
 
   @override
-  String get settingsSourceCode => 'Source Code';
+  String get settingsSourceCode => 'Código-fonte';
 
   @override
-  String get settingsMadeWithLove => 'Made with ❤️';
+  String get settingsMadeWithLove => 'Feito com ❤️';
 
   @override
-  String get settingsConsiderSupporting => 'consider supporting';
+  String get settingsConsiderSupporting => 'Considere Apoiar';
 
   @override
-  String get tagMoodTitle => 'Mood';
+  String get tagMoodTitle => 'Humor';
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).
@@ -539,6 +542,9 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get flashbacksTitle => 'Recordações';
+
+  @override
+  String get settingsFlashbacksExcludeBadDays => 'Excluir dias ruins';
 
   @override
   String get flaskbacksEmpty => 'Ainda sem recordações…';
@@ -737,6 +743,9 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
       'Mostrar Barra de Ferramentas Markdown';
 
   @override
+  String get settingsShowFlashbacks => 'Mostrar Flashbacks';
+
+  @override
   String get settingsChangeMoodIcons => 'Alterar Ícones de Humor';
 
   @override
@@ -883,6 +892,13 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get settingsExport => 'Exportar';
 
   @override
+  String get settingsExportToAnotherFormat => 'Exportar Para Outro Formato';
+
+  @override
+  String get settingsExportFormatDescription =>
+      'Isso não deve ser usado como backup!';
+
+  @override
   String get exportLogs => 'Exportar Registros';
 
   @override
@@ -912,7 +928,10 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get logFormatDescription =>
-      'O formato de outro aplicativo pode não suportar todas as funcionalidades. Isto não irá impactar os registros existentes!';
+      'O formato de outro aplicativo pode não suportar todas as funcionalidades. Por favor, informe qualquer problemas, pois os formatos de terceiros podem mudar a qualquer momento. Isto não irá impactar os registros existentes!';
+
+  @override
+  String get formatMarkdown => 'Markdown';
 
   @override
   String get settingsDeleteAllLogsTitle => 'Apagar Todos os Registros';
@@ -928,6 +947,13 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get settingsLanguageTitle => 'Idioma';
+
+  @override
+  String get settingsAppLanguageTitle => 'Linguagem do Aplicativo';
+
+  @override
+  String get settingsOverrideAppLanguageTitle =>
+      'Substituir Linguagem do Aplicativo';
 
   @override
   String get settingsAboutTitle => 'Sobre';
