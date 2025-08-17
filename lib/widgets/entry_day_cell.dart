@@ -38,27 +38,18 @@ class EntryDayCell extends StatelessWidget {
     bool showMood = configProvider.get(ConfigKey.calendarViewMode) == 'mood';
 
     if (entry != null) {
-      if (showMood) {
+      if (showMood || image == null) {
+        // Show mood
         return GestureDetector(
-          child: Container(
-            alignment: Alignment.center,
-            child: Stack(
-              alignment: Alignment.topCenter,
-              children: [
-                Column(
-                  children: [
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    MoodIcon(moodValue: entry.mood)
-                  ],
-                ),
-                Text(
-                  '${date.day}',
-                  style: const TextStyle(fontSize: 16),
-                ),
-              ],
-            ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                '${date.day}',
+                style: const TextStyle(fontSize: 16),
+              ),
+              MoodIcon(moodValue: entry.mood)
+            ],
           ),
           onTap: () async {
             await Navigator.of(context).push(MaterialPageRoute(
@@ -71,41 +62,30 @@ class EntryDayCell extends StatelessWidget {
           },
         );
       } else {
+        // Show image
         return GestureDetector(
           child: Container(
             alignment: Alignment.center,
             child: Stack(
               alignment: Alignment.center,
               children: [
-                image != null
-                    ? SizedBox(
-                        height: 57,
-                        child: Card(
-                            clipBehavior: Clip.antiAlias,
-                            child: LocalImageLoader(
-                              imagePath: image.imgPath,
-                              cacheSize: 100,
-                            )),
-                      )
-                    : Icon(
-                        size: 57,
-                        Icons.image_rounded,
-                        color: Theme.of(context).disabledColor.withOpacity(0.1),
-                      ),
+                SizedBox(
+                  height: 57,
+                  child: Card(
+                      clipBehavior: Clip.antiAlias,
+                      child: LocalImageLoader(
+                        imagePath: image.imgPath,
+                        cacheSize: 100,
+                      )),
+                ),
                 Text('${date.day}',
-                    style: image == null
-                        ? TextStyle(
-                            fontSize: 18,
-                          )
-                        : TextStyle(
-                            fontSize: 18,
-                            color: Colors.white,
-                            shadows: [
-                                Shadow(
-                                    color: Colors.black.withOpacity(0.8),
-                                    blurRadius: 6,
-                                    offset: Offset(0, 0)),
-                              ])),
+                    style:
+                        TextStyle(fontSize: 18, color: Colors.white, shadows: [
+                      Shadow(
+                          color: Colors.black.withOpacity(0.8),
+                          blurRadius: 6,
+                          offset: Offset(0, 0)),
+                    ])),
               ],
             ),
           ),
@@ -120,39 +100,35 @@ class EntryDayCell extends StatelessWidget {
         );
       }
     } else {
+      // No entry
       return GestureDetector(
         child: Container(
           alignment: Alignment.center,
-          child: Stack(
-            alignment: Alignment.topCenter,
-            children: [
-              Column(
-                children: [
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Icon(
-                    Icons.add_rounded,
-                    color: isSameDay(date, DateTime.now())
-                        ? Theme.of(context).colorScheme.primary
-                        : Theme.of(context).disabledColor,
-                  ),
-                ],
-              ),
-              Text(
-                '${date.day}',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: isSameDay(date, DateTime.now())
-                      ? FontWeight.bold
-                      : FontWeight.normal,
-                  color: isSameDay(date, DateTime.now())
-                      ? Theme.of(context).colorScheme.primary
-                      : Theme.of(context).colorScheme.onSurface,
+          child: isSameDay(date, DateTime.now())
+              ? Stack(
+                  alignment: Alignment.topCenter,
+                  children: [
+                    Column(
+                      children: [
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        Icon(Icons.add_rounded,
+                            color: Theme.of(context).colorScheme.primary),
+                      ],
+                    ),
+                    Text(
+                      '${date.day}',
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.primary),
+                    ),
+                  ],
+                )
+              : Center(
+                  child: Text('${date.day}', style: TextStyle(fontSize: 16)),
                 ),
-              ),
-            ],
-          ),
         ),
         onTap: () async {
           await Navigator.of(context).push(MaterialPageRoute(
