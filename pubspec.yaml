@@ -56,12 +56,16 @@ dependencies:
   media_scanner: ^2.2.0
   local_auth: ^2.3.0
   crypto: ^3.0.6
+  flutter_svg: ^2.2.0
 dev_dependencies:
   flutter_lints: ^5.0.0
 
 flutter:
   generate: true
   uses-material-design: true
+  assets:
+    - assets/icons/calendar_event.svg
+    - assets/icons/calendar_latest.svg
 
 icons_launcher:
   image_path: "assets/logo.png"
