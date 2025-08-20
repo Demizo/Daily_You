@@ -1,1 +1,6 @@
-{}
+{
+    "dailyReminderTitle": "Zapiš si dnešek!",
+    "@dailyReminderTitle": {},
+    "dailyReminderDescription": "Zapiš si svůj den…",
+    "@dailyReminderDescription": {}
+}
