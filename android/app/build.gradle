@@ -73,7 +73,6 @@ android {
 	signed {
             dimension "default"
             signingConfig signingConfigs.release
-	
 	}
         fdroid {
             dimension "default"
@@ -113,7 +112,7 @@ android.applicationVariants.all { variant ->
 	  // version code for only the output APK, not for the variant itself. Skipping
 	  // this step causes Gradle to use the value of variant.versionCode for the APK.
 	  output.versionCodeOverride =
-		10 * variant.versionCode + baseAbiVersionCode
+		10 * flutterVersionCode.toInteger() + baseAbiVersionCode
 	}
     }
 }
