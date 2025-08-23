@@ -43,6 +43,10 @@ android {
         jvmTarget = '1.8'
     }
 
+    aaptOptions {
+        cruncherEnabled = false
+    }
+
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
@@ -56,6 +60,7 @@ android {
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+	vectorDrawables.generatedDensities = []
     }
 
     signingConfigs {
@@ -86,6 +91,13 @@ android {
         profile {
             signingConfig signingConfigs.release
         }
+    }
+
+    dependenciesInfo {
+        // Disables dependency metadata when building APKs.
+        includeInApk = false
+        // Disables dependency metadata when building Android App Bundles.
+        includeInBundle = false
     }
 }
 
