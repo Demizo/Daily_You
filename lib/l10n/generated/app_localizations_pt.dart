@@ -956,6 +956,45 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
       'Substituir Linguagem do Aplicativo';
 
   @override
+  String get settingsSecurityTitle => 'Segurança';
+
+  @override
+  String get settingsSecurityRequirePassword => 'Requer Senha';
+
+  @override
+  String get settingsSecurityEnterPassword => 'Digite a Senha';
+
+  @override
+  String get settingsSecuritySetPassword => 'Definir Senha';
+
+  @override
+  String get settingsSecurityChangePassword => 'Mudar Senha';
+
+  @override
+  String get settingsSecurityPassword => 'Senha';
+
+  @override
+  String get settingsSecurityConfirmPassword => 'Confirmar Senha';
+
+  @override
+  String get settingsSecurityOldPassword => 'Senha Antiga';
+
+  @override
+  String get settingsSecurityIncorrectPassword => 'Senha Incorreta';
+
+  @override
+  String get settingsSecurityPasswordsDoNotMatch => 'Senhas Não Correspondem';
+
+  @override
+  String get requiredPrompt => 'Obrigatório';
+
+  @override
+  String get settingsSecurityBiometricUnlock => 'Desbloquear com Biometria';
+
+  @override
+  String get unlockAppPrompt => 'Desbloquear Aplicativo';
+
+  @override
   String get settingsAboutTitle => 'Sobre';
 
   @override

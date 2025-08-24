@@ -213,7 +213,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get themeSystem => 'Système';
 
   @override
-  String get themeLight => 'Claire';
+  String get themeLight => 'Clair';
 
   @override
   String get themeDark => 'Sombre';

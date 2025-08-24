@@ -947,6 +947,45 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get settingsOverrideAppLanguageTitle => '覆寫應用程式語言';
 
   @override
+  String get settingsSecurityTitle => '安全';
+
+  @override
+  String get settingsSecurityRequirePassword => '需要輸入密碼';
+
+  @override
+  String get settingsSecurityEnterPassword => '輸入密碼';
+
+  @override
+  String get settingsSecuritySetPassword => '設定密碼';
+
+  @override
+  String get settingsSecurityChangePassword => '更換密碼';
+
+  @override
+  String get settingsSecurityPassword => '密碼';
+
+  @override
+  String get settingsSecurityConfirmPassword => '確認密碼';
+
+  @override
+  String get settingsSecurityOldPassword => '舊密碼';
+
+  @override
+  String get settingsSecurityIncorrectPassword => '密碼錯誤';
+
+  @override
+  String get settingsSecurityPasswordsDoNotMatch => '密碼不相符';
+
+  @override
+  String get requiredPrompt => '必填';
+
+  @override
+  String get settingsSecurityBiometricUnlock => '生物辨識解鎖';
+
+  @override
+  String get unlockAppPrompt => '解鎖應用程式';
+
+  @override
   String get settingsAboutTitle => '關於';
 
   @override
