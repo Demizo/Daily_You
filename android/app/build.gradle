@@ -75,7 +75,7 @@ android {
     flavorDimensions "default"
 
     productFlavors {
-	signed {
+	independent {
             dimension "default"
             signingConfig signingConfigs.release
 	}
