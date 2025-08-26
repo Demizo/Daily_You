@@ -14,6 +14,7 @@ class LanguageOption {
   static final displayNameMapping = {
     LanguageOption(languageCode: "en"): "English",
     LanguageOption(languageCode: "ar"): "العربية",
+    LanguageOption(languageCode: "cs"): "čeština",
     LanguageOption(languageCode: "da"): "dansk",
     LanguageOption(languageCode: "de"): "Deutsch",
     LanguageOption(languageCode: "es"): "español",
