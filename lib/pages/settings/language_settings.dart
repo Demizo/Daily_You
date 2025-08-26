@@ -26,7 +26,7 @@ class _LanguageSettingsState extends State<LanguageSettings> {
 
   @override
   Widget build(BuildContext context) {
-    ConfigProvider configProvider = Provider.of(context);
+    ConfigProvider configProvider = Provider.of<ConfigProvider>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.settingsLanguageTitle),
