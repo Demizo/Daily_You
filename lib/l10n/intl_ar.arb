@@ -1,5 +1,5 @@
 {
-    "settingsNotificationsTitle": "تنبيهات",
+    "settingsNotificationsTitle": "التنبيهات",
     "@settingsNotificationsTitle": {},
     "settingsDailyReminderTitle": "تذكير يومي",
     "@settingsDailyReminderTitle": {},
@@ -215,7 +215,7 @@
     "@settingsAppLanguageTitle": {},
     "settingsOverrideAppLanguageTitle": "أجبر لغة التطبيق",
     "@settingsOverrideAppLanguageTitle": {},
-    "settingsAboutTitle": "عن",
+    "settingsAboutTitle": "عن التطبيق",
     "@settingsAboutTitle": {},
     "settingsVersion": "الإصدار",
     "@settingsVersion": {},
