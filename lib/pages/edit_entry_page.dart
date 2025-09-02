@@ -211,8 +211,10 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                                     TimeManager.currentLocale(context))
                                 .format(_entry.timeCreate),
                             moodValue: mood,
-                            onChangedMood: (mood) =>
-                                {setState(() => this.mood = mood)}),
+                            onChangedMood: (mood) {
+                              setState(() => this.mood = mood);
+                              _saveEntry();
+                            }),
                       ),
                       StatefulBuilder(
                           builder: (context, setState) => EntryTextEditor(
@@ -457,6 +459,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     setState(() {
       currentImages;
     });
+    _saveEntry();
   }
 
   void _removeLocalImage(int index) {
@@ -469,5 +472,6 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     setState(() {
       currentImages;
     });
+    _saveEntry();
   }
 }
