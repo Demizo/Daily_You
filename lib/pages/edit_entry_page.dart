@@ -52,6 +52,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   bool _deletingEntry = false;
   bool _savingEntry = false;
   bool _newEntry = false;
+  Timer? _debounceTimer;
 
   Future<void> _initEntry() async {
     if (widget.entry == null) {
@@ -67,8 +68,13 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     id = _entry.id ?? -1;
     mood = _entry.mood;
     text = _entry.text;
-    _textEditingController
-        .addListener(() => text = _textEditingController.text);
+    _textEditingController.addListener(() {
+      text = _textEditingController.text;
+      _debounceTimer?.cancel();
+      _debounceTimer = Timer(const Duration(seconds: 5), () {
+        _saveEntry();
+      });
+    });
     setState(() {
       _loadingEntry = false;
     });
@@ -92,6 +98,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     _focusNode.dispose();
     _textEditingController.dispose();
     _undoController.dispose();
+    _debounceTimer?.cancel();
     super.dispose();
   }
 
