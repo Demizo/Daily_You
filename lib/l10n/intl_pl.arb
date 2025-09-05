@@ -262,5 +262,7 @@
     "settingsSecurityRequirePassword": "Wymagaj Hasła",
     "@settingsSecurityRequirePassword": {},
     "requiredPrompt": "Wymagane",
-    "@requiredPrompt": {}
+    "@requiredPrompt": {},
+    "formatMarkdown": "Markdown",
+    "@formatMarkdown": {}
 }
