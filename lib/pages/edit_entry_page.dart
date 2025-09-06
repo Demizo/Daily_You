@@ -37,7 +37,9 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     with WidgetsBindingObserver {
   late Entry _entry;
   int id = -1;
+  String _lastText = "";
   String text = "";
+  int? _lastMood;
   int? mood;
   late List<EntryImage> currentImages;
   bool _loadingEntry = true;
@@ -66,7 +68,9 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
       _entry = widget.entry!;
     }
     id = _entry.id ?? -1;
+    _lastMood = _entry.mood;
     mood = _entry.mood;
+    _lastText = _entry.text;
     text = _entry.text;
     _textEditingController.addListener(() {
       text = _textEditingController.text;
@@ -397,8 +401,10 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
           TimeManager.isSameDay(DateTime.now(), updatedEntry.timeCreate)) {
         await NotificationManager.instance.dismissReminderNotification();
       }
-      if (updatedEntry.text != _entry.text ||
-          updatedEntry.mood != _entry.mood) {
+      // Update if the text or mood has changed
+      if (updatedEntry.text != _lastText || updatedEntry.mood != _lastMood) {
+        _lastText = updatedEntry.text;
+        _lastMood = updatedEntry.mood;
         await EntriesDatabase.instance.updateEntry(updatedEntry);
       }
       await _saveOrUpdateImage(id);
