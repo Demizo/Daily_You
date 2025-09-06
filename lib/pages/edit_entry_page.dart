@@ -179,10 +179,10 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                         EntryImagePicker(
                             imgPath: null,
                             openCamera: widget.openCamera && !_openedCamera,
-                            onChangedImage: (imgPaths) {
+                            onChangedImage: (imgPaths) async {
                               _openedCamera = true;
                               if (imgPaths != null) {
-                                _addLocalImage(imgPaths);
+                                await _addLocalImage(imgPaths);
                               }
                             }),
                       if (currentImages.isNotEmpty)
@@ -292,8 +292,11 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
           isHovered = true;
           return true;
         },
-        onAcceptWithDetails: (data) {
-          int fromIndex = currentImages.indexOf(data.data);
+        onAcceptWithDetails: (data) async {
+          // The exact image objects may change when saving the entry. It is
+          // safer to use the imgPath as a unique key.
+          int fromIndex = currentImages.indexOf(currentImages
+              .firstWhere((image) => image.imgPath == data.data.imgPath));
           isHovered = false;
           final movedItem = currentImages.removeAt(fromIndex);
           currentImages.insert(index, movedItem);
@@ -302,6 +305,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
             currentImages[i].imgRank = currentImages.length - 1 - i;
           }
           _sortImages();
+          await _saveEntry();
           setState(() {
             currentImages;
           });
@@ -337,9 +341,9 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
         EntryImagePicker(
             imgPath: currentImages[index].imgPath,
             openCamera: false,
-            onChangedImage: (imgPath) {
+            onChangedImage: (imgPath) async {
               if (imgPath == null) {
-                _removeLocalImage(index);
+                await _removeLocalImage(index);
               }
             }),
         const Padding(
@@ -407,6 +411,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
         _lastMood = updatedEntry.mood;
         await EntriesDatabase.instance.updateEntry(updatedEntry);
       }
+      // Images will update if they changed
       await _saveOrUpdateImage(id);
       _savingEntry = false;
     }
@@ -445,7 +450,12 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
         await EntriesDatabase.instance.updateImg(matchingImage);
       }
     }
-    currentImages = StatsProvider.instance.getImagesForEntry(_entry);
+    // Set current images to match saved state. Note: the entry images
+    // are copied to avoid editing the originals in StatsProvider.
+    currentImages.clear();
+    for (var image in StatsProvider.instance.getImagesForEntry(_entry)) {
+      currentImages.add(image.copy());
+    }
   }
 
   void _sortImages() {
@@ -460,7 +470,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     });
   }
 
-  void _addLocalImage(List<String> imgPaths) {
+  Future<void> _addLocalImage(List<String> imgPaths) async {
     for (var imgPath in imgPaths) {
       currentImages.add(EntryImage(
           entryId: id,
@@ -469,22 +479,22 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
           timeCreate: DateTime.now()));
       _sortImages();
     }
+    await _saveEntry();
     setState(() {
       currentImages;
     });
-    _saveEntry();
   }
 
-  void _removeLocalImage(int index) {
+  Future<void> _removeLocalImage(int index) async {
     currentImages.remove(currentImages[index]);
     // Update ranks
     for (int i = 0; i < currentImages.length; i++) {
       currentImages[i].imgRank = currentImages.length - 1 - i;
     }
+    await _saveEntry();
     _sortImages();
     setState(() {
       currentImages;
     });
-    _saveEntry();
   }
 }
