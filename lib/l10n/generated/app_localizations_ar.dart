@@ -247,7 +247,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get moodIconPrompt => 'أدخل ايقونة';
 
   @override
-  String get settingsNotificationsTitle => 'تنبيهات';
+  String get settingsNotificationsTitle => 'التنبيهات';
 
   @override
   String get settingsDailyReminderOnboarding =>
@@ -504,7 +504,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get unlockAppPrompt => 'فتح التطبيق';
 
   @override
-  String get settingsAboutTitle => 'عن';
+  String get settingsAboutTitle => 'عن التطبيق';
 
   @override
   String get settingsVersion => 'الإصدار';

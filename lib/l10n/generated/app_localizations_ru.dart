@@ -24,7 +24,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get flashbacksTitle => 'Воспоминания';
 
   @override
-  String get settingsFlashbacksExcludeBadDays => 'Exclude bad days';
+  String get settingsFlashbacksExcludeBadDays => 'Не учитывать плохие дни';
 
   @override
   String get flaskbacksEmpty => 'Воспоминаний пока нет…';
@@ -94,8 +94,8 @@ class AppLocalizationsRu extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count words',
-      one: '$count word',
+      other: '$count слова ',
+      one: '$count слов',
     );
     return '$_temp0';
   }
@@ -239,7 +239,7 @@ class AppLocalizationsRu extends AppLocalizations {
       'Показать панель инструментов Markdown';
 
   @override
-  String get settingsShowFlashbacks => 'Show Flashbacks';
+  String get settingsShowFlashbacks => 'Показать воспоминания';
 
   @override
   String get settingsChangeMoodIcons => 'Изменить значки настроения';
@@ -252,11 +252,11 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get settingsDailyReminderOnboarding =>
-      'Enable daily reminders to keep yourself consistent!';
+      'Включи ежедневные напоминания, чтобы оставаться последовательным!';
 
   @override
   String get settingsNotificationsPermissionsPrompt =>
-      'The \'schedule alarms\' permission will be requested to send the reminder at a random moment or at your preferred time.';
+      'Будет запрошено разрешение «Планирование будильников» для отправки напоминания в случайный момент или в выбранное время.';
 
   @override
   String get settingsDailyReminderTitle => 'Ежедневное напоминание';
@@ -391,11 +391,11 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsExport => 'Экспорт';
 
   @override
-  String get settingsExportToAnotherFormat => 'Export To Another Format';
+  String get settingsExportToAnotherFormat => 'Сохранить в другом формате';
 
   @override
   String get settingsExportFormatDescription =>
-      'This should not be used as a backup!';
+      'Не используйте это как резервную копию!';
 
   @override
   String get exportLogs => 'Экспорт записей';
@@ -426,7 +426,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get logFormatDescription =>
-      'Некоторые функции могут не поддерживаться форматом другого приложения. Но это не повлияет на существующие записи!';
+      'Формат другого приложения может не поддерживать все функции. Пожалуйста, сообщайте о любых проблемах, так как сторонние форматы могут изменяться в любое время. Это не повлияет на существующие записи!';
 
   @override
   String get formatDailyYouJson => 'Daily You (JSON)';
@@ -465,13 +465,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsLanguageTitle => 'Язык';
 
   @override
-  String get settingsAppLanguageTitle => 'App Language';
+  String get settingsAppLanguageTitle => 'Язык приложения';
 
   @override
   String get settingsOverrideAppLanguageTitle => 'Override App Language';
 
   @override
-  String get settingsSecurityTitle => 'Security';
+  String get settingsSecurityTitle => 'Безопасность';
 
   @override
   String get settingsSecurityRequirePassword => 'Require Password';

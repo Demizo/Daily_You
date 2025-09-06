@@ -451,43 +451,43 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsOverrideAppLanguageTitle => '覆盖应用程序语言';
 
   @override
-  String get settingsSecurityTitle => 'Security';
+  String get settingsSecurityTitle => '安全';
 
   @override
-  String get settingsSecurityRequirePassword => 'Require Password';
+  String get settingsSecurityRequirePassword => '密码解锁';
 
   @override
-  String get settingsSecurityEnterPassword => 'Enter Password';
+  String get settingsSecurityEnterPassword => '输入密码';
 
   @override
-  String get settingsSecuritySetPassword => 'Set Password';
+  String get settingsSecuritySetPassword => '设置密码';
 
   @override
-  String get settingsSecurityChangePassword => 'Change Password';
+  String get settingsSecurityChangePassword => '更改密码';
 
   @override
-  String get settingsSecurityPassword => 'Password';
+  String get settingsSecurityPassword => '密码';
 
   @override
-  String get settingsSecurityConfirmPassword => 'Confirm Password';
+  String get settingsSecurityConfirmPassword => '确认密码';
 
   @override
-  String get settingsSecurityOldPassword => 'Old Password';
+  String get settingsSecurityOldPassword => '旧密码';
 
   @override
-  String get settingsSecurityIncorrectPassword => 'Incorrect Password';
+  String get settingsSecurityIncorrectPassword => '密码错误';
 
   @override
-  String get settingsSecurityPasswordsDoNotMatch => 'Passwords do not match';
+  String get settingsSecurityPasswordsDoNotMatch => '密码不相符';
 
   @override
-  String get requiredPrompt => 'Required';
+  String get requiredPrompt => '请输入密码';
 
   @override
-  String get settingsSecurityBiometricUnlock => 'Biometric Unlock';
+  String get settingsSecurityBiometricUnlock => '生物识别解锁';
 
   @override
-  String get unlockAppPrompt => 'Unlock the app';
+  String get unlockAppPrompt => '解锁应用程序';
 
   @override
   String get settingsAboutTitle => '关于';

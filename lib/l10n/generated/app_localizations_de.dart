@@ -24,7 +24,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get flashbacksTitle => 'Rückblicke';
 
   @override
-  String get settingsFlashbacksExcludeBadDays => 'Exclude bad days';
+  String get settingsFlashbacksExcludeBadDays => 'Schließe schlechte Tage aus';
 
   @override
   String get flaskbacksEmpty => 'Bis jetzt keine Rückblicke…';
@@ -72,7 +72,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get pageGalleryTitle => 'Galerie';
 
   @override
-  String get searchLogsHint => 'Durchsuchen der Logs …';
+  String get searchLogsHint => 'Durchsuchen der Einträge …';
 
   @override
   String logCount(num count) {
@@ -90,8 +90,8 @@ class AppLocalizationsDe extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count words',
-      one: '$count word',
+      other: '$count Wörter',
+      one: '$count Wort',
     );
     return '$_temp0';
   }
@@ -233,7 +233,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsShowMarkdownToolbar => 'Zeige Markdown Werkzeugleiste';
 
   @override
-  String get settingsShowFlashbacks => 'Show Flashbacks';
+  String get settingsShowFlashbacks => 'Zeige Rückblicke';
 
   @override
   String get settingsChangeMoodIcons => 'Ändere Mood Icons';
@@ -257,17 +257,17 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settingsDailyReminderDescription =>
-      'Erlaube der App im Hintergrund zu laufen, um beste Ergebnisse zu erzielen';
+      'Eine kleine Erinnerung jeden Tag';
 
   @override
-  String get settingsReminderTime => 'Erinnerungs-Zeit';
+  String get settingsReminderTime => 'Erinnerungszeit';
 
   @override
-  String get settingsFixedReminderTimeTitle => 'Feste Erinnerungs-Zeit';
+  String get settingsFixedReminderTimeTitle => 'Feste Erinnerungszeit';
 
   @override
   String get settingsFixedReminderTimeDescription =>
-      'Wähl eine feste Zeit für die Erinnerung';
+      'Wähle eine feste Zeit für die Erinnerung';
 
   @override
   String get settingsAlwaysSendReminderTitle => 'Erinnerung immer Zeigen';
@@ -385,11 +385,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsExport => 'Exportieren';
 
   @override
-  String get settingsExportToAnotherFormat => 'Export To Another Format';
+  String get settingsExportToAnotherFormat =>
+      'In ein anderes Format exportieren';
 
   @override
   String get settingsExportFormatDescription =>
-      'This should not be used as a backup!';
+      'Das sollte nicht als Backup verwendet werden!';
 
   @override
   String get exportLogs => 'Einträge Exportieren';
@@ -421,7 +422,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get logFormatDescription =>
-      'Die Formate anderer Apps könnten ggf. nicht alle Funktionen beinhalten. Das wird sich nicht auf aktuell Einträge auswirken!';
+      'Die Formate anderer Apps könnten ggf. nicht alle Funktionen beinhalten. Bitte melde alle Probleme, da Formate anderer Apps sich jederzeit ändern können. Das wird sich nicht auf aktuelle Einträge auswirken!';
 
   @override
   String get formatDailyYouJson => 'Daily You (JSON)';
@@ -460,43 +461,43 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsLanguageTitle => 'Sprache';
 
   @override
-  String get settingsAppLanguageTitle => 'App Language';
+  String get settingsAppLanguageTitle => 'App Sprache';
 
   @override
-  String get settingsOverrideAppLanguageTitle => 'Override App Language';
+  String get settingsOverrideAppLanguageTitle => 'Überschreibe App Sprache';
 
   @override
-  String get settingsSecurityTitle => 'Security';
+  String get settingsSecurityTitle => 'Sicherheit';
 
   @override
-  String get settingsSecurityRequirePassword => 'Require Password';
+  String get settingsSecurityRequirePassword => 'Benötigt Passwort';
 
   @override
-  String get settingsSecurityEnterPassword => 'Enter Password';
+  String get settingsSecurityEnterPassword => 'Passwort eingeben';
 
   @override
-  String get settingsSecuritySetPassword => 'Set Password';
+  String get settingsSecuritySetPassword => 'Passwort setzen';
 
   @override
-  String get settingsSecurityChangePassword => 'Change Password';
+  String get settingsSecurityChangePassword => 'Passwort ändern';
 
   @override
-  String get settingsSecurityPassword => 'Password';
+  String get settingsSecurityPassword => 'Passwort';
 
   @override
-  String get settingsSecurityConfirmPassword => 'Confirm Password';
+  String get settingsSecurityConfirmPassword => 'Passwort bestätigen';
 
   @override
-  String get settingsSecurityOldPassword => 'Old Password';
+  String get settingsSecurityOldPassword => 'Altes Passwort';
 
   @override
-  String get settingsSecurityIncorrectPassword => 'Incorrect Password';
+  String get settingsSecurityIncorrectPassword => 'Falsches Passwort';
 
   @override
   String get settingsSecurityPasswordsDoNotMatch => 'Passwords do not match';
 
   @override
-  String get requiredPrompt => 'Required';
+  String get requiredPrompt => 'Notwendig';
 
   @override
   String get settingsSecurityBiometricUnlock => 'Biometric Unlock';

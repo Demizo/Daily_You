@@ -40,8 +40,8 @@ class AppLocalizationsPl extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count Weeks Ago',
-      one: '$count Week Ago',
+      other: '$count Tygodnie temu',
+      one: '$count Tydzień temu',
     );
     return '$_temp0';
   }
@@ -51,8 +51,8 @@ class AppLocalizationsPl extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count Months Ago',
-      one: '$count Month Ago',
+      other: '$count Miesiące Temu',
+      one: '$count Miesiąc Temu',
     );
     return '$_temp0';
   }
@@ -62,8 +62,8 @@ class AppLocalizationsPl extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count Years Ago',
-      one: '$count Year Ago',
+      other: '$count Lata Temu',
+      one: '$count Rok Temu',
     );
     return '$_temp0';
   }
@@ -469,7 +469,7 @@ class AppLocalizationsPl extends AppLocalizations {
   String get settingsSecurityTitle => 'Bezpieczeństwo';
 
   @override
-  String get settingsSecurityRequirePassword => 'Require Password';
+  String get settingsSecurityRequirePassword => 'Wymagaj Hasła';
 
   @override
   String get settingsSecurityEnterPassword => 'Wprowadź hasło';
@@ -496,7 +496,7 @@ class AppLocalizationsPl extends AppLocalizations {
   String get settingsSecurityPasswordsDoNotMatch => 'Hasła się nie zgadzają';
 
   @override
-  String get requiredPrompt => 'Required';
+  String get requiredPrompt => 'Wymagane';
 
   @override
   String get settingsSecurityBiometricUnlock => 'Odblokowanie Biometryczne';

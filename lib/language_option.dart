@@ -11,6 +11,7 @@ class LanguageOption {
     this.countryCode,
   });
 
+  // See https://github.com/guidezpl/flutter-localized-locales/blob/main/lib/native_locale_names.dart
   static final displayNameMapping = {
     LanguageOption(languageCode: "en"): "English",
     LanguageOption(languageCode: "ar"): "العربية",
@@ -18,8 +19,10 @@ class LanguageOption {
     LanguageOption(languageCode: "da"): "dansk",
     LanguageOption(languageCode: "de"): "Deutsch",
     LanguageOption(languageCode: "es"): "español",
+    LanguageOption(languageCode: "fi"): "suomi",
     LanguageOption(languageCode: "fr"): "français",
     LanguageOption(languageCode: "id"): "Indonesia",
+    LanguageOption(languageCode: "nl"): "Nederlands",
     LanguageOption(languageCode: "oc"): "Occitan",
     LanguageOption(languageCode: "pl"): "polski",
     LanguageOption(languageCode: "pt", countryCode: "BR"): "português (Brasil)",
