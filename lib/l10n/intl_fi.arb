@@ -1,0 +1,14 @@
+{
+    "dailyReminderDescription": "Pidä päivittäinen päiväkirjasi…",
+    "@dailyReminderDescription": {},
+    "pageHomeTitle": "Etusivu",
+    "@pageHomeTitle": {},
+    "flashbacksTitle": "Muistikuvat",
+    "@flashbacksTitle": {},
+    "settingsFlashbacksExcludeBadDays": "Jätä huonot päivät huomioimatta",
+    "@settingsFlashbacksExcludeBadDays": {},
+    "flaskbacksEmpty": "Ei ole vielä muistikuvia…",
+    "@flaskbacksEmpty": {},
+    "dailyReminderTitle": "Täytä päiväkirja tänään!",
+    "@dailyReminderTitle": {}
+}

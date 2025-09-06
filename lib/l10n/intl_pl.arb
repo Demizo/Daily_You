@@ -252,5 +252,17 @@
     "unlockAppPrompt": "Odblokuj aplikację",
     "@unlockAppPrompt": {},
     "settingsSecurityPasswordsDoNotMatch": "Hasła się nie zgadzają",
-    "@settingsSecurityPasswordsDoNotMatch": {}
+    "@settingsSecurityPasswordsDoNotMatch": {},
+    "flashbackWeek": "{count, plural, one{{count} Tydzień temu} other{{count} Tygodnie temu}}",
+    "@flashbackWeek": {},
+    "flashbackMonth": "{count, plural, one{{count} Miesiąc Temu} other{{count} Miesiące Temu}}",
+    "@flashbackMonth": {},
+    "flashbackYear": "{count, plural, one{{count} Rok Temu} other{{count} Lata Temu}}",
+    "@flashbackYear": {},
+    "settingsSecurityRequirePassword": "Wymagaj Hasła",
+    "@settingsSecurityRequirePassword": {},
+    "requiredPrompt": "Wymagane",
+    "@requiredPrompt": {},
+    "formatMarkdown": "Markdown",
+    "@formatMarkdown": {}
 }
