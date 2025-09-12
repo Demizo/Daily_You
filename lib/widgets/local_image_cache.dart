@@ -100,6 +100,11 @@ class LocalImageCache {
 
   Future<Uint8List?> getResizedImageBytes(
       String originalPath, int width) async {
+    // Skip GIFs
+    if (extension(originalPath).toLowerCase() == ".gif") {
+      return await EntriesDatabase.instance.getImgBytes(originalPath);
+    }
+
     final key = '${originalPath}_w$width';
 
     // Memory cache

@@ -50,7 +50,7 @@ class ExportUtils {
           final bytes =
               await EntriesDatabase.instance.getImgBytes(image.imgPath);
           final prettyName =
-              "image_${DateFormat("yyyy-MM-dd", TimeManager.currentLocale(context)).format(entry.timeCreate)}_${image.imgRank}.jpg";
+              "image_${DateFormat("yyyy-MM-dd", TimeManager.currentLocale(context)).format(entry.timeCreate)}_${image.imgRank}${extension(image.imgPath)}";
           if (bytes != null) {
             noteBody.writeln('![](Images/$prettyName)');
 
