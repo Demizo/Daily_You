@@ -317,16 +317,18 @@ DROP TABLE old_entries;
       return imageName;
     }
 
+    var extenstion = imageName != null ? extension(imageName) : ".jpg";
+
     final timestamp =
         currTime.toIso8601String().split('.').first.replaceAll(':', '-');
 
-    var newImageName = "daily_you_$timestamp.jpg";
+    var newImageName = "daily_you_$timestamp$extenstion";
 
     // Ensure unique name
     int index = 1;
     while (await FileLayer.exists(await getInternalImgDatabasePath(),
         name: newImageName, useExternalPath: false)) {
-      newImageName = "daily_you_${timestamp}_$index.jpg";
+      newImageName = "daily_you_${timestamp}_$index$extenstion";
       index += 1;
     }
 
