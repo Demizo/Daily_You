@@ -24,7 +24,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get flashbacksTitle => 'Geçmiş';
 
   @override
-  String get settingsFlashbacksExcludeBadDays => 'Exclude bad days';
+  String get settingsFlashbacksExcludeBadDays => 'Kötü günleri çıkar';
 
   @override
   String get flaskbacksEmpty => 'Henüz geçmiş yok…';
@@ -233,7 +233,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get settingsShowMarkdownToolbar => 'Markdown araç çubuğunu göster';
 
   @override
-  String get settingsShowFlashbacks => 'Show Flashbacks';
+  String get settingsShowFlashbacks => 'Bilgi Kartlarını Göster';
 
   @override
   String get settingsChangeMoodIcons => 'Ruh hali simgelerini değiştir';
@@ -380,11 +380,11 @@ class AppLocalizationsTr extends AppLocalizations {
   String get settingsExport => 'Dışa aktar';
 
   @override
-  String get settingsExportToAnotherFormat => 'Export To Another Format';
+  String get settingsExportToAnotherFormat => 'Başka Bir Formatta Dışarı Aktar';
 
   @override
   String get settingsExportFormatDescription =>
-      'This should not be used as a backup!';
+      'Bu yedek olarak kullanılmamalıdır!';
 
   @override
   String get exportLogs => 'Kayıtları dışa aktar';
@@ -415,7 +415,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get logFormatDescription =>
-      'Başka bir uygulamanın biçimi tüm özellikleri desteklemeyebilir. Bu mevcut günlükleri etkilemez!';
+      'Başka bir uygulamanın formatı tüm özellikleri desteklemeyebilir. Üçüncü taraf formatlar her an değişebileceğinden dolayı lütfen herhangi bir sorunu bildirin. Bu mevcut günlükleri etkilemez!';
 
   @override
   String get formatDailyYouJson => 'Daily You (JSON)';
@@ -454,49 +454,49 @@ class AppLocalizationsTr extends AppLocalizations {
   String get settingsLanguageTitle => 'Dil';
 
   @override
-  String get settingsAppLanguageTitle => 'App Language';
+  String get settingsAppLanguageTitle => 'Uygulama Dili';
 
   @override
-  String get settingsOverrideAppLanguageTitle => 'Override App Language';
+  String get settingsOverrideAppLanguageTitle => 'Uygulama Dilini Özelleştir';
 
   @override
-  String get settingsSecurityTitle => 'Security';
+  String get settingsSecurityTitle => 'Güvenlik';
 
   @override
-  String get settingsSecurityRequirePassword => 'Require Password';
+  String get settingsSecurityRequirePassword => 'Şifre Gerektir';
 
   @override
-  String get settingsSecurityEnterPassword => 'Enter Password';
+  String get settingsSecurityEnterPassword => 'Şifre Gir';
 
   @override
-  String get settingsSecuritySetPassword => 'Set Password';
+  String get settingsSecuritySetPassword => 'Şifre Belirle';
 
   @override
-  String get settingsSecurityChangePassword => 'Change Password';
+  String get settingsSecurityChangePassword => 'Şifre Değiştir';
 
   @override
-  String get settingsSecurityPassword => 'Password';
+  String get settingsSecurityPassword => 'Şifre';
 
   @override
-  String get settingsSecurityConfirmPassword => 'Confirm Password';
+  String get settingsSecurityConfirmPassword => 'Şifreyi Doğrula';
 
   @override
-  String get settingsSecurityOldPassword => 'Old Password';
+  String get settingsSecurityOldPassword => 'Eski Şifre';
 
   @override
-  String get settingsSecurityIncorrectPassword => 'Incorrect Password';
+  String get settingsSecurityIncorrectPassword => 'Yanlış Şifre';
 
   @override
-  String get settingsSecurityPasswordsDoNotMatch => 'Passwords do not match';
+  String get settingsSecurityPasswordsDoNotMatch => 'Şifreler eşleşmiyor';
 
   @override
-  String get requiredPrompt => 'Required';
+  String get requiredPrompt => 'Gerekli';
 
   @override
-  String get settingsSecurityBiometricUnlock => 'Biometric Unlock';
+  String get settingsSecurityBiometricUnlock => 'Biyometrik Açma';
 
   @override
-  String get unlockAppPrompt => 'Unlock the app';
+  String get unlockAppPrompt => 'Uygulamayı Aç';
 
   @override
   String get settingsAboutTitle => 'Hakkında';

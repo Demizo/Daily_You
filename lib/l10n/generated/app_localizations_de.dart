@@ -253,7 +253,7 @@ class AppLocalizationsDe extends AppLocalizations {
       'The \'schedule alarms\' permission will be requested to send the reminder at a random moment or at your preferred time.';
 
   @override
-  String get settingsDailyReminderTitle => 'Tägliche erinnrung';
+  String get settingsDailyReminderTitle => 'Tägliche Erinnerung';
 
   @override
   String get settingsDailyReminderDescription =>
@@ -270,7 +270,7 @@ class AppLocalizationsDe extends AppLocalizations {
       'Wähle eine feste Zeit für die Erinnerung';
 
   @override
-  String get settingsAlwaysSendReminderTitle => 'Erinnerung immer Zeigen';
+  String get settingsAlwaysSendReminderTitle => 'Erinnerung immer zeigen';
 
   @override
   String get settingsAlwaysSendReminderDescription =>
@@ -385,8 +385,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsExport => 'Exportieren';
 
   @override
-  String get settingsExportToAnotherFormat =>
-      'In ein anderes Format exportieren';
+  String get settingsExportToAnotherFormat => 'In anderes Format exportieren';
 
   @override
   String get settingsExportFormatDescription =>
@@ -479,13 +478,13 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsSecuritySetPassword => 'Passwort setzen';
 
   @override
-  String get settingsSecurityChangePassword => 'Passwort ändern';
+  String get settingsSecurityChangePassword => 'Ändere Passwort';
 
   @override
   String get settingsSecurityPassword => 'Passwort';
 
   @override
-  String get settingsSecurityConfirmPassword => 'Passwort bestätigen';
+  String get settingsSecurityConfirmPassword => 'Bestätige Passwort';
 
   @override
   String get settingsSecurityOldPassword => 'Altes Passwort';
@@ -494,16 +493,17 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsSecurityIncorrectPassword => 'Falsches Passwort';
 
   @override
-  String get settingsSecurityPasswordsDoNotMatch => 'Passwords do not match';
+  String get settingsSecurityPasswordsDoNotMatch =>
+      'Passwörter sind nicht gleich';
 
   @override
   String get requiredPrompt => 'Notwendig';
 
   @override
-  String get settingsSecurityBiometricUnlock => 'Biometric Unlock';
+  String get settingsSecurityBiometricUnlock => 'Biometrisch Entsperren';
 
   @override
-  String get unlockAppPrompt => 'Unlock the app';
+  String get unlockAppPrompt => 'App entsperren';
 
   @override
   String get settingsAboutTitle => 'Über';
