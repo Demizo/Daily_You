@@ -187,7 +187,7 @@
     "@tagMoodTitle": {},
     "noLogs": "暂无日迹…",
     "@noLogs": {},
-    "settingsDeleteAllLogsPrompt": "请输入'{prompt}'以确认继续删除，此操作无法撤销！",
+    "settingsDeleteAllLogsPrompt": "请输入 '{prompt}' 以确认继续删除，此操作无法撤销！",
     "@settingsDeleteAllLogsPrompt": {},
     "backupErrorDescription": "创建备份失败！",
     "@backupErrorDescription": {},
