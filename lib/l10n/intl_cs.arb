@@ -240,5 +240,11 @@
     "imageQualityNoCompression": "Bez komprese",
     "@imageQualityNoCompression": {},
     "statisticsRangeAllTime": "Celé období",
-    "@statisticsRangeAllTime": {}
+    "@statisticsRangeAllTime": {},
+    "settingsShowMarkdownToolbar": "Zobrazit panel nástrojů",
+    "@settingsShowMarkdownToolbar": {},
+    "formatMarkdown": "Markdown",
+    "@formatMarkdown": {},
+    "noTemplateTitle": "Žádný",
+    "@noTemplateTitle": {}
 }
