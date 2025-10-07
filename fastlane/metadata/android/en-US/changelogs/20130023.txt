@@ -1,0 +1,9 @@
+Daily You v2.13.2 has arrived! This one is animated:
+
+• Added GIF support
+• Added Hebrew and Italian language support
+• Updated translations
+
+In this patch:
+
+• Revert dependencies for F-Droid build support
