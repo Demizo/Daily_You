@@ -30,10 +30,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get flaskbacksEmpty => 'Aún no hay recuerdos…';
 
   @override
-  String get flashbackGoodDay => 'Un día bueno';
+  String get flashbackGoodDay => 'Un Buen Día';
 
   @override
-  String get flashbackRandomDay => 'Un día aleatorio';
+  String get flashbackRandomDay => 'Un Día Aleatorio';
 
   @override
   String flashbackWeek(num count) {
@@ -72,7 +72,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get pageGalleryTitle => 'Galería';
 
   @override
-  String get searchLogsHint => 'Buscar entradas…';
+  String get searchLogsHint => 'Buscar registros…';
 
   @override
   String logCount(num count) {
@@ -97,7 +97,7 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get noLogs => 'No hay entradas…';
+  String get noLogs => 'No hay registros…';
 
   @override
   String get sortDateTitle => 'Fecha';

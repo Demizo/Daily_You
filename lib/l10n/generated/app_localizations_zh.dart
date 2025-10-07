@@ -438,7 +438,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String settingsDeleteAllLogsPrompt(Object prompt) {
-    return '请输入\'$prompt\'以确认继续删除，此操作无法撤销！';
+    return '请输入 \'$prompt\' 以确认继续删除，此操作无法撤销！';
   }
 
   @override

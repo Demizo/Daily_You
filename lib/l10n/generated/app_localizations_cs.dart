@@ -18,61 +18,43 @@ class AppLocalizationsCs extends AppLocalizations {
   String get dailyReminderDescription => 'Zapiš si svůj den…';
 
   @override
-  String get pageHomeTitle => 'Home';
+  String get pageHomeTitle => 'Hlavní stránka';
 
   @override
-  String get flashbacksTitle => 'Flashbacks';
+  String get flashbacksTitle => 'Vzpomínky';
 
   @override
-  String get settingsFlashbacksExcludeBadDays => 'Exclude bad days';
+  String get settingsFlashbacksExcludeBadDays => 'Vyřadit špatné dny';
 
   @override
-  String get flaskbacksEmpty => 'No Flashbacks Yet…';
+  String get flaskbacksEmpty => 'Zatím žádné vzpomínky…';
 
   @override
-  String get flashbackGoodDay => 'A Good Day';
+  String get flashbackGoodDay => 'Dobrý den';
 
   @override
-  String get flashbackRandomDay => 'A Random Day';
+  String get flashbackRandomDay => 'Náhodný den';
 
   @override
   String flashbackWeek(num count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count Weeks Ago',
-      one: '$count Week Ago',
-    );
-    return '$_temp0';
+    return '';
   }
 
   @override
   String flashbackMonth(num count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count Months Ago',
-      one: '$count Month Ago',
-    );
-    return '$_temp0';
+    return '';
   }
 
   @override
   String flashbackYear(num count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count Years Ago',
-      one: '$count Year Ago',
-    );
-    return '$_temp0';
+    return '';
   }
 
   @override
-  String get pageGalleryTitle => 'Gallery';
+  String get pageGalleryTitle => 'Galerie';
 
   @override
-  String get searchLogsHint => 'Search Logs…';
+  String get searchLogsHint => 'Vyhledávání záznamů…';
 
   @override
   String logCount(num count) {
@@ -97,43 +79,43 @@ class AppLocalizationsCs extends AppLocalizations {
   }
 
   @override
-  String get noLogs => 'No Logs…';
+  String get noLogs => 'Žádné záznamy…';
 
   @override
-  String get sortDateTitle => 'Date';
+  String get sortDateTitle => 'Datum';
 
   @override
-  String get sortOrderAscendingTitle => 'Ascending';
+  String get sortOrderAscendingTitle => 'Stoupající';
 
   @override
-  String get sortOrderDescendingTitle => 'Descending';
+  String get sortOrderDescendingTitle => 'Klesající';
 
   @override
-  String get pageStatisticsTitle => 'Statistics';
+  String get pageStatisticsTitle => 'Statistiky';
 
   @override
-  String get statisticsNotEnoughData => 'Not enough data…';
+  String get statisticsNotEnoughData => 'Nedostatek dat…';
 
   @override
-  String get statisticsRangeOneMonth => '1 Month';
+  String get statisticsRangeOneMonth => '1 měsíc';
 
   @override
-  String get statisticsRangeSixMonths => '6 Months';
+  String get statisticsRangeSixMonths => '6 měsíců';
 
   @override
-  String get statisticsRangeOneYear => '1 Year';
+  String get statisticsRangeOneYear => '1 rok';
 
   @override
-  String get statisticsRangeAllTime => 'All Time';
+  String get statisticsRangeAllTime => 'Celé období';
 
   @override
   String chartSummaryTitle(Object tag) {
-    return '$tag Summary';
+    return '$tag Shrnutí';
   }
 
   @override
   String chartByDayTitle(Object tag) {
-    return '$tag By Day';
+    return '$tag Ve dne';
   }
 
   @override
@@ -168,223 +150,225 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get errorExternalStorageAccessTitle =>
-      'Can\'t Access External Storage';
+      'Nelze přistoupit k Externími uložišti';
 
   @override
   String get errorExternalStorageAccessDescription =>
-      'If you are using network storage make sure the service is online and you have network access.\n\nOtherwise, the app may have lost permissions for the external folder. Go to settings, and reselect the external folder to grant access.\n\nWarning, changes will not be synced until you restore access to the external storage location!';
+      'Pokud používáte síťové úložiště, ujistěte se, že je služba online a že máte přístup k síti.\n\nV opačném případě mohla aplikace ztratit oprávnění pro externí složku. Přejděte do nastavení a znovu vyberte externí složku, abyste jí udělili přístup.\n\nUpozornění: změny nebudou synchronizovány, dokud neobnovíte přístup k externímu úložišti!';
 
   @override
   String get errorExternalStorageAccessContinue =>
-      'Continue With Local Database';
+      'Pokračovat s lokální databází';
 
   @override
-  String get lastModified => 'Modified';
+  String get lastModified => 'Upraveno';
 
   @override
-  String get writeSomethingHint => 'Write something…';
+  String get writeSomethingHint => 'Napiš něco…';
 
   @override
-  String get titleHint => 'Title…';
+  String get titleHint => 'Název…';
 
   @override
-  String get deleteLogTitle => 'Delete Log';
+  String get deleteLogTitle => 'Smazat záznam';
 
   @override
-  String get deleteLogDescription => 'Do you want to delete this log?';
+  String get deleteLogDescription => 'Chcete smazat tento záznam?';
 
   @override
-  String get deletePhotoTitle => 'Delete Photo';
+  String get deletePhotoTitle => 'Smazat fotografii';
 
   @override
-  String get deletePhotoDescription => 'Do you want to delete this photo?';
+  String get deletePhotoDescription => 'Chcete smazat tuto fotografii?';
 
   @override
-  String get pageSettingsTitle => 'Settings';
+  String get pageSettingsTitle => 'Nastavení';
 
   @override
-  String get settingsAppearanceTitle => 'Appearance';
+  String get settingsAppearanceTitle => 'Vzhled';
 
   @override
-  String get settingsTheme => 'Theme';
+  String get settingsTheme => 'Téma';
 
   @override
-  String get themeSystem => 'System';
+  String get themeSystem => 'Systém';
 
   @override
-  String get themeLight => 'Light';
+  String get themeLight => 'Světlý';
 
   @override
-  String get themeDark => 'Dark';
+  String get themeDark => 'Tmavý';
 
   @override
   String get themeAmoled => 'AMOLED';
 
   @override
-  String get settingsFirstDayOfWeek => 'First Day Of Week';
+  String get settingsFirstDayOfWeek => 'První den v týdnu';
 
   @override
-  String get settingsUseSystemAccentColor => 'Use System Accent Color';
+  String get settingsUseSystemAccentColor => 'Použít barvu systému';
 
   @override
-  String get settingsCustomAccentColor => 'Custom Accent Color';
+  String get settingsCustomAccentColor => 'Vlastní barva';
 
   @override
-  String get settingsShowMarkdownToolbar => 'Show Markdown Toolbar';
+  String get settingsShowMarkdownToolbar => 'Zobrazit panel nástrojů';
 
   @override
-  String get settingsShowFlashbacks => 'Show Flashbacks';
+  String get settingsShowFlashbacks => 'Ukázat vzpomínky';
 
   @override
-  String get settingsChangeMoodIcons => 'Change Mood Icons';
+  String get settingsChangeMoodIcons => 'Změnit ikony nálad';
 
   @override
-  String get moodIconPrompt => 'Enter an icon';
+  String get moodIconPrompt => 'Vložte ikonu';
 
   @override
-  String get settingsNotificationsTitle => 'Notifications';
+  String get settingsNotificationsTitle => 'Oznámení';
 
   @override
   String get settingsDailyReminderOnboarding =>
-      'Enable daily reminders to keep yourself consistent!';
+      'Zapněte si denní připomenutí, abyste byli důslední!';
 
   @override
   String get settingsNotificationsPermissionsPrompt =>
-      'The \'schedule alarms\' permission will be requested to send the reminder at a random moment or at your preferred time.';
+      'K odeslání připomenutí v náhodný okamžik nebo ve vámi preferovaný čas bude vyžadováno oprávnění „naplánovat alarmy“.';
 
   @override
-  String get settingsDailyReminderTitle => 'Daily Reminder';
+  String get settingsDailyReminderTitle => 'Denní připomenutí';
 
   @override
-  String get settingsDailyReminderDescription => 'A gentle reminder each day';
+  String get settingsDailyReminderDescription => 'Jemné každodenní připomenutí';
 
   @override
-  String get settingsReminderTime => 'Reminder Time';
+  String get settingsReminderTime => 'Čas připomenutí';
 
   @override
-  String get settingsFixedReminderTimeTitle => 'Fixed Reminder Time';
+  String get settingsFixedReminderTimeTitle => 'Pevný čas připomenutí';
 
   @override
   String get settingsFixedReminderTimeDescription =>
-      'Pick a fixed time for the reminder';
+      'Vyberte pevný čas pro připomenutí';
 
   @override
-  String get settingsAlwaysSendReminderTitle => 'Always Send Reminder';
+  String get settingsAlwaysSendReminderTitle => 'Vždy posílat připomenutí';
 
   @override
   String get settingsAlwaysSendReminderDescription =>
       'Send reminder even if a log was already started';
 
   @override
-  String get settingsCustomizeNotificationTitle => 'Customize Notifications';
+  String get settingsCustomizeNotificationTitle => 'Přizpůsobit oznámení';
 
   @override
-  String get settingsTemplatesTitle => 'Templates';
+  String get settingsTemplatesTitle => 'Šablony';
 
   @override
-  String get settingsDefaultTemplate => 'Default Template';
+  String get settingsDefaultTemplate => 'Výchozí šablona';
 
   @override
-  String get manageTemplates => 'Manage Templates';
+  String get manageTemplates => 'Spravovat šablony';
 
   @override
-  String get addTemplate => 'Add a Template';
+  String get addTemplate => 'Přidat šablonu';
 
   @override
-  String get newTemplate => 'New Template';
+  String get newTemplate => 'Nová šablona';
 
   @override
-  String get noTemplateTitle => 'None';
+  String get noTemplateTitle => 'Žádný';
 
   @override
-  String get noTemplatesDescription => 'No templates created yet…';
+  String get noTemplatesDescription => 'Zatím nebyly vytvořeny žádné šablony…';
 
   @override
-  String get settingsStorageTitle => 'Storage';
+  String get settingsStorageTitle => 'Uložiště';
 
   @override
-  String get settingsImageQuality => 'Image Quality';
+  String get settingsImageQuality => 'Kvalita fotografie';
 
   @override
-  String get imageQualityHigh => 'High';
+  String get imageQualityHigh => 'Vysoká';
 
   @override
-  String get imageQualityMedium => 'Medium';
+  String get imageQualityMedium => 'Střední';
 
   @override
-  String get imageQualityLow => 'Low';
+  String get imageQualityLow => 'Nízká';
 
   @override
-  String get imageQualityNoCompression => 'No Compression';
+  String get imageQualityNoCompression => 'Bez komprese';
 
   @override
-  String get settingsLogFolder => 'Log Folder';
+  String get settingsLogFolder => 'Složka záznamů';
 
   @override
-  String get settingsImageFolder => 'Image Folder';
+  String get settingsImageFolder => 'Složka obrázků';
 
   @override
-  String get warningTitle => 'Warning';
+  String get warningTitle => 'Varování';
 
   @override
   String get logFolderWarningDescription =>
-      'If the selected folder already contains a \'daily_you.db\' file, it will be used to overwrite your existing logs!';
+      'Pokud vybraná složka již obsahuje soubor „daily_you.db“, bude použit k přepsání vašich stávajících záznamů!';
 
   @override
-  String get errorTitle => 'Error';
+  String get errorTitle => 'Chyba';
 
   @override
-  String get logFolderErrorDescription => 'Failed to change log folder!';
+  String get logFolderErrorDescription =>
+      'Nepodařilo se změnit složku záznamů!';
 
   @override
-  String get imageFolderErrorDescription => 'Failed to change image folder!';
+  String get imageFolderErrorDescription =>
+      'Nepodařilo se změnit složku obrázků!';
 
   @override
-  String get backupErrorDescription => 'Failed to create backup!';
+  String get backupErrorDescription => 'Nepodařilo se vytvořit zálohu!';
 
   @override
-  String get restoreErrorDescription => 'Failed to restore backup!';
+  String get restoreErrorDescription => 'Obnovení zálohy se nezdařilo!';
 
   @override
-  String get settingsBackupRestoreTitle => 'Backup & Restore';
+  String get settingsBackupRestoreTitle => 'Zálohování a obnovení';
 
   @override
-  String get settingsBackup => 'Backup';
+  String get settingsBackup => 'Zálohovat';
 
   @override
-  String get settingsRestore => 'Restore';
+  String get settingsRestore => 'Obnovit';
 
   @override
   String get settingsRestorePromptDescription =>
-      'Restoring a backup will overwrite your existing data!';
+      'Obnovení zálohy přepíše vaše stávající data!';
 
   @override
   String tranferStatus(Object percent) {
-    return 'Transferring… $percent%';
+    return 'Přenos… $percent%';
   }
 
   @override
   String creatingBackupStatus(Object percent) {
-    return 'Creating Backup… $percent%';
+    return 'Vytváření zálohy... $percent%';
   }
 
   @override
   String restoringBackupStatus(Object percent) {
-    return 'Restoring Backup… $percent%';
+    return 'Obnovení zálohy… $percent%';
   }
 
   @override
-  String get cleanUpStatus => 'Cleaning Up…';
+  String get cleanUpStatus => 'Uklízení…';
 
   @override
   String get settingsExport => 'Export';
 
   @override
-  String get settingsExportToAnotherFormat => 'Export To Another Format';
+  String get settingsExportToAnotherFormat => 'Exportovat do jiného formátu';
 
   @override
   String get settingsExportFormatDescription =>
-      'This should not be used as a backup!';
+      'To by nemělo být použito jako záloha!';
 
   @override
   String get exportLogs => 'Export Logs';
@@ -396,14 +380,14 @@ class AppLocalizationsCs extends AppLocalizations {
   String get settingsImport => 'Import';
 
   @override
-  String get settingsImportFromAnotherApp => 'Import From Another App';
+  String get settingsImportFromAnotherApp => 'Importovat z jiné aplikace';
 
   @override
   String get settingsTranslateCallToAction =>
-      'Everyone should have access to a journal!';
+      'Každý by měl mít přístup k deníku!';
 
   @override
-  String get settingsHelpTranslate => 'Help Translate';
+  String get settingsHelpTranslate => 'Pomozte s překladem';
 
   @override
   String get importLogs => 'Import Logs';
@@ -412,11 +396,11 @@ class AppLocalizationsCs extends AppLocalizations {
   String get importImages => 'Import Images';
 
   @override
-  String get logFormatTitle => 'Choose Format';
+  String get logFormatTitle => 'Zvolte formát';
 
   @override
   String get logFormatDescription =>
-      'Another app\'s format may not support all features. Please report any issues since third party formats may change at any time. This will not impact existing logs!';
+      'Formát jiné aplikace nemusí podporovat všechny funkce. Nahlaste prosím jakékoli problémy, protože formáty třetích stran se mohou kdykoli změnit. To nebude mít vliv na stávající záznamy!';
 
   @override
   String get formatDailyYouJson => 'Daily You (JSON)';
@@ -440,86 +424,86 @@ class AppLocalizationsCs extends AppLocalizations {
   String get formatMarkdown => 'Markdown';
 
   @override
-  String get settingsDeleteAllLogsTitle => 'Delete All Logs';
+  String get settingsDeleteAllLogsTitle => 'Smazat všechny záznamy';
 
   @override
   String get settingsDeleteAllLogsDescription =>
-      'Do you want to delete all of your logs?';
+      'Chcete smazat všechny své záznamy?';
 
   @override
   String settingsDeleteAllLogsPrompt(Object prompt) {
-    return 'Enter \'$prompt\' to confirm. This cannot be undone!';
+    return 'Zadejte \'$prompt\' pro potvrzení. Tento úkon nelze vrátit zpět!';
   }
 
   @override
-  String get settingsLanguageTitle => 'Language';
+  String get settingsLanguageTitle => 'Jazyk';
 
   @override
-  String get settingsAppLanguageTitle => 'App Language';
+  String get settingsAppLanguageTitle => 'Jazyk aplikace';
 
   @override
-  String get settingsOverrideAppLanguageTitle => 'Override App Language';
+  String get settingsOverrideAppLanguageTitle => 'Přepsat jazyk aplikace';
 
   @override
-  String get settingsSecurityTitle => 'Security';
+  String get settingsSecurityTitle => 'Zabezpečení';
 
   @override
-  String get settingsSecurityRequirePassword => 'Require Password';
+  String get settingsSecurityRequirePassword => 'Vyžadovat heslo';
 
   @override
-  String get settingsSecurityEnterPassword => 'Enter Password';
+  String get settingsSecurityEnterPassword => 'Zadejte heslo';
 
   @override
-  String get settingsSecuritySetPassword => 'Set Password';
+  String get settingsSecuritySetPassword => 'Nastavit heslo';
 
   @override
-  String get settingsSecurityChangePassword => 'Change Password';
+  String get settingsSecurityChangePassword => 'Změnit heslo';
 
   @override
-  String get settingsSecurityPassword => 'Password';
+  String get settingsSecurityPassword => 'Heslo';
 
   @override
-  String get settingsSecurityConfirmPassword => 'Confirm Password';
+  String get settingsSecurityConfirmPassword => 'Potvrďte heslo';
 
   @override
-  String get settingsSecurityOldPassword => 'Old Password';
+  String get settingsSecurityOldPassword => 'Staré heslo';
 
   @override
-  String get settingsSecurityIncorrectPassword => 'Incorrect Password';
+  String get settingsSecurityIncorrectPassword => 'Nesprávné heslo';
 
   @override
-  String get settingsSecurityPasswordsDoNotMatch => 'Passwords do not match';
+  String get settingsSecurityPasswordsDoNotMatch => 'Hesla se neshodují';
 
   @override
-  String get requiredPrompt => 'Required';
+  String get requiredPrompt => 'Povinné';
 
   @override
-  String get settingsSecurityBiometricUnlock => 'Biometric Unlock';
+  String get settingsSecurityBiometricUnlock => 'Biometrické odemykání';
 
   @override
-  String get unlockAppPrompt => 'Unlock the app';
+  String get unlockAppPrompt => 'Odemknout aplikaci';
 
   @override
-  String get settingsAboutTitle => 'About';
+  String get settingsAboutTitle => 'O nás';
 
   @override
-  String get settingsVersion => 'Version';
+  String get settingsVersion => 'Verze';
 
   @override
-  String get settingsLicense => 'License';
+  String get settingsLicense => 'Licence';
 
   @override
   String get licenseGPLv3 => 'GPL-3.0';
 
   @override
-  String get settingsSourceCode => 'Source Code';
+  String get settingsSourceCode => 'Zdrojový kód';
 
   @override
-  String get settingsMadeWithLove => 'Made with ❤️';
+  String get settingsMadeWithLove => 'Vyrobeno s ❤️';
 
   @override
-  String get settingsConsiderSupporting => 'consider supporting';
+  String get settingsConsiderSupporting => 'zvažte podporu';
 
   @override
-  String get tagMoodTitle => 'Mood';
+  String get tagMoodTitle => 'Nálada';
 }

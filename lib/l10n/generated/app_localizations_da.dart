@@ -24,7 +24,7 @@ class AppLocalizationsDa extends AppLocalizations {
   String get flashbacksTitle => 'Minder';
 
   @override
-  String get settingsFlashbacksExcludeBadDays => 'Exclude bad days';
+  String get settingsFlashbacksExcludeBadDays => 'Ekskluder dårlige dage';
 
   @override
   String get flaskbacksEmpty => 'Ingen minder endnu…';
@@ -90,8 +90,8 @@ class AppLocalizationsDa extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count words',
-      one: '$count word',
+      other: '$count ord',
+      one: '$count ord',
     );
     return '$_temp0';
   }
@@ -231,7 +231,7 @@ class AppLocalizationsDa extends AppLocalizations {
   String get settingsShowMarkdownToolbar => 'Vis markdown-værktøjslinje';
 
   @override
-  String get settingsShowFlashbacks => 'Show Flashbacks';
+  String get settingsShowFlashbacks => 'Vis minder';
 
   @override
   String get settingsChangeMoodIcons => 'Skift humør-ikoner';
@@ -244,7 +244,7 @@ class AppLocalizationsDa extends AppLocalizations {
 
   @override
   String get settingsDailyReminderOnboarding =>
-      'Enable daily reminders to keep yourself consistent!';
+      'Aktivér daglige påmindelser for at forblive konsekvent!';
 
   @override
   String get settingsNotificationsPermissionsPrompt =>
