@@ -245,6 +245,6 @@
     "@settingsShowMarkdownToolbar": {},
     "formatMarkdown": "Markdown",
     "@formatMarkdown": {},
-    "noTemplateTitle": "Žádný",
+    "noTemplateTitle": "Žádná",
     "@noTemplateTitle": {}
 }
