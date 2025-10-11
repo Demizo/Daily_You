@@ -131,7 +131,12 @@ class _ImageViewPageState extends State<ImageViewPage> {
                   var bytes =
                       await EntriesDatabase.instance.getImgBytes(currentImage);
                   if (bytes != null) {
-                    String? saveDir = await FileLayer.pickDirectory();
+                    String? saveDir;
+                    try {
+                      saveDir = await FileLayer.pickDirectory();
+                    } catch (_) {
+                      return;
+                    }
                     if (saveDir == null) return;
                     var newImageName = await FileLayer.createFile(
                         saveDir, currentImage, bytes);

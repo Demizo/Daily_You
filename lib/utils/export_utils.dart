@@ -25,7 +25,14 @@ class ExportUtils {
       BuildContext context, Function(String) updateStatus) async {
     updateStatus("(1/2) 0%");
 
-    final exportFolder = await FileLayer.pickDirectory();
+    String? exportFolder;
+    try {
+      exportFolder = await FileLayer.pickDirectory();
+    } catch (e) {
+      updateStatus("$e");
+      await Future.delayed(Duration(seconds: 5));
+      return false;
+    }
     if (exportFolder == null) return false;
 
     bool success = true;

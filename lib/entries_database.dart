@@ -554,31 +554,36 @@ DROP TABLE old_entries;
 
   Future<bool> selectDatabaseLocation() async {
     StatsProvider.instance.updateSyncStats(0, 0);
-    var selectedDirectory = await FileLayer.pickDirectory();
-    if (selectedDirectory == null) return false;
+    try {
+      var selectedDirectory = await FileLayer.pickDirectory();
+      if (selectedDirectory == null) return false;
 
-    // Save old external path
-    var oldExternalPath = ConfigProvider.instance.get(ConfigKey.externalDbUri);
-    var oldUseExternalPath = usingExternalDb();
+      // Save old external path
+      var oldExternalPath =
+          ConfigProvider.instance.get(ConfigKey.externalDbUri);
+      var oldUseExternalPath = usingExternalDb();
 
-    await ConfigProvider.instance
-        .set(ConfigKey.externalDbUri, selectedDirectory);
-    await ConfigProvider.instance.set(ConfigKey.useExternalDb, true);
-    // Sync with external folder
-    var synced = await syncDatabase(forceOverwrite: true);
-    if (synced) {
-      // Open new database and update stats
-      await _database!.close();
-      await initDB();
-      await StatsProvider.instance.updateStats();
-      if (usingExternalImg()) await syncImageFolder(true);
-      return true;
-    } else {
-      // Restore state after failure
       await ConfigProvider.instance
-          .set(ConfigKey.externalDbUri, oldExternalPath);
-      await ConfigProvider.instance
-          .set(ConfigKey.useExternalDb, oldUseExternalPath);
+          .set(ConfigKey.externalDbUri, selectedDirectory);
+      await ConfigProvider.instance.set(ConfigKey.useExternalDb, true);
+      // Sync with external folder
+      var synced = await syncDatabase(forceOverwrite: true);
+      if (synced) {
+        // Open new database and update stats
+        await _database!.close();
+        await initDB();
+        await StatsProvider.instance.updateStats();
+        if (usingExternalImg()) await syncImageFolder(true);
+        return true;
+      } else {
+        // Restore state after failure
+        await ConfigProvider.instance
+            .set(ConfigKey.externalDbUri, oldExternalPath);
+        await ConfigProvider.instance
+            .set(ConfigKey.useExternalDb, oldUseExternalPath);
+        return false;
+      }
+    } catch (_) {
       return false;
     }
   }
@@ -717,26 +722,30 @@ DROP TABLE old_entries;
   }
 
   Future<bool> selectImageFolder() async {
-    var selectedDirectory = await FileLayer.pickDirectory();
-    if (selectedDirectory == null) return false;
+    try {
+      var selectedDirectory = await FileLayer.pickDirectory();
+      if (selectedDirectory == null) return false;
 
-    // Save Old Settings
-    var oldExternalImgUri =
-        ConfigProvider.instance.get(ConfigKey.externalImgUri);
-    var oldUseExternalImg = usingExternalImg();
+      // Save Old Settings
+      var oldExternalImgUri =
+          ConfigProvider.instance.get(ConfigKey.externalImgUri);
+      var oldUseExternalImg = usingExternalImg();
 
-    await ConfigProvider.instance
-        .set(ConfigKey.externalImgUri, selectedDirectory);
-    await ConfigProvider.instance.set(ConfigKey.useExternalImg, true);
-    var synced = await syncImageFolder(true);
-    if (synced) {
-      return true;
-    } else {
-      // Restore Settings
       await ConfigProvider.instance
-          .set(ConfigKey.externalImgUri, oldExternalImgUri);
-      await ConfigProvider.instance
-          .set(ConfigKey.useExternalImg, oldUseExternalImg);
+          .set(ConfigKey.externalImgUri, selectedDirectory);
+      await ConfigProvider.instance.set(ConfigKey.useExternalImg, true);
+      var synced = await syncImageFolder(true);
+      if (synced) {
+        return true;
+      } else {
+        // Restore Settings
+        await ConfigProvider.instance
+            .set(ConfigKey.externalImgUri, oldExternalImgUri);
+        await ConfigProvider.instance
+            .set(ConfigKey.useExternalImg, oldUseExternalImg);
+        return false;
+      }
+    } catch (_) {
       return false;
     }
   }

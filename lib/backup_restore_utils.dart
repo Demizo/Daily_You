@@ -12,7 +12,14 @@ import 'package:path_provider/path_provider.dart';
 class BackupRestoreUtils {
   static Future<bool> backupToZip(
       BuildContext context, void Function(String) updateStatus) async {
-    String? savePath = await FileLayer.pickDirectory();
+    String? savePath;
+    try {
+      savePath = await FileLayer.pickDirectory();
+    } catch (e) {
+      updateStatus("$e");
+      await Future.delayed(Duration(seconds: 5));
+      return false;
+    }
     if (savePath == null) return false;
 
     var tempDir = await getTemporaryDirectory();
