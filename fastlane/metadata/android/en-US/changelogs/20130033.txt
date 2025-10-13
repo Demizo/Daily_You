@@ -1,0 +1,9 @@
+Daily You v2.13.3 has arrived! This one is animated:
+
+• Added GIF support
+• Added Hebrew and Italian language support
+
+In this patch:
+
+• Improved error handling when selecting folders
+• Updated translations
