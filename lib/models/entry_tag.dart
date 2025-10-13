@@ -1,7 +1,16 @@
+import 'package:daily_you/entries_database.dart';
+
 const String entryTagsTable = 'entryTags';
 
 class EntryTagsFields {
-  static const List<String> values = [id, entryId, tagId, value, timeCreate, timeModified];
+  static const List<String> values = [
+    id,
+    entryId,
+    tagId,
+    value,
+    timeCreate,
+    timeModified
+  ];
   static const String id = 'id';
   static const String entryId = 'entry_id';
   static const String tagId = 'tag_id';
@@ -62,4 +71,73 @@ class EntryTag {
         EntryTagsFields.timeCreate: timeCreate.toIso8601String(),
         EntryTagsFields.timeModified: timeModified.toIso8601String(),
       };
+
+  // Database Interactions
+
+  static Future<EntryTag> create(EntryTag entryTag) async {
+    final db = EntriesDatabase.instance.database!;
+
+    final id = await db.insert(entryTagsTable, entryTag.toJson());
+    if (EntriesDatabase.instance.usingExternalDb()) {
+      await EntriesDatabase.instance.updateExternalDatabase();
+    }
+    return entryTag.copy(id: id);
+  }
+
+  static Future<EntryTag?> get(int id) async {
+    final db = EntriesDatabase.instance.database!;
+
+    final maps = await db.query(
+      entryTagsTable,
+      columns: EntryTagsFields.values,
+      where: '${EntryTagsFields.id} = ?',
+      whereArgs: [id],
+    );
+
+    if (maps.isNotEmpty) {
+      return EntryTag.fromJson(maps.first);
+    } else {
+      return null;
+    }
+  }
+
+  static Future<List<EntryTag>> getAll() async {
+    final db = EntriesDatabase.instance.database!;
+
+    final result = await db.query(entryTagsTable,
+        orderBy: '${EntryTagsFields.timeCreate} DESC');
+
+    return result.map((json) => EntryTag.fromJson(json)).toList();
+  }
+
+  static Future<int> update(EntryTag entryTag) async {
+    final db = EntriesDatabase.instance.database!;
+
+    final id = await db.update(
+      entryTagsTable,
+      entryTag.toJson(),
+      where: '${EntryTagsFields.id} = ?',
+      whereArgs: [entryTag.id],
+    );
+
+    if (EntriesDatabase.instance.usingExternalDb()) {
+      await EntriesDatabase.instance.updateExternalDatabase();
+    }
+    return id;
+  }
+
+  static Future<int> delete(int id) async {
+    final db = EntriesDatabase.instance.database!;
+
+    final removedId = await db.delete(
+      entryTagsTable,
+      where: '${EntryTagsFields.id} = ?',
+      whereArgs: [id],
+    );
+
+    if (EntriesDatabase.instance.usingExternalDb()) {
+      await EntriesDatabase.instance.updateExternalDatabase();
+    }
+    return removedId;
+  }
 }

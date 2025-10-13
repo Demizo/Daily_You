@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/models/entry.dart';
+import 'package:daily_you/models/entry_tag.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/stat_range_selector.dart';
@@ -52,6 +53,7 @@ class StatsProvider with ChangeNotifier {
 
   List<Entry> entries = List.empty();
   List<EntryImage> images = List.empty();
+  List<EntryTag> tags = List.empty();
 
   StatsRange statsRange = StatsRange.month;
 
@@ -92,6 +94,7 @@ class StatsProvider with ChangeNotifier {
     entries = await EntriesDatabase.instance.getAllEntries();
     filteredEntries = filterEntries(entries);
     images = await EntriesDatabase.instance.getAllEntryImages();
+    tags = await EntryTag.getAll();
     getWordCount();
     await getStreaks();
     await getMoodCounts();
@@ -291,5 +294,9 @@ class StatsProvider with ChangeNotifier {
 
   List<EntryImage> getImagesForEntry(Entry entry) {
     return images.where((img) => img.entryId == entry.id!).toList();
+  }
+
+  List<EntryTag> getTagsForEntry(Entry entry) {
+    return tags.where((tag) => tag.entryId == entry.id!).toList();
   }
 }

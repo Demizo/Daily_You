@@ -11,11 +11,17 @@ class TagsFields {
   static const String timeModified = 'time_modified';
 }
 
-class Tag {
-  static String tagBuiltInFavorite = 'Favorite';
-  static String tagTypeTag = 'tag';
-  static String tagTypeRating = 'rating';
+class TagType {
+  static const String tag = "tag";
+  static const String rating = "rating";
+}
 
+class BuiltInTag {
+  static const String mood = "Mood";
+  static const String favorite = "Favorite";
+}
+
+class Tag {
   final int? id;
   final String name;
   final String type;
@@ -65,14 +71,14 @@ class Tag {
 
   static Future createDefaultTags() async {
     await createTag(Tag(
-        name: tagBuiltInFavorite,
-        type: tagTypeTag,
+        name: BuiltInTag.mood,
+        type: TagType.rating,
         timeCreate: DateTime.now(),
         timeModified: DateTime.now()));
 
     await createTag(Tag(
-        name: "Mood",
-        type: tagTypeRating,
+        name: BuiltInTag.favorite,
+        type: TagType.tag,
         timeCreate: DateTime.now(),
         timeModified: DateTime.now()));
   }
