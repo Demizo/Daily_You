@@ -276,7 +276,7 @@ class AppLocalizationsCs extends AppLocalizations {
   String get newTemplate => 'Nová šablona';
 
   @override
-  String get noTemplateTitle => 'Žádný';
+  String get noTemplateTitle => 'Žádná';
 
   @override
   String get noTemplatesDescription => 'Zatím nebyly vytvořeny žádné šablony…';
