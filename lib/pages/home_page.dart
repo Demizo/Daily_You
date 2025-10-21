@@ -27,7 +27,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  bool listView = true;
   String searchText = '';
   bool sortOrderAsc = true;
   bool firstLoad = true;
@@ -36,8 +35,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    String viewMode = ConfigProvider.instance.get(ConfigKey.homePageViewMode);
-    listView = viewMode == 'list';
     _checkForNotificationLaunch();
   }
 
@@ -55,11 +52,6 @@ class _HomePageState extends State<HomePage> {
           builder: (context) => AddEditEntryPage(
               entry: todayEntry, openCamera: openCamera, images: todayImages)),
     );
-  }
-
-  Future<void> setViewMode() async {
-    var viewMode = listView ? 'list' : 'grid';
-    await ConfigProvider.instance.set(ConfigKey.homePageViewMode, viewMode);
   }
 
   Future _checkForNotificationLaunch() async {
@@ -110,9 +102,12 @@ class _HomePageState extends State<HomePage> {
     List<Flashback> flashbacks =
         FlashbackManager.getFlashbacks(context, statsProvider.entries);
 
+    String viewMode = ConfigProvider.instance.get(ConfigKey.homePageViewMode);
+    bool listView = viewMode == 'list';
+
     return Center(
       child: Stack(alignment: Alignment.bottomCenter, children: [
-        buildEntries(context, configProvider, flashbacks),
+        buildEntries(context, configProvider, flashbacks, listView),
         HidingWidget(
           duration: Duration(milliseconds: 200),
           hideDirection: HideDirection.down,
@@ -170,33 +165,18 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget buildEntries(BuildContext context, ConfigProvider configProvider,
-          List<Flashback> flashbacks) =>
+          List<Flashback> flashbacks, bool listView) =>
       ListView(controller: _scrollController, children: [
         const Center(
             child: SizedBox(height: 430, width: 400, child: EntryCalendar())),
         if (configProvider.get(ConfigKey.showFlashbacks))
-          Card(
-            child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text(
-                      AppLocalizations.of(context)!.flashbacksTitle,
-                      style: TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.normal),
-                    ),
-                  ),
-                  IconButton(
-                      onPressed: () async {
-                        listView = !listView;
-                        await setViewMode();
-                        setState(() {});
-                      },
-                      icon: listView
-                          ? const Icon(Icons.grid_view_rounded)
-                          : const Icon(Icons.view_list_rounded)),
-                ]),
+          Padding(
+            padding:
+                EdgeInsets.only(left: 16.0, right: 16.0, top: 8.0, bottom: 8.0),
+            child: Text(
+              AppLocalizations.of(context)!.flashbacksTitle,
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.normal),
+            ),
           ),
         if (configProvider.get(ConfigKey.showFlashbacks))
           flashbacks.isEmpty
