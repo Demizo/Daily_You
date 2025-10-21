@@ -270,5 +270,13 @@
     "settingsSecurityBiometricUnlock": "Біометричне розблокування",
     "@settingsSecurityBiometricUnlock": {},
     "unlockAppPrompt": "Розблокувати додаток",
-    "@unlockAppPrompt": {}
+    "@unlockAppPrompt": {},
+    "settingsFlashbacksViewLayout": "Макет перегляду флешбеків",
+    "@settingsFlashbacksViewLayout": {},
+    "settingsGalleryViewLayout": "Макет перегляду галереї",
+    "@settingsGalleryViewLayout": {},
+    "viewLayoutList": "Список",
+    "@viewLayoutList": {},
+    "viewLayoutGrid": "Сітка",
+    "@viewLayoutGrid": {}
 }
