@@ -247,6 +247,18 @@ class AppLocalizationsAr extends AppLocalizations {
   String get moodIconPrompt => 'أدخل ايقونة';
 
   @override
+  String get settingsFlashbacksViewLayout => 'Flashbacks View Layout';
+
+  @override
+  String get settingsGalleryViewLayout => 'Gallery View Layout';
+
+  @override
+  String get viewLayoutList => 'List';
+
+  @override
+  String get viewLayoutGrid => 'Grid';
+
+  @override
   String get settingsNotificationsTitle => 'التنبيهات';
 
   @override

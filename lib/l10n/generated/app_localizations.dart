@@ -466,6 +466,30 @@ abstract class AppLocalizations {
   /// **'Enter an icon'**
   String get moodIconPrompt;
 
+  /// No description provided for @settingsFlashbacksViewLayout.
+  ///
+  /// In en, this message translates to:
+  /// **'Flashbacks View Layout'**
+  String get settingsFlashbacksViewLayout;
+
+  /// No description provided for @settingsGalleryViewLayout.
+  ///
+  /// In en, this message translates to:
+  /// **'Gallery View Layout'**
+  String get settingsGalleryViewLayout;
+
+  /// No description provided for @viewLayoutList.
+  ///
+  /// In en, this message translates to:
+  /// **'List'**
+  String get viewLayoutList;
+
+  /// No description provided for @viewLayoutGrid.
+  ///
+  /// In en, this message translates to:
+  /// **'Grid'**
+  String get viewLayoutGrid;
+
   /// No description provided for @settingsNotificationsTitle.
   ///
   /// In en, this message translates to:

@@ -242,6 +242,18 @@ class AppLocalizationsPl extends AppLocalizations {
   String get moodIconPrompt => 'Wprowadź ikonę';
 
   @override
+  String get settingsFlashbacksViewLayout => 'Flashbacks View Layout';
+
+  @override
+  String get settingsGalleryViewLayout => 'Gallery View Layout';
+
+  @override
+  String get viewLayoutList => 'List';
+
+  @override
+  String get viewLayoutGrid => 'Grid';
+
+  @override
   String get settingsNotificationsTitle => 'Powiadomienia';
 
   @override

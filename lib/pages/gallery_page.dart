@@ -17,7 +17,6 @@ class GalleryPage extends StatefulWidget {
 }
 
 class _GalleryPageState extends State<GalleryPage> {
-  bool listView = false;
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   late final FocusNode _focusNode = FocusNode();
@@ -26,9 +25,6 @@ class _GalleryPageState extends State<GalleryPage> {
   void initState() {
     super.initState();
     _searchController.text = StatsProvider.instance.searchText;
-    String viewMode =
-        ConfigProvider.instance.get(ConfigKey.galleryPageViewMode);
-    listView = viewMode == 'list';
   }
 
   @override
@@ -37,11 +33,6 @@ class _GalleryPageState extends State<GalleryPage> {
     _scrollController.dispose();
     _focusNode.dispose();
     super.dispose();
-  }
-
-  Future<void> setViewMode() async {
-    var viewMode = listView ? 'list' : 'grid';
-    await ConfigProvider.instance.set(ConfigKey.galleryPageViewMode, viewMode);
   }
 
   void _showSortSelectionPopup(BuildContext context) {
@@ -112,9 +103,12 @@ class _GalleryPageState extends State<GalleryPage> {
   @override
   Widget build(BuildContext context) {
     final statsProvider = Provider.of<StatsProvider>(context);
+    final configProvider = Provider.of<ConfigProvider>(context);
+    String viewMode = configProvider.get(ConfigKey.galleryPageViewMode);
+    bool listView = viewMode == 'list';
     return Center(
       child: Stack(alignment: Alignment.topCenter, children: [
-        buildEntries(context),
+        buildEntries(context, listView),
         Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -187,15 +181,6 @@ class _GalleryPageState extends State<GalleryPage> {
                           .logCount(statsProvider.filteredEntries.length)),
                     ),
                     IconButton(
-                        onPressed: () async {
-                          listView = !listView;
-                          await setViewMode();
-                          setState(() {});
-                        },
-                        icon: listView
-                            ? const Icon(Icons.grid_view_rounded)
-                            : const Icon(Icons.view_list_rounded)),
-                    IconButton(
                         icon: const Icon(Icons.sort_rounded),
                         onPressed: () => _showSortSelectionPopup(context)),
                   ],
@@ -217,7 +202,7 @@ class _GalleryPageState extends State<GalleryPage> {
     );
   }
 
-  Widget buildEntries(BuildContext context) {
+  Widget buildEntries(BuildContext context, bool listView) {
     final statsProvider = Provider.of<StatsProvider>(context);
     var entries = statsProvider.filteredEntries;
     return statsProvider.filteredEntries.isEmpty

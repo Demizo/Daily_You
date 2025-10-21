@@ -238,7 +238,50 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
                 configProvider.set(ConfigKey.useMarkdownToolbar, value);
               }),
           Padding(
-            padding: const EdgeInsets.only(top: 8.0, left: 16.0),
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: SettingsDropdown<String>(
+                title:
+                    AppLocalizations.of(context)!.settingsFlashbacksViewLayout,
+                value: configProvider.get(ConfigKey.homePageViewMode),
+                options: [
+                  DropdownMenuItem<String>(
+                      value: "list",
+                      child:
+                          Text(AppLocalizations.of(context)!.viewLayoutList)),
+                  DropdownMenuItem<String>(
+                      value: "grid",
+                      child:
+                          Text(AppLocalizations.of(context)!.viewLayoutGrid)),
+                ],
+                onChanged: (String? newValue) {
+                  if (newValue != null) {
+                    configProvider.set(ConfigKey.homePageViewMode, newValue);
+                  }
+                }),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: SettingsDropdown<String>(
+                title: AppLocalizations.of(context)!.settingsGalleryViewLayout,
+                value: configProvider.get(ConfigKey.galleryPageViewMode),
+                options: [
+                  DropdownMenuItem<String>(
+                      value: "list",
+                      child:
+                          Text(AppLocalizations.of(context)!.viewLayoutList)),
+                  DropdownMenuItem<String>(
+                      value: "grid",
+                      child:
+                          Text(AppLocalizations.of(context)!.viewLayoutGrid)),
+                ],
+                onChanged: (String? newValue) {
+                  if (newValue != null) {
+                    configProvider.set(ConfigKey.galleryPageViewMode, newValue);
+                  }
+                }),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 16.0, left: 16.0),
             child: Text(
               AppLocalizations.of(context)!.settingsChangeMoodIcons,
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),

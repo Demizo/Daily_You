@@ -240,6 +240,18 @@ class AppLocalizationsDa extends AppLocalizations {
   String get moodIconPrompt => 'Angiv et ikon';
 
   @override
+  String get settingsFlashbacksViewLayout => 'Flashbacks View Layout';
+
+  @override
+  String get settingsGalleryViewLayout => 'Gallery View Layout';
+
+  @override
+  String get viewLayoutList => 'List';
+
+  @override
+  String get viewLayoutGrid => 'Grid';
+
+  @override
   String get settingsNotificationsTitle => 'Meddelelser';
 
   @override
