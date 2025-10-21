@@ -64,13 +64,14 @@ class _TemplateSelectDialogState extends State<TemplateSelect> {
                 ),
               ),
               contentPadding: EdgeInsets.zero,
-              trailing: IconButton(
-                icon: const Icon(Icons.add_rounded),
-                onPressed: () {
-                  widget.onTemplatesSelected(template);
-                  Navigator.of(context).pop();
-                },
+              trailing: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: const Icon(Icons.add_rounded),
               ),
+              onTap: () {
+                widget.onTemplatesSelected(template);
+                Navigator.of(context).pop();
+              },
             ),
           );
         },
