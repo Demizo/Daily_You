@@ -105,27 +105,16 @@ class EntryDayCell extends StatelessWidget {
     } else {
       // No entry
       return GestureDetector(
-        child: isSameDay(date, DateTime.now())
-            ? FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      '${date.day}',
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.primary),
-                    ),
-                    Icon(Icons.add_rounded,
-                        color: Theme.of(context).colorScheme.primary),
-                  ],
-                ),
-              )
-            : Center(
-                child: Text('${date.day}', style: TextStyle(fontSize: 16)),
-              ),
+        behavior: HitTestBehavior.translucent,
+        child: Center(
+          child: Text('${date.day}',
+              style: isSameDay(date, DateTime.now())
+                  ? TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.primary)
+                  : TextStyle(fontSize: 16)),
+        ),
         onTap: () async {
           await Navigator.of(context).push(MaterialPageRoute(
             allowSnapshotting: false,
