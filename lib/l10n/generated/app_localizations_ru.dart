@@ -248,6 +248,18 @@ class AppLocalizationsRu extends AppLocalizations {
   String get moodIconPrompt => 'Введите значок (емодзи)';
 
   @override
+  String get settingsFlashbacksViewLayout => 'Flashbacks View Layout';
+
+  @override
+  String get settingsGalleryViewLayout => 'Gallery View Layout';
+
+  @override
+  String get viewLayoutList => 'List';
+
+  @override
+  String get viewLayoutGrid => 'Grid';
+
+  @override
   String get settingsNotificationsTitle => 'Уведомления';
 
   @override
