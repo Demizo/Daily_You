@@ -175,11 +175,13 @@ class _GalleryPageState extends State<GalleryPage> {
                           : SizedBox.shrink(
                               key: ValueKey('empty')), // Empty widget
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: Text(AppLocalizations.of(context)!
-                          .logCount(statsProvider.filteredEntries.length)),
-                    ),
+                    if (statsProvider.filteredEntries.length !=
+                        statsProvider.entries.length)
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: Text(AppLocalizations.of(context)!
+                            .logCount(statsProvider.filteredEntries.length)),
+                      ),
                     IconButton(
                         icon: const Icon(Icons.sort_rounded),
                         onPressed: () => _showSortSelectionPopup(context)),
