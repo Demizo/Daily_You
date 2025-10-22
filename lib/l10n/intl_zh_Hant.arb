@@ -274,5 +274,13 @@
     "settingsSecurityBiometricUnlock": "生物辨識解鎖",
     "@settingsSecurityBiometricUnlock": {},
     "unlockAppPrompt": "解鎖應用程式",
-    "@unlockAppPrompt": {}
+    "@unlockAppPrompt": {},
+    "viewLayoutList": "清單",
+    "@viewLayoutList": {},
+    "viewLayoutGrid": "網格",
+    "@viewLayoutGrid": {},
+    "settingsFlashbacksViewLayout": "往日重現檢視佈局",
+    "@settingsFlashbacksViewLayout": {},
+    "settingsGalleryViewLayout": "紀錄檢視佈局",
+    "@settingsGalleryViewLayout": {}
 }
