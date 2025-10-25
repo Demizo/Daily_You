@@ -1,4 +1,3 @@
-import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:daily_you/widgets/edit_toolbar.dart';
 import 'package:daily_you/widgets/entry_text_edit.dart';
@@ -47,13 +46,13 @@ class _EditTemplateState extends State<EditTemplate> {
 
   Future<void> _saveTemplate() async {
     if (widget.template == null) {
-      await EntriesDatabase.instance.createTemplate(Template(
+      await Template.create(Template(
           name: _nameController.text,
           text: templateText,
           timeCreate: DateTime.now(),
           timeModified: DateTime.now()));
     } else {
-      await EntriesDatabase.instance.updateTemplate(widget.template!.copy(
+      await Template.update(widget.template!.copy(
           name: _nameController.text,
           text: templateText,
           timeModified: DateTime.now()));

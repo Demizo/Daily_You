@@ -1,5 +1,4 @@
 import 'package:daily_you/config_provider.dart';
-import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:daily_you/widgets/settings_dropdown.dart';
 import 'package:daily_you/widgets/settings_icon_action.dart';
@@ -26,7 +25,7 @@ class _TemplateSettingsState extends State<TemplateSettings> {
   }
 
   Future<void> _loadTemplates() async {
-    List<Template> templates = await EntriesDatabase.instance.getAllTemplates();
+    List<Template> templates = await Template.getAll();
     setState(() {
       _templates = templates;
       isLoading = false;

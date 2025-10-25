@@ -1,5 +1,4 @@
 import 'package:daily_you/config_provider.dart';
-import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:daily_you/widgets/edit_template.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +23,7 @@ class _TemplateManagementDialogState extends State<TemplateManager> {
   }
 
   Future<void> _loadTemplates() async {
-    List<Template> templates = await EntriesDatabase.instance.getAllTemplates();
+    List<Template> templates = await Template.getAll();
     setState(() {
       _templates = templates;
     });
@@ -73,7 +72,7 @@ class _TemplateManagementDialogState extends State<TemplateManager> {
                 IconButton(
                   icon: const Icon(Icons.delete),
                   onPressed: () async {
-                    await EntriesDatabase.instance.deleteTemplate(template.id!);
+                    await Template.delete(template.id!);
                     if (ConfigProvider.instance
                             .get(ConfigKey.defaultTemplate) ==
                         template.id!) {
