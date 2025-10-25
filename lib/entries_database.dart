@@ -22,6 +22,7 @@ class EntriesDatabase {
   static final EntriesDatabase instance = EntriesDatabase._init();
 
   static Database? _database;
+  Database? get database => _database;
 
   final FileBytesCache imageCache =
       FileBytesCache(maxCacheSize: 10 * 1024 * 1024);
@@ -140,69 +141,6 @@ DROP TABLE old_entries;
     ''');
       });
     }
-  }
-
-  // Template Methods
-
-  Future<Template> createTemplate(Template template) async {
-    final db = _database!;
-
-    final id = await db.insert(templatesTable, template.toJson());
-    if (usingExternalDb()) await updateExternalDatabase();
-    return template.copy(id: id);
-  }
-
-  Future<Template?> getTemplate(int id) async {
-    final db = _database!;
-
-    final maps = await db.query(
-      templatesTable,
-      columns: TemplatesFields.values,
-      where: '${TemplatesFields.id} = ?',
-      whereArgs: [id],
-    );
-
-    if (maps.isNotEmpty) {
-      return Template.fromJson(maps.first);
-    } else {
-      return null;
-    }
-  }
-
-  Future<List<Template>> getAllTemplates() async {
-    final db = _database!;
-
-    final result =
-        await db.query(templatesTable, orderBy: '${TemplatesFields.name} ASC');
-
-    return result.map((json) => Template.fromJson(json)).toList();
-  }
-
-  Future<int> updateTemplate(Template template) async {
-    final db = _database!;
-
-    final id = await db.update(
-      templatesTable,
-      template.toJson(),
-      where: '${TemplatesFields.id} = ?',
-      whereArgs: [template.id],
-    );
-
-    if (usingExternalDb()) await updateExternalDatabase();
-    return id;
-  }
-
-  Future<int> deleteTemplate(int id) async {
-    final db = _database!;
-
-    final removedId = await db.delete(
-      templatesTable,
-      where: '${TemplatesFields.id} = ?',
-      whereArgs: [id],
-    );
-
-    if (usingExternalDb()) await updateExternalDatabase();
-    return removedId;
   }
 
   // Image Methods
@@ -378,7 +316,7 @@ DROP TABLE old_entries;
     var defaultTemplateId =
         ConfigProvider.instance.get(ConfigKey.defaultTemplate);
     if (defaultTemplateId != -1) {
-      var defaultTemplate = await getTemplate(defaultTemplateId);
+      var defaultTemplate = await Template.get(defaultTemplateId);
       if (defaultTemplate != null) {
         text = defaultTemplate.text ?? "";
       }

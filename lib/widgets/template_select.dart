@@ -1,4 +1,3 @@
-import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:daily_you/widgets/template_manager.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +22,7 @@ class _TemplateSelectDialogState extends State<TemplateSelect> {
   }
 
   Future<void> _loadTemplates() async {
-    List<Template> templates = await EntriesDatabase.instance.getAllTemplates();
+    List<Template> templates = await Template.getAll();
     setState(() {
       _templates = templates;
     });
