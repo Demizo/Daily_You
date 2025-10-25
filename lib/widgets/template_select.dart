@@ -29,15 +29,13 @@ class _TemplateSelectDialogState extends State<TemplateSelect> {
     });
   }
 
-  void _showTemplateManagementPopup(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return TemplateManager(
-          onTemplatesUpdated: _loadTemplates,
-        );
-      },
-    );
+  void _showTemplateManagementPopup(BuildContext context) async {
+    await Navigator.of(context).push(MaterialPageRoute(
+        allowSnapshotting: false,
+        fullscreenDialog: true,
+        builder: (context) => TemplateManager(
+              onTemplatesUpdated: _loadTemplates,
+            )));
   }
 
   Widget _buildTemplatesList() {
@@ -54,25 +52,23 @@ class _TemplateSelectDialogState extends State<TemplateSelect> {
         itemCount: _templates.length,
         itemBuilder: (context, index) {
           final template = _templates[index];
-          return Card(
-            child: ListTile(
-              title: Padding(
-                padding: const EdgeInsets.only(left: 8.0),
-                child: Text(
-                  template.name,
-                  overflow: TextOverflow.ellipsis,
-                ),
+          return ListTile(
+            title: Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: Text(
+                template.name,
+                overflow: TextOverflow.ellipsis,
               ),
-              contentPadding: EdgeInsets.zero,
-              trailing: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: const Icon(Icons.add_rounded),
-              ),
-              onTap: () {
-                widget.onTemplatesSelected(template);
-                Navigator.of(context).pop();
-              },
             ),
+            contentPadding: EdgeInsets.zero,
+            trailing: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: const Icon(Icons.add_rounded),
+            ),
+            onTap: () {
+              widget.onTemplatesSelected(template);
+              Navigator.of(context).pop();
+            },
           );
         },
       );
