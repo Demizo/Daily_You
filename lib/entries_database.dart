@@ -173,7 +173,7 @@ DROP TABLE old_entries;
     final db = _database!;
 
     final result =
-        await db.query(templatesTable, orderBy: '${TemplatesFields.name} DESC');
+        await db.query(templatesTable, orderBy: '${TemplatesFields.name} ASC');
 
     return result.map((json) => Template.fromJson(json)).toList();
   }
