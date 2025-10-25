@@ -4,12 +4,12 @@ import 'package:daily_you/widgets/mood_icon.dart';
 
 class EntryMoodPicker extends StatefulWidget {
   final int? moodValue;
-  final String date;
+  final List<Widget> actions;
   final ValueChanged<int?> onChangedMood;
 
   const EntryMoodPicker(
       {super.key,
-      required this.date,
+      required this.actions,
       this.moodValue,
       required this.onChangedMood});
 
@@ -55,15 +55,10 @@ class _EntryMoodPickerState extends State<EntryMoodPicker> {
   Widget build(BuildContext context) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.only(bottom: 8.0),
         child: Column(children: [
           Row(
-            children: [
-              Text(
-                widget.date,
-                style: const TextStyle(fontSize: 16),
-              ),
-            ],
+            children: widget.actions,
           ),
           const SizedBox(
             height: 8,
