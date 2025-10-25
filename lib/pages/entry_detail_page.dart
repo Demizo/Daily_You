@@ -84,11 +84,28 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
           return IconButton(
               icon: const Icon(Icons.edit_rounded),
               onPressed: () async {
+                final editedEntryId = entry.id;
                 await Navigator.of(context).push(MaterialPageRoute(
                   allowSnapshotting: false,
                   builder: (context) =>
                       AddEditEntryPage(entry: entry, images: images),
                 ));
+
+                // Get the new list of entries since the date of the edited entry
+                // may have changed.
+                var updatedEntries = widget.filtered
+                    ? statsProvider.filteredEntries
+                    : statsProvider.entries;
+
+                // Find new index of the same entry by ID
+                final newIndex =
+                    updatedEntries.indexWhere((e) => e.id == editedEntryId);
+
+                // Jump to the new index if found
+                if (newIndex != -1 && mounted) {
+                  _pageController.jumpToPage(newIndex);
+                  _currentPageNotifier.value = newIndex;
+                }
               });
         });
   }

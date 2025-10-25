@@ -9,12 +9,14 @@ import 'package:daily_you/widgets/edit_toolbar.dart';
 import 'package:daily_you/widgets/local_image_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/widgets/entry_image_picker.dart';
 import 'package:daily_you/widgets/entry_text_edit.dart';
 import 'package:daily_you/widgets/entry_mood_picker.dart';
+import 'package:provider/provider.dart';
 
 class AddEditEntryPage extends StatefulWidget {
   final Entry? entry;
@@ -41,6 +43,8 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   String text = "";
   int? _lastMood;
   int? mood;
+  DateTime? _lastEntryDate;
+  DateTime? entryDate;
   late List<EntryImage> currentImages;
   bool _loadingEntry = true;
   final ScrollController _scrollController = ScrollController();
@@ -70,6 +74,8 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     id = _entry.id ?? -1;
     _lastMood = _entry.mood;
     mood = _entry.mood;
+    _lastEntryDate = _entry.timeCreate;
+    entryDate = _entry.timeCreate;
     _lastText = _entry.text;
     text = _entry.text;
     _textEditingController.addListener(() {
@@ -218,9 +224,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                         ),
                       StatefulBuilder(
                         builder: (context, setState) => EntryMoodPicker(
-                            date: DateFormat.yMMMEd(
-                                    TimeManager.currentLocale(context))
-                                .format(_entry.timeCreate),
+                            actions: [_changeDateButton()],
                             moodValue: mood,
                             onChangedMood: (mood) {
                               setState(() => this.mood = mood);
@@ -256,6 +260,46 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
         icon: const Icon(Icons.delete),
         onPressed: () => _showDeleteEntryPopup(),
       );
+
+  Widget _changeDateButton() {
+    final theme = Theme.of(context);
+    final statsProvider = Provider.of<StatsProvider>(context);
+
+    return TextButton.icon(
+        // icon: Icon(Icons.edit_rounded),
+        icon: SvgPicture.asset(
+          'assets/icons/calendar_event.svg',
+          colorFilter:
+              ColorFilter.mode(theme.colorScheme.primary, BlendMode.srcIn),
+          width: 24,
+          height: 24,
+        ),
+        style: ElevatedButton.styleFrom(visualDensity: VisualDensity.compact),
+        onPressed: () async {
+          DateTime? pickedDate = await showDatePicker(
+            selectableDayPredicate: (date) =>
+                statsProvider.getEntryForDate(date) == null ||
+                TimeManager.isSameDay(date, entryDate!),
+            initialDatePickerMode: DatePickerMode.day,
+            context: context,
+            initialDate: entryDate,
+            firstDate: DateTime.utc(2000),
+            lastDate: DateTime.now(),
+          );
+          if (pickedDate != null) {
+            entryDate = entryDate!.copyWith(
+                year: pickedDate.year,
+                month: pickedDate.month,
+                day: pickedDate.day);
+            await _saveEntry();
+          }
+        },
+        label: Text(
+          DateFormat.yMMMEd(TimeManager.currentLocale(context))
+              .format(entryDate!),
+          style: TextStyle(fontSize: 16),
+        ));
+  }
 
   Widget _buildDraggableListItem(int index) {
     bool isHovered = false;
@@ -398,6 +442,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
       final updatedEntry = _entry.copy(
         text: text,
         mood: mood,
+        timeCreate: entryDate,
         timeModified: DateTime.now(),
       );
 
@@ -405,10 +450,13 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
           TimeManager.isSameDay(DateTime.now(), updatedEntry.timeCreate)) {
         await NotificationManager.instance.dismissReminderNotification();
       }
-      // Update if the text or mood has changed
-      if (updatedEntry.text != _lastText || updatedEntry.mood != _lastMood) {
+      // Update if the text, mood, or date has changed
+      if (updatedEntry.text != _lastText ||
+          updatedEntry.mood != _lastMood ||
+          updatedEntry.timeCreate != _lastEntryDate) {
         _lastText = updatedEntry.text;
         _lastMood = updatedEntry.mood;
+        _lastEntryDate = updatedEntry.timeCreate;
         await EntriesDatabase.instance.updateEntry(updatedEntry);
       }
       // Images will update if they changed
