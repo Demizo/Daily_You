@@ -33,15 +33,13 @@ class _TemplateSettingsState extends State<TemplateSettings> {
     });
   }
 
-  void _showTemplateManagementPopup(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return TemplateManager(
-          onTemplatesUpdated: _loadTemplates,
-        );
-      },
-    );
+  void _showTemplateManagementPopup(BuildContext context) async {
+    await Navigator.of(context).push(MaterialPageRoute(
+        allowSnapshotting: false,
+        fullscreenDialog: true,
+        builder: (context) => TemplateManager(
+              onTemplatesUpdated: _loadTemplates,
+            )));
   }
 
   List<DropdownMenuItem<int>> _buildDefaultTemplateDropdownItems(
