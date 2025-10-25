@@ -41,7 +41,7 @@ class EntriesDatabase {
     final dbPath = await getInternalDbPath();
 
     _database = await openDatabase(dbPath,
-        version: 3, onCreate: _createDB, onUpgrade: _onUpgrade);
+        version: 4, onCreate: _createDB, onUpgrade: _onUpgrade);
     return _database != null;
   }
 
@@ -52,6 +52,7 @@ CREATE TABLE $entriesTable (
   ${EntryFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   ${EntryFields.text} TEXT NOT NULL,
   ${EntryFields.mood} INTEGER,
+  ${EntryFields.time} DATETIME NOT NULL DEFAULT (DATETIME('now')),
   ${EntryFields.timeCreate} DATETIME NOT NULL DEFAULT (DATETIME('now')),
   ${EntryFields.timeModified} DATETIME NOT NULL DEFAULT (DATETIME('now'))
 )
@@ -131,6 +132,38 @@ CREATE TABLE $entriesTable (
 -- Step 4: Copy data from the old entries table to the new one
 INSERT INTO $entriesTable (${EntryFields.id}, ${EntryFields.text}, ${EntryFields.mood}, ${EntryFields.timeCreate}, ${EntryFields.timeModified})
 SELECT ${EntryFields.id}, ${EntryFields.text}, ${EntryFields.mood}, ${EntryFields.timeCreate}, ${EntryFields.timeModified}
+FROM old_entries;
+    ''');
+
+        await txn.execute('''
+-- Step 5: Drop the old entries table
+DROP TABLE old_entries;
+    ''');
+      });
+    }
+    if (oldVersion <= 3) {
+      await db.transaction((txn) async {
+        await txn.execute('''
+-- Step 2: Rename the old entries table
+ALTER TABLE $entriesTable RENAME TO old_entries;
+    ''');
+
+        await txn.execute('''
+-- Step 3: Create a new entries table without the imgPath field
+CREATE TABLE $entriesTable (
+  ${EntryFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  ${EntryFields.text} TEXT NOT NULL,
+  ${EntryFields.mood} INTEGER,
+  ${EntryFields.time} DATETIME NOT NULL DEFAULT (DATETIME('now')),
+  ${EntryFields.timeCreate} DATETIME NOT NULL DEFAULT (DATETIME('now')),
+  ${EntryFields.timeModified} DATETIME NOT NULL DEFAULT (DATETIME('now'))
+);
+    ''');
+
+        await txn.execute('''
+-- Step 4: Copy data from the old entries table to the new one
+INSERT INTO $entriesTable (${EntryFields.id}, ${EntryFields.text}, ${EntryFields.mood}, ${EntryFields.time}, ${EntryFields.timeCreate}, ${EntryFields.timeModified})
+SELECT ${EntryFields.id}, ${EntryFields.text}, ${EntryFields.mood}, ${EntryFields.timeCreate}, ${EntryFields.timeCreate}, ${EntryFields.timeModified}
 FROM old_entries;
     ''');
 
@@ -372,7 +405,7 @@ DROP TABLE old_entries;
     return entry.copy(id: id);
   }
 
-  Future<Entry> createNewEntry(DateTime? timeCreate) async {
+  Future<Entry> createNewEntry(DateTime? time) async {
     var text = "";
 
     var defaultTemplateId =
@@ -387,12 +420,13 @@ DROP TABLE old_entries;
     final newEntry = Entry(
       text: text,
       mood: null,
-      timeCreate: timeCreate ?? DateTime.now(),
+      time: time ?? DateTime.now(),
+      timeCreate: DateTime.now(),
       timeModified: DateTime.now(),
     );
 
     if (Platform.isAndroid &&
-        TimeManager.isSameDay(DateTime.now(), newEntry.timeCreate)) {
+        TimeManager.isSameDay(DateTime.now(), newEntry.time)) {
       await NotificationManager.instance.dismissReminderNotification();
     }
 

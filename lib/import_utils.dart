@@ -50,6 +50,8 @@ class ImportUtils {
             Entry(
                 text: entry['text'],
                 mood: entry['mood'] as int?,
+                time: DateTime.parse(entry[
+                    'timeCreated']), // Old JSON exports did not have a independent `time` field
                 timeCreate: DateTime.parse(entry['timeCreated']),
                 timeModified: DateTime.parse(entry['timeModified'])),
             updateStatsAndSync: false);
@@ -129,6 +131,7 @@ class ImportUtils {
             Entry(
                 text: entry['textContent'],
                 mood: mood,
+                time: createdDateTime, // Use created time for entry time
                 timeCreate: createdDateTime,
                 timeModified: DateTime.now()),
             updateStatsAndSync: false);
@@ -176,12 +179,10 @@ class ImportUtils {
     for (var entry in jsonData) {
       // Skip non-mood entries
       if (entry['type'] == 'Mood') {
-        DateTime timeCreated = DateFormat("yyyy-MM-dd").parse(entry['date']);
-        DateTime timeModified = DateTime.now();
+        DateTime time = DateFormat("yyyy-MM-dd").parse(entry['date']);
 
         // Skip if the day already has an entry
-        if (await EntriesDatabase.instance.getEntryForDate(timeCreated) ==
-            null) {
+        if (await EntriesDatabase.instance.getEntryForDate(time) == null) {
           int avgMood =
               (entry['scores'] as List<dynamic>).reduce((a, b) => a + b) ~/
                   entry['scores'].length;
@@ -192,8 +193,9 @@ class ImportUtils {
               Entry(
                   text: entry['notes'] ?? '',
                   mood: mappedMood,
-                  timeCreate: timeCreated,
-                  timeModified: timeModified),
+                  time: time,
+                  timeCreate: time, // Use entry date as creation time
+                  timeModified: DateTime.now()),
               updateStatsAndSync: false);
         }
       }
