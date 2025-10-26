@@ -191,7 +191,7 @@
     "@licenseGPLv3": {},
     "settingsFlashbacksExcludeBadDays": "Excluir dias malos",
     "@settingsFlashbacksExcludeBadDays": {},
-    "wordCount": "{count, plural, one{{count} palabra}\nother{{count}} palabras}}",
+    "wordCount": "{count, plural, one{{count} palabra} other{{count} palabras}}",
     "@wordCount": {},
     "settingsShowFlashbacks": "Mostrar Recuerdos",
     "@settingsShowFlashbacks": {},
