@@ -24,7 +24,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get flashbacksTitle => 'Recuerdos';
 
   @override
-  String get settingsFlashbacksExcludeBadDays => 'Exclude bad days';
+  String get settingsFlashbacksExcludeBadDays => 'Excluir dias malos';
 
   @override
   String get flaskbacksEmpty => 'Aún no hay recuerdos…';
@@ -90,8 +90,8 @@ class AppLocalizationsEs extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count words',
-      one: '$count word',
+      other: '$count palabras',
+      one: '$count palabra',
     );
     return '$_temp0';
   }
@@ -234,7 +234,7 @@ class AppLocalizationsEs extends AppLocalizations {
       'Mostrar Barra de Herramientas Markdown';
 
   @override
-  String get settingsShowFlashbacks => 'Show Flashbacks';
+  String get settingsShowFlashbacks => 'Mostrar Recuerdos';
 
   @override
   String get settingsChangeMoodIcons => 'Cambiar Iconos de Estado de Ánimo';
@@ -259,11 +259,11 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get settingsDailyReminderOnboarding =>
-      'Enable daily reminders to keep yourself consistent!';
+      '¡Activa recordatorios diarios para mantenerte activo!';
 
   @override
   String get settingsNotificationsPermissionsPrompt =>
-      'The \'schedule alarms\' permission will be requested to send the reminder at a random moment or at your preferred time.';
+      'Los permisos de \"alarmas de planificacion\" seran solicitados para enviarte un recordatorio en un momento aleatorio de tu preferencia.';
 
   @override
   String get settingsDailyReminderTitle => 'Recordatorio diario';
@@ -283,14 +283,15 @@ class AppLocalizationsEs extends AppLocalizations {
       'Elija una hora fija para el recordatorio';
 
   @override
-  String get settingsAlwaysSendReminderTitle => 'Always Send Reminder';
+  String get settingsAlwaysSendReminderTitle => 'Siempre enviar recordatorio';
 
   @override
   String get settingsAlwaysSendReminderDescription =>
-      'Send reminder even if a log was already started';
+      'Enviar recordatorio aunque ya se haya hecho un registro del dia';
 
   @override
-  String get settingsCustomizeNotificationTitle => 'Customize Notifications';
+  String get settingsCustomizeNotificationTitle =>
+      'Personalizar notificaciones';
 
   @override
   String get settingsTemplatesTitle => 'Plantillas';
@@ -356,51 +357,51 @@ class AppLocalizationsEs extends AppLocalizations {
       '¡No se pudo cambiar la carpeta de imágenes!';
 
   @override
-  String get backupErrorDescription => 'Failed to create backup!';
+  String get backupErrorDescription => '¡Error al intentar crear un resplado!';
 
   @override
-  String get restoreErrorDescription => 'Failed to restore backup!';
+  String get restoreErrorDescription => '¡Error en restaurar respaldo!';
 
   @override
-  String get settingsBackupRestoreTitle => 'Backup & Restore';
+  String get settingsBackupRestoreTitle => 'Respaldo y Restauracion';
 
   @override
-  String get settingsBackup => 'Backup';
+  String get settingsBackup => 'Respaldo';
 
   @override
-  String get settingsRestore => 'Restore';
+  String get settingsRestore => 'Restauracion';
 
   @override
   String get settingsRestorePromptDescription =>
-      'Restoring a backup will overwrite your existing data!';
+      '¡Restaurar un respaldo hara sobreescritura en tus datos ya existente!';
 
   @override
   String tranferStatus(Object percent) {
-    return 'Transferring… $percent%';
+    return 'Transfiriendo... $percent%';
   }
 
   @override
   String creatingBackupStatus(Object percent) {
-    return 'Creating Backup… $percent%';
+    return 'Creando Respaldo... $percent%';
   }
 
   @override
   String restoringBackupStatus(Object percent) {
-    return 'Restoring Backup… $percent%';
+    return 'Restaurando Respaldo… $percent%';
   }
 
   @override
-  String get cleanUpStatus => 'Cleaning Up…';
+  String get cleanUpStatus => 'Restableciendo…';
 
   @override
   String get settingsExport => 'Exportar';
 
   @override
-  String get settingsExportToAnotherFormat => 'Export To Another Format';
+  String get settingsExportToAnotherFormat => 'Exportar A Otro Formato';
 
   @override
   String get settingsExportFormatDescription =>
-      'This should not be used as a backup!';
+      '¡Esto no deberia ser usado como un\nrespaldo!';
 
   @override
   String get exportLogs => 'Exportar Registros';
@@ -412,14 +413,14 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsImport => 'Importar';
 
   @override
-  String get settingsImportFromAnotherApp => 'Import From Another App';
+  String get settingsImportFromAnotherApp => 'Importar de otra aplicacion';
 
   @override
   String get settingsTranslateCallToAction =>
-      'Everyone should have access to a journal!';
+      'Todos deberian tener acceso a el diario!';
 
   @override
-  String get settingsHelpTranslate => 'Help Translate';
+  String get settingsHelpTranslate => 'Ayuda a traducir';
 
   @override
   String get importLogs => 'Importar Registros';
@@ -432,7 +433,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get logFormatDescription =>
-      'Another app\'s format may not support all features. Please report any issues since third party formats may change at any time. This will not impact existing logs!';
+      'Otros formatos de aplicaciones pueden no soportar todas las caracteristicas. Por favor reporta cualquier problema, ya que los formatos de terceros pueden cambiar con el tiempo. Esto no afectara a los registros ya existentes';
 
   @override
   String get formatDailyYouJson => 'Daily You (JSON)';
@@ -453,7 +454,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get formatPixels => 'Pixels';
 
   @override
-  String get formatMarkdown => 'Markdown';
+  String get formatMarkdown => 'Reduccion';
 
   @override
   String get settingsDeleteAllLogsTitle => 'Eliminar Todos los Registros';
@@ -464,56 +465,58 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String settingsDeleteAllLogsPrompt(Object prompt) {
-    return 'Enter \'$prompt\' to confirm. This cannot be undone!';
+    return 'Escribe \'$prompt\'para confirmar. ¡Esto no se puede desahacer!';
   }
 
   @override
-  String get settingsLanguageTitle => 'Language';
+  String get settingsLanguageTitle => 'Lenguaje';
 
   @override
-  String get settingsAppLanguageTitle => 'App Language';
+  String get settingsAppLanguageTitle => 'Lenguaje de aplicacion';
 
   @override
-  String get settingsOverrideAppLanguageTitle => 'Override App Language';
+  String get settingsOverrideAppLanguageTitle =>
+      'Anular lenguaje de aplicacion';
 
   @override
-  String get settingsSecurityTitle => 'Security';
+  String get settingsSecurityTitle => 'Seguridad';
 
   @override
-  String get settingsSecurityRequirePassword => 'Require Password';
+  String get settingsSecurityRequirePassword => 'Requiere Contraseña';
 
   @override
-  String get settingsSecurityEnterPassword => 'Enter Password';
+  String get settingsSecurityEnterPassword => 'Introduzca la contraseña';
 
   @override
-  String get settingsSecuritySetPassword => 'Set Password';
+  String get settingsSecuritySetPassword => 'Establecer contraseña';
 
   @override
-  String get settingsSecurityChangePassword => 'Change Password';
+  String get settingsSecurityChangePassword => 'Cambiar contraseña';
 
   @override
-  String get settingsSecurityPassword => 'Password';
+  String get settingsSecurityPassword => 'Contraseña';
 
   @override
-  String get settingsSecurityConfirmPassword => 'Confirm Password';
+  String get settingsSecurityConfirmPassword => 'Confirmar contraseña';
 
   @override
-  String get settingsSecurityOldPassword => 'Old Password';
+  String get settingsSecurityOldPassword => 'Contraseña antigua';
 
   @override
-  String get settingsSecurityIncorrectPassword => 'Incorrect Password';
+  String get settingsSecurityIncorrectPassword => 'Contraseña incorrecta';
 
   @override
-  String get settingsSecurityPasswordsDoNotMatch => 'Passwords do not match';
+  String get settingsSecurityPasswordsDoNotMatch =>
+      'Las contraseñas no coinciden';
 
   @override
-  String get requiredPrompt => 'Required';
+  String get requiredPrompt => 'Necesario';
 
   @override
-  String get settingsSecurityBiometricUnlock => 'Biometric Unlock';
+  String get settingsSecurityBiometricUnlock => 'Desbloqueo biometrico';
 
   @override
-  String get unlockAppPrompt => 'Unlock the app';
+  String get unlockAppPrompt => 'Desbloquea la aplicacion';
 
   @override
   String get settingsAboutTitle => 'Acerca de';
@@ -531,10 +534,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsSourceCode => 'Código Fuente';
 
   @override
-  String get settingsMadeWithLove => 'Made with ❤️';
+  String get settingsMadeWithLove => 'Hecho con 💚';
 
   @override
-  String get settingsConsiderSupporting => 'consider supporting';
+  String get settingsConsiderSupporting => 'Considera en apoyar';
 
   @override
   String get tagMoodTitle => 'Ánimo';

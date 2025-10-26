@@ -248,16 +248,16 @@ class AppLocalizationsUk extends AppLocalizations {
   String get moodIconPrompt => 'Введіть іконку (емоджи)';
 
   @override
-  String get settingsFlashbacksViewLayout => 'Flashbacks View Layout';
+  String get settingsFlashbacksViewLayout => 'Макет перегляду флешбеків';
 
   @override
-  String get settingsGalleryViewLayout => 'Gallery View Layout';
+  String get settingsGalleryViewLayout => 'Макет перегляду галереї';
 
   @override
-  String get viewLayoutList => 'List';
+  String get viewLayoutList => 'Список';
 
   @override
-  String get viewLayoutGrid => 'Grid';
+  String get viewLayoutGrid => 'Сітка';
 
   @override
   String get settingsNotificationsTitle => 'Нагадування';

@@ -762,6 +762,18 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get moodIconPrompt => '輸入圖示';
 
   @override
+  String get settingsFlashbacksViewLayout => '往日重現檢視佈局';
+
+  @override
+  String get settingsGalleryViewLayout => '紀錄檢視佈局';
+
+  @override
+  String get viewLayoutList => '清單';
+
+  @override
+  String get viewLayoutGrid => '網格';
+
+  @override
   String get settingsNotificationsTitle => '通知';
 
   @override
