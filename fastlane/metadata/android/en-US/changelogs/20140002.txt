@@ -1,0 +1,10 @@
+Daily You v2.14.0 has arrived! Time to smoothen rough edges:
+
+• Added the ability to change a log's date after creation
+• Updated the template selection and management interfaces
+• Moved the flashback and gallery view layouts to settings
+• Removed visual clutter from the search bar
+• Improved tap detection on the calendar
+• Minor UI fixes and improvements
+• Updated translations
+
