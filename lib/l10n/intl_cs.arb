@@ -246,5 +246,13 @@
     "formatMarkdown": "Markdown",
     "@formatMarkdown": {},
     "noTemplateTitle": "Žádná",
-    "@noTemplateTitle": {}
+    "@noTemplateTitle": {},
+    "viewLayoutGrid": "Mřížka",
+    "@viewLayoutGrid": {},
+    "settingsFlashbacksViewLayout": "Zobrazení rozložení vzpomínek",
+    "@settingsFlashbacksViewLayout": {},
+    "settingsGalleryViewLayout": "Rozložení zobrazení galerie",
+    "@settingsGalleryViewLayout": {},
+    "viewLayoutList": "Seznam",
+    "@viewLayoutList": {}
 }
