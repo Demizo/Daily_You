@@ -619,16 +619,27 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   }
 
   @override
+  String wordCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count palavras',
+      one: '$count palavra',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get noLogs => 'Sem Registros…';
 
   @override
   String get sortDateTitle => 'Data';
 
   @override
-  String get sortOrderAscendingTitle => 'Ascendente';
+  String get sortOrderAscendingTitle => 'Crescente';
 
   @override
-  String get sortOrderDescendingTitle => 'Descendente';
+  String get sortOrderDescendingTitle => 'Decrescente';
 
   @override
   String get pageStatisticsTitle => 'Estatísticas';
@@ -763,6 +774,18 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get moodIconPrompt => 'Insira um ícone';
+
+  @override
+  String get settingsFlashbacksViewLayout => 'Visualização de Recordações';
+
+  @override
+  String get settingsGalleryViewLayout => 'Visualização da Galeria';
+
+  @override
+  String get viewLayoutList => 'Lista';
+
+  @override
+  String get viewLayoutGrid => 'Grade';
 
   @override
   String get settingsNotificationsTitle => 'Notificações';

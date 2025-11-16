@@ -242,13 +242,13 @@ class AppLocalizationsDe extends AppLocalizations {
   String get moodIconPrompt => 'Icon hier eingeben';
 
   @override
-  String get settingsFlashbacksViewLayout => 'Flashbacks View Layout';
+  String get settingsFlashbacksViewLayout => 'Layout der Rückblicksansicht';
 
   @override
-  String get settingsGalleryViewLayout => 'Gallery View Layout';
+  String get settingsGalleryViewLayout => 'Layout der Gallerie';
 
   @override
-  String get viewLayoutList => 'List';
+  String get viewLayoutList => 'Liste';
 
   @override
   String get viewLayoutGrid => 'Grid';

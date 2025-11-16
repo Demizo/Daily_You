@@ -37,17 +37,35 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String flashbackWeek(num count) {
-    return '';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count týdny před',
+      one: '$count týden před',
+    );
+    return '$_temp0';
   }
 
   @override
   String flashbackMonth(num count) {
-    return '';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count měsíců zpět',
+      one: '$count měsíců zpět',
+    );
+    return '$_temp0';
   }
 
   @override
   String flashbackYear(num count) {
-    return '';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count roky zpět',
+      one: '$count rok zpět',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -224,16 +242,16 @@ class AppLocalizationsCs extends AppLocalizations {
   String get moodIconPrompt => 'Vložte ikonu';
 
   @override
-  String get settingsFlashbacksViewLayout => 'Flashbacks View Layout';
+  String get settingsFlashbacksViewLayout => 'Zobrazení rozložení vzpomínek';
 
   @override
-  String get settingsGalleryViewLayout => 'Gallery View Layout';
+  String get settingsGalleryViewLayout => 'Rozložení zobrazení galerie';
 
   @override
-  String get viewLayoutList => 'List';
+  String get viewLayoutList => 'Seznam';
 
   @override
-  String get viewLayoutGrid => 'Grid';
+  String get viewLayoutGrid => 'Mřížka';
 
   @override
   String get settingsNotificationsTitle => 'Oznámení';
