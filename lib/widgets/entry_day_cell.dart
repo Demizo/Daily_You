@@ -14,8 +14,10 @@ import '../pages/entry_detail_page.dart';
 
 class EntryDayCell extends StatelessWidget {
   final DateTime date;
+  final DateTime currentMonth;
 
-  const EntryDayCell({super.key, required this.date});
+  const EntryDayCell(
+      {super.key, required this.date, required this.currentMonth});
 
   @override
   Widget build(BuildContext context) {
@@ -104,27 +106,35 @@ class EntryDayCell extends StatelessWidget {
       }
     } else {
       // No entry
-      return GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        child: Center(
+      if (TimeManager.isSameMonth(date, currentMonth)) {
+        return GestureDetector(
+          behavior: HitTestBehavior.translucent,
+          child: Center(
+            child: Text('${date.day}',
+                style: isSameDay(date, DateTime.now())
+                    ? TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.primary)
+                    : TextStyle(fontSize: 16)),
+          ),
+          onTap: () async {
+            await Navigator.of(context).push(MaterialPageRoute(
+              allowSnapshotting: false,
+              builder: (context) => AddEditEntryPage(
+                overrideCreateDate: TimeManager.currentTimeOnDifferentDate(date)
+                    .copyWith(isUtc: false),
+              ),
+            ));
+          },
+        );
+      } else {
+        return Center(
           child: Text('${date.day}',
-              style: isSameDay(date, DateTime.now())
-                  ? TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.primary)
-                  : TextStyle(fontSize: 16)),
-        ),
-        onTap: () async {
-          await Navigator.of(context).push(MaterialPageRoute(
-            allowSnapshotting: false,
-            builder: (context) => AddEditEntryPage(
-              overrideCreateDate: TimeManager.currentTimeOnDifferentDate(date)
-                  .copyWith(isUtc: false),
-            ),
-          ));
-        },
-      );
+              style: TextStyle(
+                  fontSize: 16, color: Theme.of(context).disabledColor)),
+        );
+      }
     }
   }
 }
