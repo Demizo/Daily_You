@@ -24,17 +24,21 @@ class EntryDayCell extends StatelessWidget {
     final statsProvider = Provider.of<StatsProvider>(context);
     final configProvider = Provider.of<ConfigProvider>(context);
 
-    var entries = statsProvider.entries
-        .where((entry) => isSameDay(entry.timeCreate, date))
-        .toList();
-    Entry? entry = entries.isNotEmpty ? entries.first : null;
+    // Skip entries outside of the current month
+    if (!TimeManager.isSameMonth(date, currentMonth) ||
+        date.isAfter(DateTime.now())) {
+      return Center(
+        child: Text('${date.day}',
+            style: TextStyle(
+                fontSize: 16, color: Theme.of(context).disabledColor)),
+      );
+    }
+
+    Entry? entry = statsProvider.getEntryForDate(date);
 
     EntryImage? image;
     if (entry != null) {
-      var images = statsProvider.images
-          .where((img) => img.entryId == entry.id!)
-          .toList();
-      image = images.isNotEmpty ? images.first : null;
+      image = statsProvider.getImagesForEntry(entry).firstOrNull;
     }
 
     bool showMood = configProvider.get(ConfigKey.calendarViewMode) == 'mood';
@@ -106,35 +110,27 @@ class EntryDayCell extends StatelessWidget {
       }
     } else {
       // No entry
-      if (TimeManager.isSameMonth(date, currentMonth)) {
-        return GestureDetector(
-          behavior: HitTestBehavior.translucent,
-          child: Center(
-            child: Text('${date.day}',
-                style: isSameDay(date, DateTime.now())
-                    ? TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.primary)
-                    : TextStyle(fontSize: 16)),
-          ),
-          onTap: () async {
-            await Navigator.of(context).push(MaterialPageRoute(
-              allowSnapshotting: false,
-              builder: (context) => AddEditEntryPage(
-                overrideCreateDate: TimeManager.currentTimeOnDifferentDate(date)
-                    .copyWith(isUtc: false),
-              ),
-            ));
-          },
-        );
-      } else {
-        return Center(
+      return GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        child: Center(
           child: Text('${date.day}',
-              style: TextStyle(
-                  fontSize: 16, color: Theme.of(context).disabledColor)),
-        );
-      }
+              style: isSameDay(date, DateTime.now())
+                  ? TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.primary)
+                  : TextStyle(fontSize: 16)),
+        ),
+        onTap: () async {
+          await Navigator.of(context).push(MaterialPageRoute(
+            allowSnapshotting: false,
+            builder: (context) => AddEditEntryPage(
+              overrideCreateDate: TimeManager.currentTimeOnDifferentDate(date)
+                  .copyWith(isUtc: false),
+            ),
+          ));
+        },
+      );
     }
   }
 }
