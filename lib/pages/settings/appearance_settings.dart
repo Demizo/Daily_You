@@ -223,22 +223,20 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
                 _showAccentColorPopup(themeProvider);
               },
             ),
-          SettingsDropdown<String>(
-              title: AppLocalizations.of(context)!.settingsFirstDayOfWeek,
-              value: configProvider.get(ConfigKey.startingDayOfWeek),
-              options: _buildFirstDayOfWeekDropdownItems(context),
-              onChanged: (String? newValue) async {
-                await configProvider.set(ConfigKey.startingDayOfWeek, newValue);
-                statsProvider.updateStats();
-              }),
-          SettingsToggle(
-              title: AppLocalizations.of(context)!.settingsShowMarkdownToolbar,
-              settingsKey: ConfigKey.useMarkdownToolbar,
-              onChanged: (value) {
-                configProvider.set(ConfigKey.useMarkdownToolbar, value);
-              }),
           Padding(
             padding: const EdgeInsets.only(bottom: 8.0),
+            child: SettingsDropdown<String>(
+                title: AppLocalizations.of(context)!.settingsFirstDayOfWeek,
+                value: configProvider.get(ConfigKey.startingDayOfWeek),
+                options: _buildFirstDayOfWeekDropdownItems(context),
+                onChanged: (String? newValue) async {
+                  await configProvider.set(
+                      ConfigKey.startingDayOfWeek, newValue);
+                  statsProvider.updateStats();
+                }),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: SettingsDropdown<String>(
                 title:
                     AppLocalizations.of(context)!.settingsFlashbacksViewLayout,
