@@ -236,6 +236,25 @@ class _StorageSettingsState extends State<StorageSettings> {
     Navigator.of(context).pop();
   }
 
+  String _displayNameFromUri(String uriString) {
+    try {
+      final decoded = Uri.decodeFull(uriString);
+
+      // Everything after the last slash
+      final lastSegment = decoded.split('/').last;
+
+      // Get the folder for directory URIs. URIs cannot be turned
+      // into full paths.
+      if (lastSegment.contains(':')) {
+        return lastSegment.split(':').last;
+      }
+      return lastSegment;
+    } catch (e) {
+      // Fall back to URI string when it cannot be parsed
+      return uriString;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final statsProvider = Provider.of<StatsProvider>(context);
@@ -301,8 +320,8 @@ class _StorageSettingsState extends State<StorageSettings> {
                           if (snapshot.hasData && snapshot.data != null) {
                             var folderText = snapshot.data!;
                             if (EntriesDatabase.instance.usingExternalDb()) {
-                              folderText =
-                                  configProvider.get(ConfigKey.externalDbUri);
+                              folderText = _displayNameFromUri(
+                                  configProvider.get(ConfigKey.externalDbUri));
                             }
                             return SettingsIconAction(
                               title: AppLocalizations.of(context)!
@@ -332,8 +351,8 @@ class _StorageSettingsState extends State<StorageSettings> {
                           if (snapshot.hasData && snapshot.data != null) {
                             var folderText = snapshot.data!;
                             if (EntriesDatabase.instance.usingExternalImg()) {
-                              folderText =
-                                  configProvider.get(ConfigKey.externalImgUri);
+                              folderText = _displayNameFromUri(
+                                  configProvider.get(ConfigKey.externalImgUri));
                             }
                             return SettingsIconAction(
                               title: AppLocalizations.of(context)!
