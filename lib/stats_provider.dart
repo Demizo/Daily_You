@@ -64,7 +64,7 @@ class StatsProvider with ChangeNotifier {
   SortOrder sortOrder = SortOrder.descending;
 
   List<Entry> filterEntries(List<Entry> entries) {
-    if (searchText.length > 2) {
+    if (searchText.isNotEmpty) {
       entries = entries
           .where((entry) =>
               entry.text.toLowerCase().contains(searchText.toLowerCase()))
