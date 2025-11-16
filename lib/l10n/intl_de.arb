@@ -272,5 +272,11 @@
     "settingsSecurityBiometricUnlock": "Biometrisch Entsperren",
     "@settingsSecurityBiometricUnlock": {},
     "unlockAppPrompt": "App entsperren",
-    "@unlockAppPrompt": {}
+    "@unlockAppPrompt": {},
+    "settingsFlashbacksViewLayout": "Layout der Rückblicksansicht",
+    "@settingsFlashbacksViewLayout": {},
+    "settingsGalleryViewLayout": "Layout der Gallerie",
+    "@settingsGalleryViewLayout": {},
+    "viewLayoutList": "Liste",
+    "@viewLayoutList": {}
 }
