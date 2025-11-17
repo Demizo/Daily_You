@@ -24,16 +24,6 @@ class EntryDayCell extends StatelessWidget {
     final statsProvider = Provider.of<StatsProvider>(context);
     final configProvider = Provider.of<ConfigProvider>(context);
 
-    // Skip entries outside of the current month
-    if (!TimeManager.isSameMonth(date, currentMonth) ||
-        date.isAfter(DateTime.now())) {
-      return Center(
-        child: Text('${date.day}',
-            style: TextStyle(
-                fontSize: 16, color: Theme.of(context).disabledColor)),
-      );
-    }
-
     Entry? entry = statsProvider.getEntryForDate(date);
 
     EntryImage? image;

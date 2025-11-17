@@ -24,6 +24,14 @@ class _EntryCalendarState extends State<EntryCalendar>
   @override
   bool get wantKeepAlive => true;
 
+  Widget _disabledDay(DateTime date) {
+    return Center(
+      child: Text('${date.day}',
+          style:
+              TextStyle(fontSize: 16, color: Theme.of(context).disabledColor)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -198,20 +206,18 @@ class _EntryCalendarState extends State<EntryCalendar>
           currentMonth: currentMonth,
         );
       }, todayBuilder: (context, date, currentMonth) {
-        return EntryDayCell(
-          date: date,
-          currentMonth: currentMonth,
-        );
+        if (TimeManager.isSameMonth(date, currentMonth)) {
+          return EntryDayCell(
+            date: date,
+            currentMonth: currentMonth,
+          );
+        } else {
+          return _disabledDay(date);
+        }
       }, disabledBuilder: (context, date, currentMonth) {
-        return EntryDayCell(
-          date: date,
-          currentMonth: currentMonth,
-        );
+        return _disabledDay(date);
       }, outsideBuilder: (context, date, currentMonth) {
-        return EntryDayCell(
-          date: date,
-          currentMonth: currentMonth,
-        );
+        return _disabledDay(date);
       }),
     );
   }
