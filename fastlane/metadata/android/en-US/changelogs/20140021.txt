@@ -1,0 +1,15 @@
+Daily You v2.14.2 has arrived! Time to smoothen rough edges:
+
+• Added the ability to change a log's date after creation
+• Updated the template selection and management interfaces
+• Moved the flashback and gallery view layouts to settings
+• Removed visual clutter from the search bar
+
+In this patch:
+
+• Prevent the current day's log from showing on the previous month
+• Properly display storage folder locations
+• Begin search after a single character
+• Remove redundant Show Markdown Toolbar setting
+• Minor UI fixes and improvements
+• Updated translations
