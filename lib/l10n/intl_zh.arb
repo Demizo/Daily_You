@@ -274,5 +274,13 @@
     "settingsSecurityBiometricUnlock": "生物识别解锁",
     "@settingsSecurityBiometricUnlock": {},
     "unlockAppPrompt": "解锁应用程序",
-    "@unlockAppPrompt": {}
+    "@unlockAppPrompt": {},
+    "settingsFlashbacksViewLayout": "闪回视图布局",
+    "@settingsFlashbacksViewLayout": {},
+    "settingsGalleryViewLayout": "图库视图布局",
+    "@settingsGalleryViewLayout": {},
+    "viewLayoutGrid": "网格",
+    "@viewLayoutGrid": {},
+    "viewLayoutList": "列表",
+    "@viewLayoutList": {}
 }
