@@ -258,5 +258,7 @@
     "settingsConsiderSupporting": "overweeg te ondersteunen",
     "@settingsConsiderSupporting": {},
     "tagMoodTitle": "Humeur",
-    "@tagMoodTitle": {}
+    "@tagMoodTitle": {},
+    "viewLayoutGrid": "Raster",
+    "@viewLayoutGrid": {}
 }
