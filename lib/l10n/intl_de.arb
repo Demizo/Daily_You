@@ -278,5 +278,9 @@
     "settingsGalleryViewLayout": "Layout der Gallerie",
     "@settingsGalleryViewLayout": {},
     "viewLayoutList": "Liste",
-    "@viewLayoutList": {}
+    "@viewLayoutList": {},
+    "viewLayoutGrid": "Raster",
+    "@viewLayoutGrid": {},
+    "settingsNotificationsPermissionsPrompt": "Die Berechtigung \"Planen von genauen Weckern\" wird angefragt, um eine Errinnerung an dich zu einer zufälligen Zeit oder zu deiner ausgewählten Zeit zu senden.",
+    "@settingsNotificationsPermissionsPrompt": {}
 }
