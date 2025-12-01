@@ -6,6 +6,7 @@ import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/stats_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/edit_toolbar.dart';
+import 'package:daily_you/widgets/images_provider.dart';
 import 'package:daily_you/widgets/local_image_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
@@ -477,7 +478,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   }
 
   Future _saveOrUpdateImage(int entryId) async {
-    final savedImages = StatsProvider.instance.getImagesForEntry(_entry);
+    final savedImages = ImagesProvider.instance.getImagesForEntry(_entry);
     // Add images
     for (EntryImage currentImage in currentImages) {
       currentImage.entryId = entryId;
@@ -499,9 +500,9 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
       }
     }
     // Set current images to match saved state. Note: the entry images
-    // are copied to avoid editing the originals in StatsProvider.
+    // are copied to avoid editing the originals in ImagesProvider.
     currentImages.clear();
-    for (var image in StatsProvider.instance.getImagesForEntry(_entry)) {
+    for (var image in ImagesProvider.instance.getImagesForEntry(_entry)) {
       currentImages.add(image.copy());
     }
   }

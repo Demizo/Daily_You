@@ -10,6 +10,7 @@ import 'package:daily_you/stats_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/entry_calendar.dart';
 import 'package:daily_you/widgets/hiding_widget.dart';
+import 'package:daily_you/widgets/images_provider.dart';
 import 'package:daily_you/widgets/large_entry_card_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
@@ -71,7 +72,7 @@ class _HomePageState extends State<HomePage> {
           Entry? entry =
               await EntriesDatabase.instance.getEntryForDate(targetDate);
           List<EntryImage> entryImages = entry != null
-              ? StatsProvider.instance.getImagesForEntry(entry)
+              ? ImagesProvider.instance.getImagesForEntry(entry)
               : [];
 
           await Navigator.of(context).push(
@@ -95,9 +96,10 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final configProvider = Provider.of<ConfigProvider>(context);
     final statsProvider = Provider.of<StatsProvider>(context);
+    final imagesProvider = Provider.of<ImagesProvider>(context);
     Entry? todayEntry = statsProvider.getEntryForToday();
     List<EntryImage> todayImages =
-        todayEntry != null ? statsProvider.getImagesForEntry(todayEntry) : [];
+        todayEntry != null ? imagesProvider.getImagesForEntry(todayEntry) : [];
 
     List<Flashback> flashbacks =
         FlashbackManager.getFlashbacks(context, statsProvider.entries);
@@ -214,14 +216,14 @@ class _HomePageState extends State<HomePage> {
                             ? LargeEntryCardWidget(
                                 title: flashback.title,
                                 entry: flashback.entry,
-                                images: StatsProvider.instance.images
+                                images: ImagesProvider.instance.images
                                     .where((img) =>
                                         img.entryId == flashback.entry.id!)
                                     .toList())
                             : EntryCardWidget(
                                 title: flashback.title,
                                 entry: flashback.entry,
-                                images: StatsProvider.instance.images
+                                images: ImagesProvider.instance.images
                                     .where((img) =>
                                         img.entryId == flashback.entry.id!)
                                     .toList(),

@@ -10,6 +10,7 @@ import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/pages/launch_page.dart';
 import 'package:daily_you/stats_provider.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:daily_you/widgets/images_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/layouts/mobile_scaffold.dart';
@@ -95,6 +96,9 @@ void main() async {
     ),
     ChangeNotifierProvider<StatsProvider>(
       create: (_) => StatsProvider.instance,
+    ),
+    ChangeNotifierProvider<ImagesProvider>(
+      create: (_) => ImagesProvider.instance,
     ),
     ChangeNotifierProvider<ConfigProvider>(
       create: (_) => ConfigProvider.instance,
