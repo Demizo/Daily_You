@@ -8,6 +8,7 @@ import 'package:daily_you/models/image.dart';
 import 'package:daily_you/stats_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/utils/zip_utils.dart';
+import 'package:daily_you/widgets/images_provider.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -50,7 +51,7 @@ class ExportUtils {
       final totalLogs = StatsProvider.instance.entries.length;
       int processedLogs = 0;
       for (Entry entry in StatsProvider.instance.entries) {
-        final images = StatsProvider.instance.getImagesForEntry(entry);
+        final images = ImagesProvider.instance.getImagesForEntry(entry);
         StringBuffer noteBody = StringBuffer();
 
         for (EntryImage image in images) {

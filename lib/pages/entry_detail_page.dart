@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/stats_provider.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:daily_you/widgets/images_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
@@ -77,9 +78,10 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
         valueListenable: _currentPageNotifier,
         builder: (context, currentIndex, child) {
           final statsProvider = Provider.of<StatsProvider>(context);
+          final imagesProvider = Provider.of<ImagesProvider>(context);
 
           var entry = entries[currentIndex];
-          var images = statsProvider.getImagesForEntry(entry);
+          var images = imagesProvider.getImagesForEntry(entry);
 
           return IconButton(
               icon: const Icon(Icons.edit_rounded),
@@ -115,9 +117,10 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
         valueListenable: _currentPageNotifier,
         builder: (context, currentIndex, child) {
           final statsProvider = Provider.of<StatsProvider>(context);
+          final imagesProvider = Provider.of<ImagesProvider>(context);
 
           var entry = entries[currentIndex];
-          var images = statsProvider.images
+          var images = imagesProvider.images
               .where((img) => img.entryId == entry.id!)
               .toList();
 
@@ -169,10 +172,11 @@ class EntryDetails extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final statsProvider = Provider.of<StatsProvider>(context);
+    final imagesProvider = Provider.of<ImagesProvider>(context);
 
     var entry = entries[index];
     var images =
-        statsProvider.images.where((img) => img.entryId == entry.id!).toList();
+        imagesProvider.images.where((img) => img.entryId == entry.id!).toList();
 
     return Center(
       child: Container(

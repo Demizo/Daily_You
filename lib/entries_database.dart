@@ -8,6 +8,7 @@ import 'package:daily_you/models/image.dart';
 import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/stats_provider.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:daily_you/widgets/images_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/template.dart';
@@ -177,7 +178,7 @@ DROP TABLE old_entries;
     final id = await db.insert(imagesTable, entryImage.toJson());
 
     if (updateStatsAndSync) {
-      await StatsProvider.instance.updateStats();
+      await ImagesProvider.instance.update();
       if (usingExternalDb()) await updateExternalDatabase();
     }
 
@@ -197,7 +198,7 @@ DROP TABLE old_entries;
       whereArgs: [entryImage.id],
     );
     if (updateData) {
-      await StatsProvider.instance.updateStats();
+      await ImagesProvider.instance.update();
       if (usingExternalDb()) await updateExternalDatabase();
     }
     return removedId;
@@ -212,7 +213,7 @@ DROP TABLE old_entries;
       where: '${EntryImageFields.id} = ?',
       whereArgs: [image.id],
     );
-    await StatsProvider.instance.updateStats();
+    await ImagesProvider.instance.update();
     if (usingExternalDb()) await updateExternalDatabase();
     return id;
   }

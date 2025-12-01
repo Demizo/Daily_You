@@ -51,7 +51,6 @@ class StatsProvider with ChangeNotifier {
   }
 
   List<Entry> entries = List.empty();
-  List<EntryImage> images = List.empty();
 
   StatsRange statsRange = StatsRange.month;
 
@@ -91,7 +90,6 @@ class StatsProvider with ChangeNotifier {
   Future<void> updateStats() async {
     entries = await EntriesDatabase.instance.getAllEntries();
     filteredEntries = filterEntries(entries);
-    images = await EntriesDatabase.instance.getAllEntryImages();
     getWordCount();
     await getStreaks();
     await getMoodCounts();
@@ -287,9 +285,5 @@ class StatsProvider with ChangeNotifier {
     }
 
     return null;
-  }
-
-  List<EntryImage> getImagesForEntry(Entry entry) {
-    return images.where((img) => img.entryId == entry.id!).toList();
   }
 }

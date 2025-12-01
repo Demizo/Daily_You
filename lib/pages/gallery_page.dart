@@ -1,6 +1,7 @@
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/stats_provider.dart';
 import 'package:daily_you/widgets/hiding_widget.dart';
+import 'package:daily_you/widgets/images_provider.dart';
 import 'package:daily_you/widgets/large_entry_card_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
@@ -206,6 +207,7 @@ class _GalleryPageState extends State<GalleryPage> {
 
   Widget buildEntries(BuildContext context, bool listView) {
     final statsProvider = Provider.of<StatsProvider>(context);
+    final imagesProvider = Provider.of<ImagesProvider>(context);
     var entries = statsProvider.filteredEntries;
     return statsProvider.filteredEntries.isEmpty
         ? Center(
@@ -238,12 +240,12 @@ class _GalleryPageState extends State<GalleryPage> {
                 child: listView
                     ? LargeEntryCardWidget(
                         entry: entry,
-                        images: statsProvider.images
+                        images: imagesProvider.images
                             .where((img) => img.entryId == entry.id!)
                             .toList())
                     : EntryCardWidget(
                         entry: entry,
-                        images: statsProvider.images
+                        images: imagesProvider.images
                             .where((img) => img.entryId == entry.id!)
                             .toList()),
               );
