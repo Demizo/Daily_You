@@ -1,15 +1,17 @@
 import 'dart:typed_data';
 
-class FileBytesCache {
+import 'package:flutter/material.dart';
+
+class MemoryImageCache {
   final int maxCacheSize; // Maximum cache size in bytes
   int _currentSize = 0;
 
-  final Map<String, Uint8List> _cache = {};
+  final Map<String, MemoryImage> _cache = {};
   final List<String> _usageOrder = []; // To track least recently used keys
 
-  FileBytesCache({required this.maxCacheSize});
+  MemoryImageCache({required this.maxCacheSize});
 
-  Uint8List? get(String key) {
+  MemoryImage? get(String key) {
     if (_cache.containsKey(key)) {
       // Update usage order to mark as recently used
       _usageOrder.remove(key);
@@ -19,13 +21,14 @@ class FileBytesCache {
     return null;
   }
 
-  void put(String key, Uint8List value) {
-    final valueSize = value.lengthInBytes;
+  void put(String key, MemoryImage newImage) {
+    final valueSize = newImage.bytes.lengthInBytes;
 
     // If the key already exists, update the value
     if (_cache.containsKey(key)) {
-      _currentSize -= _cache[key]!.lengthInBytes; // Subtract old size
-      _cache[key] = value;
+      final oldImage = _cache[key]!;
+      _currentSize -= oldImage.bytes.lengthInBytes; // Subtract old size
+      _cache[key] = newImage;
       _currentSize += valueSize; // Add new size
       _usageOrder.remove(key); // Update usage order
       _usageOrder.add(key);
@@ -37,12 +40,12 @@ class FileBytesCache {
         _usageOrder.length > 1 &&
         (_currentSize + valueSize > maxCacheSize)) {
       final oldestKey = _usageOrder.removeAt(0); // Remove least recently used
-      _currentSize -= _cache[oldestKey]!.lengthInBytes;
+      _currentSize -= _cache[oldestKey]!.bytes.lengthInBytes;
       _cache.remove(oldestKey);
     }
 
     // Add the new item
-    _cache[key] = value;
+    _cache[key] = newImage;
     _usageOrder.add(key);
     _currentSize += valueSize;
   }

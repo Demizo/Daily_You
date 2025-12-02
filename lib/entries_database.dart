@@ -25,8 +25,6 @@ class EntriesDatabase {
   static Database? _database;
   Database? get database => _database;
 
-  final FileBytesCache imageCache =
-      FileBytesCache(maxCacheSize: 10 * 1024 * 1024);
   final Pool imgFetchPool = Pool(3);
 
   EntriesDatabase._init();
@@ -219,14 +217,9 @@ DROP TABLE old_entries;
   }
 
   Future<Uint8List?> getImgBytes(String imageName) async {
-    // Fetch cache copy if present
-    var bytes = imageCache.get(imageName);
-    if (bytes != null) {
-      return bytes;
-    }
     // Fetch local copy if present
     var internalDir = await getInternalImgDatabasePath();
-    bytes = await imgFetchPool.withResource(() => FileLayer.getFileBytes(
+    var bytes = await imgFetchPool.withResource(() => FileLayer.getFileBytes(
         internalDir,
         name: imageName,
         useExternalPath: false));
@@ -240,9 +233,6 @@ DROP TABLE old_entries;
             await getInternalImgDatabasePath(), imageName, bytes,
             useExternalPath: false);
       }
-    }
-    if (bytes != null) {
-      imageCache.put(imageName, bytes);
     }
     return bytes;
   }

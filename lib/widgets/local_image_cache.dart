@@ -4,6 +4,7 @@ import 'dart:isolate';
 import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/file_bytes_cache.dart';
 import 'package:daily_you/file_layer.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
@@ -32,8 +33,8 @@ class LocalImageCache {
   final CacheManager _diskCache;
   String? tempImgFolderPath;
   final _pending = <String>{};
-  final FileBytesCache imageCache =
-      FileBytesCache(maxCacheSize: 10 * 1024 * 1024);
+  final MemoryImageCache imageCache =
+      MemoryImageCache(maxCacheSize: 10 * 1024 * 1024);
   final Pool imgFetchPool = Pool(5);
 
   SendPort? _resizeSendPort;
@@ -74,7 +75,7 @@ class LocalImageCache {
           name: "$key.jpg", useExternalPath: false);
 
       if (bytes != null) {
-        imageCache.put(key, bytes);
+        // imageCache.put(key, MemoryImage(bytes));
         await _diskCache.putFile(key, bytes, fileExtension: 'jpg');
         await FileLayer.deleteFile(tempImgFolderPath!,
             name: "$key.jpg", useExternalPath: false);
@@ -98,30 +99,42 @@ class LocalImageCache {
     _resizeSendPort!.send(request);
   }
 
-  Future<Uint8List?> getResizedImageBytes(
-      String originalPath, int width) async {
-    // Skip GIFs
-    if (extension(originalPath).toLowerCase() == ".gif") {
-      return await EntriesDatabase.instance.getImgBytes(originalPath);
-    }
-
+  Future<MemoryImage?> getCachedImage(String originalPath, int width) async {
     final key = '${originalPath}_w$width';
 
     // Memory cache
-    final bytes = imageCache.get(key);
-    if (bytes != null) {
-      return bytes;
+    final image = imageCache.get(key);
+    if (image != null) {
+      return image;
     }
 
-    // Disk cache
-    final fileInfo =
-        await imgFetchPool.withResource(() => _diskCache.getFileFromCache(key));
-    if (fileInfo != null) {
-      final bytes = await fileInfo.file.readAsBytes();
-      imageCache.put(key, bytes);
-      return bytes;
-    }
+    return imgFetchPool.withResource(() async {
+      // Don't cache GIFs on disk
+      if (extension(originalPath).toLowerCase() == ".gif") {
+        final bytes = await EntriesDatabase.instance.getImgBytes(originalPath);
+        if (bytes != null) {
+          final image = MemoryImage(bytes);
+          imageCache.put(key, image);
+          return image;
+        } else {
+          return null;
+        }
+      }
 
+      // Disk cache
+      final fileInfo = await _diskCache.getFileFromCache(key);
+      if (fileInfo != null) {
+        final bytes = await fileInfo.file.readAsBytes();
+        final image = MemoryImage(bytes);
+        imageCache.put(key, image);
+        return image;
+      }
+
+      return null;
+    });
+  }
+
+  Future<Uint8List?> getImageBytes(String originalPath, int width) async {
     // Prime cache in the background
     primeCache(originalPath, width);
 
