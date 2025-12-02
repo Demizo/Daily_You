@@ -512,6 +512,7 @@ DROP TABLE old_entries;
         await _database!.close();
         await initDB();
         await StatsProvider.instance.updateStats();
+        await ImagesProvider.instance.update();
         if (usingExternalImg()) await syncImageFolder(true);
         return true;
       } else {
@@ -658,6 +659,7 @@ DROP TABLE old_entries;
     await ConfigProvider.instance.set(ConfigKey.useExternalDb, false);
     await initDB();
     await StatsProvider.instance.updateStats();
+    await ImagesProvider.instance.update();
   }
 
   Future<bool> selectImageFolder() async {
