@@ -2,6 +2,7 @@ import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/stats_provider.dart';
 import 'package:daily_you/widgets/auth_popup.dart';
+import 'package:daily_you/widgets/images_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -68,6 +69,7 @@ class _LaunchPageState extends State<LaunchPage> {
               ));
     }
     await StatsProvider.instance.updateStats();
+    await ImagesProvider.instance.update();
     await Navigator.of(context).pushReplacement(MaterialPageRoute(
         builder: (context) => widget.nextPage, allowSnapshotting: false));
   }

@@ -8,6 +8,7 @@ import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/stats_provider.dart';
 import 'package:daily_you/utils/zip_utils.dart';
+import 'package:daily_you/widgets/images_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart';
@@ -87,7 +88,8 @@ class ImportUtils {
     if (EntriesDatabase.instance.usingExternalImg()) {
       await EntriesDatabase.instance.syncImageFolder(true);
     }
-    StatsProvider.instance.updateStats();
+    await StatsProvider.instance.updateStats();
+    await ImagesProvider.instance.update();
 
     return true;
   }
@@ -154,7 +156,8 @@ class ImportUtils {
     if (EntriesDatabase.instance.usingExternalImg()) {
       await EntriesDatabase.instance.syncImageFolder(true);
     }
-    StatsProvider.instance.updateStats();
+    await StatsProvider.instance.updateStats();
+    await ImagesProvider.instance.update();
 
     return true;
   }
@@ -208,7 +211,8 @@ class ImportUtils {
     if (EntriesDatabase.instance.usingExternalImg()) {
       await EntriesDatabase.instance.syncImageFolder(true);
     }
-    StatsProvider.instance.updateStats();
+    await StatsProvider.instance.updateStats();
+    await ImagesProvider.instance.update();
 
     return true;
   }
@@ -333,7 +337,8 @@ class ImportUtils {
     if (EntriesDatabase.instance.usingExternalImg()) {
       await EntriesDatabase.instance.syncImageFolder(true);
     }
-    StatsProvider.instance.updateStats();
+    await StatsProvider.instance.updateStats();
+    await ImagesProvider.instance.update();
 
     return success;
   }
@@ -502,7 +507,8 @@ class ImportUtils {
       await EntriesDatabase.instance.syncDatabase();
     }
     // Images were created externally as they were added. No need to sync with external image folder
-    StatsProvider.instance.updateStats();
+    await StatsProvider.instance.updateStats();
+    await ImagesProvider.instance.update();
 
     if (db != null && db.isOpen) {
       await db.close();
@@ -693,7 +699,8 @@ class ImportUtils {
       await EntriesDatabase.instance.syncDatabase();
     }
     // Images were created externally as they were added. No need to sync with external image folder
-    StatsProvider.instance.updateStats();
+    await StatsProvider.instance.updateStats();
+    await ImagesProvider.instance.update();
 
     if (await File(join(tempDir.path, tempDaylioZip)).exists()) {
       await File(join(tempDir.path, tempDaylioZip)).delete();
