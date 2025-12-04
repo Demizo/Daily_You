@@ -11,5 +11,4 @@ In this patch:
 • Properly display storage folder locations
 • Begin search after a single character
 • Remove redundant Show Markdown Toolbar setting
-• Minor UI fixes and improvements
 • Updated translations
