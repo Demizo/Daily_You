@@ -254,7 +254,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get viewLayoutList => 'List';
 
   @override
-  String get viewLayoutGrid => 'Grid';
+  String get viewLayoutGrid => 'Raster';
 
   @override
   String get settingsNotificationsTitle => 'Meldingen';

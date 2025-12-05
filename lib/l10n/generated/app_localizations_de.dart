@@ -251,7 +251,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get viewLayoutList => 'Liste';
 
   @override
-  String get viewLayoutGrid => 'Grid';
+  String get viewLayoutGrid => 'Raster';
 
   @override
   String get settingsNotificationsTitle => 'Benachrichtigung';
@@ -262,7 +262,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settingsNotificationsPermissionsPrompt =>
-      'The \'schedule alarms\' permission will be requested to send the reminder at a random moment or at your preferred time.';
+      'Die Berechtigung \"Planen von genauen Weckern\" wird angefragt, um eine Errinnerung an dich zu einer zufälligen Zeit oder zu deiner ausgewählten Zeit zu senden.';
 
   @override
   String get settingsDailyReminderTitle => 'Tägliche Erinnerung';

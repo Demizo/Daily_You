@@ -243,16 +243,16 @@ class AppLocalizationsEs extends AppLocalizations {
   String get moodIconPrompt => 'Introduce un icono';
 
   @override
-  String get settingsFlashbacksViewLayout => 'Flashbacks View Layout';
+  String get settingsFlashbacksViewLayout => 'Vista de Recuerdos';
 
   @override
-  String get settingsGalleryViewLayout => 'Gallery View Layout';
+  String get settingsGalleryViewLayout => 'Vista de Galería';
 
   @override
-  String get viewLayoutList => 'List';
+  String get viewLayoutList => 'Lista';
 
   @override
-  String get viewLayoutGrid => 'Grid';
+  String get viewLayoutGrid => 'Cuadrícula';
 
   @override
   String get settingsNotificationsTitle => 'Notificaciones';
@@ -269,8 +269,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsDailyReminderTitle => 'Recordatorio diario';
 
   @override
-  String get settingsDailyReminderDescription =>
-      'Permitir que la aplicación se ejecute en segundo plano para obtener mejores resultados';
+  String get settingsDailyReminderDescription => 'Breve recordatorio diario.';
 
   @override
   String get settingsReminderTime => 'Hora del Recordatorio';

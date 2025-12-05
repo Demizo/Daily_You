@@ -248,16 +248,16 @@ class AppLocalizationsRu extends AppLocalizations {
   String get moodIconPrompt => 'Введите значок (емодзи)';
 
   @override
-  String get settingsFlashbacksViewLayout => 'Flashbacks View Layout';
+  String get settingsFlashbacksViewLayout => 'Отображение флеш-беков';
 
   @override
-  String get settingsGalleryViewLayout => 'Gallery View Layout';
+  String get settingsGalleryViewLayout => 'Отображение галереи';
 
   @override
-  String get viewLayoutList => 'List';
+  String get viewLayoutList => 'Список';
 
   @override
-  String get viewLayoutGrid => 'Grid';
+  String get viewLayoutGrid => 'Сетка';
 
   @override
   String get settingsNotificationsTitle => 'Уведомления';
@@ -275,7 +275,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get settingsDailyReminderDescription =>
-      'Разрешите приложению работать в фоне для максимального удобства';
+      'Удобное пуш-уведомление на каждый день';
 
   @override
   String get settingsReminderTime => 'Время напоминания';
@@ -480,46 +480,46 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsAppLanguageTitle => 'Язык приложения';
 
   @override
-  String get settingsOverrideAppLanguageTitle => 'Override App Language';
+  String get settingsOverrideAppLanguageTitle => 'Заменить язык приложения';
 
   @override
   String get settingsSecurityTitle => 'Безопасность';
 
   @override
-  String get settingsSecurityRequirePassword => 'Require Password';
+  String get settingsSecurityRequirePassword => 'Требовать пароль';
 
   @override
-  String get settingsSecurityEnterPassword => 'Enter Password';
+  String get settingsSecurityEnterPassword => 'Введите пароль';
 
   @override
-  String get settingsSecuritySetPassword => 'Set Password';
+  String get settingsSecuritySetPassword => 'Установить пароль';
 
   @override
-  String get settingsSecurityChangePassword => 'Change Password';
+  String get settingsSecurityChangePassword => 'Сменить пароль';
 
   @override
-  String get settingsSecurityPassword => 'Password';
+  String get settingsSecurityPassword => 'Пароль';
 
   @override
-  String get settingsSecurityConfirmPassword => 'Confirm Password';
+  String get settingsSecurityConfirmPassword => 'Подтверждение пароля';
 
   @override
-  String get settingsSecurityOldPassword => 'Old Password';
+  String get settingsSecurityOldPassword => 'Старый пароль';
 
   @override
-  String get settingsSecurityIncorrectPassword => 'Incorrect Password';
+  String get settingsSecurityIncorrectPassword => 'Неверный пароль';
 
   @override
-  String get settingsSecurityPasswordsDoNotMatch => 'Passwords do not match';
+  String get settingsSecurityPasswordsDoNotMatch => 'Пароли не совпадают';
 
   @override
-  String get requiredPrompt => 'Required';
+  String get requiredPrompt => 'При входе требуется пароль';
 
   @override
-  String get settingsSecurityBiometricUnlock => 'Biometric Unlock';
+  String get settingsSecurityBiometricUnlock => 'Отпечаток пальца';
 
   @override
-  String get unlockAppPrompt => 'Unlock the app';
+  String get unlockAppPrompt => 'Разблокировка дневника';
 
   @override
   String get settingsAboutTitle => 'О программе';
