@@ -1,0 +1,10 @@
+Daily You v2.14.3 has arrived! Time to smoothen rough edges:
+
+• Added the ability to change a log's date after creation
+• Updated the template selection and management interfaces
+• Moved the flashback and gallery view layouts to settings
+
+In this patch:
+
+• Prevent unnecessary image reloads to avoid flickering
+• Update translations
