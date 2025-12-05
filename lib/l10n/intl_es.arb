@@ -105,7 +105,7 @@
     "@settingsNotificationsTitle": {},
     "settingsDailyReminderTitle": "Recordatorio diario",
     "@settingsDailyReminderTitle": {},
-    "settingsDailyReminderDescription": "Permitir que la aplicación se ejecute en segundo plano para obtener mejores resultados",
+    "settingsDailyReminderDescription": "Breve recordatorio diario.",
     "@settingsDailyReminderDescription": {},
     "settingsReminderTime": "Hora del Recordatorio",
     "@settingsReminderTime": {},
@@ -276,5 +276,13 @@
     "settingsMadeWithLove": "Hecho con 💚",
     "@settingsMadeWithLove": {},
     "settingsConsiderSupporting": "Considera en apoyar",
-    "@settingsConsiderSupporting": {}
+    "@settingsConsiderSupporting": {},
+    "settingsFlashbacksViewLayout": "Vista de Recuerdos",
+    "@settingsFlashbacksViewLayout": {},
+    "settingsGalleryViewLayout": "Vista de Galería",
+    "@settingsGalleryViewLayout": {},
+    "viewLayoutGrid": "Cuadrícula",
+    "@viewLayoutGrid": {},
+    "viewLayoutList": "Lista",
+    "@viewLayoutList": {}
 }
