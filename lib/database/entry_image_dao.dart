@@ -31,22 +31,20 @@ class EntryImageDao {
     return entryImage.copy(id: id);
   }
 
-  static Future<int> remove(EntryImage entryImage) async {
-    final removedId = await EntriesDatabase.instance.database!.delete(
+  static Future<void> remove(EntryImage entryImage) async {
+    await EntriesDatabase.instance.database!.delete(
       imagesTable,
       where: '${EntryImageFields.id} = ?',
       whereArgs: [entryImage.id],
     );
-    return removedId;
   }
 
-  static Future<int> update(EntryImage image) async {
-    final id = await EntriesDatabase.instance.database!.update(
+  static Future<void> update(EntryImage image) async {
+    await EntriesDatabase.instance.database!.update(
       imagesTable,
       image.toJson(),
       where: '${EntryImageFields.id} = ?',
       whereArgs: [image.id],
     );
-    return id;
   }
 }

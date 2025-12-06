@@ -1,9 +1,14 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:daily_you/config_provider.dart';
+import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/file_bytes_cache.dart';
 import 'package:daily_you/file_layer.dart';
+import 'package:daily_you/models/entry.dart';
+import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/stats_provider.dart';
 import 'package:media_scanner/media_scanner.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -42,9 +47,13 @@ class ImageStorage {
     }
   }
 
-  Future<String> getExternalFolder() async {
-    final rootImgPath = ConfigProvider.instance.get(ConfigKey.externalImgUri);
-    return rootImgPath;
+  String _getExternalFolder() {
+    return ConfigProvider.instance.get(ConfigKey.externalImgUri);
+  }
+
+  /// Return whether the app has permission to access the external location
+  Future<bool> hasExternalLocationPermission() async {
+    return FileLayer.hasPermission(await getInternalFolder());
   }
 
   Future<Uint8List?> getBytes(String imageName) async {
@@ -62,10 +71,10 @@ class ImageStorage {
     // Attempt to fetch file externally
     if (bytes == null && usingExternalLocation()) {
       // Get and cache external image
-      bytes = await FileLayer.getFileBytes(await getExternalFolder(),
+      bytes = await FileLayer.getFileBytes(_getExternalFolder(),
           name: imageName, useExternalPath: true);
       if (bytes != null) {
-        await FileLayer.createFile(await getInternalFolder(), imageName, bytes,
+        await FileLayer.createFile(internalDir, imageName, bytes,
             useExternalPath: false);
       }
     }
@@ -79,8 +88,12 @@ class ImageStorage {
       {DateTime? currTime}) async {
     currTime ??= DateTime.now();
 
+    final internalFolder = await getInternalFolder();
+
     // Don't make a copy of files already in the folder
-    if (imageName != null && await getBytes(imageName) != null) {
+    if (imageName != null &&
+        await FileLayer.exists(internalFolder,
+            name: imageName, useExternalPath: false)) {
       return imageName;
     }
 
@@ -93,18 +106,17 @@ class ImageStorage {
 
     // Ensure unique name
     int index = 1;
-    while (await FileLayer.exists(await getInternalFolder(),
+    while (await FileLayer.exists(internalFolder,
         name: newImageName, useExternalPath: false)) {
       newImageName = "daily_you_${timestamp}_$index$extenstion";
       index += 1;
     }
 
-    if (usingExternalLocation()) {
-      FileLayer.createFile(await getExternalFolder(), newImageName, bytes,
-          useExternalPath: true); //Background
-    }
+    // Do not await operation
+    unawaited(_createRemote(newImageName, bytes));
+
     var imageFilePath = await FileLayer.createFile(
-        await getInternalFolder(), newImageName, bytes,
+        internalFolder, newImageName, bytes,
         useExternalPath: false);
     if (imageFilePath == null) return null;
     if (Platform.isAndroid) {
@@ -114,14 +126,97 @@ class ImageStorage {
     return newImageName;
   }
 
+  Future<void> _createRemote(String name, Uint8List bytes) async {
+    final externalFolder = _getExternalFolder();
+    if (usingExternalLocation() &&
+        !(await FileLayer.exists(externalFolder,
+            name: name, useExternalPath: true))) {
+      await FileLayer.createFile(externalFolder, name, bytes,
+          useExternalPath: true);
+    }
+  }
+
   Future<bool> delete(String imageName) async {
+    final internalFolder = await getInternalFolder();
+    final externalFolder = _getExternalFolder();
+    // Delete local
+    await FileLayer.deleteFile(internalFolder,
+        name: imageName, useExternalPath: false);
+
     // Delete remote
     if (usingExternalLocation()) {
-      await FileLayer.deleteFile(await getExternalFolder(),
-          name: imageName, useExternalPath: true);
+      // Do not await operation
+      unawaited(FileLayer.deleteFile(externalFolder,
+          name: imageName, useExternalPath: true));
     }
-    // Delete local
-    return await FileLayer.deleteFile(await getInternalFolder(),
-        name: imageName, useExternalPath: false);
+
+    return true;
+  }
+
+  Future<bool> syncImageFolder(bool garbageCollect) async {
+    StatsProvider.instance.updateSyncStats(0, 0);
+
+    final internalFolder = await getInternalFolder();
+    final externalFolder = _getExternalFolder();
+
+    List<String> entryImages = List.empty(growable: true);
+
+    List<String> externalImages =
+        await FileLayer.listFiles(externalFolder, useExternalPath: true);
+    List<String> internalImages =
+        await FileLayer.listFiles(internalFolder, useExternalPath: false);
+
+    List<Entry> entries = await EntriesDatabase.instance.getAllEntries();
+    int syncedEntries = 0;
+    for (Entry entry in entries) {
+      var images = EntryImagesProvider.instance.getForEntry(entry);
+      for (final image in images) {
+        var entryImg = image.imgPath;
+
+        entryImages.add(entryImg);
+
+        // Export
+        if (internalImages.contains(entryImg) &&
+            !externalImages.contains(entryImg)) {
+          var bytes = await FileLayer.getFileBytes(internalFolder,
+              name: entryImg, useExternalPath: false);
+          await FileLayer.createFile(externalFolder, entryImg, bytes!,
+              useExternalPath: true);
+        }
+
+        // Import
+        if (externalImages.contains(entryImg) &&
+            !internalImages.contains(entryImg)) {
+          var bytes = await FileLayer.getFileBytes(externalFolder,
+              name: entryImg, useExternalPath: true);
+          await FileLayer.createFile(internalFolder, entryImg, bytes!,
+              useExternalPath: false);
+        }
+        syncedEntries += 1;
+        StatsProvider.instance.updateSyncStats(entries.length, syncedEntries);
+      }
+    }
+
+    if (garbageCollect) {
+      return await _garbageCollectImages();
+    }
+    return true;
+  }
+
+  Future<bool> _garbageCollectImages() async {
+    var entryImages = EntryImagesProvider.instance.images;
+    var entryImageNames =
+        entryImages.map((entryImage) => entryImage.imgPath).toList();
+    // Get all internal photos
+    var internalImages = Directory(await getInternalFolder()).list();
+    await for (FileSystemEntity fileEntity in internalImages) {
+      if (fileEntity is File) {
+        // Delete any that aren't used
+        if (!entryImageNames.contains(basename(fileEntity.path))) {
+          await File(fileEntity.path).delete();
+        }
+      }
+    }
+    return true;
   }
 }
