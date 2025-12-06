@@ -6,6 +6,7 @@ import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/stat_range_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:word_count/word_count.dart';
 
 enum OrderBy { date, mood }
 
@@ -101,8 +102,7 @@ class StatsProvider with ChangeNotifier {
   void getWordCount() {
     wordCount = 0;
     for (var entry in entries) {
-      final RegExp regex = RegExp(r'\w+');
-      wordCount += regex.allMatches(entry.text).length;
+      wordCount += wordsCount(entry.text);
     }
   }
 
