@@ -1,6 +1,6 @@
 import 'dart:async';
+import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/database/entry_image_dao.dart';
-import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +14,7 @@ class EntryImagesProvider with ChangeNotifier {
 
   /// Load the provider's data from the app database
   Future<void> load() async {
-    images = await EntriesDatabase.instance.getAllEntryImages();
+    images = await EntryImageDao.getAll();
     notifyListeners();
   }
 
@@ -24,10 +24,24 @@ class EntryImagesProvider with ChangeNotifier {
     // Insert the image into the database so that it has an ID
     final imageWithId = await EntryImageDao.add(image);
     images.add(imageWithId);
-    // TODO trigger sync
+    await AppDatabase.instance.updateExternalDatabase();
+    notifyListeners();
   }
 
-  // TODO add other CRUD operations
+  Future<void> remove(EntryImage image) async {
+    await EntryImageDao.remove(image);
+    images.removeWhere((x) => x.id == image.id);
+    await AppDatabase.instance.updateExternalDatabase();
+    notifyListeners();
+  }
+
+  Future<void> update(EntryImage image) async {
+    await EntryImageDao.update(image);
+    final index = images.indexWhere((x) => x.id == image.id);
+    images[index] = image.copy();
+    await AppDatabase.instance.updateExternalDatabase();
+    notifyListeners();
+  }
 
   /// Get the images for a given entry
   ///
