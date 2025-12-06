@@ -1,6 +1,8 @@
 import 'package:daily_you/backup_restore_utils.dart';
 import 'package:daily_you/import_utils.dart';
+import 'package:daily_you/stats_provider.dart';
 import 'package:daily_you/utils/export_utils.dart';
+import 'package:daily_you/widgets/images_provider.dart';
 import 'package:daily_you/widgets/settings_icon_action.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
@@ -103,6 +105,9 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
           statusNotifier.value = status;
         });
       }
+
+      await StatsProvider.instance.updateStats();
+      await ImagesProvider.instance.update();
 
       Navigator.of(context).pop();
     }
