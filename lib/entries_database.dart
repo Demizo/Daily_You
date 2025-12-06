@@ -250,8 +250,12 @@ DROP TABLE old_entries;
       {DateTime? currTime}) async {
     currTime ??= DateTime.now();
 
+    final internalFolder = await getInternalImgDatabasePath();
+
     // Don't make a copy of files already in the folder
-    if (imageName != null && await getImgBytes(imageName) != null) {
+    if (imageName != null &&
+        await FileLayer.exists(internalFolder,
+            name: imageName, useExternalPath: false)) {
       return imageName;
     }
 
@@ -264,19 +268,17 @@ DROP TABLE old_entries;
 
     // Ensure unique name
     int index = 1;
-    while (await FileLayer.exists(await getInternalImgDatabasePath(),
+    while (await FileLayer.exists(internalFolder,
         name: newImageName, useExternalPath: false)) {
       newImageName = "daily_you_${timestamp}_$index$extenstion";
       index += 1;
     }
 
-    if (usingExternalImg()) {
-      FileLayer.createFile(
-          await getExternalImgDatabasePath(), newImageName, bytes,
-          useExternalPath: true); //Background
-    }
+    // Do not await operation
+    createRemoteImg(newImageName, bytes);
+
     var imageFilePath = await FileLayer.createFile(
-        await getInternalImgDatabasePath(), newImageName, bytes,
+        internalFolder, newImageName, bytes,
         useExternalPath: false);
     if (imageFilePath == null) return null;
     if (Platform.isAndroid) {
@@ -286,15 +288,31 @@ DROP TABLE old_entries;
     return newImageName;
   }
 
+  Future<void> createRemoteImg(String name, Uint8List bytes) async {
+    final externalFolder = await getExternalImgDatabasePath();
+    if (usingExternalImg() &&
+        !(await FileLayer.exists(externalFolder,
+            name: name, useExternalPath: true))) {
+      await FileLayer.createFile(externalFolder, name, bytes,
+          useExternalPath: true);
+    }
+  }
+
   Future<bool> deleteImg(String imageName) async {
+    final internalFolder = await getInternalImgDatabasePath();
+    final externalFolder = await getExternalImgDatabasePath();
+    // Delete local
+    await FileLayer.deleteFile(internalFolder,
+        name: imageName, useExternalPath: false);
+
     // Delete remote
     if (usingExternalImg()) {
-      await FileLayer.deleteFile(await getExternalImgDatabasePath(),
+      // Do not await operation
+      FileLayer.deleteFile(externalFolder,
           name: imageName, useExternalPath: true);
     }
-    // Delete local
-    return await FileLayer.deleteFile(await getInternalImgDatabasePath(),
-        name: imageName, useExternalPath: false);
+
+    return true;
   }
 
   // Entry Methods
