@@ -441,6 +441,9 @@ class AppLocalizationsFi extends AppLocalizations {
   String get formatDiarium => 'Diarium';
 
   @override
+  String get formatDiaro => 'Diaro';
+
+  @override
   String get formatMyBrain => 'My Brain';
 
   @override

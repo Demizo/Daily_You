@@ -832,6 +832,12 @@ abstract class AppLocalizations {
   /// **'Diarium'**
   String get formatDiarium;
 
+  /// No description provided for @formatDiaro.
+  ///
+  /// In en, this message translates to:
+  /// **'Diaro'**
+  String get formatDiaro;
+
   /// No description provided for @formatMyBrain.
   ///
   /// In en, this message translates to:

@@ -231,6 +231,8 @@
   "@formatDaylio": {},
   "formatDiarium": "Diarium",
   "@formatDiarium": {},
+  "formatDiaro": "Diaro",
+  "@formatDiaro": {},
   "formatMyBrain": "My Brain",
   "@formatMyBrain": {},
   "formatOneShot": "OneShot",
