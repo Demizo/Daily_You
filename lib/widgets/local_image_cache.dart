@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:isolate';
 
-import 'package:daily_you/entries_database.dart';
+import 'package:daily_you/database/image_storage.dart';
 import 'package:daily_you/file_bytes_cache.dart';
 import 'package:daily_you/file_layer.dart';
 import 'package:flutter/services.dart';
@@ -50,8 +50,7 @@ class LocalImageCache {
   }
 
   Future<void> _initResizeIsolate() async {
-    final imgFolderPath =
-        await EntriesDatabase.instance.getInternalImgDatabasePath();
+    final imgFolderPath = await ImageStorage.instance.getInternalFolder();
     tempImgFolderPath = (await getTemporaryDirectory()).path;
 
     final responsePort = ReceivePort();
@@ -102,7 +101,7 @@ class LocalImageCache {
       String originalPath, int width) async {
     // Skip GIFs
     if (extension(originalPath).toLowerCase() == ".gif") {
-      return await EntriesDatabase.instance.getImgBytes(originalPath);
+      return await ImageStorage.instance.getBytes(originalPath);
     }
 
     final key = '${originalPath}_w$width';
@@ -125,8 +124,7 @@ class LocalImageCache {
     // Prime cache in the background
     primeCache(originalPath, width);
 
-    final originalBytes =
-        await EntriesDatabase.instance.getImgBytes(originalPath);
+    final originalBytes = await ImageStorage.instance.getBytes(originalPath);
     if (originalBytes == null) return null;
 
     return originalBytes;
