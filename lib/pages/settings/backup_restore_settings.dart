@@ -50,6 +50,12 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
                     Navigator.of(context).pop();
                   }),
               ListTile(
+                  title: Text(AppLocalizations.of(context)!.formatDiaro),
+                  onTap: () {
+                    chosenFormat = ImportFormat.diaro;
+                    Navigator.of(context).pop();
+                  }),
+              ListTile(
                   title: Text(AppLocalizations.of(context)!.formatMyBrain),
                   onTap: () {
                     chosenFormat = ImportFormat.myBrain;
@@ -88,6 +94,10 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
         });
       } else if (chosenFormat == ImportFormat.diarium) {
         await ImportUtils.importFromDiarium(context, (status) {
+          statusNotifier.value = status;
+        });
+      } else if (chosenFormat == ImportFormat.diaro) {
+        await ImportUtils.importFromDiaro(context, (status) {
           statusNotifier.value = status;
         });
       } else if (chosenFormat == ImportFormat.myBrain) {

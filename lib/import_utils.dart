@@ -15,12 +15,14 @@ import 'package:path_provider/path_provider.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:html2md/html2md.dart' as html2md;
+import 'package:xml/xml.dart';
 
 enum ImportFormat {
   none,
   dailyYouJson,
   daylio,
   diarium,
+  diaro,
   myBrain,
   oneShot,
   pixels,
@@ -700,6 +702,257 @@ class ImportUtils {
     }
     if (await tempDaylioFolder.exists()) {
       await tempDaylioFolder.delete(recursive: true);
+    }
+
+    return success;
+  }
+
+  static DateTime convertWithOffset(int millisUtc, String tzOffset) {
+    // Parse timestamp
+    final utc = DateTime.fromMillisecondsSinceEpoch(millisUtc, isUtc: true);
+
+    final sign = tzOffset.startsWith('-') ? -1 : 1;
+    final parts = tzOffset.substring(1).split(':');
+    final hours = int.parse(parts[0]);
+    final minutes = int.parse(parts[1]);
+
+    final offsetDuration = Duration(
+      hours: hours * sign,
+      minutes: minutes * sign,
+    );
+
+    // Apply the offset to get the true local time of the entry
+    return utc.add(offsetDuration);
+  }
+
+  static Future<bool> importFromDiaro(
+      BuildContext context, Function(String) updateStatus) async {
+    updateStatus("0%");
+
+    final selectedFile = await FileLayer.pickFile();
+    if (selectedFile == null) return false;
+
+    bool success = true;
+
+    var tempDir = await getTemporaryDirectory();
+    final tempZip = "temp_diaro.zip";
+    final tempZipFolder = Directory(join(tempDir.path, "Diaro"));
+    await tempZipFolder.create(recursive: true);
+
+    try {
+      // Import archive
+      updateStatus(AppLocalizations.of(context)!.tranferStatus("0"));
+      await FileLayer.copyFromExternalLocation(
+          selectedFile, tempDir.path, tempZip, onProgress: (percent) {
+        updateStatus(
+            AppLocalizations.of(context)!.tranferStatus("${percent.round()}"));
+      });
+
+      await ZipUtils.extract(
+        join(tempDir.path, tempZip),
+        tempZipFolder.path,
+      );
+
+      // --- Load XML ---
+      final xmlFile = await tempZipFolder.list().firstWhere(
+            (f) => basename(f.path).endsWith('DiaroBackup.xml'),
+            orElse: () =>
+                throw Exception('DiaroBackup.xml not found in archive'),
+          );
+
+      final xmlString = utf8.decode(
+          await FileLayer.getFileBytes(xmlFile.path, useExternalPath: false)
+              as List<int>);
+      final xmlDoc = XmlDocument.parse(xmlString);
+
+      // --- Get tables ---
+      final entriesTable = xmlDoc
+          .findAllElements('table')
+          .firstWhere((t) => t.getAttribute('name') == 'diaro_entries');
+
+      final attachmentTable = xmlDoc
+          .findAllElements('table')
+          .firstWhere((t) => t.getAttribute('name') == 'diaro_attachments');
+
+      // --- Parse attachments ---
+      final attachmentsByEntry = <String, List<Map<String, dynamic>>>{};
+      for (final r in attachmentTable.findAllElements('r')) {
+        if (r.getElement('type')?.innerText != 'photo') continue;
+        final entryUid = r.getElement('entry_uid')?.innerText ?? "";
+        final filename = r.getElement('filename')?.innerText ?? "";
+        final position =
+            int.tryParse(r.getElement('position')?.innerText ?? "");
+
+        if (entryUid.isEmpty || filename.isEmpty || position == null) continue;
+
+        attachmentsByEntry.putIfAbsent(entryUid, () => []).add({
+          'filename': filename,
+          'position': position,
+        });
+      }
+
+      final Map<int, int> moodValueMapping = {
+        1: 2,
+        2: 1,
+        3: 0,
+        4: -1,
+        5: -2,
+      };
+
+      // --- Parse each entry ---
+      final entries = <Map<String, dynamic>>[];
+      for (final r in entriesTable.findAllElements('r')) {
+        final uid = r.getElement('uid')?.innerText ?? "";
+        final title = r.getElement('title')?.innerText ?? "";
+        final text = r.getElement('text')?.innerText ?? "";
+        final moodString = r.getElement('mood')?.innerText ?? "";
+        final utcTimestamp = r.getElement('date')?.innerText ?? "";
+        final tzOffset = r.getElement('tz_offset')?.innerText ?? "";
+
+        if (uid.isEmpty || utcTimestamp.isEmpty || tzOffset.isEmpty) continue;
+
+        final created = convertWithOffset(int.parse(utcTimestamp), tzOffset);
+
+        int? mood;
+        if (moodString.isNotEmpty) {
+          final m = int.tryParse(moodString);
+          if (m != null) {
+            mood = (moodValueMapping[m.clamp(1, 5)]!);
+          }
+        }
+
+        entries.add({
+          'uid': uid,
+          'title': title,
+          'text': text,
+          'date': created,
+          'mood': mood,
+          'attachments': attachmentsByEntry[uid] ?? [],
+        });
+      }
+
+      // --- Group entries by day ---
+      final entriesByDate = <String, List<Map<String, dynamic>>>{};
+      for (final e in entries) {
+        final d = e['date'] as DateTime;
+        final key =
+            "${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}";
+
+        entriesByDate.putIfAbsent(key, () => []).add(e);
+      }
+
+      final totalDays = entriesByDate.length;
+      int processedDays = 0;
+
+      // --- Import day by day ---
+      for (final dayEntries in entriesByDate.values) {
+        // Sort by timestamp
+        dayEntries.sort(
+            (a, b) => (a['date'] as DateTime).compareTo(b['date'] as DateTime));
+
+        DateTime earliest = dayEntries.first['date'];
+        DateTime latest = dayEntries.last['date'];
+
+        // Build combined text
+        final combinedTextParts = <String>[];
+        final moods = <int>[];
+
+        final images = <Map<String, dynamic>>[];
+
+        var currentImageRank = 0;
+        for (final e in dayEntries) {
+          final title = e['title'] as String? ?? "";
+          final text = e['text'] as String? ?? "";
+          final mood = e['mood'] as int?;
+
+          if (title.isNotEmpty) combinedTextParts.add("# $title");
+          if (text.isNotEmpty) combinedTextParts.add(text);
+
+          if (mood != null) moods.add(mood);
+
+          // --- Handle attachments ---
+          final atts = (e['attachments'] as List<Map<String, dynamic>>);
+          if (atts.isNotEmpty) {
+            atts.sort((a, b) => a['position'].compareTo(b['position']));
+
+            for (final att in atts) {
+              final filename = att['filename'] as String;
+
+              final rank = currentImageRank;
+              currentImageRank += 1;
+
+              images.add({
+                'path': filename,
+                'rank': rank,
+              });
+            }
+          }
+        }
+
+        final combinedText = combinedTextParts.join("\n\n");
+        final averageMood = moods.isNotEmpty
+            ? (moods.reduce((a, b) => a + b) / moods.length).round()
+            : null;
+
+        processedDays++;
+        updateStatus("${((processedDays / totalDays) * 100).round()}%");
+
+        // Skip if already exists
+        if (await EntriesDatabase.instance.getEntryForDate(earliest) != null) {
+          continue;
+        }
+
+        final addedEntry = await EntriesDatabase.instance.addEntry(
+          Entry(
+            text: combinedText,
+            mood: averageMood,
+            timeCreate: earliest,
+            timeModified: latest,
+          ),
+          updateStatsAndSync: false,
+        );
+
+        // Add images
+        for (final img in images) {
+          final photoFile =
+              File(join(tempZipFolder.path, 'media', 'photo', img['path']));
+          final photoBytes = await FileLayer.getFileBytes(photoFile.path,
+              useExternalPath: false);
+          if (photoBytes == null) continue;
+          final imagePath = await EntriesDatabase.instance
+              .createImg(null, photoBytes, currTime: earliest);
+          if (imagePath != null) {
+            await EntriesDatabase.instance.addImg(
+              EntryImage(
+                entryId: addedEntry.id!,
+                imgPath: imagePath,
+                imgRank: img['rank'],
+                timeCreate: earliest,
+              ),
+              updateStatsAndSync: false,
+            );
+          }
+        }
+      }
+    } catch (e) {
+      updateStatus("$e");
+      await Future.delayed(Duration(seconds: 5));
+      success = false;
+    }
+
+    updateStatus(AppLocalizations.of(context)!.cleanUpStatus);
+
+    if (EntriesDatabase.instance.usingExternalDb()) {
+      await EntriesDatabase.instance.syncDatabase();
+    }
+    // Images were created externally as they were added. No need to sync with external image folder
+    StatsProvider.instance.updateStats();
+
+    if (await File(join(tempDir.path, tempZip)).exists()) {
+      await File(join(tempDir.path, tempZip)).delete();
+    }
+    if (await tempZipFolder.exists()) {
+      await tempZipFolder.delete(recursive: true);
     }
 
     return success;
