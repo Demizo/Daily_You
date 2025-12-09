@@ -6,8 +6,9 @@ import 'package:daily_you/file_layer.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/models/template.dart';
+import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
-import 'package:daily_you/stats_provider.dart';
+import 'package:daily_you/providers/templates_provider.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -39,8 +40,9 @@ class AppDatabase {
     _database = await openDatabase(_internalPath!,
         version: 3, onCreate: _createDatabase, onUpgrade: _onUpgrade);
 
+    await EntriesProvider.instance.load();
     await EntryImagesProvider.instance.load();
-    // TODO update other providers
+    await TemplatesProvider.instance.load();
   }
 
   Future<void> close() async {
@@ -77,7 +79,6 @@ class AppDatabase {
 
   /// Select an external database location. Returns whether a new location was set successfully.
   Future<bool> selectExternalLocation() async {
-    StatsProvider.instance.updateSyncStats(0, 0);
     try {
       var selectedDirectory = await FileLayer.pickDirectory();
       if (selectedDirectory == null) return false;
@@ -94,8 +95,7 @@ class AppDatabase {
       if (synced) {
         // Open new database and update stats
         await _database!.close();
-        await init();
-        await StatsProvider.instance.updateStats();
+        await open();
         if (ImageStorage.instance.usingExternalLocation()) {
           await ImageStorage.instance.syncImageFolder(true);
         }

@@ -1,12 +1,12 @@
 import 'dart:io';
 
 import 'package:daily_you/config_provider.dart';
-import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/flashback_manager.dart';
 import 'package:daily_you/models/flashback.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/notification_manager.dart';
-import 'package:daily_you/stats_provider.dart';
+import 'package:daily_you/providers/entries_provider.dart';
+import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/entry_calendar.dart';
 import 'package:daily_you/widgets/hiding_widget.dart';
@@ -68,10 +68,9 @@ class _HomePageState extends State<HomePage> {
           DateTime targetDate = DateTime.tryParse(
                   launchDetails?.notificationResponse?.payload ?? "") ??
               DateTime.now();
-          Entry? entry =
-              await EntriesDatabase.instance.getEntryForDate(targetDate);
+          Entry? entry = EntriesProvider.instance.getEntryForDate(targetDate);
           List<EntryImage> entryImages = entry != null
-              ? StatsProvider.instance.getImagesForEntry(entry)
+              ? EntryImagesProvider.instance.getForEntry(entry)
               : [];
 
           await Navigator.of(context).push(
@@ -94,13 +93,15 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final configProvider = Provider.of<ConfigProvider>(context);
-    final statsProvider = Provider.of<StatsProvider>(context);
-    Entry? todayEntry = statsProvider.getEntryForToday();
+    final entriesProvider = Provider.of<EntriesProvider>(context);
+    final entryImagesProvider = Provider.of<EntryImagesProvider>(context);
+
+    Entry? todayEntry = entriesProvider.getEntryForToday();
     List<EntryImage> todayImages =
-        todayEntry != null ? statsProvider.getImagesForEntry(todayEntry) : [];
+        todayEntry != null ? entryImagesProvider.getForEntry(todayEntry) : [];
 
     List<Flashback> flashbacks =
-        FlashbackManager.getFlashbacks(context, statsProvider.entries);
+        FlashbackManager.getFlashbacks(context, entriesProvider.entries);
 
     String viewMode = ConfigProvider.instance.get(ConfigKey.homePageViewMode);
     bool listView = viewMode == 'list';
@@ -206,7 +207,7 @@ class _HomePageState extends State<HomePage> {
                             allowSnapshotting: false,
                             builder: (context) => EntryDetailPage(
                                 filtered: false,
-                                index: StatsProvider.instance
+                                index: EntriesProvider.instance
                                     .getIndexOfEntry(flashback.entry.id!)),
                           ));
                         },
@@ -214,18 +215,13 @@ class _HomePageState extends State<HomePage> {
                             ? LargeEntryCardWidget(
                                 title: flashback.title,
                                 entry: flashback.entry,
-                                images: StatsProvider.instance.images
-                                    .where((img) =>
-                                        img.entryId == flashback.entry.id!)
-                                    .toList())
+                                images: EntryImagesProvider.instance
+                                    .getForEntry(flashback.entry))
                             : EntryCardWidget(
                                 title: flashback.title,
                                 entry: flashback.entry,
-                                images: StatsProvider.instance.images
-                                    .where((img) =>
-                                        img.entryId == flashback.entry.id!)
-                                    .toList(),
-                              ));
+                                images: EntryImagesProvider.instance
+                                    .getForEntry(flashback.entry)));
                   },
                 ),
       ]);

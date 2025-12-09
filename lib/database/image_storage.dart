@@ -3,12 +3,11 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:daily_you/config_provider.dart';
-import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/file_bytes_cache.dart';
 import 'package:daily_you/file_layer.dart';
 import 'package:daily_you/models/entry.dart';
+import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
-import 'package:daily_you/stats_provider.dart';
 import 'package:media_scanner/media_scanner.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -166,7 +165,7 @@ class ImageStorage {
     List<String> internalImages =
         await FileLayer.listFiles(internalFolder, useExternalPath: false);
 
-    List<Entry> entries = await EntriesDatabase.instance.getAllEntries();
+    List<Entry> entries = EntriesProvider.instance.entries;
     int syncedEntries = 0;
     for (Entry entry in entries) {
       var images = EntryImagesProvider.instance.getForEntry(entry);

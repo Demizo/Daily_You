@@ -4,11 +4,13 @@ import 'dart:math';
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/custom_locale_delegates.dart';
+import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/device_info_service.dart';
-import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/pages/launch_page.dart';
-import 'package:daily_you/stats_provider.dart';
+import 'package:daily_you/providers/entries_provider.dart';
+import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/providers/templates_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
@@ -26,8 +28,9 @@ import 'package:provider/provider.dart';
 void callbackDispatcher() async {
   await ConfigProvider.instance.init();
   // Skip syncing for the alarm background task
-  await EntriesDatabase.instance.initDB(forceWithoutSync: true);
-  if (await EntriesDatabase.instance.getEntryForDate(DateTime.now()) == null ||
+  await AppDatabase.instance.init(forceWithoutSync: true);
+  await AppDatabase.instance.open();
+  if (EntriesProvider.instance.getEntryForDate(DateTime.now()) == null ||
       ConfigProvider.instance.get(ConfigKey.alwaysRemind)) {
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
         FlutterLocalNotificationsPlugin();
@@ -61,7 +64,7 @@ void callbackDispatcher() async {
           payload: DateTime.now().toIso8601String());
     }
   }
-  EntriesDatabase.instance.close();
+  AppDatabase.instance.close();
   setAlarm(firstSet: false);
 }
 
@@ -93,8 +96,14 @@ void main() async {
     ChangeNotifierProvider<ThemeModeProvider>(
       create: (_) => themeProvider,
     ),
-    ChangeNotifierProvider<StatsProvider>(
-      create: (_) => StatsProvider.instance,
+    ChangeNotifierProvider<EntriesProvider>(
+      create: (_) => EntriesProvider.instance,
+    ),
+    ChangeNotifierProvider<EntryImagesProvider>(
+      create: (_) => EntryImagesProvider.instance,
+    ),
+    ChangeNotifierProvider<TemplatesProvider>(
+      create: (_) => TemplatesProvider.instance,
     ),
     ChangeNotifierProvider<ConfigProvider>(
       create: (_) => ConfigProvider.instance,

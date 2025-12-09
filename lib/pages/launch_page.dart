@@ -1,6 +1,6 @@
 import 'package:daily_you/config_provider.dart';
-import 'package:daily_you/entries_database.dart';
-import 'package:daily_you/stats_provider.dart';
+import 'package:daily_you/database/app_database.dart';
+import 'package:daily_you/database/image_storage.dart';
 import 'package:daily_you/widgets/auth_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
@@ -34,9 +34,9 @@ class _LaunchPageState extends State<LaunchPage> {
 
   _checkDatabaseConnection() async {
     //Initialize Database
-    if (await EntriesDatabase.instance.initDB()) {
-      if (EntriesDatabase.instance.usingExternalImg()) {
-        if (await EntriesDatabase.instance.hasImgUriPermission()) {
+    if (await AppDatabase.instance.init()) {
+      if (ImageStorage.instance.usingExternalLocation()) {
+        if (await ImageStorage.instance.hasExternalLocationPermission()) {
           await _nextPage();
         }
       } else {
@@ -50,7 +50,7 @@ class _LaunchPageState extends State<LaunchPage> {
   }
 
   _forceLocalDatabase() async {
-    await EntriesDatabase.instance.initDB(forceWithoutSync: true);
+    await AppDatabase.instance.init(forceWithoutSync: true);
     await _nextPage();
   }
 
@@ -67,7 +67,7 @@ class _LaunchPageState extends State<LaunchPage> {
                 onSuccess: () {},
               ));
     }
-    await StatsProvider.instance.updateStats();
+    await AppDatabase.instance.open();
     await Navigator.of(context).pushReplacement(MaterialPageRoute(
         builder: (context) => widget.nextPage, allowSnapshotting: false));
   }

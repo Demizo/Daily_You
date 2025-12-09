@@ -1,12 +1,13 @@
 import 'dart:io';
 
+import 'package:daily_you/database/image_storage.dart';
 import 'package:daily_you/models/entry.dart';
-import 'package:daily_you/stats_provider.dart';
+import 'package:daily_you/providers/entries_provider.dart';
+import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
-import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/pages/edit_entry_page.dart';
 import 'package:daily_you/pages/image_view_page.dart';
 import 'package:daily_you/widgets/local_image_loader.dart';
@@ -47,10 +48,11 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final statsProvider = Provider.of<StatsProvider>(context);
+    final entriesProvider = Provider.of<EntriesProvider>(context);
 
-    var entries =
-        widget.filtered ? statsProvider.filteredEntries : statsProvider.entries;
+    var entries = widget.filtered
+        ? entriesProvider.filteredEntries
+        : entriesProvider.entries;
 
     return Scaffold(
         appBar: AppBar(
@@ -76,10 +78,11 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
     return ValueListenableBuilder(
         valueListenable: _currentPageNotifier,
         builder: (context, currentIndex, child) {
-          final statsProvider = Provider.of<StatsProvider>(context);
+          final entriesProvider = Provider.of<EntriesProvider>(context);
+          final entryImagesProvider = Provider.of<EntryImagesProvider>(context);
 
           var entry = entries[currentIndex];
-          var images = statsProvider.getImagesForEntry(entry);
+          var images = entryImagesProvider.getForEntry(entry);
 
           return IconButton(
               icon: const Icon(Icons.edit_rounded),
@@ -94,8 +97,8 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
                 // Get the new list of entries since the date of the edited entry
                 // may have changed.
                 var updatedEntries = widget.filtered
-                    ? statsProvider.filteredEntries
-                    : statsProvider.entries;
+                    ? entriesProvider.filteredEntries
+                    : entriesProvider.entries;
 
                 // Find new index of the same entry by ID
                 final newIndex =
@@ -114,12 +117,10 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
     return ValueListenableBuilder(
         valueListenable: _currentPageNotifier,
         builder: (context, currentIndex, child) {
-          final statsProvider = Provider.of<StatsProvider>(context);
+          final entryImagesProvider = Provider.of<EntryImagesProvider>(context);
 
           var entry = entries[currentIndex];
-          var images = statsProvider.images
-              .where((img) => img.entryId == entry.id!)
-              .toList();
+          var images = entryImagesProvider.getForEntry(entry);
 
           if (Platform.isAndroid &&
               (images.isNotEmpty || entry.text.isNotEmpty)) {
@@ -135,8 +136,8 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
 
                   if (images.isNotEmpty) {
                     // Share Image
-                    var bytes = await EntriesDatabase.instance
-                        .getImgBytes(images.first.imgPath);
+                    var bytes = await ImageStorage.instance
+                        .getBytes(images.first.imgPath);
                     if (bytes != null) {
                       await Share.shareXFiles(
                           [XFile.fromData(bytes, mimeType: "images/*")],
@@ -168,11 +169,10 @@ class EntryDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final statsProvider = Provider.of<StatsProvider>(context);
+    final entryImagesProvider = Provider.of<EntryImagesProvider>(context);
 
     var entry = entries[index];
-    var images =
-        statsProvider.images.where((img) => img.entryId == entry.id!).toList();
+    var images = entryImagesProvider.getForEntry(entry);
 
     return Center(
       child: Container(
@@ -199,18 +199,14 @@ class EntryDetails extends StatelessWidget {
                           ),
                         ),
                         onTap: () async {
-                          if (await EntriesDatabase.instance
-                                  .getImgBytes(images[index].imgPath) !=
-                              null) {
-                            await Navigator.of(context).push(MaterialPageRoute(
-                              allowSnapshotting: false,
-                              fullscreenDialog: true,
-                              builder: (context) => ImageViewPage(
-                                images: images,
-                                index: index,
-                              ),
-                            ));
-                          }
+                          await Navigator.of(context).push(MaterialPageRoute(
+                            allowSnapshotting: false,
+                            fullscreenDialog: true,
+                            builder: (context) => ImageViewPage(
+                              images: images,
+                              index: index,
+                            ),
+                          ));
                         },
                       );
                     }),
@@ -228,18 +224,14 @@ class EntryDetails extends StatelessWidget {
                   ),
                 ),
                 onTap: () async {
-                  if (await EntriesDatabase.instance
-                          .getImgBytes(images.first.imgPath) !=
-                      null) {
-                    await Navigator.of(context).push(MaterialPageRoute(
-                      allowSnapshotting: false,
-                      fullscreenDialog: true,
-                      builder: (context) => ImageViewPage(
-                        images: images,
-                        index: 0,
-                      ),
-                    ));
-                  }
+                  await Navigator.of(context).push(MaterialPageRoute(
+                    allowSnapshotting: false,
+                    fullscreenDialog: true,
+                    builder: (context) => ImageViewPage(
+                      images: images,
+                      index: 0,
+                    ),
+                  ));
                 },
               ),
             Card(
