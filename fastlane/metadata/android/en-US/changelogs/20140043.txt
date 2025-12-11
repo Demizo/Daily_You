@@ -1,0 +1,7 @@
+Daily You v2.14.4 has arrived! Time to smoothen rough edges:
+
+• Fixed visual glitches where the wrong image was shown
+• Added Diaro as an import option
+• Support non-Latin languages for word count
+• Improved responsiveness when using a remote storage location
+• Updated translations
