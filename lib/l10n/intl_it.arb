@@ -258,5 +258,13 @@
     "settingsDeleteAllLogsDescription": "Vuoi davvero cancellare tutte le tue annotazioni?",
     "@settingsDeleteAllLogsDescription": {},
     "settingsOverrideAppLanguageTitle": "Ridefinisci Lingua dell'App",
-    "@settingsOverrideAppLanguageTitle": {}
+    "@settingsOverrideAppLanguageTitle": {},
+    "settingsFlashbacksViewLayout": "Layout di visualizzazione Ricordi",
+    "@settingsFlashbacksViewLayout": {},
+    "settingsGalleryViewLayout": "Layout visualizzazione Galleria",
+    "@settingsGalleryViewLayout": {},
+    "viewLayoutList": "Elenco",
+    "@viewLayoutList": {},
+    "viewLayoutGrid": "Griglia",
+    "@viewLayoutGrid": {}
 }
