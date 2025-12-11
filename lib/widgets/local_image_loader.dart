@@ -26,6 +26,18 @@ class _LocalImageLoaderState extends State<LocalImageLoader> {
     _load();
   }
 
+  @override
+  void didUpdateWidget(covariant LocalImageLoader oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.imagePath != widget.imagePath ||
+        oldWidget.cacheSize != widget.cacheSize) {
+      _bytes = null;
+      _imageNotFound = false;
+      _load(); // reload for the new path
+    }
+  }
+
   Future<void> _load() async {
     final bytes = await LocalImageCache.instance
         .getResizedImageBytes(widget.imagePath, widget.cacheSize);
