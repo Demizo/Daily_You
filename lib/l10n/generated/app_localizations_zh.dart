@@ -240,10 +240,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get moodIconPrompt => '输入一个图标';
 
   @override
-  String get settingsFlashbacksViewLayout => '闪回视图布局';
+  String get settingsFlashbacksViewLayout => '往昔重现的视图布局';
 
   @override
-  String get settingsGalleryViewLayout => '图库视图布局';
+  String get settingsGalleryViewLayout => '迹忆页视图布局';
 
   @override
   String get viewLayoutList => '列表';
