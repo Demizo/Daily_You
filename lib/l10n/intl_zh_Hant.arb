@@ -282,5 +282,7 @@
     "settingsFlashbacksViewLayout": "往日重現檢視佈局",
     "@settingsFlashbacksViewLayout": {},
     "settingsGalleryViewLayout": "紀錄檢視佈局",
-    "@settingsGalleryViewLayout": {}
+    "@settingsGalleryViewLayout": {},
+    "formatDiaro": "Diaro",
+    "@formatDiaro": {}
 }
