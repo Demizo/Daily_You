@@ -1,4 +1,5 @@
 import 'package:daily_you/models/template.dart';
+import 'package:daily_you/providers/templates_provider.dart';
 import 'package:daily_you/widgets/edit_toolbar.dart';
 import 'package:daily_you/widgets/entry_text_edit.dart';
 import 'package:flutter/material.dart';
@@ -7,9 +8,8 @@ import 'package:daily_you/l10n/generated/app_localizations.dart';
 
 class EditTemplate extends StatefulWidget {
   final Template? template;
-  final Function onTemplateSaved;
 
-  const EditTemplate({super.key, this.template, required this.onTemplateSaved});
+  const EditTemplate({super.key, this.template});
 
   @override
   State<EditTemplate> createState() => _EditTemplateState();
@@ -46,18 +46,17 @@ class _EditTemplateState extends State<EditTemplate> {
 
   Future<void> _saveTemplate() async {
     if (widget.template == null) {
-      await Template.create(Template(
+      await TemplatesProvider.instance.add(Template(
           name: _nameController.text,
           text: templateText,
           timeCreate: DateTime.now(),
           timeModified: DateTime.now()));
     } else {
-      await Template.update(widget.template!.copy(
+      await TemplatesProvider.instance.update(widget.template!.copy(
           name: _nameController.text,
           text: templateText,
           timeModified: DateTime.now()));
     }
-    widget.onTemplateSaved();
     Navigator.of(context).pop();
   }
 

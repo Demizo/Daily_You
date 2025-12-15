@@ -1,5 +1,6 @@
 import 'package:daily_you/config_provider.dart';
-import 'package:daily_you/stats_provider.dart';
+import 'package:daily_you/providers/entries_provider.dart';
+import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/widgets/hiding_widget.dart';
 import 'package:daily_you/widgets/large_entry_card_widget.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +25,7 @@ class _GalleryPageState extends State<GalleryPage> {
   @override
   void initState() {
     super.initState();
-    _searchController.text = StatsProvider.instance.searchText;
+    _searchController.text = EntriesProvider.instance.searchText;
   }
 
   @override
@@ -36,7 +37,8 @@ class _GalleryPageState extends State<GalleryPage> {
   }
 
   void _showSortSelectionPopup(BuildContext context) {
-    final statsProvider = Provider.of<StatsProvider>(context, listen: false);
+    final entriesProvider =
+        Provider.of<EntriesProvider>(context, listen: false);
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -47,11 +49,10 @@ class _GalleryPageState extends State<GalleryPage> {
                     children: [
                       RadioListTile<OrderBy>(
                         value: OrderBy.date,
-                        groupValue: statsProvider.orderBy,
+                        groupValue: entriesProvider.orderBy,
                         onChanged: (value) => setState(() {
                           if (value != null) {
-                            statsProvider.orderBy = value;
-                            statsProvider.updateStats();
+                            entriesProvider.orderBy = value;
                           }
                         }),
                         title:
@@ -59,11 +60,10 @@ class _GalleryPageState extends State<GalleryPage> {
                       ),
                       RadioListTile<OrderBy>(
                         value: OrderBy.mood,
-                        groupValue: statsProvider.orderBy,
+                        groupValue: entriesProvider.orderBy,
                         onChanged: (value) => setState(() {
                           if (value != null) {
-                            statsProvider.orderBy = value;
-                            statsProvider.updateStats();
+                            entriesProvider.orderBy = value;
                           }
                         }),
                         title: Text(AppLocalizations.of(context)!.tagMoodTitle),
@@ -71,11 +71,10 @@ class _GalleryPageState extends State<GalleryPage> {
                       const Divider(),
                       RadioListTile<SortOrder>(
                         value: SortOrder.ascending,
-                        groupValue: statsProvider.sortOrder,
+                        groupValue: entriesProvider.sortOrder,
                         onChanged: (value) => setState(() {
                           if (value != null) {
-                            statsProvider.sortOrder = value;
-                            statsProvider.updateStats();
+                            entriesProvider.sortOrder = value;
                           }
                         }),
                         title: Text(AppLocalizations.of(context)!
@@ -83,11 +82,10 @@ class _GalleryPageState extends State<GalleryPage> {
                       ),
                       RadioListTile<SortOrder>(
                         value: SortOrder.descending,
-                        groupValue: statsProvider.sortOrder,
+                        groupValue: entriesProvider.sortOrder,
                         onChanged: (value) => setState(() {
                           if (value != null) {
-                            statsProvider.sortOrder = value;
-                            statsProvider.updateStats();
+                            entriesProvider.sortOrder = value;
                           }
                         }),
                         title: Text(AppLocalizations.of(context)!
@@ -102,7 +100,7 @@ class _GalleryPageState extends State<GalleryPage> {
 
   @override
   Widget build(BuildContext context) {
-    final statsProvider = Provider.of<StatsProvider>(context);
+    final entriesProvider = Provider.of<EntriesProvider>(context);
     final configProvider = Provider.of<ConfigProvider>(context);
     String viewMode = configProvider.get(ConfigKey.galleryPageViewMode);
     bool listView = viewMode == 'list';
@@ -167,20 +165,19 @@ class _GalleryPageState extends State<GalleryPage> {
                               icon: Icon(Icons.clear),
                               onPressed: () {
                                 _searchController.clear();
-                                statsProvider.searchText = "";
-                                statsProvider.updateStats();
+                                entriesProvider.searchText = "";
                                 setState(() {});
                               },
                             )
                           : SizedBox.shrink(
                               key: ValueKey('empty')), // Empty widget
                     ),
-                    if (statsProvider.filteredEntries.length !=
-                        statsProvider.entries.length)
+                    if (entriesProvider.filteredEntries.length !=
+                        entriesProvider.entries.length)
                       Padding(
                         padding: const EdgeInsets.only(right: 8.0),
                         child: Text(AppLocalizations.of(context)!
-                            .logCount(statsProvider.filteredEntries.length)),
+                            .logCount(entriesProvider.filteredEntries.length)),
                       ),
                     IconButton(
                         icon: const Icon(Icons.sort_rounded),
@@ -192,8 +189,7 @@ class _GalleryPageState extends State<GalleryPage> {
                   elevation: WidgetStateProperty.all(1),
                   onChanged: (queryText) => EasyDebounce.debounce(
                       'search-debounce', const Duration(milliseconds: 300), () {
-                    statsProvider.searchText = queryText;
-                    statsProvider.updateStats();
+                    entriesProvider.searchText = queryText;
                   }),
                 ),
               ),
@@ -205,9 +201,10 @@ class _GalleryPageState extends State<GalleryPage> {
   }
 
   Widget buildEntries(BuildContext context, bool listView) {
-    final statsProvider = Provider.of<StatsProvider>(context);
-    var entries = statsProvider.filteredEntries;
-    return statsProvider.filteredEntries.isEmpty
+    final entriesProvider = Provider.of<EntriesProvider>(context);
+    final entryImagesProvider = Provider.of<EntryImagesProvider>(context);
+    var entries = entriesProvider.filteredEntries;
+    return entriesProvider.filteredEntries.isEmpty
         ? Center(
             child: Text(
               AppLocalizations.of(context)!.noLogs,
@@ -238,14 +235,10 @@ class _GalleryPageState extends State<GalleryPage> {
                 child: listView
                     ? LargeEntryCardWidget(
                         entry: entry,
-                        images: statsProvider.images
-                            .where((img) => img.entryId == entry.id!)
-                            .toList())
+                        images: entryImagesProvider.getForEntry(entry))
                     : EntryCardWidget(
                         entry: entry,
-                        images: statsProvider.images
-                            .where((img) => img.entryId == entry.id!)
-                            .toList()),
+                        images: entryImagesProvider.getForEntry(entry)),
               );
             },
           );

@@ -24,7 +24,7 @@ class AppDatabase {
   String? _internalPath;
 
   Future<bool> init({bool forceWithoutSync = false}) async {
-    _internalPath = await _getInternalPath();
+    _internalPath = await getInternalPath();
 
     if (usingExternalLocation() && !forceWithoutSync) {
       if (await hasExternalLocationPermission()) {
@@ -55,7 +55,7 @@ class AppDatabase {
     return ConfigProvider.instance.get(ConfigKey.useExternalDb) ?? false;
   }
 
-  Future<String> _getInternalPath() async {
+  Future<String> getInternalPath() async {
     Directory basePath;
     if (Platform.isAndroid) {
       basePath = (await getExternalStorageDirectory())!;
@@ -78,7 +78,7 @@ class AppDatabase {
   }
 
   /// Select an external database location. Returns whether a new location was set successfully.
-  Future<bool> selectExternalLocation() async {
+  Future<bool> selectExternalLocation(Function(String) updateStatus) async {
     try {
       var selectedDirectory = await FileLayer.pickDirectory();
       if (selectedDirectory == null) return false;
@@ -97,7 +97,8 @@ class AppDatabase {
         await _database!.close();
         await open();
         if (ImageStorage.instance.usingExternalLocation()) {
-          await ImageStorage.instance.syncImageFolder(true);
+          await ImageStorage.instance
+              .syncImageFolder(true, updateStatus: updateStatus);
         }
         return true;
       } else {
@@ -111,6 +112,10 @@ class AppDatabase {
     } catch (_) {
       return false;
     }
+  }
+
+  void resetExternalLocation() async {
+    await ConfigProvider.instance.set(ConfigKey.useExternalDb, false);
   }
 
   /// Overwrite the external database with local changes

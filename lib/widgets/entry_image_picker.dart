@@ -1,12 +1,12 @@
 import 'dart:io';
 
 import 'package:daily_you/config_provider.dart';
+import 'package:daily_you/database/image_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:daily_you/entries_database.dart';
 import 'package:image/image.dart' as img;
 import 'package:path/path.dart' show extension;
 
@@ -70,8 +70,8 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
     final pickedFile = await picker.pickImage(source: ImageSource.camera);
 
     if (pickedFile != null) {
-      var imageName = await EntriesDatabase.instance.createImg(
-          pickedFile.name, await _compressImage(pickedFile, quality));
+      var imageName = await ImageStorage.instance
+          .create(pickedFile.name, await _compressImage(pickedFile, quality));
       if (imageName == null) return;
       setState(() {
         widget.onChangedImage([imageName]);
@@ -90,8 +90,8 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
 
     List<String> newImages = List.empty(growable: true);
     for (var file in pickedFiles) {
-      var imageName = await EntriesDatabase.instance
-          .createImg(file.name, await _compressImage(file, quality));
+      var imageName = await ImageStorage.instance
+          .create(file.name, await _compressImage(file, quality));
       if (imageName != null) {
         newImages.add(imageName);
       }

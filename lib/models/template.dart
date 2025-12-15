@@ -1,5 +1,3 @@
-import 'package:daily_you/entries_database.dart';
-
 const String templatesTable = 'templates';
 
 class TemplatesFields {
@@ -57,73 +55,4 @@ class Template {
         TemplatesFields.timeCreate: timeCreate.toIso8601String(),
         TemplatesFields.timeModified: timeModified.toIso8601String(),
       };
-
-  // Database Interactions
-
-  static Future<Template> create(Template template) async {
-    final db = EntriesDatabase.instance.database!;
-
-    final id = await db.insert(templatesTable, template.toJson());
-    if (EntriesDatabase.instance.usingExternalDb()) {
-      await EntriesDatabase.instance.updateExternalDatabase();
-    }
-    return template.copy(id: id);
-  }
-
-  static Future<Template?> get(int id) async {
-    final db = EntriesDatabase.instance.database!;
-
-    final maps = await db.query(
-      templatesTable,
-      columns: TemplatesFields.values,
-      where: '${TemplatesFields.id} = ?',
-      whereArgs: [id],
-    );
-
-    if (maps.isNotEmpty) {
-      return Template.fromJson(maps.first);
-    } else {
-      return null;
-    }
-  }
-
-  static Future<List<Template>> getAll() async {
-    final db = EntriesDatabase.instance.database!;
-
-    final result =
-        await db.query(templatesTable, orderBy: '${TemplatesFields.name} ASC');
-
-    return result.map((json) => Template.fromJson(json)).toList();
-  }
-
-  static Future<int> update(Template template) async {
-    final db = EntriesDatabase.instance.database!;
-
-    final id = await db.update(
-      templatesTable,
-      template.toJson(),
-      where: '${TemplatesFields.id} = ?',
-      whereArgs: [template.id],
-    );
-
-    if (EntriesDatabase.instance.usingExternalDb()) {
-      await EntriesDatabase.instance.updateExternalDatabase();
-    }
-    return id;
-  }
-
-  static Future<int> delete(int id) async {
-    final db = EntriesDatabase.instance.database!;
-
-    final removedId = await db.delete(
-      templatesTable,
-      where: '${TemplatesFields.id} = ?',
-      whereArgs: [id],
-    );
-
-    if (EntriesDatabase.instance.usingExternalDb()) {
-      await EntriesDatabase.instance.updateExternalDatabase();
-    }
-    return removedId;
-  }
 }

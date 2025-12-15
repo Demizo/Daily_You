@@ -85,6 +85,7 @@ class ImportUtils {
     // Sync and update stats
     if (EntriesDatabase.instance.usingExternalDb()) {
       await EntriesDatabase.instance.syncDatabase();
+      // TODO: use debounced external db update
     }
     if (EntriesDatabase.instance.usingExternalImg()) {
       await EntriesDatabase.instance.syncImageFolder(true);

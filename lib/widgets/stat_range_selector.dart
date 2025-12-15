@@ -1,4 +1,4 @@
-import 'package:daily_you/stats_provider.dart';
+import 'package:daily_you/providers/entries_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:provider/provider.dart';
@@ -16,7 +16,7 @@ class StatsRangeSelector extends StatefulWidget {
 class _StatsRangeSelectorState extends State<StatsRangeSelector> {
   @override
   Widget build(BuildContext context) {
-    final statsProvider = Provider.of<StatsProvider>(context);
+    final entriesProvider = Provider.of<EntriesProvider>(context);
     return SegmentedButton<StatsRange>(
       showSelectedIcon: false,
       segments: <ButtonSegment<StatsRange>>[
@@ -37,11 +37,10 @@ class _StatsRangeSelectorState extends State<StatsRangeSelector> {
           label: Text(AppLocalizations.of(context)!.statisticsRangeAllTime),
         ),
       ],
-      selected: <StatsRange>{statsProvider.statsRange},
+      selected: <StatsRange>{entriesProvider.statsRange},
       onSelectionChanged: (Set<StatsRange> newSelection) {
         setState(() {
-          statsProvider.statsRange = newSelection.first;
-          StatsProvider.instance.updateStats();
+          entriesProvider.setStatsRange(newSelection.first);
         });
         widget.onSelectionChanged(newSelection);
       },

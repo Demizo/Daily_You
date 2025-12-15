@@ -1,6 +1,7 @@
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/models/image.dart';
-import 'package:daily_you/stats_provider.dart';
+import 'package:daily_you/providers/entries_provider.dart';
+import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/local_image_loader.dart';
 import 'package:flutter/material.dart';
@@ -21,14 +22,15 @@ class EntryDayCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final statsProvider = Provider.of<StatsProvider>(context);
+    final entriesProvider = Provider.of<EntriesProvider>(context);
+    final entryImagesProvider = Provider.of<EntryImagesProvider>(context);
     final configProvider = Provider.of<ConfigProvider>(context);
 
-    Entry? entry = statsProvider.getEntryForDate(date);
+    Entry? entry = entriesProvider.getEntryForDate(date);
 
     EntryImage? image;
     if (entry != null) {
-      image = statsProvider.getImagesForEntry(entry).firstOrNull;
+      image = entryImagesProvider.getForEntry(entry).firstOrNull;
     }
 
     bool showMood = configProvider.get(ConfigKey.calendarViewMode) == 'mood';
@@ -54,7 +56,7 @@ class EntryDayCell extends StatelessWidget {
                 allowSnapshotting: false,
                 builder: (context) => EntryDetailPage(
                   filtered: false,
-                  index: statsProvider.getIndexOfEntry(entry.id!),
+                  index: entriesProvider.getIndexOfEntry(entry.id!),
                 ),
               ));
             },
@@ -81,7 +83,7 @@ class EntryDayCell extends StatelessWidget {
                     style:
                         TextStyle(fontSize: 18, color: Colors.white, shadows: [
                       Shadow(
-                          color: Colors.black.withOpacity(0.8),
+                          color: Colors.black.withValues(alpha: 0.8),
                           blurRadius: 6,
                           offset: Offset(0, 0)),
                     ])),
@@ -93,7 +95,7 @@ class EntryDayCell extends StatelessWidget {
               allowSnapshotting: false,
               builder: (context) => EntryDetailPage(
                   filtered: false,
-                  index: statsProvider.getIndexOfEntry(entry.id!)),
+                  index: entriesProvider.getIndexOfEntry(entry.id!)),
             ));
           },
         );

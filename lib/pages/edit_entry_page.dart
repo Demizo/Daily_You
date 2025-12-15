@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:daily_you/database/image_storage.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/notification_manager.dart';
-import 'package:daily_you/stats_provider.dart';
+import 'package:daily_you/providers/entries_provider.dart';
+import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/edit_toolbar.dart';
 import 'package:daily_you/widgets/local_image_loader.dart';
@@ -11,7 +13,6 @@ import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
-import 'package:daily_you/entries_database.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/widgets/entry_image_picker.dart';
 import 'package:daily_you/widgets/entry_text_edit.dart';
@@ -66,7 +67,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
           (TimeManager.isToday(widget.overrideCreateDate ?? DateTime.now()))
               ? DateTime.now()
               : (widget.overrideCreateDate ?? DateTime.now());
-      _entry = await EntriesDatabase.instance.createNewEntry(createTime);
+      _entry = await EntriesProvider.instance.createNewEntry(createTime);
       _newEntry = true;
     } else {
       _entry = widget.entry!;
@@ -132,7 +133,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
               onPressed: () async {
                 _deletingEntry = true;
                 Navigator.of(context).popUntil((route) => route.isFirst);
-                await _deleteEntry(id);
+                await _deleteEntry(_entry);
               },
             ),
             TextButton(
@@ -163,7 +164,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                 if (updatedEntry.text == _entry.text &&
                     updatedEntry.mood == _entry.mood &&
                     currentImages.isEmpty) {
-                  await _deleteEntry(id);
+                  await _deleteEntry(_entry);
                 } else {
                   await _saveEntry();
                 }
@@ -263,7 +264,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
 
   Widget _changeDateButton() {
     final theme = Theme.of(context);
-    final statsProvider = Provider.of<StatsProvider>(context);
+    final entriesProvider = Provider.of<EntriesProvider>(context);
 
     return TextButton.icon(
         // icon: Icon(Icons.edit_rounded),
@@ -278,7 +279,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
         onPressed: () async {
           DateTime? pickedDate = await showDatePicker(
             selectableDayPredicate: (date) =>
-                statsProvider.getEntryForDate(date) == null ||
+                entriesProvider.getEntryForDate(date) == null ||
                 TimeManager.isSameDay(date, entryDate!),
             initialDatePickerMode: DatePickerMode.day,
             context: context,
@@ -457,7 +458,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
         _lastText = updatedEntry.text;
         _lastMood = updatedEntry.mood;
         _lastEntryDate = updatedEntry.timeCreate;
-        await EntriesDatabase.instance.updateEntry(updatedEntry);
+        await EntriesProvider.instance.update(updatedEntry);
       }
       // Images will update if they changed
       await _saveOrUpdateImage(id);
@@ -465,25 +466,25 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     }
   }
 
-  Future _deleteEntry(int id) async {
+  Future _deleteEntry(Entry entry) async {
     // Delete entry images
-    var entryImages = await EntriesDatabase.instance.getImagesForEntry(id);
+    var entryImages = EntryImagesProvider.instance.getForEntry(entry);
     for (EntryImage image in entryImages) {
-      await EntriesDatabase.instance.deleteImg(image.imgPath);
-      await EntriesDatabase.instance.removeImg(image);
+      await ImageStorage.instance.delete(image.imgPath);
+      await EntryImagesProvider.instance.remove(image);
     }
     // Delete entry
-    await EntriesDatabase.instance.deleteEntry(id);
+    await EntriesProvider.instance.remove(entry);
   }
 
   Future _saveOrUpdateImage(int entryId) async {
-    final savedImages = StatsProvider.instance.getImagesForEntry(_entry);
+    final savedImages = EntryImagesProvider.instance.getForEntry(_entry);
     // Add images
     for (EntryImage currentImage in currentImages) {
       currentImage.entryId = entryId;
       if (currentImage.id == null ||
           savedImages.where((image) => image.id == currentImage.id!).isEmpty) {
-        await EntriesDatabase.instance.addImg(currentImage);
+        await EntryImagesProvider.instance.add(currentImage);
       }
     }
     // Update images
@@ -493,15 +494,15 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
           .firstOrNull;
       if (matchingImage == null) {
         // Delete image
-        await EntriesDatabase.instance.removeImg(existingImage);
+        await EntryImagesProvider.instance.remove(existingImage);
       } else if (matchingImage.imgRank != existingImage.imgRank) {
-        await EntriesDatabase.instance.updateImg(matchingImage);
+        await EntryImagesProvider.instance.update(matchingImage);
       }
     }
     // Set current images to match saved state. Note: the entry images
     // are copied to avoid editing the originals in StatsProvider.
     currentImages.clear();
-    for (var image in StatsProvider.instance.getImagesForEntry(_entry)) {
+    for (var image in EntryImagesProvider.instance.getForEntry(_entry)) {
       currentImages.add(image.copy());
     }
   }

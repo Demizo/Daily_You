@@ -55,6 +55,39 @@ class ImageStorage {
     return FileLayer.hasPermission(await getInternalFolder());
   }
 
+  Future<bool> selectExternalLocation(Function(String) updateStatus) async {
+    try {
+      var selectedDirectory = await FileLayer.pickDirectory();
+      if (selectedDirectory == null) return false;
+
+      // Save Old Settings
+      var oldExternalImgUri =
+          ConfigProvider.instance.get(ConfigKey.externalImgUri);
+      var oldUseExternalImg = usingExternalLocation();
+
+      await ConfigProvider.instance
+          .set(ConfigKey.externalImgUri, selectedDirectory);
+      await ConfigProvider.instance.set(ConfigKey.useExternalImg, true);
+      var synced = await syncImageFolder(true, updateStatus: updateStatus);
+      if (synced) {
+        return true;
+      } else {
+        // Restore Settings
+        await ConfigProvider.instance
+            .set(ConfigKey.externalImgUri, oldExternalImgUri);
+        await ConfigProvider.instance
+            .set(ConfigKey.useExternalImg, oldUseExternalImg);
+        return false;
+      }
+    } catch (_) {
+      return false;
+    }
+  }
+
+  void resetImageFolderLocation() async {
+    await ConfigProvider.instance.set(ConfigKey.useExternalImg, false);
+  }
+
   Future<Uint8List?> getBytes(String imageName) async {
     // Fetch cache copy if present
     var bytes = imageCache.get(imageName);
@@ -152,8 +185,10 @@ class ImageStorage {
     return true;
   }
 
-  Future<bool> syncImageFolder(bool garbageCollect) async {
-    StatsProvider.instance.updateSyncStats(0, 0);
+  Future<bool> syncImageFolder(bool garbageCollect,
+      {Function(String)? updateStatus}) async {
+    List<Entry> entries = EntriesProvider.instance.entries;
+    updateStatus?.call("0/${entries.length}");
 
     final internalFolder = await getInternalFolder();
     final externalFolder = _getExternalFolder();
@@ -165,7 +200,6 @@ class ImageStorage {
     List<String> internalImages =
         await FileLayer.listFiles(internalFolder, useExternalPath: false);
 
-    List<Entry> entries = EntriesProvider.instance.entries;
     int syncedEntries = 0;
     for (Entry entry in entries) {
       var images = EntryImagesProvider.instance.getForEntry(entry);
@@ -192,7 +226,7 @@ class ImageStorage {
               useExternalPath: false);
         }
         syncedEntries += 1;
-        StatsProvider.instance.updateSyncStats(entries.length, syncedEntries);
+        updateStatus?.call("$syncedEntries/${entries.length}");
       }
     }
 

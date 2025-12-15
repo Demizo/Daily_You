@@ -65,7 +65,7 @@ class MoodByDayChart extends StatelessWidget {
                       color: Theme.of(context)
                           .colorScheme
                           .onSurface
-                          .withOpacity(0.2),
+                          .withValues(alpha: 0.2),
                       width: 1,
                     ))),
                 gridData: FlGridData(
@@ -77,7 +77,7 @@ class MoodByDayChart extends StatelessWidget {
                     color: Theme.of(context)
                         .colorScheme
                         .onSurface
-                        .withOpacity(0.2),
+                        .withValues(alpha: 0.2),
                     strokeWidth: 1,
                   ),
                 ),

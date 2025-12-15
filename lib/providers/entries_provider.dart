@@ -1,7 +1,13 @@
 import 'dart:async';
+import 'dart:io';
+import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/database/entry_dao.dart';
 import 'package:daily_you/models/entry.dart';
+import 'package:daily_you/models/template.dart';
+import 'package:daily_you/notification_manager.dart';
+import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/providers/templates_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/stat_range_selector.dart';
 import 'package:flutter/material.dart';
@@ -23,9 +29,36 @@ class EntriesProvider with ChangeNotifier {
 
   // Used for filtered searches on the gallery page
   List<Entry> filteredEntries = List.empty();
-  String searchText = "";
-  OrderBy orderBy = OrderBy.date;
-  SortOrder sortOrder = SortOrder.descending;
+
+  String _searchText = "";
+  String get searchText {
+    return _searchText;
+  }
+
+  set searchText(String newSearchText) {
+    _searchText = newSearchText;
+    notifyListeners();
+  }
+
+  OrderBy _orderBy = OrderBy.date;
+  OrderBy get orderBy {
+    return _orderBy;
+  }
+
+  set orderBy(OrderBy newOrderBy) {
+    _orderBy = newOrderBy;
+    notifyListeners();
+  }
+
+  SortOrder _sortOrder = SortOrder.descending;
+  SortOrder get sortOrder {
+    return _sortOrder;
+  }
+
+  set sortOrder(SortOrder newSortOrder) {
+    _sortOrder = newSortOrder;
+    notifyListeners();
+  }
 
   // Used for preserving calendar state
   DateTime selectedDate = DateTime.now();
@@ -38,10 +71,19 @@ class EntriesProvider with ChangeNotifier {
 
   // CRUD operations
 
-  Future<void> add(Entry entry) async {
+  Future<Entry> add(Entry entry) async {
     // Insert the entry into the database so that it has an ID
     final entryWithId = await EntryDao.add(entry);
     entries.add(entryWithId);
+    await AppDatabase.instance.updateExternalDatabase();
+    notifyListeners();
+    return entryWithId;
+  }
+
+  Future<void> update(Entry entry) async {
+    await EntryDao.update(entry);
+    final index = entries.indexWhere((x) => x.id == entry.id);
+    entries[index] = entry.copy();
     await AppDatabase.instance.updateExternalDatabase();
     notifyListeners();
   }
@@ -53,30 +95,74 @@ class EntriesProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> update(Entry entry) async {
-    await EntryDao.update(entry);
-    final index = entries.indexWhere((x) => x.id == entry.id);
-    entries[index] = entry.copy();
-    await AppDatabase.instance.updateExternalDatabase();
-    notifyListeners();
+  Future<Entry> createNewEntry(DateTime? timeCreate) async {
+    var text = "";
+    final defaultTemplate = TemplatesProvider.instance.getDefaultTemplate();
+    if (defaultTemplate != null) {
+      text = defaultTemplate.text ?? "";
+    }
+
+    final newEntry = Entry(
+      text: text,
+      mood: null,
+      timeCreate: timeCreate ?? DateTime.now(),
+      timeModified: DateTime.now(),
+    );
+
+    if (Platform.isAndroid &&
+        TimeManager.isSameDay(DateTime.now(), newEntry.timeCreate)) {
+      await NotificationManager.instance.dismissReminderNotification();
+    }
+
+    return await add(newEntry);
   }
 
-  Future<void> setStatsRange(StatsRange range) async {
+  Future<void> deleteAll(Function(String) updateStatus) async {
+    updateStatus("0%");
+    var processedEntries = 0;
+    for (Entry entry in entries) {
+      var images = EntryImagesProvider.instance.getForEntry(entry);
+      for (final image in images) {
+        // TODO: Don't update data until everything is deleted. Is this needed?!?
+        await EntryImagesProvider.instance.remove(image);
+      }
+      processedEntries += 1;
+      // The provider's remove function is not used to avoid editing the entries
+      // list while iterating over it.
+      await EntryDao.remove(entry.id!);
+      updateStatus("${((processedEntries / entries.length) * 100).round()}%");
+    }
+
+    // Reload the provider since all entries have been deleted
+    await load();
+    if (AppDatabase.instance.usingExternalLocation()) {
+      await AppDatabase.instance.updateExternalDatabase();
+    }
+  }
+
+  /// Set the stats range and update listening widgets
+  void setStatsRange(StatsRange range) async {
     statsRange = range;
     getMoodTotals();
     notifyListeners();
   }
 
+  /// Set the selected date and update listening widgets
+  void setSelectedDate(DateTime date) {
+    selectedDate = date;
+    notifyListeners();
+  }
+
   Future<void> filterEntries() async {
-    if (searchText.isNotEmpty) {
+    if (_searchText.isNotEmpty) {
       filteredEntries = entries
           .where((entry) =>
-              entry.text.toLowerCase().contains(searchText.toLowerCase()))
+              entry.text.toLowerCase().contains(_searchText.toLowerCase()))
           .toList();
     }
 
     // Ordering by date is the default
-    if (orderBy == OrderBy.mood) {
+    if (_orderBy == OrderBy.mood) {
       filteredEntries.sort((a, b) {
         var aValue = a.mood ?? -999;
         var bValue = b.mood ?? -999;
@@ -85,7 +171,7 @@ class EntriesProvider with ChangeNotifier {
     }
 
     // Sorting is descending by default
-    if (sortOrder == SortOrder.ascending) {
+    if (_sortOrder == SortOrder.ascending) {
       filteredEntries = entries.reversed.toList();
     }
 

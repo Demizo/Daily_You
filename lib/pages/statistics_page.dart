@@ -1,4 +1,4 @@
-import 'package:daily_you/stats_provider.dart';
+import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/widgets/mood_by_day_chart.dart';
 import 'package:daily_you/widgets/mood_by_month_chart.dart';
 import 'package:daily_you/widgets/mood_totals_chart.dart';
@@ -19,7 +19,10 @@ class StatsPage extends StatelessWidget {
       );
 
   Widget buildEntries(BuildContext context) {
-    final statsProvider = Provider.of<StatsProvider>(context);
+    final entriesProvider = Provider.of<EntriesProvider>(context);
+    int wordCount = entriesProvider.getWordCount();
+    var (currentStreak, longestStreak, daysSinceBadDay) =
+        entriesProvider.getStreaks();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -30,33 +33,30 @@ class StatsPage extends StatelessWidget {
           child: Wrap(
             children: [
               StreakCard(
-                title: AppLocalizations.of(context)!
-                    .streakCurrent(statsProvider.currentStreak),
+                title:
+                    AppLocalizations.of(context)!.streakCurrent(currentStreak),
                 isVisible: true,
                 icon: Icons.bolt,
               ),
               StreakCard(
                   title: AppLocalizations.of(context)!
-                      .streakLongest(statsProvider.longestStreak),
-                  isVisible:
-                      statsProvider.longestStreak > statsProvider.currentStreak,
+                      .streakLongest(longestStreak),
+                  isVisible: longestStreak > currentStreak,
                   icon: Icons.history_rounded),
               StreakCard(
                   title: AppLocalizations.of(context)!
-                      .streakSinceBadDay(statsProvider.daysSinceBadDay ?? 0),
-                  isVisible: statsProvider.daysSinceBadDay != null &&
-                      statsProvider.daysSinceBadDay! > 3,
+                      .streakSinceBadDay(daysSinceBadDay ?? 0),
+                  isVisible: daysSinceBadDay != null && daysSinceBadDay > 3,
                   icon: Icons.timeline_rounded),
               StreakCard(
                 title: AppLocalizations.of(context)!
-                    .logCount(statsProvider.entries.length),
+                    .logCount(entriesProvider.entries.length),
                 isVisible: true,
                 icon: Icons.description_outlined,
               ),
               StreakCard(
-                title: AppLocalizations.of(context)!
-                    .wordCount(statsProvider.wordCount),
-                isVisible: statsProvider.wordCount > 100,
+                title: AppLocalizations.of(context)!.wordCount(wordCount),
+                isVisible: wordCount > 100,
                 icon: Icons.sort_rounded,
               ),
             ],
@@ -78,7 +78,7 @@ class StatsPage extends StatelessWidget {
           ),
         ),
         MoodTotalsChart(
-          moodCounts: statsProvider.moodTotals,
+          moodCounts: entriesProvider.getMoodTotals(),
         ),
         Center(
           child: Text(
@@ -88,7 +88,7 @@ class StatsPage extends StatelessWidget {
           ),
         ),
         MoodByDayChart(
-          averageMood: statsProvider.getMoodsByDay(),
+          averageMood: entriesProvider.getMoodsByDay(),
         ),
       ],
     );

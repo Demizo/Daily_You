@@ -1,33 +1,12 @@
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/models/template.dart';
+import 'package:daily_you/providers/templates_provider.dart';
 import 'package:daily_you/widgets/edit_template.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 
-class TemplateManager extends StatefulWidget {
-  final Function onTemplatesUpdated;
-
-  const TemplateManager({super.key, required this.onTemplatesUpdated});
-
-  @override
-  State<TemplateManager> createState() => _TemplateManagementDialogState();
-}
-
-class _TemplateManagementDialogState extends State<TemplateManager> {
-  List<Template> _templates = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _loadTemplates();
-  }
-
-  Future<void> _loadTemplates() async {
-    List<Template> templates = await Template.getAll();
-    setState(() {
-      _templates = templates;
-    });
-  }
+class TemplateManager extends StatelessWidget {
+  const TemplateManager({super.key});
 
   void _showEditTemplatePopup(BuildContext context, Template? template) async {
     await Navigator.of(context).push(MaterialPageRoute(
@@ -35,15 +14,13 @@ class _TemplateManagementDialogState extends State<TemplateManager> {
         fullscreenDialog: true,
         builder: (context) => EditTemplate(
               template: template,
-              onTemplateSaved: () {
-                _loadTemplates();
-                widget.onTemplatesUpdated();
-              },
             )));
   }
 
-  Widget _buildTemplatesList() {
-    if (_templates.isEmpty) {
+  Widget _buildTemplatesList(BuildContext context) {
+    final templates = TemplatesProvider.instance.templates;
+
+    if (templates.isEmpty) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -53,9 +30,9 @@ class _TemplateManagementDialogState extends State<TemplateManager> {
     } else {
       return ListView.builder(
         shrinkWrap: true,
-        itemCount: _templates.length,
+        itemCount: templates.length,
         itemBuilder: (context, index) {
-          final template = _templates[index];
+          final template = templates[index];
           return ListTile(
             title: Padding(
               padding: const EdgeInsets.only(
@@ -72,15 +49,14 @@ class _TemplateManagementDialogState extends State<TemplateManager> {
                 IconButton(
                   icon: const Icon(Icons.delete),
                   onPressed: () async {
-                    await Template.delete(template.id!);
                     if (ConfigProvider.instance
                             .get(ConfigKey.defaultTemplate) ==
                         template.id!) {
                       await ConfigProvider.instance
                           .set(ConfigKey.defaultTemplate, -1);
                     }
-                    _loadTemplates();
-                    widget.onTemplatesUpdated();
+                    // TODO: does this misbehave?
+                    await TemplatesProvider.instance.remove(template);
                   },
                 ),
                 IconButton(
@@ -114,7 +90,7 @@ class _TemplateManagementDialogState extends State<TemplateManager> {
           ),
         ],
       ),
-      body: _buildTemplatesList(),
+      body: _buildTemplatesList(context),
     );
   }
 }

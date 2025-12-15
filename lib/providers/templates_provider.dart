@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/database/template_dao.dart';
 import 'package:daily_you/models/template.dart';
@@ -40,5 +41,11 @@ class TemplatesProvider with ChangeNotifier {
     templates[index] = template.copy();
     await AppDatabase.instance.updateExternalDatabase();
     notifyListeners();
+  }
+
+  Template? getDefaultTemplate() {
+    var defaultTemplateId =
+        ConfigProvider.instance.get(ConfigKey.defaultTemplate);
+    return templates.where((t) => t.id == defaultTemplateId).firstOrNull;
   }
 }
