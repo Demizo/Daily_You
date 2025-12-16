@@ -251,7 +251,7 @@
     "@settingsShowFlashbacks": {},
     "settingsSecurityTitle": "安全",
     "@settingsSecurityTitle": {},
-    "settingsSecurityRequirePassword": "需要輸入密碼",
+    "settingsSecurityRequirePassword": "使用密碼解鎖",
     "@settingsSecurityRequirePassword": {},
     "settingsSecurityEnterPassword": "輸入密碼",
     "@settingsSecurityEnterPassword": {},
