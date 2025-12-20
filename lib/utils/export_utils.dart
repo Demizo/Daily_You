@@ -1,11 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:daily_you/entries_database.dart';
+import 'package:daily_you/database/image_storage.dart';
 import 'package:daily_you/file_layer.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/image.dart';
-import 'package:daily_you/stats_provider.dart';
+import 'package:daily_you/providers/entries_provider.dart';
+import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/utils/zip_utils.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
@@ -47,15 +48,15 @@ class ExportUtils {
         "daily_you_markdown_export_${DateTime.now().toIso8601String().replaceAll(':', '-')}.zip";
 
     try {
-      final totalLogs = StatsProvider.instance.entries.length;
+      final entries = EntriesProvider.instance.entries;
+      final totalLogs = entries.length;
       int processedLogs = 0;
-      for (Entry entry in StatsProvider.instance.entries) {
-        final images = StatsProvider.instance.getImagesForEntry(entry);
+      for (Entry entry in entries) {
+        final images = EntryImagesProvider.instance.getForEntry(entry);
         StringBuffer noteBody = StringBuffer();
 
         for (EntryImage image in images) {
-          final bytes =
-              await EntriesDatabase.instance.getImgBytes(image.imgPath);
+          final bytes = await ImageStorage.instance.getBytes(image.imgPath);
           final prettyName =
               "image_${DateFormat("yyyy-MM-dd", TimeManager.currentLocale(context)).format(entry.timeCreate)}_${image.imgRank}${extension(image.imgPath)}";
           if (bytes != null) {

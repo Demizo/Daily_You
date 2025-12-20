@@ -1,8 +1,8 @@
 import 'dart:io';
 
-import 'package:daily_you/entries_database.dart';
+import 'package:daily_you/database/app_database.dart';
+import 'package:daily_you/database/image_storage.dart';
 import 'package:daily_you/file_layer.dart';
-import 'package:daily_you/stats_provider.dart';
 import 'package:daily_you/utils/zip_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
@@ -30,9 +30,9 @@ class BackupRestoreUtils {
     // Create archive
     updateStatus(AppLocalizations.of(context)!.creatingBackupStatus("0"));
     await ZipUtils.compress(join(tempDir.path, exportedZipName), [
-      await EntriesDatabase.instance.getInternalDbPath()
+      await AppDatabase.instance.getInternalPath()
     ], [
-      await EntriesDatabase.instance.getInternalImgDatabasePath()
+      await ImageStorage.instance.getInternalFolder()
     ], onProgress: (percent) {
       updateStatus(AppLocalizations.of(context)!
           .creatingBackupStatus("${percent.round()}"));
@@ -89,10 +89,11 @@ class BackupRestoreUtils {
     final tempDb = File(join(restoreFolder.path, 'daily_you.db'));
     if (await tempDb.exists()) {
       // Import database
-      await EntriesDatabase.instance.close();
-      await File(await EntriesDatabase.instance.getInternalDbPath())
+      await AppDatabase.instance.close();
+      await File(await AppDatabase.instance.getInternalPath())
           .writeAsBytes(await tempDb.readAsBytes());
-      await EntriesDatabase.instance.initDB();
+      await AppDatabase.instance.open();
+      await AppDatabase.instance.updateExternalDatabase();
 
       // Import images. These will be garbage collected after import
       if (await Directory(join(restoreFolder.path, "Images")).exists()) {
@@ -100,20 +101,17 @@ class BackupRestoreUtils {
         updateStatus(AppLocalizations.of(context)!.cleanUpStatus);
         var files = Directory(join(restoreFolder.path, "Images")).list();
         final internalImagePath =
-            await EntriesDatabase.instance.getInternalImgDatabasePath();
+            await ImageStorage.instance.getInternalFolder();
         await for (FileSystemEntity fileEntity in files) {
           if (fileEntity is File) {
             await File(join(internalImagePath, basename(fileEntity.path)))
                 .writeAsBytes(await fileEntity.readAsBytes());
           }
         }
-        if (EntriesDatabase.instance.usingExternalImg()) {
-          await EntriesDatabase.instance.syncImageFolder(false);
+        if (ImageStorage.instance.usingExternalLocation()) {
+          await ImageStorage.instance.syncImageFolder(true);
         }
-        await EntriesDatabase.instance.garbageCollectImages();
       }
-
-      await StatsProvider.instance.updateStats();
     } else {
       importSuccessful = false;
     }
