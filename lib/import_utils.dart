@@ -620,7 +620,7 @@ class ImportUtils {
             if (file == null) continue;
 
             images.add({
-              'data': await File(file).readAsBytes(),
+              'file': file,
               'rank': 0, // Daylio doesn’t have ranks
             });
           }
@@ -643,7 +643,7 @@ class ImportUtils {
 
           for (final img in images) {
             final imagePath = await ImageStorage.instance.create(
-                null, Uint8List.fromList(img['data']),
+                null, Uint8List.fromList(await File(img['file']).readAsBytes()),
                 currTime: earliest);
             if (imagePath != null) {
               await EntryImagesProvider.instance.add(
