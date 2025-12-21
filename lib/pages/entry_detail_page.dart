@@ -51,7 +51,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
     final entriesProvider = Provider.of<EntriesProvider>(context);
 
     var entries = widget.filtered
-        ? entriesProvider.filteredEntries
+        ? entriesProvider.getFilteredEntries()
         : entriesProvider.entries;
 
     // When entries are deleted the current index may be too large
@@ -102,7 +102,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
                 // Get the new list of entries since the date of the edited entry
                 // may have changed.
                 var updatedEntries = widget.filtered
-                    ? entriesProvider.filteredEntries
+                    ? entriesProvider.getFilteredEntries()
                     : entriesProvider.entries;
 
                 // Find new index of the same entry by ID

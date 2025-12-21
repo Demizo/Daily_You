@@ -172,12 +172,11 @@ class _GalleryPageState extends State<GalleryPage> {
                           : SizedBox.shrink(
                               key: ValueKey('empty')), // Empty widget
                     ),
-                    if (entriesProvider.filteredEntries.length !=
-                        entriesProvider.entries.length)
+                    if (entriesProvider.searchText.isNotEmpty)
                       Padding(
                         padding: const EdgeInsets.only(right: 8.0),
-                        child: Text(AppLocalizations.of(context)!
-                            .logCount(entriesProvider.filteredEntries.length)),
+                        child: Text(AppLocalizations.of(context)!.logCount(
+                            entriesProvider.getFilteredEntries().length)),
                       ),
                     IconButton(
                         icon: const Icon(Icons.sort_rounded),
@@ -203,8 +202,8 @@ class _GalleryPageState extends State<GalleryPage> {
   Widget buildEntries(BuildContext context, bool listView) {
     final entriesProvider = Provider.of<EntriesProvider>(context);
     final entryImagesProvider = Provider.of<EntryImagesProvider>(context);
-    var entries = entriesProvider.filteredEntries;
-    return entriesProvider.filteredEntries.isEmpty
+    var entries = entriesProvider.getFilteredEntries();
+    return entries.isEmpty
         ? Center(
             child: Text(
               AppLocalizations.of(context)!.noLogs,

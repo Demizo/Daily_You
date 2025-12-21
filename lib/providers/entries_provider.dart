@@ -27,9 +27,6 @@ class EntriesProvider with ChangeNotifier {
 
   StatsRange statsRange = StatsRange.month;
 
-  // Used for filtered searches on the gallery page
-  List<Entry> filteredEntries = List.empty();
-
   String _searchText = "";
   String get searchText {
     return _searchText;
@@ -127,7 +124,6 @@ class EntriesProvider with ChangeNotifier {
     for (Entry entry in entries) {
       var images = EntryImagesProvider.instance.getForEntry(entry);
       for (final image in images) {
-        // TODO: Don't update data until everything is deleted. Is this needed?!?
         await EntryImagesProvider.instance.remove(image);
       }
       processedEntries += 1;
@@ -155,12 +151,16 @@ class EntriesProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> filterEntries() async {
+  List<Entry> getFilteredEntries() {
+    List<Entry> filteredEntries;
+    // Make a copy of the entries list
     if (_searchText.isNotEmpty) {
       filteredEntries = entries
           .where((entry) =>
               entry.text.toLowerCase().contains(_searchText.toLowerCase()))
           .toList();
+    } else {
+      filteredEntries = entries.toList();
     }
 
     // Ordering by date is the default
@@ -174,10 +174,10 @@ class EntriesProvider with ChangeNotifier {
 
     // Sorting is descending by default
     if (_sortOrder == SortOrder.ascending) {
-      filteredEntries = entries.reversed.toList();
+      filteredEntries = filteredEntries.reversed.toList();
     }
 
-    notifyListeners();
+    return filteredEntries;
   }
 
   int getWordCount() {
