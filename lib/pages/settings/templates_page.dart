@@ -20,8 +20,8 @@ class TemplateSettings extends StatelessWidget {
 
   List<DropdownMenuItem<int>> _buildDefaultTemplateDropdownItems(
       BuildContext context) {
-    var dropdownItems =
-        TemplatesProvider.instance.templates.map((Template template) {
+    final templatesProvider = Provider.of<TemplatesProvider>(context);
+    var dropdownItems = templatesProvider.templates.map((Template template) {
       return DropdownMenuItem<int>(
         value: template.id,
         child: ConstrainedBox(

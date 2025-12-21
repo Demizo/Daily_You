@@ -38,7 +38,7 @@ class EntryImagesProvider with ChangeNotifier {
   Future<void> update(EntryImage image) async {
     await EntryImageDao.update(image);
     final index = images.indexWhere((x) => x.id == image.id);
-    images[index] = image.copy();
+    images[index] = image;
     await AppDatabase.instance.updateExternalDatabase();
     notifyListeners();
   }
@@ -49,7 +49,7 @@ class EntryImagesProvider with ChangeNotifier {
   List<EntryImage> getForEntry(Entry entry) {
     final imagesForEntry =
         images.where((img) => img.entryId == entry.id!).toList();
-    // TODO double check that this is the correct order
+    // Reverse order such that the highest rank is the first in the list
     imagesForEntry.sort((a, b) => b.imgRank.compareTo(a.imgRank));
     return imagesForEntry;
   }

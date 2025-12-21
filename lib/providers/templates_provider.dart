@@ -38,7 +38,7 @@ class TemplatesProvider with ChangeNotifier {
   Future<void> update(Template template) async {
     await TemplateDao.update(template);
     final index = templates.indexWhere((x) => x.id == template.id);
-    templates[index] = template.copy();
+    templates[index] = template;
     await AppDatabase.instance.updateExternalDatabase();
     notifyListeners();
   }

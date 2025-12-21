@@ -228,7 +228,6 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
                 value: configProvider.get(ConfigKey.startingDayOfWeek),
                 options: _buildFirstDayOfWeekDropdownItems(context),
                 onChanged: (String? newValue) async {
-                  // TODO: Check if a stats update is needed here
                   await configProvider.set(
                       ConfigKey.startingDayOfWeek, newValue);
                 }),

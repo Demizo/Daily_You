@@ -3,6 +3,7 @@ import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:provider/provider.dart';
 
 class MoodByDayChart extends StatelessWidget {
   final Map<String, double> averageMood;
@@ -108,9 +109,9 @@ class MoodByDayChart extends StatelessWidget {
   }
 
   List<MapEntry<String, double>> _getOrderedDays(BuildContext context) {
+    final configProvider = Provider.of<ConfigProvider>(context);
     List<MapEntry<String, double>> days = averageMood.entries.toList();
-    final startingDayIndex =
-        ConfigProvider.instance.getFirstDayOfWeekIndex(context);
+    final startingDayIndex = configProvider.getFirstDayOfWeekIndex(context);
     days = days.sublist(startingDayIndex)
       ..addAll(days.sublist(0, startingDayIndex));
     return days;

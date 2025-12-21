@@ -4,6 +4,7 @@ import 'package:daily_you/providers/templates_provider.dart';
 import 'package:daily_you/widgets/edit_template.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
+import 'package:provider/provider.dart';
 
 class TemplateManager extends StatelessWidget {
   const TemplateManager({super.key});
@@ -18,7 +19,8 @@ class TemplateManager extends StatelessWidget {
   }
 
   Widget _buildTemplatesList(BuildContext context) {
-    final templates = TemplatesProvider.instance.templates;
+    final templatesProvider = Provider.of<TemplatesProvider>(context);
+    final templates = templatesProvider.templates;
 
     if (templates.isEmpty) {
       return Row(
@@ -55,8 +57,7 @@ class TemplateManager extends StatelessWidget {
                       await ConfigProvider.instance
                           .set(ConfigKey.defaultTemplate, -1);
                     }
-                    // TODO: does this misbehave?
-                    await TemplatesProvider.instance.remove(template);
+                    await templatesProvider.remove(template);
                   },
                 ),
                 IconButton(

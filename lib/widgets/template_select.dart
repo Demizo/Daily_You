@@ -3,6 +3,7 @@ import 'package:daily_you/providers/templates_provider.dart';
 import 'package:daily_you/widgets/template_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
+import 'package:provider/provider.dart';
 
 class TemplateSelect extends StatelessWidget {
   final Function(Template template) onTemplatesSelected;
@@ -17,7 +18,9 @@ class TemplateSelect extends StatelessWidget {
   }
 
   Widget _buildTemplatesList(BuildContext context) {
-    final templates = TemplatesProvider.instance.templates;
+    final templatesProvider = Provider.of<TemplatesProvider>(context);
+    final templates = templatesProvider.templates;
+
     if (templates.isEmpty) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,

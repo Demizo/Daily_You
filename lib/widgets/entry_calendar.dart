@@ -36,6 +36,7 @@ class _EntryCalendarState extends State<EntryCalendar>
   Widget build(BuildContext context) {
     super.build(context);
     final entriesProvider = Provider.of<EntriesProvider>(context);
+    final configProvider = Provider.of<ConfigProvider>(context);
     final theme = Theme.of(context);
     return TableCalendar(
       locale: TimeManager.currentLocale(context),
@@ -43,7 +44,7 @@ class _EntryCalendarState extends State<EntryCalendar>
       daysOfWeekHeight: 24,
       sixWeekMonthsEnforced: true,
       startingDayOfWeek: StartingDayOfWeek
-          .values[ConfigProvider.instance.getFirstDayOfWeekIndex(context)],
+          .values[configProvider.getFirstDayOfWeekIndex(context)],
       availableGestures: AvailableGestures.horizontalSwipe,
       availableCalendarFormats: const {
         CalendarFormat.month: 'Month',
