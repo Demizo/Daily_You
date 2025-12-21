@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/pages/settings/notification_settings.dart';
+import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/pages/statistics_page.dart';
@@ -20,12 +21,25 @@ class MobileScaffold extends StatefulWidget {
 
 class _MobileScaffoldState extends State<MobileScaffold> {
   int currentIndex = 0;
+  late final PageController _pageController;
 
   final List<Widget> pages = [
     const HomePage(),
     const GalleryPage(),
     const StatsPage(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: currentIndex);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
 
   void _showNotificationOnboardingPopup() {
     showDialog(
@@ -98,21 +112,31 @@ class _MobileScaffoldState extends State<MobileScaffold> {
           },
         )
       ]),
-      body: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 200),
-          transitionBuilder: (Widget child, Animation<double> animation) {
-            return FadeTransition(opacity: animation, child: child);
+      body: PageView(
+          controller: _pageController,
+          physics: const ClampingScrollPhysics(),
+          onPageChanged: (index) {
+            EasyDebounce.debounce(
+                "page-change",
+                Duration(milliseconds: 150),
+                () => setState(() {
+                      currentIndex = index;
+                    }));
           },
-          switchInCurve: Curves.easeIn,
-          switchOutCurve: Curves.easeOut,
-          child: pages[currentIndex]),
+          children: pages),
       bottomNavigationBar: NavigationBar(
         labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
         selectedIndex: currentIndex,
         onDestinationSelected: (index) {
+          EasyDebounce.cancel("page-change");
           setState(() {
             currentIndex = index;
           });
+          _pageController.animateToPage(
+            index,
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeOut,
+          );
         },
         destinations: [
           NavigationDestination(
