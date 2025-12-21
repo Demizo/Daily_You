@@ -26,17 +26,19 @@ class Entry {
     required this.timeModified,
   });
 
+  static const _unset = Object();
+
   Entry copy({
     int? id,
     String? text,
-    int? mood,
+    Object? mood = _unset,
     DateTime? timeCreate,
     DateTime? timeModified,
   }) =>
       Entry(
         id: id ?? this.id,
         text: text ?? this.text,
-        mood: mood,
+        mood: mood == _unset ? this.mood : mood as int?,
         timeCreate: timeCreate ?? this.timeCreate,
         timeModified: timeModified ?? this.timeModified,
       );
