@@ -75,6 +75,8 @@ class EntriesProvider with ChangeNotifier {
     // Insert the entry into the database so that it has an ID
     final entryWithId = await EntryDao.add(entry);
     entries.add(entryWithId);
+    // Reverse chronological order such that the most recent day is first
+    entries.sort((a, b) => b.timeCreate.compareTo(a.timeCreate));
     await AppDatabase.instance.updateExternalDatabase();
     notifyListeners();
     return entryWithId;
@@ -83,7 +85,9 @@ class EntriesProvider with ChangeNotifier {
   Future<void> update(Entry entry) async {
     await EntryDao.update(entry);
     final index = entries.indexWhere((x) => x.id == entry.id);
-    entries[index] = entry.copy();
+    entries[index] = entry;
+    // Reverse chronological order such that the most recent day is first
+    entries.sort((a, b) => b.timeCreate.compareTo(a.timeCreate));
     await AppDatabase.instance.updateExternalDatabase();
     notifyListeners();
   }
@@ -135,9 +139,7 @@ class EntriesProvider with ChangeNotifier {
 
     // Reload the provider since all entries have been deleted
     await load();
-    if (AppDatabase.instance.usingExternalLocation()) {
-      await AppDatabase.instance.updateExternalDatabase();
-    }
+    await AppDatabase.instance.updateExternalDatabase();
   }
 
   /// Set the stats range and update listening widgets
@@ -300,8 +302,6 @@ class EntriesProvider with ChangeNotifier {
     Entry? prevEntry;
 
     bool mostRecentBadDay = true;
-    // TODO check if this order is correct
-    entries.sort((a, b) => a.timeCreate.compareTo(b.timeCreate));
     for (Entry entry in entries) {
       // Check for bad day
       if (entry.mood != null && mostRecentBadDay) {
