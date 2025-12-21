@@ -54,6 +54,11 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
         ? entriesProvider.filteredEntries
         : entriesProvider.entries;
 
+    // When entries are deleted the current index may be too large
+    if (_currentPageNotifier.value >= entries.length) {
+      _currentPageNotifier.value = entries.length - 1;
+    }
+
     return Scaffold(
         appBar: AppBar(
           actions: [
