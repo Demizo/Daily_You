@@ -26,11 +26,15 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage>
+    with AutomaticKeepAliveClientMixin {
   String searchText = '';
   bool sortOrderAsc = true;
   bool firstLoad = true;
   final ScrollController _scrollController = ScrollController();
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -92,6 +96,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final configProvider = Provider.of<ConfigProvider>(context);
     final entriesProvider = Provider.of<EntriesProvider>(context);
     final entryImagesProvider = Provider.of<EntryImagesProvider>(context);

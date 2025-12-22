@@ -17,10 +17,14 @@ class GalleryPage extends StatefulWidget {
   State<GalleryPage> createState() => _GalleryPageState();
 }
 
-class _GalleryPageState extends State<GalleryPage> {
+class _GalleryPageState extends State<GalleryPage>
+    with AutomaticKeepAliveClientMixin {
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   late final FocusNode _focusNode = FocusNode();
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -100,6 +104,7 @@ class _GalleryPageState extends State<GalleryPage> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final entriesProvider = Provider.of<EntriesProvider>(context);
     final configProvider = Provider.of<ConfigProvider>(context);
     String viewMode = configProvider.get(ConfigKey.galleryPageViewMode);

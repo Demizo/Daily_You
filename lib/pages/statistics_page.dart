@@ -8,15 +8,27 @@ import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:provider/provider.dart';
 
-class StatsPage extends StatelessWidget {
+class StatsPage extends StatefulWidget {
   const StatsPage({super.key});
 
   @override
-  Widget build(BuildContext context) => Center(
-        child: SingleChildScrollView(
-          child: buildEntries(context),
-        ),
-      );
+  State<StatsPage> createState() => _StatsPageState();
+}
+
+class _StatsPageState extends State<StatsPage>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return Center(
+      child: SingleChildScrollView(
+        child: buildEntries(context),
+      ),
+    );
+  }
 
   Widget buildEntries(BuildContext context) {
     final entriesProvider = Provider.of<EntriesProvider>(context);
