@@ -11,6 +11,7 @@ class HidingWidget extends StatefulWidget {
     this.duration = const Duration(milliseconds: 300),
     required this.hideDirection,
     this.focusNode,
+    this.shouldShow,
   });
 
   final Widget child;
@@ -18,6 +19,7 @@ class HidingWidget extends StatefulWidget {
   final Duration duration;
   final HideDirection hideDirection;
   final FocusNode? focusNode;
+  final bool Function()? shouldShow;
 
   @override
   State<HidingWidget> createState() => _HidingWidgetState();
@@ -36,6 +38,7 @@ class _HidingWidgetState extends State<HidingWidget>
     _controller = AnimationController(
       vsync: this,
       duration: widget.duration,
+      value: widget.shouldShow?.call() ?? true ? 0.0 : 1.0,
     );
 
     _offsetAnimation = _createTween().animate(_controller);
@@ -58,6 +61,22 @@ class _HidingWidgetState extends State<HidingWidget>
     if (!mounted) return;
 
     if (widget.focusNode == null || !widget.focusNode!.hasFocus) {
+      if (widget.shouldShow != null) {
+        if (widget.shouldShow!()) {
+          if (_controller.status != AnimationStatus.reverse &&
+              _controller.status != AnimationStatus.dismissed) {
+            _controller.reverse();
+          }
+        } else {
+          if (_controller.status != AnimationStatus.forward &&
+              _controller.status != AnimationStatus.completed) {
+            _controller.forward();
+          }
+        }
+        return;
+      }
+
+      // Default behavior
       final direction = widget.scrollController.position.userScrollDirection;
       if (direction == ScrollDirection.forward) {
         if (_controller.status != AnimationStatus.reverse &&

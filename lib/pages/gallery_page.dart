@@ -115,87 +115,118 @@ class _GalleryPageState extends State<GalleryPage>
         Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            Padding(
+              padding:
+                  const EdgeInsets.only(top: 4, bottom: 8, left: 8, right: 8),
+              child: SearchBar(
+                focusNode: _focusNode,
+                controller: _searchController,
+                leading: const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Icon(Icons.search_rounded),
+                ),
+                trailing: [
+                  AnimatedSwitcher(
+                    duration: Duration(milliseconds: 300),
+                    transitionBuilder:
+                        (Widget child, Animation<double> animation) {
+                      final rotationAnimation =
+                          Tween<double>(begin: 0.0, end: 0.5).animate(
+                        CurvedAnimation(
+                            parent: animation, curve: Curves.easeOut),
+                      );
+
+                      final scaleAnimation = TweenSequence([
+                        TweenSequenceItem(
+                          tween: Tween<double>(begin: 0.0, end: 1.1)
+                              .chain(CurveTween(curve: Curves.easeOut)),
+                          weight: 50,
+                        ),
+                        TweenSequenceItem(
+                          tween: Tween<double>(begin: 1.1, end: 1.0)
+                              .chain(CurveTween(curve: Curves.easeIn)),
+                          weight: 50,
+                        ),
+                      ]).animate(animation);
+
+                      return RotationTransition(
+                        turns: rotationAnimation,
+                        child: ScaleTransition(
+                          scale: scaleAnimation,
+                          child: child,
+                        ),
+                      );
+                    },
+                    child: _searchController.text.isNotEmpty
+                        ? IconButton(
+                            visualDensity: VisualDensity(
+                                horizontal: VisualDensity.minimumDensity),
+                            key: ValueKey('clearButton'),
+                            icon: Icon(Icons.clear),
+                            onPressed: () {
+                              _searchController.clear();
+                              entriesProvider.searchText = "";
+                              setState(() {});
+                            },
+                          )
+                        : SizedBox.shrink(
+                            key: ValueKey('empty')), // Empty widget
+                  ),
+                  if (entriesProvider.searchText.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: Text(AppLocalizations.of(context)!.logCount(
+                          entriesProvider.getFilteredEntries().length)),
+                    ),
+                  IconButton(
+                      icon: const Icon(Icons.sort_rounded),
+                      onPressed: () => _showSortSelectionPopup(context)),
+                ],
+                hintText: AppLocalizations.of(context)!.searchLogsHint,
+                padding: WidgetStateProperty.all(
+                    const EdgeInsets.only(left: 4, right: 4)),
+                elevation: WidgetStateProperty.all(1),
+                onChanged: (queryText) => EasyDebounce.debounce(
+                    'search-debounce', const Duration(milliseconds: 300), () {
+                  entriesProvider.searchText = queryText;
+                }),
+              ),
+            ),
             HidingWidget(
-              focusNode: _focusNode,
               scrollController: _scrollController,
               duration: Duration(milliseconds: 200),
-              hideDirection: HideDirection.up,
-              child: Padding(
-                padding:
-                    const EdgeInsets.only(top: 4, bottom: 8, left: 8, right: 8),
-                child: SearchBar(
-                  focusNode: _focusNode,
-                  controller: _searchController,
-                  leading: const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Icon(Icons.search_rounded),
-                  ),
-                  trailing: [
-                    AnimatedSwitcher(
-                      duration: Duration(milliseconds: 300),
-                      transitionBuilder:
-                          (Widget child, Animation<double> animation) {
-                        final rotationAnimation =
-                            Tween<double>(begin: 0.0, end: 0.5).animate(
-                          CurvedAnimation(
-                              parent: animation, curve: Curves.easeOut),
-                        );
-
-                        final scaleAnimation = TweenSequence([
-                          TweenSequenceItem(
-                            tween: Tween<double>(begin: 0.0, end: 1.1)
-                                .chain(CurveTween(curve: Curves.easeOut)),
-                            weight: 50,
-                          ),
-                          TweenSequenceItem(
-                            tween: Tween<double>(begin: 1.1, end: 1.0)
-                                .chain(CurveTween(curve: Curves.easeIn)),
-                            weight: 50,
-                          ),
-                        ]).animate(animation);
-
-                        return RotationTransition(
-                          turns: rotationAnimation,
-                          child: ScaleTransition(
-                            scale: scaleAnimation,
-                            child: child,
-                          ),
-                        );
-                      },
-                      child: _searchController.text.isNotEmpty
-                          ? IconButton(
-                              visualDensity: VisualDensity(
-                                  horizontal: VisualDensity.minimumDensity),
-                              key: ValueKey('clearButton'),
-                              icon: Icon(Icons.clear),
-                              onPressed: () {
-                                _searchController.clear();
-                                entriesProvider.searchText = "";
-                                setState(() {});
-                              },
-                            )
-                          : SizedBox.shrink(
-                              key: ValueKey('empty')), // Empty widget
-                    ),
-                    if (entriesProvider.searchText.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: Text(AppLocalizations.of(context)!.logCount(
-                            entriesProvider.getFilteredEntries().length)),
+              hideDirection: HideDirection.down,
+              shouldShow: () {
+                return _scrollController.position.pixels >= 500;
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.arrow_upward_rounded,
+                        color: Theme.of(context).colorScheme.primary,
+                        size: 28,
                       ),
-                    IconButton(
-                        icon: const Icon(Icons.sort_rounded),
-                        onPressed: () => _showSortSelectionPopup(context)),
-                  ],
-                  hintText: AppLocalizations.of(context)!.searchLogsHint,
-                  padding: WidgetStateProperty.all(
-                      const EdgeInsets.only(left: 4, right: 4)),
-                  elevation: WidgetStateProperty.all(1),
-                  onChanged: (queryText) => EasyDebounce.debounce(
-                      'search-debounce', const Duration(milliseconds: 300), () {
-                    entriesProvider.searchText = queryText;
-                  }),
-                ),
+                      onPressed: () async {
+                        _scrollController.position.animateTo(0,
+                            duration: Duration(milliseconds: 300),
+                            curve: Curves.easeOut);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.all(16),
+                        backgroundColor:
+                            Theme.of(context).colorScheme.primaryContainer,
+                        elevation: 3,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16.0),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -216,7 +247,7 @@ class _GalleryPageState extends State<GalleryPage>
           )
         : GridView.builder(
             controller: _scrollController,
-            padding: const EdgeInsets.only(top: 70),
+            padding: const EdgeInsets.only(top: 70, bottom: 70),
             physics: const ScrollPhysics(),
             shrinkWrap: true,
             gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
