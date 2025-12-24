@@ -52,7 +52,7 @@ class ImageStorage {
 
   /// Return whether the app has permission to access the external location
   Future<bool> hasExternalLocationPermission() async {
-    return FileLayer.hasPermission(await getInternalFolder());
+    return FileLayer.hasPermission(_getExternalFolder());
   }
 
   Future<bool> selectExternalLocation(Function(String) updateStatus) async {
