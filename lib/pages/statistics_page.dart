@@ -47,7 +47,7 @@ class _StatsPageState extends State<StatsPage>
               StreakCard(
                 title:
                     AppLocalizations.of(context)!.streakCurrent(currentStreak),
-                isVisible: true,
+                isVisible: currentStreak > 0,
                 icon: Icons.bolt,
               ),
               StreakCard(
@@ -63,7 +63,7 @@ class _StatsPageState extends State<StatsPage>
               StreakCard(
                 title: AppLocalizations.of(context)!
                     .logCount(entriesProvider.entries.length),
-                isVisible: true,
+                isVisible: entriesProvider.entries.isNotEmpty,
                 icon: Icons.description_outlined,
               ),
               StreakCard(
