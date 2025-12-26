@@ -29,7 +29,6 @@ void callbackDispatcher() async {
   await ConfigProvider.instance.init();
   // Skip syncing for the alarm background task
   await AppDatabase.instance.init(forceWithoutSync: true);
-  await AppDatabase.instance.open();
   if (EntriesProvider.instance.getEntryForDate(DateTime.now()) == null ||
       ConfigProvider.instance.get(ConfigKey.alwaysRemind)) {
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =

@@ -25,6 +25,7 @@ class AppDatabase {
 
   Future<bool> init({bool forceWithoutSync = false}) async {
     _internalPath = await getInternalPath();
+    await AppDatabase.instance.open();
 
     if (usingExternalLocation() && !forceWithoutSync) {
       if (await hasExternalLocationPermission()) {

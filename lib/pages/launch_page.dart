@@ -67,7 +67,6 @@ class _LaunchPageState extends State<LaunchPage> {
                 onSuccess: () {},
               ));
     }
-    await AppDatabase.instance.open();
     await Navigator.of(context).pushReplacement(MaterialPageRoute(
         builder: (context) => widget.nextPage, allowSnapshotting: false));
   }
