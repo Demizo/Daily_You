@@ -25,6 +25,7 @@ class _EntryMoodPickerState extends State<EntryMoodPicker> {
       child: Column(
         children: [
           PunchScale(
+            key: ValueKey(index),
             trigger: index == _mood,
             child: MoodIcon(moodValue: index, size: 24),
           ),

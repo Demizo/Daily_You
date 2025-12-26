@@ -277,7 +277,7 @@ class EntriesProvider with ChangeNotifier {
     }
 
     // Filter entries by time range
-    var filteredEntries = entries;
+    var filteredEntries = entries.toList();
     if (filterMonthCount > 0) {
       filteredEntries = filteredEntries.where((entry) {
         DateTime now = DateTime.now();

@@ -9,6 +9,7 @@ import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/edit_toolbar.dart';
 import 'package:daily_you/widgets/local_image_loader.dart';
+import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:flutter_svg/svg.dart';
@@ -229,7 +230,8 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                             moodValue: mood,
                             onChangedMood: (mood) {
                               setState(() => this.mood = mood);
-                              _saveEntry();
+                              EasyDebounce.debounce("save-entry",
+                                  Duration(seconds: 5), () => _saveEntry());
                             }),
                       ),
                       StatefulBuilder(
