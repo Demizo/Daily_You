@@ -1,17 +1,14 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/database/entry_dao.dart';
 import 'package:daily_you/models/entry.dart';
-import 'package:daily_you/models/template.dart';
 import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/providers/templates_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/stat_range_selector.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:word_count/word_count.dart';
 
 enum OrderBy { date, mood }
@@ -24,8 +21,6 @@ class EntriesProvider with ChangeNotifier {
   EntriesProvider._init();
 
   List<Entry> entries = List.empty();
-
-  StatsRange statsRange = StatsRange.month;
 
   String _searchText = "";
   String get searchText {
@@ -138,13 +133,6 @@ class EntriesProvider with ChangeNotifier {
     await AppDatabase.instance.updateExternalDatabase();
   }
 
-  /// Set the stats range and update listening widgets
-  void setStatsRange(StatsRange range) async {
-    statsRange = range;
-    getMoodTotals();
-    notifyListeners();
-  }
-
   /// Set the selected date and update listening widgets
   void setSelectedDate(DateTime date) {
     selectedDate = date;
@@ -188,70 +176,7 @@ class EntriesProvider with ChangeNotifier {
     return wordCount;
   }
 
-  Map<int, int> getMoodTotals() {
-    Map<int, int> moodTotals = {
-      -2: 0,
-      -1: 0,
-      0: 0,
-      1: 0,
-      2: 0,
-    };
-
-    for (Entry entry in _getEntriesInRange()) {
-      if (entry.mood == null) continue;
-      moodTotals.update(
-        entry.mood!,
-        (value) => value + 1,
-      );
-    }
-
-    return moodTotals;
-  }
-
-  Map<String, double> getMoodsByDay() {
-    Map<String, List<double>> moodsByDay = {};
-
-    var filteredEntries = _getEntriesInRange();
-    for (Entry entry in filteredEntries) {
-      if (entry.mood == null) continue;
-      String dayKey = DateFormat('EEE').format(entry.timeCreate);
-
-      if (moodsByDay[dayKey] == null) {
-        moodsByDay[dayKey] = List.empty(growable: true);
-        moodsByDay[dayKey]!.add(entry.mood!.toDouble());
-      } else {
-        moodsByDay[dayKey]!.add(entry.mood!.toDouble());
-      }
-    }
-
-    // Average the mood for each day
-    for (var key in moodsByDay.keys) {
-      moodsByDay[key]!.first =
-          moodsByDay[key]!.reduce((a, b) => a + b) / moodsByDay[key]!.length;
-    }
-
-    Map<String, double> averageMoodsByDay = {
-      'Mon': -2,
-      'Tue': -2,
-      'Wed': -2,
-      'Thu': -2,
-      'Fri': -2,
-      'Sat': -2,
-      'Sun': -2,
-    };
-
-    for (String key in moodsByDay.keys) {
-      if (moodsByDay[key] == null) {
-        averageMoodsByDay[key] = -2;
-      } else {
-        averageMoodsByDay[key] = moodsByDay[key]!.first;
-      }
-    }
-
-    return averageMoodsByDay;
-  }
-
-  List<Entry> _getEntriesInRange() {
+  List<Entry> getEntriesInRange(StatsRange statsRange) {
     int filterMonthCount = 0;
     switch (statsRange) {
       case StatsRange.month:
