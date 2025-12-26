@@ -128,7 +128,7 @@ class _HomePageState extends State<HomePage>
                   IconButton(
                     icon: Icon(
                       Icons.camera_alt_rounded,
-                      color: Theme.of(context).colorScheme.primary,
+                      color: Theme.of(context).colorScheme.primaryContainer,
                       size: 24,
                     ),
                     onPressed: () async {
@@ -136,8 +136,7 @@ class _HomePageState extends State<HomePage>
                     },
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.all(8),
-                      backgroundColor:
-                          Theme.of(context).colorScheme.primaryContainer,
+                      backgroundColor: Theme.of(context).colorScheme.primary,
                       elevation: 3,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(80.0),
@@ -147,7 +146,7 @@ class _HomePageState extends State<HomePage>
                 IconButton(
                   icon: Icon(
                     todayEntry == null ? Icons.add_rounded : Icons.edit_rounded,
-                    color: Theme.of(context).colorScheme.primary,
+                    color: Theme.of(context).colorScheme.primaryContainer,
                     size: 28,
                   ),
                   onPressed: () async {
@@ -155,8 +154,7 @@ class _HomePageState extends State<HomePage>
                   },
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.all(16),
-                    backgroundColor:
-                        Theme.of(context).colorScheme.primaryContainer,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                     elevation: 3,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16.0),
