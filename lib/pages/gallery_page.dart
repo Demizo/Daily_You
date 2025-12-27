@@ -192,43 +192,44 @@ class _GalleryPageState extends State<GalleryPage>
                 }),
               ),
             ),
-            HidingWidget(
-              scrollController: _scrollController,
-              duration: Duration(milliseconds: 200),
-              hideDirection: HideDirection.down,
-              shouldShow: () {
-                return _scrollController.position.pixels >= 500;
-              },
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: IconButton(
-                      icon: Icon(
-                        Icons.arrow_upward_rounded,
-                        color: Theme.of(context).colorScheme.primary,
-                        size: 28,
-                      ),
-                      onPressed: () async {
-                        _scrollController.position.animateTo(0,
-                            duration: Duration(milliseconds: 300),
-                            curve: Curves.easeOut);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.all(16),
-                        backgroundColor:
-                            Theme.of(context).colorScheme.primaryContainer,
-                        elevation: 3,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16.0),
+            if (entriesProvider.getFilteredEntries().isNotEmpty)
+              HidingWidget(
+                scrollController: _scrollController,
+                duration: Duration(milliseconds: 200),
+                hideDirection: HideDirection.down,
+                shouldShow: () {
+                  return _scrollController.position.pixels >= 500;
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.arrow_upward_rounded,
+                          color: Theme.of(context).colorScheme.primary,
+                          size: 28,
+                        ),
+                        onPressed: () async {
+                          _scrollController.position.animateTo(0,
+                              duration: Duration(milliseconds: 300),
+                              curve: Curves.easeOut);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.all(16),
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primaryContainer,
+                          elevation: 3,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16.0),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
           ],
         ),
       ]),
