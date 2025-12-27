@@ -328,7 +328,7 @@ class _StorageSettingsState extends State<StorageSettings> {
               builder: (context, snapshot) {
                 if (snapshot.hasData && snapshot.data != null) {
                   var folderText = snapshot.data!;
-                  if (AppDatabase.instance.usingExternalLocation()) {
+                  if (ImageStorage.instance.usingExternalLocation()) {
                     folderText = _displayNameFromUri(
                         configProvider.get(ConfigKey.externalImgUri));
                   }
