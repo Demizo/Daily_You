@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class MoodByMonthChart extends StatefulWidget {
   const MoodByMonthChart({super.key});
@@ -28,7 +29,8 @@ class _MoodByMonthChartState extends State<MoodByMonthChart> {
 
   @override
   Widget build(BuildContext context) {
-    List<Entry> entries = EntriesProvider.instance.entries;
+    final entriesProvider = Provider.of<EntriesProvider>(context);
+    List<Entry> entries = entriesProvider.entries;
     Map<String, List<double>> moodsByMonth = {};
 
     // Collect moods by month
