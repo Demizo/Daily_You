@@ -24,7 +24,7 @@ class EntryDao {
     }
   }
 
-  static Future<Entry> add(Entry entry, {updateStatsAndSync = true}) async {
+  static Future<Entry> add(Entry entry) async {
     final id = await AppDatabase.instance.database!
         .insert(entriesTable, entry.toJson());
 

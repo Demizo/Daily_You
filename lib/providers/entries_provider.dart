@@ -72,19 +72,22 @@ class EntriesProvider with ChangeNotifier {
 
   // CRUD operations
 
-  Future<Entry> add(Entry entry) async {
+  Future<Entry> add(Entry entry, {skipUpdate = false}) async {
     // Insert the entry into the database so that it has an ID
     final entryWithId = await EntryDao.add(entry);
     entries.add(entryWithId);
-    // Reverse chronological order such that the most recent day is first
-    entries.sort((a, b) => compareDateOnly(b.timeCreate, a.timeCreate));
     await AppDatabase.instance.updateExternalDatabase();
 
-    // Update stats
-    _calculateWordCount();
-    _calculateEntriesByDay();
+    if (!skipUpdate) {
+      // Reverse chronological order such that the most recent day is first
+      entries.sort((a, b) => compareDateOnly(b.timeCreate, a.timeCreate));
 
-    notifyListeners();
+      // Update stats
+      _calculateWordCount();
+      _calculateEntriesByDay();
+
+      notifyListeners();
+    }
     return entryWithId;
   }
 

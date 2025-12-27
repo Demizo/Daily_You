@@ -55,33 +55,37 @@ class ImportUtils {
               mood: entry['mood'] as int?,
               timeCreate: DateTime.parse(entry['timeCreated']),
               timeModified: DateTime.parse(entry['timeModified'])),
+          skipUpdate: true,
         );
         // Support old imgPath field
         if (entry['imgPath'] != null) {
           await EntryImagesProvider.instance.add(
-            EntryImage(
-                entryId: addedEntry.id,
-                imgPath: entry['imgPath'],
-                imgRank: 0,
-                timeCreate: DateTime.now()),
-          );
+              EntryImage(
+                  entryId: addedEntry.id,
+                  imgPath: entry['imgPath'],
+                  imgRank: 0,
+                  timeCreate: DateTime.now()),
+              skipUpdate: true);
         }
         // Import images
         if (entry['images'] != null) {
           for (var img in entry['images']) {
             await EntryImagesProvider.instance.add(
-              EntryImage(
-                  entryId: addedEntry.id,
-                  imgPath: img['imgPath'],
-                  imgRank: img['imgRank'] as int,
-                  timeCreate: DateTime.parse(img['timeCreated'])),
-            );
+                EntryImage(
+                    entryId: addedEntry.id,
+                    imgPath: img['imgPath'],
+                    imgRank: img['imgRank'] as int,
+                    timeCreate: DateTime.parse(img['timeCreated'])),
+                skipUpdate: true);
           }
         }
       }
       processedEntries += 1;
       updateStatus("${((processedEntries / totalEntries) * 100).round()}%");
     }
+
+    await EntriesProvider.instance.load();
+    await EntryImagesProvider.instance.load();
 
     // Pull in any potentially new photos
     if (ImageStorage.instance.usingExternalLocation()) {
@@ -125,26 +129,29 @@ class ImportUtils {
       // Skip if the day already has an entry
       if (EntriesProvider.instance.getEntryForDate(createdDateTime) == null) {
         var addedEntry = await EntriesProvider.instance.add(
-          Entry(
-              text: entry['textContent'],
-              mood: mood,
-              timeCreate: createdDateTime,
-              timeModified: DateTime.now()),
-        );
+            Entry(
+                text: entry['textContent'],
+                mood: mood,
+                timeCreate: createdDateTime,
+                timeModified: DateTime.now()),
+            skipUpdate: true);
         // Import image
         if (entry['relativePath'] != null) {
           await EntryImagesProvider.instance.add(
-            EntryImage(
-                entryId: addedEntry.id,
-                imgPath: entry['relativePath'],
-                imgRank: 0,
-                timeCreate: DateTime.now()),
-          );
+              EntryImage(
+                  entryId: addedEntry.id,
+                  imgPath: entry['relativePath'],
+                  imgRank: 0,
+                  timeCreate: DateTime.now()),
+              skipUpdate: true);
         }
       }
       processedEntries += 1;
       updateStatus("${((processedEntries / totalEntries) * 100).round()}%");
     }
+
+    await EntriesProvider.instance.load();
+    await EntryImagesProvider.instance.load();
 
     // Pull in any potentially new photos
     if (ImageStorage.instance.usingExternalLocation()) {
@@ -184,17 +191,20 @@ class ImportUtils {
           int mappedMood = avgMood - 3;
 
           await EntriesProvider.instance.add(
-            Entry(
-                text: entry['notes'] ?? '',
-                mood: mappedMood,
-                timeCreate: timeCreated,
-                timeModified: timeModified),
-          );
+              Entry(
+                  text: entry['notes'] ?? '',
+                  mood: mappedMood,
+                  timeCreate: timeCreated,
+                  timeModified: timeModified),
+              skipUpdate: true);
         }
       }
       processedEntries += 1;
       updateStatus("${((processedEntries / totalEntries) * 100).round()}%");
     }
+
+    await EntriesProvider.instance.load();
+    await EntryImagesProvider.instance.load();
 
     // Pull in any potentially new photos
     if (ImageStorage.instance.usingExternalLocation()) {
@@ -299,13 +309,13 @@ class ImportUtils {
         if (EntriesProvider.instance.getEntryForDate(earliestCreated!) ==
             null) {
           await EntriesProvider.instance.add(
-            Entry(
-              text: combinedText ?? '',
-              mood: averageMood,
-              timeCreate: earliestCreated,
-              timeModified: latestModified!,
-            ),
-          );
+              Entry(
+                text: combinedText ?? '',
+                mood: averageMood,
+                timeCreate: earliestCreated,
+                timeModified: latestModified!,
+              ),
+              skipUpdate: true);
         }
 
         processedDays += 1;
@@ -316,6 +326,9 @@ class ImportUtils {
       await Future.delayed(Duration(seconds: 5));
       success = false;
     }
+
+    await EntriesProvider.instance.load();
+    await EntryImagesProvider.instance.load();
 
     // Pull in any potentially new photos
     if (ImageStorage.instance.usingExternalLocation()) {
@@ -444,13 +457,13 @@ class ImportUtils {
         // Skip day if it already has an entry
         if (EntriesProvider.instance.getEntryForDate(earliest!) == null) {
           final addedEntry = await EntriesProvider.instance.add(
-            Entry(
-              text: combinedText,
-              mood: averageMood,
-              timeCreate: earliest,
-              timeModified: latest!,
-            ),
-          );
+              Entry(
+                text: combinedText,
+                mood: averageMood,
+                timeCreate: earliest,
+                timeModified: latest!,
+              ),
+              skipUpdate: true);
 
           for (final img in images) {
             final newImage = await ImageStorage.instance.create(
@@ -461,14 +474,14 @@ class ImportUtils {
 
             if (newImage != null) {
               await EntryImagesProvider.instance.add(
-                EntryImage(
-                  id: null,
-                  entryId: addedEntry.id!,
-                  imgPath: newImage,
-                  imgRank: img['rank'],
-                  timeCreate: earliest,
-                ),
-              );
+                  EntryImage(
+                    id: null,
+                    entryId: addedEntry.id!,
+                    imgPath: newImage,
+                    imgRank: img['rank'],
+                    timeCreate: earliest,
+                  ),
+                  skipUpdate: true);
             }
           }
         }
@@ -483,6 +496,9 @@ class ImportUtils {
     }
 
     updateStatus(AppLocalizations.of(context)!.cleanUpStatus);
+
+    await EntriesProvider.instance.load();
+    await EntryImagesProvider.instance.load();
 
     // Images were created externally as they were added. No need to sync with external image folder
 
@@ -633,13 +649,13 @@ class ImportUtils {
 
         if (EntriesProvider.instance.getEntryForDate(earliest!) == null) {
           final addedEntry = await EntriesProvider.instance.add(
-            Entry(
-              text: combinedText,
-              mood: avgMood,
-              timeCreate: earliest,
-              timeModified: latest!,
-            ),
-          );
+              Entry(
+                text: combinedText,
+                mood: avgMood,
+                timeCreate: earliest,
+                timeModified: latest!,
+              ),
+              skipUpdate: true);
 
           for (final img in images) {
             final imagePath = await ImageStorage.instance.create(
@@ -647,13 +663,13 @@ class ImportUtils {
                 currTime: earliest);
             if (imagePath != null) {
               await EntryImagesProvider.instance.add(
-                EntryImage(
-                  entryId: addedEntry.id!,
-                  imgPath: imagePath,
-                  imgRank: img['rank'],
-                  timeCreate: earliest,
-                ),
-              );
+                  EntryImage(
+                    entryId: addedEntry.id!,
+                    imgPath: imagePath,
+                    imgRank: img['rank'],
+                    timeCreate: earliest,
+                  ),
+                  skipUpdate: true);
             }
           }
         }
@@ -668,6 +684,9 @@ class ImportUtils {
     }
 
     updateStatus(AppLocalizations.of(context)!.cleanUpStatus);
+
+    await EntriesProvider.instance.load();
+    await EntryImagesProvider.instance.load();
 
     // Images were created externally as they were added. No need to sync with external image folder
 
@@ -877,13 +896,13 @@ class ImportUtils {
         }
 
         final addedEntry = await EntriesProvider.instance.add(
-          Entry(
-            text: combinedText,
-            mood: averageMood,
-            timeCreate: earliest,
-            timeModified: latest,
-          ),
-        );
+            Entry(
+              text: combinedText,
+              mood: averageMood,
+              timeCreate: earliest,
+              timeModified: latest,
+            ),
+            skipUpdate: true);
 
         // Add images
         for (final img in images) {
@@ -896,13 +915,13 @@ class ImportUtils {
               .create(null, photoBytes, currTime: earliest);
           if (imagePath != null) {
             await EntryImagesProvider.instance.add(
-              EntryImage(
-                entryId: addedEntry.id!,
-                imgPath: imagePath,
-                imgRank: img['rank'],
-                timeCreate: earliest,
-              ),
-            );
+                EntryImage(
+                  entryId: addedEntry.id!,
+                  imgPath: imagePath,
+                  imgRank: img['rank'],
+                  timeCreate: earliest,
+                ),
+                skipUpdate: true);
           }
         }
       }
@@ -913,6 +932,9 @@ class ImportUtils {
     }
 
     updateStatus(AppLocalizations.of(context)!.cleanUpStatus);
+
+    await EntriesProvider.instance.load();
+    await EntryImagesProvider.instance.load();
 
     // Images were created externally as they were added. No need to sync with external image folder
 

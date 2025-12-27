@@ -20,12 +20,14 @@ class EntryImagesProvider with ChangeNotifier {
 
   // CRUD operations
 
-  Future<void> add(EntryImage image) async {
+  Future<void> add(EntryImage image, {skipUpdate = false}) async {
     // Insert the image into the database so that it has an ID
     final imageWithId = await EntryImageDao.add(image);
     images.add(imageWithId);
     await AppDatabase.instance.updateExternalDatabase();
-    notifyListeners();
+    if (!skipUpdate) {
+      notifyListeners();
+    }
   }
 
   Future<void> remove(EntryImage image) async {
