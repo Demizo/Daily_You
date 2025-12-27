@@ -264,5 +264,11 @@
     "requiredPrompt": "Wymagane",
     "@requiredPrompt": {},
     "formatMarkdown": "Markdown",
-    "@formatMarkdown": {}
+    "@formatMarkdown": {},
+    "settingsGalleryViewLayout": "Widok galerii",
+    "@settingsGalleryViewLayout": {},
+    "viewLayoutList": "Lista",
+    "@viewLayoutList": {},
+    "viewLayoutGrid": "Siatka",
+    "@viewLayoutGrid": {}
 }

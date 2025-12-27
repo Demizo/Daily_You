@@ -251,7 +251,7 @@
     "@settingsShowFlashbacks": {},
     "settingsSecurityTitle": "安全",
     "@settingsSecurityTitle": {},
-    "settingsSecurityRequirePassword": "需要輸入密碼",
+    "settingsSecurityRequirePassword": "使用密碼解鎖",
     "@settingsSecurityRequirePassword": {},
     "settingsSecurityEnterPassword": "輸入密碼",
     "@settingsSecurityEnterPassword": {},
@@ -282,5 +282,7 @@
     "settingsFlashbacksViewLayout": "往日重現檢視佈局",
     "@settingsFlashbacksViewLayout": {},
     "settingsGalleryViewLayout": "紀錄檢視佈局",
-    "@settingsGalleryViewLayout": {}
+    "@settingsGalleryViewLayout": {},
+    "formatDiaro": "Diaro",
+    "@formatDiaro": {}
 }

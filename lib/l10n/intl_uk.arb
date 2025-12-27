@@ -278,5 +278,7 @@
     "viewLayoutList": "Список",
     "@viewLayoutList": {},
     "viewLayoutGrid": "Сітка",
-    "@viewLayoutGrid": {}
+    "@viewLayoutGrid": {},
+    "formatDiaro": "Діаро",
+    "@formatDiaro": {}
 }
