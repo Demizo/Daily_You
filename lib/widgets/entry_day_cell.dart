@@ -73,6 +73,9 @@ class EntryDayCell extends StatelessWidget {
                 SizedBox(
                   height: 57,
                   child: Card(
+                      margin: EdgeInsets.all(2),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(8))),
                       clipBehavior: Clip.antiAlias,
                       child: LocalImageLoader(
                         imagePath: image.imgPath,
