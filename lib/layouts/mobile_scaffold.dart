@@ -119,7 +119,7 @@ class _MobileScaffoldState extends State<MobileScaffold> {
           onPageChanged: (index) {
             EasyDebounce.debounce(
                 "page-change",
-                Duration(milliseconds: 100),
+                Duration(milliseconds: 150),
                 () => setState(() {
                       currentIndex = index;
                     }));
