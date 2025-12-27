@@ -77,7 +77,7 @@ class EntriesProvider with ChangeNotifier {
     final entryWithId = await EntryDao.add(entry);
     entries.add(entryWithId);
     // Reverse chronological order such that the most recent day is first
-    entries.sort((a, b) => b.timeCreate.compareTo(a.timeCreate));
+    entries.sort((a, b) => compareDateOnly(b.timeCreate, a.timeCreate));
     await AppDatabase.instance.updateExternalDatabase();
 
     // Update stats
@@ -93,7 +93,7 @@ class EntriesProvider with ChangeNotifier {
     final index = entries.indexWhere((x) => x.id == entry.id);
     entries[index] = entry;
     // Reverse chronological order such that the most recent day is first
-    entries.sort((a, b) => b.timeCreate.compareTo(a.timeCreate));
+    entries.sort((a, b) => compareDateOnly(b.timeCreate, a.timeCreate));
     await AppDatabase.instance.updateExternalDatabase();
 
     // Update stats
@@ -155,6 +155,12 @@ class EntriesProvider with ChangeNotifier {
     // Reload the provider since all entries have been deleted
     await load();
     await AppDatabase.instance.updateExternalDatabase();
+  }
+
+  int compareDateOnly(DateTime a, DateTime b) {
+    if (a.year != b.year) return a.year.compareTo(b.year);
+    if (a.month != b.month) return a.month.compareTo(b.month);
+    return a.day.compareTo(b.day);
   }
 
   /// Set the selected date and update listening widgets
