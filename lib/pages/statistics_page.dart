@@ -38,7 +38,6 @@ class _StatsPageState extends State<StatsPage>
   Widget buildEntries(BuildContext context) {
     final entriesProvider = Provider.of<EntriesProvider>(context);
     entriesInRange = entriesProvider.getEntriesInRange(statsRange);
-    int wordCount = entriesProvider.getWordCount();
     var (currentStreak, longestStreak, daysSinceBadDay) =
         entriesProvider.getStreaks();
 
@@ -73,8 +72,9 @@ class _StatsPageState extends State<StatsPage>
                 icon: Icons.description_outlined,
               ),
               StreakCard(
-                title: AppLocalizations.of(context)!.wordCount(wordCount),
-                isVisible: wordCount > 100,
+                title: AppLocalizations.of(context)!
+                    .wordCount(entriesProvider.wordCount),
+                isVisible: entriesProvider.wordCount > 100,
                 icon: Icons.sort_rounded,
               ),
             ],

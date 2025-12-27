@@ -22,9 +22,16 @@ class EntriesProvider with ChangeNotifier {
 
   List<Entry> entries = List.empty();
 
+  Map<DateTime, Entry> _entriesByDay = {};
+
   String _searchText = "";
   String get searchText {
     return _searchText;
+  }
+
+  int _wordCount = 0;
+  int get wordCount {
+    return _wordCount;
   }
 
   set searchText(String newSearchText) {
@@ -58,6 +65,8 @@ class EntriesProvider with ChangeNotifier {
   /// Load the provider's data from the app database
   Future<void> load() async {
     entries = await EntryDao.getAll();
+    _calculateWordCount();
+    _calculateEntriesByDay();
     notifyListeners();
   }
 
@@ -70,6 +79,11 @@ class EntriesProvider with ChangeNotifier {
     // Reverse chronological order such that the most recent day is first
     entries.sort((a, b) => b.timeCreate.compareTo(a.timeCreate));
     await AppDatabase.instance.updateExternalDatabase();
+
+    // Update stats
+    _calculateWordCount();
+    _calculateEntriesByDay();
+
     notifyListeners();
     return entryWithId;
   }
@@ -81,6 +95,11 @@ class EntriesProvider with ChangeNotifier {
     // Reverse chronological order such that the most recent day is first
     entries.sort((a, b) => b.timeCreate.compareTo(a.timeCreate));
     await AppDatabase.instance.updateExternalDatabase();
+
+    // Update stats
+    _calculateWordCount();
+    _calculateEntriesByDay();
+
     notifyListeners();
   }
 
@@ -88,6 +107,11 @@ class EntriesProvider with ChangeNotifier {
     await EntryDao.remove(entry.id!);
     entries.removeWhere((x) => x.id == entry.id);
     await AppDatabase.instance.updateExternalDatabase();
+
+    // Update stats
+    _calculateWordCount();
+    _calculateEntriesByDay();
+
     notifyListeners();
   }
 
@@ -168,12 +192,11 @@ class EntriesProvider with ChangeNotifier {
     return filteredEntries;
   }
 
-  int getWordCount() {
-    var wordCount = 0;
+  void _calculateWordCount() {
+    _wordCount = 0;
     for (var entry in entries) {
-      wordCount += wordsCount(entry.text);
+      _wordCount += wordsCount(entry.text);
     }
-    return wordCount;
   }
 
   List<Entry> getEntriesInRange(StatsRange statsRange) {
@@ -286,16 +309,19 @@ class EntriesProvider with ChangeNotifier {
     return todayEntry;
   }
 
-  Entry? getEntryForDate(DateTime date) {
-    //Search each entry for one on the date
-    for (var entry in entries) {
-      if (entry.timeCreate.day == date.day &&
-          entry.timeCreate.month == date.month &&
-          entry.timeCreate.year == date.year) {
-        return entry;
-      }
-    }
+  void _calculateEntriesByDay() {
+    _entriesByDay = {
+      for (final e in entries)
+        DateTime(e.timeCreate.year, e.timeCreate.month, e.timeCreate.day): e
+    };
+  }
 
-    return null;
+  Entry? getEntryForDate(DateTime date) {
+    final target = DateTime(date.year, date.month, date.day);
+    if (_entriesByDay.containsKey(target)) {
+      return _entriesByDay[target];
+    } else {
+      return null;
+    }
   }
 }
