@@ -245,7 +245,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsFlashbacksViewLayout => 'Layout der Rückblicksansicht';
 
   @override
-  String get settingsGalleryViewLayout => 'Layout der Gallerie';
+  String get settingsGalleryViewLayout => 'Galerieansichts-Layout';
 
   @override
   String get viewLayoutList => 'Liste';
@@ -484,7 +484,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsSecurityTitle => 'Sicherheit';
 
   @override
-  String get settingsSecurityRequirePassword => 'Benötigt Passwort';
+  String get settingsSecurityRequirePassword => 'Benötige Passwort';
 
   @override
   String get settingsSecurityEnterPassword => 'Passwort eingeben';

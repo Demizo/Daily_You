@@ -240,7 +240,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get moodIconPrompt => '输入一个图标';
 
   @override
-  String get settingsFlashbacksViewLayout => '往昔重现的视图布局';
+  String get settingsFlashbacksViewLayout => '闪回视图布局';
 
   @override
   String get settingsGalleryViewLayout => '迹忆页视图布局';
@@ -469,7 +469,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsSecurityTitle => '安全';
 
   @override
-  String get settingsSecurityRequirePassword => '密码解锁';
+  String get settingsSecurityRequirePassword => '使用密码解锁';
 
   @override
   String get settingsSecurityEnterPassword => '输入密码';
@@ -948,6 +948,9 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
       '其他應用程式的格式可能不支援所有功能，且第三方格式可能隨時發生變化，發現任何問題請向我們回報。這並不會影響現有日誌！';
 
   @override
+  String get formatDiaro => 'Diaro';
+
+  @override
   String get formatOneShot => 'OneShot';
 
   @override
@@ -977,7 +980,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get settingsSecurityTitle => '安全';
 
   @override
-  String get settingsSecurityRequirePassword => '需要輸入密碼';
+  String get settingsSecurityRequirePassword => '使用密碼解鎖';
 
   @override
   String get settingsSecurityEnterPassword => '輸入密碼';

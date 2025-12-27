@@ -245,13 +245,13 @@ class AppLocalizationsPl extends AppLocalizations {
   String get settingsFlashbacksViewLayout => 'Flashbacks View Layout';
 
   @override
-  String get settingsGalleryViewLayout => 'Gallery View Layout';
+  String get settingsGalleryViewLayout => 'Widok galerii';
 
   @override
-  String get viewLayoutList => 'List';
+  String get viewLayoutList => 'Lista';
 
   @override
-  String get viewLayoutGrid => 'Grid';
+  String get viewLayoutGrid => 'Siatka';
 
   @override
   String get settingsNotificationsTitle => 'Powiadomienia';
