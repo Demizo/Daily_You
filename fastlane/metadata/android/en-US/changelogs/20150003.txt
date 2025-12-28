@@ -1,0 +1,8 @@
+Daily You v2.15.0 has arrived! Sliding in some improvements:
+
+• Added the ability to swipe between app pages
+• Added an action button to jump to the top of the gallery
+• Various user interface improvements
+• Fix animation stutter
+• Internal app improvements
+• Updated translations
