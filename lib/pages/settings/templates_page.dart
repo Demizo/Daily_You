@@ -1,5 +1,6 @@
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/models/template.dart';
+import 'package:daily_you/providers/templates_provider.dart';
 import 'package:daily_you/widgets/settings_dropdown.dart';
 import 'package:daily_you/widgets/settings_icon_action.dart';
 import 'package:daily_you/widgets/template_manager.dart';
@@ -7,43 +8,20 @@ import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:provider/provider.dart';
 
-class TemplateSettings extends StatefulWidget {
+class TemplateSettings extends StatelessWidget {
   const TemplateSettings({super.key});
-
-  @override
-  State<TemplateSettings> createState() => _TemplateSettingsState();
-}
-
-class _TemplateSettingsState extends State<TemplateSettings> {
-  List<Template> _templates = [];
-  bool isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadTemplates();
-  }
-
-  Future<void> _loadTemplates() async {
-    List<Template> templates = await Template.getAll();
-    setState(() {
-      _templates = templates;
-      isLoading = false;
-    });
-  }
 
   void _showTemplateManagementPopup(BuildContext context) async {
     await Navigator.of(context).push(MaterialPageRoute(
         allowSnapshotting: false,
         fullscreenDialog: true,
-        builder: (context) => TemplateManager(
-              onTemplatesUpdated: _loadTemplates,
-            )));
+        builder: (context) => TemplateManager()));
   }
 
   List<DropdownMenuItem<int>> _buildDefaultTemplateDropdownItems(
       BuildContext context) {
-    var dropdownItems = _templates.map((Template template) {
+    final templatesProvider = Provider.of<TemplatesProvider>(context);
+    var dropdownItems = templatesProvider.templates.map((Template template) {
       return DropdownMenuItem<int>(
         value: template.id,
         child: ConstrainedBox(
@@ -72,15 +50,14 @@ class _TemplateSettingsState extends State<TemplateSettings> {
       ),
       body: ListView(
         children: [
-          if (!isLoading)
-            SettingsDropdown<int>(
-              title: AppLocalizations.of(context)!.settingsDefaultTemplate,
-              value: configProvider.get(ConfigKey.defaultTemplate),
-              options: _buildDefaultTemplateDropdownItems(context),
-              onChanged: (int? newValue) {
-                configProvider.set(ConfigKey.defaultTemplate, newValue);
-              },
-            ),
+          SettingsDropdown<int>(
+            title: AppLocalizations.of(context)!.settingsDefaultTemplate,
+            value: configProvider.get(ConfigKey.defaultTemplate),
+            options: _buildDefaultTemplateDropdownItems(context),
+            onChanged: (int? newValue) {
+              configProvider.set(ConfigKey.defaultTemplate, newValue);
+            },
+          ),
           SettingsIconAction(
               title: AppLocalizations.of(context)!.manageTemplates,
               icon: Icon(Icons.edit_document),

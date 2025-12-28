@@ -2,11 +2,12 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:daily_you/entries_database.dart';
+import 'package:daily_you/database/image_storage.dart';
 import 'package:daily_you/file_layer.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/image.dart';
-import 'package:daily_you/stats_provider.dart';
+import 'package:daily_you/providers/entries_provider.dart';
+import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/utils/zip_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -45,36 +46,37 @@ class ImportUtils {
 
     for (var entry in jsonData) {
       // Skip if the day already has an entry
-      if (await EntriesDatabase.instance
+      if (EntriesProvider.instance
               .getEntryForDate(DateTime.parse(entry['timeCreated'])) ==
           null) {
-        var addedEntry = await EntriesDatabase.instance.addEntry(
-            Entry(
-                text: entry['text'],
-                mood: entry['mood'] as int?,
-                timeCreate: DateTime.parse(entry['timeCreated']),
-                timeModified: DateTime.parse(entry['timeModified'])),
-            updateStatsAndSync: false);
+        var addedEntry = await EntriesProvider.instance.add(
+          Entry(
+              text: entry['text'],
+              mood: entry['mood'] as int?,
+              timeCreate: DateTime.parse(entry['timeCreated']),
+              timeModified: DateTime.parse(entry['timeModified'])),
+          skipUpdate: true,
+        );
         // Support old imgPath field
         if (entry['imgPath'] != null) {
-          await EntriesDatabase.instance.addImg(
+          await EntryImagesProvider.instance.add(
               EntryImage(
                   entryId: addedEntry.id,
                   imgPath: entry['imgPath'],
                   imgRank: 0,
                   timeCreate: DateTime.now()),
-              updateStatsAndSync: false);
+              skipUpdate: true);
         }
         // Import images
         if (entry['images'] != null) {
           for (var img in entry['images']) {
-            await EntriesDatabase.instance.addImg(
+            await EntryImagesProvider.instance.add(
                 EntryImage(
                     entryId: addedEntry.id,
                     imgPath: img['imgPath'],
                     imgRank: img['imgRank'] as int,
                     timeCreate: DateTime.parse(img['timeCreated'])),
-                updateStatsAndSync: false);
+                skipUpdate: true);
           }
         }
       }
@@ -82,14 +84,14 @@ class ImportUtils {
       updateStatus("${((processedEntries / totalEntries) * 100).round()}%");
     }
 
-    // Sync and update stats
-    if (EntriesDatabase.instance.usingExternalDb()) {
-      await EntriesDatabase.instance.syncDatabase();
+    await EntriesProvider.instance.load();
+    await EntryImagesProvider.instance.load();
+
+    // Pull in any potentially new photos
+    if (ImageStorage.instance.usingExternalLocation()) {
+      await ImageStorage.instance
+          .syncImageFolder(true, updateStatus: updateStatus);
     }
-    if (EntriesDatabase.instance.usingExternalImg()) {
-      await EntriesDatabase.instance.syncImageFolder(true);
-    }
-    StatsProvider.instance.updateStats();
 
     return true;
   }
@@ -125,38 +127,37 @@ class ImportUtils {
       final mood = happinessMapping[happinessText];
 
       // Skip if the day already has an entry
-      if (await EntriesDatabase.instance.getEntryForDate(createdDateTime) ==
-          null) {
-        var addedEntry = await EntriesDatabase.instance.addEntry(
+      if (EntriesProvider.instance.getEntryForDate(createdDateTime) == null) {
+        var addedEntry = await EntriesProvider.instance.add(
             Entry(
                 text: entry['textContent'],
                 mood: mood,
                 timeCreate: createdDateTime,
                 timeModified: DateTime.now()),
-            updateStatsAndSync: false);
+            skipUpdate: true);
         // Import image
         if (entry['relativePath'] != null) {
-          await EntriesDatabase.instance.addImg(
+          await EntryImagesProvider.instance.add(
               EntryImage(
                   entryId: addedEntry.id,
                   imgPath: entry['relativePath'],
                   imgRank: 0,
                   timeCreate: DateTime.now()),
-              updateStatsAndSync: false);
+              skipUpdate: true);
         }
       }
       processedEntries += 1;
       updateStatus("${((processedEntries / totalEntries) * 100).round()}%");
     }
 
-    // Sync and update stats
-    if (EntriesDatabase.instance.usingExternalDb()) {
-      await EntriesDatabase.instance.syncDatabase();
+    await EntriesProvider.instance.load();
+    await EntryImagesProvider.instance.load();
+
+    // Pull in any potentially new photos
+    if (ImageStorage.instance.usingExternalLocation()) {
+      await ImageStorage.instance
+          .syncImageFolder(true, updateStatus: updateStatus);
     }
-    if (EntriesDatabase.instance.usingExternalImg()) {
-      await EntriesDatabase.instance.syncImageFolder(true);
-    }
-    StatsProvider.instance.updateStats();
 
     return true;
   }
@@ -182,35 +183,34 @@ class ImportUtils {
         DateTime timeModified = DateTime.now();
 
         // Skip if the day already has an entry
-        if (await EntriesDatabase.instance.getEntryForDate(timeCreated) ==
-            null) {
+        if (EntriesProvider.instance.getEntryForDate(timeCreated) == null) {
           int avgMood =
               (entry['scores'] as List<dynamic>).reduce((a, b) => a + b) ~/
                   entry['scores'].length;
           // Convert mood from 1-5 scale to -2 to 2 scale
           int mappedMood = avgMood - 3;
 
-          await EntriesDatabase.instance.addEntry(
+          await EntriesProvider.instance.add(
               Entry(
                   text: entry['notes'] ?? '',
                   mood: mappedMood,
                   timeCreate: timeCreated,
                   timeModified: timeModified),
-              updateStatsAndSync: false);
+              skipUpdate: true);
         }
       }
       processedEntries += 1;
       updateStatus("${((processedEntries / totalEntries) * 100).round()}%");
     }
 
-    // Sync and update stats
-    if (EntriesDatabase.instance.usingExternalDb()) {
-      await EntriesDatabase.instance.syncDatabase();
+    await EntriesProvider.instance.load();
+    await EntryImagesProvider.instance.load();
+
+    // Pull in any potentially new photos
+    if (ImageStorage.instance.usingExternalLocation()) {
+      await ImageStorage.instance
+          .syncImageFolder(true, updateStatus: updateStatus);
     }
-    if (EntriesDatabase.instance.usingExternalImg()) {
-      await EntriesDatabase.instance.syncImageFolder(true);
-    }
-    StatsProvider.instance.updateStats();
 
     return true;
   }
@@ -306,17 +306,16 @@ class ImportUtils {
         }
 
         // Only add if there’s no entry already on this date
-        if (await EntriesDatabase.instance.getEntryForDate(earliestCreated!) ==
+        if (EntriesProvider.instance.getEntryForDate(earliestCreated!) ==
             null) {
-          await EntriesDatabase.instance.addEntry(
-            Entry(
-              text: combinedText ?? '',
-              mood: averageMood,
-              timeCreate: earliestCreated,
-              timeModified: latestModified!,
-            ),
-            updateStatsAndSync: false,
-          );
+          await EntriesProvider.instance.add(
+              Entry(
+                text: combinedText ?? '',
+                mood: averageMood,
+                timeCreate: earliestCreated,
+                timeModified: latestModified!,
+              ),
+              skipUpdate: true);
         }
 
         processedDays += 1;
@@ -328,14 +327,14 @@ class ImportUtils {
       success = false;
     }
 
-    // Sync and update stats
-    if (EntriesDatabase.instance.usingExternalDb()) {
-      await EntriesDatabase.instance.syncDatabase();
+    await EntriesProvider.instance.load();
+    await EntryImagesProvider.instance.load();
+
+    // Pull in any potentially new photos
+    if (ImageStorage.instance.usingExternalLocation()) {
+      await ImageStorage.instance
+          .syncImageFolder(true, updateStatus: updateStatus);
     }
-    if (EntriesDatabase.instance.usingExternalImg()) {
-      await EntriesDatabase.instance.syncImageFolder(true);
-    }
-    StatsProvider.instance.updateStats();
 
     return success;
   }
@@ -456,35 +455,33 @@ class ImportUtils {
             : null;
 
         // Skip day if it already has an entry
-        if (await EntriesDatabase.instance.getEntryForDate(earliest!) == null) {
-          final addedEntry = await EntriesDatabase.instance.addEntry(
-            Entry(
-              text: combinedText,
-              mood: averageMood,
-              timeCreate: earliest,
-              timeModified: latest!,
-            ),
-            updateStatsAndSync: false,
-          );
+        if (EntriesProvider.instance.getEntryForDate(earliest!) == null) {
+          final addedEntry = await EntriesProvider.instance.add(
+              Entry(
+                text: combinedText,
+                mood: averageMood,
+                timeCreate: earliest,
+                timeModified: latest!,
+              ),
+              skipUpdate: true);
 
           for (final img in images) {
-            final newImage = await EntriesDatabase.instance.createImg(
+            final newImage = await ImageStorage.instance.create(
               null,
               img['data'],
               currTime: earliest,
             );
 
             if (newImage != null) {
-              await EntriesDatabase.instance.addImg(
-                EntryImage(
-                  id: null,
-                  entryId: addedEntry.id!,
-                  imgPath: newImage,
-                  imgRank: img['rank'],
-                  timeCreate: earliest,
-                ),
-                updateStatsAndSync: false,
-              );
+              await EntryImagesProvider.instance.add(
+                  EntryImage(
+                    id: null,
+                    entryId: addedEntry.id!,
+                    imgPath: newImage,
+                    imgRank: img['rank'],
+                    timeCreate: earliest,
+                  ),
+                  skipUpdate: true);
             }
           }
         }
@@ -500,11 +497,10 @@ class ImportUtils {
 
     updateStatus(AppLocalizations.of(context)!.cleanUpStatus);
 
-    if (EntriesDatabase.instance.usingExternalDb()) {
-      await EntriesDatabase.instance.syncDatabase();
-    }
+    await EntriesProvider.instance.load();
+    await EntryImagesProvider.instance.load();
+
     // Images were created externally as they were added. No need to sync with external image folder
-    StatsProvider.instance.updateStats();
 
     if (db != null && db.isOpen) {
       await db.close();
@@ -640,7 +636,7 @@ class ImportUtils {
             if (file == null) continue;
 
             images.add({
-              'data': await File(file).readAsBytes(),
+              'file': file,
               'rank': 0, // Daylio doesn’t have ranks
             });
           }
@@ -651,31 +647,29 @@ class ImportUtils {
             ? (moods.reduce((a, b) => a + b) / moods.length).round()
             : null;
 
-        if (await EntriesDatabase.instance.getEntryForDate(earliest!) == null) {
-          final addedEntry = await EntriesDatabase.instance.addEntry(
-            Entry(
-              text: combinedText,
-              mood: avgMood,
-              timeCreate: earliest,
-              timeModified: latest!,
-            ),
-            updateStatsAndSync: false,
-          );
+        if (EntriesProvider.instance.getEntryForDate(earliest!) == null) {
+          final addedEntry = await EntriesProvider.instance.add(
+              Entry(
+                text: combinedText,
+                mood: avgMood,
+                timeCreate: earliest,
+                timeModified: latest!,
+              ),
+              skipUpdate: true);
 
           for (final img in images) {
-            final imagePath = await EntriesDatabase.instance.createImg(
-                null, Uint8List.fromList(img['data']),
+            final imagePath = await ImageStorage.instance.create(
+                null, Uint8List.fromList(await File(img['file']).readAsBytes()),
                 currTime: earliest);
             if (imagePath != null) {
-              await EntriesDatabase.instance.addImg(
-                EntryImage(
-                  entryId: addedEntry.id!,
-                  imgPath: imagePath,
-                  imgRank: img['rank'],
-                  timeCreate: earliest,
-                ),
-                updateStatsAndSync: false,
-              );
+              await EntryImagesProvider.instance.add(
+                  EntryImage(
+                    entryId: addedEntry.id!,
+                    imgPath: imagePath,
+                    imgRank: img['rank'],
+                    timeCreate: earliest,
+                  ),
+                  skipUpdate: true);
             }
           }
         }
@@ -691,11 +685,10 @@ class ImportUtils {
 
     updateStatus(AppLocalizations.of(context)!.cleanUpStatus);
 
-    if (EntriesDatabase.instance.usingExternalDb()) {
-      await EntriesDatabase.instance.syncDatabase();
-    }
+    await EntriesProvider.instance.load();
+    await EntryImagesProvider.instance.load();
+
     // Images were created externally as they were added. No need to sync with external image folder
-    StatsProvider.instance.updateStats();
 
     if (await File(join(tempDir.path, tempDaylioZip)).exists()) {
       await File(join(tempDir.path, tempDaylioZip)).delete();
@@ -898,19 +891,18 @@ class ImportUtils {
         updateStatus("${((processedDays / totalDays) * 100).round()}%");
 
         // Skip if already exists
-        if (await EntriesDatabase.instance.getEntryForDate(earliest) != null) {
+        if (EntriesProvider.instance.getEntryForDate(earliest) != null) {
           continue;
         }
 
-        final addedEntry = await EntriesDatabase.instance.addEntry(
-          Entry(
-            text: combinedText,
-            mood: averageMood,
-            timeCreate: earliest,
-            timeModified: latest,
-          ),
-          updateStatsAndSync: false,
-        );
+        final addedEntry = await EntriesProvider.instance.add(
+            Entry(
+              text: combinedText,
+              mood: averageMood,
+              timeCreate: earliest,
+              timeModified: latest,
+            ),
+            skipUpdate: true);
 
         // Add images
         for (final img in images) {
@@ -919,18 +911,17 @@ class ImportUtils {
           final photoBytes = await FileLayer.getFileBytes(photoFile.path,
               useExternalPath: false);
           if (photoBytes == null) continue;
-          final imagePath = await EntriesDatabase.instance
-              .createImg(null, photoBytes, currTime: earliest);
+          final imagePath = await ImageStorage.instance
+              .create(null, photoBytes, currTime: earliest);
           if (imagePath != null) {
-            await EntriesDatabase.instance.addImg(
-              EntryImage(
-                entryId: addedEntry.id!,
-                imgPath: imagePath,
-                imgRank: img['rank'],
-                timeCreate: earliest,
-              ),
-              updateStatsAndSync: false,
-            );
+            await EntryImagesProvider.instance.add(
+                EntryImage(
+                  entryId: addedEntry.id!,
+                  imgPath: imagePath,
+                  imgRank: img['rank'],
+                  timeCreate: earliest,
+                ),
+                skipUpdate: true);
           }
         }
       }
@@ -942,11 +933,10 @@ class ImportUtils {
 
     updateStatus(AppLocalizations.of(context)!.cleanUpStatus);
 
-    if (EntriesDatabase.instance.usingExternalDb()) {
-      await EntriesDatabase.instance.syncDatabase();
-    }
+    await EntriesProvider.instance.load();
+    await EntryImagesProvider.instance.load();
+
     // Images were created externally as they were added. No need to sync with external image folder
-    StatsProvider.instance.updateStats();
 
     if (await File(join(tempDir.path, tempZip)).exists()) {
       await File(join(tempDir.path, tempZip)).delete();

@@ -448,7 +448,7 @@ class AppLocalizationsUk extends AppLocalizations {
   String get formatDiarium => 'Diarium';
 
   @override
-  String get formatDiaro => 'Diaro';
+  String get formatDiaro => 'Діаро';
 
   @override
   String get formatMyBrain => 'My Brain';

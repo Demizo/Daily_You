@@ -55,8 +55,7 @@ class _LanguageSettingsState extends State<LanguageSettings> {
                 DropdownMenuItem(
                     value: null,
                     child: Text(AppLocalizations.of(context)!.themeSystem)),
-                for (var locale in AppLocalizations.supportedLocales
-                    .where((locale) => locale.toLanguageTag() != "pt"))
+                for (var locale in AppLocalizations.supportedLocales)
                   DropdownMenuItem(
                       value: LanguageOption.fromLocale(locale),
                       child:

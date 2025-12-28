@@ -1,8 +1,9 @@
 import 'dart:io';
 import 'package:daily_you/backup_restore_utils.dart';
 import 'package:daily_you/config_provider.dart';
-import 'package:daily_you/entries_database.dart';
-import 'package:daily_you/stats_provider.dart';
+import 'package:daily_you/database/app_database.dart';
+import 'package:daily_you/database/image_storage.dart';
+import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/widgets/settings_dropdown.dart';
 import 'package:daily_you/widgets/settings_icon_action.dart';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -19,8 +20,6 @@ class StorageSettings extends StatefulWidget {
 }
 
 class _StorageSettingsState extends State<StorageSettings> {
-  bool isSyncing = false;
-
   @override
   void initState() {
     super.initState();
@@ -92,14 +91,16 @@ class _StorageSettingsState extends State<StorageSettings> {
       },
     );
     if (confirmed) {
-      setState(() {
-        isSyncing = true;
-      });
+      ValueNotifier<String> statusNotifier = ValueNotifier<String>("");
+
+      BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
       bool locationSet =
-          await EntriesDatabase.instance.selectDatabaseLocation();
-      setState(() {
-        isSyncing = false;
+          await AppDatabase.instance.selectExternalLocation((status) {
+        statusNotifier.value = status;
       });
+
+      Navigator.of(context).pop();
+
       if (!locationSet) {
         await showDialog(
             context: context,
@@ -123,13 +124,16 @@ class _StorageSettingsState extends State<StorageSettings> {
   }
 
   Future<void> _attemptImageFolderChange() async {
-    setState(() {
-      isSyncing = true;
+    ValueNotifier<String> statusNotifier = ValueNotifier<String>("");
+
+    BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
+    bool locationSet =
+        await ImageStorage.instance.selectExternalLocation((status) {
+      statusNotifier.value = status;
     });
-    bool locationSet = await EntriesDatabase.instance.selectImageFolder();
-    setState(() {
-      isSyncing = false;
-    });
+
+    Navigator.of(context).pop();
+
     if (!locationSet) {
       await showDialog(
           context: context,
@@ -229,7 +233,7 @@ class _StorageSettingsState extends State<StorageSettings> {
 
     BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
 
-    await EntriesDatabase.instance.deleteAllEntries((status) {
+    await EntriesProvider.instance.deleteAll((status) {
       statusNotifier.value = status;
     });
 
@@ -257,135 +261,105 @@ class _StorageSettingsState extends State<StorageSettings> {
 
   @override
   Widget build(BuildContext context) {
-    final statsProvider = Provider.of<StatsProvider>(context);
     final configProvider = Provider.of<ConfigProvider>(context);
 
-    return PopScope(
-        canPop: !isSyncing,
-        child: isSyncing
-            ? Scaffold(
-                body: Center(
-                    child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const CircularProgressIndicator(),
-                  statsProvider.totalEntries == 0
-                      ? Container()
-                      : Text(
-                          "${statsProvider.syncedEntries}/${statsProvider.totalEntries}"),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                ],
-              )))
-            : Scaffold(
-                appBar: AppBar(
-                  title:
-                      Text(AppLocalizations.of(context)!.settingsStorageTitle),
-                  centerTitle: true,
-                ),
-                body: ListView(
-                  children: [
-                    SettingsDropdown<String>(
-                        title:
-                            AppLocalizations.of(context)!.settingsImageQuality,
-                        value: configProvider.get(ConfigKey.imageQualityLevel),
-                        options: [
-                          DropdownMenuItem<String>(
-                              value: ImageQuality.noCompression,
-                              child: Text(AppLocalizations.of(context)!
-                                  .imageQualityNoCompression)),
-                          DropdownMenuItem<String>(
-                              value: ImageQuality.high,
-                              child: Text(AppLocalizations.of(context)!
-                                  .imageQualityHigh)),
-                          DropdownMenuItem<String>(
-                              value: ImageQuality.medium,
-                              child: Text(AppLocalizations.of(context)!
-                                  .imageQualityMedium)),
-                          DropdownMenuItem<String>(
-                              value: ImageQuality.low,
-                              child: Text(AppLocalizations.of(context)!
-                                  .imageQualityLow)),
-                        ],
-                        onChanged: (String? newValue) {
-                          if (newValue != null) {
-                            configProvider.set(
-                                ConfigKey.imageQualityLevel, newValue);
-                          }
-                        }),
-                    FutureBuilder(
-                        future: EntriesDatabase.instance.getInternalDbPath(),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData && snapshot.data != null) {
-                            var folderText = snapshot.data!;
-                            if (EntriesDatabase.instance.usingExternalDb()) {
-                              folderText = _displayNameFromUri(
-                                  configProvider.get(ConfigKey.externalDbUri));
-                            }
-                            return SettingsIconAction(
-                              title: AppLocalizations.of(context)!
-                                  .settingsLogFolder,
-                              hint: folderText,
-                              icon: Icon(Icons.folder_rounded),
-                              secondaryIcon: Icon(Icons.refresh_rounded),
-                              onPressed: () async {
-                                if (Platform.isAndroid &&
-                                    !await requestStoragePermission()) {
-                                  return;
-                                }
-                                await _showChangeLogFolderWarning();
-                              },
-                              onSecondaryPressed: () async {
-                                EntriesDatabase.instance
-                                    .resetDatabaseLocation();
-                              },
-                            );
-                          }
-                          return const SizedBox();
-                        }),
-                    FutureBuilder(
-                        future: EntriesDatabase.instance
-                            .getInternalImgDatabasePath(),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData && snapshot.data != null) {
-                            var folderText = snapshot.data!;
-                            if (EntriesDatabase.instance.usingExternalImg()) {
-                              folderText = _displayNameFromUri(
-                                  configProvider.get(ConfigKey.externalImgUri));
-                            }
-                            return SettingsIconAction(
-                              title: AppLocalizations.of(context)!
-                                  .settingsImageFolder,
-                              hint: folderText,
-                              icon: Icon(Icons.folder_rounded),
-                              secondaryIcon: Icon(Icons.refresh_rounded),
-                              onPressed: () async {
-                                if (Platform.isAndroid &&
-                                    !await requestPhotosPermission()) {
-                                  return;
-                                }
-                                await _attemptImageFolderChange();
-                              },
-                              onSecondaryPressed: () async {
-                                EntriesDatabase.instance
-                                    .resetImageFolderLocation();
-                              },
-                            );
-                          }
-                          return const SizedBox();
-                        }),
-                    SettingsIconAction(
-                        title: AppLocalizations.of(context)!
-                            .settingsDeleteAllLogsTitle,
-                        icon: Icon(Icons.delete_forever_rounded),
-                        onPressed: () => _showDeleteAllLogsDialog(
-                            context,
-                            AppLocalizations.of(context)!
-                                .settingsDeleteAllLogsTitle,
-                            () => _deleteAllLogs(context))),
-                  ],
-                ),
-              ));
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(AppLocalizations.of(context)!.settingsStorageTitle),
+        centerTitle: true,
+      ),
+      body: ListView(
+        children: [
+          SettingsDropdown<String>(
+              title: AppLocalizations.of(context)!.settingsImageQuality,
+              value: configProvider.get(ConfigKey.imageQualityLevel),
+              options: [
+                DropdownMenuItem<String>(
+                    value: ImageQuality.noCompression,
+                    child: Text(AppLocalizations.of(context)!
+                        .imageQualityNoCompression)),
+                DropdownMenuItem<String>(
+                    value: ImageQuality.high,
+                    child:
+                        Text(AppLocalizations.of(context)!.imageQualityHigh)),
+                DropdownMenuItem<String>(
+                    value: ImageQuality.medium,
+                    child:
+                        Text(AppLocalizations.of(context)!.imageQualityMedium)),
+                DropdownMenuItem<String>(
+                    value: ImageQuality.low,
+                    child: Text(AppLocalizations.of(context)!.imageQualityLow)),
+              ],
+              onChanged: (String? newValue) {
+                if (newValue != null) {
+                  configProvider.set(ConfigKey.imageQualityLevel, newValue);
+                }
+              }),
+          FutureBuilder(
+              future: AppDatabase.instance.getInternalPath(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData && snapshot.data != null) {
+                  var folderText = snapshot.data!;
+                  if (AppDatabase.instance.usingExternalLocation()) {
+                    folderText = _displayNameFromUri(
+                        configProvider.get(ConfigKey.externalDbUri));
+                  }
+                  return SettingsIconAction(
+                    title: AppLocalizations.of(context)!.settingsLogFolder,
+                    hint: folderText,
+                    icon: Icon(Icons.folder_rounded),
+                    secondaryIcon: Icon(Icons.refresh_rounded),
+                    onPressed: () async {
+                      if (Platform.isAndroid &&
+                          !await requestStoragePermission()) {
+                        return;
+                      }
+                      await _showChangeLogFolderWarning();
+                    },
+                    onSecondaryPressed: () async {
+                      AppDatabase.instance.resetExternalLocation();
+                    },
+                  );
+                }
+                return const SizedBox();
+              }),
+          FutureBuilder(
+              future: ImageStorage.instance.getInternalFolder(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData && snapshot.data != null) {
+                  var folderText = snapshot.data!;
+                  if (ImageStorage.instance.usingExternalLocation()) {
+                    folderText = _displayNameFromUri(
+                        configProvider.get(ConfigKey.externalImgUri));
+                  }
+                  return SettingsIconAction(
+                    title: AppLocalizations.of(context)!.settingsImageFolder,
+                    hint: folderText,
+                    icon: Icon(Icons.folder_rounded),
+                    secondaryIcon: Icon(Icons.refresh_rounded),
+                    onPressed: () async {
+                      if (Platform.isAndroid &&
+                          !await requestPhotosPermission()) {
+                        return;
+                      }
+                      await _attemptImageFolderChange();
+                    },
+                    onSecondaryPressed: () async {
+                      ImageStorage.instance.resetImageFolderLocation();
+                    },
+                  );
+                }
+                return const SizedBox();
+              }),
+          SettingsIconAction(
+              title: AppLocalizations.of(context)!.settingsDeleteAllLogsTitle,
+              icon: Icon(Icons.delete_forever_rounded),
+              onPressed: () => _showDeleteAllLogsDialog(
+                  context,
+                  AppLocalizations.of(context)!.settingsDeleteAllLogsTitle,
+                  () => _deleteAllLogs(context))),
+        ],
+      ),
+    );
   }
 }

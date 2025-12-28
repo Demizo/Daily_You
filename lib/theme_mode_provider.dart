@@ -17,7 +17,7 @@ class ThemeModeProvider with ChangeNotifier {
   }
 
   set accentColor(Color color) {
-    ConfigProvider.instance.set(ConfigKey.accentColor, color.value);
+    ConfigProvider.instance.set(ConfigKey.accentColor, color.toARGB32());
     _accentColor = color;
   }
 

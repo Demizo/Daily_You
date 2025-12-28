@@ -48,7 +48,7 @@ class NotificationSettings extends StatefulWidget {
         handlerColor: theme.colorScheme.primary,
         strokeColor: theme.colorScheme.primary,
         selectedColor: theme.colorScheme.primary,
-        backgroundColor: theme.disabledColor.withOpacity(0.2),
+        backgroundColor: theme.disabledColor.withValues(alpha: 0.2),
         ticksColor: theme.colorScheme.surface,
         interval: Duration(minutes: 10),
         ticksWidth: 2,

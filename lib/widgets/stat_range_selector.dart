@@ -1,4 +1,4 @@
-import 'package:daily_you/stats_provider.dart';
+import 'package:daily_you/providers/entries_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:provider/provider.dart';
@@ -6,17 +6,26 @@ import 'package:provider/provider.dart';
 enum StatsRange { month, sixMonths, year, allTime }
 
 class StatsRangeSelector extends StatefulWidget {
-  final Function(Set<StatsRange> newSelection) onSelectionChanged;
-  const StatsRangeSelector({super.key, required this.onSelectionChanged});
+  final StatsRange statsRange;
+  final Function(StatsRange newSelection) onSelectionChanged;
+  const StatsRangeSelector(
+      {super.key, required this.statsRange, required this.onSelectionChanged});
 
   @override
   State<StatsRangeSelector> createState() => _StatsRangeSelectorState();
 }
 
 class _StatsRangeSelectorState extends State<StatsRangeSelector> {
+  late StatsRange statsRange;
+
+  @override
+  void initState() {
+    super.initState();
+    statsRange = widget.statsRange;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final statsProvider = Provider.of<StatsProvider>(context);
     return SegmentedButton<StatsRange>(
       showSelectedIcon: false,
       segments: <ButtonSegment<StatsRange>>[
@@ -37,13 +46,12 @@ class _StatsRangeSelectorState extends State<StatsRangeSelector> {
           label: Text(AppLocalizations.of(context)!.statisticsRangeAllTime),
         ),
       ],
-      selected: <StatsRange>{statsProvider.statsRange},
+      selected: <StatsRange>{statsRange},
       onSelectionChanged: (Set<StatsRange> newSelection) {
         setState(() {
-          statsProvider.statsRange = newSelection.first;
-          StatsProvider.instance.updateStats();
+          statsRange = newSelection.first;
         });
-        widget.onSelectionChanged(newSelection);
+        widget.onSelectionChanged(newSelection.first);
       },
     );
   }

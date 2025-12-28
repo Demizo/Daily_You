@@ -2,7 +2,7 @@ import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/pages/edit_entry_page.dart';
 import 'package:daily_you/pages/entry_detail_page.dart';
-import 'package:daily_you/stats_provider.dart';
+import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/year_month_picker.dart';
 import 'package:flutter/material.dart';
@@ -35,7 +35,8 @@ class _EntryCalendarState extends State<EntryCalendar>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final statsProvider = Provider.of<StatsProvider>(context);
+    final entriesProvider = Provider.of<EntriesProvider>(context);
+    final configProvider = Provider.of<ConfigProvider>(context);
     final theme = Theme.of(context);
     return TableCalendar(
       locale: TimeManager.currentLocale(context),
@@ -43,15 +44,15 @@ class _EntryCalendarState extends State<EntryCalendar>
       daysOfWeekHeight: 24,
       sixWeekMonthsEnforced: true,
       startingDayOfWeek: StartingDayOfWeek
-          .values[ConfigProvider.instance.getFirstDayOfWeekIndex(context)],
+          .values[configProvider.getFirstDayOfWeekIndex(context)],
       availableGestures: AvailableGestures.horizontalSwipe,
       availableCalendarFormats: const {
         CalendarFormat.month: 'Month',
       },
-      focusedDay: statsProvider.selectedDate,
+      focusedDay: entriesProvider.selectedDate,
       lastDay: DateTime.now(),
       firstDay: DateTime.utc(2000),
-      onPageChanged: (DateTime date) => statsProvider.selectedDate = date,
+      onPageChanged: (DateTime date) => entriesProvider.selectedDate = date,
       headerStyle: HeaderStyle(
           leftChevronIcon: Icon(Icons.chevron_left,
               color: theme.colorScheme.onSurfaceVariant),
@@ -85,17 +86,16 @@ class _EntryCalendarState extends State<EntryCalendar>
                       DateTime? pickedDate = await showDatePicker(
                         initialDatePickerMode: DatePickerMode.day,
                         context: context,
-                        initialDate: statsProvider.selectedDate,
+                        initialDate: entriesProvider.selectedDate,
                         firstDate: DateTime.utc(2000),
                         lastDate: DateTime.now(),
                       );
                       if (pickedDate != null) {
-                        statsProvider.selectedDate = pickedDate;
                         // Update now to jump to the selected day on the calendar
-                        statsProvider.forceUpdate();
+                        entriesProvider.setSelectedDate(pickedDate);
 
                         Entry? pickedEntry =
-                            statsProvider.getEntryForDate(pickedDate);
+                            entriesProvider.getEntryForDate(pickedDate);
 
                         if (pickedEntry != null) {
                           // Open entry
@@ -103,7 +103,7 @@ class _EntryCalendarState extends State<EntryCalendar>
                             allowSnapshotting: false,
                             builder: (context) => EntryDetailPage(
                                 filtered: false,
-                                index: statsProvider
+                                index: entriesProvider
                                     .getIndexOfEntry(pickedEntry.id!)),
                           ));
                         } else {
@@ -136,11 +136,10 @@ class _EntryCalendarState extends State<EntryCalendar>
                   ),
                   onTap: () async {
                     final selectedDate = await showYearMonthPicker(context,
-                        initialDate: statsProvider.selectedDate);
+                        initialDate: entriesProvider.selectedDate);
                     if (selectedDate != null) {
-                      statsProvider.selectedDate = selectedDate;
                       // Update now to jump to the selected day on the calendar
-                      statsProvider.forceUpdate();
+                      entriesProvider.setSelectedDate(selectedDate);
                     }
                   },
                 ),
@@ -172,13 +171,12 @@ class _EntryCalendarState extends State<EntryCalendar>
                     );
                   },
                   child: (!TimeManager.isSameMonth(
-                          statsProvider.selectedDate, DateTime.now()))
+                          entriesProvider.selectedDate, DateTime.now()))
                       ? IconButton(
                           key: ValueKey('todayButton'),
                           onPressed: () async {
-                            statsProvider.selectedDate = DateTime.now();
                             // Update now to jump to today on the calendar
-                            statsProvider.forceUpdate();
+                            entriesProvider.setSelectedDate(DateTime.now());
                           },
                           icon: SvgPicture.asset(
                             'assets/icons/calendar_latest.svg',

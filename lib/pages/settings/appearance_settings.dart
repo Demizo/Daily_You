@@ -1,5 +1,4 @@
 import 'package:daily_you/config_provider.dart';
-import 'package:daily_you/stats_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
 import 'package:daily_you/widgets/settings_dropdown.dart';
@@ -160,7 +159,6 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
 
   @override
   Widget build(BuildContext context) {
-    final statsProvider = Provider.of<StatsProvider>(context);
     final themeProvider = Provider.of<ThemeModeProvider>(context);
     final configProvider = Provider.of<ConfigProvider>(context);
 
@@ -232,7 +230,6 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
                 onChanged: (String? newValue) async {
                   await configProvider.set(
                       ConfigKey.startingDayOfWeek, newValue);
-                  statsProvider.updateStats();
                 }),
           ),
           Padding(

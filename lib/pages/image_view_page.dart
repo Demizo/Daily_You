@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:daily_you/entries_database.dart';
+import 'package:daily_you/database/image_storage.dart';
 import 'package:daily_you/file_layer.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:extended_image/extended_image.dart';
@@ -55,8 +55,8 @@ class _ImageViewPageState extends State<ImageViewPage> {
           },
           itemBuilder: (context, currentIndex) {
             return FutureBuilder(
-                future: EntriesDatabase.instance
-                    .getImgBytes(widget.images[currentIndex].imgPath),
+                future: ImageStorage.instance
+                    .getBytes(widget.images[currentIndex].imgPath),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: SizedBox());
@@ -104,8 +104,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
               icon: const Icon(Icons.share_rounded),
               onPressed: () async {
                 final currentImage = widget.images[currentIndex].imgPath;
-                var bytes =
-                    await EntriesDatabase.instance.getImgBytes(currentImage);
+                var bytes = await ImageStorage.instance.getBytes(currentImage);
                 if (bytes != null) {
                   await Share.shareXFiles(
                       [XFile.fromData(bytes, mimeType: "images/*")],
@@ -129,7 +128,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
                 onPressed: () async {
                   final currentImage = widget.images[currentIndex].imgPath;
                   var bytes =
-                      await EntriesDatabase.instance.getImgBytes(currentImage);
+                      await ImageStorage.instance.getBytes(currentImage);
                   if (bytes != null) {
                     String? saveDir;
                     try {

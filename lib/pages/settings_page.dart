@@ -8,7 +8,7 @@ import 'package:daily_you/pages/settings/notification_settings.dart';
 import 'package:daily_you/pages/settings/security_settings.dart';
 import 'package:daily_you/pages/settings/storage_settings.dart';
 import 'package:daily_you/pages/settings/templates_page.dart';
-import 'package:daily_you/stats_provider.dart';
+import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/widgets/settings_category.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +31,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final statsProvider = Provider.of<StatsProvider>(context);
+    final entriesProvider = Provider.of<EntriesProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -49,13 +49,13 @@ class _SettingsPageState extends State<SettingsPage> {
                     style: TextStyle(
                         fontSize: 14,
                         color: Theme.of(context).colorScheme.secondary)),
-                if (statsProvider.entries.length > 30)
+                if (entriesProvider.entries.length > 30)
                   TextSpan(
                       text: " ",
                       style: TextStyle(
                           fontSize: 14,
                           color: Theme.of(context).colorScheme.secondary)),
-                if (statsProvider.entries.length > 30)
+                if (entriesProvider.entries.length > 30)
                   TextSpan(
                     text: AppLocalizations.of(context)!
                         .settingsConsiderSupporting,

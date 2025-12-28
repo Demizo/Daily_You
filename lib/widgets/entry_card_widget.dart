@@ -41,10 +41,9 @@ class EntryCardWidget extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Expanded(
-                              child: ClipRect(
-                                  child: LocalImageLoader(
+                              child: LocalImageLoader(
                             imagePath: images.first.imgPath,
-                          )))
+                          ))
                         ],
                       )
                     : (entry.text.isNotEmpty)

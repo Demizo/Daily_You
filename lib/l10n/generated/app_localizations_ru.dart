@@ -15,7 +15,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get dailyReminderTitle => 'Напиши про день!';
 
   @override
-  String get dailyReminderDescription => 'Время описать сегодня…';
+  String get dailyReminderDescription => 'Заполни свой дневник сегодня…';
 
   @override
   String get pageHomeTitle => 'Дом';
@@ -94,8 +94,8 @@ class AppLocalizationsRu extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count слова ',
-      one: '$count слов',
+      other: '$count слов',
+      one: '$count слово',
     );
     return '$_temp0';
   }
@@ -107,7 +107,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get sortDateTitle => 'Дата';
 
   @override
-  String get sortOrderAscendingTitle => 'Возрастание';
+  String get sortOrderAscendingTitle => 'В порядке возрастания';
 
   @override
   String get sortOrderDescendingTitle => 'Убывание';

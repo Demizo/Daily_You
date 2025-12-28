@@ -58,8 +58,10 @@ class _MoodTotalsChartState extends State<MoodTotalsChart> {
               show: true,
               border: Border.symmetric(
                 horizontal: BorderSide(
-                  color:
-                      Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.2),
                 ),
               ),
             ),
@@ -94,7 +96,10 @@ class _MoodTotalsChartState extends State<MoodTotalsChart> {
               show: true,
               drawVerticalLine: false,
               getDrawingHorizontalLine: (value) => FlLine(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.2),
                 strokeWidth: 1,
               ),
             ),

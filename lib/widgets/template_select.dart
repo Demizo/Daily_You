@@ -1,44 +1,27 @@
 import 'package:daily_you/models/template.dart';
+import 'package:daily_you/providers/templates_provider.dart';
 import 'package:daily_you/widgets/template_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
+import 'package:provider/provider.dart';
 
-class TemplateSelect extends StatefulWidget {
+class TemplateSelect extends StatelessWidget {
   final Function(Template template) onTemplatesSelected;
 
   const TemplateSelect({super.key, required this.onTemplatesSelected});
-
-  @override
-  State<TemplateSelect> createState() => _TemplateSelectDialogState();
-}
-
-class _TemplateSelectDialogState extends State<TemplateSelect> {
-  List<Template> _templates = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _loadTemplates();
-  }
-
-  Future<void> _loadTemplates() async {
-    List<Template> templates = await Template.getAll();
-    setState(() {
-      _templates = templates;
-    });
-  }
 
   void _showTemplateManagementPopup(BuildContext context) async {
     await Navigator.of(context).push(MaterialPageRoute(
         allowSnapshotting: false,
         fullscreenDialog: true,
-        builder: (context) => TemplateManager(
-              onTemplatesUpdated: _loadTemplates,
-            )));
+        builder: (context) => TemplateManager()));
   }
 
-  Widget _buildTemplatesList() {
-    if (_templates.isEmpty) {
+  Widget _buildTemplatesList(BuildContext context) {
+    final templatesProvider = Provider.of<TemplatesProvider>(context);
+    final templates = templatesProvider.templates;
+
+    if (templates.isEmpty) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -48,9 +31,9 @@ class _TemplateSelectDialogState extends State<TemplateSelect> {
     } else {
       return ListView.builder(
         shrinkWrap: true,
-        itemCount: _templates.length,
+        itemCount: templates.length,
         itemBuilder: (context, index) {
-          final template = _templates[index];
+          final template = templates[index];
           return ListTile(
             title: Padding(
               padding: const EdgeInsets.only(left: 8.0),
@@ -65,7 +48,7 @@ class _TemplateSelectDialogState extends State<TemplateSelect> {
               child: const Icon(Icons.add_rounded),
             ),
             onTap: () {
-              widget.onTemplatesSelected(template);
+              onTemplatesSelected(template);
               Navigator.of(context).pop();
             },
           );
@@ -78,7 +61,8 @@ class _TemplateSelectDialogState extends State<TemplateSelect> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text(AppLocalizations.of(context)!.addTemplate),
-      content: SizedBox(width: double.maxFinite, child: _buildTemplatesList()),
+      content: SizedBox(
+          width: double.maxFinite, child: _buildTemplatesList(context)),
       actions: [
         TextButton.icon(
           icon: const Icon(Icons.edit_document),

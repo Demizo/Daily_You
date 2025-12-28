@@ -1,11 +1,12 @@
 import 'package:daily_you/models/entry.dart';
-import 'package:daily_you/stats_provider.dart';
+import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class MoodByMonthChart extends StatefulWidget {
   const MoodByMonthChart({super.key});
@@ -28,7 +29,8 @@ class _MoodByMonthChartState extends State<MoodByMonthChart> {
 
   @override
   Widget build(BuildContext context) {
-    List<Entry> entries = StatsProvider.instance.entries;
+    final entriesProvider = Provider.of<EntriesProvider>(context);
+    List<Entry> entries = entriesProvider.entries;
     Map<String, List<double>> moodsByMonth = {};
 
     // Collect moods by month
@@ -235,7 +237,7 @@ class _MoodByMonthChartState extends State<MoodByMonthChart> {
         drawVerticalLine: true,
         verticalInterval: 1,
         getDrawingHorizontalLine: (value) => FlLine(
-          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
           strokeWidth: 1,
         ),
       ),
@@ -243,7 +245,8 @@ class _MoodByMonthChartState extends State<MoodByMonthChart> {
           show: true,
           border: Border.symmetric(
               horizontal: BorderSide(
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
+            color:
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
             width: 1,
           ))),
     );

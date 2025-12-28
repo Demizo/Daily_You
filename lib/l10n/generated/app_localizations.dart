@@ -11,11 +11,13 @@ import 'app_localizations_da.dart';
 import 'app_localizations_de.dart';
 import 'app_localizations_en.dart';
 import 'app_localizations_es.dart';
+import 'app_localizations_fa.dart';
 import 'app_localizations_fi.dart';
 import 'app_localizations_fr.dart';
 import 'app_localizations_he.dart';
 import 'app_localizations_id.dart';
 import 'app_localizations_it.dart';
+import 'app_localizations_ja.dart';
 import 'app_localizations_nl.dart';
 import 'app_localizations_oc.dart';
 import 'app_localizations_pl.dart';
@@ -118,11 +120,13 @@ abstract class AppLocalizations {
     Locale('de'),
     Locale('en'),
     Locale('es'),
+    Locale('fa'),
     Locale('fi'),
     Locale('fr'),
     Locale('he'),
     Locale('id'),
     Locale('it'),
+    Locale('ja'),
     Locale('nl'),
     Locale('oc'),
     Locale('pl'),
@@ -1042,11 +1046,13 @@ class _AppLocalizationsDelegate
         'de',
         'en',
         'es',
+        'fa',
         'fi',
         'fr',
         'he',
         'id',
         'it',
+        'ja',
         'nl',
         'oc',
         'pl',
@@ -1101,6 +1107,8 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
       return AppLocalizationsEn();
     case 'es':
       return AppLocalizationsEs();
+    case 'fa':
+      return AppLocalizationsFa();
     case 'fi':
       return AppLocalizationsFi();
     case 'fr':
@@ -1111,6 +1119,8 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
       return AppLocalizationsId();
     case 'it':
       return AppLocalizationsIt();
+    case 'ja':
+      return AppLocalizationsJa();
     case 'nl':
       return AppLocalizationsNl();
     case 'oc':
