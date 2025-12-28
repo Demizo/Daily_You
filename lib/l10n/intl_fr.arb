@@ -274,5 +274,13 @@
     "settingsSecurityBiometricUnlock": "Déverrouillage biométrique",
     "@settingsSecurityBiometricUnlock": {},
     "unlockAppPrompt": "Déverrouiller l'application",
-    "@unlockAppPrompt": {}
+    "@unlockAppPrompt": {},
+    "settingsFlashbacksViewLayout": "Disposition de la vue des flashbacks",
+    "@settingsFlashbacksViewLayout": {},
+    "settingsGalleryViewLayout": "Disposition de la gallerie",
+    "@settingsGalleryViewLayout": {},
+    "viewLayoutList": "Liste",
+    "@viewLayoutList": {},
+    "viewLayoutGrid": "Grille",
+    "@viewLayoutGrid": {}
 }
