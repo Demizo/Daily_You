@@ -824,6 +824,12 @@ abstract class AppLocalizations {
   /// **'Daily You (JSON)'**
   String get formatDailyYouJson;
 
+  /// No description provided for @formatDaybook.
+  ///
+  /// In en, this message translates to:
+  /// **'Daybook'**
+  String get formatDaybook;
+
   /// No description provided for @formatDaylio.
   ///
   /// In en, this message translates to:

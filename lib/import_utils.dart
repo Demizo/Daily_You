@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:csv/csv.dart';
 import 'package:daily_you/database/image_storage.dart';
 import 'package:daily_you/file_layer.dart';
 import 'package:daily_you/models/entry.dart';
@@ -21,6 +22,7 @@ import 'package:xml/xml.dart';
 enum ImportFormat {
   none,
   dailyYouJson,
+  daybook,
   daylio,
   diarium,
   diaro,
@@ -928,6 +930,230 @@ class ImportUtils {
     } catch (e) {
       updateStatus("$e");
       await Future.delayed(Duration(seconds: 5));
+      success = false;
+    }
+
+    updateStatus(AppLocalizations.of(context)!.cleanUpStatus);
+
+    await EntriesProvider.instance.load();
+    await EntryImagesProvider.instance.load();
+
+    // Images were created externally as they were added. No need to sync with external image folder
+
+    if (await File(join(tempDir.path, tempZip)).exists()) {
+      await File(join(tempDir.path, tempZip)).delete();
+    }
+    if (await tempZipFolder.exists()) {
+      await tempZipFolder.delete(recursive: true);
+    }
+
+    return success;
+  }
+
+  static DateTime parseDaybookLocal(String s) {
+    // yyyy-MM-dd-HH:mm
+    final match = RegExp(
+      r'^(\d{4})-(\d{2})-(\d{2})-(\d{2}):(\d{2})$',
+    ).firstMatch(s);
+
+    if (match == null) {
+      throw FormatException("Invalid Daybook date: $s");
+    }
+
+    return DateTime(
+      int.parse(match[1]!),
+      int.parse(match[2]!),
+      int.parse(match[3]!),
+      int.parse(match[4]!),
+      int.parse(match[5]!),
+    );
+  }
+
+  static Future<bool> importFromDaybook(
+      BuildContext context, Function(String) updateStatus) async {
+    updateStatus("0%");
+
+    final selectedFile = await FileLayer.pickFile();
+    if (selectedFile == null) return false;
+
+    bool success = true;
+
+    final tempDir = await getTemporaryDirectory();
+    final tempZip = "temp_daybook.zip";
+    final tempZipFolder = Directory(join(tempDir.path, "Daybook"));
+    await tempZipFolder.create(recursive: true);
+
+    try {
+      // --- Copy ZIP ---
+      updateStatus(AppLocalizations.of(context)!.tranferStatus("0"));
+      await FileLayer.copyFromExternalLocation(
+        selectedFile,
+        tempDir.path,
+        tempZip,
+        onProgress: (percent) {
+          updateStatus(
+            AppLocalizations.of(context)!.tranferStatus("${percent.round()}"),
+          );
+        },
+      );
+
+      // --- Extract ---
+      await ZipUtils.extract(
+        join(tempDir.path, tempZip),
+        tempZipFolder.path,
+      );
+
+      // --- Load CSV ---
+      final csvFile = await tempZipFolder.list().firstWhere(
+            (f) => basename(f.path) == 'entries.csv',
+            orElse: () => throw Exception('entries.csv not found'),
+          );
+
+      final csvString = utf8.decode(
+        await FileLayer.getFileBytes(csvFile.path, useExternalPath: false)
+            as List<int>,
+      );
+
+      final rows = const CsvToListConverter(
+        fieldDelimiter: ',',
+        textDelimiter: '"',
+        eol: '\n',
+        shouldParseNumbers: false,
+      ).convert(csvString);
+
+      if (rows.isEmpty) {
+        throw Exception("entries.csv is empty");
+      }
+
+      // Expect header row
+      // ["Date","Title","Text","Images"]
+      final header = rows.first.map((e) => e.toString()).toList();
+      final dateIdx = header.indexOf("Date");
+      final titleIdx = header.indexOf("Title");
+      final textIdx = header.indexOf("Text");
+      final imagesIdx = header.indexOf("Images");
+
+      if ([dateIdx, titleIdx, textIdx, imagesIdx].contains(-1)) {
+        throw Exception("entries.csv has unexpected format");
+      }
+
+      // --- Parse entries ---
+      final parsedEntries = <Map<String, dynamic>>[];
+
+      for (final row in rows.skip(1)) {
+        final dateStr = row[dateIdx]?.toString() ?? "";
+        if (dateStr.isEmpty) continue;
+
+        final created = parseDaybookLocal(dateStr);
+
+        parsedEntries.add({
+          'date': created,
+          'title': row[titleIdx]?.toString() ?? "",
+          'text': row[textIdx]?.toString() ?? "",
+          'images': (row[imagesIdx]?.toString() ?? "")
+              .split(',')
+              .map((s) => s.trim())
+              .where((s) => s.isNotEmpty)
+              .toList(),
+        });
+      }
+
+      // --- Group entries by day ---
+      final entriesByDay = <String, List<Map<String, dynamic>>>{};
+
+      for (final e in parsedEntries) {
+        final d = e['date'] as DateTime;
+        final key =
+            "${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}";
+
+        entriesByDay.putIfAbsent(key, () => []).add(e);
+      }
+
+      // --- Import entries ---
+      final totalDays = entriesByDay.length;
+      int processedDays = 0;
+
+      for (final dayEntries in entriesByDay.values) {
+        // Chronological order
+        dayEntries.sort(
+          (a, b) => (a['date'] as DateTime).compareTo(b['date'] as DateTime),
+        );
+
+        final earliest = dayEntries.first['date'] as DateTime;
+        final latest = dayEntries.last['date'] as DateTime;
+
+        // --- Build combined text ---
+        final combinedTextParts = <String>[];
+        final images = <Map<String, dynamic>>[];
+
+        int imageRank = 0;
+
+        for (final e in dayEntries) {
+          final title = e['title'] as String;
+          final text = e['text'] as String;
+
+          if (title.isNotEmpty) {
+            combinedTextParts.add("# $title");
+          }
+          if (text.isNotEmpty) {
+            combinedTextParts.add(text);
+          }
+
+          // Images
+          for (final filename in e['images'] as List<String>) {
+            images.add({
+              'filename': filename,
+              'rank': imageRank++,
+            });
+          }
+        }
+
+        processedDays++;
+        updateStatus("${((processedDays / totalDays) * 100).round()}%");
+
+        // Skip if already imported
+        if (EntriesProvider.instance.getEntryForDate(earliest) != null) {
+          continue;
+        }
+
+        final addedEntry = await EntriesProvider.instance.add(
+          Entry(
+            text: combinedTextParts.join("\n\n"),
+            mood: null,
+            timeCreate: earliest,
+            timeModified: latest,
+          ),
+          skipUpdate: true,
+        );
+
+        // --- Import images ---
+        for (final img in images) {
+          final file = File(join(tempZipFolder.path, img['filename']));
+          if (!await file.exists()) continue;
+
+          final bytes =
+              await FileLayer.getFileBytes(file.path, useExternalPath: false);
+          if (bytes == null) continue;
+
+          final imagePath = await ImageStorage.instance
+              .create(null, bytes, currTime: earliest);
+
+          if (imagePath != null) {
+            await EntryImagesProvider.instance.add(
+              EntryImage(
+                entryId: addedEntry.id!,
+                imgPath: imagePath,
+                imgRank: img['rank'],
+                timeCreate: earliest,
+              ),
+              skipUpdate: true,
+            );
+          }
+        }
+      }
+    } catch (e) {
+      updateStatus("$e");
+      await Future.delayed(const Duration(seconds: 5));
       success = false;
     }
 
