@@ -59,10 +59,11 @@ class _EntryMoodPickerState extends State<EntryMoodPicker> {
         padding: const EdgeInsets.only(bottom: 8.0),
         child: Column(children: [
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: widget.actions,
           ),
           const SizedBox(
-            height: 8,
+            height: 4,
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,

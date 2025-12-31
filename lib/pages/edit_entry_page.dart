@@ -8,7 +8,7 @@ import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/edit_toolbar.dart';
-import 'package:daily_you/widgets/local_image_loader.dart';
+import 'package:daily_you/widgets/entry_image_editable_list.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
@@ -47,7 +47,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   int? mood;
   DateTime? _lastEntryDate;
   DateTime? entryDate;
-  late List<EntryImage> currentImages;
+  late List<EntryImage> _currentImages;
   bool _loadingEntry = true;
   final ScrollController _scrollController = ScrollController();
   bool _isDragging = false;
@@ -96,9 +96,9 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    currentImages = List.empty(growable: true);
+    _currentImages = List.empty(growable: true);
     for (var image in widget.images) {
-      currentImages.add(image.copy());
+      _currentImages.add(image.copy());
     }
     _initEntry();
   }
@@ -164,7 +164,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                 );
                 if (updatedEntry.text == _entry.text &&
                     updatedEntry.mood == _entry.mood &&
-                    currentImages.isEmpty) {
+                    _currentImages.isEmpty) {
                   await _deleteEntry(_entry);
                 } else {
                   await _saveEntry();
@@ -183,50 +183,21 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                   child: ListView(
                     padding: const EdgeInsets.only(left: 8, right: 8),
                     children: [
-                      if (currentImages.isEmpty)
-                        EntryImagePicker(
-                            imgPath: null,
-                            openCamera: widget.openCamera && !_openedCamera,
-                            onChangedImage: (imgPaths) async {
-                              _openedCamera = true;
-                              if (imgPaths != null) {
-                                await _addLocalImage(imgPaths);
-                              }
+                      if (_currentImages.isNotEmpty)
+                        EntryImageEditableList(
+                            images: _currentImages,
+                            onImagesChanged: (images) async {
+                              _currentImages = images;
+                              await _saveEntry();
                             }),
-                      if (currentImages.isNotEmpty)
-                        SizedBox(
-                          height: 220,
-                          child: Listener(
-                            onPointerMove: _handlePointerMove,
-                            onPointerDown: _handlePointerDown,
-                            onPointerUp: _handlePointerUp,
-                            child: ListView.builder(
-                              controller: _scrollController,
-                              shrinkWrap: true,
-                              scrollDirection: Axis.horizontal,
-                              itemCount: currentImages.length + 1,
-                              itemBuilder: (context, index) {
-                                if (index == 0) {
-                                  return EntryImagePicker(
-                                      imgPath: null,
-                                      openCamera:
-                                          widget.openCamera && !_openedCamera,
-                                      onChangedImage: (imgPaths) {
-                                        _openedCamera = true;
-                                        if (imgPaths != null) {
-                                          _addLocalImage(imgPaths);
-                                        }
-                                      });
-                                } else {
-                                  return _buildDraggableListItem(index - 1);
-                                }
-                              },
-                            ),
-                          ),
-                        ),
                       StatefulBuilder(
                         builder: (context, setState) => EntryMoodPicker(
-                            actions: [_changeDateButton()],
+                            actions: [
+                              _changeDateButton(),
+                              EntryImagePicker(
+                                  onChangedImage: (newImages) =>
+                                      _addImage(newImages))
+                            ],
                             moodValue: mood,
                             onChangedMood: (mood) {
                               setState(() => this.mood = mood);
@@ -277,7 +248,6 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
           width: 24,
           height: 24,
         ),
-        style: ElevatedButton.styleFrom(visualDensity: VisualDensity.compact),
         onPressed: () async {
           DateTime? pickedDate = await showDatePicker(
             selectableDayPredicate: (date) =>
@@ -302,138 +272,6 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
               .format(entryDate!),
           style: TextStyle(fontSize: 16),
         ));
-  }
-
-  Widget _buildDraggableListItem(int index) {
-    bool isHovered = false;
-    return LongPressDraggable<EntryImage>(
-      onDragStarted: () => _isDragging = true,
-      data: currentImages[index],
-      feedback: Opacity(
-        opacity: 0.7,
-        child: SizedBox(
-          key: ValueKey(currentImages[index].imgRank),
-          height: 220,
-          width: 220,
-          child: Card(
-              clipBehavior: Clip.antiAlias,
-              child: LocalImageLoader(imagePath: currentImages[index].imgPath)),
-        ),
-      ),
-      childWhenDragging: Opacity(
-        opacity: 0.2,
-        child: SizedBox(
-          key: ValueKey(currentImages[index].imgRank),
-          height: 220,
-          width: 220,
-          child: Card(
-              clipBehavior: Clip.antiAlias,
-              child: LocalImageLoader(imagePath: currentImages[index].imgPath)),
-        ),
-      ),
-      child: DragTarget<EntryImage>(
-        onLeave: (data) {
-          isHovered = false;
-        },
-        onWillAcceptWithDetails: (data) {
-          isHovered = true;
-          return true;
-        },
-        onAcceptWithDetails: (data) async {
-          // The exact image objects may change when saving the entry. It is
-          // safer to use the imgPath as a unique key.
-          int fromIndex = currentImages.indexOf(currentImages
-              .firstWhere((image) => image.imgPath == data.data.imgPath));
-          isHovered = false;
-          final movedItem = currentImages.removeAt(fromIndex);
-          currentImages.insert(index, movedItem);
-          // Update ranks
-          for (int i = 0; i < currentImages.length; i++) {
-            currentImages[i].imgRank = currentImages.length - 1 - i;
-          }
-          _sortImages();
-          await _saveEntry();
-          setState(() {
-            currentImages;
-          });
-        },
-        builder: (context, candidateData, rejectedData) {
-          return _buildListItem(index, isHovered, context);
-        },
-      ),
-    );
-  }
-
-  Widget _buildListItem(int index, bool isHovered, context) {
-    if (isHovered && _isDragging) {
-      return SizedBox(
-          key: ValueKey(currentImages[index].imgRank),
-          height: 220,
-          width: 220,
-          child: Stack(alignment: Alignment.center, children: [
-            Opacity(
-              opacity: 0.2,
-              child: Card(
-                  clipBehavior: Clip.antiAlias,
-                  child: LocalImageLoader(
-                      imagePath: currentImages[index].imgPath)),
-            ),
-            Icon(
-                size: 100.0,
-                color: Theme.of(context).colorScheme.primary,
-                Icons.arrow_downward_rounded)
-          ]));
-    } else {
-      return Stack(alignment: Alignment.bottomCenter, children: [
-        EntryImagePicker(
-            imgPath: currentImages[index].imgPath,
-            openCamera: false,
-            onChangedImage: (imgPath) async {
-              if (imgPath == null) {
-                await _removeLocalImage(index);
-              }
-            }),
-        const Padding(
-          padding: EdgeInsets.all(8.0),
-          child: Icon(Icons.drag_handle_rounded),
-        ),
-      ]);
-    }
-  }
-
-  void _handlePointerDown(PointerEvent event) {
-    _startAutoScrollTimer();
-  }
-
-  void _handlePointerUp(PointerEvent event) {
-    _isDragging = false;
-    _autoScrollTimer?.cancel();
-  }
-
-  void _handlePointerMove(PointerEvent event) {
-    _draggingOffset = event.position;
-  }
-
-  void _startAutoScrollTimer() {
-    const autoScrollThreshold = 50.0;
-    const scrollSpeed = 15.0;
-
-    _autoScrollTimer =
-        Timer.periodic(const Duration(milliseconds: 20), (timer) {
-      if (!_isDragging) {
-        return;
-      }
-
-      final position = _scrollController.position;
-      if (_draggingOffset.dx < autoScrollThreshold &&
-          position.pixels > position.minScrollExtent) {
-        _scrollController.jumpTo(position.pixels - scrollSpeed);
-      } else if (_draggingOffset.dx >
-              position.viewportDimension - autoScrollThreshold &&
-          position.pixels < position.maxScrollExtent) {
-        _scrollController.jumpTo(position.pixels + scrollSpeed);
-      }
-    });
   }
 
   Future<void> _saveEntry() async {
@@ -482,7 +320,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   Future _saveOrUpdateImage(int entryId) async {
     final savedImages = EntryImagesProvider.instance.getForEntry(_entry);
     // Add images
-    for (EntryImage currentImage in currentImages) {
+    for (EntryImage currentImage in _currentImages) {
       currentImage.entryId = entryId;
       if (currentImage.id == null ||
           savedImages.where((image) => image.id == currentImage.id!).isEmpty) {
@@ -491,61 +329,36 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     }
     // Update images
     for (EntryImage existingImage in savedImages) {
-      EntryImage? matchingImage = currentImages
+      EntryImage? matchingImage = _currentImages
           .where((image) => image.id == existingImage.id!)
           .firstOrNull;
       if (matchingImage == null) {
         // Delete image
+        await ImageStorage.instance.delete(existingImage.imgPath);
         await EntryImagesProvider.instance.remove(existingImage);
       } else if (matchingImage.imgRank != existingImage.imgRank) {
         await EntryImagesProvider.instance.update(matchingImage);
       }
     }
     // Set current images to match saved state. Note: the entry images
-    // are copied to avoid editing the originals in StatsProvider.
-    currentImages.clear();
+    // are copied to avoid editing the originals in the provider.
+    _currentImages.clear();
     for (var image in EntryImagesProvider.instance.getForEntry(_entry)) {
-      currentImages.add(image.copy());
+      _currentImages.add(image.copy());
     }
-  }
-
-  void _sortImages() {
-    currentImages.sort((a, b) {
-      if (a.imgRank == b.imgRank) {
-        return 0;
-      } else if (a.imgRank < b.imgRank) {
-        return 1;
-      } else {
-        return -1;
-      }
+    setState(() {
+      _currentImages;
     });
   }
 
-  Future<void> _addLocalImage(List<String> imgPaths) async {
+  Future<void> _addImage(List<String> imgPaths) async {
     for (var imgPath in imgPaths) {
-      currentImages.add(EntryImage(
+      _currentImages.add(EntryImage(
           entryId: id,
           imgPath: imgPath,
-          imgRank: currentImages.length,
+          imgRank: _currentImages.length,
           timeCreate: DateTime.now()));
-      _sortImages();
     }
     await _saveEntry();
-    setState(() {
-      currentImages;
-    });
-  }
-
-  Future<void> _removeLocalImage(int index) async {
-    currentImages.remove(currentImages[index]);
-    // Update ranks
-    for (int i = 0; i < currentImages.length; i++) {
-      currentImages[i].imgRank = currentImages.length - 1 - i;
-    }
-    await _saveEntry();
-    _sortImages();
-    setState(() {
-      currentImages;
-    });
   }
 }
