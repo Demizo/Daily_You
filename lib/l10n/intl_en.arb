@@ -227,6 +227,8 @@
   "@logFormatDescription": {},
   "formatDailyYouJson": "Daily You (JSON)",
   "@formatDailyYouJson": {},
+  "formatDaybook": "Daybook",
+  "@formatDaybook": {},
   "formatDaylio": "Daylio",
   "@formatDaylio": {},
   "formatDiarium": "Diarium",

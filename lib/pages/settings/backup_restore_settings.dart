@@ -38,6 +38,12 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
                     Navigator.of(context).pop();
                   }),
               ListTile(
+                  title: Text(AppLocalizations.of(context)!.formatDaybook),
+                  onTap: () {
+                    chosenFormat = ImportFormat.daybook;
+                    Navigator.of(context).pop();
+                  }),
+              ListTile(
                   title: Text(AppLocalizations.of(context)!.formatDaylio),
                   onTap: () {
                     chosenFormat = ImportFormat.daylio;
@@ -86,6 +92,10 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
 
       if (chosenFormat == ImportFormat.dailyYouJson) {
         await ImportUtils.importFromJson((status) {
+          statusNotifier.value = status;
+        });
+      } else if (chosenFormat == ImportFormat.daybook) {
+        await ImportUtils.importFromDaybook(context, (status) {
           statusNotifier.value = status;
         });
       } else if (chosenFormat == ImportFormat.daylio) {

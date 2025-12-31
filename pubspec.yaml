@@ -59,6 +59,7 @@ dependencies:
   flutter_svg: ^2.2.0
   word_count: ^1.0.4
   xml: ^6.6.1
+  csv: ^6.0.0
 dev_dependencies:
   flutter_lints: ^5.0.0
 

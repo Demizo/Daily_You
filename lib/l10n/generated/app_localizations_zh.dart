@@ -425,6 +425,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get formatDailyYouJson => 'Daily You (JSON)';
 
   @override
+  String get formatDaybook => 'Daybook';
+
+  @override
   String get formatDaylio => 'Daylio';
 
   @override
