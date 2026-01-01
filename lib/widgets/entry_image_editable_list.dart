@@ -99,7 +99,8 @@ class _EntryImageEditableListState extends State<EntryImageEditableList> {
   Card editableWidget(int index, {bool showDragHandle = true}) {
     return Card(
       clipBehavior: Clip.antiAlias,
-      child: Stack(alignment: Alignment.topCenter, children: [
+      child:
+          Stack(alignment: Alignment.center, fit: StackFit.expand, children: [
         LocalImageLoader(imagePath: _images[index].imgPath),
         Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
