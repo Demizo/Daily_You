@@ -50,10 +50,6 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   late List<EntryImage> _currentImages;
   bool _loadingEntry = true;
   final ScrollController _scrollController = ScrollController();
-  bool _isDragging = false;
-  Timer? _autoScrollTimer;
-  Offset _draggingOffset = Offset.zero;
-  bool _openedCamera = false;
   final FocusNode _focusNode = FocusNode();
   final TextEditingController _textEditingController = TextEditingController();
   final UndoHistoryController _undoController = UndoHistoryController();
