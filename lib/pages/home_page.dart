@@ -7,16 +7,20 @@ import 'package:daily_you/models/image.dart';
 import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/providers/selection_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/entry_calendar.dart';
 import 'package:daily_you/widgets/hiding_widget.dart';
 import 'package:daily_you/widgets/large_entry_card_widget.dart';
+import 'package:daily_you/widgets/mood_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/pages/entry_detail_page.dart';
 import 'package:daily_you/pages/edit_entry_page.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 import '../widgets/entry_card_widget.dart';
 
 class HomePage extends StatefulWidget {
@@ -94,12 +98,50 @@ class _HomePageState extends State<HomePage>
     }
   }
 
+  Future<void> _shareSelectedEntries(BuildContext context) async {
+    final selectionProvider =
+        Provider.of<SelectionProvider>(context, listen: false);
+    final entriesProvider =
+        Provider.of<EntriesProvider>(context, listen: false);
+
+    // Get entries for selected dates
+    List<Entry> entries = selectionProvider.selectedDates
+        .map((date) => entriesProvider.getEntryForDate(date))
+        .whereType<Entry>() // Filter out nulls (dates with no entries)
+        .toList()
+      ..sort((a, b) => a.timeCreate.compareTo(b.timeCreate));
+
+    if (entries.isEmpty) {
+      // Exit selection mode if no entries to share
+      selectionProvider.clearSelection();
+      return;
+    }
+
+    // Build concatenated text
+    String sharedText = entries.map((entry) {
+      String line = "";
+      if (entry.mood != null) {
+        line = "${MoodIcon.getMoodIcon(entry.mood)} ";
+      }
+      line +=
+          "${DateFormat.yMMMEd(TimeManager.currentLocale(context)).format(entry.timeCreate)}\n${entry.text}";
+      return line;
+    }).join("\n\n");
+
+    // Share text only (no images for multi-day shares)
+    await Share.share(sharedText);
+
+    // Exit selection mode after sharing
+    selectionProvider.clearSelection();
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
     final configProvider = Provider.of<ConfigProvider>(context);
     final entriesProvider = Provider.of<EntriesProvider>(context);
     final entryImagesProvider = Provider.of<EntryImagesProvider>(context);
+    final selectionProvider = Provider.of<SelectionProvider>(context);
 
     Entry? todayEntry = entriesProvider.getEntryForToday();
     List<EntryImage> todayImages =
@@ -111,61 +153,78 @@ class _HomePageState extends State<HomePage>
     String viewMode = ConfigProvider.instance.get(ConfigKey.homePageViewMode);
     bool listView = viewMode == 'list';
 
-    return Center(
-      child: Stack(alignment: Alignment.bottomCenter, children: [
-        buildEntries(context, configProvider, flashbacks, listView),
-        HidingWidget(
-          duration: Duration(milliseconds: 200),
-          hideDirection: HideDirection.down,
-          scrollController: _scrollController,
-          child: Padding(
-            padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                if (Platform.isAndroid)
+    return Scaffold(
+      appBar: selectionProvider.isSelectionMode
+          ? AppBar(
+              leading: IconButton(
+                icon: Icon(Icons.close),
+                onPressed: () => selectionProvider.clearSelection(),
+              ),
+              title: Text('${selectionProvider.selectedCount} selected'),
+              actions: [
+                IconButton(
+                  icon: Icon(Icons.share_rounded),
+                  onPressed: () => _shareSelectedEntries(context),
+                ),
+              ],
+            )
+          : null,
+      body: Center(
+        child: Stack(alignment: Alignment.bottomCenter, children: [
+          buildEntries(context, configProvider, flashbacks, listView),
+          HidingWidget(
+            duration: Duration(milliseconds: 200),
+            hideDirection: HideDirection.down,
+            scrollController: _scrollController,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  if (Platform.isAndroid)
+                    IconButton(
+                      icon: Icon(
+                        Icons.camera_alt_rounded,
+                        color: Theme.of(context).colorScheme.primaryContainer,
+                        size: 24,
+                      ),
+                      onPressed: () async {
+                        await addOrEditTodayEntry(todayEntry, todayImages, true);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.all(8),
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        elevation: 3,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(80.0),
+                        ),
+                      ),
+                    ),
                   IconButton(
                     icon: Icon(
-                      Icons.camera_alt_rounded,
+                      todayEntry == null ? Icons.add_rounded : Icons.edit_rounded,
                       color: Theme.of(context).colorScheme.primaryContainer,
-                      size: 24,
+                      size: 28,
                     ),
                     onPressed: () async {
-                      await addOrEditTodayEntry(todayEntry, todayImages, true);
+                      await addOrEditTodayEntry(todayEntry, todayImages, false);
                     },
                     style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(16),
                       backgroundColor: Theme.of(context).colorScheme.primary,
                       elevation: 3,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(80.0),
+                        borderRadius: BorderRadius.circular(16.0),
                       ),
                     ),
                   ),
-                IconButton(
-                  icon: Icon(
-                    todayEntry == null ? Icons.add_rounded : Icons.edit_rounded,
-                    color: Theme.of(context).colorScheme.primaryContainer,
-                    size: 28,
-                  ),
-                  onPressed: () async {
-                    await addOrEditTodayEntry(todayEntry, todayImages, false);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.all(16),
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    elevation: 3,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16.0),
-                    ),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-        ),
-      ]),
+        ]),
+      ),
     );
   }
 
