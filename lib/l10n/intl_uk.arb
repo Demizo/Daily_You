@@ -280,5 +280,7 @@
     "viewLayoutGrid": "Сітка",
     "@viewLayoutGrid": {},
     "formatDiaro": "Діаро",
-    "@formatDiaro": {}
+    "@formatDiaro": {},
+    "formatDaybook": "Щоденник",
+    "@formatDaybook": {}
 }
