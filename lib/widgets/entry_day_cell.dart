@@ -38,29 +38,39 @@ class EntryDayCell extends StatelessWidget {
     if (entry != null) {
       if (showMood || image == null) {
         // Show mood
-        return FittedBox(
-          fit: BoxFit.scaleDown,
-          child: GestureDetector(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  '${date.day}',
-                  style: const TextStyle(fontSize: 16),
-                ),
-                MoodIcon(moodValue: entry.mood)
-              ],
+        return GestureDetector(
+          child: SizedBox(
+            width: 57,
+            height: 57,
+            child: Card(
+              margin: EdgeInsets.all(2),
+              elevation: 0,
+              color: Theme.of(context).colorScheme.surfaceContainer,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(8))),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    '${date.day}',
+                    style: TextStyle(
+                        fontSize: 16,
+                        color: Theme.of(context).colorScheme.onSurface),
+                  ),
+                  MoodIcon(moodValue: entry.mood)
+                ],
+              ),
             ),
-            onTap: () async {
-              await Navigator.of(context).push(MaterialPageRoute(
-                allowSnapshotting: false,
-                builder: (context) => EntryDetailPage(
-                  filtered: false,
-                  index: entriesProvider.getIndexOfEntry(entry.id!),
-                ),
-              ));
-            },
           ),
+          onTap: () async {
+            await Navigator.of(context).push(MaterialPageRoute(
+              allowSnapshotting: false,
+              builder: (context) => EntryDetailPage(
+                filtered: false,
+                index: entriesProvider.getIndexOfEntry(entry.id!),
+              ),
+            ));
+          },
         );
       } else {
         // Show image
@@ -73,6 +83,7 @@ class EntryDayCell extends StatelessWidget {
                 SizedBox(
                   height: 57,
                   child: Card(
+                      elevation: 0,
                       margin: EdgeInsets.all(2),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(Radius.circular(8))),
