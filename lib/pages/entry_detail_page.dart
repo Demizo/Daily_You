@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:daily_you/database/image_storage.dart';
 import 'package:daily_you/models/entry.dart';
+import 'package:daily_you/models/image.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/time_manager.dart';
@@ -186,36 +187,7 @@ class EntryDetails extends StatelessWidget {
           padding: const EdgeInsets.only(left: 8, right: 8),
           children: [
             if (images.isNotEmpty && images.length > 1)
-              SizedBox(
-                height: 220,
-                child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: images.length,
-                    itemBuilder: (context, index) {
-                      return GestureDetector(
-                        child: Center(
-                          child: SizedBox(
-                            height: 220,
-                            width: 220,
-                            child: Card(
-                                clipBehavior: Clip.antiAlias,
-                                child: LocalImageLoader(
-                                    imagePath: images[index].imgPath)),
-                          ),
-                        ),
-                        onTap: () async {
-                          await Navigator.of(context).push(MaterialPageRoute(
-                            allowSnapshotting: false,
-                            fullscreenDialog: true,
-                            builder: (context) => ImageViewPage(
-                              images: images,
-                              index: index,
-                            ),
-                          ));
-                        },
-                      );
-                    }),
-              ),
+              _imagesList(context, images),
             if (images.isNotEmpty && images.length == 1)
               GestureDetector(
                 child: Center(
@@ -281,6 +253,88 @@ class EntryDetails extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _imagesList(BuildContext context, List<EntryImage> images) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const imageSize = 160.0;
+
+        final totalWidth = images.length * imageSize;
+
+        final fits = totalWidth <= constraints.maxWidth;
+
+        if (fits) {
+          // Centered row
+          return Center(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: images
+                  .map(
+                    (image) => SizedBox(
+                      width: imageSize,
+                      child: GestureDetector(
+                        child: Center(
+                          child: SizedBox(
+                            height: imageSize,
+                            width: imageSize,
+                            child: Card(
+                                clipBehavior: Clip.antiAlias,
+                                child:
+                                    LocalImageLoader(imagePath: image.imgPath)),
+                          ),
+                        ),
+                        onTap: () async {
+                          await Navigator.of(context).push(MaterialPageRoute(
+                            allowSnapshotting: false,
+                            fullscreenDialog: true,
+                            builder: (context) => ImageViewPage(
+                              images: images,
+                              index: images.indexWhere((x) => x.id == image.id),
+                            ),
+                          ));
+                        },
+                      ),
+                    ),
+                  )
+                  .toList(),
+            ),
+          );
+        }
+
+        // Normal scrolling list
+        return SizedBox(
+          height: imageSize,
+          child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: images.length,
+              itemBuilder: (context, index) {
+                return GestureDetector(
+                  child: Center(
+                    child: SizedBox(
+                      height: imageSize,
+                      width: imageSize,
+                      child: Card(
+                          clipBehavior: Clip.antiAlias,
+                          child: LocalImageLoader(
+                              imagePath: images[index].imgPath)),
+                    ),
+                  ),
+                  onTap: () async {
+                    await Navigator.of(context).push(MaterialPageRoute(
+                      allowSnapshotting: false,
+                      fullscreenDialog: true,
+                      builder: (context) => ImageViewPage(
+                        images: images,
+                        index: index,
+                      ),
+                    ));
+                  },
+                );
+              }),
+        );
+      },
     );
   }
 }
