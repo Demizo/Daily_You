@@ -10,6 +10,7 @@ import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/pages/launch_page.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/providers/selection_provider.dart';
 import 'package:daily_you/providers/templates_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:flutter/material.dart';
@@ -106,6 +107,9 @@ void main() async {
     ),
     ChangeNotifierProvider<ConfigProvider>(
       create: (_) => ConfigProvider.instance,
+    ),
+    ChangeNotifierProvider<SelectionProvider>(
+      create: (_) => SelectionProvider(),
     )
   ], builder: (context, child) => const MainApp()));
 }
