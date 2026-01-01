@@ -102,21 +102,28 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
+        IconButton(
+          onPressed: _choosePicture,
+          icon: Icon(
+            Icons.photo,
+            color: Theme.of(context).colorScheme.primary,
+            size: 24,
+          ),
+          style: IconButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.primaryContainer),
+        ),
         if (Platform.isAndroid)
           IconButton(
-              onPressed: _takePicture,
-              icon: Icon(
-                Icons.photo_camera_rounded,
-                color: Theme.of(context).colorScheme.primary,
-                size: 24,
-              )),
-        IconButton(
-            onPressed: _choosePicture,
+            onPressed: _takePicture,
             icon: Icon(
-              Icons.photo,
+              Icons.photo_camera_rounded,
               color: Theme.of(context).colorScheme.primary,
               size: 24,
-            )),
+            ),
+            style: IconButton.styleFrom(
+                backgroundColor:
+                    Theme.of(context).colorScheme.primaryContainer),
+          ),
       ],
     );
   }
