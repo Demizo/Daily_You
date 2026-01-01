@@ -240,7 +240,6 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     final entriesProvider = Provider.of<EntriesProvider>(context);
 
     return TextButton.icon(
-        // icon: Icon(Icons.edit_rounded),
         icon: SvgPicture.asset(
           'assets/icons/calendar_event.svg',
           colorFilter:
@@ -353,10 +352,14 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
 
   Future<void> _addImage(List<String> imgPaths) async {
     for (var imgPath in imgPaths) {
+      // Add image to the end by giving it the lowest rank
+      for (var image in _currentImages) {
+        image.imgRank += 1;
+      }
       _currentImages.add(EntryImage(
           entryId: id,
           imgPath: imgPath,
-          imgRank: _currentImages.length,
+          imgRank: 0,
           timeCreate: DateTime.now()));
     }
     await _saveEntry();
