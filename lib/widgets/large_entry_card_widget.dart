@@ -47,7 +47,13 @@ class LargeEntryCardWidget extends StatelessWidget {
                   padding: const EdgeInsets.all(8.0),
                   child: Icon(
                     Icons.photo_library_rounded,
-                    color: theme.disabledColor,
+                    color: Colors.white,
+                    shadows: [
+                      Shadow(
+                          color: Colors.black.withValues(alpha: 0.6),
+                          blurRadius: 6,
+                          offset: Offset(0, 0)),
+                    ],
                   ),
                 ),
             ])),
