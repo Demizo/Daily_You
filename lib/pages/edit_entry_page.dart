@@ -191,8 +191,10 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                             actions: [
                               _changeDateButton(),
                               EntryImagePicker(
-                                  onChangedImage: (newImages) =>
-                                      _addImage(newImages))
+                                onChangedImage: (newImages) =>
+                                    _addImage(newImages),
+                                openCamera: widget.openCamera,
+                              )
                             ],
                             moodValue: mood,
                             onChangedMood: (mood) {
