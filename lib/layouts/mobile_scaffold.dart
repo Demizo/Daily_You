@@ -117,6 +117,7 @@ class _MobileScaffoldState extends State<MobileScaffold> {
           controller: _pageController,
           physics: const FastPageViewScrollPhysics(),
           onPageChanged: (index) {
+            FocusManager.instance.primaryFocus?.unfocus();
             EasyDebounce.debounce(
                 "page-change",
                 Duration(milliseconds: 150),
