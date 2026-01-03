@@ -416,7 +416,7 @@ class AppLocalizationsId extends AppLocalizations {
       'Everyone should have access to a journal!';
 
   @override
-  String get settingsHelpTranslate => 'Help Translate';
+  String get settingsHelpTranslate => 'Bantu Terjemahkan';
 
   @override
   String get importLogs => 'Impor log';
@@ -471,10 +471,10 @@ class AppLocalizationsId extends AppLocalizations {
   }
 
   @override
-  String get settingsLanguageTitle => 'Language';
+  String get settingsLanguageTitle => 'Bahasa';
 
   @override
-  String get settingsAppLanguageTitle => 'App Language';
+  String get settingsAppLanguageTitle => 'Bahasa Aplikasi';
 
   @override
   String get settingsOverrideAppLanguageTitle => 'Override App Language';

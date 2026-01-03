@@ -119,13 +119,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get statisticsNotEnoughData => 'لا توجد بيانات كافية…';
 
   @override
-  String get statisticsRangeOneMonth => '1 شهر';
+  String get statisticsRangeOneMonth => '١ شهر';
 
   @override
-  String get statisticsRangeSixMonths => '6 أشهر';
+  String get statisticsRangeSixMonths => '٦ أشهر';
 
   @override
-  String get statisticsRangeOneYear => '1 سنة';
+  String get statisticsRangeOneYear => '١ سنة';
 
   @override
   String get statisticsRangeAllTime => 'كل الأوقات';
@@ -184,10 +184,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'متابعة مع قاعدة البيانات المحلية';
 
   @override
-  String get lastModified => 'معدل';
+  String get lastModified => 'معدّل';
 
   @override
-  String get writeSomethingHint => 'أكتب شيئا…';
+  String get writeSomethingHint => 'اكتب شيئًا…';
 
   @override
   String get titleHint => 'عنوان…';
@@ -205,7 +205,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get deletePhotoDescription => 'هل تريد حذف هذه الصورة؟';
 
   @override
-  String get pageSettingsTitle => 'إعدادات';
+  String get pageSettingsTitle => 'الإعدادات';
 
   @override
   String get settingsAppearanceTitle => 'المظهر';
@@ -229,10 +229,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsFirstDayOfWeek => 'أول يوم في الأسبوع';
 
   @override
-  String get settingsUseSystemAccentColor => 'استخدم الوان النظام';
+  String get settingsUseSystemAccentColor => 'استخدم ألوان النظام';
 
   @override
-  String get settingsCustomAccentColor => 'لون مميز مخصص';
+  String get settingsCustomAccentColor => 'لون مخصص';
 
   @override
   String get settingsShowMarkdownToolbar => 'إظهار شريط أدوات Markdown';
@@ -241,29 +241,29 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsShowFlashbacks => 'عرض الذكريات';
 
   @override
-  String get settingsChangeMoodIcons => 'غير وضع الايقونات';
+  String get settingsChangeMoodIcons => 'غير شكل الأيقونات';
 
   @override
-  String get moodIconPrompt => 'أدخل ايقونة';
+  String get moodIconPrompt => 'أدخل أيقونة';
 
   @override
-  String get settingsFlashbacksViewLayout => 'Flashbacks View Layout';
+  String get settingsFlashbacksViewLayout => 'طريقة عرض الذكريات';
 
   @override
-  String get settingsGalleryViewLayout => 'Gallery View Layout';
+  String get settingsGalleryViewLayout => 'طريقة عرض الصور';
 
   @override
-  String get viewLayoutList => 'List';
+  String get viewLayoutList => 'قائمة';
 
   @override
-  String get viewLayoutGrid => 'Grid';
+  String get viewLayoutGrid => 'شبكة';
 
   @override
-  String get settingsNotificationsTitle => 'التنبيهات';
+  String get settingsNotificationsTitle => 'الإشعارات';
 
   @override
   String get settingsDailyReminderOnboarding =>
-      'قم بتفعيل التذكيرات اليومية لتحافظ على اتساقك!';
+      'قم بتفعيل التذكيرات اليومية لتحافظ على استمرارك!';
 
   @override
   String get settingsNotificationsPermissionsPrompt =>
@@ -290,7 +290,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settingsAlwaysSendReminderDescription =>
-      'إرسال تذكير حتى لو تم بدء السجل بالفعل';
+      'أرسل تذكير حتى لو تم بدء السجل بالفعل';
 
   @override
   String get settingsCustomizeNotificationTitle => 'تخصيص الإشعارات';
@@ -311,7 +311,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get newTemplate => 'قالب جديد';
 
   @override
-  String get noTemplateTitle => 'لا شئ';
+  String get noTemplateTitle => 'لا شيء';
 
   @override
   String get noTemplatesDescription => 'لم يتم إنشاء أي قوالب بعد…';
@@ -332,7 +332,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get imageQualityLow => 'ضعيفة';
 
   @override
-  String get imageQualityNoCompression => 'لا ضغط';
+  String get imageQualityNoCompression => 'بدون ضغط';
 
   @override
   String get settingsLogFolder => 'مجلد السجل';
@@ -354,10 +354,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get logFolderErrorDescription => 'فشل في تغيير مجلد السجل!';
 
   @override
-  String get imageFolderErrorDescription => 'فشل في تغيير مجلد الصورة!';
+  String get imageFolderErrorDescription => 'فشل في تغيير مجلد الصور!';
 
   @override
-  String get backupErrorDescription => 'فشل إنشاء النسخة الاحتياطية!';
+  String get backupErrorDescription => 'فشل في إنشاء النسخة الاحتياطية!';
 
   @override
   String get restoreErrorDescription => 'فشل في استعادة النسخة الاحتياطية!';
@@ -369,7 +369,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsBackup => 'النسخ الاحتياطي';
 
   @override
-  String get settingsRestore => 'الإستعادة';
+  String get settingsRestore => 'الاستعادة';
 
   @override
   String get settingsRestorePromptDescription =>
@@ -387,11 +387,11 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String restoringBackupStatus(Object percent) {
-    return 'جاري استعادة النسخة الاحتياطية… $percent%';
+    return 'جارٍ استعادة النسخة الاحتياطية… $percent%';
   }
 
   @override
-  String get cleanUpStatus => 'جاري التنظيف…';
+  String get cleanUpStatus => 'جارٍ التنظيف…';
 
   @override
   String get settingsExport => 'Export';
@@ -420,7 +420,7 @@ class AppLocalizationsAr extends AppLocalizations {
       'ينبغي أن يكون لدى الجميع إمكانية الوصول إلى المجلة!';
 
   @override
-  String get settingsHelpTranslate => 'مساعدة في الترجمة';
+  String get settingsHelpTranslate => 'ساعد في الترجمة';
 
   @override
   String get importLogs => 'Import Logs';

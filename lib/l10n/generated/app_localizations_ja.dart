@@ -204,16 +204,16 @@ class AppLocalizationsJa extends AppLocalizations {
   String get settingsAppearanceTitle => 'Appearance';
 
   @override
-  String get settingsTheme => 'Theme';
+  String get settingsTheme => 'テーマ';
 
   @override
-  String get themeSystem => 'System';
+  String get themeSystem => 'システムに従う';
 
   @override
-  String get themeLight => 'Light';
+  String get themeLight => 'ライト';
 
   @override
-  String get themeDark => 'Dark';
+  String get themeDark => 'ダーク';
 
   @override
   String get themeAmoled => 'AMOLED';
@@ -234,10 +234,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get settingsShowFlashbacks => 'Show Flashbacks';
 
   @override
-  String get settingsChangeMoodIcons => 'Change Mood Icons';
+  String get settingsChangeMoodIcons => '気分のアイコンを変更する';
 
   @override
-  String get moodIconPrompt => 'Enter an icon';
+  String get moodIconPrompt => 'アイコンを入力してください';
 
   @override
   String get settingsFlashbacksViewLayout => 'Flashbacks View Layout';
@@ -289,52 +289,52 @@ class AppLocalizationsJa extends AppLocalizations {
   String get settingsCustomizeNotificationTitle => 'Customize Notifications';
 
   @override
-  String get settingsTemplatesTitle => 'Templates';
+  String get settingsTemplatesTitle => 'テンプレート';
 
   @override
-  String get settingsDefaultTemplate => 'Default Template';
+  String get settingsDefaultTemplate => 'デフォルトテンプレート';
 
   @override
-  String get manageTemplates => 'Manage Templates';
+  String get manageTemplates => 'テンプレートを管理する';
 
   @override
-  String get addTemplate => 'Add a Template';
+  String get addTemplate => 'テンプレートを追加する';
 
   @override
   String get newTemplate => 'New Template';
 
   @override
-  String get noTemplateTitle => 'None';
+  String get noTemplateTitle => 'なし';
 
   @override
-  String get noTemplatesDescription => 'No templates created yet…';
+  String get noTemplatesDescription => 'テンプレートはまだ作成されていません…';
 
   @override
-  String get settingsStorageTitle => 'Storage';
+  String get settingsStorageTitle => 'ストレージ';
 
   @override
-  String get settingsImageQuality => 'Image Quality';
+  String get settingsImageQuality => '画質';
 
   @override
-  String get imageQualityHigh => 'High';
+  String get imageQualityHigh => '高';
 
   @override
-  String get imageQualityMedium => 'Medium';
+  String get imageQualityMedium => '中';
 
   @override
-  String get imageQualityLow => 'Low';
+  String get imageQualityLow => '低';
 
   @override
-  String get imageQualityNoCompression => 'No Compression';
+  String get imageQualityNoCompression => '圧縮なし';
 
   @override
-  String get settingsLogFolder => 'Log Folder';
+  String get settingsLogFolder => '記録フォルダ';
 
   @override
-  String get settingsImageFolder => 'Image Folder';
+  String get settingsImageFolder => '画像フォルダ';
 
   @override
-  String get warningTitle => 'Warning';
+  String get warningTitle => '警告';
 
   @override
   String get logFolderWarningDescription =>
@@ -485,7 +485,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get settingsSecurityEnterPassword => 'パスワードを入力してください';
 
   @override
-  String get settingsSecuritySetPassword => 'パスワードを設定';
+  String get settingsSecuritySetPassword => 'パスワードを設定する';
 
   @override
   String get settingsSecurityChangePassword => 'パスワードを変更する';
