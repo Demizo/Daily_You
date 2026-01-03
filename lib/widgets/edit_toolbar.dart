@@ -118,6 +118,7 @@ class EditToolbar extends StatelessWidget {
                                   _showTemplateSelectPopup(context),
                               icon: Icon(
                                 Icons.note_add_rounded,
+                                color: Theme.of(context).colorScheme.primary,
                                 size: 24,
                               )),
                       ],
