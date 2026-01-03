@@ -49,6 +49,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   DateTime? entryDate;
   late List<EntryImage> _currentImages;
   bool _loadingEntry = true;
+  bool _openedCamera = false;
   final ScrollController _scrollController = ScrollController();
   final FocusNode _focusNode = FocusNode();
   final TextEditingController _textEditingController = TextEditingController();
@@ -191,9 +192,11 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                             actions: [
                               _changeDateButton(),
                               EntryImagePicker(
-                                onChangedImage: (newImages) =>
-                                    _addImage(newImages),
-                                openCamera: widget.openCamera,
+                                onChangedImage: (newImages) {
+                                  _openedCamera = true;
+                                  _addImage(newImages);
+                                },
+                                openCamera: widget.openCamera && !_openedCamera,
                               )
                             ],
                             moodValue: mood,
