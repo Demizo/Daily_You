@@ -25,6 +25,18 @@ class _EntryCalendarState extends State<EntryCalendar>
     with AutomaticKeepAliveClientMixin {
   Map<int, ui.Image> dayNumberCache = {};
   bool dayNumberCacheCreated = false;
+  double? _lastDpr;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final dpr = MediaQuery.of(context).devicePixelRatio;
+    if (_lastDpr == dpr) return;
+
+    _lastDpr = dpr;
+    _createDayNumberCache(dpr);
+  }
 
   @override
   bool get wantKeepAlive => true;
@@ -37,9 +49,7 @@ class _EntryCalendarState extends State<EntryCalendar>
     );
   }
 
-  Future<ui.Image> _bakeDayNumber(String text) async {
-    final dpr = MediaQuery.of(context).devicePixelRatio;
-
+  Future<ui.Image> _bakeDayNumber(String text, double dpr) async {
     // Entry day cells are 57x57
     const logicalSize = 57.0;
     final physicalSize = (logicalSize * dpr).ceil();
@@ -77,19 +87,13 @@ class _EntryCalendarState extends State<EntryCalendar>
     return recorder.endRecording().toImage(physicalSize, physicalSize);
   }
 
-  Future<void> _createDayNumberCache() async {
+  Future<void> _createDayNumberCache(double dpr) async {
     for (int i = 1; i < 32; i++) {
-      dayNumberCache[i] = await _bakeDayNumber(i.toString());
+      dayNumberCache[i] = await _bakeDayNumber(i.toString(), dpr);
     }
     setState(() {
       dayNumberCacheCreated = true;
     });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _createDayNumberCache();
   }
 
   @override
