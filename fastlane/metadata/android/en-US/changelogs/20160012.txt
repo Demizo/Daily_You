@@ -1,0 +1,11 @@
+Daily You v2.16.1 has arrived! A picture perfect update:
+
+• Updated the image list and sorting interface
+• Added the option to import from Daybook
+• Various user interface improvements
+• Remove focus from the search bar when switching pages
+• Updated translations
+
+In this patch:
+
+• Fixed regression where external log changes were not incorporated
