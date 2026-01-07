@@ -274,5 +274,13 @@
     "settingsSecurityBiometricUnlock": "Biyometrik Açma",
     "@settingsSecurityBiometricUnlock": {},
     "unlockAppPrompt": "Uygulamayı Aç",
-    "@unlockAppPrompt": {}
+    "@unlockAppPrompt": {},
+    "settingsFlashbacksViewLayout": "Geçmiş Görünüm Düzeni",
+    "@settingsFlashbacksViewLayout": {},
+    "settingsGalleryViewLayout": "Galeri Görünüm Düzeni",
+    "@settingsGalleryViewLayout": {},
+    "viewLayoutList": "Liste",
+    "@viewLayoutList": {},
+    "viewLayoutGrid": "Izgara",
+    "@viewLayoutGrid": {}
 }
