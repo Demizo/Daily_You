@@ -561,13 +561,14 @@ class ImportUtils {
       final Map<String, String> checksumToFilePath = {};
 
       // Collect photos from assets
-      for (final file
-          in await Directory(join(tempDaylioFolder.path, 'assets', 'photos'))
-              .list(recursive: true)
-              .toList()) {
-        if (file is File) {
-          final checksum = basenameWithoutExtension(file.path);
-          checksumToFilePath[checksum] = file.path;
+      final photosFolder =
+          Directory(join(tempDaylioFolder.path, 'assets', 'photos'));
+      if (await photosFolder.exists()) {
+        for (final file in await photosFolder.list(recursive: true).toList()) {
+          if (file is File) {
+            final checksum = basenameWithoutExtension(file.path);
+            checksumToFilePath[checksum] = file.path;
+          }
         }
       }
 
