@@ -121,9 +121,12 @@ class _GalleryPageState extends State<GalleryPage>
               child: SearchBar(
                 focusNode: _focusNode,
                 controller: _searchController,
-                leading: const Padding(
+                leading: Padding(
                   padding: EdgeInsets.all(8.0),
-                  child: Icon(Icons.search_rounded),
+                  child: Icon(
+                    Icons.search_rounded,
+                    color: Theme.of(context).colorScheme.secondary,
+                  ),
                 ),
                 trailing: [
                   AnimatedSwitcher(
@@ -186,6 +189,8 @@ class _GalleryPageState extends State<GalleryPage>
                 padding: WidgetStateProperty.all(
                     const EdgeInsets.only(left: 4, right: 4)),
                 elevation: WidgetStateProperty.all(1),
+                backgroundColor: WidgetStatePropertyAll(
+                    Theme.of(context).colorScheme.secondaryContainer),
                 onChanged: (queryText) => EasyDebounce.debounce(
                     'search-debounce', const Duration(milliseconds: 300), () {
                   entriesProvider.searchText = queryText;
@@ -205,8 +210,12 @@ class _GalleryPageState extends State<GalleryPage>
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: IconButton(
-                        icon: Icon(
+                      child: FloatingActionButton(
+                        heroTag: "gallery-jump-to-top-button",
+                        backgroundColor:
+                            Theme.of(context).colorScheme.primaryContainer,
+                        elevation: 1,
+                        child: Icon(
                           Icons.arrow_upward_rounded,
                           color: Theme.of(context).colorScheme.primary,
                           size: 28,
@@ -216,15 +225,16 @@ class _GalleryPageState extends State<GalleryPage>
                               duration: Duration(milliseconds: 300),
                               curve: Curves.easeOut);
                         },
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.all(16),
-                          backgroundColor:
-                              Theme.of(context).colorScheme.primaryContainer,
-                          elevation: 3,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16.0),
-                          ),
-                        ),
+                        // style: ElevatedButton.styleFrom(
+                        //   visualDensity: VisualDensity.comfortable,
+                        //   padding: const EdgeInsets.all(0),
+                        //   backgroundColor:
+                        //       Theme.of(context).colorScheme.primaryContainer,
+                        //   elevation: 1,
+                        //   shape: RoundedRectangleBorder(
+                        //     borderRadius: BorderRadius.circular(16.0),
+                        //   ),
+                        // ),
                       ),
                     ),
                   ],

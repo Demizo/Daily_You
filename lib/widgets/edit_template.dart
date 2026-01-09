@@ -83,7 +83,8 @@ class _EditTemplateState extends State<EditTemplate> {
               child: ListView(
                 padding: const EdgeInsets.only(left: 8, right: 8),
                 children: [
-                  Card(
+                  Card.filled(
+                    color: Theme.of(context).colorScheme.surfaceContainer,
                     child: Padding(
                       padding: const EdgeInsets.only(
                         left: 8.0,

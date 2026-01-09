@@ -125,8 +125,12 @@ class _HomePageState extends State<HomePage>
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 if (Platform.isAndroid)
-                  IconButton(
-                    icon: Icon(
+                  FloatingActionButton.small(
+                    heroTag: "home-camera-button",
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    elevation: 1,
+                    shape: CircleBorder(),
+                    child: Icon(
                       Icons.camera_alt_rounded,
                       color: Theme.of(context).colorScheme.primaryContainer,
                       size: 24,
@@ -134,17 +138,12 @@ class _HomePageState extends State<HomePage>
                     onPressed: () async {
                       await addOrEditTodayEntry(todayEntry, todayImages, true);
                     },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.all(8),
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      elevation: 3,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(80.0),
-                      ),
-                    ),
                   ),
-                IconButton(
-                  icon: Icon(
+                FloatingActionButton(
+                  heroTag: "home-entry-button",
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  elevation: 1,
+                  child: Icon(
                     todayEntry == null ? Icons.add_rounded : Icons.edit_rounded,
                     color: Theme.of(context).colorScheme.primaryContainer,
                     size: 28,
@@ -152,14 +151,6 @@ class _HomePageState extends State<HomePage>
                   onPressed: () async {
                     await addOrEditTodayEntry(todayEntry, todayImages, false);
                   },
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.all(16),
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    elevation: 3,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16.0),
-                    ),
-                  ),
                 ),
               ],
             ),

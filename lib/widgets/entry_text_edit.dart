@@ -47,20 +47,21 @@ class _EntryTextEditorState extends State<EntryTextEditor> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Stack(alignment: Alignment.topRight, children: [
-          Card(
+          Card.filled(
+              color: Theme.of(context).colorScheme.surfaceContainer,
               child: Padding(
-            padding:
-                const EdgeInsets.only(left: 8, top: 2, bottom: 0, right: 8),
-            child: Platform.isAndroid
-                ? Scrollbar(
-                    controller: _scrollController,
-                    thumbVisibility: true,
-                    interactive: true,
-                    radius: const Radius.circular(8),
-                    child: entryTextField(),
-                  )
-                : entryTextField(),
-          )),
+                padding:
+                    const EdgeInsets.only(left: 8, top: 2, bottom: 0, right: 8),
+                child: Platform.isAndroid
+                    ? Scrollbar(
+                        controller: _scrollController,
+                        thumbVisibility: true,
+                        interactive: true,
+                        radius: const Radius.circular(8),
+                        child: entryTextField(),
+                      )
+                    : entryTextField(),
+              )),
         ])
       ],
     );

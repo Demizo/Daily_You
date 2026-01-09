@@ -126,12 +126,14 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
   Widget moodIconButton(int? index) {
     return GestureDetector(
       child: Card(
+          color: Theme.of(context).colorScheme.surfaceContainer,
+          elevation: 0,
           child: Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: Container(
-            constraints: const BoxConstraints(minWidth: 30),
-            child: Center(child: MoodIcon(moodValue: index, size: 24))),
-      )),
+            padding: const EdgeInsets.all(4.0),
+            child: Container(
+                constraints: const BoxConstraints(minWidth: 32),
+                child: Center(child: MoodIcon(moodValue: index, size: 24))),
+          )),
       onTap: () => _showMoodEmojiPopup(index),
     );
   }
