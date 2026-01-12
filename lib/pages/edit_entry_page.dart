@@ -172,7 +172,13 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
             }
           },
           child: Scaffold(
-            appBar: AppBar(actions: [_deleteButton()]),
+            appBar: AppBar(
+                leading: BackButton(
+                  onPressed: () {
+                    Navigator.of(context).popUntil((route) => route.isFirst);
+                  },
+                ),
+                actions: [_deleteButton(), _saveButton()]),
             body: Column(children: [
               Expanded(
                 child: Container(
@@ -234,6 +240,11 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   Widget _deleteButton() => IconButton(
         icon: const Icon(Icons.delete),
         onPressed: () => _showDeleteEntryPopup(),
+      );
+
+  Widget _saveButton() => IconButton(
+        icon: const Icon(Icons.check_rounded),
+        onPressed: () => Navigator.of(context).pop(),
       );
 
   Widget _changeDateButton() {

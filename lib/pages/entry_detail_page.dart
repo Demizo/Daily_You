@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:daily_you/database/image_storage.dart';
+import 'package:daily_you/layouts/fast_page_view_scroll_physics.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/providers/entries_provider.dart';
@@ -70,6 +71,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
         body: PageView.builder(
             hitTestBehavior: HitTestBehavior.translucent,
             controller: _pageController,
+            physics: FastPageViewScrollPhysics(),
             reverse: true,
             itemCount: entries.length,
             onPageChanged: (int newIndex) {
@@ -94,10 +96,32 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
               icon: const Icon(Icons.edit_rounded),
               onPressed: () async {
                 final editedEntryId = entry.id;
-                await Navigator.of(context).push(MaterialPageRoute(
+                await Navigator.of(context).push(PageRouteBuilder(
                   allowSnapshotting: false,
-                  builder: (context) =>
+                  fullscreenDialog: true,
+                  pageBuilder: (context, _, __) =>
                       AddEditEntryPage(entry: entry, images: images),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(
+                      opacity: animation,
+                      child: child,
+                    );
+                    final curved = CurvedAnimation(
+                      parent: animation,
+                      curve: Curves.easeOutCubic,
+                    );
+
+                    return FadeTransition(
+                      opacity: curved,
+                      child: ScaleTransition(
+                        scale: Tween<double>(begin: 0.98, end: 1.0)
+                            .animate(curved),
+                        child: child,
+                      ),
+                    );
+                  },
+                  transitionDuration: const Duration(milliseconds: 200),
                 ));
 
                 // Get the new list of entries since the date of the edited entry
@@ -195,6 +219,7 @@ class EntryDetails extends StatelessWidget {
                     height: 220,
                     width: 220,
                     child: Card(
+                        elevation: 0,
                         clipBehavior: Clip.antiAlias,
                         child:
                             LocalImageLoader(imagePath: images.first.imgPath)),
@@ -212,6 +237,8 @@ class EntryDetails extends StatelessWidget {
                 },
               ),
             Card(
+              elevation: 0,
+              color: Theme.of(context).colorScheme.surfaceContainer,
               child: Padding(
                 padding:
                     const EdgeInsets.only(left: 8, top: 4, bottom: 4, right: 8),
@@ -233,6 +260,8 @@ class EntryDetails extends StatelessWidget {
             ),
             if (entry.text.isNotEmpty)
               Card(
+                  elevation: 0,
+                  color: Theme.of(context).colorScheme.surfaceContainer,
                   child: Padding(
                       padding: const EdgeInsets.only(
                           left: 8, top: 4, bottom: 4, right: 8),
@@ -280,6 +309,7 @@ class EntryDetails extends StatelessWidget {
                             height: imageSize,
                             width: imageSize,
                             child: Card(
+                                elevation: 0,
                                 clipBehavior: Clip.antiAlias,
                                 child:
                                     LocalImageLoader(imagePath: image.imgPath)),
@@ -316,6 +346,7 @@ class EntryDetails extends StatelessWidget {
                       height: imageSize,
                       width: imageSize,
                       child: Card(
+                          elevation: 0,
                           clipBehavior: Clip.antiAlias,
                           child: LocalImageLoader(
                               imagePath: images[index].imgPath)),

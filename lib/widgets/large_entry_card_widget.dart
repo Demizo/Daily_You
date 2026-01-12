@@ -25,10 +25,9 @@ class LargeEntryCardWidget extends StatelessWidget {
     final theme = Theme.of(context);
     final time = DateFormat.yMMMd(TimeManager.currentLocale(context))
         .format(entry.timeCreate);
-    return Card(
+    return Card.filled(
+      color: Theme.of(context).colorScheme.surfaceContainer,
       clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(16))),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         mainAxisSize: MainAxisSize.min,
@@ -36,29 +35,34 @@ class LargeEntryCardWidget extends StatelessWidget {
         children: [
           if (images.isNotEmpty)
             Expanded(
-                child: Stack(alignment: Alignment.topRight, children: [
-              Center(
-                child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: LocalImageLoader(
-                      imagePath: images.first.imgPath,
-                    )),
-              ),
-              if (images.length > 1)
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Icon(
-                    Icons.photo_library_rounded,
-                    color: Colors.white,
-                    shadows: [
-                      Shadow(
-                          color: Colors.black.withValues(alpha: 0.6),
-                          blurRadius: 6,
-                          offset: Offset(0, 0)),
-                    ],
-                  ),
-                ),
-            ])),
+                child: Stack(
+                    fit: StackFit.expand,
+                    alignment: Alignment.topRight,
+                    children: [
+                  ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: LocalImageLoader(
+                        imagePath: images.first.imgPath,
+                      )),
+                  if (images.length > 1)
+                    Positioned(
+                      top: 0,
+                      right: 0,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Icon(
+                          Icons.photo_library_rounded,
+                          color: Colors.white,
+                          shadows: [
+                            Shadow(
+                                color: Colors.black.withValues(alpha: 0.6),
+                                blurRadius: 6,
+                                offset: Offset(0, 0)),
+                          ],
+                        ),
+                      ),
+                    ),
+                ])),
           Expanded(
             child: Wrap(children: [
               Padding(

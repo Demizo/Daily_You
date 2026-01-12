@@ -27,7 +27,8 @@ class StreakCard extends StatelessWidget {
     final int numberEnd = match.end;
 
     return isVisible
-        ? Card(
+        ? Card.filled(
+            color: Theme.of(context).colorScheme.secondaryContainer,
             child: Padding(
               padding: const EdgeInsets.all(4.0),
               child: Row(
