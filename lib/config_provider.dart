@@ -2,8 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
+import 'package:daily_you/device_info_service.dart';
 import 'package:daily_you/language_option.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:daily_you/utils/regional_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
@@ -159,6 +161,13 @@ class ConfigProvider with ChangeNotifier {
     ImageQuality.low: 1024.0,
   };
 
+  int? _firstDayOfWeekPreference;
+
+  Future<void> loadFirstDayOfWeekPreference() async {
+    _firstDayOfWeekPreference =
+        await RegionalPreferences.getFirstDayOfWeekIndex();
+  }
+
   dynamic get(String field) {
     return _config[field];
   }
@@ -195,6 +204,7 @@ class ConfigProvider with ChangeNotifier {
     await readConfig();
     await loadSecureConfig();
     await poplulateDefaults();
+    await loadFirstDayOfWeekPreference();
   }
 
   Future<void> poplulateDefaults() async {
@@ -266,6 +276,12 @@ class ConfigProvider with ChangeNotifier {
   int getFirstDayOfWeekIndex(BuildContext context) {
     final startingDay = get("startingDayOfWeek");
     if (startingDay == 'system') {
+      // Respect the regional preference on Android
+      // Note: date pickers will continue to follow the locale, see https://github.com/flutter/flutter/issues/154539
+      if (_firstDayOfWeekPreference != null) {
+        return _firstDayOfWeekPreference!;
+      }
+      // Fall back to locale
       return DateFormat.yMd(TimeManager.currentLocale(context))
           .dateSymbols
           .FIRSTDAYOFWEEK;
