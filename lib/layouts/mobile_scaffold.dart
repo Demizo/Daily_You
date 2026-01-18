@@ -1,7 +1,7 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:daily_you/config_provider.dart';
+import 'package:daily_you/layouts/fast_page_view_scroll_physics.dart';
 import 'package:daily_you/pages/settings/notification_settings.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
@@ -155,31 +155,6 @@ class _MobileScaffoldState extends State<MobileScaffold> {
           ),
         ],
       ),
-    );
-  }
-}
-
-// NOTE: See https://github.com/flutter/flutter/issues/55103#issuecomment-747059541
-class FastPageViewScrollPhysics extends ScrollPhysics {
-  const FastPageViewScrollPhysics({super.parent});
-
-  @override
-  FastPageViewScrollPhysics applyTo(ScrollPhysics? ancestor) {
-    return FastPageViewScrollPhysics(parent: buildParent(ancestor)!);
-  }
-
-  @override
-  SpringDescription get spring => noBounceSpring(0.10);
-
-  SpringDescription noBounceSpring(double settleTimeSeconds) {
-    const mass = 1.0;
-    final stiffness = mass * pow(4 / settleTimeSeconds, 2);
-    final damping = 2 * sqrt(stiffness * mass);
-
-    return SpringDescription(
-      mass: mass,
-      stiffness: stiffness,
-      damping: damping,
     );
   }
 }
