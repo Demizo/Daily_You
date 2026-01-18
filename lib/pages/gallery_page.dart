@@ -23,6 +23,7 @@ class _GalleryPageState extends State<GalleryPage>
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   late final FocusNode _focusNode = FocusNode();
+  double _searchElevation = 0.0;
 
   @override
   bool get wantKeepAlive => true;
@@ -31,6 +32,15 @@ class _GalleryPageState extends State<GalleryPage>
   void initState() {
     super.initState();
     _searchController.text = EntriesProvider.instance.searchText;
+    _scrollController.addListener(() {
+      final elevation = _scrollController.position.pixels > 0 ? 1.0 : 0.0;
+
+      if (_searchElevation != elevation) {
+        setState(() {
+          _searchElevation = elevation;
+        });
+      }
+    });
   }
 
   @override
@@ -123,9 +133,13 @@ class _GalleryPageState extends State<GalleryPage>
               child: SearchBar(
                 focusNode: _focusNode,
                 controller: _searchController,
-                leading: const Padding(
+                elevation: WidgetStatePropertyAll(_searchElevation),
+                leading: Padding(
                   padding: EdgeInsets.all(8.0),
-                  child: Icon(Icons.search_rounded),
+                  child: Icon(
+                    Icons.search_rounded,
+                    color: Theme.of(context).colorScheme.secondary,
+                  ),
                 ),
                 trailing: [
                   AnimatedSwitcher(
@@ -187,7 +201,8 @@ class _GalleryPageState extends State<GalleryPage>
                 hintText: AppLocalizations.of(context)!.searchLogsHint,
                 padding: WidgetStateProperty.all(
                     const EdgeInsets.only(left: 4, right: 4)),
-                elevation: WidgetStateProperty.all(1),
+                backgroundColor: WidgetStatePropertyAll(
+                    Theme.of(context).colorScheme.secondaryContainer),
                 onChanged: (queryText) => EasyDebounce.debounce(
                     'search-debounce', const Duration(milliseconds: 300), () {
                   entriesProvider.searchText = queryText;
