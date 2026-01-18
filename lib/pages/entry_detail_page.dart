@@ -205,7 +205,7 @@ class EntryDetails extends StatelessWidget {
                   child: SizedBox(
                     height: 220,
                     width: 220,
-                    child: Card(
+                    child: Card.filled(
                         clipBehavior: Clip.antiAlias,
                         child:
                             LocalImageLoader(imagePath: images.first.imgPath)),
@@ -222,7 +222,8 @@ class EntryDetails extends StatelessWidget {
                   ));
                 },
               ),
-            Card(
+            Card.filled(
+              color: Theme.of(context).colorScheme.surfaceContainer,
               child: Padding(
                 padding:
                     const EdgeInsets.only(left: 8, top: 4, bottom: 4, right: 8),
@@ -243,7 +244,8 @@ class EntryDetails extends StatelessWidget {
               ),
             ),
             if (entry.text.isNotEmpty)
-              Card(
+              Card.filled(
+                  color: Theme.of(context).colorScheme.surfaceContainer,
                   child: Padding(
                       padding: const EdgeInsets.only(
                           left: 8, top: 4, bottom: 4, right: 8),
@@ -290,7 +292,7 @@ class EntryDetails extends StatelessWidget {
                           child: SizedBox(
                             height: imageSize,
                             width: imageSize,
-                            child: Card(
+                            child: Card.filled(
                                 clipBehavior: Clip.antiAlias,
                                 child:
                                     LocalImageLoader(imagePath: image.imgPath)),
@@ -326,7 +328,7 @@ class EntryDetails extends StatelessWidget {
                     child: SizedBox(
                       height: imageSize,
                       width: imageSize,
-                      child: Card(
+                      child: Card.filled(
                           clipBehavior: Clip.antiAlias,
                           child: LocalImageLoader(
                               imagePath: images[index].imgPath)),

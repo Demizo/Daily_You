@@ -1,3 +1,4 @@
+import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:flutter/material.dart';
@@ -24,87 +25,76 @@ class EntryCardWidget extends StatelessWidget {
     final theme = Theme.of(context);
     final time = DateFormat.yMMMd(TimeManager.currentLocale(context))
         .format(entry.timeCreate);
-    return Stack(alignment: Alignment.bottomLeft, children: [
-      Card(
-        clipBehavior: Clip.antiAlias,
-        surfaceTintColor: null,
-        child: Container(
-          constraints: const BoxConstraints.expand(),
-          padding: const EdgeInsets.all(0),
-          child: Stack(
-              alignment: Alignment.topRight,
-              clipBehavior: Clip.antiAlias,
-              children: [
-                (images.isNotEmpty)
-                    ? Column(
-                        mainAxisSize: MainAxisSize.max,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Expanded(
-                              child: LocalImageLoader(
+    return Card.filled(
+      color: Theme.of(context).colorScheme.surfaceContainer,
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Expanded(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Stack(
+                  fit: StackFit.expand,
+                  alignment: Alignment.topRight,
+                  clipBehavior: Clip.antiAlias,
+                  children: [
+                    (images.isNotEmpty)
+                        ? LocalImageLoader(
                             imagePath: images.first.imgPath,
-                          ))
-                        ],
-                      )
-                    : (entry.text.isNotEmpty)
-                        ? Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Wrap(children: [
-                              IgnorePointer(
-                                  child: SizedBox(
-                                width: double.maxFinite,
-                                child: MarkdownBlock(
-                                    config: theme.brightness == Brightness.light
-                                        ? MarkdownConfig.defaultConfig
-                                        : MarkdownConfig.darkConfig,
-                                    data: entry.text),
-                              ))
-                            ]),
                           )
-                        : Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Center(
-                                  child: Icon(
-                                Icons.photo,
-                                color: theme.disabledColor,
-                                size: 90,
-                              )),
-                              Text(
-                                'Empty Log',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: theme.disabledColor),
+                        : (entry.text.isNotEmpty)
+                            ? Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Wrap(children: [
+                                  IgnorePointer(
+                                      child: SizedBox(
+                                    width: double.maxFinite,
+                                    child: MarkdownBlock(
+                                        config:
+                                            theme.brightness == Brightness.light
+                                                ? MarkdownConfig.defaultConfig
+                                                : MarkdownConfig.darkConfig,
+                                        data: entry.text),
+                                  ))
+                                ]),
+                              )
+                            : Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Text(
+                                  AppLocalizations.of(context)!
+                                      .writeSomethingHint,
+                                  style: TextStyle(
+                                      color: theme.disabledColor, fontSize: 16),
+                                ),
                               ),
+                    if (images.length > 1)
+                      Positioned(
+                        top: 0,
+                        right: 0,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Icon(
+                            Icons.photo_library_rounded,
+                            color: Colors.white,
+                            shadows: [
+                              Shadow(
+                                  color: Colors.black.withValues(alpha: 0.6),
+                                  blurRadius: 6,
+                                  offset: Offset(0, 0)),
                             ],
                           ),
-                if (images.length > 1)
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Icon(
-                      Icons.photo_library_rounded,
-                      color: Colors.white,
-                      shadows: [
-                        Shadow(
-                            color: Colors.black.withValues(alpha: 0.6),
-                            blurRadius: 6,
-                            offset: Offset(0, 0)),
-                      ],
-                    ),
-                  ),
-              ]),
-        ),
-      ),
-      Card(
-        clipBehavior: Clip.antiAlias,
-        shadowColor: Colors.transparent,
-        child: Padding(
-          padding: const EdgeInsets.all(2.0),
-          child: Row(
+                        ),
+                      ),
+                  ]),
+            ),
+          ),
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Padding(
-                padding: const EdgeInsets.only(left: 4.0),
+                padding: const EdgeInsets.symmetric(horizontal: 4.0),
                 child: Text(
                   title == null ? time : title!,
                   style: TextStyle(
@@ -112,16 +102,19 @@ class EntryCardWidget extends StatelessWidget {
                       fontWeight: FontWeight.bold),
                 ),
               ),
-              Container(
-                constraints: const BoxConstraints(minWidth: 16),
-                child: MoodIcon(
-                  moodValue: entry.mood,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                child: Container(
+                  constraints: const BoxConstraints(minWidth: 16),
+                  child: MoodIcon(
+                    moodValue: entry.mood,
+                  ),
                 ),
               ),
             ],
           ),
-        ),
+        ],
       ),
-    ]);
+    );
   }
 }
