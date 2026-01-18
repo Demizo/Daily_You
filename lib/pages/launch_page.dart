@@ -33,6 +33,19 @@ class _LaunchPageState extends State<LaunchPage> {
   }
 
   _checkDatabaseConnection() async {
+    // Prompt unlock before initializing database
+    if (await ConfigProvider.instance.get(ConfigKey.requirePassword)) {
+      await showDialog(
+          context: context,
+          builder: (context) => AuthPopup(
+                mode: AuthPopupMode.unlock,
+                title: AppLocalizations.of(context)!.unlockAppPrompt,
+                showBiometrics:
+                    ConfigProvider.instance.get(ConfigKey.biometricUnlock),
+                dismissable: false,
+                onSuccess: () {},
+              ));
+    }
     //Initialize Database
     if (await AppDatabase.instance.init()) {
       if (ImageStorage.instance.usingExternalLocation()) {
@@ -55,18 +68,6 @@ class _LaunchPageState extends State<LaunchPage> {
   }
 
   Future<void> _nextPage() async {
-    if (await ConfigProvider.instance.get(ConfigKey.requirePassword)) {
-      await showDialog(
-          context: context,
-          builder: (context) => AuthPopup(
-                mode: AuthPopupMode.unlock,
-                title: AppLocalizations.of(context)!.unlockAppPrompt,
-                showBiometrics:
-                    ConfigProvider.instance.get(ConfigKey.biometricUnlock),
-                dismissable: false,
-                onSuccess: () {},
-              ));
-    }
     await Navigator.of(context).pushReplacement(MaterialPageRoute(
         builder: (context) => widget.nextPage, allowSnapshotting: false));
   }
