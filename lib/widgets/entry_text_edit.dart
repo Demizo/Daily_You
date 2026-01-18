@@ -75,6 +75,7 @@ class _EntryTextEditorState extends State<EntryTextEditor> {
       scrollController: _scrollController,
       minLines: 5,
       maxLines: null,
+      selectionWidthStyle: BoxWidthStyle.tight,
       spellCheckConfiguration: SpellCheckConfiguration(
           spellCheckService: DefaultSpellCheckService()),
       textCapitalization: TextCapitalization.sentences,
