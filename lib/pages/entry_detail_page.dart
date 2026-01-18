@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:daily_you/database/image_storage.dart';
+import 'package:daily_you/layouts/fast_page_view_scroll_physics.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/providers/entries_provider.dart';
@@ -70,6 +71,7 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
         body: PageView.builder(
             hitTestBehavior: HitTestBehavior.translucent,
             controller: _pageController,
+            physics: FastPageViewScrollPhysics(),
             reverse: true,
             itemCount: entries.length,
             onPageChanged: (int newIndex) {

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:daily_you/database/image_storage.dart';
 import 'package:daily_you/file_layer.dart';
+import 'package:daily_you/layouts/fast_page_view_scroll_physics.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
@@ -48,6 +49,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
         ),
         body: PageView.builder(
           controller: _pageController,
+          physics: FastPageViewScrollPhysics(),
           hitTestBehavior: HitTestBehavior.deferToChild,
           itemCount: widget.images.length,
           onPageChanged: (int newIndex) {
