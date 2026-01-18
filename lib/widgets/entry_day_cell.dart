@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/providers/entries_provider.dart';
@@ -16,9 +18,13 @@ import '../pages/entry_detail_page.dart';
 class EntryDayCell extends StatelessWidget {
   final DateTime date;
   final DateTime currentMonth;
+  final ui.Image dayNumber;
 
   const EntryDayCell(
-      {super.key, required this.date, required this.currentMonth});
+      {super.key,
+      required this.date,
+      required this.currentMonth,
+      required this.dayNumber});
 
   @override
   Widget build(BuildContext context) {
@@ -93,14 +99,10 @@ class EntryDayCell extends StatelessWidget {
                         cacheSize: 100,
                       )),
                 ),
-                Text('${date.day}',
-                    style:
-                        TextStyle(fontSize: 18, color: Colors.white, shadows: [
-                      Shadow(
-                          color: Colors.black.withValues(alpha: 0.8),
-                          blurRadius: 6,
-                          offset: Offset(0, 0)),
-                    ])),
+                // Use number with baked in shadow. The Impeller renderer stutters with text shadows
+                RawImage(
+                  image: dayNumber,
+                )
               ],
             ),
           ),

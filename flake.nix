@@ -22,7 +22,7 @@
         };
         buildToolsVersion = "35.0.1";
         platformToolsVersion = "35.0.2";
-        ndkVersion = "26.3.11579264";
+        ndkVersion = "28.2.13676358";
         androidEnv = pkgs.androidenv.override { licenseAccepted = true; };
         androidComposition = androidEnv.composeAndroidPackages {
           platformToolsVersion = platformToolsVersion;
@@ -31,10 +31,12 @@
           includeNDK = true;
           buildToolsVersions = [
             buildToolsVersion
+            "35.0.0"
             "34.0.0"
             "33.0.1"
           ];
           platformVersions = [
+            "36"
             "35"
             "34"
             "33"
