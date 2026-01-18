@@ -276,8 +276,14 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
                   }
                 }),
           ),
+          SettingsToggle(
+              title: AppLocalizations.of(context)!.settingsHideImagesInGallery,
+              settingsKey: ConfigKey.hideImagesInGallery,
+              onChanged: (value) {
+                configProvider.set(ConfigKey.hideImagesInGallery, value);
+              }),
           Padding(
-            padding: const EdgeInsets.only(top: 16.0, left: 16.0),
+            padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
             child: Text(
               AppLocalizations.of(context)!.settingsChangeMoodIcons,
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),

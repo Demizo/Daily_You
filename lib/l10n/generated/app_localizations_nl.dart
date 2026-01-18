@@ -251,6 +251,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settingsGalleryViewLayout => 'Gallery View Layout';
 
   @override
+  String get settingsHideImagesInGallery => 'Hide Images In Gallery';
+
+  @override
   String get viewLayoutList => 'List';
 
   @override

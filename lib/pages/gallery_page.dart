@@ -251,6 +251,7 @@ class _GalleryPageState extends State<GalleryPage>
   Widget buildEntries(
       BuildContext context, bool listView, List<Entry> entries) {
     final entryImagesProvider = Provider.of<EntryImagesProvider>(context);
+    final configProvider = Provider.of<ConfigProvider>(context);
     return entries.isEmpty
         ? Center(
             child: Text(
@@ -282,10 +283,16 @@ class _GalleryPageState extends State<GalleryPage>
                 child: listView
                     ? LargeEntryCardWidget(
                         entry: entry,
-                        images: entryImagesProvider.getForEntry(entry))
+                        images: entryImagesProvider.getForEntry(entry),
+                        hideImage:
+                            configProvider.get(ConfigKey.hideImagesInGallery),
+                      )
                     : EntryCardWidget(
                         entry: entry,
-                        images: entryImagesProvider.getForEntry(entry)),
+                        images: entryImagesProvider.getForEntry(entry),
+                        hideImage:
+                            configProvider.get(ConfigKey.hideImagesInGallery),
+                      ),
               );
             },
           );

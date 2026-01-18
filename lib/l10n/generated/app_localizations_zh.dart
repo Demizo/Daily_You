@@ -246,6 +246,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsGalleryViewLayout => '迹忆页视图布局';
 
   @override
+  String get settingsHideImagesInGallery => 'Hide Images In Gallery';
+
+  @override
   String get viewLayoutList => '列表';
 
   @override
