@@ -1,4 +1,5 @@
 import 'package:daily_you/config_provider.dart';
+import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/widgets/hiding_widget.dart';
@@ -109,9 +110,10 @@ class _GalleryPageState extends State<GalleryPage>
     final configProvider = Provider.of<ConfigProvider>(context);
     String viewMode = configProvider.get(ConfigKey.galleryPageViewMode);
     bool listView = viewMode == 'list';
+    var entries = entriesProvider.getFilteredEntries();
     return Center(
       child: Stack(alignment: Alignment.topCenter, children: [
-        buildEntries(context, listView),
+        buildEntries(context, listView, entries),
         Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -175,8 +177,8 @@ class _GalleryPageState extends State<GalleryPage>
                   if (entriesProvider.searchText.isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.only(right: 8.0),
-                      child: Text(AppLocalizations.of(context)!.logCount(
-                          entriesProvider.getFilteredEntries().length)),
+                      child: Text(AppLocalizations.of(context)!
+                          .logCount(entries.length)),
                     ),
                   IconButton(
                       icon: const Icon(Icons.sort_rounded),
@@ -192,7 +194,7 @@ class _GalleryPageState extends State<GalleryPage>
                 }),
               ),
             ),
-            if (entriesProvider.getFilteredEntries().isNotEmpty)
+            if (entries.isNotEmpty)
               HidingWidget(
                 scrollController: _scrollController,
                 duration: Duration(milliseconds: 200),
@@ -231,10 +233,9 @@ class _GalleryPageState extends State<GalleryPage>
     );
   }
 
-  Widget buildEntries(BuildContext context, bool listView) {
-    final entriesProvider = Provider.of<EntriesProvider>(context);
+  Widget buildEntries(
+      BuildContext context, bool listView, List<Entry> entries) {
     final entryImagesProvider = Provider.of<EntryImagesProvider>(context);
-    var entries = entriesProvider.getFilteredEntries();
     return entries.isEmpty
         ? Center(
             child: Text(
