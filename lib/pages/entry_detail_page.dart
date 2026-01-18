@@ -96,10 +96,19 @@ class _EntryDetailPageState extends State<EntryDetailPage> {
               icon: const Icon(Icons.edit_rounded),
               onPressed: () async {
                 final editedEntryId = entry.id;
-                await Navigator.of(context).push(MaterialPageRoute(
+                await Navigator.of(context).push(PageRouteBuilder(
                   allowSnapshotting: false,
-                  builder: (context) =>
+                  fullscreenDialog: true,
+                  pageBuilder: (context, _, __) =>
                       AddEditEntryPage(entry: entry, images: images),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(
+                      opacity: animation,
+                      child: child,
+                    );
+                  },
+                  transitionDuration: const Duration(milliseconds: 200),
                 ));
 
                 // Get the new list of entries since the date of the edited entry
