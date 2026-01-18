@@ -1,4 +1,5 @@
 import 'package:daily_you/config_provider.dart';
+import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/widgets/hiding_widget.dart';
@@ -22,6 +23,7 @@ class _GalleryPageState extends State<GalleryPage>
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   late final FocusNode _focusNode = FocusNode();
+  double _searchElevation = 0.0;
 
   @override
   bool get wantKeepAlive => true;
@@ -30,6 +32,15 @@ class _GalleryPageState extends State<GalleryPage>
   void initState() {
     super.initState();
     _searchController.text = EntriesProvider.instance.searchText;
+    _scrollController.addListener(() {
+      final elevation = _scrollController.position.pixels > 0 ? 1.0 : 0.0;
+
+      if (_searchElevation != elevation) {
+        setState(() {
+          _searchElevation = elevation;
+        });
+      }
+    });
   }
 
   @override
@@ -109,9 +120,10 @@ class _GalleryPageState extends State<GalleryPage>
     final configProvider = Provider.of<ConfigProvider>(context);
     String viewMode = configProvider.get(ConfigKey.galleryPageViewMode);
     bool listView = viewMode == 'list';
+    var entries = entriesProvider.getFilteredEntries();
     return Center(
       child: Stack(alignment: Alignment.topCenter, children: [
-        buildEntries(context, listView),
+        buildEntries(context, listView, entries),
         Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -121,9 +133,13 @@ class _GalleryPageState extends State<GalleryPage>
               child: SearchBar(
                 focusNode: _focusNode,
                 controller: _searchController,
-                leading: const Padding(
+                elevation: WidgetStatePropertyAll(_searchElevation),
+                leading: Padding(
                   padding: EdgeInsets.all(8.0),
-                  child: Icon(Icons.search_rounded),
+                  child: Icon(
+                    Icons.search_rounded,
+                    color: Theme.of(context).colorScheme.secondary,
+                  ),
                 ),
                 trailing: [
                   AnimatedSwitcher(
@@ -175,8 +191,8 @@ class _GalleryPageState extends State<GalleryPage>
                   if (entriesProvider.searchText.isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.only(right: 8.0),
-                      child: Text(AppLocalizations.of(context)!.logCount(
-                          entriesProvider.getFilteredEntries().length)),
+                      child: Text(AppLocalizations.of(context)!
+                          .logCount(entries.length)),
                     ),
                   IconButton(
                       icon: const Icon(Icons.sort_rounded),
@@ -185,14 +201,15 @@ class _GalleryPageState extends State<GalleryPage>
                 hintText: AppLocalizations.of(context)!.searchLogsHint,
                 padding: WidgetStateProperty.all(
                     const EdgeInsets.only(left: 4, right: 4)),
-                elevation: WidgetStateProperty.all(1),
+                backgroundColor: WidgetStatePropertyAll(
+                    Theme.of(context).colorScheme.secondaryContainer),
                 onChanged: (queryText) => EasyDebounce.debounce(
                     'search-debounce', const Duration(milliseconds: 300), () {
                   entriesProvider.searchText = queryText;
                 }),
               ),
             ),
-            if (entriesProvider.getFilteredEntries().isNotEmpty)
+            if (entries.isNotEmpty)
               HidingWidget(
                 scrollController: _scrollController,
                 duration: Duration(milliseconds: 200),
@@ -205,8 +222,12 @@ class _GalleryPageState extends State<GalleryPage>
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: IconButton(
-                        icon: Icon(
+                      child: FloatingActionButton(
+                        heroTag: "gallery-jump-to-top-button",
+                        backgroundColor:
+                            Theme.of(context).colorScheme.primaryContainer,
+                        elevation: 1,
+                        child: Icon(
                           Icons.arrow_upward_rounded,
                           color: Theme.of(context).colorScheme.primary,
                           size: 28,
@@ -216,15 +237,6 @@ class _GalleryPageState extends State<GalleryPage>
                               duration: Duration(milliseconds: 300),
                               curve: Curves.easeOut);
                         },
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.all(16),
-                          backgroundColor:
-                              Theme.of(context).colorScheme.primaryContainer,
-                          elevation: 3,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16.0),
-                          ),
-                        ),
                       ),
                     ),
                   ],
@@ -236,10 +248,9 @@ class _GalleryPageState extends State<GalleryPage>
     );
   }
 
-  Widget buildEntries(BuildContext context, bool listView) {
-    final entriesProvider = Provider.of<EntriesProvider>(context);
+  Widget buildEntries(
+      BuildContext context, bool listView, List<Entry> entries) {
     final entryImagesProvider = Provider.of<EntryImagesProvider>(context);
-    var entries = entriesProvider.getFilteredEntries();
     return entries.isEmpty
         ? Center(
             child: Text(

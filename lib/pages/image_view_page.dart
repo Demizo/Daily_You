@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:daily_you/database/image_storage.dart';
 import 'package:daily_you/file_layer.dart';
+import 'package:daily_you/layouts/fast_page_view_scroll_physics.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
@@ -23,13 +24,13 @@ class ImageViewPage extends StatefulWidget {
 }
 
 class _ImageViewPageState extends State<ImageViewPage> {
-  late PageController _pageController;
+  late ExtendedPageController _pageController;
   late ValueNotifier<int> _currentPageNotifier;
 
   @override
   void initState() {
     super.initState();
-    _pageController = PageController(initialPage: widget.index);
+    _pageController = ExtendedPageController(initialPage: widget.index);
     _currentPageNotifier = ValueNotifier<int>(widget.index);
   }
 
@@ -46,9 +47,9 @@ class _ImageViewPageState extends State<ImageViewPage> {
         appBar: AppBar(
           actions: [shareButton(context), downloadButton(context)],
         ),
-        body: PageView.builder(
+        body: ExtendedImageGesturePageView.builder(
           controller: _pageController,
-          hitTestBehavior: HitTestBehavior.deferToChild,
+          physics: FastPageViewScrollPhysics(),
           itemCount: widget.images.length,
           onPageChanged: (int newIndex) {
             _currentPageNotifier.value = newIndex;
@@ -66,7 +67,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
                     return ExtendedImage.memory(
                       snapshot.data!,
                       fit: BoxFit.contain,
-                      filterQuality: FilterQuality.medium,
+                      filterQuality: FilterQuality.high,
                       mode: ExtendedImageMode.gesture,
                       initGestureConfigHandler: (state) {
                         return GestureConfig(

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:daily_you/models/template.dart';
 import 'package:flutter/material.dart';
@@ -43,30 +44,15 @@ class _EntryTextEditorState extends State<EntryTextEditor> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Stack(alignment: Alignment.topRight, children: [
-          Card(
-              child: Padding(
-            padding:
-                const EdgeInsets.only(left: 8, top: 2, bottom: 0, right: 8),
-            child: Platform.isAndroid
-                ? Scrollbar(
-                    controller: _scrollController,
-                    thumbVisibility: true,
-                    interactive: true,
-                    radius: const Radius.circular(8),
-                    child: entryTextField(),
-                  )
-                : entryTextField(),
-          )),
-        ])
-      ],
-    );
+    return Card.filled(
+        color: Theme.of(context).colorScheme.surfaceContainer,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 8, top: 2, bottom: 0, right: 8),
+          child: entryTextField(),
+        ));
   }
 
-  TextField entryTextField() {
+  Widget entryTextField() {
     return TextField(
       scrollPadding: EdgeInsets.zero,
       controller: widget.textEditingController,
@@ -75,6 +61,7 @@ class _EntryTextEditorState extends State<EntryTextEditor> {
       scrollController: _scrollController,
       minLines: 5,
       maxLines: null,
+      selectionWidthStyle: BoxWidthStyle.tight,
       spellCheckConfiguration: SpellCheckConfiguration(
           spellCheckService: DefaultSpellCheckService()),
       textCapitalization: TextCapitalization.sentences,

@@ -54,7 +54,8 @@ class _EntryMoodPickerState extends State<EntryMoodPicker> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return Card.filled(
+      color: Theme.of(context).colorScheme.surfaceContainer,
       child: Padding(
         padding: const EdgeInsets.only(bottom: 8.0),
         child: Column(children: [
