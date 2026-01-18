@@ -205,8 +205,12 @@ class _GalleryPageState extends State<GalleryPage>
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: IconButton(
-                        icon: Icon(
+                      child: FloatingActionButton(
+                        heroTag: "gallery-jump-to-top-button",
+                        backgroundColor:
+                            Theme.of(context).colorScheme.primaryContainer,
+                        elevation: 1,
+                        child: Icon(
                           Icons.arrow_upward_rounded,
                           color: Theme.of(context).colorScheme.primary,
                           size: 28,
@@ -216,15 +220,6 @@ class _GalleryPageState extends State<GalleryPage>
                               duration: Duration(milliseconds: 300),
                               curve: Curves.easeOut);
                         },
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.all(16),
-                          backgroundColor:
-                              Theme.of(context).colorScheme.primaryContainer,
-                          elevation: 3,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16.0),
-                          ),
-                        ),
                       ),
                     ),
                   ],
