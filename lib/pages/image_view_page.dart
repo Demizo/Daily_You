@@ -24,13 +24,13 @@ class ImageViewPage extends StatefulWidget {
 }
 
 class _ImageViewPageState extends State<ImageViewPage> {
-  late PageController _pageController;
+  late ExtendedPageController _pageController;
   late ValueNotifier<int> _currentPageNotifier;
 
   @override
   void initState() {
     super.initState();
-    _pageController = PageController(initialPage: widget.index);
+    _pageController = ExtendedPageController(initialPage: widget.index);
     _currentPageNotifier = ValueNotifier<int>(widget.index);
   }
 
@@ -47,10 +47,9 @@ class _ImageViewPageState extends State<ImageViewPage> {
         appBar: AppBar(
           actions: [shareButton(context), downloadButton(context)],
         ),
-        body: PageView.builder(
+        body: ExtendedImageGesturePageView.builder(
           controller: _pageController,
           physics: FastPageViewScrollPhysics(),
-          hitTestBehavior: HitTestBehavior.deferToChild,
           itemCount: widget.images.length,
           onPageChanged: (int newIndex) {
             _currentPageNotifier.value = newIndex;
@@ -68,7 +67,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
                     return ExtendedImage.memory(
                       snapshot.data!,
                       fit: BoxFit.contain,
-                      filterQuality: FilterQuality.medium,
+                      filterQuality: FilterQuality.high,
                       mode: ExtendedImageMode.gesture,
                       initGestureConfigHandler: (state) {
                         return GestureConfig(
