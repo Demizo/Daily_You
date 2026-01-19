@@ -15,6 +15,7 @@ class LanguageOption {
   static final displayNameMapping = {
     LanguageOption(languageCode: "en"): "English",
     LanguageOption(languageCode: "ar"): "العربية",
+    LanguageOption(languageCode: "be"): "беларуская",
     LanguageOption(languageCode: "cs"): "čeština",
     LanguageOption(languageCode: "da"): "dansk",
     LanguageOption(languageCode: "de"): "Deutsch",
@@ -23,6 +24,7 @@ class LanguageOption {
     LanguageOption(languageCode: "fi"): "suomi",
     LanguageOption(languageCode: "fr"): "français",
     LanguageOption(languageCode: "he"): "עברית",
+    LanguageOption(languageCode: "hi"): "हिंदी",
     LanguageOption(languageCode: "id"): "Indonesia",
     LanguageOption(languageCode: "it"): "italiano",
     LanguageOption(languageCode: "ja"): "日本語",
@@ -32,6 +34,7 @@ class LanguageOption {
     LanguageOption(languageCode: "pt"): "português",
     LanguageOption(languageCode: "pt", countryCode: "BR"): "português (Brasil)",
     LanguageOption(languageCode: "ru"): "русский",
+    LanguageOption(languageCode: "ta"): "தமிழ்",
     LanguageOption(languageCode: "tr"): "Türkçe",
     LanguageOption(languageCode: "uk"): "українська",
     LanguageOption(languageCode: "vi"): "Tiếng Việt",
