@@ -6,6 +6,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_ar.dart';
+import 'app_localizations_be.dart';
 import 'app_localizations_cs.dart';
 import 'app_localizations_da.dart';
 import 'app_localizations_de.dart';
@@ -15,6 +16,7 @@ import 'app_localizations_fa.dart';
 import 'app_localizations_fi.dart';
 import 'app_localizations_fr.dart';
 import 'app_localizations_he.dart';
+import 'app_localizations_hi.dart';
 import 'app_localizations_id.dart';
 import 'app_localizations_it.dart';
 import 'app_localizations_ja.dart';
@@ -23,6 +25,7 @@ import 'app_localizations_oc.dart';
 import 'app_localizations_pl.dart';
 import 'app_localizations_pt.dart';
 import 'app_localizations_ru.dart';
+import 'app_localizations_ta.dart';
 import 'app_localizations_tr.dart';
 import 'app_localizations_uk.dart';
 import 'app_localizations_vi.dart';
@@ -115,6 +118,7 @@ abstract class AppLocalizations {
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('ar'),
+    Locale('be'),
     Locale('cs'),
     Locale('da'),
     Locale('de'),
@@ -124,6 +128,7 @@ abstract class AppLocalizations {
     Locale('fi'),
     Locale('fr'),
     Locale('he'),
+    Locale('hi'),
     Locale('id'),
     Locale('it'),
     Locale('ja'),
@@ -133,6 +138,7 @@ abstract class AppLocalizations {
     Locale('pt'),
     Locale('pt', 'BR'),
     Locale('ru'),
+    Locale('ta'),
     Locale('tr'),
     Locale('uk'),
     Locale('vi'),
@@ -1053,6 +1059,7 @@ class _AppLocalizationsDelegate
   @override
   bool isSupported(Locale locale) => <String>[
         'ar',
+        'be',
         'cs',
         'da',
         'de',
@@ -1062,6 +1069,7 @@ class _AppLocalizationsDelegate
         'fi',
         'fr',
         'he',
+        'hi',
         'id',
         'it',
         'ja',
@@ -1070,6 +1078,7 @@ class _AppLocalizationsDelegate
         'pl',
         'pt',
         'ru',
+        'ta',
         'tr',
         'uk',
         'vi',
@@ -1109,6 +1118,8 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
   switch (locale.languageCode) {
     case 'ar':
       return AppLocalizationsAr();
+    case 'be':
+      return AppLocalizationsBe();
     case 'cs':
       return AppLocalizationsCs();
     case 'da':
@@ -1127,6 +1138,8 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
       return AppLocalizationsFr();
     case 'he':
       return AppLocalizationsHe();
+    case 'hi':
+      return AppLocalizationsHi();
     case 'id':
       return AppLocalizationsId();
     case 'it':
@@ -1143,6 +1156,8 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
       return AppLocalizationsPt();
     case 'ru':
       return AppLocalizationsRu();
+    case 'ta':
+      return AppLocalizationsTa();
     case 'tr':
       return AppLocalizationsTr();
     case 'uk':

@@ -24,7 +24,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get flashbacksTitle => 'الذكريات';
 
   @override
-  String get settingsFlashbacksExcludeBadDays => 'استبعاد الأيام السيئة';
+  String get settingsFlashbacksExcludeBadDays => 'استبعد الأيام السيئة';
 
   @override
   String get flaskbacksEmpty => 'لا توجد ذكريات حتى الآن…';
@@ -76,7 +76,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get pageGalleryTitle => 'المعرض';
 
   @override
-  String get searchLogsHint => 'سجلات البحث…';
+  String get searchLogsHint => 'ابحث في السجلات…';
 
   @override
   String logCount(num count) {
@@ -101,7 +101,7 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get noLogs => 'لا سجلات…';
+  String get noLogs => 'لا توجد سجلات…';
 
   @override
   String get sortDateTitle => 'التاريخ';
@@ -119,13 +119,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get statisticsNotEnoughData => 'لا توجد بيانات كافية…';
 
   @override
-  String get statisticsRangeOneMonth => '١ شهر';
+  String get statisticsRangeOneMonth => 'شهر';
 
   @override
   String get statisticsRangeSixMonths => '٦ أشهر';
 
   @override
-  String get statisticsRangeOneYear => '١ سنة';
+  String get statisticsRangeOneYear => 'سنة';
 
   @override
   String get statisticsRangeAllTime => 'كل الأوقات';
@@ -177,7 +177,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get errorExternalStorageAccessDescription =>
-      'إذا كنت تستخدم التخزين عبر الانترنت تأكد من أن الخدمة متاحة ولديك وصول للشبكة.\n\nوإلا فقد يكون التطبيق قد فقد الأذونات للمجلد الخارجي. اذهب إلى الإعدادات وأعد اختيار المجلد الخارجي لمنح الوصول.\n\nتحذير، لن تتم مزامنة التغييرات حتى تستعيد الوصول إلى موقع التخزين الخارجي!';
+      'إذا كنت تستخدم التخزين عبر الانترنت تأكد من أن الخدمة متاحة ولديك وصول للشبكة.\n\nوإلا فقد يكون التطبيق فقد الأذونات للمجلد الخارجي. اذهب إلى الإعدادات وأعد اختيار المجلد الخارجي لمنح الوصول.\n\nتحذير، لن تتم مزامنة التغييرات حتى تستعيد الوصول إلى موقع التخزين الخارجي!';
 
   @override
   String get errorExternalStorageAccessContinue =>
@@ -193,13 +193,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get titleHint => 'عنوان…';
 
   @override
-  String get deleteLogTitle => 'حذف السجل';
+  String get deleteLogTitle => 'احذف السجل';
 
   @override
   String get deleteLogDescription => 'هل تريد حذف هذا السجل؟';
 
   @override
-  String get deletePhotoTitle => 'حذف الصورة';
+  String get deletePhotoTitle => 'احذف الصورة';
 
   @override
   String get deletePhotoDescription => 'هل تريد حذف هذه الصورة؟';
@@ -238,10 +238,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsShowMarkdownToolbar => 'إظهار شريط أدوات Markdown';
 
   @override
-  String get settingsShowFlashbacks => 'عرض الذكريات';
+  String get settingsShowFlashbacks => 'اعرض الذكريات';
 
   @override
-  String get settingsChangeMoodIcons => 'غير شكل الأيقونات';
+  String get settingsChangeMoodIcons => 'غيِّر شكل الأيقونات';
 
   @override
   String get moodIconPrompt => 'أدخل أيقونة';
@@ -289,7 +289,7 @@ class AppLocalizationsAr extends AppLocalizations {
       'اختر وقتًا ثابتًا للتذكير';
 
   @override
-  String get settingsAlwaysSendReminderTitle => 'إرسال تذكير دائمًا';
+  String get settingsAlwaysSendReminderTitle => 'أرسل تذكير دائمًا';
 
   @override
   String get settingsAlwaysSendReminderDescription =>
@@ -332,7 +332,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get imageQualityMedium => 'متوسطة';
 
   @override
-  String get imageQualityLow => 'ضعيفة';
+  String get imageQualityLow => 'منخفضة';
 
   @override
   String get imageQualityNoCompression => 'بدون ضغط';
@@ -420,7 +420,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settingsTranslateCallToAction =>
-      'ينبغي أن يكون لدى الجميع إمكانية الوصول إلى المجلة!';
+      'ينبغي أن يكون لدى الجميع إمكانية الوصول إلى دفتر اليوميات!';
 
   @override
   String get settingsHelpTranslate => 'ساعد في الترجمة';
@@ -463,10 +463,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get formatPixels => 'Pixels';
 
   @override
-  String get formatMarkdown => 'ماركداون';
+  String get formatMarkdown => 'ماركداون (markdown)';
 
   @override
-  String get settingsDeleteAllLogsTitle => 'حذف جميع السجلات';
+  String get settingsDeleteAllLogsTitle => 'احذف جميع السجلات';
 
   @override
   String get settingsDeleteAllLogsDescription => 'هل تريد حذف كافة سجلاتك؟';
@@ -489,7 +489,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsSecurityTitle => 'الأمان';
 
   @override
-  String get settingsSecurityRequirePassword => 'طلب كلمة مرور';
+  String get settingsSecurityRequirePassword => 'اطلب كلمة مرور';
 
   @override
   String get settingsSecurityEnterPassword => 'أدخل كلمة المرور';
@@ -519,10 +519,11 @@ class AppLocalizationsAr extends AppLocalizations {
   String get requiredPrompt => 'مطلوب';
 
   @override
-  String get settingsSecurityBiometricUnlock => 'فتح باستخدام القياسات الحيوية';
+  String get settingsSecurityBiometricUnlock =>
+      'افتح باستخدام القياسات الحيوية';
 
   @override
-  String get unlockAppPrompt => 'فتح التطبيق';
+  String get unlockAppPrompt => 'افتح التطبيق';
 
   @override
   String get settingsAboutTitle => 'عن التطبيق';

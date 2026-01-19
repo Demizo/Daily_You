@@ -242,19 +242,19 @@ class AppLocalizationsTr extends AppLocalizations {
   String get moodIconPrompt => 'Bir simge belirleyin';
 
   @override
-  String get settingsFlashbacksViewLayout => 'Flashbacks View Layout';
+  String get settingsFlashbacksViewLayout => 'Geçmiş Görünüm Düzeni';
 
   @override
-  String get settingsGalleryViewLayout => 'Gallery View Layout';
+  String get settingsGalleryViewLayout => 'Galeri Görünüm Düzeni';
 
   @override
   String get settingsHideImagesInGallery => 'Hide Images In Gallery';
 
   @override
-  String get viewLayoutList => 'List';
+  String get viewLayoutList => 'Liste';
 
   @override
-  String get viewLayoutGrid => 'Grid';
+  String get viewLayoutGrid => 'Izgara';
 
   @override
   String get settingsNotificationsTitle => 'Bildirimler';
