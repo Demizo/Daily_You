@@ -1,0 +1,18 @@
+{
+    "dailyReminderTitle": "இன்றைய பதிவு!",
+    "@dailyReminderTitle": {},
+    "dailyReminderDescription": "உங்கள் தினசரி பதிவை மேற்கொள்ளுங்கள்…",
+    "@dailyReminderDescription": {},
+    "pageHomeTitle": "முகப்பு",
+    "@pageHomeTitle": {},
+    "flashbacksTitle": "நினைவலைகள்",
+    "@flashbacksTitle": {},
+    "settingsFlashbacksExcludeBadDays": "மோசமான நாட்களை தவிர்க்க",
+    "@settingsFlashbacksExcludeBadDays": {},
+    "flaskbacksEmpty": "இதுவரை நினைவலைகள் எதுவும் இல்லை …",
+    "@flaskbacksEmpty": {},
+    "flashbackGoodDay": "ஒரு நல்ல நாள்",
+    "@flashbackGoodDay": {},
+    "flashbackRandomDay": "குறிப்பிடப்படாத ஒரு நாள்",
+    "@flashbackRandomDay": {}
+}
