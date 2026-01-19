@@ -113,6 +113,8 @@
   "@settingsFlashbacksViewLayout": {},
   "settingsGalleryViewLayout": "Gallery View Layout",
   "@settingsGalleryViewLayout": {},
+  "settingsHideImagesInGallery": "Hide Images In Gallery",
+  "@settingsHideImagesInGallery": {},
   "viewLayoutList": "List",
   "@viewLayoutList": {},
   "viewLayoutGrid": "Grid",

@@ -9,16 +9,17 @@ import 'package:markdown_widget/markdown_widget.dart';
 import 'local_image_loader.dart';
 
 class EntryCardWidget extends StatelessWidget {
-  const EntryCardWidget({
-    super.key,
-    this.title,
-    required this.entry,
-    required this.images,
-  });
+  const EntryCardWidget(
+      {super.key,
+      this.title,
+      required this.entry,
+      required this.images,
+      this.hideImage = false});
 
   final Entry entry;
   final String? title;
   final List<EntryImage> images;
+  final bool hideImage;
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +41,7 @@ class EntryCardWidget extends StatelessWidget {
                   alignment: Alignment.topRight,
                   clipBehavior: Clip.antiAlias,
                   children: [
-                    (images.isNotEmpty)
+                    (images.isNotEmpty && !hideImage)
                         ? LocalImageLoader(
                             imagePath: images.first.imgPath,
                           )
@@ -69,7 +70,7 @@ class EntryCardWidget extends StatelessWidget {
                                       color: theme.disabledColor, fontSize: 16),
                                 ),
                               ),
-                    if (images.length > 1)
+                    if (images.length > 1 && !hideImage)
                       Positioned(
                         top: 0,
                         right: 0,

@@ -252,6 +252,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settingsGalleryViewLayout => 'Disposition de la gallerie';
 
   @override
+  String get settingsHideImagesInGallery => 'Hide Images In Gallery';
+
+  @override
   String get viewLayoutList => 'Liste';
 
   @override

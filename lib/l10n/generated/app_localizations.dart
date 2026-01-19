@@ -482,6 +482,12 @@ abstract class AppLocalizations {
   /// **'Gallery View Layout'**
   String get settingsGalleryViewLayout;
 
+  /// No description provided for @settingsHideImagesInGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide Images In Gallery'**
+  String get settingsHideImagesInGallery;
+
   /// No description provided for @viewLayoutList.
   ///
   /// In en, this message translates to:

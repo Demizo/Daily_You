@@ -9,16 +9,17 @@ import 'package:markdown_widget/markdown_widget.dart';
 import 'local_image_loader.dart';
 
 class LargeEntryCardWidget extends StatelessWidget {
-  const LargeEntryCardWidget({
-    super.key,
-    this.title,
-    required this.entry,
-    required this.images,
-  });
+  const LargeEntryCardWidget(
+      {super.key,
+      this.title,
+      required this.entry,
+      required this.images,
+      this.hideImage = false});
 
   final Entry entry;
   final List<EntryImage> images;
   final String? title;
+  final bool hideImage;
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +34,7 @@ class LargeEntryCardWidget extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (images.isNotEmpty)
+          if (images.isNotEmpty && !hideImage)
             Expanded(
                 child: Stack(
                     fit: StackFit.expand,

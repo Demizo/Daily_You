@@ -248,6 +248,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get settingsGalleryViewLayout => 'Rozložení zobrazení galerie';
 
   @override
+  String get settingsHideImagesInGallery => 'Hide Images In Gallery';
+
+  @override
   String get viewLayoutList => 'Seznam';
 
   @override

@@ -254,6 +254,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsGalleryViewLayout => 'Отображение галереи';
 
   @override
+  String get settingsHideImagesInGallery => 'Hide Images In Gallery';
+
+  @override
   String get viewLayoutList => 'Список';
 
   @override
