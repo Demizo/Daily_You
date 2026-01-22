@@ -120,7 +120,7 @@
     "settingsAppLanguageTitle": "Ajouter une langue",
     "settingsOverrideAppLanguageTitle": "Surcharger la langue de l'application",
     "settingsFlashbacksExcludeBadDays": "Exclure les mauvais jours",
-    "settingsShowFlashbacks": "Afficher les réviviscence",
+    "settingsShowFlashbacks": "Afficher les souvenirs",
     "settingsExportToAnotherFormat": "Exporter dans un autre format",
     "settingsExportFormatDescription": "Ne doit pas être utilisé comme sauvegarde !",
     "formatMarkdown": "Markdown",
@@ -138,8 +138,8 @@
     "settingsSecurityBiometricUnlock": "Déverrouillage biométrique",
     "unlockAppPrompt": "Déverrouiller l'application",
     "settingsFlashbacksViewLayout": "Disposition de la vue des flashbacks",
-    "settingsGalleryViewLayout": "Disposition de la gallerie",
+    "settingsGalleryViewLayout": "Disposition de la galerie",
     "viewLayoutList": "Liste",
     "viewLayoutGrid": "Grille",
-    "settingsHideImagesInGallery": "Cacher les images dans la gallerie"
+    "settingsHideImagesInGallery": "Cacher les images dans la galerie"
 }
