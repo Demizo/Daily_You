@@ -82,39 +82,47 @@ class AppDatabase {
 
   /// Select an external database location. Returns whether a new location was set successfully.
   Future<bool> selectExternalLocation(Function(String) updateStatus) async {
+    bool databaseUpdated = false;
+
+    // Save old external path
+    var oldExternalPath = getExternalPath();
+    var oldUseExternalPath = usingExternalLocation();
+    await _database!.close();
+
     try {
       var selectedDirectory = await FileLayer.pickDirectory();
-      if (selectedDirectory == null) return false;
+      if (selectedDirectory != null) {
+        await ConfigProvider.instance
+            .set(ConfigKey.externalDbUri, selectedDirectory);
+        await ConfigProvider.instance.set(ConfigKey.useExternalDb, true);
 
-      // Save old external path
-      var oldExternalPath = getExternalPath();
-      var oldUseExternalPath = usingExternalLocation();
+        // Sync with external folder
+        databaseUpdated = await _syncWithExternalDatabase(forceOverwrite: true);
+      }
+    } catch (_) {
+      // Do nothing
+    }
 
+    // Cleanup
+    await open();
+    if (!databaseUpdated) {
+      // Restore state after failure
       await ConfigProvider.instance
-          .set(ConfigKey.externalDbUri, selectedDirectory);
-      await ConfigProvider.instance.set(ConfigKey.useExternalDb, true);
-      // Sync with external folder
-      var synced = await _syncWithExternalDatabase(forceOverwrite: true);
-      if (synced) {
-        // Open new database and update stats
-        await _database!.close();
-        await open();
-        if (ImageStorage.instance.usingExternalLocation()) {
+          .set(ConfigKey.externalDbUri, oldExternalPath);
+      await ConfigProvider.instance
+          .set(ConfigKey.useExternalDb, oldUseExternalPath);
+    } else {
+      try {
+        if (ImageStorage.instance.usingExternalLocation() &&
+            await ImageStorage.instance.hasExternalLocationPermission()) {
           await ImageStorage.instance
               .syncImageFolder(true, updateStatus: updateStatus);
         }
-        return true;
-      } else {
-        // Restore state after failure
-        await ConfigProvider.instance
-            .set(ConfigKey.externalDbUri, oldExternalPath);
-        await ConfigProvider.instance
-            .set(ConfigKey.useExternalDb, oldUseExternalPath);
-        return false;
+      } catch (_) {
+        // Do nothing
       }
-    } catch (_) {
-      return false;
     }
+    return databaseUpdated;
   }
 
   void resetExternalLocation() async {
