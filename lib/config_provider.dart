@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:ui';
 import 'package:daily_you/language_option.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
@@ -188,11 +189,6 @@ class ConfigProvider with ChangeNotifier {
       dbPath = await getApplicationSupportDirectory();
     }
     configFilePath = join(dbPath.path, 'config.json');
-    final configFile = File(configFilePath);
-    if (!(await configFile.exists())) {
-      await configFile.create();
-      await configFile.writeAsString('{}');
-    }
 
     await readConfig();
     await loadSecureConfig();
@@ -200,10 +196,13 @@ class ConfigProvider with ChangeNotifier {
   }
 
   Future<void> poplulateDefaults() async {
+    bool configChanged = false;
+
     // Set default config data
     for (String key in _defaultConfig.keys) {
       if (!_config.containsKey(key)) {
         _config[key] = _defaultConfig[key];
+        configChanged = true;
       }
     }
 
@@ -216,9 +215,12 @@ class ConfigProvider with ChangeNotifier {
     }
     for (String key in oldKeys) {
       _config.remove(key);
+      configChanged = true;
     }
 
-    await writeConfig();
+    if (configChanged) {
+      await writeConfig();
+    }
   }
 
   Future<void> loadSecureConfig() async {
@@ -240,21 +242,40 @@ class ConfigProvider with ChangeNotifier {
 
   Future<void> readConfig() async {
     final configFile = File(configFilePath);
-    if (await configFile.exists()) {
-      final configFileContent = await configFile.readAsString();
-      _config = json.decode(configFileContent);
-    } else {
+
+    if (!await configFile.exists()) {
+      _config = {};
+      return;
+    }
+
+    try {
+      final content = await configFile.readAsString();
+      final decoded = json.decode(content);
+
+      if (decoded is Map<String, dynamic>) {
+        _config = decoded;
+      } else {
+        throw const FormatException('Config is not a map');
+      }
+    } catch (e) {
+      // Corrupted config: reset to defaults
       _config = {};
     }
   }
 
   Future<void> writeConfig() async {
-    // Don't write secure configurations to the config file
-    final filteredConfig = Map<String, dynamic>.from(_config)
-      ..removeWhere((key, _) => _isSecureKey(key));
+    EasyDebounce.debounce("save-config", Duration(seconds: 1), () async {
+      // Don't write secure configurations to the config file
+      final filteredConfig = Map<String, dynamic>.from(_config)
+        ..removeWhere((key, _) => _isSecureKey(key));
 
-    final configFile = File(configFilePath);
-    await configFile.writeAsString(json.encode(filteredConfig));
+      final tempFile = File('$configFilePath.tmp');
+
+      final jsonString = json.encode(filteredConfig);
+
+      await tempFile.writeAsString(jsonString, flush: true);
+      await tempFile.rename(configFilePath);
+    });
   }
 
   bool is24HourFormat() {
