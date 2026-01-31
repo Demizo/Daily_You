@@ -1,5 +1,6 @@
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:daily_you/widgets/scaled_markdown.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:intl/intl.dart';
@@ -94,11 +95,7 @@ class LargeEntryCardWidget extends StatelessWidget {
                 child: Wrap(children: [
                   IgnorePointer(
                       child: (entry.text.isNotEmpty)
-                          ? MarkdownBlock(
-                              config: theme.brightness == Brightness.light
-                                  ? MarkdownConfig.defaultConfig
-                                  : MarkdownConfig.darkConfig,
-                              data: entry.text)
+                          ? ScaledMarkdown(data: entry.text)
                           : Text(
                               AppLocalizations.of(context)!.writeSomethingHint,
                               style: TextStyle(

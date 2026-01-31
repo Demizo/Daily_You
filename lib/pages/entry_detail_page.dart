@@ -7,6 +7,7 @@ import 'package:daily_you/models/image.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:daily_you/widgets/scaled_markdown.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
@@ -249,10 +250,7 @@ class EntryDetails extends StatelessWidget {
                   child: Padding(
                       padding: const EdgeInsets.only(
                           left: 8, top: 4, bottom: 4, right: 8),
-                      child: MarkdownBlock(
-                        config: theme.brightness == Brightness.light
-                            ? MarkdownConfig.defaultConfig
-                            : MarkdownConfig.darkConfig,
+                      child: ScaledMarkdown(
                         data: entry.text,
                       ))),
             Padding(
