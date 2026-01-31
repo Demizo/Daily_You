@@ -1,0 +1,13 @@
+Daily You v2.17.2 has arrived! A visual makeover:
+
+• Performance improvements and smoother animations
+• Streamlined the log editing flow
+• Improved the image view controls
+• Added the option to hide images in the gallery
+• Various user interface improvements
+
+In this patch:
+
+• Fixed Markdown scaling incorrectly with system text size
+• Improved reliability of config saving and external folder sync
+• Updated translations
