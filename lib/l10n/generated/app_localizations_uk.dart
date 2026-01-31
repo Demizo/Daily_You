@@ -254,7 +254,7 @@ class AppLocalizationsUk extends AppLocalizations {
   String get settingsGalleryViewLayout => 'Макет перегляду галереї';
 
   @override
-  String get settingsHideImagesInGallery => 'Hide Images In Gallery';
+  String get settingsHideImagesInGallery => 'Приховати зображення в галереї';
 
   @override
   String get viewLayoutList => 'Список';

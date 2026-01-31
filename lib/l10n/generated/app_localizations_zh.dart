@@ -246,7 +246,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsGalleryViewLayout => '迹忆页视图布局';
 
   @override
-  String get settingsHideImagesInGallery => 'Hide Images In Gallery';
+  String get settingsHideImagesInGallery => '隐藏图库中的图片';
 
   @override
   String get viewLayoutList => '列表';
@@ -775,6 +775,9 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get settingsGalleryViewLayout => '紀錄檢視佈局';
+
+  @override
+  String get settingsHideImagesInGallery => '隱藏紀錄頁中的圖片';
 
   @override
   String get viewLayoutList => '清單';

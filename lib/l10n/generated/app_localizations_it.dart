@@ -28,13 +28,13 @@ class AppLocalizationsIt extends AppLocalizations {
   String get settingsFlashbacksExcludeBadDays => 'Escludi le giornate negative';
 
   @override
-  String get flaskbacksEmpty => 'Ancora Nessun Ricordo…';
+  String get flaskbacksEmpty => 'Ancora nessun ricordo…';
 
   @override
-  String get flashbackGoodDay => 'Una Bella Giornata';
+  String get flashbackGoodDay => 'Una bella giornata';
 
   @override
-  String get flashbackRandomDay => 'Una Giornata a Caso';
+  String get flashbackRandomDay => 'Una giornata a caso';
 
   @override
   String flashbackWeek(num count) {
@@ -73,7 +73,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get pageGalleryTitle => 'Galleria';
 
   @override
-  String get searchLogsHint => 'Cerca Annotazioni…';
+  String get searchLogsHint => 'Cerca annotazioni…';
 
   @override
   String logCount(num count) {
@@ -98,7 +98,7 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get noLogs => 'Nessuna Annotazione…';
+  String get noLogs => 'Nessuna annotazione…';
 
   @override
   String get sortDateTitle => 'Data';
@@ -134,7 +134,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String chartByDayTitle(Object tag) {
-    return '$tag Giorno per Giorno';
+    return '$tag per giorno';
   }
 
   @override
@@ -142,7 +142,7 @@ class AppLocalizationsIt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Sequenza Corrente $count',
+      other: 'Sequenza corrente $count',
     );
     return '$_temp0';
   }
@@ -162,22 +162,22 @@ class AppLocalizationsIt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Giorni Trascorsi dall\'Ultima Giornata Negativa $count',
+      other: 'Giorni trascorsi dall\'ultima giornata negativa $count',
     );
     return '$_temp0';
   }
 
   @override
   String get errorExternalStorageAccessTitle =>
-      'Impossibile Accedere alla Memoria Esterna';
+      'Impossibile accedere alla memoria esterna';
 
   @override
   String get errorExternalStorageAccessDescription =>
-      'Se utilizzi un archivio di rete, assicurati che il servizio sia online e che tu disponga di accesso alla rete.\n\nIn caso contrario, l\'App potrebbe aver perso le autorizzazioni per la cartella esterna. Vai alle impostazioni e riseleziona la cartella esterna per concedere l\'accesso.\n\nAttenzione, le modifiche non verranno sincronizzate finché non ripristinerai l\'accesso alla posizione di archiviazione esterna!';
+      'Se utilizzi un archivio di rete, assicurati che il servizio sia online e che tu disponga di accesso alla rete.\n\nIn caso contrario, l\'app potrebbe aver perso le autorizzazioni per la cartella esterna. Vai alle impostazioni e riseleziona la cartella esterna per concedere l\'accesso.\n\nAttenzione, le modifiche non verranno sincronizzate finché non ripristinerai l\'accesso alla posizione di archiviazione esterna!';
 
   @override
   String get errorExternalStorageAccessContinue =>
-      'Prosegui col Database Locale';
+      'Prosegui con la base di dati locale';
 
   @override
   String get lastModified => 'Modificato';
@@ -189,17 +189,17 @@ class AppLocalizationsIt extends AppLocalizations {
   String get titleHint => 'Titolo…';
 
   @override
-  String get deleteLogTitle => 'Cancella Annotazione';
+  String get deleteLogTitle => 'Elimina l\'annotazione';
 
   @override
   String get deleteLogDescription =>
-      'Vuoi davvero cancellare questa annotazione?';
+      'Vuoi davvero eliminare questa annotazione?';
 
   @override
-  String get deletePhotoTitle => 'Cancella Foto';
+  String get deletePhotoTitle => 'Elimina la foto';
 
   @override
-  String get deletePhotoDescription => 'Vuoi cancellare questa foto?';
+  String get deletePhotoDescription => 'Vuoi eliminare questa foto?';
 
   @override
   String get pageSettingsTitle => 'Impostazioni';
@@ -226,20 +226,20 @@ class AppLocalizationsIt extends AppLocalizations {
   String get settingsFirstDayOfWeek => 'Primo Giorno della Settimana';
 
   @override
-  String get settingsUseSystemAccentColor => 'Usa Colore di Sistema';
+  String get settingsUseSystemAccentColor => 'Usa il colore di sistema';
 
   @override
-  String get settingsCustomAccentColor => 'Colore Personalizzato';
+  String get settingsCustomAccentColor => 'Colore personalizzato';
 
   @override
   String get settingsShowMarkdownToolbar =>
       'Mostra la barra degli strumenti Markdown';
 
   @override
-  String get settingsShowFlashbacks => 'Mostra Ricordi';
+  String get settingsShowFlashbacks => 'Mostra i ricordi';
 
   @override
-  String get settingsChangeMoodIcons => 'Cambia le Icone dell\'Umore';
+  String get settingsChangeMoodIcons => 'Cambia le icone dell\'umore';
 
   @override
   String get moodIconPrompt => 'Inserisci un\'icona';
@@ -252,7 +252,8 @@ class AppLocalizationsIt extends AppLocalizations {
   String get settingsGalleryViewLayout => 'Layout visualizzazione Galleria';
 
   @override
-  String get settingsHideImagesInGallery => 'Hide Images In Gallery';
+  String get settingsHideImagesInGallery =>
+      'Nascondi le immagini nella galleria';
 
   @override
   String get viewLayoutList => 'Elenco';
@@ -289,7 +290,7 @@ class AppLocalizationsIt extends AppLocalizations {
       'Scegli un orario fisso per il promemoria';
 
   @override
-  String get settingsAlwaysSendReminderTitle => 'Invia Sempre Promemoria';
+  String get settingsAlwaysSendReminderTitle => 'Invia sempre promemoria';
 
   @override
   String get settingsAlwaysSendReminderDescription =>

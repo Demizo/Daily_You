@@ -15,7 +15,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get dailyReminderTitle => 'Heute Eintragen!';
 
   @override
-  String get dailyReminderDescription => 'Mache deinen Eintrag…';
+  String get dailyReminderDescription => 'Mache deinen Eintrag …';
 
   @override
   String get pageHomeTitle => 'Start';
@@ -30,10 +30,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get flaskbacksEmpty => 'Bis jetzt keine Rückblicke…';
 
   @override
-  String get flashbackGoodDay => 'Ein Guter Tag';
+  String get flashbackGoodDay => 'Ein guter Tag';
 
   @override
-  String get flashbackRandomDay => 'Ein Zufälliger Tag';
+  String get flashbackRandomDay => 'Ein zufälliger Tag';
 
   @override
   String flashbackWeek(num count) {
@@ -97,7 +97,7 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get noLogs => 'Keine Einträge vorhanden …';
+  String get noLogs => 'Keine Einträge vorhanden …';
 
   @override
   String get sortDateTitle => 'Datum';
@@ -112,7 +112,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get pageStatisticsTitle => 'Statistiken';
 
   @override
-  String get statisticsNotEnoughData => 'Nicht genügend Daten…';
+  String get statisticsNotEnoughData => 'Nicht genügend Daten …';
 
   @override
   String get statisticsRangeOneMonth => '1 Monat';
@@ -133,7 +133,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String chartByDayTitle(Object tag) {
-    return '$tag Pro Tag';
+    return '$tag pro Tag';
   }
 
   @override
@@ -206,7 +206,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsAppearanceTitle => 'Aussehen';
 
   @override
-  String get settingsTheme => 'Theme';
+  String get settingsTheme => 'Farbschema';
 
   @override
   String get themeSystem => 'System';
@@ -224,7 +224,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsFirstDayOfWeek => 'Erster Tag der Woche';
 
   @override
-  String get settingsUseSystemAccentColor => 'System Akzentfarbe Verwenden';
+  String get settingsUseSystemAccentColor => 'System-Akzentfarbe verwenden';
 
   @override
   String get settingsCustomAccentColor => 'Eigene Akzentfarbe';
@@ -236,10 +236,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsShowFlashbacks => 'Zeige Rückblicke';
 
   @override
-  String get settingsChangeMoodIcons => 'Ändere Mood Icons';
+  String get settingsChangeMoodIcons => 'Stimmung-Symbole ändern';
 
   @override
-  String get moodIconPrompt => 'Icon hier eingeben';
+  String get moodIconPrompt => 'Symbol hier eingeben';
 
   @override
   String get settingsFlashbacksViewLayout => 'Layout der Rückblicksansicht';
@@ -248,7 +248,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsGalleryViewLayout => 'Galerieansichts-Layout';
 
   @override
-  String get settingsHideImagesInGallery => 'Hide Images In Gallery';
+  String get settingsHideImagesInGallery => 'Bilder in der Galerie verbergen';
 
   @override
   String get viewLayoutList => 'Liste';

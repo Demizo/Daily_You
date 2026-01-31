@@ -248,7 +248,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get settingsGalleryViewLayout => 'Galeri Görünüm Düzeni';
 
   @override
-  String get settingsHideImagesInGallery => 'Hide Images In Gallery';
+  String get settingsHideImagesInGallery => 'Görüntüleri galeride gizle';
 
   @override
   String get viewLayoutList => 'Liste';

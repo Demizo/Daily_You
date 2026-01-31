@@ -12,10 +12,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get appTitle => 'Daily You';
 
   @override
-  String get dailyReminderTitle => '今日を記録する！';
+  String get dailyReminderTitle => '今日の日記を書きましょう！';
 
   @override
-  String get dailyReminderDescription => '今日の記録を残しましょう…';
+  String get dailyReminderDescription => '今日の日記を残しましょう…';
 
   @override
   String get pageHomeTitle => 'ホーム';
@@ -69,7 +69,7 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get pageGalleryTitle => 'Gallery';
+  String get pageGalleryTitle => 'ギャラリー';
 
   @override
   String get searchLogsHint => '記録を検索…';
@@ -128,12 +128,12 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String chartSummaryTitle(Object tag) {
-    return '$tag Summary';
+    return '$tag 要約';
   }
 
   @override
   String chartByDayTitle(Object tag) {
-    return '$tag By Day';
+    return '$tag 日毎';
   }
 
   @override
@@ -201,7 +201,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get pageSettingsTitle => '設定';
 
   @override
-  String get settingsAppearanceTitle => 'Appearance';
+  String get settingsAppearanceTitle => '外観';
 
   @override
   String get settingsTheme => 'テーマ';
@@ -216,22 +216,22 @@ class AppLocalizationsJa extends AppLocalizations {
   String get themeDark => 'ダーク';
 
   @override
-  String get themeAmoled => 'AMOLED';
+  String get themeAmoled => 'ダーク(AMOLED)';
 
   @override
-  String get settingsFirstDayOfWeek => 'First Day Of Week';
+  String get settingsFirstDayOfWeek => '週の始まり';
 
   @override
-  String get settingsUseSystemAccentColor => 'Use System Accent Color';
+  String get settingsUseSystemAccentColor => 'システムのユーザーの色を利用';
 
   @override
-  String get settingsCustomAccentColor => 'Custom Accent Color';
+  String get settingsCustomAccentColor => '強調色をカスタマイズ';
 
   @override
   String get settingsShowMarkdownToolbar => 'Show Markdown Toolbar';
 
   @override
-  String get settingsShowFlashbacks => 'Show Flashbacks';
+  String get settingsShowFlashbacks => '回想を表示';
 
   @override
   String get settingsChangeMoodIcons => '気分のアイコンを変更する';
@@ -240,13 +240,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get moodIconPrompt => 'アイコンを入力してください';
 
   @override
-  String get settingsFlashbacksViewLayout => 'Flashbacks View Layout';
+  String get settingsFlashbacksViewLayout => '回想の外観設定';
 
   @override
-  String get settingsGalleryViewLayout => 'Gallery View Layout';
+  String get settingsGalleryViewLayout => 'ギャラリーの外観設定';
 
   @override
-  String get settingsHideImagesInGallery => 'Hide Images In Gallery';
+  String get settingsHideImagesInGallery => 'ギャラリーでは画像を非表示';
 
   @override
   String get viewLayoutList => 'リスト';
@@ -258,38 +258,36 @@ class AppLocalizationsJa extends AppLocalizations {
   String get settingsNotificationsTitle => '通知';
 
   @override
-  String get settingsDailyReminderOnboarding =>
-      'Enable daily reminders to keep yourself consistent!';
+  String get settingsDailyReminderOnboarding => 'リマインダーを有効にして、毎日日記を継続しましょう！';
 
   @override
   String get settingsNotificationsPermissionsPrompt =>
-      'The \'schedule alarms\' permission will be requested to send the reminder at a random moment or at your preferred time.';
+      'ランダム、または希望する時間にリマインダーを送信するには、「アラームとリマインダー」の権限が必要です。';
 
   @override
-  String get settingsDailyReminderTitle => 'Daily Reminder';
+  String get settingsDailyReminderTitle => 'リマインダー';
 
   @override
-  String get settingsDailyReminderDescription => 'A gentle reminder each day';
+  String get settingsDailyReminderDescription => '毎日、便利なリマインダーを送信';
 
   @override
-  String get settingsReminderTime => 'Reminder Time';
+  String get settingsReminderTime => 'リマインダーの送信時間';
 
   @override
-  String get settingsFixedReminderTimeTitle => 'Fixed Reminder Time';
+  String get settingsFixedReminderTimeTitle => '固定リマインダー時間';
 
   @override
-  String get settingsFixedReminderTimeDescription =>
-      'Pick a fixed time for the reminder';
+  String get settingsFixedReminderTimeDescription => 'リマインダーの送信時間を固定する';
 
   @override
-  String get settingsAlwaysSendReminderTitle => 'Always Send Reminder';
+  String get settingsAlwaysSendReminderTitle => '常にリマインダーを送信する';
 
   @override
   String get settingsAlwaysSendReminderDescription =>
-      'Send reminder even if a log was already started';
+      '記入が開始されている場合でもリマインダーを送信する';
 
   @override
-  String get settingsCustomizeNotificationTitle => 'Customize Notifications';
+  String get settingsCustomizeNotificationTitle => '通知をカスタマイズ';
 
   @override
   String get settingsTemplatesTitle => 'テンプレート';
@@ -341,22 +339,22 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get logFolderWarningDescription =>
-      'If the selected folder already contains a \'daily_you.db\' file, it will be used to overwrite your existing logs!';
+      '選択したフォルダーに既に \'daily_you.db\' ファイルが含まれている場合は、既存のログを上書きするために使用されます！';
 
   @override
   String get errorTitle => 'エラー';
 
   @override
-  String get logFolderErrorDescription => 'Failed to change log folder!';
+  String get logFolderErrorDescription => '日記フォルダの変更に失敗しました！';
 
   @override
-  String get imageFolderErrorDescription => 'Failed to change image folder!';
+  String get imageFolderErrorDescription => '画像フォルダの変更に失敗しました！';
 
   @override
-  String get backupErrorDescription => 'Failed to create backup!';
+  String get backupErrorDescription => 'バックアップの作成に失敗しました！';
 
   @override
-  String get restoreErrorDescription => 'Failed to restore backup!';
+  String get restoreErrorDescription => 'バックアップの復元に失敗しました！';
 
   @override
   String get settingsBackupRestoreTitle => 'バックアップと復元';
@@ -372,31 +370,30 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String tranferStatus(Object percent) {
-    return 'Transferring… $percent%';
+    return '転送中...$percent%';
   }
 
   @override
   String creatingBackupStatus(Object percent) {
-    return 'Creating Backup… $percent%';
+    return 'バックアップを作成中... $percent%';
   }
 
   @override
   String restoringBackupStatus(Object percent) {
-    return 'Restoring Backup… $percent%';
+    return 'バックアップを復元中... $percent%';
   }
 
   @override
-  String get cleanUpStatus => 'Cleaning Up…';
+  String get cleanUpStatus => 'クリーンアップ中…';
 
   @override
   String get settingsExport => 'Export';
 
   @override
-  String get settingsExportToAnotherFormat => 'Export To Another Format';
+  String get settingsExportToAnotherFormat => 'その他の形式にエクスポート';
 
   @override
-  String get settingsExportFormatDescription =>
-      'This should not be used as a backup!';
+  String get settingsExportFormatDescription => 'これらの形式はバックアップとして利用できません！';
 
   @override
   String get exportLogs => 'Export Logs';
@@ -408,11 +405,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get settingsImport => 'Import';
 
   @override
-  String get settingsImportFromAnotherApp => 'Import From Another App';
+  String get settingsImportFromAnotherApp => 'バックアップのインポート';
 
   @override
-  String get settingsTranslateCallToAction =>
-      'Everyone should have access to a journal!';
+  String get settingsTranslateCallToAction => '誰もが日記を利用できるようにご協力よろしくお願いします！';
 
   @override
   String get settingsHelpTranslate => '翻訳を手伝う';
@@ -424,11 +420,11 @@ class AppLocalizationsJa extends AppLocalizations {
   String get importImages => 'Import Images';
 
   @override
-  String get logFormatTitle => 'Choose Format';
+  String get logFormatTitle => '形式の選択';
 
   @override
   String get logFormatDescription =>
-      'Another app\'s format may not support all features. Please report any issues since third party formats may change at any time. This will not impact existing logs!';
+      '外部アプリの形式では、すべての機能が利用可能とは限りません。サードパーティの形式は随時変更される可能性があるため、問題が発生した場合はご報告ください。既存のログには影響しません！';
 
   @override
   String get formatDailyYouJson => 'Daily You (JSON)';
@@ -458,15 +454,14 @@ class AppLocalizationsJa extends AppLocalizations {
   String get formatMarkdown => 'Markdown';
 
   @override
-  String get settingsDeleteAllLogsTitle => 'Delete All Logs';
+  String get settingsDeleteAllLogsTitle => 'すべてのログを消去';
 
   @override
-  String get settingsDeleteAllLogsDescription =>
-      'Do you want to delete all of your logs?';
+  String get settingsDeleteAllLogsDescription => '本当にすべてのログを消去しますか？';
 
   @override
   String settingsDeleteAllLogsPrompt(Object prompt) {
-    return 'Enter \'$prompt\' to confirm. This cannot be undone!';
+    return '確認のため \'$prompt\' と入力してください。この変更は元に戻せません！';
   }
 
   @override
@@ -509,13 +504,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get settingsSecurityPasswordsDoNotMatch => 'パスワードが一致しません';
 
   @override
-  String get requiredPrompt => 'Required';
+  String get requiredPrompt => '必要';
 
   @override
-  String get settingsSecurityBiometricUnlock => 'Biometric Unlock';
+  String get settingsSecurityBiometricUnlock => '生体認証';
 
   @override
-  String get unlockAppPrompt => 'Unlock the app';
+  String get unlockAppPrompt => 'ロック解除';
 
   @override
   String get settingsAboutTitle => 'Daily Youについて';
@@ -536,7 +531,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get settingsMadeWithLove => '❤️ をこめて作りました';
 
   @override
-  String get settingsConsiderSupporting => 'consider supporting';
+  String get settingsConsiderSupporting => '支援の検討';
 
   @override
   String get tagMoodTitle => '気分';

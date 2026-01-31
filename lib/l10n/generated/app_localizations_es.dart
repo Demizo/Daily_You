@@ -249,7 +249,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsGalleryViewLayout => 'Vista de Galería';
 
   @override
-  String get settingsHideImagesInGallery => 'Hide Images In Gallery';
+  String get settingsHideImagesInGallery => 'Ocultar Imágenes en Galería';
 
   @override
   String get viewLayoutList => 'Lista';
@@ -272,7 +272,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsDailyReminderTitle => 'Recordatorio diario';
 
   @override
-  String get settingsDailyReminderDescription => 'Breve recordatorio diario.';
+  String get settingsDailyReminderDescription => 'Breve recordatorio diario';
 
   @override
   String get settingsReminderTime => 'Hora del Recordatorio';

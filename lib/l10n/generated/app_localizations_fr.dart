@@ -236,7 +236,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'Afficher la barre d\'outils Markdown';
 
   @override
-  String get settingsShowFlashbacks => 'Afficher les réviviscence';
+  String get settingsShowFlashbacks => 'Afficher les souvenirs';
 
   @override
   String get settingsChangeMoodIcons => 'Modifier les icônes d\'humeur';
@@ -249,10 +249,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Disposition de la vue des flashbacks';
 
   @override
-  String get settingsGalleryViewLayout => 'Disposition de la gallerie';
+  String get settingsGalleryViewLayout => 'Disposition de la galerie';
 
   @override
-  String get settingsHideImagesInGallery => 'Hide Images In Gallery';
+  String get settingsHideImagesInGallery => 'Cacher les images dans la galerie';
 
   @override
   String get viewLayoutList => 'Liste';
