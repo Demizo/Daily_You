@@ -34,7 +34,7 @@ dependencies:
       ref: release
   device_info_plus: ^11.2.0
   fl_chart: ^0.66.2
-  markdown_widget: ^2.3.2+3
+  markdown_widget: ^2.3.2+8
 
   intl: ^0.20.0
   share_plus: ^10.1.3

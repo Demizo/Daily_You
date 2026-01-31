@@ -1,6 +1,7 @@
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:daily_you/widgets/scaled_markdown.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:daily_you/models/entry.dart';
@@ -52,12 +53,7 @@ class EntryCardWidget extends StatelessWidget {
                                   IgnorePointer(
                                       child: SizedBox(
                                     width: double.maxFinite,
-                                    child: MarkdownBlock(
-                                        config:
-                                            theme.brightness == Brightness.light
-                                                ? MarkdownConfig.defaultConfig
-                                                : MarkdownConfig.darkConfig,
-                                        data: entry.text),
+                                    child: ScaledMarkdown(data: entry.text),
                                   ))
                                 ]),
                               )
