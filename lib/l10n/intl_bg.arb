@@ -1,1 +1,11 @@
-{}
+{
+    "dailyReminderDescription": "Вземи дневния си журнал…",
+    "pageHomeTitle": "У дома",
+    "flashbacksTitle": "Спомени",
+    "settingsFlashbacksExcludeBadDays": "Отлъчи лоши дни",
+    "flaskbacksEmpty": "Без Спомени Засега…",
+    "flashbackGoodDay": "Хубав Ден",
+    "flashbackRandomDay": "Произволен Ден",
+    "flashbackWeek": "{count, plural, one{{count} преди седмица} other{{count} преди седмици}}",
+    "dailyReminderTitle": "Води Докладна!"
+}
