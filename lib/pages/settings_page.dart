@@ -7,6 +7,7 @@ import 'package:daily_you/pages/settings/language_settings.dart';
 import 'package:daily_you/pages/settings/notification_settings.dart';
 import 'package:daily_you/pages/settings/security_settings.dart';
 import 'package:daily_you/pages/settings/storage_settings.dart';
+import 'package:daily_you/pages/settings/synchronization_settings.dart';
 import 'package:daily_you/pages/settings/templates_page.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/widgets/settings_category.dart';
@@ -48,20 +49,29 @@ class _SettingsPageState extends State<SettingsPage> {
                     text: AppLocalizations.of(context)!.settingsMadeWithLove,
                     style: TextStyle(
                         fontSize: 14,
-                        color: Theme.of(context).colorScheme.secondary)),
+                        color: Theme
+                            .of(context)
+                            .colorScheme
+                            .secondary)),
                 if (entriesProvider.entries.length > 30)
                   TextSpan(
                       text: " ",
                       style: TextStyle(
                           fontSize: 14,
-                          color: Theme.of(context).colorScheme.secondary)),
+                          color: Theme
+                              .of(context)
+                              .colorScheme
+                              .secondary)),
                 if (entriesProvider.entries.length > 30)
                   TextSpan(
                     text: AppLocalizations.of(context)!
                         .settingsConsiderSupporting,
                     style: TextStyle(
                       fontSize: 14,
-                      color: Theme.of(context).colorScheme.primary,
+                      color: Theme
+                          .of(context)
+                          .colorScheme
+                          .primary,
                       decoration: TextDecoration.underline,
                     ),
                     recognizer: TapGestureRecognizer()
@@ -116,6 +126,10 @@ class _SettingsPageState extends State<SettingsPage> {
               title: AppLocalizations.of(context)!.settingsBackupRestoreTitle,
               icon: Icons.settings_backup_restore_rounded,
               page: BackupRestoreSettings()),
+          SettingsCategory(
+              title: "Synchronization",
+              icon: Icons.sync,
+              page: SynchronizationSettings()),
           SettingsCategory(
               title: AppLocalizations.of(context)!.settingsAboutTitle,
               icon: Icons.info_rounded,
