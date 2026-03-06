@@ -29,6 +29,7 @@ class LanguageOption {
     LanguageOption(languageCode: "id"): "Indonesia",
     LanguageOption(languageCode: "it"): "italiano",
     LanguageOption(languageCode: "ja"): "日本語",
+    LanguageOption(languageCode: "lt"): "lietuvių",
     LanguageOption(languageCode: "nl"): "Nederlands",
     LanguageOption(languageCode: "oc"): "Occitan",
     LanguageOption(languageCode: "pl"): "polski",
