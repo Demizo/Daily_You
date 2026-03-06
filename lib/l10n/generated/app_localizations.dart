@@ -7,6 +7,7 @@ import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_ar.dart';
 import 'app_localizations_be.dart';
+import 'app_localizations_bg.dart';
 import 'app_localizations_cs.dart';
 import 'app_localizations_da.dart';
 import 'app_localizations_de.dart';
@@ -20,11 +21,13 @@ import 'app_localizations_hi.dart';
 import 'app_localizations_id.dart';
 import 'app_localizations_it.dart';
 import 'app_localizations_ja.dart';
+import 'app_localizations_lt.dart';
 import 'app_localizations_nl.dart';
 import 'app_localizations_oc.dart';
 import 'app_localizations_pl.dart';
 import 'app_localizations_pt.dart';
 import 'app_localizations_ru.dart';
+import 'app_localizations_sv.dart';
 import 'app_localizations_ta.dart';
 import 'app_localizations_tr.dart';
 import 'app_localizations_uk.dart';
@@ -119,6 +122,7 @@ abstract class AppLocalizations {
   static const List<Locale> supportedLocales = <Locale>[
     Locale('ar'),
     Locale('be'),
+    Locale('bg'),
     Locale('cs'),
     Locale('da'),
     Locale('de'),
@@ -132,12 +136,14 @@ abstract class AppLocalizations {
     Locale('id'),
     Locale('it'),
     Locale('ja'),
+    Locale('lt'),
     Locale('nl'),
     Locale('oc'),
     Locale('pl'),
     Locale('pt'),
     Locale('pt', 'BR'),
     Locale('ru'),
+    Locale('sv'),
     Locale('ta'),
     Locale('tr'),
     Locale('uk'),
@@ -1060,6 +1066,7 @@ class _AppLocalizationsDelegate
   bool isSupported(Locale locale) => <String>[
         'ar',
         'be',
+        'bg',
         'cs',
         'da',
         'de',
@@ -1073,11 +1080,13 @@ class _AppLocalizationsDelegate
         'id',
         'it',
         'ja',
+        'lt',
         'nl',
         'oc',
         'pl',
         'pt',
         'ru',
+        'sv',
         'ta',
         'tr',
         'uk',
@@ -1120,6 +1129,8 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
       return AppLocalizationsAr();
     case 'be':
       return AppLocalizationsBe();
+    case 'bg':
+      return AppLocalizationsBg();
     case 'cs':
       return AppLocalizationsCs();
     case 'da':
@@ -1146,6 +1157,8 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
       return AppLocalizationsIt();
     case 'ja':
       return AppLocalizationsJa();
+    case 'lt':
+      return AppLocalizationsLt();
     case 'nl':
       return AppLocalizationsNl();
     case 'oc':
@@ -1156,6 +1169,8 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
       return AppLocalizationsPt();
     case 'ru':
       return AppLocalizationsRu();
+    case 'sv':
+      return AppLocalizationsSv();
     case 'ta':
       return AppLocalizationsTa();
     case 'tr':

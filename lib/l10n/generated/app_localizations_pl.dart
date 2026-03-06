@@ -242,13 +242,13 @@ class AppLocalizationsPl extends AppLocalizations {
   String get moodIconPrompt => 'Wprowadź ikonę';
 
   @override
-  String get settingsFlashbacksViewLayout => 'Flashbacks View Layout';
+  String get settingsFlashbacksViewLayout => 'Układ widoku wspomnień';
 
   @override
   String get settingsGalleryViewLayout => 'Widok galerii';
 
   @override
-  String get settingsHideImagesInGallery => 'Hide Images In Gallery';
+  String get settingsHideImagesInGallery => 'Ukryj zdjęcia w galerii';
 
   @override
   String get viewLayoutList => 'Lista';

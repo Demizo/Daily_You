@@ -253,7 +253,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsGalleryViewLayout => 'طريقة عرض الصور';
 
   @override
-  String get settingsHideImagesInGallery => 'Hide Images In Gallery';
+  String get settingsHideImagesInGallery => 'إخفاء الصور من معرض الصور';
 
   @override
   String get viewLayoutList => 'قائمة';

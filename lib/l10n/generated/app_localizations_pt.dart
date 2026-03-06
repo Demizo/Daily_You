@@ -791,6 +791,9 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get settingsGalleryViewLayout => 'Visualização da Galeria';
 
   @override
+  String get settingsHideImagesInGallery => 'Ocultar Imagens Na Galeria';
+
+  @override
   String get viewLayoutList => 'Lista';
 
   @override

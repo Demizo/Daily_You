@@ -24,7 +24,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get flashbacksTitle => 'Kilas balik';
 
   @override
-  String get settingsFlashbacksExcludeBadDays => 'Exclude bad days';
+  String get settingsFlashbacksExcludeBadDays => 'Kecualikan hari buruk';
 
   @override
   String get flaskbacksEmpty => 'Belum ada kilas balik…';
@@ -90,8 +90,8 @@ class AppLocalizationsId extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count words',
-      one: '$count word',
+      other: '$count kata',
+      one: '$count kata',
     );
     return '$_temp0';
   }
@@ -233,7 +233,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get settingsShowMarkdownToolbar => 'Tampilkan Markdown Toolbar';
 
   @override
-  String get settingsShowFlashbacks => 'Show Flashbacks';
+  String get settingsShowFlashbacks => 'Tampilkan Kilas Balik';
 
   @override
   String get settingsChangeMoodIcons => 'Ubah ikon suasana hati';
@@ -242,37 +242,36 @@ class AppLocalizationsId extends AppLocalizations {
   String get moodIconPrompt => 'Masukkan ikon';
 
   @override
-  String get settingsFlashbacksViewLayout => 'Flashbacks View Layout';
+  String get settingsFlashbacksViewLayout => 'Tata Letak Tampilan Kilas Balik';
 
   @override
-  String get settingsGalleryViewLayout => 'Gallery View Layout';
+  String get settingsGalleryViewLayout => 'Tata Letak Tampilan Galeri';
 
   @override
-  String get settingsHideImagesInGallery => 'Hide Images In Gallery';
+  String get settingsHideImagesInGallery => 'Sembunyikan Gambar di Galeri';
 
   @override
-  String get viewLayoutList => 'List';
+  String get viewLayoutList => 'Daftar';
 
   @override
-  String get viewLayoutGrid => 'Grid';
+  String get viewLayoutGrid => 'Kisi';
 
   @override
   String get settingsNotificationsTitle => 'Pemberitahuan';
 
   @override
   String get settingsDailyReminderOnboarding =>
-      'Enable daily reminders to keep yourself consistent!';
+      'Aktifkan pengingat harian untuk menjaga konsistensi Anda!';
 
   @override
   String get settingsNotificationsPermissionsPrompt =>
-      'The \'schedule alarms\' permission will be requested to send the reminder at a random moment or at your preferred time.';
+      'Izin \'jadwalkan alarm\' akan diminta untuk mengirim pengingat pada waktu acak atau pada waktu yang Anda inginkan.';
 
   @override
   String get settingsDailyReminderTitle => 'Pengingat harian';
 
   @override
-  String get settingsDailyReminderDescription =>
-      'Izinkan aplikasi berjalan di latar belakang untuk hasil terbaik';
+  String get settingsDailyReminderDescription => 'Pengingat lembut setiap hari';
 
   @override
   String get settingsReminderTime => 'Waktu penginggat';
@@ -285,14 +284,14 @@ class AppLocalizationsId extends AppLocalizations {
       'Pilih waktu yang tetap untuk pengingat';
 
   @override
-  String get settingsAlwaysSendReminderTitle => 'Always Send Reminder';
+  String get settingsAlwaysSendReminderTitle => 'Selalu Kirim Pengingat';
 
   @override
   String get settingsAlwaysSendReminderDescription =>
-      'Send reminder even if a log was already started';
+      'Kirim pengingat meskipun catatan sudah dimulai';
 
   @override
-  String get settingsCustomizeNotificationTitle => 'Customize Notifications';
+  String get settingsCustomizeNotificationTitle => 'Sesuaikan Notifikasi';
 
   @override
   String get settingsTemplatesTitle => 'Template';
@@ -362,7 +361,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get restoreErrorDescription => 'Gagal memulihkan cadangan!';
 
   @override
-  String get settingsBackupRestoreTitle => 'Backup & Restore';
+  String get settingsBackupRestoreTitle => 'Cadangkan & Pulihkan';
 
   @override
   String get settingsBackup => 'Cadangan';
@@ -396,11 +395,11 @@ class AppLocalizationsId extends AppLocalizations {
   String get settingsExport => 'Eksport';
 
   @override
-  String get settingsExportToAnotherFormat => 'Export To Another Format';
+  String get settingsExportToAnotherFormat => 'Ekspor ke Format Lain';
 
   @override
   String get settingsExportFormatDescription =>
-      'This should not be used as a backup!';
+      'Ini tidak boleh digunakan sebagai cadangan!';
 
   @override
   String get exportLogs => 'Ekspor Log';
@@ -412,11 +411,11 @@ class AppLocalizationsId extends AppLocalizations {
   String get settingsImport => 'Impor';
 
   @override
-  String get settingsImportFromAnotherApp => 'Import From Another App';
+  String get settingsImportFromAnotherApp => 'Impor dari Aplikasi Lain';
 
   @override
   String get settingsTranslateCallToAction =>
-      'Everyone should have access to a journal!';
+      'Semua orang berhak memiliki akses ke jurnal!';
 
   @override
   String get settingsHelpTranslate => 'Bantu Terjemahkan';
@@ -432,7 +431,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get logFormatDescription =>
-      'Format aplikasi lain mungkin tidak mendukung semua fitur. Ini tidak akan memengaruhi log yang ada!';
+      'Format aplikasi lain mungkin tidak mendukung semua fitur. Harap laporkan masalah apa pun karena format pihak ketiga dapat berubah sewaktu-waktu. Ini tidak akan memengaruhi catatan yang sudah ada!';
 
   @override
   String get formatDailyYouJson => 'Daily You (JSON)';
@@ -480,46 +479,46 @@ class AppLocalizationsId extends AppLocalizations {
   String get settingsAppLanguageTitle => 'Bahasa Aplikasi';
 
   @override
-  String get settingsOverrideAppLanguageTitle => 'Override App Language';
+  String get settingsOverrideAppLanguageTitle => 'Ganti Bahasa Aplikasi';
 
   @override
-  String get settingsSecurityTitle => 'Security';
+  String get settingsSecurityTitle => 'Keamanan';
 
   @override
-  String get settingsSecurityRequirePassword => 'Require Password';
+  String get settingsSecurityRequirePassword => 'Wajibkan Kata Sandi';
 
   @override
-  String get settingsSecurityEnterPassword => 'Enter Password';
+  String get settingsSecurityEnterPassword => 'Masukkan Kata Sandi';
 
   @override
-  String get settingsSecuritySetPassword => 'Set Password';
+  String get settingsSecuritySetPassword => 'Atur Kata Sandi';
 
   @override
-  String get settingsSecurityChangePassword => 'Change Password';
+  String get settingsSecurityChangePassword => 'Ubah Kata Sandi';
 
   @override
-  String get settingsSecurityPassword => 'Password';
+  String get settingsSecurityPassword => 'Kata Sandi';
 
   @override
-  String get settingsSecurityConfirmPassword => 'Confirm Password';
+  String get settingsSecurityConfirmPassword => 'Konfirmasi Kata Sandi';
 
   @override
-  String get settingsSecurityOldPassword => 'Old Password';
+  String get settingsSecurityOldPassword => 'Kata Sandi Lama';
 
   @override
-  String get settingsSecurityIncorrectPassword => 'Incorrect Password';
+  String get settingsSecurityIncorrectPassword => 'Kata Sandi Salah';
 
   @override
-  String get settingsSecurityPasswordsDoNotMatch => 'Passwords do not match';
+  String get settingsSecurityPasswordsDoNotMatch => 'Kata sandi tidak cocok';
 
   @override
-  String get requiredPrompt => 'Required';
+  String get requiredPrompt => 'Wajib diisi';
 
   @override
-  String get settingsSecurityBiometricUnlock => 'Biometric Unlock';
+  String get settingsSecurityBiometricUnlock => 'Buka Kunci Biometrik';
 
   @override
-  String get unlockAppPrompt => 'Unlock the app';
+  String get unlockAppPrompt => 'Buka kunci aplikasi';
 
   @override
   String get settingsAboutTitle => 'Tentang';
@@ -537,10 +536,10 @@ class AppLocalizationsId extends AppLocalizations {
   String get settingsSourceCode => 'Sumber kode';
 
   @override
-  String get settingsMadeWithLove => 'Made with ❤️';
+  String get settingsMadeWithLove => 'Dibuat dengan ❤️';
 
   @override
-  String get settingsConsiderSupporting => 'consider supporting';
+  String get settingsConsiderSupporting => 'pertimbangkan untuk mendukung';
 
   @override
   String get tagMoodTitle => 'Perasaan';

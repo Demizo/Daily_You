@@ -248,7 +248,7 @@ class AppLocalizationsCs extends AppLocalizations {
   String get settingsGalleryViewLayout => 'Rozložení zobrazení galerie';
 
   @override
-  String get settingsHideImagesInGallery => 'Hide Images In Gallery';
+  String get settingsHideImagesInGallery => 'Skrýt obrázky v galerii';
 
   @override
   String get viewLayoutList => 'Seznam';
@@ -288,7 +288,7 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get settingsAlwaysSendReminderDescription =>
-      'Send reminder even if a log was already started';
+      'Poslat připomenutí i když už byl vytvořený zápis';
 
   @override
   String get settingsCustomizeNotificationTitle => 'Přizpůsobit oznámení';
