@@ -25,8 +25,18 @@ class EditToolbar extends StatelessWidget {
       builder: (BuildContext context) {
         return TemplateSelect(
           onTemplatesSelected: (Template template) {
+            final templateText = template.text ?? "";
             if (controller.text.isNotEmpty) {
-              controller.text += "\n${template.text ?? ""}";
+              if (controller.selection.isValid) {
+                int cursorPos = controller.selection.base.offset;
+                final beforeText = controller.text.substring(0, cursorPos);
+                final afterText = controller.text.substring(cursorPos);
+                controller.text = beforeText + templateText + afterText;
+                controller.selection = TextSelection.collapsed(
+                    offset: cursorPos + templateText.length);
+              } else {
+                controller.text += "\n${template.text ?? ""}";
+              }
             } else {
               controller.text = template.text ?? "";
             }
