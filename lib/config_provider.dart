@@ -60,6 +60,9 @@ class ConfigKey {
   static const String requirePassword = "requirePassword";
   static const String biometricUnlock = "biometricUnlock";
   static const String passwordHash = "passwordHash";
+  // Synchronization settings
+  static const String syncEnabled = "syncEnabled";
+  static const String syncProvider = "syncProvider";
   // DEPRECATED
   static const String imageQuality = "imageQuality";
 }
@@ -121,6 +124,8 @@ class ConfigProvider with ChangeNotifier {
     ConfigKey.showflashbackGoodDay: true,
     ConfigKey.showflashbackRandomDay: true,
     ConfigKey.hideImagesInGallery: false,
+    ConfigKey.syncEnabled: false,
+    ConfigKey.syncProvider: 'none',
   };
 
   final Map<String, dynamic> _secureConfig = {
