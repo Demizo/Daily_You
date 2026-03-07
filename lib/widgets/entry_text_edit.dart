@@ -8,7 +8,6 @@ import 'package:flutter/services.dart';
 
 class EntryTextEditor extends StatefulWidget {
   final String text;
-  final bool showTemplatesButton;
   final FocusNode focusNode;
   final TextEditingController textEditingController;
   final UndoHistoryController undoHistoryController;
@@ -19,7 +18,6 @@ class EntryTextEditor extends StatefulWidget {
     required this.focusNode,
     required this.textEditingController,
     required this.undoHistoryController,
-    this.showTemplatesButton = true,
   });
 
   @override

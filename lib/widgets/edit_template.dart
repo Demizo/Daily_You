@@ -2,6 +2,7 @@ import 'package:daily_you/models/template.dart';
 import 'package:daily_you/providers/templates_provider.dart';
 import 'package:daily_you/widgets/edit_toolbar.dart';
 import 'package:daily_you/widgets/entry_text_edit.dart';
+import 'package:daily_you/widgets/template_variable_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
@@ -108,7 +109,6 @@ class _EditTemplateState extends State<EditTemplate> {
                     focusNode: _focusNode,
                     textEditingController: _textEditingController,
                     undoHistoryController: _undoController,
-                    showTemplatesButton: false,
                   ),
                 ],
               ),
@@ -120,7 +120,8 @@ class _EditTemplateState extends State<EditTemplate> {
               controller: _textEditingController,
               undoController: _undoController,
               focusNode: _focusNode,
-              showTemplatesButton: false,
+              trailer:
+                  TemplateVariableButton(controller: _textEditingController),
             ),
           ),
         ],
