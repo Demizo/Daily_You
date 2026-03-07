@@ -320,6 +320,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get noTemplatesDescription => 'لم يتم إنشاء أي قوالب بعد…';
 
   @override
+  String get templateVariableTime => 'Time';
+
+  @override
   String get settingsStorageTitle => 'التخزين';
 
   @override

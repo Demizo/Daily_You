@@ -317,6 +317,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get noTemplatesDescription => 'Noch kein Vorlagen erstellt…';
 
   @override
+  String get templateVariableTime => 'Time';
+
+  @override
   String get settingsStorageTitle => 'Speicher';
 
   @override

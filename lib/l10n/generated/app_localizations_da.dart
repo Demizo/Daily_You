@@ -314,6 +314,9 @@ class AppLocalizationsDa extends AppLocalizations {
   String get noTemplatesDescription => 'Ingen skabeloner oprettet endnu…';
 
   @override
+  String get templateVariableTime => 'Time';
+
+  @override
   String get settingsStorageTitle => 'Lager';
 
   @override

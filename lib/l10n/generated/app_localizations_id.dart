@@ -315,6 +315,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get noTemplatesDescription => 'Belum ada template yang dibuat…';
 
   @override
+  String get templateVariableTime => 'Time';
+
+  @override
   String get settingsStorageTitle => 'Penyimpanan';
 
   @override

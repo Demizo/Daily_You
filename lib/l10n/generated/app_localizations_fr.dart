@@ -321,6 +321,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get noTemplatesDescription => 'Aucun modèle créé pour l\'instant…';
 
   @override
+  String get templateVariableTime => 'Time';
+
+  @override
   String get settingsStorageTitle => 'Stockage';
 
   @override

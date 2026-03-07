@@ -316,6 +316,9 @@ class AppLocalizationsPl extends AppLocalizations {
   String get noTemplatesDescription => 'Brak utworzonych szablonów…';
 
   @override
+  String get templateVariableTime => 'Time';
+
+  @override
   String get settingsStorageTitle => 'Pamięć';
 
   @override

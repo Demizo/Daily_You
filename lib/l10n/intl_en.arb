@@ -155,6 +155,8 @@
   "@noTemplateTitle": {},
   "noTemplatesDescription": "No templates created yet…",
   "@noTemplatesDescription": {},
+  "templateVariableTime": "Time",
+  "@templateVariableTime": {},
   "settingsStorageTitle": "Storage",
   "@settingsStorageTitle": {},
   "settingsImageQuality": "Image Quality",

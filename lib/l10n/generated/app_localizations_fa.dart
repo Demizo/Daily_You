@@ -314,6 +314,9 @@ class AppLocalizationsFa extends AppLocalizations {
   String get noTemplatesDescription => 'هیچ الگویی هنوز ایجاد نشده است…';
 
   @override
+  String get templateVariableTime => 'Time';
+
+  @override
   String get settingsStorageTitle => 'ذخیره سازی';
 
   @override

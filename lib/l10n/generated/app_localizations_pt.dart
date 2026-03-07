@@ -316,6 +316,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get noTemplatesDescription => 'Nenhum modelo criado ainda…';
 
   @override
+  String get templateVariableTime => 'Time';
+
+  @override
   String get settingsStorageTitle => 'Armazenamento';
 
   @override

@@ -315,6 +315,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get noTemplatesDescription => 'Henüz şablon oluşturulmadı…';
 
   @override
+  String get templateVariableTime => 'Time';
+
+  @override
   String get settingsStorageTitle => 'Depolama';
 
   @override

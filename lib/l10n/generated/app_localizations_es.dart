@@ -317,6 +317,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get noTemplatesDescription => 'Aún no se han creado plantillas…';
 
   @override
+  String get templateVariableTime => 'Time';
+
+  @override
   String get settingsStorageTitle => 'Almacenamiento';
 
   @override

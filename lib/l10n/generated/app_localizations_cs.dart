@@ -315,6 +315,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get noTemplatesDescription => 'Zatím nebyly vytvořeny žádné šablony…';
 
   @override
+  String get templateVariableTime => 'Time';
+
+  @override
   String get settingsStorageTitle => 'Uložiště';
 
   @override

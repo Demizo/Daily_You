@@ -319,6 +319,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get noTemplatesDescription => 'Nog geen sjablonen aangemaakt…';
 
   @override
+  String get templateVariableTime => 'Time';
+
+  @override
   String get settingsStorageTitle => 'Opslag';
 
   @override

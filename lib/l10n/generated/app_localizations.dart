@@ -620,6 +620,12 @@ abstract class AppLocalizations {
   /// **'No templates created yet…'**
   String get noTemplatesDescription;
 
+  /// No description provided for @templateVariableTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Time'**
+  String get templateVariableTime;
+
   /// No description provided for @settingsStorageTitle.
   ///
   /// In en, this message translates to:

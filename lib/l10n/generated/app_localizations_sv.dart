@@ -315,6 +315,9 @@ class AppLocalizationsSv extends AppLocalizations {
   String get noTemplatesDescription => 'No templates created yet…';
 
   @override
+  String get templateVariableTime => 'Time';
+
+  @override
   String get settingsStorageTitle => 'Storage';
 
   @override

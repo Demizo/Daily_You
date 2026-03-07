@@ -323,6 +323,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get noTemplatesDescription => 'Нет созданных шаблонов…';
 
   @override
+  String get templateVariableTime => 'Time';
+
+  @override
   String get settingsStorageTitle => 'Хранилище';
 
   @override

@@ -311,6 +311,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get noTemplatesDescription => 'テンプレートはまだ作成されていません…';
 
   @override
+  String get templateVariableTime => 'Time';
+
+  @override
   String get settingsStorageTitle => 'ストレージ';
 
   @override

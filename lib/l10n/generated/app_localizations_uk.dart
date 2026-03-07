@@ -321,6 +321,9 @@ class AppLocalizationsUk extends AppLocalizations {
   String get noTemplatesDescription => 'Жодного шаблону немає…';
 
   @override
+  String get templateVariableTime => 'Time';
+
+  @override
   String get settingsStorageTitle => 'Сховище';
 
   @override

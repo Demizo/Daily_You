@@ -309,6 +309,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get noTemplatesDescription => '尚未创建任何模板…';
 
   @override
+  String get templateVariableTime => 'Time';
+
+  @override
   String get settingsStorageTitle => '存储';
 
   @override
