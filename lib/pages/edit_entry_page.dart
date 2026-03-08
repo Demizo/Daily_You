@@ -9,6 +9,7 @@ import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/edit_toolbar.dart';
 import 'package:daily_you/widgets/entry_image_editable_list.dart';
+import 'package:daily_you/widgets/template_select_button.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
@@ -230,7 +231,8 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                   controller: _textEditingController,
                   undoController: _undoController,
                   focusNode: _focusNode,
-                  showTemplatesButton: true,
+                  trailer:
+                      TemplateSelectButton(controller: _textEditingController),
                 ),
               ),
             ]),

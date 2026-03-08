@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:daily_you/config_provider.dart';
+import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/database/template_dao.dart';
 import 'package:daily_you/models/template.dart';
@@ -47,5 +48,31 @@ class TemplatesProvider with ChangeNotifier {
     var defaultTemplateId =
         ConfigProvider.instance.get(ConfigKey.defaultTemplate);
     return templates.where((t) => t.id == defaultTemplateId).firstOrNull;
+  }
+
+  Future<void> createDefaultTemplates() async {
+    final locale = WidgetsBinding.instance.platformDispatcher.locale;
+    final l10n = await AppLocalizations.delegate.load(locale);
+    final defaultTemplates = [
+      Template(
+          name: l10n.templateDefaultTimestampTitle,
+          text: l10n.templateDefaultTimestampBody("{{date}}", "{{time}}"),
+          timeCreate: DateTime.now(),
+          timeModified: DateTime.now()),
+      Template(
+          name: l10n.templateDefaultSummaryTitle,
+          text: l10n.templateDefaultSummaryBody,
+          timeCreate: DateTime.now(),
+          timeModified: DateTime.now()),
+      Template(
+          name: l10n.templateDefaultReflectionTitle,
+          text: l10n.templateDefaultReflectionBody,
+          timeCreate: DateTime.now(),
+          timeModified: DateTime.now()),
+    ];
+
+    for (final template in defaultTemplates) {
+      add(template);
+    }
   }
 }

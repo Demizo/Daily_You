@@ -1,7 +1,5 @@
 import 'package:daily_you/config_provider.dart';
-import 'package:daily_you/models/template.dart';
 import 'package:daily_you/widgets/markdown_toolbar.dart';
-import 'package:daily_you/widgets/template_select.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -11,40 +9,13 @@ class EditToolbar extends StatelessWidget {
     required this.controller,
     required this.undoController,
     required this.focusNode,
-    required this.showTemplatesButton,
+    this.trailer,
   });
 
   final TextEditingController controller;
   final UndoHistoryController undoController;
   final FocusNode focusNode;
-  final bool showTemplatesButton;
-
-  void _showTemplateSelectPopup(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return TemplateSelect(
-          onTemplatesSelected: (Template template) {
-            final templateText = template.text ?? "";
-            if (controller.text.isNotEmpty) {
-              if (controller.selection.isValid) {
-                int cursorPos = controller.selection.base.offset;
-                final beforeText = controller.text.substring(0, cursorPos);
-                final afterText = controller.text.substring(cursorPos);
-                controller.text = beforeText + templateText + afterText;
-                controller.selection = TextSelection.collapsed(
-                    offset: cursorPos + templateText.length);
-              } else {
-                controller.text += "\n${template.text ?? ""}";
-              }
-            } else {
-              controller.text = template.text ?? "";
-            }
-          },
-        );
-      },
-    );
-  }
+  final Widget? trailer;
 
   @override
   Widget build(BuildContext context) {
@@ -120,17 +91,7 @@ class EditToolbar extends StatelessWidget {
                                   : Theme.of(context).disabledColor,
                               size: 24,
                             )),
-                        if (showTemplatesButton)
-                          IconButton(
-                              padding: EdgeInsets.zero,
-                              visualDensity: VisualDensity.compact,
-                              onPressed: () =>
-                                  _showTemplateSelectPopup(context),
-                              icon: Icon(
-                                Icons.note_add_rounded,
-                                color: Theme.of(context).colorScheme.primary,
-                                size: 24,
-                              )),
+                        if (trailer != null) trailer!
                       ],
                     ),
                   );
