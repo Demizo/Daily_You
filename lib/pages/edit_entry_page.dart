@@ -359,9 +359,11 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     for (var image in EntryImagesProvider.instance.getForEntry(_entry)) {
       _currentImages.add(image.copy());
     }
-    setState(() {
-      _currentImages;
-    });
+    if (mounted) {
+      setState(() {
+        _currentImages;
+      });
+    }
   }
 
   Future<void> _addImage(List<String> imgPaths) async {
