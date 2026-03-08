@@ -54,6 +54,18 @@ class AppDatabase {
     db.close();
   }
 
+  Future<bool> _validateSqliteDatabase(String path) async {
+    try {
+      final db = await openDatabase(path, readOnly: true);
+      final result = await db.rawQuery("PRAGMA integrity_check;");
+      await db.close();
+
+      return result.first.values.first == "ok";
+    } catch (_) {
+      return false;
+    }
+  }
+
   bool usingExternalLocation() {
     return ConfigProvider.instance.get(ConfigKey.useExternalDb) ?? false;
   }
@@ -135,11 +147,25 @@ class AppDatabase {
     if (usingExternalLocation()) {
       EasyDebounce.debounce("update-remote-database", Duration(seconds: 1),
           () async {
-        var bytes = await FileLayer.getFileBytes(_internalPath!,
-            useExternalPath: false);
+        // Create temporary export copy
+        final tmpExport =
+            "${_internalPath!}.export_${DateTime.now().millisecondsSinceEpoch}";
+        database!.execute("VACUUM INTO '$tmpExport'");
+
+        // Ensure export copy is valid
+        if (!await _validateSqliteDatabase(tmpExport)) {
+          await File(tmpExport).delete();
+          return;
+        }
+
+        // Write to external location
+        var bytes =
+            await FileLayer.getFileBytes(tmpExport, useExternalPath: false);
         if (bytes == null) return;
         await FileLayer.writeFileBytes(getExternalPath(), bytes,
             name: "daily_you.db");
+
+        await FileLayer.deleteFile(tmpExport, useExternalPath: false);
       });
     }
   }
@@ -160,13 +186,33 @@ class AppDatabase {
           await FileLayer.createFile(getExternalPath(), "daily_you.db", bytes);
       return externalDbPath != null;
     } else if (forceOverwrite || await _isExternalDatabaseNewer()) {
+      // Overwrite internal DB
       var externalBytes =
           await FileLayer.getFileBytes(getExternalPath(), name: "daily_you.db");
       if (externalBytes == null) return false;
 
-      // Overwrite internal DB
-      return await FileLayer.writeFileBytes(_internalPath!, externalBytes,
+      // Create temporary internal DB
+      final temporaryInternalPath =
+          "${_internalPath!}.${DateTime.now().millisecondsSinceEpoch}.tmp";
+      final internalDirectory = dirname(temporaryInternalPath);
+      final temporaryFileName = basename(temporaryInternalPath);
+      await FileLayer.createFile(
+          internalDirectory, temporaryFileName, externalBytes,
           useExternalPath: false);
+
+      // Check that the new database is valid
+      if (await FileLayer.exists(internalDirectory,
+              name: temporaryFileName, useExternalPath: false) &&
+          await _validateSqliteDatabase(temporaryInternalPath)) {
+        // Replace internal database
+        await FileLayer.renameFile(temporaryInternalPath, _internalPath!,
+            useExternalPath: false);
+      } else {
+        // Delete temporary database
+        await FileLayer.deleteFile(temporaryInternalPath,
+            useExternalPath: false);
+        return false;
+      }
     }
     return true;
   }
