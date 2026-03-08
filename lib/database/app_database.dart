@@ -209,6 +209,9 @@ CREATE TABLE $templatesTable (
   ${TemplatesFields.timeModified} DATETIME NOT NULL DEFAULT (DATETIME('now'))
 )
 ''');
+
+    await TemplatesProvider.instance.createDefaultTemplates();
+
     await db.execute('''
 CREATE TABLE $imagesTable (
     ${EntryImageFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -234,6 +237,8 @@ CREATE TABLE $templatesTable (
   ${TemplatesFields.timeModified} DATETIME NOT NULL DEFAULT (DATETIME('now'))
 )
 ''');
+
+      await TemplatesProvider.instance.createDefaultTemplates();
     }
     if (oldVersion <= 2) {
       await db.execute('''

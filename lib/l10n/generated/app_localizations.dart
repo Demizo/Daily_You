@@ -626,6 +626,42 @@ abstract class AppLocalizations {
   /// **'Time'**
   String get templateVariableTime;
 
+  /// No description provided for @templateDefaultTimestampTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Timestamp'**
+  String get templateDefaultTimestampTitle;
+
+  /// No description provided for @templateDefaultTimestampBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{date} - {time}:'**
+  String templateDefaultTimestampBody(Object date, Object time);
+
+  /// No description provided for @templateDefaultSummaryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Day Summary'**
+  String get templateDefaultSummaryTitle;
+
+  /// No description provided for @templateDefaultSummaryBody.
+  ///
+  /// In en, this message translates to:
+  /// **'### Summary\n- \n\n### Quote\n> '**
+  String get templateDefaultSummaryBody;
+
+  /// No description provided for @templateDefaultReflectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reflection'**
+  String get templateDefaultReflectionTitle;
+
+  /// No description provided for @templateDefaultReflectionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'### What did you enjoy about today?\n- \n\n### What are you thankful for?\n- \n\n### What are you looking forward to?\n- '**
+  String get templateDefaultReflectionBody;
+
   /// No description provided for @settingsStorageTitle.
   ///
   /// In en, this message translates to:

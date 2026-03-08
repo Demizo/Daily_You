@@ -318,6 +318,27 @@ class AppLocalizationsTr extends AppLocalizations {
   String get templateVariableTime => 'Time';
 
   @override
+  String get templateDefaultTimestampTitle => 'Timestamp';
+
+  @override
+  String templateDefaultTimestampBody(Object date, Object time) {
+    return '$date - $time:';
+  }
+
+  @override
+  String get templateDefaultSummaryTitle => 'Day Summary';
+
+  @override
+  String get templateDefaultSummaryBody => '### Summary\n- \n\n### Quote\n> ';
+
+  @override
+  String get templateDefaultReflectionTitle => 'Reflection';
+
+  @override
+  String get templateDefaultReflectionBody =>
+      '### What did you enjoy about today?\n- \n\n### What are you thankful for?\n- \n\n### What are you looking forward to?\n- ';
+
+  @override
   String get settingsStorageTitle => 'Depolama';
 
   @override
