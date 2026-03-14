@@ -142,5 +142,12 @@
     "settingsFlashbacksViewLayout": "往日重現檢視佈局",
     "settingsGalleryViewLayout": "紀錄檢視佈局",
     "formatDiaro": "Diaro",
-    "settingsHideImagesInGallery": "隱藏紀錄頁中的圖片"
+    "settingsHideImagesInGallery": "隱藏紀錄頁中的圖片",
+    "templateVariableTime": "時間",
+    "templateDefaultTimestampTitle": "時間戳記",
+    "templateDefaultTimestampBody": "{date} - {time}:",
+    "templateDefaultSummaryTitle": "每日摘要",
+    "templateDefaultSummaryBody": "### 摘要\n- \n\n### 引用\n> ",
+    "templateDefaultReflectionTitle": "反思",
+    "templateDefaultReflectionBody": "### 你今天最開心的是什麼？\n- \n\n### 你感恩什麼？\n- \n\n### 你最期待什麼？\n- "
 }
