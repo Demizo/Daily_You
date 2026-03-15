@@ -236,7 +236,7 @@ class AppLocalizationsPl extends AppLocalizations {
   String get settingsShowFlashbacks => 'Pokaż wspomnienia';
 
   @override
-  String get settingsChangeMoodIcons => 'Pokaż ikony nastroju';
+  String get settingsChangeMoodIcons => 'Zmień ikony nastroju';
 
   @override
   String get moodIconPrompt => 'Wprowadź ikonę';

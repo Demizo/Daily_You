@@ -865,6 +865,30 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get noTemplatesDescription => '尚未建立模板…';
 
   @override
+  String get templateVariableTime => '時間';
+
+  @override
+  String get templateDefaultTimestampTitle => '時間戳記';
+
+  @override
+  String templateDefaultTimestampBody(Object date, Object time) {
+    return '$date - $time:';
+  }
+
+  @override
+  String get templateDefaultSummaryTitle => '每日摘要';
+
+  @override
+  String get templateDefaultSummaryBody => '### 摘要\n- \n\n### 引用\n> ';
+
+  @override
+  String get templateDefaultReflectionTitle => '反思';
+
+  @override
+  String get templateDefaultReflectionBody =>
+      '### 你今天最開心的是什麼？\n- \n\n### 你感恩什麼？\n- \n\n### 你最期待什麼？\n- ';
+
+  @override
   String get settingsStorageTitle => '存儲';
 
   @override

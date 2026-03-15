@@ -320,10 +320,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get noTemplatesDescription => 'لم يتم إنشاء أي قوالب بعد…';
 
   @override
-  String get templateVariableTime => 'Time';
+  String get templateVariableTime => 'الوقت';
 
   @override
-  String get templateDefaultTimestampTitle => 'Timestamp';
+  String get templateDefaultTimestampTitle => 'الطابع الزمني';
 
   @override
   String templateDefaultTimestampBody(Object date, Object time) {
@@ -331,7 +331,7 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get templateDefaultSummaryTitle => 'Day Summary';
+  String get templateDefaultSummaryTitle => 'ملخص اليوم';
 
   @override
   String get templateDefaultSummaryBody => '### Summary\n- \n\n### Quote\n> ';

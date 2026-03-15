@@ -314,13 +314,13 @@ class AppLocalizationsDe extends AppLocalizations {
   String get noTemplateTitle => 'Keine';
 
   @override
-  String get noTemplatesDescription => 'Noch kein Vorlagen erstellt…';
+  String get noTemplatesDescription => 'Noch keine Vorlagen erstellt…';
 
   @override
-  String get templateVariableTime => 'Time';
+  String get templateVariableTime => 'Uhrzeit';
 
   @override
-  String get templateDefaultTimestampTitle => 'Timestamp';
+  String get templateDefaultTimestampTitle => 'Zeitstempel';
 
   @override
   String templateDefaultTimestampBody(Object date, Object time) {
@@ -328,17 +328,18 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get templateDefaultSummaryTitle => 'Day Summary';
+  String get templateDefaultSummaryTitle => 'Tageszusammenfassung';
 
   @override
-  String get templateDefaultSummaryBody => '### Summary\n- \n\n### Quote\n> ';
+  String get templateDefaultSummaryBody =>
+      '### Zusammenfassung\n-•\n### Zitat\n> ';
 
   @override
-  String get templateDefaultReflectionTitle => 'Reflection';
+  String get templateDefaultReflectionTitle => 'Rückblick';
 
   @override
   String get templateDefaultReflectionBody =>
-      '### What did you enjoy about today?\n- \n\n### What are you thankful for?\n- \n\n### What are you looking forward to?\n- ';
+      '-•\n\n### Wofür bist Du dankbar?\n-•\n\n### Worauf freust Du Dich?\n-• ';
 
   @override
   String get settingsStorageTitle => 'Speicher';
@@ -356,10 +357,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get imageQualityLow => 'Niedrig';
 
   @override
-  String get imageQualityNoCompression => 'keine Komprimierung';
+  String get imageQualityNoCompression => 'Keine Komprimierung';
 
   @override
-  String get settingsLogFolder => 'Eintrags Ordner';
+  String get settingsLogFolder => 'Einträge Ordner';
 
   @override
   String get settingsImageFolder => 'Bild Ordner';
@@ -400,7 +401,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settingsRestorePromptDescription =>
-      'Eine Sicherung wiederherzustellen löscht alle bisherigen Daten!';
+      'Wiederherstellung einer Sicherung überschreibt vorhandene Daten!';
 
   @override
   String tranferStatus(Object percent) {
@@ -444,10 +445,10 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settingsTranslateCallToAction =>
-      'Jede*r sollte das Recht auf ein Eintrag haben!';
+      'Jede*r sollte das Recht auf einen Eintrag haben!';
 
   @override
-  String get settingsHelpTranslate => 'Hilf Übersetzen';
+  String get settingsHelpTranslate => 'Hilf übersetzen';
 
   @override
   String get importLogs => 'Einträge Importieren';
@@ -539,7 +540,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settingsSecurityPasswordsDoNotMatch =>
-      'Passwörter sind nicht gleich';
+      'Passwörter sind nicht identisch';
 
   @override
   String get requiredPrompt => 'Notwendig';
