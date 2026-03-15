@@ -1,0 +1,7 @@
+Daily You v2.18.0 has arrived! Supercharged templates:
+
+• Added the ability to include date and time variables in templates
+• Templates are now inserted at the cursor position
+• Added default example templates for new installs
+• Improved reliability when syncing
+• Updated translations
