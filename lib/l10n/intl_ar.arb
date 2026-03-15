@@ -133,5 +133,8 @@
     "settingsGalleryViewLayout": "طريقة عرض الصور",
     "viewLayoutList": "قائمة",
     "viewLayoutGrid": "شبكة",
-    "settingsHideImagesInGallery": "إخفاء الصور من معرض الصور"
+    "settingsHideImagesInGallery": "إخفاء الصور من معرض الصور",
+    "templateVariableTime": "الوقت",
+    "templateDefaultTimestampTitle": "الطابع الزمني",
+    "templateDefaultSummaryTitle": "ملخص اليوم"
 }
