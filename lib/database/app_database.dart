@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/database/image_storage.dart';
@@ -170,6 +171,18 @@ class AppDatabase {
     }
   }
 
+  Future<Uint8List?> getDatabaseBytes() {
+    return FileLayer.getFileBytes(_internalPath!, useExternalPath: false);
+  }
+
+  Future<void> restoreFromBytes(List<int> remoteBytes) async {
+    await close();
+    await FileLayer.writeFileBytes(_internalPath!, Uint8List.fromList(remoteBytes),
+        useExternalPath: false);
+    await open();
+  }
+
+
   /// Pull in remote changes if the external database is newer or if forceOverwrite is set
   Future<bool> _syncWithExternalDatabase({bool forceOverwrite = false}) async {
     // Check if external database exists
@@ -335,5 +348,4 @@ DROP TABLE old_entries;
     ''');
       });
     }
-  }
-}
+  }}
