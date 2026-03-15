@@ -141,5 +141,12 @@
     "settingsGalleryViewLayout": "Disposition de la galerie",
     "viewLayoutList": "Liste",
     "viewLayoutGrid": "Grille",
-    "settingsHideImagesInGallery": "Cacher les images dans la galerie"
+    "settingsHideImagesInGallery": "Cacher les images dans la galerie",
+    "templateVariableTime": "Heure",
+    "templateDefaultTimestampTitle": "Horodatage",
+    "templateDefaultTimestampBody": "{date} – {time} :",
+    "templateDefaultSummaryTitle": "Résumé du jour",
+    "templateDefaultSummaryBody": "### Résumé\n- \n\n### Avis\n> ",
+    "templateDefaultReflectionTitle": "Remarque",
+    "templateDefaultReflectionBody": "### Qu'est-ce qui vous a plu aujourd'hui ?\n- \n\n### Pour quoi avez-vous de la reconnaissance ?\n- \n\n### Qu'est-ce qu'il vous tarde ?\n- "
 }
