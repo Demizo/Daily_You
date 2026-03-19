@@ -18,6 +18,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get dailyReminderDescription => 'Günlük kaydı oluştur…';
 
   @override
+  String get actionTakePhoto => 'Take photo';
+
+  @override
   String get pageHomeTitle => 'Ana';
 
   @override

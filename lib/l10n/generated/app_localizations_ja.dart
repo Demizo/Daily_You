@@ -18,6 +18,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get dailyReminderDescription => '今日の日記を残しましょう…';
 
   @override
+  String get actionTakePhoto => 'Take photo';
+
+  @override
   String get pageHomeTitle => 'ホーム';
 
   @override

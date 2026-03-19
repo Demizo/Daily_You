@@ -18,6 +18,9 @@ class AppLocalizationsUk extends AppLocalizations {
   String get dailyReminderDescription => 'Час написати про сьогодні…';
 
   @override
+  String get actionTakePhoto => 'Take photo';
+
+  @override
   String get pageHomeTitle => 'Домашня';
 
   @override

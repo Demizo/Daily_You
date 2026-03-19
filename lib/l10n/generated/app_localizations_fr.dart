@@ -19,6 +19,9 @@ class AppLocalizationsFr extends AppLocalizations {
       'N\'oubliez pas d\'enregistrer votre journée…';
 
   @override
+  String get actionTakePhoto => 'Take photo';
+
+  @override
   String get pageHomeTitle => 'Accueil';
 
   @override

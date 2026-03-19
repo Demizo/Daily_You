@@ -18,6 +18,9 @@ class AppLocalizationsFi extends AppLocalizations {
   String get dailyReminderDescription => 'Pidä päivittäinen päiväkirjasi…';
 
   @override
+  String get actionTakePhoto => 'Take photo';
+
+  @override
   String get pageHomeTitle => 'Etusivu';
 
   @override

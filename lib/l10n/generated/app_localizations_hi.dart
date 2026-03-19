@@ -18,6 +18,9 @@ class AppLocalizationsHi extends AppLocalizations {
   String get dailyReminderDescription => 'अपना आज का दिन दर्ज करें…';
 
   @override
+  String get actionTakePhoto => 'Take photo';
+
+  @override
   String get pageHomeTitle => 'होम';
 
   @override

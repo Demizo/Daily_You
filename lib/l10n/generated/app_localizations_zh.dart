@@ -18,6 +18,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dailyReminderDescription => '今天的日迹还没写呢…';
 
   @override
+  String get actionTakePhoto => 'Take photo';
+
+  @override
   String get pageHomeTitle => '主页';
 
   @override
