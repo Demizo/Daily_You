@@ -18,6 +18,9 @@ class AppLocalizationsBe extends AppLocalizations {
   String get dailyReminderDescription => 'Зрабі свой штодзённы запіс…';
 
   @override
+  String get actionTakePhoto => 'Take photo';
+
+  @override
   String get pageHomeTitle => 'Home';
 
   @override

@@ -5,6 +5,8 @@
   "@dailyReminderTitle": {},
   "dailyReminderDescription": "Take your daily log…",
   "@dailyReminderDescription": {},
+  "actionTakePhoto": "Take photo",
+  "@actionTakePhoto": {},
   "pageHomeTitle": "Home",
   "@pageHomeTitle": {},
   "flashbacksTitle": "Flashbacks",

@@ -1,7 +1,9 @@
 import 'dart:io';
 
 import 'package:daily_you/config_provider.dart';
+import 'package:daily_you/device_info_service.dart';
 import 'package:daily_you/flashback_manager.dart';
+import 'package:daily_you/launch_intent.dart';
 import 'package:daily_you/models/flashback.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/notification_manager.dart';
@@ -39,6 +41,7 @@ class _HomePageState extends State<HomePage>
   @override
   void initState() {
     super.initState();
+    _checkForLaunchIntent();
     _checkForNotificationLaunch();
   }
 
@@ -56,6 +59,19 @@ class _HomePageState extends State<HomePage>
           builder: (context) => AddEditEntryPage(
               entry: todayEntry, openCamera: openCamera, images: todayImages)),
     );
+  }
+
+  Future _checkForLaunchIntent() async {
+    final intent = DeviceInfoService().launchIntent;
+    if (intent != null) {
+      Entry? todayEntry = EntriesProvider.instance.getEntryForToday();
+      List<EntryImage> todayImages = todayEntry != null
+          ? EntryImagesProvider.instance.getForEntry(todayEntry)
+          : [];
+      bool openCamera = (intent is TakePhotoIntent) ? true : false;
+      DeviceInfoService().launchIntent = null;
+      await addOrEditTodayEntry(todayEntry, todayImages, openCamera);
+    }
   }
 
   Future _checkForNotificationLaunch() async {

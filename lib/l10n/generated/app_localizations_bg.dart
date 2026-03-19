@@ -18,6 +18,9 @@ class AppLocalizationsBg extends AppLocalizations {
   String get dailyReminderDescription => 'Вземи дневния си журнал…';
 
   @override
+  String get actionTakePhoto => 'Take photo';
+
+  @override
   String get pageHomeTitle => 'У дома';
 
   @override

@@ -18,6 +18,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get dailyReminderDescription => 'خذ سجل يومياتك…';
 
   @override
+  String get actionTakePhoto => 'Take photo';
+
+  @override
   String get pageHomeTitle => 'الرئيسية';
 
   @override

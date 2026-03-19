@@ -18,6 +18,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get dailyReminderDescription => 'Ambil log harian Anda…';
 
   @override
+  String get actionTakePhoto => 'Take photo';
+
+  @override
   String get pageHomeTitle => 'Beranda';
 
   @override

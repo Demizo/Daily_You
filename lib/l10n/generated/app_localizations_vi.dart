@@ -19,6 +19,9 @@ class AppLocalizationsVi extends AppLocalizations {
       'Hãy ghi chép nhật ký hàng ngày của bạn…';
 
   @override
+  String get actionTakePhoto => 'Take photo';
+
+  @override
   String get pageHomeTitle => 'Trang chủ';
 
   @override

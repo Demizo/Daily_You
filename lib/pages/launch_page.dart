@@ -1,9 +1,12 @@
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/database/image_storage.dart';
+import 'package:daily_you/device_info_service.dart';
+import 'package:daily_you/launch_intent.dart';
 import 'package:daily_you/widgets/auth_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
+import 'package:quick_actions/quick_actions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LaunchPage extends StatefulWidget {
@@ -21,7 +24,32 @@ class _LaunchPageState extends State<LaunchPage> {
   void initState() {
     super.initState();
     _storeLocalizedNotificationStrings();
+    _updateAppShortcuts();
     _checkDatabaseConnection();
+  }
+
+  _updateAppShortcuts() {
+    final QuickActions quickActions = const QuickActions();
+    quickActions.initialize((shortcutType) {
+      if (shortcutType == 'action_log_today') {
+        DeviceInfoService().launchIntent = LaunchIntent.logToday();
+      } else if (shortcutType == 'action_take_photo') {
+        DeviceInfoService().launchIntent = LaunchIntent.takePhoto();
+      }
+    });
+
+    quickActions.setShortcutItems(<ShortcutItem>[
+      ShortcutItem(
+        type: 'action_log_today',
+        localizedTitle: AppLocalizations.of(context)!.dailyReminderTitle,
+        icon: '@drawable/ic_notification',
+      ),
+      ShortcutItem(
+        type: 'action_take_photo',
+        localizedTitle: AppLocalizations.of(context)!.actionTakePhoto,
+        icon: '@drawable/ic_notification',
+      )
+    ]);
   }
 
   _storeLocalizedNotificationStrings() async {

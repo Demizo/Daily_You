@@ -170,6 +170,12 @@ abstract class AppLocalizations {
   /// **'Take your daily log…'**
   String get dailyReminderDescription;
 
+  /// No description provided for @actionTakePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Take photo'**
+  String get actionTakePhoto;
+
   /// No description provided for @pageHomeTitle.
   ///
   /// In en, this message translates to:

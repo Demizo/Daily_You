@@ -18,6 +18,9 @@ class AppLocalizationsTa extends AppLocalizations {
   String get dailyReminderDescription => 'உங்கள் தினசரி பதிவை மேற்கொள்ளுங்கள்…';
 
   @override
+  String get actionTakePhoto => 'Take photo';
+
+  @override
   String get pageHomeTitle => 'முகப்பு';
 
   @override
