@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:daily_you/launch_intent.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -12,6 +13,7 @@ class DeviceInfoService {
   String? model;
   PackageInfo? appInfo;
   bool? supportsBiometrics;
+  LaunchIntent? launchIntent;
 
   Future<void> init() async {
     final plugin = DeviceInfoPlugin();
