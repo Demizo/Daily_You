@@ -17,6 +17,7 @@ import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/layouts/mobile_scaffold.dart';
 import 'package:daily_you/layouts/responsive_layout.dart';
 import 'package:daily_you/theme_mode_provider.dart';
+import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -86,6 +87,7 @@ void main() async {
 
   // Notification only supported on android
   if (Platform.isAndroid) {
+    await FlutterDisplayMode.setHighRefreshRate();
     await NotificationManager.instance.init();
 
     await AndroidAlarmManager.initialize();
