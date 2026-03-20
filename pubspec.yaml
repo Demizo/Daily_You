@@ -61,6 +61,7 @@ dependencies:
   xml: ^6.6.1
   csv: ^6.0.0
   quick_actions: ^1.1.0
+  flutter_displaymode: ^0.7.0
 dev_dependencies:
   flutter_lints: ^5.0.0
 
