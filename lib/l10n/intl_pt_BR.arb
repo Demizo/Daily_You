@@ -143,7 +143,7 @@
     "actionTakePhoto": "Tirar uma foto",
     "templateVariableTime": "Tempo",
     "templateDefaultTimestampTitle": "Registro de data",
-    "templateDefaultTimestampBody": "{data}-{hora}:",
+    "templateDefaultTimestampBody": "{date}-{time}:",
     "templateDefaultSummaryTitle": "Resumo Diário",
     "templateDefaultReflectionTitle": "Reflexão",
     "templateDefaultReflectionBody": "### O que você gostou sobre hoje?\n- \n\n### O que te deixou agradecido(a)?\n- \n\n### O que você espera para o futuro?\n- ",
