@@ -571,8 +571,3 @@ class AppLocalizationsNb extends AppLocalizations {
   @override
   String get tagMoodTitle => 'Mood';
 }
-
-/// The translations for Norwegian Bokmål, as used in Norway (`nb_NO`).
-class AppLocalizationsNbNo extends AppLocalizationsNb {
-  AppLocalizationsNbNo() : super('nb_NO');
-}

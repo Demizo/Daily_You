@@ -141,7 +141,6 @@ abstract class AppLocalizations {
     Locale('ko'),
     Locale('lt'),
     Locale('nb'),
-    Locale('nb', 'NO'),
     Locale('nl'),
     Locale('oc'),
     Locale('pl'),
@@ -1168,14 +1167,6 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
 
   // Lookup logic when language+country codes are specified.
   switch (locale.languageCode) {
-    case 'nb':
-      {
-        switch (locale.countryCode) {
-          case 'NO':
-            return AppLocalizationsNbNo();
-        }
-        break;
-      }
     case 'pt':
       {
         switch (locale.countryCode) {
