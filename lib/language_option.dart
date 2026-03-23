@@ -29,7 +29,11 @@ class LanguageOption {
     LanguageOption(languageCode: "id"): "Indonesia",
     LanguageOption(languageCode: "it"): "italiano",
     LanguageOption(languageCode: "ja"): "日本語",
+    LanguageOption(languageCode: "ko"): "한국어",
     LanguageOption(languageCode: "lt"): "lietuvių",
+    LanguageOption(languageCode: "nb"): "norsk bokmål",
+    LanguageOption(languageCode: "nb", countryCode: "NO"):
+        "norsk bokmål (Norge)",
     LanguageOption(languageCode: "nl"): "Nederlands",
     LanguageOption(languageCode: "oc"): "Occitan",
     LanguageOption(languageCode: "pl"): "polski",
