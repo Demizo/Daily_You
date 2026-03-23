@@ -4,7 +4,7 @@
     "searchLogsHint": "Rechercher des souvenirs…",
     "dailyReminderDescription": "N'oubliez pas d'enregistrer votre journée…",
     "pageHomeTitle": "Accueil",
-    "flashbackRandomDay": "Une journée quelconque",
+    "flashbackRandomDay": "Une journée ordinaire",
     "pageGalleryTitle": "Galerie",
     "noLogs": "Aucun souvenir…",
     "sortDateTitle": "Date",
@@ -49,7 +49,7 @@
     "chartByDayTitle": "{tag} par jour",
     "streakCurrent": "{count, plural, other{Série actuelle {count}}}",
     "streakLongest": "{count, plural, other{Série la plus longue {count}}}",
-    "streakSinceBadDay": "{count, plural, other{jours écoulés depuis une mauvaise journée {count}}}",
+    "streakSinceBadDay": "{count, plural, other{jours depuis une mauvaise journée {count}}}",
     "errorExternalStorageAccessTitle": "Impossible d'accéder au stockage externe",
     "imageQualityMedium": "Moyenne",
     "errorExternalStorageAccessDescription": "Si vous utilisez le stockage en réseau, assurez-vous que le service est en ligne et que vous avez accès au réseau.\n\nDans le cas contraire, l'application peut avoir perdu les autorisations pour le dossier externe. Allez dans les paramètres et resélectionnez le dossier externe pour lui accorder l'accès.\n\nAttention, les modifications ne seront pas synchronisées tant que vous n'aurez pas rétabli l'accès à l'emplacement de stockage externe !",
@@ -141,5 +141,12 @@
     "settingsGalleryViewLayout": "Disposition de la galerie",
     "viewLayoutList": "Liste",
     "viewLayoutGrid": "Grille",
-    "settingsHideImagesInGallery": "Cacher les images dans la galerie"
+    "settingsHideImagesInGallery": "Cacher les images dans la galerie",
+    "templateVariableTime": "Heure",
+    "templateDefaultTimestampTitle": "Horodatage",
+    "templateDefaultTimestampBody": "{date} – {time} :",
+    "templateDefaultSummaryTitle": "Résumé du jour",
+    "templateDefaultSummaryBody": "### Résumé\n- \n\n### Avis\n> ",
+    "templateDefaultReflectionTitle": "Remarque",
+    "templateDefaultReflectionBody": "### Qu'est-ce qui vous a plu aujourd'hui ?\n- \n\n### Pour quoi avez-vous de la reconnaissance ?\n- \n\n### Qu'est-ce qu'il vous tarde ?\n- "
 }
