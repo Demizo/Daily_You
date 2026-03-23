@@ -34,18 +34,18 @@ class AppLocalizationsFi extends AppLocalizations {
   String get flaskbacksEmpty => 'Ei ole vielä muistikuvia…';
 
   @override
-  String get flashbackGoodDay => 'A Good Day';
+  String get flashbackGoodDay => 'Hyvä päivä';
 
   @override
-  String get flashbackRandomDay => 'A Random Day';
+  String get flashbackRandomDay => 'Satunnainen päivä';
 
   @override
   String flashbackWeek(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count Weeks Ago',
-      one: '$count Week Ago',
+      other: '$count viikkoa sitten',
+      one: '$count viikko sitten',
     );
     return '$_temp0';
   }
@@ -55,8 +55,8 @@ class AppLocalizationsFi extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count Months Ago',
-      one: '$count Month Ago',
+      other: '$count kuukautta sitten',
+      one: '$count kuukausi sitten',
     );
     return '$_temp0';
   }
@@ -66,25 +66,25 @@ class AppLocalizationsFi extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count Years Ago',
-      one: '$count Year Ago',
+      other: '$count vuotta sitten',
+      one: '$count vuosi sitten',
     );
     return '$_temp0';
   }
 
   @override
-  String get pageGalleryTitle => 'Gallery';
+  String get pageGalleryTitle => 'Galleria';
 
   @override
-  String get searchLogsHint => 'Search Logs…';
+  String get searchLogsHint => 'Hae lokeista…';
 
   @override
   String logCount(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count logs',
-      one: '$count log',
+      other: '$count lokia',
+      one: '$count loki',
     );
     return '$_temp0';
   }
@@ -94,50 +94,50 @@ class AppLocalizationsFi extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count words',
-      one: '$count word',
+      other: '$count sanaa',
+      one: '$count sana',
     );
     return '$_temp0';
   }
 
   @override
-  String get noLogs => 'No Logs…';
+  String get noLogs => 'Ei lokeja…';
 
   @override
-  String get sortDateTitle => 'Date';
+  String get sortDateTitle => 'Päivämäärä';
 
   @override
-  String get sortOrderAscendingTitle => 'Ascending';
+  String get sortOrderAscendingTitle => 'Nouseva';
 
   @override
-  String get sortOrderDescendingTitle => 'Descending';
+  String get sortOrderDescendingTitle => 'Laskeva';
 
   @override
-  String get pageStatisticsTitle => 'Statistics';
+  String get pageStatisticsTitle => 'Tilastot';
 
   @override
-  String get statisticsNotEnoughData => 'Not enough data…';
+  String get statisticsNotEnoughData => 'Ei tarpeeksi dataa…';
 
   @override
-  String get statisticsRangeOneMonth => '1 Month';
+  String get statisticsRangeOneMonth => 'Yksi kuukausi';
 
   @override
-  String get statisticsRangeSixMonths => '6 Months';
+  String get statisticsRangeSixMonths => 'Kuusi kuukautta';
 
   @override
-  String get statisticsRangeOneYear => '1 Year';
+  String get statisticsRangeOneYear => 'Yksi vuosi';
 
   @override
-  String get statisticsRangeAllTime => 'All Time';
+  String get statisticsRangeAllTime => 'Koko aika';
 
   @override
   String chartSummaryTitle(Object tag) {
-    return '$tag Summary';
+    return '$tag Yhteenveto';
   }
 
   @override
   String chartByDayTitle(Object tag) {
-    return '$tag By Day';
+    return '$tag Päiväkohtaisesti';
   }
 
   @override
@@ -145,7 +145,7 @@ class AppLocalizationsFi extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Current Streak $count',
+      other: 'Nykyinen putki $count',
     );
     return '$_temp0';
   }
@@ -155,7 +155,7 @@ class AppLocalizationsFi extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Longest Streak $count',
+      other: 'Pisin putki $count',
     );
     return '$_temp0';
   }
@@ -165,164 +165,164 @@ class AppLocalizationsFi extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Days Since a Bad Day $count',
+      other: 'Päiviä huonosta päivästä lähtien $count',
     );
     return '$_temp0';
   }
 
   @override
   String get errorExternalStorageAccessTitle =>
-      'Can\'t Access External Storage';
+      'Ulkoiseen tallennustilaan ei pääse käsiksi';
 
   @override
   String get errorExternalStorageAccessDescription =>
-      'If you are using network storage make sure the service is online and you have network access.\n\nOtherwise, the app may have lost permissions for the external folder. Go to settings, and reselect the external folder to grant access.\n\nWarning, changes will not be synced until you restore access to the external storage location!';
+      'Jos käytät verkkotallennustilaa, varmista, että palvelu on verkossa ja sinulla on verkkoyhteys.\n\nMuuten sovellus on saattanut menettää ulkoisen kansion käyttöoikeudet. Siirry asetuksiin ja valitse ulkoinen kansio uudelleen myöntääksesi käyttöoikeudet.\n\nVaroitus: muutoksia ei synkronoida, ennen kuin palautat käyttöoikeuden ulkoiseen tallennussijaintiin!';
 
   @override
   String get errorExternalStorageAccessContinue =>
-      'Continue With Local Database';
+      'Jatka paikallisen tietokannan kanssa';
 
   @override
-  String get lastModified => 'Modified';
+  String get lastModified => 'Muokattu';
 
   @override
-  String get writeSomethingHint => 'Write something…';
+  String get writeSomethingHint => 'Kirjoita jotain…';
 
   @override
-  String get titleHint => 'Title…';
+  String get titleHint => 'Otsikko…';
 
   @override
-  String get deleteLogTitle => 'Delete Log';
+  String get deleteLogTitle => 'Poista loki';
 
   @override
-  String get deleteLogDescription => 'Do you want to delete this log?';
+  String get deleteLogDescription => 'Haluatko poistaa tämän lokin?';
 
   @override
-  String get deletePhotoTitle => 'Delete Photo';
+  String get deletePhotoTitle => 'Poista valokuva';
 
   @override
-  String get deletePhotoDescription => 'Do you want to delete this photo?';
+  String get deletePhotoDescription => 'Haluatko poistaa tämän valokuvan?';
 
   @override
-  String get pageSettingsTitle => 'Settings';
+  String get pageSettingsTitle => 'Asetukset';
 
   @override
-  String get settingsAppearanceTitle => 'Appearance';
+  String get settingsAppearanceTitle => 'Ulkoasu';
 
   @override
-  String get settingsTheme => 'Theme';
+  String get settingsTheme => 'Teema';
 
   @override
-  String get themeSystem => 'System';
+  String get themeSystem => 'Järjestelmä';
 
   @override
-  String get themeLight => 'Light';
+  String get themeLight => 'Vaalea';
 
   @override
-  String get themeDark => 'Dark';
+  String get themeDark => 'Tumma';
 
   @override
   String get themeAmoled => 'AMOLED';
 
   @override
-  String get settingsFirstDayOfWeek => 'First Day Of Week';
+  String get settingsFirstDayOfWeek => 'Viikon ensimmäinen päivä';
 
   @override
-  String get settingsUseSystemAccentColor => 'Use System Accent Color';
+  String get settingsUseSystemAccentColor => 'Käytä järjestelmän korostusväriä';
 
   @override
-  String get settingsCustomAccentColor => 'Custom Accent Color';
+  String get settingsCustomAccentColor => 'Mukautettu korostusväri';
 
   @override
   String get settingsShowMarkdownToolbar => 'Show Markdown Toolbar';
 
   @override
-  String get settingsShowFlashbacks => 'Show Flashbacks';
+  String get settingsShowFlashbacks => 'Näytä takaumat';
 
   @override
-  String get settingsChangeMoodIcons => 'Change Mood Icons';
+  String get settingsChangeMoodIcons => 'Vaihda mielialakuvakkeita';
 
   @override
-  String get moodIconPrompt => 'Enter an icon';
+  String get moodIconPrompt => 'Syötä kuvake';
 
   @override
-  String get settingsFlashbacksViewLayout => 'Flashbacks View Layout';
+  String get settingsFlashbacksViewLayout => 'Takaumien näkymän asettelu';
 
   @override
-  String get settingsGalleryViewLayout => 'Gallery View Layout';
+  String get settingsGalleryViewLayout => 'Gallerianäkymän asettelu';
 
   @override
-  String get settingsHideImagesInGallery => 'Hide Images In Gallery';
+  String get settingsHideImagesInGallery => 'Piilota kuvat galleriassa';
 
   @override
-  String get viewLayoutList => 'List';
+  String get viewLayoutList => 'Lista';
 
   @override
-  String get viewLayoutGrid => 'Grid';
+  String get viewLayoutGrid => 'Ruudukko';
 
   @override
-  String get settingsNotificationsTitle => 'Notifications';
+  String get settingsNotificationsTitle => 'Ilmoitukset';
 
   @override
   String get settingsDailyReminderOnboarding =>
-      'Enable daily reminders to keep yourself consistent!';
+      'Ota päivittäiset muistutukset käyttöön pysyäksesi johdonmukaisena!';
 
   @override
   String get settingsNotificationsPermissionsPrompt =>
-      'The \'schedule alarms\' permission will be requested to send the reminder at a random moment or at your preferred time.';
+      '\'Ajoita hälytykset\' -lupaa pyydetään muistutuksen lähettämiseksi satunnaiseen aikaan tai haluamanasi aikana.';
 
   @override
-  String get settingsDailyReminderTitle => 'Daily Reminder';
+  String get settingsDailyReminderTitle => 'Päivittäinen muistutus';
 
   @override
-  String get settingsDailyReminderDescription => 'A gentle reminder each day';
+  String get settingsDailyReminderDescription => 'Lempeä muistutus joka päivä';
 
   @override
-  String get settingsReminderTime => 'Reminder Time';
+  String get settingsReminderTime => 'Muistutusaika';
 
   @override
-  String get settingsFixedReminderTimeTitle => 'Fixed Reminder Time';
+  String get settingsFixedReminderTimeTitle => 'Kiinteä muistutusaika';
 
   @override
   String get settingsFixedReminderTimeDescription =>
-      'Pick a fixed time for the reminder';
+      'Valitse muistutukselle kiinteä aika';
 
   @override
-  String get settingsAlwaysSendReminderTitle => 'Always Send Reminder';
+  String get settingsAlwaysSendReminderTitle => 'Lähetä aina muistutus';
 
   @override
   String get settingsAlwaysSendReminderDescription =>
-      'Send reminder even if a log was already started';
+      'Lähetä muistutus, vaikka loki olisi jo aloitettu';
 
   @override
-  String get settingsCustomizeNotificationTitle => 'Customize Notifications';
+  String get settingsCustomizeNotificationTitle => 'Mukauta ilmoituksia';
 
   @override
-  String get settingsTemplatesTitle => 'Templates';
+  String get settingsTemplatesTitle => 'Pohjamallit';
 
   @override
-  String get settingsDefaultTemplate => 'Default Template';
+  String get settingsDefaultTemplate => 'Oletuspohjamalli';
 
   @override
-  String get manageTemplates => 'Manage Templates';
+  String get manageTemplates => 'Hallitse pohjamalleja';
 
   @override
-  String get addTemplate => 'Add a Template';
+  String get addTemplate => 'Lisää pohjamalli';
 
   @override
   String get newTemplate => 'New Template';
 
   @override
-  String get noTemplateTitle => 'None';
+  String get noTemplateTitle => 'Ei mitään';
 
   @override
-  String get noTemplatesDescription => 'No templates created yet…';
+  String get noTemplatesDescription => 'Ei vielä luotuja pohjamalleja…';
 
   @override
-  String get templateVariableTime => 'Time';
+  String get templateVariableTime => 'Aika';
 
   @override
-  String get templateDefaultTimestampTitle => 'Timestamp';
+  String get templateDefaultTimestampTitle => 'Aikaleima';
 
   @override
   String templateDefaultTimestampBody(Object date, Object time) {
@@ -330,104 +330,108 @@ class AppLocalizationsFi extends AppLocalizations {
   }
 
   @override
-  String get templateDefaultSummaryTitle => 'Day Summary';
+  String get templateDefaultSummaryTitle => 'Päivän yhteenveto';
 
   @override
-  String get templateDefaultSummaryBody => '### Summary\n- \n\n### Quote\n> ';
+  String get templateDefaultSummaryBody =>
+      '### Yhteenveto\n- \n\n### Lainaus\n> ';
 
   @override
-  String get templateDefaultReflectionTitle => 'Reflection';
+  String get templateDefaultReflectionTitle => 'Pohdinta';
 
   @override
   String get templateDefaultReflectionBody =>
-      '### What did you enjoy about today?\n- \n\n### What are you thankful for?\n- \n\n### What are you looking forward to?\n- ';
+      '### Mistä nautit tänään?\n- \n\n### Mistä olet kiitollinen?\n- \n\n### Mitä odotat innolla?\n- ';
 
   @override
-  String get settingsStorageTitle => 'Storage';
+  String get settingsStorageTitle => 'Tallennustila';
 
   @override
-  String get settingsImageQuality => 'Image Quality';
+  String get settingsImageQuality => 'Kuvanlaatu';
 
   @override
-  String get imageQualityHigh => 'High';
+  String get imageQualityHigh => 'Korkea';
 
   @override
-  String get imageQualityMedium => 'Medium';
+  String get imageQualityMedium => 'Keskitasoinen';
 
   @override
-  String get imageQualityLow => 'Low';
+  String get imageQualityLow => 'Alhainen';
 
   @override
-  String get imageQualityNoCompression => 'No Compression';
+  String get imageQualityNoCompression => 'Ei pakkausta';
 
   @override
-  String get settingsLogFolder => 'Log Folder';
+  String get settingsLogFolder => 'Lokikansio';
 
   @override
-  String get settingsImageFolder => 'Image Folder';
+  String get settingsImageFolder => 'Kuvakansio';
 
   @override
-  String get warningTitle => 'Warning';
+  String get warningTitle => 'Varoitus';
 
   @override
   String get logFolderWarningDescription =>
-      'If the selected folder already contains a \'daily_you.db\' file, it will be used to overwrite your existing logs!';
+      'Jos valitussa kansiossa on jo \'daily_you.db\'-tiedosto, sitä käytetään olemassa olevien lokien korvaamiseen!';
 
   @override
-  String get errorTitle => 'Error';
+  String get errorTitle => 'Virhe';
 
   @override
-  String get logFolderErrorDescription => 'Failed to change log folder!';
+  String get logFolderErrorDescription =>
+      'Lokikansion vaihtaminen epäonnistui!';
 
   @override
-  String get imageFolderErrorDescription => 'Failed to change image folder!';
+  String get imageFolderErrorDescription =>
+      'Kuvakansion vaihtaminen epäonnistui!';
 
   @override
-  String get backupErrorDescription => 'Failed to create backup!';
+  String get backupErrorDescription => 'Varmuuskopion luominen epäonnistui!';
 
   @override
-  String get restoreErrorDescription => 'Failed to restore backup!';
+  String get restoreErrorDescription =>
+      'Varmuuskopion palauttaminen epäonnistui!';
 
   @override
-  String get settingsBackupRestoreTitle => 'Backup & Restore';
+  String get settingsBackupRestoreTitle => 'Varmuuskopiointi ja palautus';
 
   @override
-  String get settingsBackup => 'Backup';
+  String get settingsBackup => 'Varmuuskopioi';
 
   @override
-  String get settingsRestore => 'Restore';
+  String get settingsRestore => 'Palauta';
 
   @override
   String get settingsRestorePromptDescription =>
-      'Restoring a backup will overwrite your existing data!';
+      'Varmuuskopion palauttaminen korvaa olemassa olevat tiedot!';
 
   @override
   String tranferStatus(Object percent) {
-    return 'Transferring… $percent%';
+    return 'Siirretään… $percent %';
   }
 
   @override
   String creatingBackupStatus(Object percent) {
-    return 'Creating Backup… $percent%';
+    return 'Varmuuskopiota luodaan… $percent %';
   }
 
   @override
   String restoringBackupStatus(Object percent) {
-    return 'Restoring Backup… $percent%';
+    return 'Varmuuskopiota palautetaan… $percent %';
   }
 
   @override
-  String get cleanUpStatus => 'Cleaning Up…';
+  String get cleanUpStatus => 'Siivotaan…';
 
   @override
   String get settingsExport => 'Export';
 
   @override
-  String get settingsExportToAnotherFormat => 'Export To Another Format';
+  String get settingsExportToAnotherFormat => 'Vie toiseen muotoon';
 
   @override
   String get settingsExportFormatDescription =>
-      'This should not be used as a backup!';
+      'Tätä ei tule käyttää varmuuskopiona!';
 
   @override
   String get exportLogs => 'Export Logs';
@@ -439,14 +443,14 @@ class AppLocalizationsFi extends AppLocalizations {
   String get settingsImport => 'Import';
 
   @override
-  String get settingsImportFromAnotherApp => 'Import From Another App';
+  String get settingsImportFromAnotherApp => 'Tuo toisesta sovelluksesta';
 
   @override
   String get settingsTranslateCallToAction =>
-      'Everyone should have access to a journal!';
+      'Jokaisella pitäisi olla pääsy päiväkirjaan!';
 
   @override
-  String get settingsHelpTranslate => 'Help Translate';
+  String get settingsHelpTranslate => 'Auta kääntämään';
 
   @override
   String get importLogs => 'Import Logs';
@@ -455,11 +459,11 @@ class AppLocalizationsFi extends AppLocalizations {
   String get importImages => 'Import Images';
 
   @override
-  String get logFormatTitle => 'Choose Format';
+  String get logFormatTitle => 'Valitse muoto';
 
   @override
   String get logFormatDescription =>
-      'Another app\'s format may not support all features. Please report any issues since third party formats may change at any time. This will not impact existing logs!';
+      'Toisen sovelluksen muoto ei välttämättä tue kaikkia ominaisuuksia. Ilmoita kaikista vioista, koska kolmansien osapuolten muodot voivat muuttua milloin tahansa. Tämä ei vaikuta olemassa oleviin lokeihin!';
 
   @override
   String get formatDailyYouJson => 'Daily You (JSON)';
@@ -489,86 +493,87 @@ class AppLocalizationsFi extends AppLocalizations {
   String get formatMarkdown => 'Markdown';
 
   @override
-  String get settingsDeleteAllLogsTitle => 'Delete All Logs';
+  String get settingsDeleteAllLogsTitle => 'Poista kaikki lokit';
 
   @override
   String get settingsDeleteAllLogsDescription =>
-      'Do you want to delete all of your logs?';
+      'Haluatko poistaa kaikki lokisi?';
 
   @override
   String settingsDeleteAllLogsPrompt(Object prompt) {
-    return 'Enter \'$prompt\' to confirm. This cannot be undone!';
+    return 'Vahvista syöttämällä \'$prompt\'. Tätä ei voi perua!';
   }
 
   @override
-  String get settingsLanguageTitle => 'Language';
+  String get settingsLanguageTitle => 'Kieli';
 
   @override
-  String get settingsAppLanguageTitle => 'App Language';
+  String get settingsAppLanguageTitle => 'Sovelluksen kieli';
 
   @override
-  String get settingsOverrideAppLanguageTitle => 'Override App Language';
+  String get settingsOverrideAppLanguageTitle => 'Ohita sovelluksen kieli';
 
   @override
-  String get settingsSecurityTitle => 'Security';
+  String get settingsSecurityTitle => 'Turvallisuus';
 
   @override
-  String get settingsSecurityRequirePassword => 'Require Password';
+  String get settingsSecurityRequirePassword => 'Vaadi salasana';
 
   @override
-  String get settingsSecurityEnterPassword => 'Enter Password';
+  String get settingsSecurityEnterPassword => 'Syötä salasana';
 
   @override
-  String get settingsSecuritySetPassword => 'Set Password';
+  String get settingsSecuritySetPassword => 'Aseta salasana';
 
   @override
-  String get settingsSecurityChangePassword => 'Change Password';
+  String get settingsSecurityChangePassword => 'Vaihda salasana';
 
   @override
-  String get settingsSecurityPassword => 'Password';
+  String get settingsSecurityPassword => 'Salasana';
 
   @override
-  String get settingsSecurityConfirmPassword => 'Confirm Password';
+  String get settingsSecurityConfirmPassword => 'Vahvista salasana';
 
   @override
-  String get settingsSecurityOldPassword => 'Old Password';
+  String get settingsSecurityOldPassword => 'Vanha salasana';
 
   @override
-  String get settingsSecurityIncorrectPassword => 'Incorrect Password';
+  String get settingsSecurityIncorrectPassword => 'Väärä salasana';
 
   @override
-  String get settingsSecurityPasswordsDoNotMatch => 'Passwords do not match';
+  String get settingsSecurityPasswordsDoNotMatch => 'Salasanat eivät täsmää';
 
   @override
-  String get requiredPrompt => 'Required';
+  String get requiredPrompt => 'Pakollinen';
 
   @override
-  String get settingsSecurityBiometricUnlock => 'Biometric Unlock';
+  String get settingsSecurityBiometricUnlock =>
+      'Biometrinen lukituksen avaaminen';
 
   @override
-  String get unlockAppPrompt => 'Unlock the app';
+  String get unlockAppPrompt => 'Avaa sovelluksen lukitus';
 
   @override
-  String get settingsAboutTitle => 'About';
+  String get settingsAboutTitle => 'Tietoja';
 
   @override
-  String get settingsVersion => 'Version';
+  String get settingsVersion => 'Versio';
 
   @override
-  String get settingsLicense => 'License';
+  String get settingsLicense => 'Lisenssi';
 
   @override
-  String get licenseGPLv3 => 'GPL-3.0';
+  String get licenseGPLv3 => 'GPL-v. 3.0';
 
   @override
-  String get settingsSourceCode => 'Source Code';
+  String get settingsSourceCode => 'Lähdekoodi';
 
   @override
-  String get settingsMadeWithLove => 'Made with ❤️';
+  String get settingsMadeWithLove => '❤️:lla tehty';
 
   @override
-  String get settingsConsiderSupporting => 'consider supporting';
+  String get settingsConsiderSupporting => 'harkitse tukemista';
 
   @override
-  String get tagMoodTitle => 'Mood';
+  String get tagMoodTitle => 'Mieliala';
 }

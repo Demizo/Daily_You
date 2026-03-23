@@ -21,7 +21,9 @@ import 'app_localizations_hi.dart';
 import 'app_localizations_id.dart';
 import 'app_localizations_it.dart';
 import 'app_localizations_ja.dart';
+import 'app_localizations_ko.dart';
 import 'app_localizations_lt.dart';
+import 'app_localizations_nb.dart';
 import 'app_localizations_nl.dart';
 import 'app_localizations_oc.dart';
 import 'app_localizations_pl.dart';
@@ -136,7 +138,10 @@ abstract class AppLocalizations {
     Locale('id'),
     Locale('it'),
     Locale('ja'),
+    Locale('ko'),
     Locale('lt'),
+    Locale('nb'),
+    Locale('nb', 'NO'),
     Locale('nl'),
     Locale('oc'),
     Locale('pl'),
@@ -1128,7 +1133,9 @@ class _AppLocalizationsDelegate
         'id',
         'it',
         'ja',
+        'ko',
         'lt',
+        'nb',
         'nl',
         'oc',
         'pl',
@@ -1161,6 +1168,14 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
 
   // Lookup logic when language+country codes are specified.
   switch (locale.languageCode) {
+    case 'nb':
+      {
+        switch (locale.countryCode) {
+          case 'NO':
+            return AppLocalizationsNbNo();
+        }
+        break;
+      }
     case 'pt':
       {
         switch (locale.countryCode) {
@@ -1205,8 +1220,12 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
       return AppLocalizationsIt();
     case 'ja':
       return AppLocalizationsJa();
+    case 'ko':
+      return AppLocalizationsKo();
     case 'lt':
       return AppLocalizationsLt();
+    case 'nb':
+      return AppLocalizationsNb();
     case 'nl':
       return AppLocalizationsNl();
     case 'oc':

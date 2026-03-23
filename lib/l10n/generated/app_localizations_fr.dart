@@ -37,7 +37,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get flashbackGoodDay => 'Une bonne journée';
 
   @override
-  String get flashbackRandomDay => 'Une journée quelconque';
+  String get flashbackRandomDay => 'Une journée ordinaire';
 
   @override
   String flashbackWeek(num count) {
@@ -165,7 +165,7 @@ class AppLocalizationsFr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'jours écoulés depuis une mauvaise journée $count',
+      other: 'jours depuis une mauvaise journée $count',
     );
     return '$_temp0';
   }
@@ -324,28 +324,28 @@ class AppLocalizationsFr extends AppLocalizations {
   String get noTemplatesDescription => 'Aucun modèle créé pour l\'instant…';
 
   @override
-  String get templateVariableTime => 'Time';
+  String get templateVariableTime => 'Heure';
 
   @override
-  String get templateDefaultTimestampTitle => 'Timestamp';
+  String get templateDefaultTimestampTitle => 'Horodatage';
 
   @override
   String templateDefaultTimestampBody(Object date, Object time) {
-    return '$date - $time:';
+    return '$date – $time :';
   }
 
   @override
-  String get templateDefaultSummaryTitle => 'Day Summary';
+  String get templateDefaultSummaryTitle => 'Résumé du jour';
 
   @override
-  String get templateDefaultSummaryBody => '### Summary\n- \n\n### Quote\n> ';
+  String get templateDefaultSummaryBody => '### Résumé\n- \n\n### Avis\n> ';
 
   @override
-  String get templateDefaultReflectionTitle => 'Reflection';
+  String get templateDefaultReflectionTitle => 'Remarque';
 
   @override
   String get templateDefaultReflectionBody =>
-      '### What did you enjoy about today?\n- \n\n### What are you thankful for?\n- \n\n### What are you looking forward to?\n- ';
+      '### Qu\'est-ce qui vous a plu aujourd\'hui ?\n- \n\n### Pour quoi avez-vous de la reconnaissance ?\n- \n\n### Qu\'est-ce qu\'il vous tarde ?\n- ';
 
   @override
   String get settingsStorageTitle => 'Stockage';

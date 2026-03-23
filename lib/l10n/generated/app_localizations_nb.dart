@@ -4,47 +4,47 @@ import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
 
-/// The translations for Occitan (`oc`).
-class AppLocalizationsOc extends AppLocalizations {
-  AppLocalizationsOc([String locale = 'oc']) : super(locale);
+/// The translations for Norwegian Bokmål (`nb`).
+class AppLocalizationsNb extends AppLocalizations {
+  AppLocalizationsNb([String locale = 'nb']) : super(locale);
 
   @override
   String get appTitle => 'Daily You';
 
   @override
-  String get dailyReminderTitle => 'Enregistratz vòstra jornada !';
+  String get dailyReminderTitle => 'Log Today!';
 
   @override
-  String get dailyReminderDescription => 'Remplissez votre journal de bord…';
+  String get dailyReminderDescription => 'Take your daily log…';
 
   @override
   String get actionTakePhoto => 'Take photo';
 
   @override
-  String get pageHomeTitle => 'Acuèlh';
+  String get pageHomeTitle => 'Home';
 
   @override
-  String get flashbacksTitle => 'Retorn enrèire';
+  String get flashbacksTitle => 'Flashbacks';
 
   @override
-  String get settingsFlashbacksExcludeBadDays => '';
+  String get settingsFlashbacksExcludeBadDays => 'Exclude bad days';
 
   @override
   String get flaskbacksEmpty => 'No Flashbacks Yet…';
 
   @override
-  String get flashbackGoodDay => 'Una bona jornada';
+  String get flashbackGoodDay => 'A Good Day';
 
   @override
-  String get flashbackRandomDay => 'Un jorn ordinari';
+  String get flashbackRandomDay => 'A Random Day';
 
   @override
   String flashbackWeek(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'fa $count setmanas',
-      one: 'fa $count setmana',
+      other: '$count Weeks Ago',
+      one: '$count Week Ago',
     );
     return '$_temp0';
   }
@@ -54,8 +54,8 @@ class AppLocalizationsOc extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'fa $count meses',
-      one: 'fa $count mes',
+      other: '$count Months Ago',
+      one: '$count Month Ago',
     );
     return '$_temp0';
   }
@@ -65,14 +65,14 @@ class AppLocalizationsOc extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'fa $count ans',
-      one: 'fa $count an',
+      other: '$count Years Ago',
+      one: '$count Year Ago',
     );
     return '$_temp0';
   }
 
   @override
-  String get pageGalleryTitle => 'Galariá';
+  String get pageGalleryTitle => 'Gallery';
 
   @override
   String get searchLogsHint => 'Search Logs…';
@@ -82,8 +82,8 @@ class AppLocalizationsOc extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count entradas',
-      one: '$count entrada',
+      other: '$count logs',
+      one: '$count log',
     );
     return '$_temp0';
   }
@@ -93,50 +93,50 @@ class AppLocalizationsOc extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count mots',
-      one: '$count mot',
+      other: '$count words',
+      one: '$count word',
     );
     return '$_temp0';
   }
 
   @override
-  String get noLogs => 'Cap d’entrada…';
+  String get noLogs => 'No Logs…';
 
   @override
-  String get sortDateTitle => 'Data';
+  String get sortDateTitle => 'Date';
 
   @override
-  String get sortOrderAscendingTitle => 'Ascendent';
+  String get sortOrderAscendingTitle => 'Ascending';
 
   @override
-  String get sortOrderDescendingTitle => 'Descendent';
+  String get sortOrderDescendingTitle => 'Descending';
 
   @override
-  String get pageStatisticsTitle => 'Estatisticas';
+  String get pageStatisticsTitle => 'Statistics';
 
   @override
-  String get statisticsNotEnoughData => 'Pas pro de donadas…';
+  String get statisticsNotEnoughData => 'Not enough data…';
 
   @override
-  String get statisticsRangeOneMonth => '1 mes';
+  String get statisticsRangeOneMonth => '1 Month';
 
   @override
-  String get statisticsRangeSixMonths => '6 meses';
+  String get statisticsRangeSixMonths => '6 Months';
 
   @override
-  String get statisticsRangeOneYear => '1 an';
+  String get statisticsRangeOneYear => '1 Year';
 
   @override
-  String get statisticsRangeAllTime => 'Tot temps';
+  String get statisticsRangeAllTime => 'All Time';
 
   @override
   String chartSummaryTitle(Object tag) {
-    return '$tag Resumit';
+    return '$tag Summary';
   }
 
   @override
   String chartByDayTitle(Object tag) {
-    return '$tag per jorn';
+    return '$tag By Day';
   }
 
   @override
@@ -182,59 +182,58 @@ class AppLocalizationsOc extends AppLocalizations {
       'Continue With Local Database';
 
   @override
-  String get lastModified => 'Modificacion';
+  String get lastModified => 'Modified';
 
   @override
-  String get writeSomethingHint => 'Escrivètz quicòm…';
+  String get writeSomethingHint => 'Write something…';
 
   @override
-  String get titleHint => 'Títol…';
+  String get titleHint => 'Title…';
 
   @override
-  String get deleteLogTitle => 'Suprimir l’entrada ?';
+  String get deleteLogTitle => 'Delete Log';
 
   @override
   String get deleteLogDescription => 'Do you want to delete this log?';
 
   @override
-  String get deletePhotoTitle => 'Escafar la fòto';
+  String get deletePhotoTitle => 'Delete Photo';
 
   @override
-  String get deletePhotoDescription => 'Volètz escafar aquesta fòto ?';
+  String get deletePhotoDescription => 'Do you want to delete this photo?';
 
   @override
-  String get pageSettingsTitle => 'Paramètres';
+  String get pageSettingsTitle => 'Settings';
 
   @override
-  String get settingsAppearanceTitle => 'Aparéncia';
+  String get settingsAppearanceTitle => 'Appearance';
 
   @override
-  String get settingsTheme => 'Tèma';
+  String get settingsTheme => 'Theme';
 
   @override
-  String get themeSystem => 'Sistèma';
+  String get themeSystem => 'System';
 
   @override
-  String get themeLight => 'Clar';
+  String get themeLight => 'Light';
 
   @override
-  String get themeDark => 'Escur';
+  String get themeDark => 'Dark';
 
   @override
   String get themeAmoled => 'AMOLED';
 
   @override
-  String get settingsFirstDayOfWeek => 'Primièr jorn de la setmana';
+  String get settingsFirstDayOfWeek => 'First Day Of Week';
 
   @override
-  String get settingsUseSystemAccentColor => 'Personalizar la color afortida';
+  String get settingsUseSystemAccentColor => 'Use System Accent Color';
 
   @override
   String get settingsCustomAccentColor => 'Custom Accent Color';
 
   @override
-  String get settingsShowMarkdownToolbar =>
-      'Aficha la barra d\'aisinas Markdown';
+  String get settingsShowMarkdownToolbar => 'Show Markdown Toolbar';
 
   @override
   String get settingsShowFlashbacks => 'Show Flashbacks';
@@ -261,7 +260,7 @@ class AppLocalizationsOc extends AppLocalizations {
   String get viewLayoutGrid => 'Grid';
 
   @override
-  String get settingsNotificationsTitle => 'Notificacions';
+  String get settingsNotificationsTitle => 'Notifications';
 
   @override
   String get settingsDailyReminderOnboarding =>
@@ -278,7 +277,7 @@ class AppLocalizationsOc extends AppLocalizations {
   String get settingsDailyReminderDescription => 'A gentle reminder each day';
 
   @override
-  String get settingsReminderTime => 'Ora del rapèl';
+  String get settingsReminderTime => 'Reminder Time';
 
   @override
   String get settingsFixedReminderTimeTitle => 'Fixed Reminder Time';
@@ -298,22 +297,22 @@ class AppLocalizationsOc extends AppLocalizations {
   String get settingsCustomizeNotificationTitle => 'Customize Notifications';
 
   @override
-  String get settingsTemplatesTitle => 'Modèls';
+  String get settingsTemplatesTitle => 'Templates';
 
   @override
   String get settingsDefaultTemplate => 'Default Template';
 
   @override
-  String get manageTemplates => 'Gerir los modèls';
+  String get manageTemplates => 'Manage Templates';
 
   @override
-  String get addTemplate => 'Apondre un modèl';
+  String get addTemplate => 'Add a Template';
 
   @override
-  String get newTemplate => 'Modèl novèl';
+  String get newTemplate => 'New Template';
 
   @override
-  String get noTemplateTitle => 'Cap';
+  String get noTemplateTitle => 'None';
 
   @override
   String get noTemplatesDescription => 'No templates created yet…';
@@ -343,31 +342,31 @@ class AppLocalizationsOc extends AppLocalizations {
       '### What did you enjoy about today?\n- \n\n### What are you thankful for?\n- \n\n### What are you looking forward to?\n- ';
 
   @override
-  String get settingsStorageTitle => 'Emmagazinatge';
+  String get settingsStorageTitle => 'Storage';
 
   @override
-  String get settingsImageQuality => 'Qualitat d\'imatge';
+  String get settingsImageQuality => 'Image Quality';
 
   @override
-  String get imageQualityHigh => 'Elevada';
+  String get imageQualityHigh => 'High';
 
   @override
-  String get imageQualityMedium => 'Mejana';
+  String get imageQualityMedium => 'Medium';
 
   @override
-  String get imageQualityLow => 'Febla';
+  String get imageQualityLow => 'Low';
 
   @override
-  String get imageQualityNoCompression => 'Cap de compression';
+  String get imageQualityNoCompression => 'No Compression';
 
   @override
-  String get settingsLogFolder => 'Dossièr dels jornals';
+  String get settingsLogFolder => 'Log Folder';
 
   @override
-  String get settingsImageFolder => 'Dossièrs dels imatges';
+  String get settingsImageFolder => 'Image Folder';
 
   @override
-  String get warningTitle => 'Avertiment';
+  String get warningTitle => 'Warning';
 
   @override
   String get logFolderWarningDescription =>
@@ -383,8 +382,7 @@ class AppLocalizationsOc extends AppLocalizations {
   String get imageFolderErrorDescription => 'Failed to change image folder!';
 
   @override
-  String get backupErrorDescription =>
-      'Fracàs de la creacion de la salvagarda !';
+  String get backupErrorDescription => 'Failed to create backup!';
 
   @override
   String get restoreErrorDescription => 'Failed to restore backup!';
@@ -393,10 +391,10 @@ class AppLocalizationsOc extends AppLocalizations {
   String get settingsBackupRestoreTitle => 'Backup & Restore';
 
   @override
-  String get settingsBackup => 'Salvagardar';
+  String get settingsBackup => 'Backup';
 
   @override
-  String get settingsRestore => 'Restaurar';
+  String get settingsRestore => 'Restore';
 
   @override
   String get settingsRestorePromptDescription =>
@@ -404,24 +402,24 @@ class AppLocalizationsOc extends AppLocalizations {
 
   @override
   String tranferStatus(Object percent) {
-    return 'Transferiment… $percent%';
+    return 'Transferring… $percent%';
   }
 
   @override
   String creatingBackupStatus(Object percent) {
-    return 'Creacion de la salvagarda… $percent%';
+    return 'Creating Backup… $percent%';
   }
 
   @override
   String restoringBackupStatus(Object percent) {
-    return 'Restauracion de la salvagarda… $percent%';
+    return 'Restoring Backup… $percent%';
   }
 
   @override
-  String get cleanUpStatus => 'Netejatge…';
+  String get cleanUpStatus => 'Cleaning Up…';
 
   @override
-  String get settingsExport => 'Exportar';
+  String get settingsExport => 'Export';
 
   @override
   String get settingsExportToAnotherFormat => 'Export To Another Format';
@@ -431,13 +429,13 @@ class AppLocalizationsOc extends AppLocalizations {
       'This should not be used as a backup!';
 
   @override
-  String get exportLogs => 'Exportar las entradas';
+  String get exportLogs => 'Export Logs';
 
   @override
   String get exportImages => 'Export Images';
 
   @override
-  String get settingsImport => 'Importar';
+  String get settingsImport => 'Import';
 
   @override
   String get settingsImportFromAnotherApp => 'Import From Another App';
@@ -450,10 +448,10 @@ class AppLocalizationsOc extends AppLocalizations {
   String get settingsHelpTranslate => 'Help Translate';
 
   @override
-  String get importLogs => 'Importar las entradas';
+  String get importLogs => 'Import Logs';
 
   @override
-  String get importImages => 'Importar los imatges';
+  String get importImages => 'Import Images';
 
   @override
   String get logFormatTitle => 'Choose Format';
@@ -550,19 +548,19 @@ class AppLocalizationsOc extends AppLocalizations {
   String get unlockAppPrompt => 'Unlock the app';
 
   @override
-  String get settingsAboutTitle => 'A prepaus';
+  String get settingsAboutTitle => 'About';
 
   @override
   String get settingsVersion => 'Version';
 
   @override
-  String get settingsLicense => 'Licéncia';
+  String get settingsLicense => 'License';
 
   @override
   String get licenseGPLv3 => 'GPL-3.0';
 
   @override
-  String get settingsSourceCode => 'Còdi font';
+  String get settingsSourceCode => 'Source Code';
 
   @override
   String get settingsMadeWithLove => 'Made with ❤️';
@@ -571,5 +569,10 @@ class AppLocalizationsOc extends AppLocalizations {
   String get settingsConsiderSupporting => 'consider supporting';
 
   @override
-  String get tagMoodTitle => 'Umor';
+  String get tagMoodTitle => 'Mood';
+}
+
+/// The translations for Norwegian Bokmål, as used in Norway (`nb_NO`).
+class AppLocalizationsNbNo extends AppLocalizationsNb {
+  AppLocalizationsNbNo() : super('nb_NO');
 }

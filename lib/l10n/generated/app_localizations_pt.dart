@@ -587,6 +587,9 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get dailyReminderDescription => 'Faça o seu registro diário…';
 
   @override
+  String get actionTakePhoto => 'Tirar uma foto';
+
+  @override
   String get pageHomeTitle => 'Início';
 
   @override
@@ -883,6 +886,30 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get noTemplatesDescription => 'Nenhum modelo criado ainda…';
+
+  @override
+  String get templateVariableTime => 'Tempo';
+
+  @override
+  String get templateDefaultTimestampTitle => 'Registro de data';
+
+  @override
+  String templateDefaultTimestampBody(Object date, Object time) {
+    return '$date-$time:';
+  }
+
+  @override
+  String get templateDefaultSummaryTitle => 'Resumo Diário';
+
+  @override
+  String get templateDefaultSummaryBody => '### Resumo\n- \n\n### Citação\n> ';
+
+  @override
+  String get templateDefaultReflectionTitle => 'Reflexão';
+
+  @override
+  String get templateDefaultReflectionBody =>
+      '### O que você gostou sobre hoje?\n- \n\n### O que te deixou agradecido(a)?\n- \n\n### O que você espera para o futuro?\n- ';
 
   @override
   String get settingsStorageTitle => 'Armazenamento';
