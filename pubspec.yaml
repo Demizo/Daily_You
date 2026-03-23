@@ -62,6 +62,8 @@ dependencies:
   csv: ^6.0.0
   flutter_secure_storage: ^10.0.0
   webdav_client: ^1.2.2
+  cryptography: ^2.9.0
+  diff_match_patch: ^0.4.1
 dev_dependencies:
   flutter_lints: ^5.0.0
 

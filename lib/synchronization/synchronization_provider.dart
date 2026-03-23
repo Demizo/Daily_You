@@ -1,3 +1,4 @@
+import 'package:daily_you/synchronization/encryption_provider.dart';
 import 'package:daily_you/synchronization/providers/webdav_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -11,6 +12,7 @@ enum SynchronizationResult {
 
 abstract class SynchronizationProvider {
   final storage = FlutterSecureStorage();
+  EncryptionProvider? _encryptionProvider;
   Future<SynchronizationResult> synchronize({bool? preferRemote});
   Future<bool> authorize();
   Future<void> storeSecret(String key, String value) {
@@ -30,6 +32,26 @@ abstract class SynchronizationProvider {
     return storage.containsKey(key: key);
   }
   StatefulWidget getSettingsWidget();
+
+  /// Null if encryption key not found
+  Future<EncryptionProvider?> getEncryptionProvider() async {
+    if (await storage.containsKey(key: "encryption_key")) {
+      if (_encryptionProvider != null) {
+        return _encryptionProvider;
+      }
+
+      _encryptionProvider = EncryptionProvider((await storage.read(key: "encryption_key"))!);
+      return _encryptionProvider;
+    } else {
+      _encryptionProvider = null;
+      return null;
+    }
+  }
+
+  void setKey(String key) async {
+    await storage.write(key: "encryption_key", value: key);
+    _encryptionProvider = null;
+  }
 }
 
 class ProviderFactory {
