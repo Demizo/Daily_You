@@ -1,0 +1,5 @@
+Daily You v2.19.0 has arrived! Take a shortcut:
+
+• Added app shortcuts for taking photos and editing the current log
+• Enabled higher refresh rates on supported devices
+• Updated translations
