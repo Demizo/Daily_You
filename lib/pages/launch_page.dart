@@ -19,13 +19,24 @@ class LaunchPage extends StatefulWidget {
 
 class _LaunchPageState extends State<LaunchPage> {
   bool isLoading = true;
+  bool _initialized = false;
 
   @override
   void initState() {
     super.initState();
-    _storeLocalizedNotificationStrings();
-    _updateAppShortcuts();
-    _checkDatabaseConnection();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (!_initialized) {
+      _initialized = true;
+
+      _storeLocalizedNotificationStrings();
+      _updateAppShortcuts();
+      _checkDatabaseConnection();
+    }
   }
 
   _updateAppShortcuts() {
