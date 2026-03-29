@@ -10,6 +10,8 @@ class ThemeModeProvider with ChangeNotifier {
 
   Color _accentColor = const Color(0xff62A0EA);
   Color get accentColor => _accentColor;
+  bool get usingSystemColor =>
+      ConfigProvider.instance.get(ConfigKey.followSystemColor);
 
   set themeMode(ThemeMode value) {
     _themeMode = value;
