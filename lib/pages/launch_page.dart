@@ -39,9 +39,9 @@ class _LaunchPageState extends State<LaunchPage> {
     }
   }
 
-  _updateAppShortcuts() {
+  _updateAppShortcuts() async {
     final QuickActions quickActions = const QuickActions();
-    quickActions.initialize((shortcutType) {
+    await quickActions.initialize((shortcutType) {
       if (shortcutType == 'action_log_today') {
         DeviceInfoService().launchIntent = LaunchIntent.logToday();
       } else if (shortcutType == 'action_take_photo') {
@@ -49,16 +49,17 @@ class _LaunchPageState extends State<LaunchPage> {
       }
     });
 
-    quickActions.setShortcutItems(<ShortcutItem>[
+    await quickActions.clearShortcutItems();
+    await quickActions.setShortcutItems(<ShortcutItem>[
       ShortcutItem(
         type: 'action_log_today',
         localizedTitle: AppLocalizations.of(context)!.dailyReminderTitle,
-        icon: '@drawable/ic_notification',
+        icon: '@drawable/ic_shortcut_edit',
       ),
       ShortcutItem(
         type: 'action_take_photo',
         localizedTitle: AppLocalizations.of(context)!.actionTakePhoto,
-        icon: '@drawable/ic_notification',
+        icon: '@drawable/ic_shortcut_camera_alt',
       )
     ]);
   }
