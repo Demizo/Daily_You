@@ -12,6 +12,7 @@ import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/providers/templates_provider.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/layouts/mobile_scaffold.dart';
@@ -177,77 +178,95 @@ class _MainAppState extends State<MainApp> {
   Widget build(BuildContext context) {
     final themeModeProvider = Provider.of<ThemeModeProvider>(context);
     final configProvider = Provider.of<ConfigProvider>(context);
+    return DynamicColorBuilder(
+        builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
+      ThemeData lightTheme;
+      ThemeData darkTheme;
 
-    return StatsFl(
-      isEnabled: false,
-      child: GestureDetector(
-          onTap: () {
-            FocusManager.instance.primaryFocus?.unfocus();
-          },
-          child: MaterialApp(
-              onGenerateTitle: (context) =>
-                  AppLocalizations.of(context)!.appTitle,
-              title: 'Daily You',
-              themeMode: themeModeProvider.themeMode,
-              debugShowCheckedModeBanner: false,
-              localizationsDelegates: <LocalizationsDelegate<dynamic>>[
-                AppLocalizations.delegate,
-                CustomMaterialLocalizationsDelegate(),
-                CustomCupertinoLocalizationsDelegate(),
-                CustomWidgetsLocalizationsDelegate(),
-              ],
-              locale: configProvider.getOverrideLanguage(),
-              supportedLocales: [
-                Locale("en"),
-                ...AppLocalizations.supportedLocales
-                    .where((locale) => locale.languageCode != "en")
-              ],
-              localeResolutionCallback: (locale, supportedLocales) {
-                return configProvider.getOverrideLanguage();
-              },
-              theme: ThemeData(
-                useMaterial3: true,
-                colorScheme: ColorScheme.fromSeed(
-                    seedColor: themeModeProvider.accentColor,
-                    brightness: Brightness.light),
-              ),
-              darkTheme:
-                  (ConfigProvider.instance.get(ConfigKey.theme) == 'amoled')
-                      ? ThemeData(
-                          useMaterial3: true,
-                          colorScheme: ColorScheme.fromSeed(
-                            seedColor: themeModeProvider.accentColor,
-                            brightness: Brightness.dark,
-                            surfaceContainerLowest: Colors.black,
-                            surfaceContainerLow: Colors.black,
-                            surfaceContainerHighest: Colors.black,
-                            surfaceContainerHigh: Colors.black,
-                            surfaceBright: Colors.black,
-                            surfaceDim: Colors.black,
-                            surface: Colors.black,
-                            surfaceContainer: Colors.black,
-                            onSurface: Colors.white,
-                            surfaceTint: Colors.black,
-                            primaryContainer: Colors.black,
-                            secondaryContainer: Colors.black,
-                            tertiaryContainer: Colors.black,
-                            inverseSurface: Colors.black,
-                            inversePrimary: Colors.black,
-                            scrim: Colors.black,
-                          ),
-                          scaffoldBackgroundColor: Colors.black)
-                      : ThemeData(
-                          useMaterial3: true,
-                          colorScheme: ColorScheme.fromSeed(
-                              seedColor: themeModeProvider.accentColor,
-                              brightness: Brightness.dark),
-                        ),
-              home: LaunchPage(
-                  nextPage: ResponsiveLayout(
-                mobileScaffold: MobileScaffold(),
-                tabletScaffold: MobileScaffold(),
-                desktopScaffold: MobileScaffold(),
-              )))),
-    );
+      if (themeModeProvider.usingSystemColor && lightDynamic != null) {
+        lightTheme = ThemeData(colorScheme: lightDynamic.harmonized());
+      } else {
+        lightTheme = ThemeData(
+            useMaterial3: true,
+            colorScheme: ColorScheme.fromSeed(
+                seedColor: themeModeProvider.accentColor,
+                brightness: Brightness.light));
+      }
+
+      if (themeModeProvider.usingSystemColor && darkDynamic != null) {
+        darkTheme = ThemeData(colorScheme: darkDynamic.harmonized());
+      } else {
+        darkTheme = ThemeData(
+          useMaterial3: true,
+          colorScheme: ColorScheme.fromSeed(
+              seedColor: themeModeProvider.accentColor,
+              brightness: Brightness.dark),
+        );
+      }
+
+      // amoled override
+      if (ConfigProvider.instance.get(ConfigKey.theme) == 'amoled') {
+        darkTheme = ThemeData(
+            useMaterial3: true,
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: themeModeProvider.accentColor,
+              brightness: Brightness.dark,
+              surfaceContainerLowest: Colors.black,
+              surfaceContainerLow: Colors.black,
+              surfaceContainerHighest: Colors.black,
+              surfaceContainerHigh: Colors.black,
+              surfaceBright: Colors.black,
+              surfaceDim: Colors.black,
+              surface: Colors.black,
+              surfaceContainer: Colors.black,
+              onSurface: Colors.white,
+              surfaceTint: Colors.black,
+              primaryContainer: Colors.black,
+              secondaryContainer: Colors.black,
+              tertiaryContainer: Colors.black,
+              inverseSurface: Colors.black,
+              inversePrimary: Colors.black,
+              scrim: Colors.black,
+            ),
+            scaffoldBackgroundColor: Colors.black);
+      }
+
+      return StatsFl(
+        isEnabled: false,
+        child: GestureDetector(
+            onTap: () {
+              FocusManager.instance.primaryFocus?.unfocus();
+            },
+            child: MaterialApp(
+                onGenerateTitle: (context) =>
+                    AppLocalizations.of(context)!.appTitle,
+                title: 'Daily You',
+                themeMode: themeModeProvider.themeMode,
+                debugShowCheckedModeBanner: false,
+                localizationsDelegates: <LocalizationsDelegate<dynamic>>[
+                  AppLocalizations.delegate,
+                  CustomMaterialLocalizationsDelegate(),
+                  CustomCupertinoLocalizationsDelegate(),
+                  CustomWidgetsLocalizationsDelegate(),
+                ],
+                locale: configProvider.getOverrideLanguage(),
+                supportedLocales: [
+                  Locale("en"),
+                  ...AppLocalizations.supportedLocales
+                      .where((locale) => locale.languageCode != "en")
+                ],
+                localeResolutionCallback: (locale, supportedLocales) {
+                  return configProvider.getOverrideLanguage();
+                },
+                theme: lightTheme,
+                darkTheme: darkTheme,
+                home: LaunchPage(
+                    nextPage: ResponsiveLayout(
+                  mobileScaffold: MobileScaffold(),
+                  tabletScaffold: MobileScaffold(),
+                  desktopScaffold: MobileScaffold(),
+                )))),
+      );
+    });
   }
 }
