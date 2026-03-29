@@ -234,6 +234,12 @@ abstract class AppLocalizations {
   /// **'{count, plural, one{{count} Year Ago} other{{count} Years Ago}}'**
   String flashbackYear(num count);
 
+  /// No description provided for @flashbackOnThisDay.
+  ///
+  /// In en, this message translates to:
+  /// **'On This Day'**
+  String get flashbackOnThisDay;
+
   /// No description provided for @pageGalleryTitle.
   ///
   /// In en, this message translates to:

@@ -72,6 +72,9 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String get flashbackOnThisDay => 'On This Day';
+
+  @override
   String get pageGalleryTitle => '갤러리';
 
   @override

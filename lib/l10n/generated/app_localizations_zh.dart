@@ -72,6 +72,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get flashbackOnThisDay => 'On This Day';
+
+  @override
   String get pageGalleryTitle => '迹忆';
 
   @override

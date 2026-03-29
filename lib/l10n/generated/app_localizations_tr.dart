@@ -72,6 +72,9 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
+  String get flashbackOnThisDay => 'On This Day';
+
+  @override
   String get pageGalleryTitle => 'Galeri';
 
   @override

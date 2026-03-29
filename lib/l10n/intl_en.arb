@@ -25,6 +25,8 @@
   "@flashbackMonth": {},
   "flashbackYear": "{count, plural, one{{count} Year Ago} other{{count} Years Ago}}",
   "@flashbackYear": {},
+  "flashbackOnThisDay": "On This Day",
+  "@flashbackOnThisDay": {},
   "pageGalleryTitle": "Gallery",
   "@pageGalleryTitle": {},
   "searchLogsHint": "Search Logs…",
