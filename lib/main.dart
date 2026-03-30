@@ -184,7 +184,15 @@ class _MainAppState extends State<MainApp> {
       ThemeData darkTheme;
 
       if (themeModeProvider.usingSystemColor && lightDynamic != null) {
-        lightTheme = ThemeData(colorScheme: lightDynamic.harmonized());
+        // FIX: Surface colors are not correct with the dynamic theme, see https://github.com/material-foundation/flutter-packages/issues/574
+        // Use dynamic theme for seed color but do not inject chroma
+        lightTheme = ThemeData(
+            useMaterial3: true,
+            colorScheme: ColorScheme.fromSeed(
+                seedColor: lightDynamic.primary,
+                primaryContainer: lightDynamic.primaryContainer,
+                dynamicSchemeVariant: DynamicSchemeVariant.fidelity,
+                brightness: Brightness.light));
       } else {
         lightTheme = ThemeData(
             useMaterial3: true,
@@ -194,7 +202,15 @@ class _MainAppState extends State<MainApp> {
       }
 
       if (themeModeProvider.usingSystemColor && darkDynamic != null) {
-        darkTheme = ThemeData(colorScheme: darkDynamic.harmonized());
+        // FIX: Surface colors are not correct with the dynamic theme, see https://github.com/material-foundation/flutter-packages/issues/574
+        // Use dynamic theme for seed color but do not inject chroma
+        darkTheme = ThemeData(
+            useMaterial3: true,
+            colorScheme: ColorScheme.fromSeed(
+                seedColor: darkDynamic.primary,
+                primaryContainer: darkDynamic.primaryContainer,
+                dynamicSchemeVariant: DynamicSchemeVariant.tonalSpot,
+                brightness: Brightness.dark));
       } else {
         darkTheme = ThemeData(
           useMaterial3: true,
