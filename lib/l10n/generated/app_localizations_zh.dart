@@ -579,6 +579,9 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get dailyReminderDescription => '寫下我的日常紀錄…';
 
   @override
+  String get actionTakePhoto => '拍照';
+
+  @override
   String get pageHomeTitle => '主頁';
 
   @override

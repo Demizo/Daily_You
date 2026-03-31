@@ -19,7 +19,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'N\'oubliez pas d\'enregistrer votre journée…';
 
   @override
-  String get actionTakePhoto => 'Take photo';
+  String get actionTakePhoto => 'Prendre une photo';
 
   @override
   String get pageHomeTitle => 'Accueil';
@@ -73,7 +73,7 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get flashbackOnThisDay => 'On This Day';
+  String get flashbackOnThisDay => 'Ce jour-ci';
 
   @override
   String get pageGalleryTitle => 'Galerie';

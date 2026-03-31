@@ -186,12 +186,16 @@ class _MainAppState extends State<MainApp> {
       if (themeModeProvider.usingSystemColor && lightDynamic != null) {
         // FIX: Surface colors are not correct with the dynamic theme, see https://github.com/material-foundation/flutter-packages/issues/574
         // Use dynamic theme for seed color but do not inject chroma
+        bool noChroma = (lightDynamic.primary.r == lightDynamic.primary.b) &&
+            (lightDynamic.primary.b == lightDynamic.primary.g);
         lightTheme = ThemeData(
             useMaterial3: true,
             colorScheme: ColorScheme.fromSeed(
                 seedColor: lightDynamic.primary,
                 primaryContainer: lightDynamic.primaryContainer,
-                dynamicSchemeVariant: DynamicSchemeVariant.fidelity,
+                dynamicSchemeVariant: noChroma
+                    ? DynamicSchemeVariant.fidelity
+                    : DynamicSchemeVariant.tonalSpot,
                 brightness: Brightness.light));
       } else {
         lightTheme = ThemeData(
@@ -204,12 +208,16 @@ class _MainAppState extends State<MainApp> {
       if (themeModeProvider.usingSystemColor && darkDynamic != null) {
         // FIX: Surface colors are not correct with the dynamic theme, see https://github.com/material-foundation/flutter-packages/issues/574
         // Use dynamic theme for seed color but do not inject chroma
+        bool noChroma = (darkDynamic.primary.r == darkDynamic.primary.b) &&
+            (darkDynamic.primary.b == darkDynamic.primary.g);
         darkTheme = ThemeData(
             useMaterial3: true,
             colorScheme: ColorScheme.fromSeed(
                 seedColor: darkDynamic.primary,
                 primaryContainer: darkDynamic.primaryContainer,
-                dynamicSchemeVariant: DynamicSchemeVariant.fidelity,
+                dynamicSchemeVariant: noChroma
+                    ? DynamicSchemeVariant.fidelity
+                    : DynamicSchemeVariant.tonalSpot,
                 brightness: Brightness.dark));
       } else {
         darkTheme = ThemeData(
