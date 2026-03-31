@@ -209,7 +209,7 @@ class _MainAppState extends State<MainApp> {
             colorScheme: ColorScheme.fromSeed(
                 seedColor: darkDynamic.primary,
                 primaryContainer: darkDynamic.primaryContainer,
-                dynamicSchemeVariant: DynamicSchemeVariant.tonalSpot,
+                dynamicSchemeVariant: DynamicSchemeVariant.fidelity,
                 brightness: Brightness.dark));
       } else {
         darkTheme = ThemeData(
