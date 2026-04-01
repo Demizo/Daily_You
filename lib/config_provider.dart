@@ -63,6 +63,7 @@ class ConfigKey {
   // Synchronization settings
   static const String syncEnabled = "syncEnabled";
   static const String syncProvider = "syncProvider";
+  static const String syncEncryptionEnabled = "syncEncryptionEnabled";
   // DEPRECATED
   static const String imageQuality = "imageQuality";
 }
@@ -126,6 +127,7 @@ class ConfigProvider with ChangeNotifier {
     ConfigKey.hideImagesInGallery: false,
     ConfigKey.syncEnabled: false,
     ConfigKey.syncProvider: 'none',
+    ConfigKey.syncEncryptionEnabled: true
   };
 
   final Map<String, dynamic> _secureConfig = {

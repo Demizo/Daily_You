@@ -81,7 +81,7 @@ class _SynchronizationSettingsState extends State<SynchronizationSettings> {
     setState(() => _isSynchronizing = true);
 
     try {
-      final result = await _currentProvider!.synchronize(preferRemote: preferRemote);
+      final result = await _currentProvider!.synchronize();
 
       if (mounted) {
         setState(() => _isSynchronizing = false);
@@ -90,22 +90,28 @@ class _SynchronizationSettingsState extends State<SynchronizationSettings> {
         Color backgroundColor;
         bool showRemoteLocalQuestion = false;
 
-        switch (result) {
-          case SynchronizationResult.success:
+        // TODO: fix this UI implementation and handle conflict resolution!
+
+        switch (result.status) {
+          case SynchronizationResultStatus.success:
             message = 'Synchronization completed successfully!';
             backgroundColor = Colors.green;
             break;
-          case SynchronizationResult.failure:
+          case SynchronizationResultStatus.failure:
             message = 'Synchronization failed!';
             backgroundColor = Colors.red;
             break;
-          case SynchronizationResult.conflict:
+          case SynchronizationResultStatus.conflict:
             message = 'Conflict detected during synchronization!';
             backgroundColor = Colors.orange;
             showRemoteLocalQuestion = true;
             break;
-          case SynchronizationResult.unauthorized:
+          case SynchronizationResultStatus.unauthorized:
             message = 'Unauthorized! Please authorize first.';
+            backgroundColor = Colors.red;
+            break;
+          case SynchronizationResultStatus.encryptionMismatch:
+            message = 'Encryption setting must be same in app and on the remote';
             backgroundColor = Colors.red;
             break;
         }
