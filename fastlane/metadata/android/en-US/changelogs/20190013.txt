@@ -1,0 +1,7 @@
+Daily You v2.19.1 has arrived! Take a shortcut:
+
+• Added dedicated shortcut icons
+• Fix theme support for greyscale accent colors
+• Resolve a potential race condition on startup
+• Updated translations
+
