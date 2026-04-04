@@ -18,7 +18,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get dailyReminderDescription => 'Заполни свой дневник сегодня…';
 
   @override
-  String get actionTakePhoto => 'Take photo';
+  String get actionTakePhoto => 'Сделать фото';
 
   @override
   String get pageHomeTitle => 'Дом';
@@ -260,7 +260,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsGalleryViewLayout => 'Отображение галереи';
 
   @override
-  String get settingsHideImagesInGallery => 'Hide Images In Gallery';
+  String get settingsHideImagesInGallery => 'Скрыть изображения в галерее';
 
   @override
   String get viewLayoutList => 'Список';
@@ -329,10 +329,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get noTemplatesDescription => 'Нет созданных шаблонов…';
 
   @override
-  String get templateVariableTime => 'Time';
+  String get templateVariableTime => 'Время';
 
   @override
-  String get templateDefaultTimestampTitle => 'Timestamp';
+  String get templateDefaultTimestampTitle => 'Временная метка';
 
   @override
   String templateDefaultTimestampBody(Object date, Object time) {
@@ -340,10 +340,10 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get templateDefaultSummaryTitle => 'Day Summary';
+  String get templateDefaultSummaryTitle => 'Итог дня';
 
   @override
-  String get templateDefaultSummaryBody => '### Summary\n- \n\n### Quote\n> ';
+  String get templateDefaultSummaryBody => '### Итог\n- \n\n### Цитата\n> ';
 
   @override
   String get templateDefaultReflectionTitle => 'Reflection';
