@@ -69,18 +69,18 @@ abstract class SynchronizationProvider {
     } else {
       // Generate a new encryption key and store it
       final newKey = EncryptionProvider.generateEncryptionKey();
-      await _secretStorage.write(key: "encryption_key", value: newKey);
+      await storeSecret("encryption_key", newKey);
       _encryptionProvider = EncryptionProvider(newKey);
       return _encryptionProvider;
     }
   }
 
   Future<bool> hasEncryptionKey() {
-    return _secretStorage.containsKey(key: "encryption_key");
+    return hasSecret("encryption_key");
   }
 
   void setKey(String key) async {
-    await _secretStorage.write(key: "encryption_key", value: key);
+    await storeSecret("encryption_key", key);
     _encryptionProvider = null;
   }
 
