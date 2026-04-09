@@ -1,8 +1,11 @@
+import 'dart:typed_data';
+
 import 'package:daily_you/config_provider.dart';
+import 'package:daily_you/database/entry_dao.dart';
 import 'package:daily_you/database/image_storage.dart';
 import 'package:daily_you/file_layer.dart';
-import 'package:daily_you/synchronization/conflict_checker.dart';
 import 'package:daily_you/synchronization/encryption_provider.dart';
+import 'package:daily_you/synchronization/patching/conflict.dart';
 import 'package:daily_you/synchronization/providers/webdav_provider.dart';
 import 'package:daily_you/synchronization/remote_storage.dart';
 import 'package:flutter/cupertino.dart';
@@ -158,6 +161,14 @@ abstract class SynchronizationProvider {
 
       // Write to a temp file
       final String tempFilePath = "daily_you_remote_temp.db";
+
+      if (!await FileLayer.writeFileBytes(tempFilePath, Uint8List.fromList(databaseBytes))) {
+        return SynchronizationResult(SynchronizationResultStatus.failure);
+      }
+
+      final remoteDB = await openDatabase(tempFilePath);
+
+
 
       // TODO: handle this correctly
       throw UnimplementedError();

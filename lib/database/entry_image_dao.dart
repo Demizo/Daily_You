@@ -1,9 +1,14 @@
 import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/models/image.dart';
+import 'package:sqflite/sqflite.dart';
 
 class EntryImageDao {
   static Future<List<EntryImage>> getAll() async {
-    final result = await AppDatabase.instance.database!
+    return getAllFromDB(AppDatabase.instance.database!);
+  }
+
+  static Future<List<EntryImage>> getAllFromDB(Database database) async {
+    final result = await database
         .query(imagesTable, orderBy: '${EntryImageFields.imgRank} DESC');
 
     return result.map((json) => EntryImage.fromJson(json)).toList();

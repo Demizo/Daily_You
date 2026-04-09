@@ -1,12 +1,15 @@
 import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/models/template.dart';
+import 'package:sqflite/sqflite.dart';
 
 class TemplateDao {
   static Future<List<Template>> getAll() async {
-    final db = AppDatabase.instance.database!;
+    return getAllFromDB(AppDatabase.instance.database!);
+  }
 
+  static Future<List<Template>> getAllFromDB(Database database) async {
     final result =
-        await db.query(templatesTable, orderBy: '${TemplatesFields.name} ASC');
+        await database.query(templatesTable, orderBy: '${TemplatesFields.name} ASC');
 
     return result.map((json) => Template.fromJson(json)).toList();
   }
