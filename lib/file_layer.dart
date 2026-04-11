@@ -1,19 +1,10 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:daily_you/utils/saf_transfer.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:path/path.dart';
-import 'package:saf_stream/saf_stream.dart';
-import 'package:saf_stream/saf_stream_platform_interface.dart';
 import 'package:saf_util/saf_util.dart';
 import 'package:shared_storage/shared_storage.dart' as saf;
-
-class FileLayerWriteStream {
-  final bool useSaf;
-  final SafWriteStreamInfo? safStream;
-  final IOSink? sink;
-
-  const FileLayerWriteStream({required this.useSaf, this.safStream, this.sink});
-}
 
 class FileLayer {
   static Future<String?> pickDirectory() async {
@@ -96,51 +87,6 @@ class FileLayer {
       // Desktop
       var targetFile = File(join(uri, name));
       return await targetFile.exists() ? await targetFile.readAsBytes() : null;
-    }
-  }
-
-  static Future<Stream<List<int>>?> readFileStream(String uri,
-      {String? name, useExternalPath = true}) async {
-    if (Platform.isAndroid && useExternalPath) {
-      // Android
-      return await SafStream().readFileStream(uri);
-    } else {
-      // Desktop
-      var targetFile = File(join(uri, name));
-      return await targetFile.exists() ? targetFile.openRead() : null;
-    }
-  }
-
-  static Future<FileLayerWriteStream?> openFileWriteStream(
-      String uri, String name,
-      {overwrite = true, useExternalPath = true}) async {
-    if (Platform.isAndroid && useExternalPath) {
-      // Android
-      var stream =
-          await SafStream().startWriteStream(uri, name, 'application/zip');
-      return FileLayerWriteStream(useSaf: true, safStream: stream);
-    } else {
-      // Desktop
-      var targetFile = File(join(uri, name));
-      return FileLayerWriteStream(useSaf: false, sink: targetFile.openWrite());
-    }
-  }
-
-  static Future<void> writeFileWriteStreamChunk(
-      FileLayerWriteStream stream, Uint8List data) async {
-    if (stream.useSaf) {
-      await SafStream().writeChunk(stream.safStream!.session, data);
-    } else {
-      stream.sink!.add(data);
-      await stream.sink!.flush();
-    }
-  }
-
-  static Future<void> closeFileWriteStream(FileLayerWriteStream stream) async {
-    if (stream.useSaf) {
-      await SafStream().endWriteStream(stream.safStream!.session);
-    } else {
-      await stream.sink!.close();
     }
   }
 
@@ -285,58 +231,79 @@ class FileLayer {
   static Future<bool> copyFromExternalLocation(
       String externalFile, String internalFolder, String outputFile,
       {Function(double percent)? onProgress}) async {
-    final fileSize = await FileLayer.getFileSize(externalFile);
-    if (fileSize == null || fileSize == 0) return false;
+    if (Platform.isAndroid) {
+      return await SafTransfer.copyFromExternalLocation(
+          externalFile, join(internalFolder, outputFile),
+          onProgress: onProgress);
+    } else {
+      // Desktop file streaming
+      final sourceFile = File(externalFile);
+      if (!await sourceFile.exists()) return false;
 
-    var readStream =
-        await FileLayer.readFileStream(externalFile, useExternalPath: true);
-    if (readStream == null) return false;
-    var writeStream = await FileLayer.openFileWriteStream(
-        internalFolder, outputFile,
-        useExternalPath: false);
-    if (writeStream == null) return false;
+      final fileSize = await sourceFile.length();
+      if (fileSize == 0) return false;
 
-    var transferredSize = 0;
+      final destFile = File(join(internalFolder, outputFile));
+      final writeSink = destFile.openWrite();
 
-    await for (List<int> chunk in readStream) {
-      await FileLayer.writeFileWriteStreamChunk(
-          writeStream, Uint8List.fromList(chunk));
-      transferredSize += chunk.length;
-      var percent = (transferredSize / fileSize) * 100;
-      if (onProgress != null) {
-        onProgress(percent);
+      var transferredSize = 0;
+      var lastReportedProgress = 0.0;
+
+      await for (List<int> chunk in sourceFile.openRead()) {
+        writeSink.add(chunk);
+        transferredSize += chunk.length;
+
+        var percent = (transferredSize / fileSize) * 100;
+        if (percent - lastReportedProgress >= 5.0 || percent >= 100.0) {
+          lastReportedProgress = percent;
+          if (onProgress != null) {
+            onProgress(percent);
+          }
+        }
       }
+
+      await writeSink.flush();
+      await writeSink.close();
+      return true;
     }
-    await FileLayer.closeFileWriteStream(writeStream);
-    return true;
   }
 
   static Future<bool> copyToExternalLocation(
       String localFile, String externalFolder, String outputFile,
       {Function(double percent)? onProgress}) async {
-    final fileSize =
-        await FileLayer.getFileSize(localFile, useExternalPath: false);
-    if (fileSize == null || fileSize == 0) return false;
+    if (Platform.isAndroid) {
+      return await SafTransfer.copyToExternalLocation(
+          localFile, externalFolder, outputFile, "application/zip",
+          onProgress: onProgress);
+    } else {
+      final sourceFile = File(localFile);
+      if (!await sourceFile.exists()) return false;
 
-    var readStream =
-        await FileLayer.readFileStream(localFile, useExternalPath: false);
-    if (readStream == null) return false;
-    var writeStream =
-        await FileLayer.openFileWriteStream(externalFolder, outputFile);
-    if (writeStream == null) return false;
+      final fileSize = await sourceFile.length();
+      if (fileSize == 0) return false;
 
-    var transferredSize = 0;
+      final destFile = File(join(externalFolder, outputFile));
+      final writeSink = destFile.openWrite();
 
-    await for (List<int> chunk in readStream) {
-      await FileLayer.writeFileWriteStreamChunk(
-          writeStream, Uint8List.fromList(chunk));
-      transferredSize += chunk.length;
-      var percent = (transferredSize / fileSize) * 100;
-      if (onProgress != null) {
-        onProgress(percent);
+      var transferredSize = 0;
+      var lastReportedProgress = 0.0;
+
+      await for (List<int> chunk in sourceFile.openRead()) {
+        writeSink.add(chunk);
+        transferredSize += chunk.length;
+
+        var percent = (transferredSize / fileSize) * 100;
+        if (percent - lastReportedProgress >= 5.0 || percent >= 100.0) {
+          lastReportedProgress = percent;
+          if (onProgress != null) {
+            onProgress(percent);
+          }
+        }
       }
+
+      await writeSink.flush();
+      await writeSink.close();
+      return true;
     }
-    await FileLayer.closeFileWriteStream(writeStream);
-    return true;
   }
 }
