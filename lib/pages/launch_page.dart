@@ -33,10 +33,14 @@ class _LaunchPageState extends State<LaunchPage> {
     if (!_initialized) {
       _initialized = true;
 
-      _storeLocalizedNotificationStrings();
-      _updateAppShortcuts();
-      _checkDatabaseConnection();
+      _initializeApp();
     }
+  }
+
+  _initializeApp() async {
+    await _storeLocalizedNotificationStrings();
+    await _updateAppShortcuts();
+    await _checkDatabaseConnection();
   }
 
   _updateAppShortcuts() async {
