@@ -3,7 +3,7 @@ import 'dart:isolate';
 
 import 'package:daily_you/database/image_storage.dart';
 import 'package:daily_you/file_bytes_cache.dart';
-import 'package:daily_you/file_layer.dart';
+import 'package:daily_you/utils/file_layer.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';

@@ -6,7 +6,6 @@ import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
-import 'package:markdown_widget/markdown_widget.dart';
 import 'local_image_loader.dart';
 
 class LargeEntryCardWidget extends StatelessWidget {

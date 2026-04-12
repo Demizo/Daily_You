@@ -4,7 +4,7 @@ import 'dart:typed_data';
 
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/file_bytes_cache.dart';
-import 'package:daily_you/file_layer.dart';
+import 'package:daily_you/utils/file_layer.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';

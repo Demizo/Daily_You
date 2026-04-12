@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/database/image_storage.dart';
-import 'package:daily_you/file_layer.dart';
+import 'package:daily_you/utils/file_layer.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/models/template.dart';

@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:daily_you/database/image_storage.dart';
-import 'package:daily_you/file_layer.dart';
+import 'package:daily_you/utils/file_layer.dart';
 import 'package:daily_you/layouts/fast_page_view_scroll_physics.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:extended_image/extended_image.dart';
