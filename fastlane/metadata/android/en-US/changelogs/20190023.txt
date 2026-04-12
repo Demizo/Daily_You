@@ -1,0 +1,4 @@
+Daily You v2.19.2 has arrived! Take a shortcut:
+
+• Improved reliability of backup and restore
+• Minor behind the scenes improvements
