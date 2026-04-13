@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/database/image_storage.dart';
 import 'package:daily_you/device_info_service.dart';
 import 'package:daily_you/launch_intent.dart';
+import 'package:daily_you/services/share_intent_service.dart';
 import 'package:daily_you/widgets/auth_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
@@ -92,6 +95,18 @@ class _LaunchPageState extends State<LaunchPage> {
     }
     //Initialize Database
     if (await AppDatabase.instance.init()) {
+      // Cold-start share: await before navigating so the intent isn't lost
+      // when this page is replaced. Paths are stored in DeviceInfoService and
+      // consumed by MobileScaffold.initState → ShareToEntryPage.
+      if (Platform.isAndroid || Platform.isIOS) {
+        final coldStartPaths =
+            await ShareIntentService.instance.getInitialSharedFiles();
+        if (coldStartPaths != null && coldStartPaths.isNotEmpty) {
+          DeviceInfoService().launchIntent =
+              LaunchIntent.shareFiles(coldStartPaths);
+        }
+      }
+
       if (ImageStorage.instance.usingExternalLocation()) {
         if (await ImageStorage.instance.hasExternalLocationPermission()) {
           await _nextPage();

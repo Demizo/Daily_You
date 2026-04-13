@@ -1,8 +1,11 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/layouts/fast_page_view_scroll_physics.dart';
 import 'package:daily_you/pages/settings/notification_settings.dart';
+import 'package:daily_you/pages/share_to_entry_page.dart';
+import 'package:daily_you/services/share_intent_service.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
@@ -24,6 +27,7 @@ class _MobileScaffoldState extends State<MobileScaffold> {
   int currentIndex = 0;
   late final PageController _pageController;
   final List<bool> _isScrolled = [false, false, false];
+  StreamSubscription<List<String>>? _shareSubscription;
 
   final List<Widget> pages = [
     const HomePage(),
@@ -35,12 +39,29 @@ class _MobileScaffoldState extends State<MobileScaffold> {
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: currentIndex);
+    // Warm-start share: subscribe to raw file paths emitted by the plugin
+    // while the app is running.
+    if (Platform.isAndroid || Platform.isIOS) {
+      _shareSubscription = ShareIntentService.instance.sharingFilesStream
+          .listen(_onSharePaths);
+    }
   }
 
   @override
   void dispose() {
+    _shareSubscription?.cancel();
     _pageController.dispose();
     super.dispose();
+  }
+
+  Future<void> _onSharePaths(List<String> paths) async {
+    if (!mounted) return;
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        allowSnapshotting: false,
+        builder: (_) => ShareToEntryPage(sharedUris: paths),
+      ),
+    );
   }
 
   void _showNotificationOnboardingPopup() {

@@ -316,5 +316,15 @@
   "settingsConsiderSupporting": "consider supporting",
   "@settingsConsiderSupporting": {},
   "tagMoodTitle": "Mood",
-  "@tagMoodTitle": {}
+  "@tagMoodTitle": {},
+  "shareToEntryTitle": "Add to Diary",
+  "@shareToEntryTitle": {},
+  "addToToday": "Today",
+  "@addToToday": {},
+  "selectDate": "Select Date",
+  "@selectDate": {},
+  "addToEntry": "Add to Diary",
+  "@addToEntry": {},
+  "shareErrorProcessing": "Could not process the shared image(s).",
+  "@shareErrorProcessing": {}
 }
