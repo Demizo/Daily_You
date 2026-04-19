@@ -7,7 +7,7 @@ import 'package:daily_you/widgets/large_entry_card_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/widgets/entry_card_widget.dart';
-import 'package:daily_you/pages/entry_detail_page.dart';
+import 'package:daily_you/pages/entries_list_page.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:provider/provider.dart';
 
@@ -275,9 +275,10 @@ class _GalleryPageState extends State<GalleryPage>
                 onTap: () async {
                   await Navigator.of(context).push(MaterialPageRoute(
                       allowSnapshotting: false,
-                      builder: (context) => EntryDetailPage(
-                            filtered: true,
+                      builder: (context) => EntriesListPage(
                             index: index,
+                            getEntries: () =>
+                                EntriesProvider.instance.getFilteredEntries(),
                           )));
                 },
                 child: listView

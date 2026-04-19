@@ -24,6 +24,8 @@ class EntriesProvider with ChangeNotifier {
 
   Map<DateTime, Entry> _entriesByDay = {};
 
+  List<Entry> _filteredEntries = [];
+
   String _searchText = "";
   String get searchText {
     return _searchText;
@@ -35,7 +37,9 @@ class EntriesProvider with ChangeNotifier {
   }
 
   set searchText(String newSearchText) {
+    if (_searchText == newSearchText) return;
     _searchText = newSearchText;
+    _calculateFilteredEntries();
     notifyListeners();
   }
 
@@ -45,7 +49,9 @@ class EntriesProvider with ChangeNotifier {
   }
 
   set orderBy(OrderBy newOrderBy) {
+    if (_orderBy == newOrderBy) return;
     _orderBy = newOrderBy;
+    _calculateFilteredEntries();
     notifyListeners();
   }
 
@@ -55,7 +61,9 @@ class EntriesProvider with ChangeNotifier {
   }
 
   set sortOrder(SortOrder newSortOrder) {
+    if (_sortOrder == newSortOrder) return;
     _sortOrder = newSortOrder;
+    _calculateFilteredEntries();
     notifyListeners();
   }
 
@@ -67,6 +75,7 @@ class EntriesProvider with ChangeNotifier {
     entries = await EntryDao.getAll();
     _calculateWordCount();
     _calculateEntriesByDay();
+    _calculateFilteredEntries();
     notifyListeners();
   }
 
@@ -85,6 +94,7 @@ class EntriesProvider with ChangeNotifier {
       // Update stats
       _calculateWordCount();
       _calculateEntriesByDay();
+      _calculateFilteredEntries();
 
       notifyListeners();
     }
@@ -102,6 +112,7 @@ class EntriesProvider with ChangeNotifier {
     // Update stats
     _calculateWordCount();
     _calculateEntriesByDay();
+    _calculateFilteredEntries();
 
     notifyListeners();
   }
@@ -114,6 +125,7 @@ class EntriesProvider with ChangeNotifier {
     // Update stats
     _calculateWordCount();
     _calculateEntriesByDay();
+    _calculateFilteredEntries();
 
     notifyListeners();
   }
@@ -172,9 +184,10 @@ class EntriesProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  List<Entry> getFilteredEntries() {
+  List<Entry> getFilteredEntries() => _filteredEntries;
+
+  void _calculateFilteredEntries() {
     List<Entry> filteredEntries;
-    // Make a copy of the entries list
     if (_searchText.isNotEmpty) {
       filteredEntries = entries
           .where((entry) =>
@@ -184,7 +197,6 @@ class EntriesProvider with ChangeNotifier {
       filteredEntries = entries.toList();
     }
 
-    // Ordering by date is the default
     if (_orderBy == OrderBy.mood) {
       filteredEntries.sort((a, b) {
         var aValue = a.mood ?? -999;
@@ -193,12 +205,11 @@ class EntriesProvider with ChangeNotifier {
       });
     }
 
-    // Sorting is descending by default
     if (_sortOrder == SortOrder.ascending) {
       filteredEntries = filteredEntries.reversed.toList();
     }
 
-    return filteredEntries;
+    _filteredEntries = filteredEntries;
   }
 
   void _calculateWordCount() {

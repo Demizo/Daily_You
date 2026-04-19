@@ -16,7 +16,7 @@ import 'package:daily_you/widgets/large_entry_card_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/models/entry.dart';
-import 'package:daily_you/pages/entry_detail_page.dart';
+import 'package:daily_you/pages/entries_list_page.dart';
 import 'package:daily_you/pages/edit_entry_page.dart';
 import 'package:provider/provider.dart';
 import '../widgets/entry_card_widget.dart';
@@ -216,10 +216,11 @@ class _HomePageState extends State<HomePage>
                         onTap: () async {
                           await Navigator.of(context).push(MaterialPageRoute(
                             allowSnapshotting: false,
-                            builder: (context) => EntryDetailPage(
-                                filtered: false,
+                            builder: (context) => EntriesListPage(
                                 index: EntriesProvider.instance
-                                    .getIndexOfEntry(flashback.entry.id!)),
+                                    .getIndexOfEntry(flashback.entry.id!),
+                                getEntries: () =>
+                                    EntriesProvider.instance.entries),
                           ));
                         },
                         child: listView
