@@ -3,7 +3,7 @@ import 'dart:ui' as ui;
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/pages/edit_entry_page.dart';
-import 'package:daily_you/pages/entry_detail_page.dart';
+import 'package:daily_you/pages/entries_list_page.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/year_month_picker.dart';
@@ -169,10 +169,11 @@ class _EntryCalendarState extends State<EntryCalendar>
                                 await Navigator.of(context)
                                     .push(MaterialPageRoute(
                                   allowSnapshotting: false,
-                                  builder: (context) => EntryDetailPage(
-                                      filtered: false,
+                                  builder: (context) => EntriesListPage(
                                       index: entriesProvider
-                                          .getIndexOfEntry(pickedEntry.id!)),
+                                          .getIndexOfEntry(pickedEntry.id!),
+                                      getEntries: () =>
+                                          entriesProvider.entries),
                                 ));
                               } else {
                                 // Create new entry

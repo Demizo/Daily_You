@@ -5,6 +5,7 @@ import 'package:daily_you/database/image_storage.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/providers/entries_provider.dart';
+import 'package:daily_you/providers/templates_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/edit_toolbar.dart';
@@ -66,12 +67,23 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
           (TimeManager.isToday(widget.overrideCreateDate ?? DateTime.now()))
               ? DateTime.now()
               : (widget.overrideCreateDate ?? DateTime.now());
-      _entry = await EntriesProvider.instance.createNewEntry(createTime);
+      var text = "";
+      final defaultTemplate = TemplatesProvider.instance.getDefaultTemplate();
+      if (defaultTemplate != null) {
+        text = defaultTemplate.text ?? "";
+      }
+      _entry = Entry(
+        text: text,
+        mood: null,
+        timeCreate: createTime,
+        timeModified: DateTime.now(),
+      );
       _newEntry = true;
+      id = -1;
     } else {
       _entry = widget.entry!;
+      id = _entry.id ?? -1;
     }
-    id = _entry.id ?? -1;
     _lastMood = _entry.mood;
     mood = _entry.mood;
     _lastEntryDate = _entry.timeCreate;
@@ -120,6 +132,10 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   }
 
   void _showDeleteEntryPopup() {
+    if (_newEntry) {
+      Navigator.of(context).pop();
+      return;
+    }
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -131,7 +147,12 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                   Text(MaterialLocalizations.of(context).deleteButtonTooltip),
               onPressed: () async {
                 _deletingEntry = true;
-                Navigator.of(context).popUntil((route) => route.isFirst);
+                // Pop dialog
+                Navigator.of(context).pop();
+                // Pop edit page
+                Navigator.of(context).pop();
+                // Pop view page
+                Navigator.of(context).pop();
                 await _deleteEntry(_entry);
               },
             ),
@@ -154,29 +175,17 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
       : PopScope(
           onPopInvokedWithResult: (didPop, result) async {
             if (!_deletingEntry) {
-              if (_newEntry) {
-                final updatedEntry = _entry.copy(
-                  text: text,
-                  mood: mood,
-                  timeModified: DateTime.now(),
-                );
-                if (updatedEntry.text == _entry.text &&
-                    updatedEntry.mood == _entry.mood &&
-                    _currentImages.isEmpty) {
-                  await _deleteEntry(_entry);
-                } else {
-                  await _saveEntry();
-                }
-              } else {
-                await _saveEntry();
-              }
+              await _saveEntry();
             }
           },
           child: Scaffold(
             appBar: AppBar(
                 leading: BackButton(
                   onPressed: () {
-                    Navigator.of(context).popUntil((route) => route.isFirst);
+                    // Pop edit page
+                    Navigator.of(context).pop();
+                    // Pop view page
+                    Navigator.of(context).pop();
                   },
                 ),
                 actions: [_deleteButton(), _saveButton()]),
@@ -300,18 +309,37 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
         timeModified: DateTime.now(),
       );
 
-      if (Platform.isAndroid &&
-          TimeManager.isSameDay(DateTime.now(), updatedEntry.timeCreate)) {
-        await NotificationManager.instance.dismissReminderNotification();
-      }
-      // Update if the text, mood, or date has changed
-      if (updatedEntry.text != _lastText ||
-          updatedEntry.mood != _lastMood ||
-          updatedEntry.timeCreate != _lastEntryDate) {
-        _lastText = updatedEntry.text;
-        _lastMood = updatedEntry.mood;
-        _lastEntryDate = updatedEntry.timeCreate;
-        await EntriesProvider.instance.update(updatedEntry);
+      final hasTextChange = updatedEntry.text != _lastText;
+      final hasMoodChange = updatedEntry.mood != _lastMood;
+      final hasDateChange = updatedEntry.timeCreate != _lastEntryDate;
+
+      if (_newEntry) {
+        if (hasTextChange ||
+            hasMoodChange ||
+            hasDateChange ||
+            _currentImages.isNotEmpty) {
+          if (Platform.isAndroid &&
+              TimeManager.isSameDay(DateTime.now(), updatedEntry.timeCreate)) {
+            await NotificationManager.instance.dismissReminderNotification();
+          }
+          _entry = await EntriesProvider.instance.add(updatedEntry);
+          id = _entry.id!;
+          _newEntry = false;
+          _lastText = _entry.text;
+          _lastMood = _entry.mood;
+          _lastEntryDate = _entry.timeCreate;
+        }
+      } else {
+        if (hasTextChange || hasMoodChange || hasDateChange) {
+          if (Platform.isAndroid &&
+              TimeManager.isSameDay(DateTime.now(), updatedEntry.timeCreate)) {
+            await NotificationManager.instance.dismissReminderNotification();
+          }
+          _lastText = updatedEntry.text;
+          _lastMood = updatedEntry.mood;
+          _lastEntryDate = updatedEntry.timeCreate;
+          await EntriesProvider.instance.update(updatedEntry);
+        }
       }
       // Images will update if they changed
       await _saveOrUpdateImage(id);
@@ -331,6 +359,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   }
 
   Future _saveOrUpdateImage(int entryId) async {
+    if (entryId == -1 || _entry.id == null) return;
     final savedImages = EntryImagesProvider.instance.getForEntry(_entry);
     // Add images
     for (EntryImage currentImage in _currentImages) {
@@ -360,9 +389,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
       _currentImages.add(image.copy());
     }
     if (mounted) {
-      setState(() {
-        _currentImages;
-      });
+      setState(() {});
     }
   }
 
