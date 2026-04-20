@@ -150,5 +150,6 @@
     "templateDefaultSummaryBody": "### 摘要\n- \n\n### 引用\n> ",
     "templateDefaultReflectionTitle": "反思",
     "templateDefaultReflectionBody": "### 你今天最開心的是什麼？\n- \n\n### 你感恩什麼？\n- \n\n### 你最期待什麼？\n- ",
-    "actionTakePhoto": "拍照"
+    "actionTakePhoto": "拍照",
+    "flashbackOnThisDay": "這一天"
 }
