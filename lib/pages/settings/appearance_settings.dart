@@ -236,28 +236,6 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: SettingsDropdown<String>(
-                title:
-                    AppLocalizations.of(context)!.settingsFlashbacksViewLayout,
-                value: configProvider.get(ConfigKey.homePageViewMode),
-                options: [
-                  DropdownMenuItem<String>(
-                      value: "list",
-                      child:
-                          Text(AppLocalizations.of(context)!.viewLayoutList)),
-                  DropdownMenuItem<String>(
-                      value: "grid",
-                      child:
-                          Text(AppLocalizations.of(context)!.viewLayoutGrid)),
-                ],
-                onChanged: (String? newValue) {
-                  if (newValue != null) {
-                    configProvider.set(ConfigKey.homePageViewMode, newValue);
-                  }
-                }),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: SettingsDropdown<String>(
                 title: AppLocalizations.of(context)!.settingsGalleryViewLayout,
                 value: configProvider.get(ConfigKey.galleryPageViewMode),
                 options: [

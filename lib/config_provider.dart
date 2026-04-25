@@ -21,7 +21,6 @@ class ConfigKey {
   static const String externalImgUri = "externalImgUri";
   static const String startingDayOfWeek = "startingDayOfWeek";
   static const String useMarkdownToolbar = "useMarkdownToolbar";
-  static const String homePageViewMode = "homePageViewMode";
   static const String calendarViewMode = "calendarViewMode";
   static const String galleryPageViewMode = "galleryPageViewMode";
   static const String veryHappyIcon = "veryHappyIcon";
@@ -66,6 +65,7 @@ class ConfigKey {
   static const String passwordHash = "passwordHash";
   // DEPRECATED
   static const String imageQuality = "imageQuality";
+  static const String homePageViewMode = "homePageViewMode";
 }
 
 class ImageQuality {
@@ -92,7 +92,6 @@ class ConfigProvider with ChangeNotifier {
     ConfigKey.externalImgUri: '',
     ConfigKey.startingDayOfWeek: 'system',
     ConfigKey.useMarkdownToolbar: true,
-    ConfigKey.homePageViewMode: 'list',
     ConfigKey.calendarViewMode: 'image',
     ConfigKey.galleryPageViewMode: 'grid',
     ConfigKey.veryHappyIcon: '☺️',
