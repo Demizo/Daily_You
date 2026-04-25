@@ -154,12 +154,9 @@ class _HomePageState extends State<HomePage>
     List<Flashback> flashbacks =
         FlashbackManager.getFlashbacks(context, entriesProvider.entries);
 
-    String viewMode = ConfigProvider.instance.get(ConfigKey.homePageViewMode);
-    bool listView = viewMode == 'list';
-
     return Center(
       child: Stack(alignment: Alignment.bottomCenter, children: [
-        buildEntries(context, configProvider, flashbacks, listView),
+        buildEntries(context, configProvider, flashbacks),
         HidingWidget(
           duration: Duration(milliseconds: 200),
           hideDirection: HideDirection.down,
@@ -207,7 +204,7 @@ class _HomePageState extends State<HomePage>
   }
 
   Widget buildEntries(BuildContext context, ConfigProvider configProvider,
-          List<Flashback> flashbacks, bool listView) =>
+          List<Flashback> flashbacks) =>
       ListView(controller: _scrollController, children: [
         const Center(
             child: SizedBox(height: 430, width: 400, child: EntryCalendar())),
@@ -234,10 +231,10 @@ class _HomePageState extends State<HomePage>
                   physics: const ScrollPhysics(),
                   shrinkWrap: true,
                   gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                    maxCrossAxisExtent: listView ? 500 : 300,
+                    maxCrossAxisExtent: 300,
                     crossAxisSpacing: 1.0, // Spacing between columns
                     mainAxisSpacing: 1.0, // Spacing between rows
-                    childAspectRatio: listView ? 2.0 : 1.0,
+                    childAspectRatio: 1.0,
                   ),
                   itemCount: flashbacks.length,
                   itemBuilder: (context, index) {
