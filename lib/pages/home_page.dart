@@ -106,13 +106,18 @@ class _HomePageState extends State<HomePage>
         var launchDetails = await NotificationManager.instance.notifications
             .getNotificationAppLaunchDetails();
 
-        if (NotificationManager.instance.justLaunched &&
-            launchDetails?.notificationResponse?.id == 0) {
-          NotificationManager.instance.justLaunched = false;
+        if (!NotificationManager.instance.justLaunched) return;
+        NotificationManager.instance.justLaunched = false;
 
-          DateTime targetDate = DateTime.tryParse(
-                  launchDetails?.notificationResponse?.payload ?? "") ??
-              DateTime.now();
+        final notifId = launchDetails?.notificationResponse?.id;
+        final payload = launchDetails?.notificationResponse?.payload ?? '';
+
+        if (notifId == 1) {
+          DateTime referenceDate = DateTime.tryParse(payload) ?? DateTime.now();
+          await NotificationManager.instance.dismissOnThisDayNotification();
+          await _openOnThisDayTimeline(referenceDate);
+        } else if (notifId == 0) {
+          DateTime targetDate = DateTime.tryParse(payload) ?? DateTime.now();
           Entry? entry = EntriesProvider.instance.getEntryForDate(targetDate);
           List<EntryImage> entryImages = entry != null
               ? EntryImagesProvider.instance.getForEntry(entry)
