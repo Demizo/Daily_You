@@ -96,6 +96,8 @@ class _MobileScaffoldState extends State<MobileScaffold> {
     ];
     return NotificationListener<ScrollNotification>(
       onNotification: (notification) {
+        // Ignore the home page
+        if (currentIndex == 0) return false;
         // Ignore the root scrollable, which belongs to the page view, and horizontal scrolling.
         if (notification.metrics.axis != Axis.vertical ||
             notification.depth == 0) {

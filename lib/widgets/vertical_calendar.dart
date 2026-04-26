@@ -1,0 +1,530 @@
+import 'dart:ui' as ui;
+
+import 'package:daily_you/config_provider.dart';
+import 'package:daily_you/models/entry.dart';
+import 'package:daily_you/pages/edit_entry_page.dart';
+import 'package:daily_you/pages/entries_list_page.dart';
+import 'package:daily_you/providers/entries_provider.dart';
+import 'package:daily_you/time_manager.dart';
+import 'package:daily_you/widgets/entry_day_cell.dart';
+import 'package:daily_you/widgets/year_month_picker.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+
+sealed class _CalendarItem {
+  const _CalendarItem();
+}
+
+final class _MonthHeaderItem extends _CalendarItem {
+  final DateTime month;
+  const _MonthHeaderItem(this.month);
+}
+
+final class _WeekRowItem extends _CalendarItem {
+  final List<DateTime?> days;
+  const _WeekRowItem(this.days);
+}
+
+class VerticalCalendar extends StatefulWidget {
+  final ScrollController scrollController;
+
+  const VerticalCalendar({super.key, required this.scrollController});
+
+  @override
+  State<VerticalCalendar> createState() => _VerticalCalendarState();
+}
+
+class _VerticalCalendarState extends State<VerticalCalendar> {
+  static const double _monthHeaderHeight = 30.0;
+  static const double _weekRowHeight = 57.0;
+  static const double _daysOfWeekRowHeight = 32.0;
+  static const double _actionBarHeight = 48.0;
+
+  Map<int, ui.Image> _dayNumberCache = {};
+  double? _lastDpr;
+
+  bool _isScrollReady = false;
+  bool _initialScrollDone = false;
+
+  List<_CalendarItem> _items = [];
+  List<(double, DateTime)> _monthOffsets = [];
+
+  bool _showTodayButton = false;
+  String _visibleMonthLabel = '';
+  DateTime _visibleMonth = DateTime.now();
+  String _cachedLocale = '';
+
+  int? _lastFirstDayIndex;
+  double _cellWidth = 0;
+
+  final DateTime _firstDate = DateTime(2000, 1, 1);
+  late final DateTime _lastDate =
+      DateTime(DateTime.now().year, DateTime.now().month, 1);
+
+  @override
+  void initState() {
+    super.initState();
+    widget.scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final configProvider = Provider.of<ConfigProvider>(context, listen: false);
+    final firstDayIndex = configProvider.getFirstDayOfWeekIndex(context);
+    _cachedLocale = TimeManager.currentLocale(context);
+
+    if (firstDayIndex != _lastFirstDayIndex) {
+      _lastFirstDayIndex = firstDayIndex;
+      _buildCalendarItems(firstDayIndex);
+      _visibleMonth = DateTime.now();
+      _visibleMonthLabel =
+          DateFormat('MMMM y', _cachedLocale).format(_visibleMonth);
+    }
+
+    final dpr = MediaQuery.devicePixelRatioOf(context);
+    if (_lastDpr != dpr) {
+      _lastDpr = dpr;
+      _createDayNumberCache(dpr);
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.scrollController.removeListener(_onScroll);
+    super.dispose();
+  }
+
+  Future<ui.Image> _bakeDayNumber(String text, double dpr) async {
+    const logicalSize = 57.0;
+    final physicalSize = (logicalSize * dpr).ceil();
+
+    final recorder = ui.PictureRecorder();
+    final canvas = Canvas(recorder);
+    canvas.scale(dpr, dpr);
+
+    final painter = TextPainter(
+      text: TextSpan(
+        text: text,
+        style: TextStyle(
+          fontSize: 18,
+          color: Colors.white,
+          shadows: [
+            Shadow(color: Colors.black.withValues(alpha: 0.8), blurRadius: 6),
+          ],
+        ),
+      ),
+      textDirection: ui.TextDirection.ltr,
+    )..layout();
+
+    painter.paint(
+      canvas,
+      Offset(
+        (logicalSize - painter.width) / 2,
+        (logicalSize - painter.height) / 2,
+      ),
+    );
+
+    return recorder.endRecording().toImage(physicalSize, physicalSize);
+  }
+
+  Future<void> _createDayNumberCache(double dpr) async {
+    final cache = <int, ui.Image>{};
+    for (int i = 1; i <= 31; i++) {
+      cache[i] = await _bakeDayNumber(i.toString(), dpr);
+    }
+    if (!mounted) return;
+    setState(() => _dayNumberCache = cache);
+  }
+
+  void _buildCalendarItems(int firstDayIndex) {
+    final firstDayDart = firstDayIndex == 6 ? 7 : firstDayIndex + 1;
+
+    final items = <_CalendarItem>[];
+    final monthOffsets = <(double, DateTime)>[];
+    double offset = 0;
+
+    DateTime current = DateTime(_lastDate.year, _lastDate.month, 1);
+    final end = DateTime(_firstDate.year, _firstDate.month, 1);
+
+    while (!current.isBefore(end)) {
+      monthOffsets.add((offset, current));
+
+      // Day 0 is the last day of the previous month.
+      final lastDayOfMonth = DateTime(current.year, current.month + 1, 0);
+
+      // Find the start of the last week
+      final daysFromWeekStart = (lastDayOfMonth.weekday - firstDayDart + 7) % 7;
+
+      // Use constructor to subtract days to avoid DST drifts
+      DateTime weekIter = DateTime(
+        lastDayOfMonth.year,
+        lastDayOfMonth.month,
+        lastDayOfMonth.day - daysFromWeekStart,
+      );
+
+      // Find the start of the first week of this month
+      final daysBeforeFirst = (current.weekday - firstDayDart + 7) % 7;
+
+      DateTime firstWeekStart = DateTime(
+        current.year,
+        current.month,
+        current.day - daysBeforeFirst,
+      );
+
+      // Iterate backwards from the last week to the first week
+      while (!weekIter.isBefore(firstWeekStart)) {
+        final days = List<DateTime?>.generate(7, (i) {
+          final day = DateTime(weekIter.year, weekIter.month, weekIter.day + i);
+
+          return (day.month == current.month && day.year == current.year)
+              ? day
+              : null;
+        });
+
+        items.add(_WeekRowItem(days));
+        offset += _weekRowHeight;
+
+        weekIter = DateTime(weekIter.year, weekIter.month, weekIter.day - 7);
+      }
+
+      items.add(_MonthHeaderItem(current));
+      offset += _monthHeaderHeight;
+
+      current = DateTime(current.year, current.month - 1, 1);
+    }
+
+    _items = items;
+    _monthOffsets = monthOffsets;
+  }
+
+  void _scrollToToday({bool animate = true}) {
+    if (!widget.scrollController.hasClients) return;
+    if (animate) {
+      widget.scrollController.animateTo(
+        0,
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeInOut,
+      );
+    } else {
+      widget.scrollController.jumpTo(0);
+    }
+    _updateVisibleMonthFromOffset(0);
+  }
+
+  void _jumpToMonth(DateTime month) {
+    if (!widget.scrollController.hasClients) return;
+    final entry = _monthOffsets
+        .where((e) => e.$2.year == month.year && e.$2.month == month.month)
+        .firstOrNull;
+    if (entry == null) return;
+    _jumpToOffsetIteratively(entry.$1);
+  }
+
+  void _jumpToOffsetIteratively(double target, [double? previousMaxExtent]) {
+    if (!mounted || !widget.scrollController.hasClients) return;
+    final clamped =
+        target.clamp(0.0, widget.scrollController.position.maxScrollExtent);
+    widget.scrollController.jumpTo(clamped);
+
+    if (widget.scrollController.offset < target - 1.0) {
+      final currentMax = widget.scrollController.position.maxScrollExtent;
+      if (previousMaxExtent != null && currentMax <= previousMaxExtent) return;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _jumpToOffsetIteratively(target, currentMax);
+      });
+    }
+  }
+
+  void _onScroll() {
+    final offset = widget.scrollController.offset;
+    final showToday = offset > _weekRowHeight * 3;
+    if (showToday != _showTodayButton) {
+      setState(() => _showTodayButton = showToday);
+    }
+    _updateVisibleMonthFromOffset(offset);
+  }
+
+  void _updateVisibleMonthFromOffset(double offset) {
+    if (_monthOffsets.isEmpty) return;
+    DateTime visibleMonth = _monthOffsets.first.$2;
+    for (final (mOffset, month) in _monthOffsets) {
+      if (mOffset > offset) break;
+      visibleMonth = month;
+    }
+    final label = DateFormat('MMMM y', _cachedLocale).format(visibleMonth);
+    if (label != _visibleMonthLabel) {
+      setState(() {
+        _visibleMonthLabel = label;
+        _visibleMonth = visibleMonth;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    _cachedLocale = TimeManager.currentLocale(context);
+    final firstDayIndex =
+        context.watch<ConfigProvider>().getFirstDayOfWeekIndex(context);
+    final allLabels = TimeManager.daysOfWeekLabels(context);
+
+    final dayLabels = [
+      ...allLabels.sublist(firstDayIndex),
+      ...allLabels.sublist(0, firstDayIndex),
+    ];
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        _cellWidth = constraints.maxWidth / 7;
+
+        if (!_initialScrollDone) {
+          _initialScrollDone = true;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) setState(() => _isScrollReady = true);
+          });
+        }
+
+        return AnimatedOpacity(
+          opacity: _isScrollReady ? 1.0 : 0.0,
+          duration: const Duration(milliseconds: 200),
+          child: Column(
+            children: [
+              _buildStickyHeader(context, dayLabels),
+              Expanded(
+                child: CustomScrollView(
+                  controller: widget.scrollController,
+                  reverse: true,
+                  cacheExtent: _weekRowHeight * 10,
+                  slivers: [
+                    const SliverPadding(padding: EdgeInsets.only(bottom: 70)),
+                    SliverList.builder(
+                      itemCount: _items.length,
+                      itemBuilder: (context, index) =>
+                          _buildItem(context, index),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildStickyHeader(BuildContext context, List<String> dayLabels) {
+    final theme = Theme.of(context);
+    return Container(
+      color: theme.scaffoldBackgroundColor,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            height: _actionBarHeight,
+            child: Row(
+              children: [
+                IconButton(
+                  onPressed: () => _onMonthLabelTap(context),
+                  icon: const Icon(Icons.calendar_month_rounded),
+                  padding: const EdgeInsets.all(8),
+                ),
+                IconButton(
+                  onPressed: () => _onCalendarIconTap(context),
+                  icon: SvgPicture.asset(
+                    'assets/icons/calendar_event.svg',
+                    colorFilter: ColorFilter.mode(
+                        theme.colorScheme.onSurfaceVariant, BlendMode.srcIn),
+                    width: 24,
+                    height: 24,
+                  ),
+                  padding: const EdgeInsets.all(8),
+                ),
+                const Spacer(),
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  transitionBuilder: (child, animation) {
+                    final scale = TweenSequence([
+                      TweenSequenceItem(
+                        tween: Tween<double>(begin: 0.0, end: 1.1)
+                            .chain(CurveTween(curve: Curves.easeOut)),
+                        weight: 50,
+                      ),
+                      TweenSequenceItem(
+                        tween: Tween<double>(begin: 1.1, end: 1.0)
+                            .chain(CurveTween(curve: Curves.easeIn)),
+                        weight: 50,
+                      ),
+                    ]).animate(animation);
+                    return ScaleTransition(scale: scale, child: child);
+                  },
+                  child: _showTodayButton
+                      ? IconButton(
+                          key: const ValueKey('todayBtn'),
+                          onPressed: () => _scrollToToday(),
+                          icon: SvgPicture.asset(
+                            'assets/icons/calendar_latest.svg',
+                            colorFilter: ColorFilter.mode(
+                                theme.colorScheme.onSurfaceVariant,
+                                BlendMode.srcIn),
+                            width: 24,
+                            height: 24,
+                          ),
+                        )
+                      : const SizedBox.shrink(key: ValueKey('noBtn')),
+                ),
+                const CalendarViewModeSelector(),
+              ],
+            ),
+          ),
+          SizedBox(
+            height: _daysOfWeekRowHeight,
+            child: Row(
+              children: dayLabels.map((label) {
+                return Expanded(
+                  child: Center(
+                    child: Text(
+                      label,
+                      style:
+                          TextStyle(color: theme.colorScheme.onSurfaceVariant),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _onCalendarIconTap(BuildContext context) async {
+    final entriesProvider = context.read<EntriesProvider>();
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDatePickerMode: DatePickerMode.day,
+      initialDate: DateTime.now(),
+      firstDate: _firstDate,
+      lastDate: DateTime.now(),
+    );
+
+    if (picked == null || !mounted) return;
+    _jumpToMonth(picked);
+
+    final Entry? entry = entriesProvider.getEntryForDate(picked);
+    if (!context.mounted) return;
+
+    if (entry != null) {
+      await Navigator.of(context).push(MaterialPageRoute(
+        allowSnapshotting: false,
+        builder: (context) => EntriesListPage(
+          index: entriesProvider.getIndexOfEntry(entry.id!),
+          getEntries: () => entriesProvider.entries,
+        ),
+      ));
+    } else {
+      await Navigator.of(context).push(MaterialPageRoute(
+        allowSnapshotting: false,
+        builder: (context) => AddEditEntryPage(
+          overrideCreateDate: TimeManager.currentTimeOnDifferentDate(picked)
+              .copyWith(isUtc: false),
+        ),
+      ));
+    }
+  }
+
+  Future<void> _onMonthLabelTap(BuildContext context) async {
+    final DateTime? selected =
+        await showYearMonthPicker(context, initialDate: _visibleMonth);
+    if (selected == null) return;
+    _jumpToMonth(selected);
+  }
+
+  Widget _buildItem(BuildContext context, int index) {
+    final item = _items[index];
+    if (item is _MonthHeaderItem) return _buildMonthHeader(context, item.month);
+    if (item is _WeekRowItem) return _buildWeekRow(context, item);
+    return const SizedBox.shrink();
+  }
+
+  Widget _buildMonthHeader(BuildContext context, DateTime month) {
+    return SizedBox(
+      height: _monthHeaderHeight,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 4),
+        child: Align(
+          alignment: Alignment.center,
+          child: Text(
+            DateFormat('MMMM y', _cachedLocale).format(month),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWeekRow(BuildContext context, _WeekRowItem item) {
+    final firstDay = item.days.firstWhere((d) => d != null)!;
+    final currentMonth = DateTime(firstDay.year, firstDay.month, 1);
+    final now = DateTime.now();
+
+    return RepaintBoundary(child: SizedBox(
+      height: _weekRowHeight,
+      child: Row(
+        children: item.days.map((day) {
+          if (day == null) {
+            return SizedBox(width: _cellWidth, height: _weekRowHeight);
+          }
+          final isFuture = day.isAfter(now) && !TimeManager.isToday(day);
+
+          if (isFuture) {
+            return SizedBox(
+              width: _cellWidth,
+              height: _weekRowHeight,
+              child: Center(
+                child: Text(
+                  '${day.day}',
+                  style: TextStyle(
+                      fontSize: 16, color: Theme.of(context).disabledColor),
+                ),
+              ),
+            );
+          }
+
+          return SizedBox(
+            width: _cellWidth,
+            height: _weekRowHeight,
+            child: EntryDayCell(
+              date: day,
+              currentMonth: currentMonth,
+              dayNumber: _dayNumberCache[day.day],
+            ),
+          );
+        }).toList(),
+      ),
+    ));
+  }
+}
+
+class CalendarViewModeSelector extends StatelessWidget {
+  const CalendarViewModeSelector({super.key});
+
+  Future<void> _setViewMode() async {
+    final current =
+        ConfigProvider.instance.get(ConfigKey.calendarViewMode) as String;
+    await ConfigProvider.instance
+        .set(ConfigKey.calendarViewMode, current == 'mood' ? 'image' : 'mood');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final viewMode =
+        context.watch<ConfigProvider>().get(ConfigKey.calendarViewMode);
+    return IconButton(
+      onPressed: _setViewMode,
+      icon: Icon(viewMode == 'mood' ? Icons.image_rounded : Icons.mood_rounded),
+    );
+  }
+}
