@@ -80,6 +80,16 @@ class NotificationManager {
     }
   }
 
+  Future<void> dismissOnThisDayNotification() async {
+    var activeNotifications = await NotificationManager.instance.notifications
+        .getActiveNotifications();
+    for (var notif in activeNotifications) {
+      if (notif.id == 1) {
+        await NotificationManager.instance.notifications.cancel(1);
+      }
+    }
+  }
+
   Future<void> stopDailyReminders() async {
     await AndroidAlarmManager.cancel(0);
     await dismissReminderNotification();
@@ -87,5 +97,14 @@ class NotificationManager {
 
   Future<void> startScheduledDailyReminders() async {
     setAlarm(firstSet: true);
+  }
+
+  Future<void> stopOnThisDayNotifications() async {
+    await AndroidAlarmManager.cancel(1);
+    await dismissOnThisDayNotification();
+  }
+
+  Future<void> startOnThisDayNotifications() async {
+    setOnThisDayAlarm(firstSet: true);
   }
 }

@@ -27,6 +27,51 @@ import 'package:time_range_picker/time_range_picker.dart';
 import 'package:provider/provider.dart';
 
 @pragma('vm:entry-point')
+void onThisDayCallbackDispatcher() async {
+  await ConfigProvider.instance.init();
+  // Skip syncing for the alarm background task
+  await AppDatabase.instance.init(forceWithoutSync: true);
+
+  final now = DateTime.now();
+  final hasOnThisDayEntries = EntriesProvider.instance.entries.any((e) =>
+      e.timeCreate.day == now.day &&
+      e.timeCreate.month == now.month &&
+      e.timeCreate.year != now.year);
+
+  if (hasOnThisDayEntries) {
+    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+        FlutterLocalNotificationsPlugin();
+    await flutterLocalNotificationsPlugin.initialize(
+        const InitializationSettings(
+            android: AndroidInitializationSettings('@drawable/ic_notification'),
+            linux:
+                LinuxInitializationSettings(defaultActionName: 'On This Day')));
+
+    // Localized notification text is stored in SharedPreferences upon startup
+    var prefs = await SharedPreferences.getInstance();
+    var title = prefs.getString('onThisDayNotificationTitle');
+    var description = prefs.getString('onThisDayNotificationDescription');
+
+    var androidDetails = AndroidNotificationDetails(
+      'daily_you_on_this_day',
+      title ?? 'On This Day',
+      icon: '@drawable/ic_notification',
+      importance: Importance.defaultImportance,
+      priority: Priority.defaultPriority,
+    );
+
+    if (title != null && description != null) {
+      await flutterLocalNotificationsPlugin.show(
+          1, title, description, NotificationDetails(android: androidDetails),
+          payload: DateTime.now().toIso8601String());
+    }
+  }
+
+  AppDatabase.instance.close();
+  setOnThisDayAlarm(firstSet: false);
+}
+
+@pragma('vm:entry-point')
 void callbackDispatcher() async {
   await ConfigProvider.instance.init();
   // Skip syncing for the alarm background task
@@ -158,6 +203,27 @@ Future<void> setAlarm({bool firstSet = false}) async {
   DateTime reminderDateTime = DateTime.now().add(reminderTime - currentTime);
 
   await AndroidAlarmManager.oneShotAt(reminderDateTime, 0, callbackDispatcher,
+      allowWhileIdle: true, exact: true, rescheduleOnReboot: true);
+}
+
+Future<void> setOnThisDayAlarm({bool firstSet = false}) async {
+  DateTime referenceTime = TimeManager.startOfDay(DateTime.now());
+  Duration currentTime = DateTime.now().difference(referenceTime);
+
+  int hour = ConfigProvider.instance.get(ConfigKey.onThisDayNotificationHour);
+  int minute =
+      ConfigProvider.instance.get(ConfigKey.onThisDayNotificationMinute);
+  Duration reminderTime = TimeManager.addTimeOfDay(
+          referenceTime, TimeOfDay(hour: hour, minute: minute))
+      .difference(referenceTime);
+
+  if (!firstSet || reminderTime <= currentTime) {
+    reminderTime += const Duration(days: 1);
+  }
+
+  DateTime reminderDateTime = DateTime.now().add(reminderTime - currentTime);
+  await AndroidAlarmManager.oneShotAt(
+      reminderDateTime, 1, onThisDayCallbackDispatcher,
       allowWhileIdle: true, exact: true, rescheduleOnReboot: true);
 }
 

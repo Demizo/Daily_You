@@ -282,6 +282,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsDailyReminderTitle => 'تذكير يومي';
 
   @override
+  String get settingsOnThisDayDescription => 'Revisit past memories';
+
+  @override
   String get settingsDailyReminderDescription => 'تذكير لطيف كل يوم';
 
   @override

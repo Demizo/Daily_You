@@ -277,6 +277,9 @@ class AppLocalizationsHi extends AppLocalizations {
   String get settingsDailyReminderTitle => 'डेली रिमाइंडर';
 
   @override
+  String get settingsOnThisDayDescription => 'Revisit past memories';
+
+  @override
   String get settingsDailyReminderDescription => 'A gentle reminder each day';
 
   @override

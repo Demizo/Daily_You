@@ -277,6 +277,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get settingsDailyReminderTitle => 'Denní připomenutí';
 
   @override
+  String get settingsOnThisDayDescription => 'Revisit past memories';
+
+  @override
   String get settingsDailyReminderDescription => 'Jemné každodenní připomenutí';
 
   @override

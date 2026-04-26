@@ -278,6 +278,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsDailyReminderTitle => 'Recordatorio diario';
 
   @override
+  String get settingsOnThisDayDescription => 'Revisit past memories';
+
+  @override
   String get settingsDailyReminderDescription => 'Breve recordatorio diario';
 
   @override

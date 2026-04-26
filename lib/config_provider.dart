@@ -40,11 +40,15 @@ class ConfigKey {
   static const String reminderStartMinute = "reminderStartMinute";
   static const String reminderEndHour = "reminderEndHour";
   static const String reminderEndMinute = "reminderEndMinute";
-  static const String defaultTemplate = "defaultTemplate";
-  static const String imageQualityLevel = "imageQualityLevel";
   static const String alwaysRemind = "alwaysRemind";
+  static const String onThisDayNotifications = "onThisDayNotifications";
+  static const String onThisDayNotificationHour = "onThisDayNotificationHour";
+  static const String onThisDayNotificationMinute =
+      "onThisDayNotificationMinute";
   static const String dismissedNotificationOnboarding =
       "dismissedNotificationOnboarding";
+  static const String defaultTemplate = "defaultTemplate";
+  static const String imageQualityLevel = "imageQualityLevel";
   static const String overrideLanguage = "overrideLanguage";
   static const String showFlashbacks = "showFlashbacks";
   static const String excludeBadDaysFromFlashbacks =
@@ -107,10 +111,13 @@ class ConfigProvider with ChangeNotifier {
     ConfigKey.reminderStartMinute: 0,
     ConfigKey.reminderEndHour: 21,
     ConfigKey.reminderEndMinute: 0,
+    ConfigKey.alwaysRemind: false,
+    ConfigKey.onThisDayNotifications: false,
+    ConfigKey.onThisDayNotificationHour: 12,
+    ConfigKey.onThisDayNotificationMinute: 0,
+    ConfigKey.dismissedNotificationOnboarding: false,
     ConfigKey.defaultTemplate: -1,
     ConfigKey.imageQualityLevel: ImageQuality.medium,
-    ConfigKey.alwaysRemind: false,
-    ConfigKey.dismissedNotificationOnboarding: false,
     ConfigKey.overrideLanguage: null,
     ConfigKey.showFlashbacks: true,
     ConfigKey.excludeBadDaysFromFlashbacks: false,

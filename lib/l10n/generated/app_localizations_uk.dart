@@ -283,6 +283,9 @@ class AppLocalizationsUk extends AppLocalizations {
   String get settingsDailyReminderTitle => 'Кожноденне нагадування';
 
   @override
+  String get settingsOnThisDayDescription => 'Revisit past memories';
+
+  @override
   String get settingsDailyReminderDescription => 'Ніжне нагадування щодня';
 
   @override

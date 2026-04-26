@@ -273,6 +273,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsDailyReminderTitle => '每日提醒';
 
   @override
+  String get settingsOnThisDayDescription => 'Revisit past memories';
+
+  @override
   String get settingsDailyReminderDescription => '每天一次温和的提醒';
 
   @override

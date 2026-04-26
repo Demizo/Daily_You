@@ -278,6 +278,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settingsDailyReminderTitle => 'Lembrete Diário';
 
   @override
+  String get settingsOnThisDayDescription => 'Revisit past memories';
+
+  @override
   String get settingsDailyReminderDescription => 'Um lembrete suave cada dia';
 
   @override

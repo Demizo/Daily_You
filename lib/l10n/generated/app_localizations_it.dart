@@ -282,6 +282,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get settingsDailyReminderTitle => 'Promemoria Giornaliero';
 
   @override
+  String get settingsOnThisDayDescription => 'Revisit past memories';
+
+  @override
   String get settingsDailyReminderDescription =>
       'Un gentile promemoria ogni giorno';
 
