@@ -3,7 +3,6 @@ import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/database/image_storage.dart';
 import 'package:daily_you/device_info_service.dart';
 import 'package:daily_you/launch_intent.dart';
-import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/widgets/auth_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
