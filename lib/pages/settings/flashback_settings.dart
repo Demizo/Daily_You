@@ -63,9 +63,7 @@ class _FlashbackSettingsPageState extends State<FlashbackSettings> {
         child: Divider(),
       ),
       SettingsToggle(
-          title: AppLocalizations.of(context)!
-              .flashbackYear(2)
-              .replaceFirst("2", "?"), // Display "? Years Ago"
+          title: AppLocalizations.of(context)!.flashbackOnThisDay,
           settingsKey: ConfigKey.showflashbackYearsAgo,
           onChanged: (value) {
             configProvider.set(ConfigKey.showflashbackYearsAgo, value);
