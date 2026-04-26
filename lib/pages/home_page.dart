@@ -11,8 +11,8 @@ import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/entry_calendar.dart';
+import 'package:daily_you/widgets/flashback_card.dart';
 import 'package:daily_you/widgets/hiding_widget.dart';
-import 'package:daily_you/widgets/large_entry_card_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/models/entry.dart';
@@ -20,8 +20,6 @@ import 'package:daily_you/pages/entries_list_page.dart';
 import 'package:daily_you/pages/entry_timeline_page.dart';
 import 'package:daily_you/pages/edit_entry_page.dart';
 import 'package:provider/provider.dart';
-import '../widgets/entry_card_widget.dart';
-import '../widgets/flashback_card_widget.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -258,7 +256,7 @@ class _HomePageState extends State<HomePage>
                             ));
                           }
                         },
-                        child: FlashbackCardWidget(
+                        child: FlashbackCard(
                             title: flashback.title,
                             entries: flashback.entries));
                   },

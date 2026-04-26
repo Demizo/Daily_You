@@ -6,8 +6,8 @@ import 'package:daily_you/widgets/scaled_markdown.dart';
 import 'package:flutter/material.dart';
 import 'local_image_loader.dart';
 
-class FlashbackCardWidget extends StatelessWidget {
-  const FlashbackCardWidget({
+class FlashbackCard extends StatelessWidget {
+  const FlashbackCard({
     super.key,
     required this.title,
     required this.entries,
