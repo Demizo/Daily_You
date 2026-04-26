@@ -59,6 +59,8 @@ class ConfigKey {
   static const String showflashbackGoodDay = "showflashbackGoodDay";
   static const String showflashbackRandomDay = "showflashbackRandomDay";
   static const String hideImagesInGallery = "hideImagesInGallery";
+  static const String lastDismissedSupportBannerDate =
+      "lastDismissedSupportBannerDate";
   // Secure Configuration Values
   static const String requirePassword = "requirePassword";
   static const String biometricUnlock = "biometricUnlock";
@@ -127,6 +129,7 @@ class ConfigProvider with ChangeNotifier {
     ConfigKey.showflashbackGoodDay: true,
     ConfigKey.showflashbackRandomDay: true,
     ConfigKey.hideImagesInGallery: false,
+    ConfigKey.lastDismissedSupportBannerDate: null,
   };
 
   final Map<String, dynamic> _secureConfig = {

@@ -13,6 +13,7 @@ import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/entry_calendar.dart';
 import 'package:daily_you/widgets/flashback_card.dart';
 import 'package:daily_you/widgets/hiding_widget.dart';
+import 'package:daily_you/widgets/support_banner.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/models/entry.dart';
@@ -151,7 +152,6 @@ class _HomePageState extends State<HomePage>
 
     List<Flashback> flashbacks =
         FlashbackManager.getFlashbacks(context, entriesProvider.entries);
-
     return Center(
       child: Stack(alignment: Alignment.bottomCenter, children: [
         buildEntries(context, configProvider, flashbacks),
@@ -204,6 +204,12 @@ class _HomePageState extends State<HomePage>
   Widget buildEntries(BuildContext context, ConfigProvider configProvider,
           List<Flashback> flashbacks) =>
       ListView(controller: _scrollController, children: [
+        if (SupportBanner.shouldShowBanner(
+          entryCount: EntriesProvider.instance.entries.length,
+          lastDismissedIso: configProvider
+              .get(ConfigKey.lastDismissedSupportBannerDate) as String?,
+        ))
+          SupportBanner(configProvider: configProvider),
         const Center(
             child: SizedBox(height: 430, width: 400, child: EntryCalendar())),
         if (configProvider.get(ConfigKey.showFlashbacks))
