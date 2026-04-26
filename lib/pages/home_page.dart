@@ -17,9 +17,11 @@ import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/pages/entries_list_page.dart';
+import 'package:daily_you/pages/entry_timeline_page.dart';
 import 'package:daily_you/pages/edit_entry_page.dart';
 import 'package:provider/provider.dart';
 import '../widgets/entry_card_widget.dart';
+import '../widgets/flashback_card_widget.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -72,6 +74,29 @@ class _HomePageState extends State<HomePage>
       DeviceInfoService().launchIntent = null;
       await addOrEditTodayEntry(todayEntry, todayImages, openCamera);
     }
+  }
+
+  Future<void> _openOnThisDayTimeline(DateTime referenceDate) async {
+    final hasEntries = EntriesProvider.instance.entries.any((e) =>
+        e.timeCreate.day == referenceDate.day &&
+        e.timeCreate.month == referenceDate.month &&
+        e.timeCreate.year != referenceDate.year);
+    if (!hasEntries || !mounted) return;
+
+    await Navigator.of(context).push(MaterialPageRoute(
+      allowSnapshotting: false,
+      builder: (context) => EntryTimelinePage(
+        header: AppLocalizations.of(context)!.flashbackOnThisDay,
+        getEntries: () => EntriesProvider.instance.entries
+            .where((e) =>
+                e.timeCreate.day == referenceDate.day &&
+                e.timeCreate.month == referenceDate.month &&
+                e.timeCreate.year != referenceDate.year)
+            .toList(),
+        labelBuilder: (e) => AppLocalizations.of(context)!
+            .flashbackYear(referenceDate.year - e.timeCreate.year),
+      ),
+    ));
   }
 
   Future _checkForNotificationLaunch() async {
@@ -214,26 +239,26 @@ class _HomePageState extends State<HomePage>
                     final flashback = flashbacks[index];
                     return GestureDetector(
                         onTap: () async {
-                          await Navigator.of(context).push(MaterialPageRoute(
-                            allowSnapshotting: false,
-                            builder: (context) => EntriesListPage(
-                                index: EntriesProvider.instance
-                                    .getIndexOfEntry(flashback.entry.id!),
-                                getEntries: () =>
-                                    EntriesProvider.instance.entries),
-                          ));
+                          if (flashback.isMultiEntry) {
+                            // TODO: Currently, only On This Day can have multiple entries. Revisit this approach when allowing multiple entries per day.
+                            await NotificationManager.instance
+                                .dismissOnThisDayNotification();
+                            await _openOnThisDayTimeline(DateTime.now());
+                          } else {
+                            await Navigator.of(context).push(MaterialPageRoute(
+                              allowSnapshotting: false,
+                              builder: (context) => EntriesListPage(
+                                  index: EntriesProvider.instance
+                                      .getIndexOfEntry(
+                                          flashback.firstEntry.id!),
+                                  getEntries: () =>
+                                      EntriesProvider.instance.entries),
+                            ));
+                          }
                         },
-                        child: listView
-                            ? LargeEntryCardWidget(
-                                title: flashback.title,
-                                entry: flashback.entry,
-                                images: EntryImagesProvider.instance
-                                    .getForEntry(flashback.entry))
-                            : EntryCardWidget(
-                                title: flashback.title,
-                                entry: flashback.entry,
-                                images: EntryImagesProvider.instance
-                                    .getForEntry(flashback.entry)));
+                        child: FlashbackCardWidget(
+                            title: flashback.title,
+                            entries: flashback.entries));
                   },
                 ),
       ]);
