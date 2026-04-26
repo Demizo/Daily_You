@@ -119,6 +119,7 @@ class _MobileScaffoldState extends State<MobileScaffold> {
             actions: [
               if (Platform.isAndroid &&
                   !configProvider.get(ConfigKey.dailyReminders) &&
+                  !configProvider.get(ConfigKey.onThisDayNotifications) &&
                   !configProvider
                       .get(ConfigKey.dismissedNotificationOnboarding))
                 IconButton(
