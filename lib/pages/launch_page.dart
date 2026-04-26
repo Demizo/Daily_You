@@ -79,8 +79,6 @@ class _LaunchPageState extends State<LaunchPage> {
         AppLocalizations.of(context)!.flashbackOnThisDay);
     await prefs.setString('onThisDayNotificationDescription',
         AppLocalizations.of(context)!.settingsOnThisDayDescription);
-    // TODO: Dismiss On This Day after opening flashback
-    await NotificationManager.instance.dismissOnThisDayNotification();
   }
 
   _checkDatabaseConnection() async {
