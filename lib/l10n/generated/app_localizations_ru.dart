@@ -283,6 +283,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsDailyReminderTitle => 'Ежедневное напоминание';
 
   @override
+  String get settingsOnThisDayDescription => 'Revisit past memories';
+
+  @override
   String get settingsDailyReminderDescription =>
       'Удобное пуш-уведомление на каждый день';
 

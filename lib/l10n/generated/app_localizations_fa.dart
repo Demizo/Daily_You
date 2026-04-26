@@ -276,6 +276,9 @@ class AppLocalizationsFa extends AppLocalizations {
   String get settingsDailyReminderTitle => 'یادآوری روزانه';
 
   @override
+  String get settingsOnThisDayDescription => 'Revisit past memories';
+
+  @override
   String get settingsDailyReminderDescription => 'A gentle reminder each day';
 
   @override

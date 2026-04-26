@@ -552,6 +552,12 @@ abstract class AppLocalizations {
   /// **'Daily Reminder'**
   String get settingsDailyReminderTitle;
 
+  /// No description provided for @settingsOnThisDayDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Revisit past memories'**
+  String get settingsOnThisDayDescription;
+
   /// No description provided for @settingsDailyReminderDescription.
   ///
   /// In en, this message translates to:

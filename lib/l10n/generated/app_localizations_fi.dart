@@ -278,6 +278,9 @@ class AppLocalizationsFi extends AppLocalizations {
   String get settingsDailyReminderTitle => 'Päivittäinen muistutus';
 
   @override
+  String get settingsOnThisDayDescription => 'Revisit past memories';
+
+  @override
   String get settingsDailyReminderDescription => 'Lempeä muistutus joka päivä';
 
   @override

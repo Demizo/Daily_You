@@ -77,6 +77,8 @@ class _MobileScaffoldState extends State<MobileScaffold> {
                 .settingsNotificationsPermissionsPrompt),
             Divider(),
             ...NotificationSettings.buildCoreReminderSettings(context),
+            Divider(),
+            ...NotificationSettings.buildOnThisDaySettings(context),
           ]),
         );
       },

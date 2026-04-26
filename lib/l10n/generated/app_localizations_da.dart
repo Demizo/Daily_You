@@ -275,6 +275,9 @@ class AppLocalizationsDa extends AppLocalizations {
   String get settingsDailyReminderTitle => 'Daglig påmindelse';
 
   @override
+  String get settingsOnThisDayDescription => 'Revisit past memories';
+
+  @override
   String get settingsDailyReminderDescription =>
       'Lad appen køre i baggrunden for bedste resultater';
 

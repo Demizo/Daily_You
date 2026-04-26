@@ -280,6 +280,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settingsDailyReminderTitle => 'Dagelijkse herinnering';
 
   @override
+  String get settingsOnThisDayDescription => 'Revisit past memories';
+
+  @override
   String get settingsDailyReminderDescription =>
       'Iedere dag een kleine herinnering';
 

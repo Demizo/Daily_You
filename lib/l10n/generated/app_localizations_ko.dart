@@ -274,6 +274,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get settingsDailyReminderTitle => '일일 알림';
 
   @override
+  String get settingsOnThisDayDescription => 'Revisit past memories';
+
+  @override
   String get settingsDailyReminderDescription => '매일의 다정한 알림';
 
   @override

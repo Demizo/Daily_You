@@ -34,6 +34,32 @@ class NotificationSettings extends StatefulWidget {
     }
   }
 
+  static TimeOfDay _onThisDayNotificationTime() {
+    return TimeOfDay(
+      hour: ConfigProvider.instance.get(ConfigKey.onThisDayNotificationHour),
+      minute:
+          ConfigProvider.instance.get(ConfigKey.onThisDayNotificationMinute),
+    );
+  }
+
+  static Future<void> _selectOnThisDayTime(BuildContext context) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: _onThisDayNotificationTime(),
+    );
+
+    if (picked != null) {
+      await ConfigProvider.instance
+          .set(ConfigKey.onThisDayNotificationHour, picked.hour);
+      await ConfigProvider.instance
+          .set(ConfigKey.onThisDayNotificationMinute, picked.minute);
+      if (ConfigProvider.instance.get(ConfigKey.onThisDayNotifications)) {
+        await NotificationManager.instance.stopOnThisDayNotifications();
+        await NotificationManager.instance.startOnThisDayNotifications();
+      }
+    }
+  }
+
   static Future<void> _selectTimeRange(BuildContext context) async {
     ThemeData theme = Theme.of(context);
     TimeRange currentRange = TimeManager.getReminderTimeRange();
@@ -138,6 +164,37 @@ class NotificationSettings extends StatefulWidget {
             }),
     ];
   }
+
+  static List<Widget> buildOnThisDaySettings(BuildContext context) {
+    final configProvider = Provider.of<ConfigProvider>(context);
+    return [
+      SettingsToggle(
+          title: AppLocalizations.of(context)!.flashbackOnThisDay,
+          hint: AppLocalizations.of(context)!.settingsOnThisDayDescription,
+          settingsKey: ConfigKey.onThisDayNotifications,
+          onChanged: (value) async {
+            if (await NotificationManager.instance
+                .hasNotificationPermission()) {
+              if (value) {
+                await NotificationManager.instance
+                    .startOnThisDayNotifications();
+              } else {
+                await NotificationManager.instance.stopOnThisDayNotifications();
+              }
+              await configProvider.set(ConfigKey.onThisDayNotifications, value);
+            }
+          }),
+      if (configProvider.get(ConfigKey.onThisDayNotifications))
+        SettingsIconAction(
+            title: AppLocalizations.of(context)!.settingsReminderTime,
+            hint: TimeManager.timeOfDayString(
+                context, NotificationSettings._onThisDayNotificationTime()),
+            icon: Icon(Icons.schedule_rounded),
+            onPressed: () async {
+              NotificationSettings._selectOnThisDayTime(context);
+            }),
+    ];
+  }
 }
 
 class _NotificationSettingsState extends State<NotificationSettings> {
@@ -167,7 +224,19 @@ class _NotificationSettingsState extends State<NotificationSettings> {
                 onChanged: (value) async {
                   await configProvider.set(ConfigKey.alwaysRemind, value);
                 }),
-          if (configProvider.get(ConfigKey.dailyReminders))
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+            child: Divider(),
+          ),
+          ...NotificationSettings.buildOnThisDaySettings(context),
+          if (configProvider.get(ConfigKey.dailyReminders) ||
+              configProvider.get(ConfigKey.onThisDayNotifications))
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+              child: Divider(),
+            ),
+          if (configProvider.get(ConfigKey.dailyReminders) ||
+              configProvider.get(ConfigKey.onThisDayNotifications))
             SettingsIconAction(
                 title: AppLocalizations.of(context)!
                     .settingsCustomizeNotificationTitle,

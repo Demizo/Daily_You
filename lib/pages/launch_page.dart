@@ -3,6 +3,7 @@ import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/database/image_storage.dart';
 import 'package:daily_you/device_info_service.dart';
 import 'package:daily_you/launch_intent.dart';
+import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/widgets/auth_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
@@ -74,6 +75,12 @@ class _LaunchPageState extends State<LaunchPage> {
         'dailyReminderTitle', AppLocalizations.of(context)!.dailyReminderTitle);
     await prefs.setString('dailyReminderDescription',
         AppLocalizations.of(context)!.dailyReminderDescription);
+    await prefs.setString('onThisDayNotificationTitle',
+        AppLocalizations.of(context)!.flashbackOnThisDay);
+    await prefs.setString('onThisDayNotificationDescription',
+        AppLocalizations.of(context)!.settingsOnThisDayDescription);
+    // TODO: Dismiss On This Day after opening flashback
+    await NotificationManager.instance.dismissOnThisDayNotification();
   }
 
   _checkDatabaseConnection() async {

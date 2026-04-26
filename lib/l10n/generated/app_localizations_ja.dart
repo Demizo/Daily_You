@@ -274,6 +274,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get settingsDailyReminderTitle => 'リマインダー';
 
   @override
+  String get settingsOnThisDayDescription => 'Revisit past memories';
+
+  @override
   String get settingsDailyReminderDescription => '毎日、便利なリマインダーを送信';
 
   @override

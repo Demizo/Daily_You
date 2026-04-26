@@ -131,6 +131,8 @@
   "@settingsNotificationsPermissionsPrompt": {},
   "settingsDailyReminderTitle": "Daily Reminder",
   "@settingsDailyReminderTitle": {},
+  "settingsOnThisDayDescription": "Revisit past memories",
+  "@settingsOnThisDayDescription": {},
   "settingsDailyReminderDescription": "A gentle reminder each day",
   "@settingsDailyReminderDescription": {},
   "settingsReminderTime": "Reminder Time",
