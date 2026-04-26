@@ -113,8 +113,8 @@ class _EntryViewPageState extends State<EntryViewPage> {
                           data: entry.text,
                         ))),
               Padding(
-                padding:
-                    const EdgeInsets.only(left: 8, top: 4, bottom: 4, right: 8),
+                padding: const EdgeInsets.only(
+                    left: 8, top: 4, bottom: 18, right: 8),
                 child: Text(
                   "${AppLocalizations.of(context)!.lastModified}: ${DateFormat.yMMMEd(TimeManager.currentLocale(context)).format(entry.timeModified)} ${DateFormat.jm(TimeManager.currentLocale(context)).format(entry.timeModified)}",
                   style: TextStyle(fontSize: 12, color: theme.disabledColor),
