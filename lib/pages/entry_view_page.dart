@@ -146,7 +146,7 @@ class _EntryViewPageState extends State<EntryViewPage> {
             transitionDuration: const Duration(milliseconds: 200),
           ));
 
-          widget.onEntryEdited(widget.entryId);
+          widget.onEntryEdited(entry.id);
         });
   }
 
