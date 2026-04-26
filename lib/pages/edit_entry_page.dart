@@ -59,6 +59,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   bool _deletingEntry = false;
   bool _savingEntry = false;
   bool _newEntry = false;
+  bool _creatingNewEntry = false;
   Timer? _debounceTimer;
 
   Future<void> _initEntry() async {
@@ -79,6 +80,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
         timeModified: DateTime.now(),
       );
       _newEntry = true;
+      _creatingNewEntry = true;
       id = -1;
     } else {
       _entry = widget.entry!;
@@ -151,8 +153,10 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                 Navigator.of(context).pop();
                 // Pop edit page
                 Navigator.of(context).pop();
-                // Pop view page
-                Navigator.of(context).pop();
+                if (!_creatingNewEntry) {
+                  // Pop view page
+                  Navigator.of(context).pop();
+                }
                 await _deleteEntry(_entry);
               },
             ),
@@ -184,8 +188,10 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                   onPressed: () {
                     // Pop edit page
                     Navigator.of(context).pop();
-                    // Pop view page
-                    Navigator.of(context).pop();
+                    if (!_creatingNewEntry) {
+                      // Pop view page
+                      Navigator.of(context).pop();
+                    }
                   },
                 ),
                 actions: [_deleteButton(), _saveButton()]),
