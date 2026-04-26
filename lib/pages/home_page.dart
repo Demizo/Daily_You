@@ -10,10 +10,9 @@ import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/time_manager.dart';
-import 'package:daily_you/widgets/entry_calendar.dart';
 import 'package:daily_you/widgets/flashback_card.dart';
-import 'package:daily_you/widgets/hiding_widget.dart';
 import 'package:daily_you/widgets/support_banner.dart';
+import 'package:daily_you/widgets/vertical_calendar.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/models/entry.dart';
@@ -31,8 +30,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage>
     with AutomaticKeepAliveClientMixin {
-  String searchText = '';
-  bool sortOrderAsc = true;
   bool firstLoad = true;
   final ScrollController _scrollController = ScrollController();
 
@@ -48,8 +45,8 @@ class _HomePageState extends State<HomePage>
 
   @override
   void dispose() {
-    super.dispose();
     _scrollController.dispose();
+    super.dispose();
   }
 
   Future<void> addOrEditTodayEntry(
@@ -139,6 +136,57 @@ class _HomePageState extends State<HomePage>
     }
   }
 
+  Widget _buildFlashbacksRow(BuildContext context, List<Flashback> flashbacks) {
+    return SizedBox(
+      height: 148,
+      child: ShaderMask(
+        shaderCallback: (Rect bounds) => const LinearGradient(
+          stops: [0, 0.02, 0.98, 1],
+          colors: [
+            Colors.transparent,
+            Colors.white,
+            Colors.white,
+            Colors.transparent
+          ],
+        ).createShader(bounds),
+        blendMode: BlendMode.dstIn,
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          itemCount: flashbacks.length,
+          itemBuilder: (context, index) {
+            final flashback = flashbacks[index];
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: SizedBox(
+                width: 160,
+                child: GestureDetector(
+                  onTap: () async {
+                    if (flashback.isMultiEntry) {
+                      await NotificationManager.instance
+                          .dismissOnThisDayNotification();
+                      await _openOnThisDayTimeline(DateTime.now());
+                    } else {
+                      await Navigator.of(context).push(MaterialPageRoute(
+                        allowSnapshotting: false,
+                        builder: (context) => EntriesListPage(
+                            index: EntriesProvider.instance
+                                .getIndexOfEntry(flashback.firstEntry.id!),
+                            getEntries: () => EntriesProvider.instance.entries),
+                      ));
+                    }
+                  },
+                  child: FlashbackCard(
+                      title: flashback.title, entries: flashback.entries),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -150,122 +198,66 @@ class _HomePageState extends State<HomePage>
     List<EntryImage> todayImages =
         todayEntry != null ? entryImagesProvider.getForEntry(todayEntry) : [];
 
-    List<Flashback> flashbacks =
+    final List<Flashback> flashbacks =
         FlashbackManager.getFlashbacks(context, entriesProvider.entries);
-    return Center(
-      child: Stack(alignment: Alignment.bottomCenter, children: [
-        buildEntries(context, configProvider, flashbacks),
-        HidingWidget(
-          duration: Duration(milliseconds: 200),
-          hideDirection: HideDirection.down,
-          scrollController: _scrollController,
-          child: Padding(
-            padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                if (Platform.isAndroid)
-                  FloatingActionButton.small(
-                    heroTag: "home-camera-button",
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    elevation: 1,
-                    shape: CircleBorder(),
-                    child: Icon(
-                      Icons.camera_alt_rounded,
-                      color: Theme.of(context).colorScheme.primaryContainer,
-                      size: 24,
-                    ),
-                    onPressed: () async {
-                      await addOrEditTodayEntry(todayEntry, todayImages, true);
-                    },
-                  ),
-                FloatingActionButton(
-                  heroTag: "home-entry-button",
+    final bool showFlashbacks =
+        configProvider.get(ConfigKey.showFlashbacks) && flashbacks.isNotEmpty;
+    final bool showBanner = SupportBanner.shouldShowBanner(
+      entryCount: entriesProvider.entries.length,
+      lastDismissedIso: configProvider
+          .get(ConfigKey.lastDismissedSupportBannerDate) as String?,
+    );
+
+    return Stack(
+      alignment: Alignment.bottomCenter,
+      children: [
+        Column(
+          children: [
+            if (showBanner) SupportBanner(configProvider: configProvider),
+            if (showFlashbacks) _buildFlashbacksRow(context, flashbacks),
+            Expanded(
+              child: VerticalCalendar(scrollController: _scrollController),
+            ),
+          ],
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              if (Platform.isAndroid)
+                FloatingActionButton.small(
+                  heroTag: "home-camera-button",
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   elevation: 1,
+                  shape: const CircleBorder(),
                   child: Icon(
-                    todayEntry == null ? Icons.add_rounded : Icons.edit_rounded,
+                    Icons.camera_alt_rounded,
                     color: Theme.of(context).colorScheme.primaryContainer,
-                    size: 28,
+                    size: 24,
                   ),
                   onPressed: () async {
-                    await addOrEditTodayEntry(todayEntry, todayImages, false);
+                    await addOrEditTodayEntry(todayEntry, todayImages, true);
                   },
                 ),
-              ],
-            ),
+              FloatingActionButton(
+                heroTag: "home-entry-button",
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                elevation: 1,
+                child: Icon(
+                  todayEntry == null ? Icons.add_rounded : Icons.edit_rounded,
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  size: 28,
+                ),
+                onPressed: () async {
+                  await addOrEditTodayEntry(todayEntry, todayImages, false);
+                },
+              ),
+            ],
           ),
         ),
-      ]),
+      ],
     );
   }
-
-  Widget buildEntries(BuildContext context, ConfigProvider configProvider,
-          List<Flashback> flashbacks) =>
-      ListView(controller: _scrollController, children: [
-        if (SupportBanner.shouldShowBanner(
-          entryCount: EntriesProvider.instance.entries.length,
-          lastDismissedIso: configProvider
-              .get(ConfigKey.lastDismissedSupportBannerDate) as String?,
-        ))
-          SupportBanner(configProvider: configProvider),
-        const Center(
-            child: SizedBox(height: 430, width: 400, child: EntryCalendar())),
-        if (configProvider.get(ConfigKey.showFlashbacks))
-          Padding(
-            padding:
-                EdgeInsets.only(left: 16.0, right: 16.0, top: 8.0, bottom: 8.0),
-            child: Text(
-              AppLocalizations.of(context)!.flashbacksTitle,
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.normal),
-            ),
-          ),
-        if (configProvider.get(ConfigKey.showFlashbacks))
-          flashbacks.isEmpty
-              ? Center(
-                  child: Text(
-                    AppLocalizations.of(context)!.flaskbacksEmpty,
-                    style: TextStyle(
-                        fontSize: 18, color: Theme.of(context).disabledColor),
-                  ),
-                )
-              : GridView.builder(
-                  padding: const EdgeInsets.only(bottom: 80),
-                  physics: const ScrollPhysics(),
-                  shrinkWrap: true,
-                  gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                    maxCrossAxisExtent: 300,
-                    crossAxisSpacing: 1.0, // Spacing between columns
-                    mainAxisSpacing: 1.0, // Spacing between rows
-                    childAspectRatio: 1.0,
-                  ),
-                  itemCount: flashbacks.length,
-                  itemBuilder: (context, index) {
-                    final flashback = flashbacks[index];
-                    return GestureDetector(
-                        onTap: () async {
-                          if (flashback.isMultiEntry) {
-                            // TODO: Currently, only On This Day can have multiple entries. Revisit this approach when allowing multiple entries per day.
-                            await NotificationManager.instance
-                                .dismissOnThisDayNotification();
-                            await _openOnThisDayTimeline(DateTime.now());
-                          } else {
-                            await Navigator.of(context).push(MaterialPageRoute(
-                              allowSnapshotting: false,
-                              builder: (context) => EntriesListPage(
-                                  index: EntriesProvider.instance
-                                      .getIndexOfEntry(
-                                          flashback.firstEntry.id!),
-                                  getEntries: () =>
-                                      EntriesProvider.instance.entries),
-                            ));
-                          }
-                        },
-                        child: FlashbackCard(
-                            title: flashback.title,
-                            entries: flashback.entries));
-                  },
-                ),
-      ]);
 }

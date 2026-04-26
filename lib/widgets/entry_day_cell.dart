@@ -17,7 +17,7 @@ import 'package:daily_you/pages/entries_list_page.dart';
 class EntryDayCell extends StatelessWidget {
   final DateTime date;
   final DateTime currentMonth;
-  final ui.Image dayNumber;
+  final ui.Image? dayNumber;
 
   const EntryDayCell(
       {super.key,
@@ -27,22 +27,19 @@ class EntryDayCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final entriesProvider = Provider.of<EntriesProvider>(context);
-    final entryImagesProvider = Provider.of<EntryImagesProvider>(context);
-    final configProvider = Provider.of<ConfigProvider>(context);
+    final entry = context.select<EntriesProvider, Entry?>(
+        (p) => p.getEntryForDate(date));
+    final showMood = context.select<ConfigProvider, bool>(
+        (p) => p.get(ConfigKey.calendarViewMode) == 'mood');
+    final firstImage = entry == null
+        ? null
+        : context.select<EntryImagesProvider, EntryImage?>(
+            (p) => p.getFirstImageForEntry(entry.id!));
 
-    Entry? entry = entriesProvider.getEntryForDate(date);
-
-    EntryImage? image;
-    if (entry != null) {
-      image = entryImagesProvider.getForEntry(entry).firstOrNull;
-    }
-
-    bool showMood = configProvider.get(ConfigKey.calendarViewMode) == 'mood';
+    final entriesProvider = context.read<EntriesProvider>();
 
     if (entry != null) {
-      if (showMood || image == null) {
-        // Show mood
+      if (showMood || firstImage == null) {
         return GestureDetector(
           child: SizedBox(
             width: 57,
@@ -81,7 +78,6 @@ class EntryDayCell extends StatelessWidget {
           },
         );
       } else {
-        // Show image
         return GestureDetector(
           child: SizedBox(
             width: 57,
@@ -98,7 +94,7 @@ class EntryDayCell extends StatelessWidget {
                           borderRadius: BorderRadius.all(Radius.circular(8))),
                       clipBehavior: Clip.antiAlias,
                       child: LocalImageLoader(
-                        imagePath: image.imgPath,
+                        imagePath: firstImage.imgPath,
                         cacheSize: 100,
                       )),
                 ),
@@ -143,7 +139,6 @@ class EntryDayCell extends StatelessWidget {
         );
       }
     } else {
-      // No entry
       return GestureDetector(
         behavior: HitTestBehavior.translucent,
         child: Center(
