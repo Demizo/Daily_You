@@ -1,0 +1,7 @@
+Daily You v2.20.0 has arrived! Revisit past memories:
+
+• Added an "On This Day" notification and flashback
+• Added basic image information to the image viewer
+• Behind the scenes improvements to the log view and edit pages
+• Minor user interface and performance improvements
+• Updated translations
