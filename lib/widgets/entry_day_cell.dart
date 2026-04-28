@@ -80,8 +80,9 @@ class EntryDayCell extends StatelessWidget {
       } else {
         // Show image
         return GestureDetector(
-          child: Container(
-            alignment: Alignment.center,
+          child: SizedBox(
+            width: 57,
+            height: 57,
             child: Stack(
               alignment: Alignment.center,
               children: [
@@ -102,6 +103,25 @@ class EntryDayCell extends StatelessWidget {
                 RawImage(
                   image: dayNumber,
                 )
+                if (entry.mood != null)
+                  Positioned(
+                    bottom: 1,
+                    right: 1,
+                    child: Container(
+                      width: 23,
+                      height: 23,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .surface
+                            .withAlpha(255),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: MoodIcon(moodValue: entry.mood, size: 16),
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),
