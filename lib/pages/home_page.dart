@@ -7,6 +7,7 @@ import 'package:daily_you/launch_intent.dart';
 import 'package:daily_you/models/flashback.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/notification_manager.dart';
+import 'package:daily_you/pages/share_to_entry_page.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/time_manager.dart';
@@ -42,8 +43,10 @@ class _HomePageState extends State<HomePage>
   @override
   void initState() {
     super.initState();
-    _checkForLaunchIntent();
-    _checkForNotificationLaunch();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkForLaunchIntent();
+      _checkForNotificationLaunch();
+    });
   }
 
   @override
@@ -64,15 +67,28 @@ class _HomePageState extends State<HomePage>
 
   Future _checkForLaunchIntent() async {
     final intent = DeviceInfoService().launchIntent;
-    if (intent != null) {
-      Entry? todayEntry = EntriesProvider.instance.getEntryForToday();
-      List<EntryImage> todayImages = todayEntry != null
-          ? EntryImagesProvider.instance.getForEntry(todayEntry)
-          : [];
-      bool openCamera = (intent is TakePhotoIntent) ? true : false;
-      DeviceInfoService().launchIntent = null;
-      await addOrEditTodayEntry(todayEntry, todayImages, openCamera);
+    if (intent == null) return;
+
+    DeviceInfoService().launchIntent = null;
+
+    if (intent is ShareFilesIntent) {
+      // Cold-start share: show the share-to-entry UI for date selection.
+      await Navigator.of(context).push(
+        MaterialPageRoute(
+          allowSnapshotting: false,
+          builder: (_) => ShareToEntryPage(sharedUris: intent.filePaths),
+        ),
+      );
+      return;
     }
+
+    // LogTodayIntent and TakePhotoIntent.
+    Entry? todayEntry = EntriesProvider.instance.getEntryForToday();
+    List<EntryImage> todayImages = todayEntry != null
+        ? EntryImagesProvider.instance.getForEntry(todayEntry)
+        : [];
+    bool openCamera = (intent is TakePhotoIntent) ? true : false;
+    await addOrEditTodayEntry(todayEntry, todayImages, openCamera);
   }
 
   Future<void> _openOnThisDayTimeline(DateTime referenceDate) async {

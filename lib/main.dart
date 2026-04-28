@@ -11,6 +11,7 @@ import 'package:daily_you/pages/launch_page.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/providers/templates_provider.dart';
+import 'package:daily_you/services/share_intent_service.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
@@ -137,6 +138,11 @@ void main() async {
     await NotificationManager.instance.init();
 
     await AndroidAlarmManager.initialize();
+
+    // Register the warm-start share listener early so no shares are missed
+    // while the app is loading. Cold-start image processing is deferred to
+    // LaunchPage (after the database is ready).
+    ShareIntentService.instance.init();
   }
 
   runApp(MultiProvider(providers: [
