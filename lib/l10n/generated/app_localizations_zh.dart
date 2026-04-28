@@ -636,6 +636,9 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   }
 
   @override
+  String get flashbackOnThisDay => '這一天';
+
+  @override
   String get pageGalleryTitle => '紀錄';
 
   @override

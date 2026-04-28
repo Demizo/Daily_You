@@ -18,7 +18,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get dailyReminderDescription => 'Günlük kaydı oluştur…';
 
   @override
-  String get actionTakePhoto => 'Take photo';
+  String get actionTakePhoto => 'Fotoğraf çek';
 
   @override
   String get pageHomeTitle => 'Ana';
@@ -72,7 +72,7 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
-  String get flashbackOnThisDay => 'On This Day';
+  String get flashbackOnThisDay => 'Bu Günde';
 
   @override
   String get pageGalleryTitle => 'Galeri';
@@ -324,10 +324,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get noTemplatesDescription => 'Henüz şablon oluşturulmadı…';
 
   @override
-  String get templateVariableTime => 'Time';
+  String get templateVariableTime => 'Zaman';
 
   @override
-  String get templateDefaultTimestampTitle => 'Timestamp';
+  String get templateDefaultTimestampTitle => 'Zaman Damgası';
 
   @override
   String templateDefaultTimestampBody(Object date, Object time) {
@@ -335,17 +335,18 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
-  String get templateDefaultSummaryTitle => 'Day Summary';
+  String get templateDefaultSummaryTitle => 'Gün Özeti';
 
   @override
-  String get templateDefaultSummaryBody => '### Summary\n- \n\n### Quote\n> ';
+  String get templateDefaultSummaryBody =>
+      '### Gün özeti\n- \n\n### Alıntı\n> ';
 
   @override
-  String get templateDefaultReflectionTitle => 'Reflection';
+  String get templateDefaultReflectionTitle => 'Yansıma';
 
   @override
   String get templateDefaultReflectionBody =>
-      '### What did you enjoy about today?\n- \n\n### What are you thankful for?\n- \n\n### What are you looking forward to?\n- ';
+      '### Bugün hakkında neyi sevdiniz?\n- \n\n### Ne için şükrediyorsunuz?\n- \n\n### Neyi dört gözle bekliyorsunuz?\n- ';
 
   @override
   String get settingsStorageTitle => 'Depolama';
