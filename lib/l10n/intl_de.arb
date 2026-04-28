@@ -146,7 +146,10 @@
     "templateDefaultTimestampTitle": "Zeitstempel",
     "templateDefaultTimestampBody": "{date} - {time}:",
     "templateDefaultSummaryTitle": "Tageszusammenfassung",
-    "templateDefaultSummaryBody": "### Zusammenfassung\n-•\n### Zitat\n> ",
+    "templateDefaultSummaryBody": "### Zusammenfassung\n- \n\n### Zitat\n> ",
     "templateDefaultReflectionTitle": "Rückblick",
-    "templateDefaultReflectionBody": "-•\n\n### Wofür bist Du dankbar?\n-•\n\n### Worauf freust Du Dich?\n-• "
+    "templateDefaultReflectionBody": "### Was hat dir heute spaß gemachty?\n- \n\n### Wofür bist du heute Dankbar?\n- \n\n### Worauf Freist du dich?\n- ",
+    "actionTakePhoto": "Foto machen",
+    "flashbackOnThisDay": "An diesem Tag",
+    "settingsOnThisDayDescription": "Erlebe alte Erinnerungen neu"
 }
