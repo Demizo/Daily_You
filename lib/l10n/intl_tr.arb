@@ -141,5 +141,14 @@
     "settingsGalleryViewLayout": "Galeri Görünüm Düzeni",
     "viewLayoutList": "Liste",
     "viewLayoutGrid": "Izgara",
-    "settingsHideImagesInGallery": "Görüntüleri galeride gizle"
+    "settingsHideImagesInGallery": "Görüntüleri galeride gizle",
+    "actionTakePhoto": "Fotoğraf çek",
+    "flashbackOnThisDay": "Bu Günde",
+    "templateVariableTime": "Zaman",
+    "templateDefaultTimestampTitle": "Zaman Damgası",
+    "templateDefaultSummaryTitle": "Gün Özeti",
+    "templateDefaultSummaryBody": "### Gün özeti\n- \n\n### Alıntı\n> ",
+    "templateDefaultReflectionTitle": "Yansıma",
+    "templateDefaultReflectionBody": "### Bugün hakkında neyi sevdiniz?\n- \n\n### Ne için şükrediyorsunuz?\n- \n\n### Neyi dört gözle bekliyorsunuz?\n- ",
+    "templateDefaultTimestampBody": "{date} - {time}:"
 }
