@@ -141,5 +141,10 @@
     "settingsGalleryViewLayout": "迹忆页视图布局",
     "viewLayoutGrid": "网格",
     "viewLayoutList": "列表",
-    "settingsHideImagesInGallery": "隐藏图库中的图片"
+    "settingsHideImagesInGallery": "隐藏图库中的图片",
+    "actionTakePhoto": "拍张照",
+    "flashbackOnThisDay": "在这一天",
+    "settingsOnThisDayDescription": "重温过去的记忆",
+    "templateVariableTime": "时间",
+    "templateDefaultTimestampTitle": "时间戳"
 }
