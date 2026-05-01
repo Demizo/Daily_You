@@ -62,7 +62,10 @@ class EntryDayCell extends StatelessWidget {
                         fontSize: 16,
                         color: Theme.of(context).colorScheme.onSurface),
                   ),
-                  MoodIcon(moodValue: entry.mood)
+                  MoodIcon(
+                    moodValue: entry.mood,
+                    allowScaling: false,
+                  )
                 ],
               ),
             ),
@@ -102,7 +105,7 @@ class EntryDayCell extends StatelessWidget {
                 // Use number with baked in shadow. The Impeller renderer stutters with text shadows
                 RawImage(
                   image: dayNumber,
-                )
+                ),
                 if (entry.mood != null)
                   Positioned(
                     bottom: 1,
@@ -118,7 +121,11 @@ class EntryDayCell extends StatelessWidget {
                         shape: BoxShape.circle,
                       ),
                       child: Center(
-                        child: MoodIcon(moodValue: entry.mood, size: 16),
+                        child: MoodIcon(
+                          moodValue: entry.mood,
+                          size: 16,
+                          allowScaling: false,
+                        ),
                       ),
                     ),
                   ),

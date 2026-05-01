@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 class MoodIcon extends StatefulWidget {
   final int? moodValue;
   final double size;
+  final bool allowScaling;
 
   const MoodIcon({
     super.key,
     this.moodValue,
     this.size = 20,
+    this.allowScaling = true,
   });
 
   @override
@@ -30,6 +32,7 @@ class _MoodIconState extends State<MoodIcon> {
     return Text(
       MoodIcon.getMoodIcon(widget.moodValue),
       style: TextStyle(fontSize: widget.size),
+      textScaler: widget.allowScaling ? null : TextScaler.noScaling,
     );
   }
 }
