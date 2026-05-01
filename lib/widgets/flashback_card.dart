@@ -1,10 +1,10 @@
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/widgets/image_grid.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
 import 'package:daily_you/widgets/scaled_markdown.dart';
 import 'package:flutter/material.dart';
-import 'local_image_loader.dart';
 
 class FlashbackCard extends StatelessWidget {
   const FlashbackCard({
@@ -42,7 +42,7 @@ class FlashbackCard extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: hasImages
-                  ? _imageGrid(coverImages)
+                  ? ImageGrid(images: coverImages)
                   : (firstEntry.text.isNotEmpty
                       ? Padding(
                           padding: const EdgeInsets.all(8.0),
@@ -111,68 +111,4 @@ class FlashbackCard extends StatelessWidget {
     );
   }
 
-  Widget _imageGrid(List<EntryImage> imgs) {
-    if (imgs.length == 1) {
-      return LocalImageLoader(imagePath: imgs[0].imgPath);
-    }
-
-    if (imgs.length == 2) {
-      return Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Expanded(child: LocalImageLoader(imagePath: imgs[0].imgPath)),
-          const SizedBox(width: 2),
-          Expanded(child: LocalImageLoader(imagePath: imgs[1].imgPath)),
-        ],
-      );
-    }
-
-    if (imgs.length == 3) {
-      return Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Expanded(child: LocalImageLoader(imagePath: imgs[0].imgPath)),
-          const SizedBox(width: 2),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(child: LocalImageLoader(imagePath: imgs[1].imgPath)),
-                const SizedBox(height: 2),
-                Expanded(child: LocalImageLoader(imagePath: imgs[2].imgPath)),
-              ],
-            ),
-          ),
-        ],
-      );
-    }
-
-    // 4+
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Expanded(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(child: LocalImageLoader(imagePath: imgs[0].imgPath)),
-              const SizedBox(width: 2),
-              Expanded(child: LocalImageLoader(imagePath: imgs[1].imgPath)),
-            ],
-          ),
-        ),
-        const SizedBox(height: 2),
-        Expanded(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(child: LocalImageLoader(imagePath: imgs[2].imgPath)),
-              const SizedBox(width: 2),
-              Expanded(child: LocalImageLoader(imagePath: imgs[3].imgPath)),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
 }
