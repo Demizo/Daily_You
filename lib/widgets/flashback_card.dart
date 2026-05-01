@@ -2,8 +2,6 @@ import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/widgets/image_grid.dart';
-import 'package:daily_you/widgets/mood_icon.dart';
-import 'package:daily_you/widgets/scaled_markdown.dart';
 import 'package:flutter/material.dart';
 
 class FlashbackCard extends StatelessWidget {
@@ -18,10 +16,8 @@ class FlashbackCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final imagesProvider = EntryImagesProvider.instance;
 
-    // First image per entry (entries that have at least one image), up to 4
     final coverImages = entries
         .map((e) => imagesProvider.getForEntry(e).firstOrNull)
         .whereType<EntryImage>()
@@ -29,86 +25,95 @@ class FlashbackCard extends StatelessWidget {
         .toList();
 
     final hasImages = coverImages.isNotEmpty;
-    final firstEntry = entries.first;
+    final showCount = entries.length > 1;
 
-    return Card.filled(
-      color: Theme.of(context).colorScheme.surfaceContainer,
-      clipBehavior: Clip.antiAlias,
-      child: Column(
-        mainAxisSize: MainAxisSize.max,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Expanded(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: hasImages
-                  ? ImageGrid(images: coverImages)
-                  : (firstEntry.text.isNotEmpty
-                      ? Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Wrap(children: [
-                            IgnorePointer(
-                              child: SizedBox(
-                                width: double.maxFinite,
-                                child: ScaledMarkdown(data: firstEntry.text),
-                              ),
-                            ),
-                          ]),
-                        )
-                      : const SizedBox.expand()),
-            ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 4.0, vertical: 4.0),
-                child: Text(
-                  title,
-                  style: TextStyle(
-                      color: theme.textTheme.labelSmall?.color,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold),
-                ),
-              ),
-              if (entries.length == 1)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 2.0),
-                  child: Container(
-                    constraints: const BoxConstraints(minWidth: 16),
-                    child: MoodIcon(
-                      moodValue: entries[0].mood,
+    return AspectRatio(
+      aspectRatio: 3.7 / 4,
+      child: Card.filled(
+        color: Theme.of(context).colorScheme.surfaceContainer,
+        clipBehavior: Clip.antiAlias,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            hasImages
+                ? ImageGrid(images: coverImages)
+                : Center(
+                    child: Icon(
+                      Icons.history_rounded,
+                      color: Theme.of(context).disabledColor,
+                      size: 36,
                     ),
                   ),
-                ),
-              if (entries.length > 1)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: Container(
-                    width: 20,
-                    height: 20,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: theme.colorScheme.onSurface,
-                    ),
-                    child: Center(
-                      child: Text(
-                        '${entries.length}',
-                        style: TextStyle(
-                          color: theme.colorScheme.surfaceContainer,
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
+            if (hasImages)
+              Container(
+                color: Colors.black.withValues(alpha: 0.30),
+              ),
+            Positioned(
+              left: 6,
+              right: 6,
+              bottom: 6,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Flexible(
+                    child: Text(
+                      title,
+                      style: TextStyle(
+                        color: hasImages
+                            ? Colors.white
+                            : Theme.of(context).colorScheme.onSurface,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
-                ),
-            ],
-          ),
-        ],
+                ],
+              ),
+            ),
+            Positioned(
+              top: 6,
+              right: 6,
+              left: 6,
+              child: showCount
+                  ? Row(
+                      children: [
+                        // The Opacity widget (< 1.0) forces Flutter to composite this entire
+                        // container in an isolated layer. This ensures the BlendMode.dstOut
+                        // only punches a hole through the white circle, not the main images underneath
+                        Opacity(
+                          opacity: 0.99,
+                          child: Container(
+                            height: 20,
+                            width: 20,
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Center(
+                              child: Text(
+                                entries.length < 99
+                                    ? '${entries.length}'
+                                    : '99',
+                                textScaler: TextScaler.noScaling,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w900,
+                                  // This turns the text into an eraser to cut out the shape
+                                  foreground: Paint()
+                                    ..blendMode = BlendMode.dstOut,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  : SizedBox.shrink(),
+            ),
+          ],
+        ),
       ),
     );
   }
-
 }
