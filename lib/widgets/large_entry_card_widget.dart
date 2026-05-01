@@ -1,12 +1,12 @@
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:daily_you/widgets/image_grid.dart';
 import 'package:daily_you/widgets/scaled_markdown.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
-import 'local_image_loader.dart';
 
 class LargeEntryCardWidget extends StatelessWidget {
   const LargeEntryCardWidget(
@@ -36,34 +36,9 @@ class LargeEntryCardWidget extends StatelessWidget {
         children: [
           if (images.isNotEmpty && !hideImage)
             Expanded(
-                child: Stack(
-                    fit: StackFit.expand,
-                    alignment: Alignment.topRight,
-                    children: [
-                  ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: LocalImageLoader(
-                        imagePath: images.first.imgPath,
-                      )),
-                  if (images.length > 1)
-                    Positioned(
-                      top: 0,
-                      right: 0,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Icon(
-                          Icons.photo_library_rounded,
-                          color: Colors.white,
-                          shadows: [
-                            Shadow(
-                                color: Colors.black.withValues(alpha: 0.6),
-                                blurRadius: 6,
-                                offset: Offset(0, 0)),
-                          ],
-                        ),
-                      ),
-                    ),
-                ])),
+                child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: ImageGrid(images: images))),
           Expanded(
             child: Wrap(children: [
               Padding(
