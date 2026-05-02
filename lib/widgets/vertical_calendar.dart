@@ -40,6 +40,8 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
   static const double _weekRowHeight = 57.0;
   static const double _daysOfWeekRowHeight = 32.0;
 
+  double _todayOffset = 0.0;
+
   Map<int, ui.Image> _dayNumberCache = {};
   double? _lastDpr;
 
@@ -147,6 +149,7 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
 
     DateTime current = DateTime(_lastDate.year, _lastDate.month, 1);
     final end = DateTime(_firstDate.year, _firstDate.month, 1);
+    final now = DateTime.now();
 
     while (!current.isBefore(end)) {
       monthOffsets.add((offset, current));
@@ -183,6 +186,13 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
               : null;
         });
 
+        // Save the offset for the current day
+        if (current.year == now.year && current.month == now.month) {
+          if (days.any((d) => d != null && d.day == now.day)) {
+            _todayOffset = (offset -= _weekRowHeight).clamp(0, double.infinity);
+          }
+        }
+
         items.add(_WeekRowItem(days));
         offset += _weekRowHeight;
 
@@ -203,14 +213,14 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
     if (!widget.scrollController.hasClients) return;
     if (animate) {
       widget.scrollController.animateTo(
-        0,
+        _todayOffset,
         duration: const Duration(milliseconds: 400),
         curve: Curves.easeInOut,
       );
     } else {
-      widget.scrollController.jumpTo(0);
+      widget.scrollController.jumpTo(_todayOffset);
     }
-    _updateVisibleMonthFromOffset(0);
+    _updateVisibleMonthFromOffset(_todayOffset);
   }
 
   void _jumpToMonth(DateTime month) {
@@ -239,7 +249,7 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
 
   void _onScroll() {
     final offset = widget.scrollController.offset;
-    final showToday = offset > _weekRowHeight * 12;
+    final showToday = (offset - _todayOffset).abs() > _weekRowHeight * 12;
     if (showToday != _showTodayButton) {
       setState(() => _showTodayButton = showToday);
     }
@@ -281,6 +291,9 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
         if (!_initialScrollDone) {
           _initialScrollDone = true;
           WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (widget.scrollController.hasClients) {
+              widget.scrollController.jumpTo(_todayOffset);
+            }
             if (mounted) setState(() => _isScrollReady = true);
           });
         }
@@ -302,7 +315,7 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
                         cacheExtent: _weekRowHeight * 10,
                         slivers: [
                           const SliverPadding(
-                              padding: EdgeInsets.only(bottom: 75)),
+                              padding: EdgeInsets.only(bottom: 85)),
                           SliverList.builder(
                             itemCount: _items.length,
                             itemBuilder: (context, index) =>
