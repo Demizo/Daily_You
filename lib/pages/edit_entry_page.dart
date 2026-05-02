@@ -283,17 +283,24 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
             firstDate: DateTime.utc(2000),
             lastDate: DateTime.now(),
           );
-          if (pickedDate != null) {
-            entryDate = entryDate!.copyWith(
-                year: pickedDate.year,
-                month: pickedDate.month,
-                day: pickedDate.day);
-            await _saveEntry();
-          }
+          if (pickedDate == null) return;
+
+          final pickedTime = await showTimePicker(
+              context: context,
+              initialTime: TimeOfDay.fromDateTime(entryDate!));
+          if (pickedTime == null) return;
+
+          entryDate = entryDate!.copyWith(
+            year: pickedDate.year,
+            month: pickedDate.month,
+            day: pickedDate.day,
+            hour: pickedTime.hour,
+            minute: pickedTime.minute,
+          );
+          await _saveEntry();
         },
         label: Text(
-          DateFormat.yMMMEd(TimeManager.currentLocale(context))
-              .format(entryDate!),
+          "${DateFormat.yMMMEd(TimeManager.currentLocale(context)).format(entryDate!)} - ${DateFormat.jm(TimeManager.currentLocale(context)).format(entryDate!)}",
           style: TextStyle(fontSize: 16),
         ));
   }

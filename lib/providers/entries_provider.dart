@@ -175,7 +175,9 @@ class EntriesProvider with ChangeNotifier {
   int compareDateOnly(DateTime a, DateTime b) {
     if (a.year != b.year) return a.year.compareTo(b.year);
     if (a.month != b.month) return a.month.compareTo(b.month);
-    return a.day.compareTo(b.day);
+    if (a.day != b.day) return a.day.compareTo(b.day);
+    if (a.hour != b.hour) return a.hour.compareTo(b.hour);
+    return a.minute.compareTo(b.minute);
   }
 
   /// Set the selected date and update listening widgets
