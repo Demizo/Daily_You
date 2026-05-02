@@ -146,8 +146,7 @@ class EntryDayCell extends StatelessWidget {
           getEntries: () => entriesProvider.entries
               .where((e) =>
                   e.timeCreate.day == date.day &&
-                  e.timeCreate.month == date.month &&
-                  e.timeCreate.year == date.year)
+                  e.timeCreate.month == date.month)
               .toList()
               .reversed
               .toList(),
@@ -172,7 +171,8 @@ class EntryDayCell extends StatelessWidget {
     final isMulti = entries.length > 1;
 
     if (entries.isNotEmpty) {
-      return MergeSemantics(child: GestureDetector(
+      return MergeSemantics(
+          child: GestureDetector(
         onTap: () async {
           if (isMulti) {
             await _openTimeline(context);
@@ -257,8 +257,9 @@ class EntryDayCell extends StatelessWidget {
                 await Navigator.of(context).push(MaterialPageRoute(
                   allowSnapshotting: false,
                   builder: (context) => AddEditEntryPage(
-                    overrideCreateDate: TimeManager.currentTimeOnDifferentDate(date)
-                        .copyWith(isUtc: false),
+                    overrideCreateDate:
+                        TimeManager.currentTimeOnDifferentDate(date)
+                            .copyWith(isUtc: false),
                   ),
                 ));
               },
