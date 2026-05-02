@@ -146,5 +146,10 @@
     "flashbackOnThisDay": "在这一天",
     "settingsOnThisDayDescription": "重温过去的记忆",
     "templateVariableTime": "时间",
-    "templateDefaultTimestampTitle": "时间戳"
+    "templateDefaultTimestampTitle": "时间戳",
+    "templateDefaultTimestampBody": "{date} - {time}:",
+    "templateDefaultSummaryTitle": "每日总结",
+    "templateDefaultSummaryBody": "### 摘要\n- \n\n### 引用\n> ",
+    "templateDefaultReflectionTitle": "反思",
+    "templateDefaultReflectionBody": "### 你今天最享受的是什么？\n- \n\n### 你感恩什么？\n- \n\n### 你期待什么？\n- "
 }
