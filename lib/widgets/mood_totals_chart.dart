@@ -37,7 +37,7 @@ class _MoodTotalsChartState extends State<MoodTotalsChart> {
     return BarChartGroupData(
       x: x,
       barRods: [
-        BarChartRodData(toY: value, color: color, width: 16),
+        BarChartRodData(toY: value, color: color, width: 32),
       ],
       showingTooltipIndicators: touchedGroupIndex == x ? [0] : [],
     );
