@@ -99,7 +99,7 @@ class MoodByDayChart extends StatelessWidget {
         barRods: [
           BarChartRodData(
             color: color,
-            width: 16,
+            width: 32,
             fromY: -2,
             toY: mood,
           ),
