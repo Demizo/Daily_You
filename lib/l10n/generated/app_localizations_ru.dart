@@ -21,6 +21,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get actionTakePhoto => 'Сделать фото';
 
   @override
+  String get actionToday => 'Today';
+
+  @override
+  String get actionOtherDay => 'Other day';
+
+  @override
   String get pageHomeTitle => 'Дом';
 
   @override

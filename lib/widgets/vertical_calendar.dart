@@ -369,10 +369,10 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
     return Row(
       children: [
         Padding(
-          padding: const EdgeInsets.only(left: 13.0, right: 13.0, bottom: 13.0),
+          padding: const EdgeInsets.all(16.0),
           child: Card(
             elevation: 1,
-            margin: EdgeInsets.all(2),
+            margin: EdgeInsets.all(0),
             color: Theme.of(context).colorScheme.primaryContainer,
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(80))),

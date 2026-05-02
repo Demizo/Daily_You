@@ -10,6 +10,7 @@ import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:daily_you/widgets/expressive_fab_menu.dart';
 import 'package:daily_you/widgets/flashback_card.dart';
 import 'package:daily_you/widgets/support_banner.dart';
 import 'package:daily_you/widgets/vertical_calendar.dart';
@@ -282,9 +283,8 @@ class _HomePageState extends State<HomePage>
           .get(ConfigKey.lastDismissedSupportBannerDate) as String?,
     );
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: Column(
+    return Stack(alignment: Alignment.bottomCenter, children: [
+      Column(
         children: [
           if (showBanner) SupportBanner(configProvider: configProvider),
           if (showFlashbacks) _buildFlashbacksRow(context, flashbacks),
@@ -293,59 +293,27 @@ class _HomePageState extends State<HomePage>
           ),
         ],
       ),
-      floatingActionButtonLocation: ExpandableFab.location,
-      floatingActionButton: ExpandableFab(
-        key: _fabKey,
-        distance: 80,
-        type: ExpandableFabType.fan,
-        fanAngle: 85,
-        openCloseStackAlignment: Alignment.centerRight,
-        openButtonBuilder: RotateFloatingActionButtonBuilder(
-          elevation: 1,
-          child: const Icon(Icons.add_rounded),
-          fabSize: ExpandableFabSize.regular,
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          foregroundColor: Theme.of(context).colorScheme.primaryContainer,
+      Align(
+        alignment: AlignmentDirectional.bottomEnd,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: ExpressiveFabMenu(items: [
+            ExpressiveFabMenuItem(
+                icon: Icons.camera_alt_rounded,
+                label: AppLocalizations.of(context)!.actionTakePhoto,
+                onTap: () async =>
+                    await _openWithCamera(todayEntry, todayImages)),
+            ExpressiveFabMenuItem(
+                icon: Icons.event_rounded,
+                label: AppLocalizations.of(context)!.actionOtherDay,
+                onTap: () async => await _addEntryForPickedDay()),
+            ExpressiveFabMenuItem(
+                icon: Icons.schedule_rounded,
+                label: AppLocalizations.of(context)!.actionToday,
+                onTap: () async => await _addNewEntryForToday()),
+          ]),
         ),
-        closeButtonBuilder: DefaultFloatingActionButtonBuilder(
-          elevation: 1,
-          child: const Icon(Icons.close_rounded),
-          fabSize: ExpandableFabSize.regular,
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          foregroundColor: Theme.of(context).colorScheme.primaryContainer,
-        ),
-        children: [
-          if (Platform.isAndroid)
-            FloatingActionButton.small(
-              heroTag: null,
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              foregroundColor: Theme.of(context).colorScheme.primaryContainer,
-              elevation: 1,
-              shape: const CircleBorder(),
-              onPressed: () async =>
-                  await _openWithCamera(todayEntry, todayImages),
-              child: const Icon(Icons.camera_alt_rounded),
-            ),
-          FloatingActionButton.small(
-            heroTag: null,
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            foregroundColor: Theme.of(context).colorScheme.primaryContainer,
-            elevation: 1,
-            shape: const CircleBorder(),
-            onPressed: () async => await _addEntryForPickedDay(),
-            child: const Icon(Icons.event_rounded),
-          ),
-          FloatingActionButton.small(
-            heroTag: null,
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            foregroundColor: Theme.of(context).colorScheme.primaryContainer,
-            elevation: 1,
-            shape: const CircleBorder(),
-            onPressed: () async => await _addNewEntryForToday(),
-            child: const Icon(Icons.schedule_rounded),
-          ),
-        ],
-      ),
-    );
+      )
+    ]);
   }
 }

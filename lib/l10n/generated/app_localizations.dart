@@ -180,6 +180,18 @@ abstract class AppLocalizations {
   /// **'Take photo'**
   String get actionTakePhoto;
 
+  /// No description provided for @actionToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get actionToday;
+
+  /// No description provided for @actionOtherDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Other day'**
+  String get actionOtherDay;
+
   /// No description provided for @pageHomeTitle.
   ///
   /// In en, this message translates to:
