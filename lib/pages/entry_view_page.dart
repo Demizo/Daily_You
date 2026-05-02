@@ -91,8 +91,7 @@ class _EntryViewPageState extends State<EntryViewPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        DateFormat.yMMMEd(TimeManager.currentLocale(context))
-                            .format(entry.timeCreate),
+                        "${DateFormat.yMMMEd(TimeManager.currentLocale(context)).format(entry.timeCreate)} - ${DateFormat.jm(TimeManager.currentLocale(context)).format(entry.timeCreate)}",
                         style: const TextStyle(fontSize: 16),
                       ),
                       MoodIcon(
