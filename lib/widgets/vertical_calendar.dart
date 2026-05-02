@@ -48,14 +48,12 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
   double _lastWeekRowHeight = 0.0;
   int _cacheGeneration = 0;
 
-  bool _isScrollReady = false;
   bool _initialScrollDone = false;
 
   List<_CalendarItem> _items = [];
   List<(double, DateTime)> _monthOffsets = [];
 
   bool _showTodayButton = false;
-  String _visibleMonthLabel = '';
   DateTime _visibleMonth = DateTime.now();
   String _cachedLocale = '';
 
@@ -65,6 +63,8 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
   final DateTime _firstDate = DateTime(2000, 1, 1);
   late final DateTime _lastDate =
       DateTime(DateTime.now().year, DateTime.now().month, 1);
+  final DateTime _today =
+      DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
 
   @override
   void initState() {
@@ -84,8 +84,6 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
       _lastFirstDayIndex = firstDayIndex;
       _buildCalendarItems(firstDayIndex);
       _visibleMonth = DateTime.now();
-      _visibleMonthLabel =
-          DateFormat('MMMM y', _cachedLocale).format(_visibleMonth);
     }
   }
 
@@ -149,10 +147,6 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
     DateTime current = DateTime(_lastDate.year, _lastDate.month, 1);
     final end = DateTime(_firstDate.year, _firstDate.month, 1);
 
-    final DateTime currentTime = DateTime.now();
-    final DateTime today =
-        DateTime(currentTime.year, currentTime.month, currentTime.day);
-
     while (!current.isBefore(end)) {
       monthOffsets.add((offset, current));
 
@@ -189,8 +183,8 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
         });
 
         // Save the offset for the current day
-        if (current.year == today.year && current.month == today.month) {
-          if (days.any((d) => d != null && d.day == today.day)) {
+        if (current.year == _today.year && current.month == _today.month) {
+          if (days.any((d) => d != null && d.day == _today.day)) {
             _todayOffset = (offset -= _weekRowHeight).clamp(0, double.infinity);
           }
         }
@@ -260,23 +254,9 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
 
   void _updateVisibleMonthFromOffset(double offset) {
     if (_monthOffsets.isEmpty) return;
-    DateTime visibleMonth = _monthOffsets.first.$2;
-
     for (final (mOffset, month) in _monthOffsets) {
       if (mOffset > offset) break;
-      visibleMonth = month;
-    }
-
-    if (visibleMonth.year != _visibleMonth.year ||
-        visibleMonth.month != _visibleMonth.month) {
-      _visibleMonth = visibleMonth;
-      final label = DateFormat('MMMM y', _cachedLocale).format(visibleMonth);
-
-      if (label != _visibleMonthLabel) {
-        setState(() {
-          _visibleMonthLabel = label;
-        });
-      }
+      _visibleMonth = month;
     }
   }
 
@@ -314,42 +294,36 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
             if (widget.scrollController.hasClients) {
               widget.scrollController.jumpTo(_todayOffset);
             }
-            if (mounted) setState(() => _isScrollReady = true);
           });
         }
 
-        return AnimatedOpacity(
-          opacity: _isScrollReady ? 1.0 : 0.0,
-          duration: const Duration(milliseconds: 200),
-          child: Stack(
-              fit: StackFit.loose,
-              alignment: AlignmentDirectional.bottomCenter,
-              children: [
-                Column(
-                  children: [
-                    _buildWeekdayHeader(context, dayLabels),
-                    Expanded(
-                      child: CustomScrollView(
-                        controller: widget.scrollController,
-                        reverse: true,
-                        // cacheExtent: _weekRowHeight * 24,
-                        slivers: [
-                          const SliverPadding(
-                              padding: EdgeInsets.only(bottom: 85)),
-                          SliverList.builder(
-                            itemCount: _items.length,
-                            itemBuilder: (context, index) =>
-                                _buildItem(context, index),
-                          ),
-                        ],
-                      ),
+        return Stack(
+            fit: StackFit.loose,
+            alignment: AlignmentDirectional.bottomCenter,
+            children: [
+              Column(
+                children: [
+                  _buildWeekdayHeader(context, dayLabels),
+                  Expanded(
+                    child: CustomScrollView(
+                      controller: widget.scrollController,
+                      reverse: true,
+                      slivers: [
+                        const SliverPadding(
+                            padding: EdgeInsets.only(bottom: 85)),
+                        SliverList.builder(
+                          itemCount: _items.length,
+                          itemBuilder: (context, index) =>
+                              _buildItem(context, index),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                _buildCalendarControls(context),
-                _buildJumpToTodayButton(context),
-              ]),
-        );
+                  ),
+                ],
+              ),
+              _buildCalendarControls(context),
+              _buildJumpToTodayButton(context),
+            ]);
       },
     );
   }
@@ -566,6 +540,7 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
   Widget _buildWeekRow(BuildContext context, _WeekRowItem item) {
     return _WeekRow(
       days: item.days,
+      today: _today,
       cellSize: _cellWidth,
       dayNumberCache: _dayNumberCache,
     );
@@ -574,11 +549,13 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
 
 class _WeekRow extends StatelessWidget {
   final List<DateTime?> days;
+  final DateTime today;
   final double cellSize;
   final Map<int, ui.Image> dayNumberCache;
 
   const _WeekRow({
     required this.days,
+    required this.today,
     required this.cellSize,
     required this.dayNumberCache,
   });
@@ -587,11 +564,6 @@ class _WeekRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final entriesProvider = context.watch<EntriesProvider>();
     final imagesProvider = context.watch<EntryImagesProvider>();
-    final DateTime currentTime = DateTime.now();
-    final DateTime today =
-        DateTime(currentTime.year, currentTime.month, currentTime.day);
-    final firstDay = days.firstWhere((d) => d != null)!;
-    final currentMonth = DateTime(firstDay.year, firstDay.month, 1);
 
     return SizedBox(
       height: cellSize,
@@ -601,13 +573,12 @@ class _WeekRow extends StatelessWidget {
             return SizedBox(
               width: cellSize,
               height: cellSize,
-              child: Card(
-                elevation: 0,
+              child: Container(
                 margin: const EdgeInsets.all(2),
-                color: Theme.of(context).colorScheme.surfaceContainerLow,
-                shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(8))),
-                child: const SizedBox.shrink(),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surfaceContainerLow,
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
             );
           }
@@ -618,12 +589,12 @@ class _WeekRow extends StatelessWidget {
             return SizedBox(
               width: cellSize,
               height: cellSize,
-              child: Card(
-                elevation: 0,
+              child: Container(
                 margin: const EdgeInsets.all(2),
-                color: Theme.of(context).colorScheme.surfaceContainerLow,
-                shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(8))),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surfaceContainerLow,
+                  borderRadius: BorderRadius.circular(8),
+                ),
                 child: Center(
                   child: Text(
                     '${day.day}',
@@ -646,7 +617,7 @@ class _WeekRow extends StatelessWidget {
             height: cellSize,
             child: EntryDayCell(
               date: day,
-              currentMonth: currentMonth,
+              today: today,
               entries: entries,
               firstImage: firstImage,
               cellSize: cellSize,

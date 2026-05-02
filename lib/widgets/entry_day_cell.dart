@@ -16,7 +16,7 @@ import 'package:daily_you/pages/entries_list_page.dart';
 
 class EntryDayCell extends StatelessWidget {
   final DateTime date;
-  final DateTime currentMonth;
+  final DateTime today;
   final ui.Image? dayNumber;
   final double cellSize;
   final List<Entry> entries;
@@ -25,7 +25,7 @@ class EntryDayCell extends StatelessWidget {
   const EntryDayCell({
     super.key,
     required this.date,
-    required this.currentMonth,
+    required this.today,
     required this.dayNumber,
     required this.cellSize,
     required this.entries,
@@ -192,33 +192,25 @@ class EntryDayCell extends StatelessWidget {
           child: Stack(
             alignment: Alignment.center,
             children: [
-              SizedBox(
-                height: cellSize,
+              Container(
+                margin: const EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.secondaryContainer,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                clipBehavior: firstImage != null ? Clip.hardEdge : Clip.none,
                 child: firstImage != null
-                    ? Card(
-                        elevation: 0,
-                        margin: const EdgeInsets.all(2),
-                        shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(8))),
-                        clipBehavior: Clip.antiAlias,
-                        child: LocalImageLoader(
-                          imagePath: firstImage!.imgPath,
-                          cacheSize: 100,
-                        ))
-                    : Card(
-                        elevation: 0,
-                        margin: const EdgeInsets.all(2),
-                        color: Theme.of(context).colorScheme.secondaryContainer,
-                        shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(8))),
-                        child: Center(
-                          child: Text('${date.day}',
-                              style: TextStyle(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSecondaryContainer,
-                                  fontSize: 16)),
-                        ),
+                    ? LocalImageLoader(
+                        imagePath: firstImage!.imgPath,
+                        cacheSize: 100,
+                      )
+                    : Center(
+                        child: Text('${date.day}',
+                            style: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSecondaryContainer,
+                                fontSize: 16)),
                       ),
               ),
               if (firstImage != null)
@@ -257,34 +249,37 @@ class EntryDayCell extends StatelessWidget {
       );
     } else {
       return GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onTap: () async {
-          await Navigator.of(context).push(MaterialPageRoute(
-            allowSnapshotting: false,
-            builder: (context) => AddEditEntryPage(
-              overrideCreateDate: TimeManager.currentTimeOnDifferentDate(date)
-                  .copyWith(isUtc: false),
+          behavior: HitTestBehavior.translucent,
+          onTap: () async {
+            await Navigator.of(context).push(MaterialPageRoute(
+              allowSnapshotting: false,
+              builder: (context) => AddEditEntryPage(
+                overrideCreateDate: TimeManager.currentTimeOnDifferentDate(date)
+                    .copyWith(isUtc: false),
+              ),
+            ));
+          },
+          onLongPress: () => _showPopupMenu(context, entriesProvider),
+          child: SizedBox(
+            width: cellSize,
+            height: cellSize,
+            child: Container(
+              margin: const EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceContainerLow,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Center(
+                child: Text('${date.day}',
+                    style: TimeManager.isSameDay(date, today)
+                        ? TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.primary)
+                        : const TextStyle(fontSize: 16)),
+              ),
             ),
           ));
-        },
-        onLongPress: () => _showPopupMenu(context, entriesProvider),
-        child: Card(
-          elevation: 0,
-          margin: const EdgeInsets.all(2),
-          color: Theme.of(context).colorScheme.surfaceContainerLow,
-          shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(8))),
-          child: Center(
-            child: Text('${date.day}',
-                style: TimeManager.isSameDay(date, DateTime.now())
-                    ? TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.primary)
-                    : const TextStyle(fontSize: 16)),
-          ),
-        ),
-      );
     }
   }
 }
