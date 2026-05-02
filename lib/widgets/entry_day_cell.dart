@@ -169,6 +169,7 @@ class EntryDayCell extends StatelessWidget {
     final firstEntry = entries.firstOrNull;
     final entriesProvider = context.read<EntriesProvider>();
     final isMulti = entries.length > 1;
+    final colorScheme = Theme.of(context).colorScheme;
 
     if (entries.isNotEmpty) {
       return MergeSemantics(
@@ -190,12 +191,13 @@ class EntryDayCell extends StatelessWidget {
           width: cellSize,
           height: cellSize,
           child: Stack(
+            fit: StackFit.expand,
             alignment: Alignment.center,
             children: [
               Container(
                 margin: const EdgeInsets.all(2),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.secondaryContainer,
+                  color: colorScheme.secondaryContainer,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 clipBehavior: firstImage != null ? Clip.hardEdge : Clip.none,
@@ -207,9 +209,7 @@ class EntryDayCell extends StatelessWidget {
                     : Center(
                         child: Text('${date.day}',
                             style: TextStyle(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSecondaryContainer,
+                                color: colorScheme.onSecondaryContainer,
                                 fontSize: 16)),
                       ),
               ),
@@ -229,10 +229,7 @@ class EntryDayCell extends StatelessWidget {
                             width: 23,
                             height: 23,
                             decoration: BoxDecoration(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .surface
-                                  .withAlpha(255),
+                              color: colorScheme.surface.withAlpha(255),
                               shape: BoxShape.circle,
                             ),
                             child: Center(
@@ -270,7 +267,7 @@ class EntryDayCell extends StatelessWidget {
                 child: Container(
                   margin: const EdgeInsets.all(2),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surfaceContainerLow,
+                    color: colorScheme.surfaceContainerLow,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Center(
@@ -279,7 +276,7 @@ class EntryDayCell extends StatelessWidget {
                             ? TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: Theme.of(context).colorScheme.primary)
+                                color: colorScheme.primary)
                             : const TextStyle(fontSize: 16)),
                   ),
                 ),
