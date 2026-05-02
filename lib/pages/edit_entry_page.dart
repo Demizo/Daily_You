@@ -14,7 +14,6 @@ import 'package:daily_you/widgets/template_select_button.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/widgets/entry_image_picker.dart';
@@ -269,12 +268,9 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     final entriesProvider = Provider.of<EntriesProvider>(context);
 
     return TextButton.icon(
-        icon: SvgPicture.asset(
-          'assets/icons/calendar_event.svg',
-          colorFilter:
-              ColorFilter.mode(theme.colorScheme.primary, BlendMode.srcIn),
-          width: 24,
-          height: 24,
+        icon: Icon(
+          Icons.event_rounded,
+          color: theme.colorScheme.primary,
         ),
         onPressed: () async {
           DateTime? pickedDate = await showDatePicker(

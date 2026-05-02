@@ -22,7 +22,7 @@ class EntriesProvider with ChangeNotifier {
 
   List<Entry> entries = List.empty();
 
-  Map<DateTime, Entry> _entriesByDay = {};
+  Map<DateTime, List<Entry>> _entriesByDay = {};
 
   List<Entry> _filteredEntries = [];
 
@@ -264,52 +264,74 @@ class EntriesProvider with ChangeNotifier {
     int longestStreak = 0;
     int? daysSinceBadDay;
 
-    var isFirstStreak = true;
-    var activeStreak = 0;
+    // Handle empty state to prevent entries.first from throwing an error
+    if (entries.isEmpty) {
+      return (currentStreak, longestStreak, daysSinceBadDay);
+    }
 
-    Entry? prevEntry;
+    // Helper: Converts local DateTime to a UTC midnight DateTime.
+    // This completely eliminates DST drift by ensuring every calendar day difference
+    // is calculated using consistent 24-hour blocks.
+    DateTime toUtcMidnight(DateTime dt) =>
+        DateTime.utc(dt.year, dt.month, dt.day);
 
+    DateTime today = toUtcMidnight(DateTime.now());
+    DateTime firstEntryDate = toUtcMidnight(entries.first.timeCreate);
+
+    bool isFirstStreak = true;
+    int activeStreak = 0;
+    DateTime? prevDate;
     bool mostRecentBadDay = true;
+
     for (Entry entry in entries) {
-      // Check for bad day
-      if (entry.mood != null && mostRecentBadDay) {
-        if (entry.mood! < 0) {
-          mostRecentBadDay = false;
-          daysSinceBadDay = TimeManager.startOfDay(DateTime.now())
-              .difference(TimeManager.startOfDay(entry.timeCreate))
-              .inDays;
-        }
+      DateTime entryDate = toUtcMidnight(entry.timeCreate);
+
+      // 1. Check for bad day
+      if (mostRecentBadDay && entry.mood != null && entry.mood! < 0) {
+        mostRecentBadDay = false;
+        daysSinceBadDay = today.difference(entryDate).inDays;
       }
 
-      // Increment current streak
-      if (prevEntry != null &&
-          TimeManager.startOfDay(prevEntry.timeCreate)
-                  .difference(TimeManager.startOfDay(entry.timeCreate))
-                  .inDays >
-              1) {
-        if (isFirstStreak &&
-            TimeManager.startOfDay(DateTime.now())
-                    .difference(
-                        TimeManager.startOfDay(entries.first.timeCreate))
-                    .inDays <=
-                1) {
-          currentStreak = activeStreak;
-        }
-        isFirstStreak = false;
+      // 2. Process streaks
+      if (prevDate == null) {
+        // Initialize with the very first valid entry
         activeStreak = 1;
-      } else {
-        activeStreak += 1;
-        if (activeStreak > longestStreak) {
-          longestStreak = activeStreak;
+        longestStreak = 1;
+      } else if (prevDate != entryDate) {
+        // Ignores multiple entries on the same day
+
+        int daysDiff = prevDate.difference(entryDate).inDays;
+
+        if (daysDiff == 1) {
+          // Consecutive calendar day: increment streak
+          activeStreak += 1;
+          if (activeStreak > longestStreak) {
+            longestStreak = activeStreak;
+          }
+        } else if (daysDiff > 1) {
+          // Gap in days: streak broken
+          if (isFirstStreak) {
+            // The active streak only counts as the "Current Streak" if the most
+            // recent logged entry was today or yesterday.
+            if (today.difference(firstEntryDate).inDays <= 1) {
+              currentStreak = activeStreak;
+            }
+            isFirstStreak = false;
+          }
+          // Reset active streak to 1 to track older historical sequences
+          activeStreak = 1;
         }
       }
 
-      // Set the current streak if we have reached the end and are still on the first streak
-      if (isFirstStreak && entry == entries.last) {
+      // Keep track of the date we just processed
+      prevDate = entryDate;
+    }
+
+    // If the loop finished and the first sequence never broke
+    if (isFirstStreak) {
+      if (today.difference(firstEntryDate).inDays <= 1) {
         currentStreak = activeStreak;
       }
-
-      prevEntry = entry;
     }
 
     return (currentStreak, longestStreak, daysSinceBadDay);
@@ -330,18 +352,26 @@ class EntriesProvider with ChangeNotifier {
   }
 
   void _calculateEntriesByDay() {
-    _entriesByDay = {
-      for (final e in entries)
-        DateTime(e.timeCreate.year, e.timeCreate.month, e.timeCreate.day): e
-    };
+    final map = <DateTime, List<Entry>>{};
+    for (final e in entries) {
+      final key =
+          DateTime(e.timeCreate.year, e.timeCreate.month, e.timeCreate.day);
+      map.putIfAbsent(key, () => []).add(e);
+    }
+    _entriesByDay = map;
   }
 
   Entry? getEntryForDate(DateTime date) {
     final target = DateTime(date.year, date.month, date.day);
-    if (_entriesByDay.containsKey(target)) {
-      return _entriesByDay[target];
-    } else {
-      return null;
-    }
+    return _entriesByDay[target]?.first;
+  }
+
+  List<Entry> getEntriesForDate(DateTime date) {
+    final target = DateTime(date.year, date.month, date.day);
+    return _entriesByDay[target] ?? [];
+  }
+
+  bool hasEntryAtTimestamp(DateTime timestamp) {
+    return entries.any((e) => e.timeCreate == timestamp);
   }
 }

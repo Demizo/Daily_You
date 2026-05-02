@@ -6,6 +6,7 @@ import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/flashback.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class FlashbackManager {
@@ -22,7 +23,7 @@ class FlashbackManager {
     }
 
     List<Flashback> flashbacksList = List.empty(growable: true);
-    Map<String, Entry> singleFlashbacks = {};
+    Map<String, List<Entry>> singleFlashbacks = {};
     List<Entry> onThisDayEntries = [];
     List<String> onThisDayLabels = [];
 
@@ -30,6 +31,8 @@ class FlashbackManager {
     Set<Entry> usedEntries = {};
 
     if (filteredEntries.isEmpty) return flashbacksList;
+
+    final locale = TimeManager.currentLocale(context);
 
     // Time based memories
     for (var entry in filteredEntries.reversed.toList()) {
@@ -48,24 +51,24 @@ class FlashbackManager {
       if (configProvider.get(ConfigKey.showflashback6MonthsAgo) &&
           TimeManager.datesExactMonthDiff(entry.timeCreate, DateTime.now()) ==
               6) {
-        singleFlashbacks.putIfAbsent(
-            AppLocalizations.of(context)!.flashbackMonth(6), () => entry);
+        final label = AppLocalizations.of(context)!.flashbackMonth(6);
+        singleFlashbacks.putIfAbsent(label, () => []).add(entry);
         usedEntries.add(entry);
         continue;
       }
       if (configProvider.get(ConfigKey.showflashback1MonthAgo) &&
           TimeManager.datesExactMonthDiff(entry.timeCreate, DateTime.now()) ==
               1) {
-        singleFlashbacks.putIfAbsent(
-            AppLocalizations.of(context)!.flashbackMonth(1), () => entry);
+        final label = AppLocalizations.of(context)!.flashbackMonth(1);
+        singleFlashbacks.putIfAbsent(label, () => []).add(entry);
         usedEntries.add(entry);
         continue;
       }
       if (configProvider.get(ConfigKey.showflashback1WeekAgo) &&
           TimeManager.isSameDay(entry.timeCreate,
               DateTime.now().subtract(const Duration(days: 7)))) {
-        singleFlashbacks.putIfAbsent(
-            AppLocalizations.of(context)!.flashbackWeek(1), () => entry);
+        final label = AppLocalizations.of(context)!.flashbackWeek(1);
+        singleFlashbacks.putIfAbsent(label, () => []).add(entry);
         usedEntries.add(entry);
         continue;
       }
@@ -81,6 +84,7 @@ class FlashbackManager {
         title: onThisDayTitle,
         entries: onThisDayEntries.reversed.toList(), // Most recent first
         entryLabels: onThisDayLabels.reversed.toList(), // Most recent first
+        isOnThisDay: true,
       ));
     }
 
@@ -99,9 +103,8 @@ class FlashbackManager {
             index++;
             continue;
           }
-          singleFlashbacks.putIfAbsent(
-              AppLocalizations.of(context)!.flashbackGoodDay,
-              () => randomEntry);
+          final label = AppLocalizations.of(context)!.flashbackGoodDay;
+          singleFlashbacks.putIfAbsent(label, () => []).add(randomEntry);
           usedEntries.add(randomEntry);
           break;
         }
@@ -118,20 +121,23 @@ class FlashbackManager {
             index++;
             continue;
           }
-          singleFlashbacks.putIfAbsent(
-              AppLocalizations.of(context)!.flashbackRandomDay,
-              () => randomEntry);
+          final label = AppLocalizations.of(context)!.flashbackRandomDay;
+          singleFlashbacks.putIfAbsent(label, () => []).add(randomEntry);
           usedEntries.add(randomEntry);
           break;
         }
       }
     }
 
-    singleFlashbacks.forEach((label, entry) {
+    singleFlashbacks.forEach((label, entries) {
       flashbacksList.add(Flashback(
         title: label,
-        entries: [entry],
-        entryLabels: [label],
+        entries: entries,
+        entryLabels: entries.length == 1
+            ? [label]
+            : entries
+                .map((e) => DateFormat.jm(locale).format(e.timeCreate))
+                .toList(),
       ));
     });
     return flashbacksList;

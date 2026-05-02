@@ -2,14 +2,13 @@ import 'dart:ui' as ui;
 
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/models/entry.dart';
-import 'package:daily_you/pages/edit_entry_page.dart';
 import 'package:daily_you/pages/entries_list_page.dart';
+import 'package:daily_you/pages/entry_timeline_page.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/entry_day_cell.dart';
 import 'package:daily_you/widgets/year_month_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -37,10 +36,9 @@ class VerticalCalendar extends StatefulWidget {
 }
 
 class _VerticalCalendarState extends State<VerticalCalendar> {
-  static const double _monthHeaderHeight = 30.0;
+  static const double _monthHeaderHeight = 57.0;
   static const double _weekRowHeight = 57.0;
   static const double _daysOfWeekRowHeight = 32.0;
-  static const double _actionBarHeight = 48.0;
 
   Map<int, ui.Image> _dayNumberCache = {};
   double? _lastDpr;
@@ -241,7 +239,7 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
 
   void _onScroll() {
     final offset = widget.scrollController.offset;
-    final showToday = offset > _weekRowHeight * 3;
+    final showToday = offset > _weekRowHeight * 12;
     if (showToday != _showTodayButton) {
       setState(() => _showTodayButton = showToday);
     }
@@ -290,122 +288,177 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
         return AnimatedOpacity(
           opacity: _isScrollReady ? 1.0 : 0.0,
           duration: const Duration(milliseconds: 200),
-          child: Column(
-            children: [
-              _buildStickyHeader(context, dayLabels),
-              Expanded(
-                child: CustomScrollView(
-                  controller: widget.scrollController,
-                  reverse: true,
-                  cacheExtent: _weekRowHeight * 10,
-                  slivers: [
-                    const SliverPadding(padding: EdgeInsets.only(bottom: 70)),
-                    SliverList.builder(
-                      itemCount: _items.length,
-                      itemBuilder: (context, index) =>
-                          _buildItem(context, index),
+          child: Stack(
+              fit: StackFit.loose,
+              alignment: AlignmentDirectional.bottomCenter,
+              children: [
+                Column(
+                  children: [
+                    _buildWeekdayHeader(context, dayLabels),
+                    Expanded(
+                      child: CustomScrollView(
+                        controller: widget.scrollController,
+                        reverse: true,
+                        cacheExtent: _weekRowHeight * 10,
+                        slivers: [
+                          const SliverPadding(
+                              padding: EdgeInsets.only(bottom: 75)),
+                          SliverList.builder(
+                            itemCount: _items.length,
+                            itemBuilder: (context, index) =>
+                                _buildItem(context, index),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
-              ),
-            ],
-          ),
+                _buildCalendarControls(context),
+                _buildJumpToTodayButton(context),
+              ]),
         );
       },
     );
   }
 
-  Widget _buildStickyHeader(BuildContext context, List<String> dayLabels) {
+  Widget _buildWeekdayHeader(BuildContext context, List<String> dayLabels) {
     final theme = Theme.of(context);
     return Container(
-      color: theme.scaffoldBackgroundColor,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(
-            height: _actionBarHeight,
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainer,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(14),
+          topRight: Radius.circular(14),
+          bottomLeft: Radius.circular(4),
+          bottomRight: Radius.circular(4),
+        ),
+      ),
+      child: SizedBox(
+        height: _daysOfWeekRowHeight,
+        child: Row(
+          children: dayLabels.map((label) {
+            return Expanded(
+              child: Center(
+                child: Text(
+                  label,
+                  style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCalendarControls(BuildContext context) {
+    final theme = Theme.of(context);
+    return Row(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 13.0, right: 13.0, bottom: 13.0),
+          child: Card(
+            elevation: 1,
+            margin: EdgeInsets.all(2),
+            color: Theme.of(context).colorScheme.primaryContainer,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(80))),
             child: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
                   onPressed: () => _onMonthLabelTap(context),
                   icon: const Icon(Icons.calendar_month_rounded),
+                  color: theme.colorScheme.primary,
                   padding: const EdgeInsets.all(8),
                 ),
                 IconButton(
                   onPressed: () => _onCalendarIconTap(context),
-                  icon: SvgPicture.asset(
-                    'assets/icons/calendar_event.svg',
-                    colorFilter: ColorFilter.mode(
-                        theme.colorScheme.onSurfaceVariant, BlendMode.srcIn),
-                    width: 24,
-                    height: 24,
-                  ),
+                  icon: Icon(Icons.event_rounded),
+                  color: theme.colorScheme.primary,
                   padding: const EdgeInsets.all(8),
                 ),
-                const Spacer(),
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  transitionBuilder: (child, animation) {
-                    final scale = TweenSequence([
-                      TweenSequenceItem(
-                        tween: Tween<double>(begin: 0.0, end: 1.1)
-                            .chain(CurveTween(curve: Curves.easeOut)),
-                        weight: 50,
-                      ),
-                      TweenSequenceItem(
-                        tween: Tween<double>(begin: 1.1, end: 1.0)
-                            .chain(CurveTween(curve: Curves.easeIn)),
-                        weight: 50,
-                      ),
-                    ]).animate(animation);
-                    return ScaleTransition(scale: scale, child: child);
-                  },
-                  child: _showTodayButton
-                      ? IconButton(
-                          key: const ValueKey('todayBtn'),
-                          onPressed: () => _scrollToToday(),
-                          icon: SvgPicture.asset(
-                            'assets/icons/calendar_latest.svg',
-                            colorFilter: ColorFilter.mode(
-                                theme.colorScheme.onSurfaceVariant,
-                                BlendMode.srcIn),
-                            width: 24,
-                            height: 24,
-                          ),
-                        )
-                      : const SizedBox.shrink(key: ValueKey('noBtn')),
-                ),
-                const CalendarViewModeSelector(),
               ],
             ),
           ),
-          SizedBox(
-            height: _daysOfWeekRowHeight,
-            child: Row(
-              children: dayLabels.map((label) {
-                return Expanded(
-                  child: Center(
-                    child: Text(
-                      label,
-                      style:
-                          TextStyle(color: theme.colorScheme.onSurfaceVariant),
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
-        ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildJumpToTodayButton(BuildContext context) {
+    final theme = Theme.of(context);
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 13.0),
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          transitionBuilder: (child, animation) {
+            final scale = TweenSequence([
+              TweenSequenceItem(
+                tween: Tween<double>(begin: 0.0, end: 1.1)
+                    .chain(CurveTween(curve: Curves.easeOut)),
+                weight: 50,
+              ),
+              TweenSequenceItem(
+                tween: Tween<double>(begin: 1.1, end: 1.0)
+                    .chain(CurveTween(curve: Curves.easeIn)),
+                weight: 50,
+              ),
+            ]).animate(animation);
+            return ScaleTransition(scale: scale, child: child);
+          },
+          child: _showTodayButton
+              ? IconButton(
+                  color: theme.colorScheme.primary,
+                  key: const ValueKey('todayBtn'),
+                  onPressed: () => _scrollToToday(),
+                  icon: Icon(Icons.arrow_downward_rounded),
+                  style: IconButton.styleFrom(
+                      elevation: 1,
+                      shadowColor: theme.shadowColor,
+                      backgroundColor:
+                          Theme.of(context).colorScheme.primaryContainer),
+                )
+              : const SizedBox.shrink(key: ValueKey('noBtn')),
+        ),
       ),
     );
+  }
+
+  Future<void> _openTimeline(BuildContext context, DateTime date) async {
+    final locale = TimeManager.currentLocale(context);
+    final title = DateFormat.yMMMd(locale).format(date);
+    await Navigator.of(context).push(MaterialPageRoute(
+      allowSnapshotting: false,
+      builder: (context) => EntryTimelinePage(
+        header: title,
+        getEntries: () => EntriesProvider.instance.entries
+            .where((e) =>
+                e.timeCreate.day == date.day &&
+                e.timeCreate.month == date.month &&
+                e.timeCreate.year == date.year)
+            .toList()
+            .reversed
+            .toList(),
+        labelBuilder: (e) => DateFormat.jm(locale).format(e.timeCreate),
+      ),
+    ));
   }
 
   Future<void> _onCalendarIconTap(BuildContext context) async {
     final entriesProvider = context.read<EntriesProvider>();
     final DateTime? picked = await showDatePicker(
       context: context,
+      selectableDayPredicate: (date) {
+        if (entriesProvider.entries.isEmpty) return true;
+        return entriesProvider.getEntryForDate(date) != null;
+      },
       initialDatePickerMode: DatePickerMode.day,
-      initialDate: DateTime.now(),
+      initialDate: entriesProvider.entries.isNotEmpty
+          ? entriesProvider.entries.first.timeCreate
+          : DateTime.now(),
       firstDate: _firstDate,
       lastDate: DateTime.now(),
     );
@@ -413,25 +466,21 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
     if (picked == null || !mounted) return;
     _jumpToMonth(picked);
 
-    final Entry? entry = entriesProvider.getEntryForDate(picked);
+    final List<Entry> entries = entriesProvider.getEntriesForDate(picked);
     if (!context.mounted) return;
 
-    if (entry != null) {
-      await Navigator.of(context).push(MaterialPageRoute(
-        allowSnapshotting: false,
-        builder: (context) => EntriesListPage(
-          index: entriesProvider.getIndexOfEntry(entry.id!),
-          getEntries: () => entriesProvider.entries,
-        ),
-      ));
-    } else {
-      await Navigator.of(context).push(MaterialPageRoute(
-        allowSnapshotting: false,
-        builder: (context) => AddEditEntryPage(
-          overrideCreateDate: TimeManager.currentTimeOnDifferentDate(picked)
-              .copyWith(isUtc: false),
-        ),
-      ));
+    if (entries.isNotEmpty) {
+      if (entries.length == 1) {
+        await Navigator.of(context).push(MaterialPageRoute(
+          allowSnapshotting: false,
+          builder: (context) => EntriesListPage(
+            index: entriesProvider.getIndexOfEntry(entries.first.id!),
+            getEntries: () => entriesProvider.entries,
+          ),
+        ));
+      } else {
+        _openTimeline(context, picked);
+      }
     }
   }
 
@@ -452,13 +501,29 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
   Widget _buildMonthHeader(BuildContext context, DateTime month) {
     return SizedBox(
       height: _monthHeaderHeight,
-      child: Padding(
-        padding: const EdgeInsets.only(top: 4),
-        child: Align(
-          alignment: Alignment.center,
-          child: Text(
-            DateFormat('MMMM y', _cachedLocale).format(month),
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+      child: Align(
+        alignment: Alignment.bottomCenter,
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 2.0),
+          child: Container(
+            height: _daysOfWeekRowHeight,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainerLow,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(14),
+                topRight: Radius.circular(14),
+                bottomLeft: Radius.circular(4),
+                bottomRight: Radius.circular(4),
+              ),
+            ),
+            child: Align(
+              alignment: Alignment.center,
+              child: Text(
+                DateFormat('MMMM y', _cachedLocale).format(month),
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              ),
+            ),
           ),
         ),
       ),
@@ -470,12 +535,23 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
     final currentMonth = DateTime(firstDay.year, firstDay.month, 1);
     final now = DateTime.now();
 
-    return RepaintBoundary(child: SizedBox(
+    return RepaintBoundary(
+        child: SizedBox(
       height: _weekRowHeight,
       child: Row(
         children: item.days.map((day) {
           if (day == null) {
-            return SizedBox(width: _cellWidth, height: _weekRowHeight);
+            return SizedBox(
+              width: _cellWidth,
+              height: _weekRowHeight,
+              child: Card(
+                  elevation: 0,
+                  margin: EdgeInsets.all(2),
+                  color: Theme.of(context).colorScheme.surfaceContainerLow,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(8))),
+                  child: SizedBox.shrink()),
+            );
           }
           final isFuture = day.isAfter(now) && !TimeManager.isToday(day);
 
@@ -483,11 +559,18 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
             return SizedBox(
               width: _cellWidth,
               height: _weekRowHeight,
-              child: Center(
-                child: Text(
-                  '${day.day}',
-                  style: TextStyle(
-                      fontSize: 16, color: Theme.of(context).disabledColor),
+              child: Card(
+                elevation: 0,
+                margin: EdgeInsets.all(2),
+                color: Theme.of(context).colorScheme.surfaceContainerLow,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(8))),
+                child: Center(
+                  child: Text(
+                    '${day.day}',
+                    style: TextStyle(
+                        fontSize: 16, color: Theme.of(context).disabledColor),
+                  ),
                 ),
               ),
             );
@@ -505,26 +588,5 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
         }).toList(),
       ),
     ));
-  }
-}
-
-class CalendarViewModeSelector extends StatelessWidget {
-  const CalendarViewModeSelector({super.key});
-
-  Future<void> _setViewMode() async {
-    final current =
-        ConfigProvider.instance.get(ConfigKey.calendarViewMode) as String;
-    await ConfigProvider.instance
-        .set(ConfigKey.calendarViewMode, current == 'mood' ? 'image' : 'mood');
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final viewMode =
-        context.watch<ConfigProvider>().get(ConfigKey.calendarViewMode);
-    return IconButton(
-      onPressed: _setViewMode,
-      icon: Icon(viewMode == 'mood' ? Icons.image_rounded : Icons.mood_rounded),
-    );
   }
 }
