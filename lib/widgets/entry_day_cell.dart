@@ -6,7 +6,6 @@ import 'package:daily_you/models/image.dart';
 import 'package:daily_you/pages/edit_entry_page.dart';
 import 'package:daily_you/pages/entry_timeline_page.dart';
 import 'package:daily_you/providers/entries_provider.dart';
-import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/local_image_loader.dart';
 import 'package:flutter/material.dart';
@@ -19,12 +18,18 @@ class EntryDayCell extends StatelessWidget {
   final DateTime date;
   final DateTime currentMonth;
   final ui.Image? dayNumber;
+  final double cellSize;
+  final List<Entry> entries;
+  final EntryImage? firstImage;
 
   const EntryDayCell({
     super.key,
     required this.date,
     required this.currentMonth,
     required this.dayNumber,
+    required this.cellSize,
+    required this.entries,
+    required this.firstImage,
   });
 
   String _countLabel(int count) => count > 99 ? '99+' : '$count';
@@ -162,18 +167,11 @@ class EntryDayCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dayEntries = context
-        .select<EntriesProvider, List<Entry>>((p) => p.getEntriesForDate(date));
-    final firstEntry = dayEntries.firstOrNull;
-    final firstImage = firstEntry == null
-        ? null
-        : context.select<EntryImagesProvider, EntryImage?>(
-            (p) => p.getFirstImageForEntry(firstEntry.id!));
-
+    final firstEntry = entries.firstOrNull;
     final entriesProvider = context.read<EntriesProvider>();
-    final isMulti = dayEntries.length > 1;
+    final isMulti = entries.length > 1;
 
-    if (dayEntries.isNotEmpty) {
+    if (entries.isNotEmpty) {
       return GestureDetector(
         onTap: () async {
           if (isMulti) {
@@ -189,13 +187,13 @@ class EntryDayCell extends StatelessWidget {
         },
         onLongPress: () => _showPopupMenu(context, entriesProvider),
         child: SizedBox(
-          width: 57,
-          height: 57,
+          width: cellSize,
+          height: cellSize,
           child: Stack(
             alignment: Alignment.center,
             children: [
               SizedBox(
-                height: 57,
+                height: cellSize,
                 child: firstImage != null
                     ? Card(
                         elevation: 0,
@@ -204,7 +202,7 @@ class EntryDayCell extends StatelessWidget {
                             borderRadius: BorderRadius.all(Radius.circular(8))),
                         clipBehavior: Clip.antiAlias,
                         child: LocalImageLoader(
-                          imagePath: firstImage.imgPath,
+                          imagePath: firstImage!.imgPath,
                           cacheSize: 100,
                         ))
                     : Card(
@@ -231,7 +229,7 @@ class EntryDayCell extends StatelessWidget {
                 bottom: 0,
                 right: 0,
                 child: isMulti
-                    ? _countBadge(context, dayEntries.length)
+                    ? _countBadge(context, entries.length)
                     : firstEntry!.mood != null
                         ? Container(
                             width: 23,

@@ -5,6 +5,7 @@ import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/pages/entries_list_page.dart';
 import 'package:daily_you/pages/entry_timeline_page.dart';
 import 'package:daily_you/providers/entries_provider.dart';
+import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/entry_day_cell.dart';
 import 'package:daily_you/widgets/year_month_picker.dart';
@@ -37,13 +38,15 @@ class VerticalCalendar extends StatefulWidget {
 
 class _VerticalCalendarState extends State<VerticalCalendar> {
   static const double _monthHeaderHeight = 57.0;
-  static const double _weekRowHeight = 57.0;
   static const double _daysOfWeekRowHeight = 32.0;
 
+  double _weekRowHeight = 57.0;
   double _todayOffset = 0.0;
 
   Map<int, ui.Image> _dayNumberCache = {};
   double? _lastDpr;
+  double _lastWeekRowHeight = 0.0;
+  int _cacheGeneration = 0;
 
   bool _isScrollReady = false;
   bool _initialScrollDone = false;
@@ -84,12 +87,6 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
       _visibleMonthLabel =
           DateFormat('MMMM y', _cachedLocale).format(_visibleMonth);
     }
-
-    final dpr = MediaQuery.devicePixelRatioOf(context);
-    if (_lastDpr != dpr) {
-      _lastDpr = dpr;
-      _createDayNumberCache(dpr);
-    }
   }
 
   @override
@@ -98,8 +95,8 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
     super.dispose();
   }
 
-  Future<ui.Image> _bakeDayNumber(String text, double dpr) async {
-    const logicalSize = 57.0;
+  Future<ui.Image> _bakeDayNumber(
+      String text, double dpr, double logicalSize) async {
     final physicalSize = (logicalSize * dpr).ceil();
 
     final recorder = ui.PictureRecorder();
@@ -132,11 +129,13 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
   }
 
   Future<void> _createDayNumberCache(double dpr) async {
+    final generation = ++_cacheGeneration;
+    final logicalSize = _weekRowHeight;
     final cache = <int, ui.Image>{};
     for (int i = 1; i <= 31; i++) {
-      cache[i] = await _bakeDayNumber(i.toString(), dpr);
+      cache[i] = await _bakeDayNumber(i.toString(), dpr, logicalSize);
     }
-    if (!mounted) return;
+    if (!mounted || generation != _cacheGeneration) return;
     setState(() => _dayNumberCache = cache);
   }
 
@@ -149,7 +148,10 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
 
     DateTime current = DateTime(_lastDate.year, _lastDate.month, 1);
     final end = DateTime(_firstDate.year, _firstDate.month, 1);
-    final now = DateTime.now();
+
+    final DateTime currentTime = DateTime.now();
+    final DateTime today =
+        DateTime(currentTime.year, currentTime.month, currentTime.day);
 
     while (!current.isBefore(end)) {
       monthOffsets.add((offset, current));
@@ -187,8 +189,8 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
         });
 
         // Save the offset for the current day
-        if (current.year == now.year && current.month == now.month) {
-          if (days.any((d) => d != null && d.day == now.day)) {
+        if (current.year == today.year && current.month == today.month) {
+          if (days.any((d) => d != null && d.day == today.day)) {
             _todayOffset = (offset -= _weekRowHeight).clamp(0, double.infinity);
           }
         }
@@ -259,16 +261,22 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
   void _updateVisibleMonthFromOffset(double offset) {
     if (_monthOffsets.isEmpty) return;
     DateTime visibleMonth = _monthOffsets.first.$2;
+
     for (final (mOffset, month) in _monthOffsets) {
       if (mOffset > offset) break;
       visibleMonth = month;
     }
-    final label = DateFormat('MMMM y', _cachedLocale).format(visibleMonth);
-    if (label != _visibleMonthLabel) {
-      setState(() {
-        _visibleMonthLabel = label;
-        _visibleMonth = visibleMonth;
-      });
+
+    if (visibleMonth.year != _visibleMonth.year ||
+        visibleMonth.month != _visibleMonth.month) {
+      _visibleMonth = visibleMonth;
+      final label = DateFormat('MMMM y', _cachedLocale).format(visibleMonth);
+
+      if (label != _visibleMonthLabel) {
+        setState(() {
+          _visibleMonthLabel = label;
+        });
+      }
     }
   }
 
@@ -286,7 +294,19 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        _cellWidth = constraints.maxWidth / 7;
+        final newCellWidth = constraints.maxWidth / 7;
+        if (newCellWidth != _cellWidth) {
+          _cellWidth = newCellWidth;
+          _weekRowHeight = newCellWidth;
+          _buildCalendarItems(firstDayIndex);
+        }
+
+        final dpr = MediaQuery.devicePixelRatioOf(context);
+        if (_lastDpr != dpr || _lastWeekRowHeight != _weekRowHeight) {
+          _lastDpr = dpr;
+          _lastWeekRowHeight = _weekRowHeight;
+          _createDayNumberCache(dpr);
+        }
 
         if (!_initialScrollDone) {
           _initialScrollDone = true;
@@ -312,7 +332,7 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
                       child: CustomScrollView(
                         controller: widget.scrollController,
                         reverse: true,
-                        cacheExtent: _weekRowHeight * 10,
+                        // cacheExtent: _weekRowHeight * 24,
                         slivers: [
                           const SliverPadding(
                               padding: EdgeInsets.only(bottom: 85)),
@@ -544,39 +564,65 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
   }
 
   Widget _buildWeekRow(BuildContext context, _WeekRowItem item) {
-    final firstDay = item.days.firstWhere((d) => d != null)!;
-    final currentMonth = DateTime(firstDay.year, firstDay.month, 1);
-    final now = DateTime.now();
+    return _WeekRow(
+      days: item.days,
+      cellSize: _cellWidth,
+      dayNumberCache: _dayNumberCache,
+    );
+  }
+}
 
-    return RepaintBoundary(
-        child: SizedBox(
-      height: _weekRowHeight,
+class _WeekRow extends StatelessWidget {
+  final List<DateTime?> days;
+  final double cellSize;
+  final Map<int, ui.Image> dayNumberCache;
+
+  const _WeekRow({
+    required this.days,
+    required this.cellSize,
+    required this.dayNumberCache,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final entriesProvider = context.watch<EntriesProvider>();
+    final imagesProvider = context.watch<EntryImagesProvider>();
+    final DateTime currentTime = DateTime.now();
+    final DateTime today =
+        DateTime(currentTime.year, currentTime.month, currentTime.day);
+    final firstDay = days.firstWhere((d) => d != null)!;
+    final currentMonth = DateTime(firstDay.year, firstDay.month, 1);
+
+    return SizedBox(
+      height: cellSize,
       child: Row(
-        children: item.days.map((day) {
+        children: days.map((day) {
           if (day == null) {
             return SizedBox(
-              width: _cellWidth,
-              height: _weekRowHeight,
-              child: Card(
-                  elevation: 0,
-                  margin: EdgeInsets.all(2),
-                  color: Theme.of(context).colorScheme.surfaceContainerLow,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(8))),
-                  child: SizedBox.shrink()),
-            );
-          }
-          final isFuture = day.isAfter(now) && !TimeManager.isToday(day);
-
-          if (isFuture) {
-            return SizedBox(
-              width: _cellWidth,
-              height: _weekRowHeight,
+              width: cellSize,
+              height: cellSize,
               child: Card(
                 elevation: 0,
-                margin: EdgeInsets.all(2),
+                margin: const EdgeInsets.all(2),
                 color: Theme.of(context).colorScheme.surfaceContainerLow,
-                shape: RoundedRectangleBorder(
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(8))),
+                child: const SizedBox.shrink(),
+              ),
+            );
+          }
+
+          final isFuture =
+              day.isAfter(today) && !TimeManager.isSameDay(day, today);
+          if (isFuture) {
+            return SizedBox(
+              width: cellSize,
+              height: cellSize,
+              child: Card(
+                elevation: 0,
+                margin: const EdgeInsets.all(2),
+                color: Theme.of(context).colorScheme.surfaceContainerLow,
+                shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(8))),
                 child: Center(
                   child: Text(
@@ -589,17 +635,26 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
             );
           }
 
+          final entries = entriesProvider.getEntriesForDate(day);
+          final firstEntry = entries.firstOrNull;
+          final firstImage = firstEntry == null
+              ? null
+              : imagesProvider.getFirstImageForEntry(firstEntry.id!);
+
           return SizedBox(
-            width: _cellWidth,
-            height: _weekRowHeight,
+            width: cellSize,
+            height: cellSize,
             child: EntryDayCell(
               date: day,
               currentMonth: currentMonth,
-              dayNumber: _dayNumberCache[day.day],
+              entries: entries,
+              firstImage: firstImage,
+              cellSize: cellSize,
+              dayNumber: dayNumberCache[day.day],
             ),
           );
         }).toList(),
       ),
-    ));
+    );
   }
 }
