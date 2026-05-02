@@ -1,17 +1,17 @@
 import 'dart:ui' as ui;
 
-import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/pages/edit_entry_page.dart';
+import 'package:daily_you/pages/entry_timeline_page.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/local_image_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:table_calendar/table_calendar.dart';
 import 'package:daily_you/pages/entries_list_page.dart';
 
 class EntryDayCell extends StatelessWidget {
@@ -25,131 +25,216 @@ class EntryDayCell extends StatelessWidget {
       required this.currentMonth,
       required this.dayNumber});
 
+  String _countLabel(int count) => count > 99 ? '99+' : '$count';
+
+  Widget _countBadge(BuildContext context, int count) {
+    return Container(
+      width: 23,
+      height: 23,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        shape: BoxShape.circle,
+      ),
+      child: Center(
+        child: Text(
+          _countLabel(count),
+          textScaler: TextScaler.noScaling,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openTimeline(BuildContext context) async {
+    final locale = TimeManager.currentLocale(context);
+    final title = DateFormat.yMMMd(locale).format(date);
+    await Navigator.of(context).push(MaterialPageRoute(
+      allowSnapshotting: false,
+      builder: (context) => EntryTimelinePage(
+        header: title,
+        getEntries: () => EntriesProvider.instance.entries
+            .where((e) =>
+                e.timeCreate.day == date.day &&
+                e.timeCreate.month == date.month &&
+                e.timeCreate.year == date.year)
+            .toList()
+            .reversed
+            .toList(),
+        labelBuilder: (e) => DateFormat.jm(locale).format(e.timeCreate),
+      ),
+    ));
+  }
+
+  Future<void> _showLongPressSheet(
+      BuildContext context, EntriesProvider entriesProvider) async {
+    final locale = TimeManager.currentLocale(context);
+    final formattedDate = DateFormat.yMMMd(locale).format(date);
+
+    final hasOnThisDay = entriesProvider.entries.any((e) =>
+        e.timeCreate.day == date.day &&
+        e.timeCreate.month == date.month &&
+        e.timeCreate.year != date.year);
+
+    if (!context.mounted) return;
+
+    await showModalBottomSheet(
+      context: context,
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (hasOnThisDay)
+                ListTile(
+                  leading: const Icon(Icons.history_rounded),
+                  title: const Text('On This Day'),
+                  onTap: () async {
+                    Navigator.of(sheetContext).pop();
+                    if (!context.mounted) return;
+                    await Navigator.of(context).push(MaterialPageRoute(
+                      allowSnapshotting: false,
+                      builder: (context) => EntryTimelinePage(
+                        header: 'On This Day',
+                        getEntries: () => entriesProvider.entries
+                            .where((e) =>
+                                e.timeCreate.day == date.day &&
+                                e.timeCreate.month == date.month &&
+                                e.timeCreate.year != date.year)
+                            .toList(),
+                        labelBuilder: (e) =>
+                            DateFormat.y(locale).format(e.timeCreate),
+                      ),
+                    ));
+                  },
+                ),
+              ListTile(
+                leading: const Icon(Icons.add_rounded),
+                title: Text('New entry for $formattedDate'),
+                onTap: () async {
+                  Navigator.of(sheetContext).pop();
+                  if (!context.mounted) return;
+                  await Navigator.of(context).push(MaterialPageRoute(
+                    allowSnapshotting: false,
+                    builder: (context) => AddEditEntryPage(
+                      overrideCreateDate:
+                          TimeManager.currentTimeOnDifferentDate(date)
+                              .copyWith(isUtc: false),
+                    ),
+                  ));
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final entry = context.select<EntriesProvider, Entry?>(
-        (p) => p.getEntryForDate(date));
-    final showMood = context.select<ConfigProvider, bool>(
-        (p) => p.get(ConfigKey.calendarViewMode) == 'mood');
-    final firstImage = entry == null
+    final dayEntries = context
+        .select<EntriesProvider, List<Entry>>((p) => p.getEntriesForDate(date));
+    final firstEntry = dayEntries.firstOrNull;
+    final firstImage = firstEntry == null
         ? null
         : context.select<EntryImagesProvider, EntryImage?>(
-            (p) => p.getFirstImageForEntry(entry.id!));
+            (p) => p.getFirstImageForEntry(firstEntry.id!));
 
     final entriesProvider = context.read<EntriesProvider>();
+    final isMulti = dayEntries.length > 1;
 
-    if (entry != null) {
-      if (showMood || firstImage == null) {
-        return GestureDetector(
-          child: SizedBox(
-            width: 57,
-            height: 57,
-            child: Card(
-              margin: EdgeInsets.all(2),
-              elevation: 0,
-              color: Theme.of(context).colorScheme.surfaceContainer,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(8))),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    '${date.day}',
-                    style: TextStyle(
-                        fontSize: 16,
-                        color: Theme.of(context).colorScheme.onSurface),
-                  ),
-                  MoodIcon(
-                    moodValue: entry.mood,
-                    allowScaling: false,
-                  )
-                ],
-              ),
-            ),
-          ),
-          onTap: () async {
+    if (dayEntries.isNotEmpty) {
+      return GestureDetector(
+        onTap: () async {
+          if (isMulti) {
+            await _openTimeline(context);
+          } else {
             await Navigator.of(context).push(MaterialPageRoute(
               allowSnapshotting: false,
               builder: (context) => EntriesListPage(
-                index: entriesProvider.getIndexOfEntry(entry.id!),
-                getEntries: () => entriesProvider.entries,
-              ),
+                  index: entriesProvider.getIndexOfEntry(firstEntry!.id!),
+                  getEntries: () => entriesProvider.entries),
             ));
-          },
-        );
-      } else {
-        return GestureDetector(
-          child: SizedBox(
-            width: 57,
-            height: 57,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                SizedBox(
-                  height: 57,
-                  child: Card(
-                      elevation: 0,
-                      margin: EdgeInsets.all(2),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(8))),
-                      clipBehavior: Clip.antiAlias,
-                      child: LocalImageLoader(
-                        imagePath: firstImage.imgPath,
-                        cacheSize: 100,
-                      )),
-                ),
-                // Use number with baked in shadow. The Impeller renderer stutters with text shadows
+          }
+        },
+        onLongPress: () => _showLongPressSheet(context, entriesProvider),
+        child: SizedBox(
+          width: 57,
+          height: 57,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              SizedBox(
+                height: 57,
+                child: firstImage != null
+                    ? Card(
+                        elevation: 0,
+                        margin: EdgeInsets.all(2),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(8))),
+                        clipBehavior: Clip.antiAlias,
+                        child: LocalImageLoader(
+                          imagePath: firstImage.imgPath,
+                          cacheSize: 100,
+                        ))
+                    : Card(
+                        elevation: 0,
+                        margin: EdgeInsets.all(2),
+                        color: Theme.of(context).colorScheme.secondaryContainer,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(8))),
+                        child: Center(
+                          child: Text('${date.day}',
+                              style: TextStyle(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSecondaryContainer,
+                                  fontSize: 16)),
+                        ),
+                      ),
+              ),
+              // Use number with baked in shadow. The Impeller renderer stutters with text shadows
+              if (firstImage != null)
                 RawImage(
                   image: dayNumber,
                 ),
-                if (entry.mood != null)
-                  Positioned(
-                    bottom: 1,
-                    right: 1,
-                    child: Container(
-                      width: 23,
-                      height: 23,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .surface
-                            .withAlpha(255),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Center(
-                        child: MoodIcon(
-                          moodValue: entry.mood,
-                          size: 16,
-                          allowScaling: false,
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
+              Positioned(
+                bottom: 0,
+                right: 0,
+                child: isMulti
+                    ? _countBadge(context, dayEntries.length)
+                    : firstEntry!.mood != null
+                        ? Container(
+                            width: 23,
+                            height: 23,
+                            decoration: BoxDecoration(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .surface
+                                  .withAlpha(255),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Center(
+                              child: MoodIcon(
+                                moodValue: firstEntry.mood,
+                                size: 16,
+                                allowScaling: false,
+                              ),
+                            ),
+                          )
+                        : const SizedBox.shrink(),
+              ),
+            ],
           ),
-          onTap: () async {
-            await Navigator.of(context).push(MaterialPageRoute(
-              allowSnapshotting: false,
-              builder: (context) => EntriesListPage(
-                  index: entriesProvider.getIndexOfEntry(entry.id!),
-                  getEntries: () => entriesProvider.entries),
-            ));
-          },
-        );
-      }
+        ),
+      );
     } else {
       return GestureDetector(
         behavior: HitTestBehavior.translucent,
-        child: Center(
-          child: Text('${date.day}',
-              style: isSameDay(date, DateTime.now())
-                  ? TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.primary)
-                  : TextStyle(fontSize: 16)),
-        ),
         onTap: () async {
           await Navigator.of(context).push(MaterialPageRoute(
             allowSnapshotting: false,
@@ -159,6 +244,23 @@ class EntryDayCell extends StatelessWidget {
             ),
           ));
         },
+        onLongPress: () => _showLongPressSheet(context, entriesProvider),
+        child: Card(
+          elevation: 0,
+          margin: EdgeInsets.all(2),
+          color: Theme.of(context).colorScheme.surfaceContainerLow,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(8))),
+          child: Center(
+            child: Text('${date.day}',
+                style: TimeManager.isSameDay(date, DateTime.now())
+                    ? TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.primary)
+                    : TextStyle(fontSize: 16)),
+          ),
+        ),
       );
     }
   }
