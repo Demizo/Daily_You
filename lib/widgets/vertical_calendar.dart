@@ -37,7 +37,6 @@ class VerticalCalendar extends StatefulWidget {
 }
 
 class _VerticalCalendarState extends State<VerticalCalendar> {
-  static const double _monthHeaderHeight = 57.0;
   static const double _daysOfWeekRowHeight = 32.0;
 
   double _weekRowHeight = 57.0;
@@ -196,7 +195,7 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
       }
 
       items.add(_MonthHeaderItem(current));
-      offset += _monthHeaderHeight;
+      offset += _weekRowHeight;
 
       current = DateTime(current.year, current.month - 1, 1);
     }
@@ -311,10 +310,12 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
                       slivers: [
                         const SliverPadding(
                             padding: EdgeInsets.only(bottom: 85)),
-                        SliverList.builder(
-                          itemCount: _items.length,
-                          itemBuilder: (context, index) =>
-                              _buildItem(context, index),
+                        SliverFixedExtentList(
+                          itemExtent: _weekRowHeight,
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) => _buildItem(context, index),
+                            childCount: _items.length,
+                          ),
                         ),
                       ],
                     ),
@@ -507,29 +508,25 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
 
   Widget _buildMonthHeader(BuildContext context, DateTime month) {
     return SizedBox(
-      height: _monthHeaderHeight,
+      height: _weekRowHeight,
       child: Align(
         alignment: Alignment.bottomCenter,
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 2.0),
-          child: Container(
-            height: _daysOfWeekRowHeight,
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceContainerLow,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(14),
-                topRight: Radius.circular(14),
-                bottomLeft: Radius.circular(4),
-                bottomRight: Radius.circular(4),
-              ),
+        child: Container(
+          height: _daysOfWeekRowHeight,
+          margin: const EdgeInsets.only(bottom: 2.0),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surfaceContainerLow,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(14),
+              topRight: Radius.circular(14),
+              bottomLeft: Radius.circular(4),
+              bottomRight: Radius.circular(4),
             ),
-            child: Align(
-              alignment: Alignment.center,
-              child: Text(
-                DateFormat('MMMM y', _cachedLocale).format(month),
-                style:
-                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-              ),
+          ),
+          child: Center(
+            child: Text(
+              DateFormat('MMMM y', _cachedLocale).format(month),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
           ),
         ),

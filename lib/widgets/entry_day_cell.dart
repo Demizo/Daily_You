@@ -172,7 +172,7 @@ class EntryDayCell extends StatelessWidget {
     final isMulti = entries.length > 1;
 
     if (entries.isNotEmpty) {
-      return GestureDetector(
+      return MergeSemantics(child: GestureDetector(
         onTap: () async {
           if (isMulti) {
             await _openTimeline(context);
@@ -214,8 +214,10 @@ class EntryDayCell extends StatelessWidget {
                       ),
               ),
               if (firstImage != null)
-                RawImage(
-                  image: dayNumber,
+                ExcludeSemantics(
+                  child: RawImage(
+                    image: dayNumber,
+                  ),
                 ),
               Positioned(
                 bottom: 0,
@@ -246,40 +248,41 @@ class EntryDayCell extends StatelessWidget {
             ],
           ),
         ),
-      );
+      ));
     } else {
-      return GestureDetector(
-          behavior: HitTestBehavior.translucent,
-          onTap: () async {
-            await Navigator.of(context).push(MaterialPageRoute(
-              allowSnapshotting: false,
-              builder: (context) => AddEditEntryPage(
-                overrideCreateDate: TimeManager.currentTimeOnDifferentDate(date)
-                    .copyWith(isUtc: false),
-              ),
-            ));
-          },
-          onLongPress: () => _showPopupMenu(context, entriesProvider),
-          child: SizedBox(
-            width: cellSize,
-            height: cellSize,
-            child: Container(
-              margin: const EdgeInsets.all(2),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surfaceContainerLow,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Center(
-                child: Text('${date.day}',
-                    style: TimeManager.isSameDay(date, today)
-                        ? TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.primary)
-                        : const TextStyle(fontSize: 16)),
-              ),
-            ),
-          ));
+      return MergeSemantics(
+          child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: () async {
+                await Navigator.of(context).push(MaterialPageRoute(
+                  allowSnapshotting: false,
+                  builder: (context) => AddEditEntryPage(
+                    overrideCreateDate: TimeManager.currentTimeOnDifferentDate(date)
+                        .copyWith(isUtc: false),
+                  ),
+                ));
+              },
+              onLongPress: () => _showPopupMenu(context, entriesProvider),
+              child: SizedBox(
+                width: cellSize,
+                height: cellSize,
+                child: Container(
+                  margin: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surfaceContainerLow,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Center(
+                    child: Text('${date.day}',
+                        style: TimeManager.isSameDay(date, today)
+                            ? TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).colorScheme.primary)
+                            : const TextStyle(fontSize: 16)),
+                  ),
+                ),
+              )));
     }
   }
 }
