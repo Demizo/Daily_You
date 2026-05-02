@@ -21,6 +21,12 @@ class AppLocalizationsOc extends AppLocalizations {
   String get actionTakePhoto => 'Take photo';
 
   @override
+  String get actionToday => 'Today';
+
+  @override
+  String get actionOtherDay => 'Other day';
+
+  @override
   String get pageHomeTitle => 'Acuèlh';
 
   @override

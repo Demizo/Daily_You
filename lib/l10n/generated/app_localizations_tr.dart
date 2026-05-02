@@ -21,6 +21,12 @@ class AppLocalizationsTr extends AppLocalizations {
   String get actionTakePhoto => 'Fotoğraf çek';
 
   @override
+  String get actionToday => 'Today';
+
+  @override
+  String get actionOtherDay => 'Other day';
+
+  @override
   String get pageHomeTitle => 'Ana';
 
   @override

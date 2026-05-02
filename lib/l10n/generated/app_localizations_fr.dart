@@ -22,6 +22,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get actionTakePhoto => 'Prendre une photo';
 
   @override
+  String get actionToday => 'Today';
+
+  @override
+  String get actionOtherDay => 'Other day';
+
+  @override
   String get pageHomeTitle => 'Accueil';
 
   @override
