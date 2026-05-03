@@ -53,18 +53,20 @@ class _LocalImageLoaderState extends State<LocalImageLoader> {
   @override
   Widget build(BuildContext context) {
     if (_bytes != null) {
-      return FractionallySizedBox(
-        widthFactor: 1,
-        child: Image.memory(_bytes!,
-            fit: BoxFit.cover,
-            cacheWidth: widget.cacheSize, errorBuilder: (_, __, ___) {
+      return Image.memory(
+        _bytes!,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
+        cacheWidth: widget.cacheSize,
+        errorBuilder: (_, __, ___) {
           return const Center(
             child: Icon(
               Icons.broken_image_rounded,
               size: 36,
             ),
           );
-        }),
+        },
       );
     } else {
       if (_imageNotFound) {
