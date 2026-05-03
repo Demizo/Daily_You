@@ -36,7 +36,8 @@ class VerticalCalendar extends StatefulWidget {
   State<VerticalCalendar> createState() => _VerticalCalendarState();
 }
 
-class _VerticalCalendarState extends State<VerticalCalendar> {
+class _VerticalCalendarState extends State<VerticalCalendar>
+    with AutomaticKeepAliveClientMixin {
   static const double _daysOfWeekRowHeight = 32.0;
 
   double _weekRowHeight = 57.0;
@@ -52,18 +53,22 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
   List<_CalendarItem> _items = [];
   List<(double, DateTime)> _monthOffsets = [];
 
-  bool _showTodayButton = false;
+  final _showTodayButton = ValueNotifier<bool>(false);
   DateTime _visibleMonth = DateTime.now();
   String _cachedLocale = '';
 
   int? _lastFirstDayIndex;
   double _cellWidth = 0;
+  List<String> _dayLabels = [];
 
   final DateTime _firstDate = DateTime(2000, 1, 1);
   late final DateTime _lastDate =
       DateTime(DateTime.now().year, DateTime.now().month, 1);
   final DateTime _today =
       DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -77,17 +82,30 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
 
     final configProvider = Provider.of<ConfigProvider>(context, listen: false);
     final firstDayIndex = configProvider.getFirstDayOfWeekIndex(context);
-    _cachedLocale = TimeManager.currentLocale(context);
+    final newLocale = TimeManager.currentLocale(context);
 
-    if (firstDayIndex != _lastFirstDayIndex) {
+    final firstDayChanged = firstDayIndex != _lastFirstDayIndex;
+    final localeChanged = newLocale != _cachedLocale;
+    _cachedLocale = newLocale;
+
+    if (firstDayChanged) {
       _lastFirstDayIndex = firstDayIndex;
       _buildCalendarItems(firstDayIndex);
       _visibleMonth = DateTime.now();
+    }
+
+    if (firstDayChanged || localeChanged) {
+      final allLabels = TimeManager.daysOfWeekLabels(context);
+      _dayLabels = [
+        ...allLabels.sublist(firstDayIndex),
+        ...allLabels.sublist(0, firstDayIndex),
+      ];
     }
   }
 
   @override
   void dispose() {
+    _showTodayButton.dispose();
     widget.scrollController.removeListener(_onScroll);
     super.dispose();
   }
@@ -245,31 +263,33 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
   void _onScroll() {
     final offset = widget.scrollController.offset;
     final showToday = (offset - _todayOffset).abs() > _weekRowHeight * 12;
-    if (showToday != _showTodayButton) {
-      setState(() => _showTodayButton = showToday);
+    if (_showTodayButton.value != showToday) {
+      _showTodayButton.value = showToday;
     }
     _updateVisibleMonthFromOffset(offset);
   }
 
   void _updateVisibleMonthFromOffset(double offset) {
     if (_monthOffsets.isEmpty) return;
-    for (final (mOffset, month) in _monthOffsets) {
-      if (mOffset > offset) break;
-      _visibleMonth = month;
+    // Binary search for current month
+    int lo = 0, hi = _monthOffsets.length - 1;
+    while (lo < hi) {
+      final mid = (lo + hi + 1) >> 1;
+      if (_monthOffsets[mid].$1 > offset) {
+        hi = mid - 1;
+      } else {
+        lo = mid;
+      }
     }
+    _visibleMonth = _monthOffsets[lo].$2;
   }
 
   @override
   Widget build(BuildContext context) {
-    _cachedLocale = TimeManager.currentLocale(context);
     final firstDayIndex =
         context.watch<ConfigProvider>().getFirstDayOfWeekIndex(context);
-    final allLabels = TimeManager.daysOfWeekLabels(context);
-
-    final dayLabels = [
-      ...allLabels.sublist(firstDayIndex),
-      ...allLabels.sublist(0, firstDayIndex),
-    ];
+    final entriesProvider = context.watch<EntriesProvider>();
+    final imagesProvider = context.watch<EntryImagesProvider>();
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -302,7 +322,7 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
             children: [
               Column(
                 children: [
-                  _buildWeekdayHeader(context, dayLabels),
+                  _buildWeekdayHeader(context, _dayLabels),
                   Expanded(
                     child: CustomScrollView(
                       controller: widget.scrollController,
@@ -313,7 +333,8 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
                         SliverFixedExtentList(
                           itemExtent: _weekRowHeight,
                           delegate: SliverChildBuilderDelegate(
-                            (context, index) => _buildItem(context, index),
+                            (context, index) => _buildItem(context, index,
+                                entriesProvider, imagesProvider),
                             childCount: _items.length,
                           ),
                         ),
@@ -400,36 +421,39 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
       alignment: Alignment.bottomCenter,
       child: Padding(
         padding: const EdgeInsets.only(bottom: 13.0),
-        child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 300),
-          transitionBuilder: (child, animation) {
-            final scale = TweenSequence([
-              TweenSequenceItem(
-                tween: Tween<double>(begin: 0.0, end: 1.1)
-                    .chain(CurveTween(curve: Curves.easeOut)),
-                weight: 50,
-              ),
-              TweenSequenceItem(
-                tween: Tween<double>(begin: 1.1, end: 1.0)
-                    .chain(CurveTween(curve: Curves.easeIn)),
-                weight: 50,
-              ),
-            ]).animate(animation);
-            return ScaleTransition(scale: scale, child: child);
-          },
-          child: _showTodayButton
-              ? IconButton(
-                  color: theme.colorScheme.primary,
-                  key: const ValueKey('todayBtn'),
-                  onPressed: () => _scrollToToday(),
-                  icon: Icon(Icons.arrow_downward_rounded),
-                  style: IconButton.styleFrom(
-                      elevation: 1,
-                      shadowColor: theme.shadowColor,
-                      backgroundColor:
-                          Theme.of(context).colorScheme.primaryContainer),
-                )
-              : const SizedBox.shrink(key: ValueKey('noBtn')),
+        child: ValueListenableBuilder<bool>(
+          valueListenable: _showTodayButton,
+          builder: (context, showToday, _) => AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            transitionBuilder: (child, animation) {
+              final scale = TweenSequence([
+                TweenSequenceItem(
+                  tween: Tween<double>(begin: 0.0, end: 1.1)
+                      .chain(CurveTween(curve: Curves.easeOut)),
+                  weight: 50,
+                ),
+                TweenSequenceItem(
+                  tween: Tween<double>(begin: 1.1, end: 1.0)
+                      .chain(CurveTween(curve: Curves.easeIn)),
+                  weight: 50,
+                ),
+              ]).animate(animation);
+              return ScaleTransition(scale: scale, child: child);
+            },
+            child: showToday
+                ? IconButton(
+                    color: theme.colorScheme.primary,
+                    key: const ValueKey('todayBtn'),
+                    onPressed: () => _scrollToToday(),
+                    icon: Icon(Icons.arrow_downward_rounded),
+                    style: IconButton.styleFrom(
+                        elevation: 1,
+                        shadowColor: theme.shadowColor,
+                        backgroundColor:
+                            Theme.of(context).colorScheme.primaryContainer),
+                  )
+                : const SizedBox.shrink(key: ValueKey('noBtn')),
+          ),
         ),
       ),
     );
@@ -499,10 +523,13 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
     _jumpToMonth(selected);
   }
 
-  Widget _buildItem(BuildContext context, int index) {
+  Widget _buildItem(BuildContext context, int index,
+      EntriesProvider entriesProvider, EntryImagesProvider imagesProvider) {
     final item = _items[index];
     if (item is _MonthHeaderItem) return _buildMonthHeader(context, item.month);
-    if (item is _WeekRowItem) return _buildWeekRow(context, item);
+    if (item is _WeekRowItem) {
+      return _buildWeekRow(context, item, entriesProvider, imagesProvider);
+    }
     return const SizedBox.shrink();
   }
 
@@ -534,12 +561,17 @@ class _VerticalCalendarState extends State<VerticalCalendar> {
     );
   }
 
-  Widget _buildWeekRow(BuildContext context, _WeekRowItem item) {
-    return _WeekRow(
-      days: item.days,
-      today: _today,
-      cellSize: _cellWidth,
-      dayNumberCache: _dayNumberCache,
+  Widget _buildWeekRow(BuildContext context, _WeekRowItem item,
+      EntriesProvider entriesProvider, EntryImagesProvider imagesProvider) {
+    return RepaintBoundary(
+      child: _WeekRow(
+        days: item.days,
+        today: _today,
+        cellSize: _cellWidth,
+        dayNumberCache: _dayNumberCache,
+        entriesProvider: entriesProvider,
+        imagesProvider: imagesProvider,
+      ),
     );
   }
 }
@@ -549,19 +581,20 @@ class _WeekRow extends StatelessWidget {
   final DateTime today;
   final double cellSize;
   final Map<int, ui.Image> dayNumberCache;
+  final EntriesProvider entriesProvider;
+  final EntryImagesProvider imagesProvider;
 
   const _WeekRow({
     required this.days,
     required this.today,
     required this.cellSize,
     required this.dayNumberCache,
+    required this.entriesProvider,
+    required this.imagesProvider,
   });
 
   @override
   Widget build(BuildContext context) {
-    final entriesProvider = context.watch<EntriesProvider>();
-    final imagesProvider = context.watch<EntryImagesProvider>();
-
     return SizedBox(
       height: cellSize,
       child: Row(
