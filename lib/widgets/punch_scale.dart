@@ -20,7 +20,7 @@ class _PunchScaleState extends State<PunchScale>
     super.initState();
     _controller =
         AnimationController(vsync: this, duration: Duration(milliseconds: 200));
-    _scale = AlwaysStoppedAnimation(widget.trigger ? 1.3 : 1.0);
+    _scale = AlwaysStoppedAnimation(widget.trigger ? 1.2 : 1.0);
   }
 
   @override
@@ -29,12 +29,12 @@ class _PunchScaleState extends State<PunchScale>
     if (widget.trigger && !oldWidget.trigger) {
       final punchTween = TweenSequence<double>([
         TweenSequenceItem(
-          tween: Tween(begin: 1.0, end: 1.4)
+          tween: Tween(begin: 1.0, end: 1.3)
               .chain(CurveTween(curve: Curves.easeOut)),
           weight: 50, // fast rise
         ),
         TweenSequenceItem(
-          tween: Tween(begin: 1.4, end: 1.3)
+          tween: Tween(begin: 1.3, end: 1.2)
               .chain(CurveTween(curve: Curves.easeIn)),
           weight: 50, // longer settle
         ),
@@ -42,7 +42,7 @@ class _PunchScaleState extends State<PunchScale>
       _scale = punchTween.animate(_controller);
       _controller.forward(from: 0.0);
     } else if (!widget.trigger && oldWidget.trigger) {
-      final shrinkTween = Tween<double>(begin: 1.3, end: 1.0)
+      final shrinkTween = Tween<double>(begin: 1.2, end: 1.0)
           .chain(CurveTween(curve: Curves.easeOut));
 
       _scale = shrinkTween.animate(_controller);

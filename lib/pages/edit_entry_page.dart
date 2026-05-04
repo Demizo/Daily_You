@@ -209,23 +209,76 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                               await _saveEntry();
                             }),
                       StatefulBuilder(
-                        builder: (context, setState) => EntryMoodPicker(
-                            actions: [
-                              _changeDateButton(),
-                              EntryImagePicker(
-                                onChangedImage: (newImages) {
-                                  _openedCamera = true;
-                                  _addImage(newImages);
-                                },
-                                openCamera: widget.openCamera && !_openedCamera,
+                        builder: (context, setState) => Card.filled(
+                          color: Theme.of(context).colorScheme.surfaceContainer,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      _changeDateButton(),
+                                      IntrinsicHeight(
+                                        child: Row(
+                                          children: [
+                                            Text(
+                                              DateFormat.yMMMEd(
+                                                      TimeManager.currentLocale(
+                                                          context))
+                                                  .format(entryDate!),
+                                              style: const TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            VerticalDivider(
+                                              width: 16,
+                                              thickness: 2,
+                                              radius: BorderRadius.circular(4),
+                                            ),
+                                            Text(
+                                              DateFormat.jm(
+                                                      TimeManager.currentLocale(
+                                                          context))
+                                                  .format(entryDate!),
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  color: Theme.of(context)
+                                                      .dividerColor),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  EntryImagePicker(
+                                    onChangedImage: (newImages) {
+                                      _openedCamera = true;
+                                      _addImage(newImages);
+                                    },
+                                    openCamera:
+                                        widget.openCamera && !_openedCamera,
+                                  )
+                                ],
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 4.0),
+                                child: EntryMoodPicker(
+                                    moodValue: mood,
+                                    onChangedMood: (mood) {
+                                      setState(() => this.mood = mood);
+                                      EasyDebounce.debounce(
+                                          "save-entry",
+                                          Duration(seconds: 5),
+                                          () => _saveEntry());
+                                    }),
                               )
                             ],
-                            moodValue: mood,
-                            onChangedMood: (mood) {
-                              setState(() => this.mood = mood);
-                              EasyDebounce.debounce("save-entry",
-                                  Duration(seconds: 5), () => _saveEntry());
-                            }),
+                          ),
+                        ),
                       ),
                       StatefulBuilder(
                           builder: (context, setState) => EntryTextEditor(
@@ -267,42 +320,41 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     final theme = Theme.of(context);
     final entriesProvider = Provider.of<EntriesProvider>(context);
 
-    return TextButton.icon(
-        icon: Icon(
-          Icons.event_rounded,
-          color: theme.colorScheme.primary,
-        ),
-        onPressed: () async {
-          DateTime? pickedDate = await showDatePicker(
-            selectableDayPredicate: (date) =>
-                entriesProvider.getEntryForDate(date) == null ||
-                TimeManager.isSameDay(date, entryDate!),
-            initialDatePickerMode: DatePickerMode.day,
-            context: context,
-            initialDate: entryDate,
-            firstDate: DateTime.utc(2000),
-            lastDate: DateTime.now(),
-          );
-          if (pickedDate == null) return;
+    return IconButton(
+      icon: Icon(
+        Icons.event_rounded,
+        size: 24,
+        color: theme.colorScheme.primary,
+      ),
+      style: IconButton.styleFrom(
+          backgroundColor: Theme.of(context).colorScheme.surfaceContainer),
+      onPressed: () async {
+        DateTime? pickedDate = await showDatePicker(
+          selectableDayPredicate: (date) =>
+              entriesProvider.getEntryForDate(date) == null ||
+              TimeManager.isSameDay(date, entryDate!),
+          initialDatePickerMode: DatePickerMode.day,
+          context: context,
+          initialDate: entryDate,
+          firstDate: DateTime.utc(2000),
+          lastDate: DateTime.now(),
+        );
+        if (pickedDate == null) return;
 
-          final pickedTime = await showTimePicker(
-              context: context,
-              initialTime: TimeOfDay.fromDateTime(entryDate!));
-          if (pickedTime == null) return;
+        final pickedTime = await showTimePicker(
+            context: context, initialTime: TimeOfDay.fromDateTime(entryDate!));
+        if (pickedTime == null) return;
 
-          entryDate = entryDate!.copyWith(
-            year: pickedDate.year,
-            month: pickedDate.month,
-            day: pickedDate.day,
-            hour: pickedTime.hour,
-            minute: pickedTime.minute,
-          );
-          await _saveEntry();
-        },
-        label: Text(
-          "${DateFormat.yMMMEd(TimeManager.currentLocale(context)).format(entryDate!)} - ${DateFormat.jm(TimeManager.currentLocale(context)).format(entryDate!)}",
-          style: TextStyle(fontSize: 16),
-        ));
+        entryDate = entryDate!.copyWith(
+          year: pickedDate.year,
+          month: pickedDate.month,
+          day: pickedDate.day,
+          hour: pickedTime.hour,
+          minute: pickedTime.minute,
+        );
+        await _saveEntry();
+      },
+    );
   }
 
   Future<void> _saveEntry() async {

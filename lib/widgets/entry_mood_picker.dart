@@ -1,17 +1,14 @@
+import 'package:daily_you/widgets/material_shapes.dart';
 import 'package:daily_you/widgets/punch_scale.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
 
 class EntryMoodPicker extends StatefulWidget {
   final int? moodValue;
-  final List<Widget> actions;
   final ValueChanged<int?> onChangedMood;
 
   const EntryMoodPicker(
-      {super.key,
-      required this.actions,
-      this.moodValue,
-      required this.onChangedMood});
+      {super.key, this.moodValue, required this.onChangedMood});
 
   @override
   State<EntryMoodPicker> createState() => _EntryMoodPickerState();
@@ -20,31 +17,53 @@ class EntryMoodPicker extends StatefulWidget {
 class _EntryMoodPickerState extends State<EntryMoodPicker> {
   late int? _mood = widget.moodValue;
 
-  Widget moodOption(int index) {
+  @override
+  void didUpdateWidget(covariant EntryMoodPicker oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.moodValue != widget.moodValue) {
+      setState(() => _mood = widget.moodValue);
+    }
+  }
+
+  Widget _moodOption(int index) {
+    final isSelected = index == _mood;
+    final cs = Theme.of(context).colorScheme;
+
     return GestureDetector(
-      child: Column(
-        children: [
-          PunchScale(
+      onTap: () => _updateMood(index),
+      child: SizedBox(
+        width: 52,
+        height: 52,
+        child: TweenAnimationBuilder<double>(
+          tween: Tween(begin: 0.0, end: isSelected ? 1.0 : 0.0),
+          duration: const Duration(milliseconds: 150),
+          curve: Curves.easeInOut,
+          builder: (context, progress, child) {
+            return CustomPaint(
+              painter: MorphingBurstPainter(
+                progress: progress,
+                color: Color.lerp(
+                  cs.surfaceContainerLow,
+                  cs.surfaceContainerLowest,
+                  progress,
+                )!,
+              ),
+              child: Center(child: child),
+            );
+          },
+          child: PunchScale(
             key: ValueKey(index),
-            trigger: index == _mood,
-            child: MoodIcon(moodValue: index, size: 24),
+            trigger: isSelected,
+            child: Opacity(
+                opacity: isSelected ? 1.0 : 0.6,
+                child: MoodIcon(moodValue: index, size: 24)),
           ),
-          SizedBox(
-            height: 24,
-            child: Radio(
-              value: index,
-              groupValue: _mood,
-              onChanged: updateMood,
-              toggleable: true,
-            ),
-          ),
-        ],
+        ),
       ),
-      onTap: () => updateMood(index),
     );
   }
 
-  void updateMood(int? value) {
+  void _updateMood(int? value) {
     if (value == _mood) {
       value = null;
     }
@@ -54,30 +73,16 @@ class _EntryMoodPickerState extends State<EntryMoodPicker> {
 
   @override
   Widget build(BuildContext context) {
-    return Card.filled(
-      color: Theme.of(context).colorScheme.surfaceContainer,
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: 8.0),
-        child: Column(children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: widget.actions,
-          ),
-          const SizedBox(
-            height: 4,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              moodOption(-2),
-              moodOption(-1),
-              moodOption(0),
-              moodOption(1),
-              moodOption(2),
-            ],
-          ),
-        ]),
-      ),
+    return Row(
+      mainAxisSize: MainAxisSize.max,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        _moodOption(-2),
+        _moodOption(-1),
+        _moodOption(0),
+        _moodOption(1),
+        _moodOption(2),
+      ],
     );
   }
 }
