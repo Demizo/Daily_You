@@ -3,15 +3,46 @@ import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 class MoodByDayChart extends StatelessWidget {
   final Map<String, double> averageMood;
+  final bool hasData;
 
-  const MoodByDayChart({super.key, required this.averageMood});
+  const MoodByDayChart(
+      {super.key, required this.averageMood, this.hasData = true});
 
   @override
   Widget build(BuildContext context) {
+    if (!hasData) {
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: AspectRatio(
+          aspectRatio: 2,
+          child: Card(
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.bar_chart_rounded,
+                    size: 100,
+                    color: Theme.of(context).disabledColor,
+                  ),
+                  Text(
+                    AppLocalizations.of(context)!.statisticsNotEnoughData,
+                    style: TextStyle(
+                        fontSize: 18,
+                        color: Theme.of(context).disabledColor),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
     return Center(
       child: Padding(
         padding: const EdgeInsets.only(left: 0, right: 42, bottom: 0, top: 8),
@@ -34,7 +65,7 @@ class MoodByDayChart extends StatelessWidget {
                     getTitlesWidget: (value, meta) {
                       final index = value.toInt();
                       return SideTitleWidget(
-                          axisSide: meta.axisSide,
+                          meta: meta,
                           child: MoodIcon(
                             moodValue: index,
                           ));

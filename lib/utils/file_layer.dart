@@ -15,7 +15,7 @@ class FileLayer {
       return pickedFolder?.uri;
     } else {
       // Desktop
-      final selectedDirectory = await FilePicker.platform.getDirectoryPath();
+      final selectedDirectory = await FilePicker.getDirectoryPath();
       if (selectedDirectory == null || selectedDirectory == "/") return null;
 
       return selectedDirectory;
@@ -30,7 +30,7 @@ class FileLayer {
       return pickedFile?.uri;
     } else {
       // Desktop
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
+      FilePickerResult? result = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: allowedExtensions,
       );
