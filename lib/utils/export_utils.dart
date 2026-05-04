@@ -51,14 +51,22 @@ class ExportUtils {
       final entries = EntriesProvider.instance.entries;
       final totalLogs = entries.length;
       int processedLogs = 0;
+      final Map<String, int> timestampCount = {};
       for (Entry entry in entries) {
         final images = EntryImagesProvider.instance.getForEntry(entry);
         StringBuffer noteBody = StringBuffer();
 
+        final timestamp =
+            DateFormat("yyyy-MM-dd", TimeManager.currentLocale(context))
+                .format(entry.timeCreate);
+        timestampCount[timestamp] = (timestampCount[timestamp] ?? 0) + 1;
+        final index = timestampCount[timestamp]!;
+        final indexSuffix = index > 1 ? "_$index" : "";
+
         for (EntryImage image in images) {
           final bytes = await ImageStorage.instance.getBytes(image.imgPath);
           final prettyName =
-              "image_${DateFormat("yyyy-MM-dd", TimeManager.currentLocale(context)).format(entry.timeCreate)}_${image.imgRank}${extension(image.imgPath)}";
+              "image_${timestamp}${indexSuffix}_${image.imgRank}${extension(image.imgPath)}";
           if (bytes != null) {
             noteBody.writeln('![](Images/$prettyName)');
 
@@ -75,11 +83,8 @@ class ExportUtils {
         noteBody.writeln(
             "$moodText${DateFormat.yMMMEd(TimeManager.currentLocale(context)).format(entry.timeCreate)}\n${entry.text}");
 
-        final timestamp =
-            DateFormat("yyyy-MM-dd", TimeManager.currentLocale(context))
-                .format(entry.timeCreate);
-        await FileLayer.createFile(tempExportFolder.path, "log_$timestamp.md",
-            utf8.encode(noteBody.toString()),
+        await FileLayer.createFile(tempExportFolder.path,
+            "log_$timestamp${indexSuffix}.md", utf8.encode(noteBody.toString()),
             useExternalPath: false);
 
         processedLogs++;
