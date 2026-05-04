@@ -286,6 +286,7 @@ class _VerticalCalendarState extends State<VerticalCalendar>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final firstDayIndex =
         context.watch<ConfigProvider>().getFirstDayOfWeekIndex(context);
     final entriesProvider = context.watch<EntriesProvider>();

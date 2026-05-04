@@ -37,13 +37,13 @@ class _LaunchPageState extends State<LaunchPage> {
     }
   }
 
-  _initializeApp() async {
+  Future _initializeApp() async {
     await _storeLocalizedNotificationStrings();
     await _updateAppShortcuts();
     await _checkDatabaseConnection();
   }
 
-  _updateAppShortcuts() async {
+  Future _updateAppShortcuts() async {
     final QuickActions quickActions = const QuickActions();
     await quickActions.initialize((shortcutType) {
       if (shortcutType == 'action_log_today') {
@@ -54,6 +54,7 @@ class _LaunchPageState extends State<LaunchPage> {
     });
 
     await quickActions.clearShortcutItems();
+    if (!mounted) return;
     await quickActions.setShortcutItems(<ShortcutItem>[
       ShortcutItem(
         type: 'action_log_today',
@@ -68,21 +69,26 @@ class _LaunchPageState extends State<LaunchPage> {
     ]);
   }
 
-  _storeLocalizedNotificationStrings() async {
+  Future _storeLocalizedNotificationStrings() async {
     var prefs = await SharedPreferences.getInstance();
+    if (!mounted) return;
     await prefs.setString(
         'dailyReminderTitle', AppLocalizations.of(context)!.dailyReminderTitle);
+    if (!mounted) return;
     await prefs.setString('dailyReminderDescription',
         AppLocalizations.of(context)!.dailyReminderDescription);
+    if (!mounted) return;
     await prefs.setString('onThisDayNotificationTitle',
         AppLocalizations.of(context)!.flashbackOnThisDay);
+    if (!mounted) return;
     await prefs.setString('onThisDayNotificationDescription',
         AppLocalizations.of(context)!.settingsOnThisDayDescription);
   }
 
-  _checkDatabaseConnection() async {
+  Future _checkDatabaseConnection() async {
     // Prompt unlock before initializing database
     if (await ConfigProvider.instance.get(ConfigKey.requirePassword)) {
+      if (!mounted) return;
       await showDialog(
           context: context,
           builder: (context) => AuthPopup(
@@ -110,7 +116,7 @@ class _LaunchPageState extends State<LaunchPage> {
     });
   }
 
-  _forceLocalDatabase() async {
+  Future _forceLocalDatabase() async {
     await AppDatabase.instance.init(forceWithoutSync: true);
     await _nextPage();
   }

@@ -57,11 +57,9 @@ Future<bool> importFromDaybook(
           as List<int>,
     );
 
-    final rows = const CsvToListConverter(
+    final rows = const CsvDecoder(
       fieldDelimiter: ',',
-      textDelimiter: '"',
-      eol: '\n',
-      shouldParseNumbers: false,
+      quoteCharacter: '"',
     ).convert(csvString);
 
     if (rows.isEmpty) {
@@ -127,8 +125,8 @@ Future<bool> importFromDaybook(
           final bytes =
               await FileLayer.getFileBytes(file.path, useExternalPath: false);
           if (bytes == null) continue;
-          final imagePath = await ImageStorage.instance
-              .create(null, bytes, currTime: date);
+          final imagePath =
+              await ImageStorage.instance.create(null, bytes, currTime: date);
           if (imagePath != null) {
             await EntryImagesProvider.instance.add(
               EntryImage(

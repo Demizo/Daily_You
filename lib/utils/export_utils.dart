@@ -66,7 +66,7 @@ class ExportUtils {
         for (EntryImage image in images) {
           final bytes = await ImageStorage.instance.getBytes(image.imgPath);
           final prettyName =
-              "image_${timestamp}${indexSuffix}_${image.imgRank}${extension(image.imgPath)}";
+              "image_$timestamp${indexSuffix}_${image.imgRank}${extension(image.imgPath)}";
           if (bytes != null) {
             noteBody.writeln('![](Images/$prettyName)');
 
@@ -84,7 +84,7 @@ class ExportUtils {
             "$moodText${DateFormat.yMMMEd(TimeManager.currentLocale(context)).format(entry.timeCreate)}\n${entry.text}");
 
         await FileLayer.createFile(tempExportFolder.path,
-            "log_$timestamp${indexSuffix}.md", utf8.encode(noteBody.toString()),
+            "log_$timestamp$indexSuffix.md", utf8.encode(noteBody.toString()),
             useExternalPath: false);
 
         processedLogs++;

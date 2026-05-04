@@ -1,193 +1,210 @@
+import 'package:daily_you/widgets/material_shapes.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:daily_you/l10n/generated/app_localizations.dart';
 
-class MoodTotalsChart extends StatefulWidget {
+class MoodTotalsChart extends StatelessWidget {
   final Map<int, int> moodCounts;
-
-  static final moodToIndexMapping = {
-    -2: 0,
-    -1: 1,
-    0: 2,
-    1: 3,
-    2: 4,
-  };
-
-  static final indexToMoodValueMapping = Map.fromEntries(moodToIndexMapping
-      .entries
-      .map((entry) => MapEntry(entry.value, entry.key)));
 
   const MoodTotalsChart({super.key, required this.moodCounts});
 
-  @override
-  State<MoodTotalsChart> createState() => _MoodTotalsChartState();
-}
-
-class _MoodTotalsChartState extends State<MoodTotalsChart> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  BarChartGroupData generateBarGroup(
-    int x,
-    Color color,
-    double value,
-  ) {
-    return BarChartGroupData(
-      x: x,
-      barRods: [
-        BarChartRodData(toY: value, color: color, width: 32),
-      ],
-      showingTooltipIndicators: touchedGroupIndex == x ? [0] : [],
-    );
-  }
-
-  int touchedGroupIndex = -1;
+  static const _moodOrder = [2, 1, 0, -1, -2];
+  static const _barHeight = 44.0;
+  static const _iconSize = 40.0;
+  static const _countWidth = 44.0;
+  static const _gap = 4.0;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 0, right: 42, bottom: 10, top: 8),
-      child: AspectRatio(
-        aspectRatio: 2,
-        child: BarChart(
-          BarChartData(
-            alignment: BarChartAlignment.spaceAround,
-            borderData: FlBorderData(
-              show: true,
-              border: Border.symmetric(
-                horizontal: BorderSide(
-                  color: Theme.of(context)
-                      .colorScheme
-                      .onSurface
-                      .withValues(alpha: 0.2),
-                ),
+    final hasData = moodCounts.values.any((v) => v > 0);
+    final isRtl = Directionality.of(context) == TextDirection.rtl;
+    final maxCount = moodCounts.values.reduce((a, b) => a > b ? a : b);
+    final mostCommonMood = moodCounts.entries
+        .where((e) => e.value > 0)
+        .reduce((a, b) => a.value >= b.value ? a : b)
+        .key;
+
+    return Card.filled(
+      color: Theme.of(context).colorScheme.surfaceContainer,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 4.0),
+            child: Center(
+              child: Text(
+                AppLocalizations.of(context)!.chartSummaryTitle(
+                    AppLocalizations.of(context)!.tagMoodTitle),
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-            ),
-            titlesData: FlTitlesData(
-              show: true,
-              leftTitles: const AxisTitles(
-                drawBelowEverything: true,
-                sideTitles: SideTitles(
-                  showTitles: true,
-                  reservedSize: 42,
-                ),
-              ),
-              bottomTitles: AxisTitles(
-                sideTitles: SideTitles(
-                  showTitles: true,
-                  reservedSize: 36,
-                  getTitlesWidget: (value, meta) {
-                    final index = value.toInt();
-                    return SideTitleWidget(
-                        axisSide: meta.axisSide,
-                        child: _MoodLabelIconWidget(
-                          isSelected: touchedGroupIndex == index,
-                          mood: MoodTotalsChart.indexToMoodValueMapping[index]!,
-                        ));
-                  },
-                ),
-              ),
-              rightTitles: const AxisTitles(),
-              topTitles: const AxisTitles(),
-            ),
-            gridData: FlGridData(
-              show: true,
-              drawVerticalLine: false,
-              getDrawingHorizontalLine: (value) => FlLine(
-                color: Theme.of(context)
-                    .colorScheme
-                    .onSurface
-                    .withValues(alpha: 0.2),
-                strokeWidth: 1,
-              ),
-            ),
-            barGroups: widget.moodCounts.entries.map((e) {
-              final index = e.key;
-              final data = e.value;
-              return generateBarGroup(
-                  MoodTotalsChart.moodToIndexMapping[index]!,
-                  Theme.of(context).colorScheme.primary,
-                  data.toDouble());
-            }).toList(),
-            barTouchData: BarTouchData(
-              enabled: true,
-              handleBuiltInTouches: false,
-              touchTooltipData: BarTouchTooltipData(
-                tooltipBgColor: Colors.transparent,
-                tooltipMargin: 0,
-                getTooltipItem: (
-                  BarChartGroupData group,
-                  int groupIndex,
-                  BarChartRodData rod,
-                  int rodIndex,
-                ) {
-                  return BarTooltipItem(
-                    rod.toY.toInt().toString(),
-                    TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: rod.color,
-                      fontSize: 18,
-                    ),
-                  );
-                },
-              ),
-              touchCallback: (event, response) {
-                if (event.isInterestedForInteractions &&
-                    response != null &&
-                    response.spot != null) {
-                  setState(() {
-                    touchedGroupIndex = response.spot!.touchedBarGroupIndex;
-                  });
-                } else {
-                  setState(() {
-                    touchedGroupIndex = -1;
-                  });
-                }
-              },
             ),
           ),
+          if (!hasData)
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.bar_chart_rounded,
+                      size: 100,
+                      color: Theme.of(context).disabledColor,
+                    ),
+                    Text(
+                      AppLocalizations.of(context)!.statisticsNotEnoughData,
+                      style: TextStyle(
+                          fontSize: 18, color: Theme.of(context).disabledColor),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          if (hasData)
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: Column(
+                children: _moodOrder.map((mood) {
+                  final count = moodCounts[mood] ?? 0;
+                  return _MoodBarRow(
+                    mood: mood,
+                    count: count,
+                    maxCount: maxCount,
+                    isMostCommon: mood == mostCommonMood,
+                    isRtl: isRtl,
+                    barHeight: _barHeight,
+                    iconSize: _iconSize,
+                    countWidth: _countWidth,
+                    gap: _gap,
+                  );
+                }).toList(),
+              ),
+            )
+        ],
+      ),
+    );
+  }
+}
+
+class _MoodBarRow extends StatelessWidget {
+  final int mood;
+  final int count;
+  final int maxCount;
+  final bool isMostCommon;
+  final bool isRtl;
+  final double barHeight;
+  final double iconSize;
+  final double countWidth;
+  final double gap;
+
+  const _MoodBarRow({
+    required this.mood,
+    required this.count,
+    required this.maxCount,
+    required this.isMostCommon,
+    required this.isRtl,
+    required this.barHeight,
+    required this.iconSize,
+    required this.countWidth,
+    required this.gap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final primary = Theme.of(context).colorScheme.primary;
+    final surface = Theme.of(context).colorScheme.surface;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 1),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final minBarWidth = iconSize + gap;
+          final maxBarWidth = constraints.maxWidth - countWidth - gap;
+          final barWidth = maxCount > 0
+              ? (minBarWidth + (count / maxCount) * (maxBarWidth - minBarWidth))
+                  .clamp(minBarWidth, maxBarWidth)
+              : minBarWidth;
+
+          final iconWidget = _buildIconContainer(surface, primary);
+          final bar = _buildBar(barWidth, iconWidget, primary);
+          final countText = SizedBox(
+            width: countWidth,
+            child: Text(
+              count > 0 ? '$count' : '',
+              style: TextStyle(
+                  fontWeight: FontWeight.bold, fontSize: 16, color: primary),
+              textAlign: isRtl ? TextAlign.right : TextAlign.left,
+            ),
+          );
+
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: isRtl
+                ? [countText, SizedBox(width: gap), bar]
+                : [bar, SizedBox(width: gap), countText],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildBar(double width, Widget iconWidget, Color barColor) {
+    return SizedBox(
+      width: width,
+      height: barHeight,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                color: barColor,
+                borderRadius: BorderRadius.circular(barHeight / 2),
+              ),
+            ),
+          ),
+          Positioned(
+            left: isRtl ? null : (gap / 2),
+            right: isRtl ? (gap / 2) : null,
+            top: (barHeight - iconSize) / 2,
+            child: iconWidget,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildIconContainer(Color surface, Color primary) {
+    final icon = MoodIcon(
+      moodValue: mood,
+      allowScaling: false,
+    );
+
+    if (isMostCommon) {
+      return SizedBox(
+        width: iconSize,
+        height: iconSize,
+        child: ClipPath(
+          clipper: SoftBurstClipper(),
+          child: Container(
+            color: surface,
+            child: Center(child: icon),
+          ),
+        ),
+      );
+    }
+
+    return SizedBox(
+      width: iconSize,
+      height: iconSize,
+      child: Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: Container(
+          decoration: BoxDecoration(color: surface, shape: BoxShape.circle),
+          child: Center(child: icon),
         ),
       ),
     );
-  }
-}
-
-class _MoodLabelIconWidget extends ImplicitlyAnimatedWidget {
-  const _MoodLabelIconWidget({
-    required this.isSelected,
-    required this.mood,
-  }) : super(duration: const Duration(milliseconds: 100));
-  final bool isSelected;
-  final int mood;
-
-  @override
-  ImplicitlyAnimatedWidgetState<ImplicitlyAnimatedWidget> createState() =>
-      _IconWidgetState();
-}
-
-class _IconWidgetState extends AnimatedWidgetBaseState<_MoodLabelIconWidget> {
-  Tween<double>? _scaleTween;
-
-  @override
-  Widget build(BuildContext context) {
-    final scale = 1 + _scaleTween!.evaluate(animation) * 0.5;
-    return Transform(
-        transform: Matrix4.rotationZ(0).scaled(scale, scale),
-        origin: const Offset(14, 14),
-        child: MoodIcon(moodValue: widget.mood));
-  }
-
-  @override
-  void forEachTween(TweenVisitor<dynamic> visitor) {
-    _scaleTween = visitor(
-      _scaleTween,
-      widget.isSelected ? 1.0 : 0.0,
-      (dynamic value) => Tween<double>(
-        begin: value as double,
-        end: widget.isSelected ? 1.0 : 0.0,
-      ),
-    ) as Tween<double>?;
   }
 }

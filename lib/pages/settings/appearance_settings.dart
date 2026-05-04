@@ -97,6 +97,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
                         .set(ConfigKey.noMoodIcon, newEmoji);
                   }
                 }
+                if (!context.mounted) return;
                 Navigator.pop(context);
               },
             ),
@@ -117,7 +118,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
     );
   }
 
-  _resetMoodIcons() async {
+  Future _resetMoodIcons() async {
     for (var mood in ConfigProvider.defaultMoodIconFieldMapping.entries) {
       await ConfigProvider.instance.set(mood.key, mood.value);
     }

@@ -221,7 +221,7 @@ class _MoodByMonthChartState extends State<MoodByMonthChart> {
               getTitlesWidget: (value, meta) {
                 final index = value.toInt();
                 return SideTitleWidget(
-                    axisSide: meta.axisSide,
+                    meta: meta,
                     child: MoodIcon(
                       moodValue: index,
                     ));
