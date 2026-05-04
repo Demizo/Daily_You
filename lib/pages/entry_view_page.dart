@@ -90,9 +90,29 @@ class _EntryViewPageState extends State<EntryViewPage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        "${DateFormat.yMMMEd(TimeManager.currentLocale(context)).format(entry.timeCreate)} - ${DateFormat.jm(TimeManager.currentLocale(context)).format(entry.timeCreate)}",
-                        style: const TextStyle(fontSize: 16),
+                      IntrinsicHeight(
+                        child: Row(
+                          children: [
+                            Text(
+                              DateFormat.yMMMEd(
+                                      TimeManager.currentLocale(context))
+                                  .format(entry.timeCreate),
+                              style: const TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                            VerticalDivider(
+                              width: 16,
+                              thickness: 2,
+                              radius: BorderRadius.circular(4),
+                            ),
+                            Text(
+                              DateFormat.jm(TimeManager.currentLocale(context))
+                                  .format(entry.timeCreate),
+                              style: TextStyle(
+                                  fontSize: 16, color: theme.dividerColor),
+                            ),
+                          ],
+                        ),
                       ),
                       MoodIcon(
                         moodValue: entry.mood,
