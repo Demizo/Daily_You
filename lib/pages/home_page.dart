@@ -210,7 +210,7 @@ class _HomePageState extends State<HomePage>
           blendMode: BlendMode.dstIn,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 4),
             itemCount: flashbacks.length,
             itemBuilder: (context, index) {
               final flashback = flashbacks[index];
