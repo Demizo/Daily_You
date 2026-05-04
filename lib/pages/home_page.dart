@@ -175,6 +175,7 @@ class _HomePageState extends State<HomePage>
               ? EntryImagesProvider.instance.getForEntry(entry)
               : [];
 
+          if (!mounted) return;
           await Navigator.of(context).push(
             MaterialPageRoute(
                 allowSnapshotting: false,

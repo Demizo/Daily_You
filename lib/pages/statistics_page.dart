@@ -93,15 +93,11 @@ class _StatsPageState extends State<StatsPage>
             ),
           ),
         ),
-        Center(
-          child: Text(
-            AppLocalizations.of(context)!
-                .chartSummaryTitle(AppLocalizations.of(context)!.tagMoodTitle),
-            style: const TextStyle(fontSize: 18),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 2.0),
+          child: MoodTotalsChart(
+            moodCounts: getMoodTotals(entriesInRange),
           ),
-        ),
-        MoodTotalsChart(
-          moodCounts: getMoodTotals(entriesInRange),
         ),
         Center(
           child: Text(
@@ -112,6 +108,7 @@ class _StatsPageState extends State<StatsPage>
         ),
         MoodByDayChart(
           averageMood: getMoodsByDay(entriesInRange),
+          hasData: getMoodTotals(entriesInRange).values.any((v) => v > 0),
         ),
       ],
     );

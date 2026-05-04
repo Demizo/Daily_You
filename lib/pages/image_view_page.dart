@@ -124,6 +124,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
                 ? "${(bytes.length / 1024).toStringAsFixed(2)} KB"
                 : "${sizeInMb.toStringAsFixed(2)} MB";
 
+            if (!context.mounted) return;
             showDialog(
               context: context,
               builder: (context) => AlertDialog(
@@ -180,9 +181,9 @@ class _ImageViewPageState extends State<ImageViewPage> {
                 final currentImage = widget.images[currentIndex].imgPath;
                 var bytes = await ImageStorage.instance.getBytes(currentImage);
                 if (bytes != null) {
-                  await Share.shareXFiles(
-                      [XFile.fromData(bytes, mimeType: "images/*")],
-                      fileNameOverrides: [currentImage]);
+                  await SharePlus.instance.share(ShareParams(
+                      files: [XFile.fromData(bytes, mimeType: "images/*")],
+                      fileNameOverrides: [currentImage]));
                 }
               });
         },

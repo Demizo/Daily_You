@@ -112,9 +112,8 @@ class SecuritySettingsPageState extends State<SecuritySettings> {
                                 try {
                                   final bool didAuthenticate =
                                       await auth.authenticate(
-                                          options: AuthenticationOptions(
-                                              stickyAuth: false,
-                                              biometricOnly: true),
+                                          persistAcrossBackgrounding: false,
+                                          biometricOnly: true,
                                           localizedReason:
                                               AppLocalizations.of(context)!
                                                   .unlockAppPrompt);

@@ -185,13 +185,13 @@ class _EntryViewPageState extends State<EntryViewPage> {
               var bytes =
                   await ImageStorage.instance.getBytes(images.first.imgPath);
               if (bytes != null) {
-                await Share.shareXFiles(
-                    [XFile.fromData(bytes, mimeType: "images/*")],
+                await SharePlus.instance.share(ShareParams(
+                    files: [XFile.fromData(bytes, mimeType: "images/*")],
                     fileNameOverrides: [images.first.imgPath],
-                    text: sharedText);
+                    text: sharedText));
               }
             } else {
-              Share.share(sharedText);
+              SharePlus.instance.share(ShareParams(text: sharedText));
             }
           });
     }

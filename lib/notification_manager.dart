@@ -32,9 +32,11 @@ class NotificationManager {
 
     _notifications = flutterLocalNotificationsPlugin;
 
-    await _notifications!.initialize(const InitializationSettings(
-        android: AndroidInitializationSettings('@drawable/ic_notification'),
-        linux: LinuxInitializationSettings(defaultActionName: 'Log Today')));
+    await _notifications!.initialize(
+        settings: const InitializationSettings(
+            android: AndroidInitializationSettings('@drawable/ic_notification'),
+            linux:
+                LinuxInitializationSettings(defaultActionName: 'Log Today')));
   }
 
   Future<bool> hasNotificationPermission() async {
@@ -75,7 +77,7 @@ class NotificationManager {
         .getActiveNotifications();
     for (var notif in activeNotifications) {
       if (notif.id == 0) {
-        await NotificationManager.instance.notifications.cancel(0);
+        await NotificationManager.instance.notifications.cancel(id: 0);
       }
     }
   }
@@ -85,7 +87,7 @@ class NotificationManager {
         .getActiveNotifications();
     for (var notif in activeNotifications) {
       if (notif.id == 1) {
-        await NotificationManager.instance.notifications.cancel(1);
+        await NotificationManager.instance.notifications.cancel(id: 1);
       }
     }
   }

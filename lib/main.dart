@@ -42,7 +42,7 @@ void onThisDayCallbackDispatcher() async {
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
         FlutterLocalNotificationsPlugin();
     await flutterLocalNotificationsPlugin.initialize(
-        const InitializationSettings(
+        settings: const InitializationSettings(
             android: AndroidInitializationSettings('@drawable/ic_notification'),
             linux:
                 LinuxInitializationSettings(defaultActionName: 'On This Day')));
@@ -62,7 +62,10 @@ void onThisDayCallbackDispatcher() async {
 
     if (title != null && description != null) {
       await flutterLocalNotificationsPlugin.show(
-          1, title, description, NotificationDetails(android: androidDetails),
+          id: 1,
+          title: title,
+          body: description,
+          notificationDetails: NotificationDetails(android: androidDetails),
           payload: DateTime.now().toIso8601String());
     }
   }
@@ -82,7 +85,7 @@ void callbackDispatcher() async {
         FlutterLocalNotificationsPlugin();
 
     await flutterLocalNotificationsPlugin.initialize(
-        const InitializationSettings(
+        settings: const InitializationSettings(
             android: AndroidInitializationSettings('@drawable/ic_notification'),
             linux:
                 LinuxInitializationSettings(defaultActionName: 'Log Today')));
@@ -106,7 +109,10 @@ void callbackDispatcher() async {
 
     if (title != null && description != null) {
       await flutterLocalNotificationsPlugin.show(
-          0, title, description, platformChannelSpecifics,
+          id: 0,
+          title: title,
+          body: description,
+          notificationDetails: platformChannelSpecifics,
           payload: DateTime.now().toIso8601String());
     }
   }

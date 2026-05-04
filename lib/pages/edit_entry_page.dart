@@ -341,6 +341,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
         );
         if (pickedDate == null) return;
 
+        if (!mounted) return;
         final pickedTime = await showTimePicker(
             context: context, initialTime: TimeOfDay.fromDateTime(entryDate!));
         if (pickedTime == null) return;
