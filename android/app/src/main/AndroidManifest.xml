@@ -11,7 +11,8 @@
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
 	android:roundIcon="@mipmap/ic_launcher_round"
-	android:localeConfig="@xml/locales_config">
+	android:localeConfig="@xml/locales_config"
+	android:enableOnBackInvokedCallback="true">
         <service
             android:name="dev.fluttercommunity.plus.androidalarmmanager.AlarmService"
             android:permission="android.permission.BIND_JOB_SERVICE"
