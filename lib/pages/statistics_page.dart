@@ -1,7 +1,8 @@
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/widgets/mood_by_day_chart.dart';
-import 'package:daily_you/widgets/mood_by_month_chart.dart';
+import 'package:daily_you/widgets/mood_by_month_chart.dart'
+    show MoodOverTimeChart;
 import 'package:daily_you/widgets/mood_totals_chart.dart';
 import 'package:daily_you/widgets/stat_range_selector.dart';
 import 'package:daily_you/widgets/streak_card.dart';
@@ -92,7 +93,10 @@ class _StatsPageState extends State<StatsPage>
             ),
           ),
         ),
-        const MoodByMonthChart(),
+        MoodOverTimeChart(
+          entries: entriesInRange.where((e) => e.mood != null).toList(),
+          hasData: getMoodTotals(entriesInRange).values.any((v) => v > 0),
+        ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 2.0),
           child: MoodTotalsChart(
