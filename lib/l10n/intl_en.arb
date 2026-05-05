@@ -63,6 +63,8 @@
   "@chartSummaryTitle": {},
   "chartByDayTitle": "{tag} By Day",
   "@chartByDayTitle": {},
+  "chartOverTimeTitle": "{tag} Over Time",
+  "@chartOverTimeTitle": {},
   "streakCurrent": "{count, plural, other{Current Streak {count}}}",
   "@streakCurrent": {},
   "streakLongest": "{count, plural, other{Longest Streak {count}}}",

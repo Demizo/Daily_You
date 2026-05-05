@@ -1,298 +1,355 @@
 import 'package:daily_you/models/entry.dart';
-import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 
-class MoodByMonthChart extends StatefulWidget {
-  const MoodByMonthChart({super.key});
+class MoodOverTimeChart extends StatelessWidget {
+  final List<Entry> entries;
+  final bool hasData;
 
-  @override
-  State<MoodByMonthChart> createState() => _MoodByMonthChartState();
-}
+  const MoodOverTimeChart({
+    super.key,
+    required this.entries,
+    required this.hasData,
+  });
 
-class _MoodByMonthChartState extends State<MoodByMonthChart> {
-  Map<String, double?> averageMood = {};
-  late List<String> sortedKeys;
-  int currentPage = 0;
-  int monthsPerPage = 12;
-  bool notEnoughData = true;
+  static const _dummyYValues = [
+    -0.5,
+    -0.4,
+    0.0,
+    0.3,
+    -0.6,
+    0.1,
+    0.6,
+    1.2,
+    1.3,
+    0.6,
+    0.4,
+    0.4,
+    0.7,
+    0.8,
+    0.4,
+    0.2,
+    -0.5,
+    -0.8,
+    -1.5,
+    -1.0,
+    -0.3,
+    0.0,
+    0.2,
+    0.2,
+    0.5,
+    0.5,
+    0.7,
+    0.8,
+    0.9,
+    0.8,
+    0.6,
+    0.9,
+    1.2,
+    1.3,
+    1.2,
+    1.2,
+    1.3,
+    1.5,
+    1.0,
+    1.4,
+    1.7,
+  ];
 
-  @override
-  void initState() {
-    super.initState();
-  }
+  static const int _monthThreshold = 35; // Catches 31-day months easily
+  static const int _yearThreshold = 366; // Catches leap years
 
   @override
   Widget build(BuildContext context) {
-    final entriesProvider = Provider.of<EntriesProvider>(context);
-    List<Entry> entries = entriesProvider.entries;
-    Map<String, List<double>> moodsByMonth = {};
+    final today = DateTime.now();
+    final rangeEnd = DateTime(today.year, today.month, today.day, 23, 59, 59);
+    final rangeStart = hasData ? _dataRangeStart() : _dummyRangeStart(today);
 
-    // Collect moods by month
-    for (Entry entry in entries) {
-      if (entry.mood == null) continue;
-      String monthKey =
-          "${entry.timeCreate.year}-${entry.timeCreate.month.toString().padLeft(2, '0')}";
-      if (moodsByMonth[monthKey] != null) {
-        moodsByMonth[monthKey]!.add(entry.mood!.toDouble());
-      } else {
-        moodsByMonth[monthKey] = List.empty(growable: true);
-        moodsByMonth[monthKey]!.add(entry.mood!.toDouble());
-      }
-    }
+    final spanDays = rangeEnd.difference(rangeStart).inDays.clamp(1, 999999);
+    final useWeekly = spanDays <= 365;
 
-    // Average the mood for each month
-    averageMood.clear();
-    for (var month in moodsByMonth.keys) {
-      averageMood[month] = moodsByMonth[month]!.reduce((a, b) => a + b) /
-          moodsByMonth[month]!.length;
-    }
+    final buckets = useWeekly
+        ? _generateWeeklyBuckets(rangeStart, rangeEnd)
+        : _generateMonthlyBuckets(rangeStart, rangeEnd);
 
-    // Ensure there is enough data
-    notEnoughData = averageMood.length < 2;
+    if (buckets.isEmpty) return const SizedBox.shrink();
 
-    // Fill in empty months
-    sortedKeys = averageMood.keys.toList()..sort();
-    var allMonths = _generateCompleteMonthRange(sortedKeys, monthsPerPage);
-    sortedKeys = allMonths.toList()..sort();
+    final spots =
+        hasData ? _computeSpots(buckets) : _dummySpots(buckets.length);
 
-    // Determine the subset of data for the current page
-    int endIndex = (sortedKeys.length - (currentPage * monthsPerPage))
-        .clamp(0, sortedKeys.length);
-    int startIndex = (endIndex - monthsPerPage).clamp(0, endIndex);
-    // Ensure page is full if possible
-    int currentPageSize = endIndex - startIndex;
-    if (currentPageSize < monthsPerPage) {
-      endIndex = (endIndex + (monthsPerPage - currentPageSize))
-          .clamp(0, sortedKeys.length);
-    }
+    final markerSet = _computeMarkerIndices(buckets, spanDays).toSet();
+    final labelIndices =
+        _computeLabelIndices(markerSet.toList()..sort()).toSet();
 
-    List<String> currentPageKeys = sortedKeys.sublist(startIndex, endIndex);
+    final color = Theme.of(context).colorScheme.primary;
+    final surfaceColor =
+        Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2);
 
-    Map<String, double?> currentData = {
-      for (var key in currentPageKeys) key: averageMood[key]
-    };
-
-    return Center(
-      child: notEnoughData
-          ? Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: AspectRatio(
-                aspectRatio: 2,
-                child: Card(
-                    child: Center(
-                        child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.auto_graph_rounded,
-                      size: 100,
-                      color: Theme.of(context).disabledColor,
-                    ),
-                    Text(
-                      AppLocalizations.of(context)!.statisticsNotEnoughData,
-                      style: TextStyle(
-                          fontSize: 18, color: Theme.of(context).disabledColor),
-                    )
-                  ],
-                ))),
-              ),
-            )
-          : Column(
-              children: [
-                _buildPaginationControls(currentPageKeys, context),
-                Padding(
-                  padding: const EdgeInsets.only(
-                      left: 0, right: 42, bottom: 0, top: 8),
-                  child: AspectRatio(
-                    aspectRatio: 2,
-                    child: LineChart(_buildLineChartData(
-                        Theme.of(context).colorScheme.primary,
-                        currentData,
-                        currentPageKeys,
-                        context)),
-                  ),
+    final chartWidget = Padding(
+      padding: const EdgeInsets.only(right: 42, top: 8),
+      child: AspectRatio(
+        aspectRatio: 2,
+        child: LineChart(
+          LineChartData(
+            minX: 0,
+            maxX: (buckets.length - 1).toDouble(),
+            minY: -2,
+            maxY: 2,
+            lineTouchData: const LineTouchData(enabled: false),
+            lineBarsData: hasData
+                ? _buildSegments(spots, color)
+                : [_makeSegment(spots.whereType<FlSpot>().toList(), color)],
+            titlesData: FlTitlesData(
+              bottomTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  interval: 1,
+                  reservedSize: 32,
+                  getTitlesWidget: (value, _) {
+                    final i = value.toInt();
+                    if (i < 0 || i >= buckets.length) {
+                      return const SizedBox.shrink();
+                    }
+                    if (labelIndices.contains(i)) {
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          _formatLabel(buckets[i], spanDays, context),
+                          textScaler: TextScaler.noScaling,
+                        ),
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  },
                 ),
-              ],
-            ),
-    );
-  }
-
-  Widget _buildPaginationControls(List<String> keys, BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        if (_totalPages() > 1)
-          IconButton(
-            onPressed: currentPage < _totalPages() - 1 ? _goToNextPage : null,
-            icon: const Icon(Icons.arrow_back_ios_new_rounded),
-          ),
-        Text(
-            "${_formatMonthYear(keys.first, context)} - ${_formatMonthYear(keys.last, context)}"),
-        if (_totalPages() > 1)
-          IconButton(
-            onPressed: currentPage > 0 ? _goToPreviousPage : null,
-            icon: const Icon(Icons.arrow_forward_ios_rounded),
-          ),
-      ],
-    );
-  }
-
-  int _totalPages() {
-    return (sortedKeys.length / monthsPerPage).ceil();
-  }
-
-  void _goToPreviousPage() {
-    setState(() {
-      currentPage--;
-    });
-  }
-
-  void _goToNextPage() {
-    setState(() {
-      currentPage++;
-    });
-  }
-
-  LineChartData _buildLineChartData(Color color, Map<String, double?> data,
-      List<String> keys, BuildContext context) {
-    List<FlSpot?> spots = keys.asMap().entries.map((entry) {
-      int index = entry.key;
-      String key = entry.value;
-      double? mood = data[key];
-
-      return mood != null ? FlSpot(index.toDouble(), mood) : null;
-    }).toList();
-
-    return LineChartData(
-      minX: 0,
-      maxX: keys.length - 1.toDouble(),
-      minY: -2,
-      maxY: 2,
-      lineTouchData: const LineTouchData(enabled: false),
-      lineBarsData: [
-        if (spots.whereType<FlSpot>().toList().isNotEmpty)
-          LineChartBarData(
-            spots: spots.whereType<FlSpot>().toList(),
-            isCurved: false,
-            color: color,
-            barWidth: 4,
-            isStrokeCapRound: true,
-            dotData: FlDotData(
-              show: true,
-              getDotPainter: (p0, p1, p2, p3) {
-                return FlDotCirclePainter(color: color, radius: 6);
-              },
-            ),
-            belowBarData: BarAreaData(show: false),
-          ),
-      ],
-      titlesData: FlTitlesData(
-          bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-            showTitles: true,
-            getTitlesWidget: (value, _) => SizedBox(
-              height: 20,
-              width: 26,
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 2.0),
-                    child: Text(_formatMonth(
-                        value >= 0 && value < keys.length
-                            ? keys[value.toInt()]
-                            : '',
-                        context))),
               ),
-            ),
-            interval: 1,
-            reservedSize: 32,
-          )),
-          leftTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              interval: 1,
-              reservedSize: 42,
-              getTitlesWidget: (value, meta) {
-                final index = value.toInt();
-                return SideTitleWidget(
+              leftTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  interval: 1,
+                  reservedSize: 42,
+                  getTitlesWidget: (value, meta) => SideTitleWidget(
                     meta: meta,
                     child: MoodIcon(
-                      moodValue: index,
-                    ));
+                      moodValue: value.toInt(),
+                      allowScaling: false,
+                    ),
+                  ),
+                ),
+              ),
+              topTitles: const AxisTitles(),
+              rightTitles: const AxisTitles(),
+            ),
+            gridData: FlGridData(
+              show: true,
+              drawHorizontalLine: true,
+              horizontalInterval: 1,
+              drawVerticalLine: true,
+              verticalInterval: 1,
+              getDrawingHorizontalLine: (_) =>
+                  FlLine(color: surfaceColor, strokeWidth: 1),
+              getDrawingVerticalLine: (value) {
+                final i = value.toInt();
+                return markerSet.contains(i)
+                    ? FlLine(color: surfaceColor, strokeWidth: 1)
+                    : const FlLine(color: Colors.transparent, strokeWidth: 0);
               },
             ),
+            borderData: FlBorderData(
+              show: true,
+              border: Border.symmetric(
+                horizontal: BorderSide(color: surfaceColor, width: 1),
+              ),
+            ),
           ),
-          topTitles: const AxisTitles(),
-          rightTitles: const AxisTitles()),
-      gridData: FlGridData(
-        show: true,
-        drawHorizontalLine: true,
-        horizontalInterval: 1,
-        drawVerticalLine: true,
-        verticalInterval: 1,
-        getDrawingHorizontalLine: (value) => FlLine(
-          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
-          strokeWidth: 1,
         ),
       ),
-      borderData: FlBorderData(
-          show: true,
-          border: Border.symmetric(
-              horizontal: BorderSide(
-            color:
-                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
-            width: 1,
-          ))),
+    );
+
+    return Card.filled(
+      color: Theme.of(context).colorScheme.surfaceContainer,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 4.0),
+            child: Center(
+              child: Text(
+                AppLocalizations.of(context)!.chartOverTimeTitle(
+                    AppLocalizations.of(context)!.tagMoodTitle),
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              Opacity(
+                opacity: hasData ? 1.0 : 0.3,
+                child: Center(child: chartWidget),
+              ),
+              if (!hasData)
+                Text(
+                  AppLocalizations.of(context)!.statisticsNotEnoughData,
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).disabledColor,
+                  ),
+                ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
-  String _formatMonth(String dateKey, BuildContext context) {
-    DateTime date = DateFormat('yyyy-MM').parse(dateKey);
-    return DateFormat('MMM', TimeManager.currentLocale(context))
-        .format(date); // Return shorthand month (e.g., "Jan")
+  DateTime _dataRangeStart() {
+    return entries
+        .where((e) => e.mood != null)
+        .map((e) => e.timeCreate)
+        .reduce((a, b) => a.isBefore(b) ? a : b)
+        .let((d) => DateTime(d.year, d.month, d.day));
   }
 
-  String _formatMonthYear(String dateKey, BuildContext context) {
-    DateTime date = DateFormat('yyyy-MM').parse(dateKey);
-    return DateFormat('MMM yyyy', TimeManager.currentLocale(context))
-        .format(date); // Return shorthand month (e.g., "Jan")
+  DateTime _dummyRangeStart(DateTime today) {
+    return DateTime(today.year, today.month - 12, today.day);
   }
 
-  List<String> _generateCompleteMonthRange(
-      Iterable<String> keys, int monthsPerPage) {
-    if (keys.isEmpty) {
-      return List.empty();
+  List<DateTime> _generateWeeklyBuckets(DateTime start, DateTime end) {
+    final buckets = <DateTime>[];
+    DateTime current = DateTime(start.year, start.month, start.day);
+    while (!current.isAfter(end)) {
+      buckets.add(current);
+      current = current.add(const Duration(days: 7));
     }
-
-    List<DateTime> parsedDates =
-        keys.map((key) => DateFormat('yyyy-MM').parse(key)).toList()..sort();
-
-    DateTime startDate = parsedDates.first;
-    DateTime endDate = parsedDates.last;
-
-    // Start chart on left side if page can't be filled
-    DateTime minEndDate = DateTime(
-        startDate.year, startDate.month + (monthsPerPage - 1), startDate.day);
-    if (endDate.isBefore(minEndDate)) {
-      endDate = minEndDate;
-    }
-
-    List<String> allMonths = [];
-    DateTime current = startDate;
-
-    while (!current.isAfter(endDate)) {
-      String monthKey =
-          "${current.year}-${current.month.toString().padLeft(2, '0')}";
-      allMonths.add(monthKey);
-      current = DateTime(current.year, current.month + 1);
-    }
-
-    return allMonths;
+    return buckets;
   }
+
+  List<DateTime> _generateMonthlyBuckets(DateTime start, DateTime end) {
+    final buckets = <DateTime>[];
+    DateTime current = DateTime(start.year, start.month, 1);
+    while (!current.isAfter(end)) {
+      buckets.add(current);
+      current = DateTime(current.year, current.month + 1, 1);
+    }
+    return buckets;
+  }
+
+  List<FlSpot?> _computeSpots(List<DateTime> buckets) {
+    final Map<int, List<double>> bucketMoods = {};
+
+    for (final entry in entries) {
+      if (entry.mood == null) continue;
+      final entryDate = entry.timeCreate;
+      int bucketIndex = -1;
+      for (int i = buckets.length - 1; i >= 0; i--) {
+        if (!buckets[i].isAfter(entryDate)) {
+          bucketIndex = i;
+          break;
+        }
+      }
+      if (bucketIndex < 0) continue;
+      (bucketMoods[bucketIndex] ??= []).add(entry.mood!.toDouble());
+    }
+
+    return List.generate(buckets.length, (i) {
+      final moods = bucketMoods[i];
+      if (moods == null || moods.isEmpty) return null;
+      return FlSpot(i.toDouble(), moods.reduce((a, b) => a + b) / moods.length);
+    });
+  }
+
+  List<FlSpot?> _dummySpots(int count) {
+    return List.generate(
+      count,
+      (i) => FlSpot(i.toDouble(), _dummyYValues[i % _dummyYValues.length]),
+    );
+  }
+
+  List<LineChartBarData> _buildSegments(List<FlSpot?> spots, Color color) {
+    final segments = <LineChartBarData>[];
+    var run = <FlSpot>[];
+    for (final spot in spots) {
+      if (spot != null) {
+        run.add(spot);
+      } else if (run.isNotEmpty) {
+        segments.add(_makeSegment(run, color));
+        run = [];
+      }
+    }
+    if (run.isNotEmpty) segments.add(_makeSegment(run, color));
+    return segments;
+  }
+
+  LineChartBarData _makeSegment(List<FlSpot> spots, Color color) {
+    return LineChartBarData(
+      spots: spots,
+      isCurved: true,
+      color: color,
+      barWidth: 4,
+      isStrokeCapRound: true,
+      dotData: const FlDotData(show: false),
+      belowBarData: BarAreaData(show: false),
+    );
+  }
+
+  List<int> _computeMarkerIndices(List<DateTime> buckets, int spanDays) {
+    if (buckets.isEmpty) return [];
+    final markers = <int>[];
+    for (int i = 0; i < buckets.length; i++) {
+      final date = buckets[i];
+      if (spanDays <= _monthThreshold) {
+        markers.add(i);
+      } else if (spanDays <= _yearThreshold) {
+        if (i == 0 ||
+            date.month != buckets[i - 1].month ||
+            date.year != buckets[i - 1].year) {
+          markers.add(i);
+        }
+      } else if (spanDays < 3 * _yearThreshold) {
+        if (date.month == 1 ||
+            date.month == 4 ||
+            date.month == 7 ||
+            date.month == 10) {
+          markers.add(i);
+        }
+      } else {
+        if (date.month == 1) markers.add(i);
+      }
+    }
+    return markers;
+  }
+
+  List<int> _computeLabelIndices(List<int> markerIndices) {
+    if (markerIndices.length <= 6) return List.from(markerIndices);
+    final result = <int>[];
+    final step = (markerIndices.length / 6).ceil();
+    for (int i = 0; i < markerIndices.length; i += step) {
+      result.add(markerIndices[i]);
+    }
+    return result;
+  }
+
+  String _formatLabel(DateTime date, int spanDays, BuildContext context) {
+    final locale = TimeManager.currentLocale(context);
+    if (spanDays <= _monthThreshold) {
+      return DateFormat('MMM d', locale).format(date);
+    } else if (spanDays <= _yearThreshold) {
+      return DateFormat('MMM', locale).format(date);
+    } else if (spanDays < 3 * _yearThreshold) {
+      return DateFormat("MMM ''yy", locale).format(date);
+    } else {
+      return DateFormat('yyyy', locale).format(date);
+    }
+  }
+}
+
+extension _Let<T> on T {
+  R let<R>(R Function(T) block) => block(this);
 }
