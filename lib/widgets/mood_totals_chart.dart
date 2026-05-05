@@ -1,7 +1,9 @@
+import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/widgets/material_shapes.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
+import 'package:provider/provider.dart';
 
 class MoodTotalsChart extends StatelessWidget {
   final Map<int, int> moodCounts;
@@ -14,12 +16,21 @@ class MoodTotalsChart extends StatelessWidget {
   static const _countWidth = 44.0;
   static const _gap = 4.0;
 
+  static const _dummyMoodCounts = {2: 4, 1: 8, 0: 9, -1: 3, -2: 1};
+
   @override
   Widget build(BuildContext context) {
+    return Consumer<ConfigProvider>(
+      builder: (context, configProvider, child) => _buildChart(context),
+    );
+  }
+
+  Widget _buildChart(BuildContext context) {
     final hasData = moodCounts.values.any((v) => v > 0);
     final isRtl = Directionality.of(context) == TextDirection.rtl;
-    final maxCount = moodCounts.values.reduce((a, b) => a > b ? a : b);
-    final mostCommonMood = moodCounts.entries
+    final displayCounts = hasData ? moodCounts : _dummyMoodCounts;
+    final maxCount = displayCounts.values.reduce((a, b) => a > b ? a : b);
+    final mostCommonMood = displayCounts.entries
         .where((e) => e.value > 0)
         .reduce((a, b) => a.value >= b.value ? a : b)
         .key;
@@ -41,47 +52,42 @@ class MoodTotalsChart extends StatelessWidget {
               ),
             ),
           ),
-          if (!hasData)
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.bar_chart_rounded,
-                      size: 100,
-                      color: Theme.of(context).disabledColor,
-                    ),
-                    Text(
-                      AppLocalizations.of(context)!.statisticsNotEnoughData,
-                      style: TextStyle(
-                          fontSize: 18, color: Theme.of(context).disabledColor),
-                    ),
-                  ],
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              Opacity(
+                opacity: hasData ? 1.0 : 0.3,
+                child: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Column(
+                    children: _moodOrder.map((mood) {
+                      final count = displayCounts[mood] ?? 0;
+                      return _MoodBarRow(
+                        mood: mood,
+                        count: count,
+                        maxCount: maxCount,
+                        isMostCommon: mood == mostCommonMood,
+                        isRtl: isRtl,
+                        showLabel: hasData,
+                        barHeight: _barHeight,
+                        iconSize: _iconSize,
+                        countWidth: _countWidth,
+                        gap: _gap,
+                      );
+                    }).toList(),
+                  ),
                 ),
               ),
-            ),
-          if (hasData)
-            Padding(
-              padding: const EdgeInsets.all(8),
-              child: Column(
-                children: _moodOrder.map((mood) {
-                  final count = moodCounts[mood] ?? 0;
-                  return _MoodBarRow(
-                    mood: mood,
-                    count: count,
-                    maxCount: maxCount,
-                    isMostCommon: mood == mostCommonMood,
-                    isRtl: isRtl,
-                    barHeight: _barHeight,
-                    iconSize: _iconSize,
-                    countWidth: _countWidth,
-                    gap: _gap,
-                  );
-                }).toList(),
-              ),
-            )
+              if (!hasData)
+                Text(
+                  AppLocalizations.of(context)!.statisticsNotEnoughData,
+                  style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).disabledColor),
+                ),
+            ],
+          ),
         ],
       ),
     );
@@ -94,6 +100,7 @@ class _MoodBarRow extends StatelessWidget {
   final int maxCount;
   final bool isMostCommon;
   final bool isRtl;
+  final bool showLabel;
   final double barHeight;
   final double iconSize;
   final double countWidth;
@@ -105,6 +112,7 @@ class _MoodBarRow extends StatelessWidget {
     required this.maxCount,
     required this.isMostCommon,
     required this.isRtl,
+    required this.showLabel,
     required this.barHeight,
     required this.iconSize,
     required this.countWidth,
@@ -115,35 +123,44 @@ class _MoodBarRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final primary = Theme.of(context).colorScheme.primary;
     final surface = Theme.of(context).colorScheme.surface;
+    final fraction = maxCount > 0 ? count / maxCount : 0.0;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 1),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final minBarWidth = iconSize + gap;
-          final maxBarWidth = constraints.maxWidth - countWidth - gap;
-          final barWidth = maxCount > 0
-              ? (minBarWidth + (count / maxCount) * (maxBarWidth - minBarWidth))
-                  .clamp(minBarWidth, maxBarWidth)
-              : minBarWidth;
+      child: TweenAnimationBuilder<double>(
+        tween: Tween<double>(begin: 0.0, end: fraction),
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeInOut,
+        builder: (context, animatedFraction, _) {
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              final minBarWidth = iconSize + gap;
+              final maxBarWidth = constraints.maxWidth - countWidth - gap;
+              final barWidth =
+                  (minBarWidth + animatedFraction * (maxBarWidth - minBarWidth))
+                      .clamp(minBarWidth, maxBarWidth);
 
-          final iconWidget = _buildIconContainer(surface, primary);
-          final bar = _buildBar(barWidth, iconWidget, primary);
-          final countText = SizedBox(
-            width: countWidth,
-            child: Text(
-              count > 0 ? '$count' : '',
-              style: TextStyle(
-                  fontWeight: FontWeight.bold, fontSize: 16, color: primary),
-              textAlign: isRtl ? TextAlign.right : TextAlign.left,
-            ),
-          );
+              final iconWidget = _buildIconContainer(surface, primary);
+              final bar = _buildBar(barWidth, iconWidget, primary);
+              final countText = SizedBox(
+                width: countWidth,
+                child: Text(
+                  (count > 0 && showLabel) ? '$count' : '',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: primary),
+                  textAlign: isRtl ? TextAlign.right : TextAlign.left,
+                ),
+              );
 
-          return Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: isRtl
-                ? [countText, SizedBox(width: gap), bar]
-                : [bar, SizedBox(width: gap), countText],
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: isRtl
+                    ? [countText, SizedBox(width: gap), bar]
+                    : [bar, SizedBox(width: gap), countText],
+              );
+            },
           );
         },
       ),

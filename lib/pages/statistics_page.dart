@@ -44,7 +44,6 @@ class _StatsPageState extends State<StatsPage>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const MoodByMonthChart(),
         Padding(
           padding: const EdgeInsets.only(left: 8.0, right: 8.0),
           child: Wrap(
@@ -93,22 +92,19 @@ class _StatsPageState extends State<StatsPage>
             ),
           ),
         ),
+        const MoodByMonthChart(),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 2.0),
           child: MoodTotalsChart(
             moodCounts: getMoodTotals(entriesInRange),
           ),
         ),
-        Center(
-          child: Text(
-            AppLocalizations.of(context)!
-                .chartByDayTitle(AppLocalizations.of(context)!.tagMoodTitle),
-            style: const TextStyle(fontSize: 18),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 2.0),
+          child: MoodByDayChart(
+            averageMood: getMoodsByDay(entriesInRange),
+            hasData: getMoodTotals(entriesInRange).values.any((v) => v > 0),
           ),
-        ),
-        MoodByDayChart(
-          averageMood: getMoodsByDay(entriesInRange),
-          hasData: getMoodTotals(entriesInRange).values.any((v) => v > 0),
         ),
       ],
     );
