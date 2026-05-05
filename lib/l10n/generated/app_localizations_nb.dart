@@ -149,6 +149,11 @@ class AppLocalizationsNb extends AppLocalizations {
   }
 
   @override
+  String chartOverTimeTitle(Object tag) {
+    return '$tag Over Time';
+  }
+
+  @override
   String streakCurrent(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

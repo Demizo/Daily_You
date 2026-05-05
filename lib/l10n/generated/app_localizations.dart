@@ -348,6 +348,12 @@ abstract class AppLocalizations {
   /// **'{tag} By Day'**
   String chartByDayTitle(Object tag);
 
+  /// No description provided for @chartOverTimeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{tag} Over Time'**
+  String chartOverTimeTitle(Object tag);
+
   /// No description provided for @streakCurrent.
   ///
   /// In en, this message translates to:

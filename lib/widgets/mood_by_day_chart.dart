@@ -77,6 +77,7 @@ class MoodByDayChart extends StatelessWidget {
                                       meta: meta,
                                       child: MoodIcon(
                                         moodValue: index,
+                                        allowScaling: false,
                                       ));
                                 },
                               )),
