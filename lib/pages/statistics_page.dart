@@ -1,9 +1,8 @@
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/widgets/mood_by_day_chart.dart';
-import 'package:daily_you/widgets/mood_by_month_chart.dart'
-    show MoodOverTimeChart;
-import 'package:daily_you/widgets/mood_totals_chart.dart';
+import 'package:daily_you/widgets/mood_over_time_chart.dart';
+import 'package:daily_you/widgets/mood_summary_chart.dart';
 import 'package:daily_you/widgets/stat_range_selector.dart';
 import 'package:daily_you/widgets/streak_card.dart';
 import 'package:flutter/material.dart';
@@ -46,7 +45,7 @@ class _StatsPageState extends State<StatsPage>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+          padding: const EdgeInsets.only(left: 2.0, right: 2.0),
           child: Wrap(
             children: [
               StreakCard(
@@ -99,7 +98,7 @@ class _StatsPageState extends State<StatsPage>
         ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 2.0),
-          child: MoodTotalsChart(
+          child: MoodSummaryChart(
             moodCounts: getMoodTotals(entriesInRange),
           ),
         ),
