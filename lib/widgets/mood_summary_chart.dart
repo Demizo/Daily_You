@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:provider/provider.dart';
 
-class MoodTotalsChart extends StatelessWidget {
+class MoodSummaryChart extends StatelessWidget {
   final Map<int, int> moodCounts;
 
-  const MoodTotalsChart({super.key, required this.moodCounts});
+  const MoodSummaryChart({super.key, required this.moodCounts});
 
   static const _moodOrder = [2, 1, 0, -1, -2];
   static const _barHeight = 44.0;
@@ -36,7 +36,7 @@ class MoodTotalsChart extends StatelessWidget {
         .key;
 
     return Card.filled(
-      color: Theme.of(context).colorScheme.surfaceContainer,
+      color: Theme.of(context).colorScheme.surfaceContainerLow,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
