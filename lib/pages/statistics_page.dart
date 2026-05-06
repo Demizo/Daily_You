@@ -92,9 +92,12 @@ class _StatsPageState extends State<StatsPage>
             ),
           ),
         ),
-        MoodOverTimeChart(
-          entries: entriesInRange.where((e) => e.mood != null).toList(),
-          hasData: getMoodTotals(entriesInRange).values.any((v) => v > 0),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 2.0),
+          child: MoodOverTimeChart(
+            entries: entriesInRange.where((e) => e.mood != null).toList(),
+            hasData: getMoodTotals(entriesInRange).values.any((v) => v > 0),
+          ),
         ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 2.0),
