@@ -179,7 +179,7 @@ class MoodOverTimeChart extends StatelessWidget {
     );
 
     return Card.filled(
-      color: Theme.of(context).colorScheme.surfaceContainer,
+      color: Theme.of(context).colorScheme.surfaceContainerLow,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -340,8 +340,7 @@ class MoodOverTimeChart extends StatelessWidget {
     return markers;
   }
 
-  List<DateTime> _computeLabelDates(
-      List<DateTime> markerDates, int spanDays) {
+  List<DateTime> _computeLabelDates(List<DateTime> markerDates, int spanDays) {
     if (spanDays > 3 * _yearThreshold) {
       // Only label year starts for very long ranges
       return markerDates.where((d) => d.month == 1).toList();

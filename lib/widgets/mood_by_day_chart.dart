@@ -28,7 +28,7 @@ class MoodByDayChart extends StatelessWidget {
     final displayMood = hasData ? averageMood : _dummyAverageMood;
 
     return Card.filled(
-      color: Theme.of(context).colorScheme.surfaceContainer,
+      color: Theme.of(context).colorScheme.surfaceContainerLow,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
