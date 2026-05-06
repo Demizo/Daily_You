@@ -69,7 +69,8 @@ class MoodOverTimeChart extends StatelessWidget {
     final rangeEnd = DateTime(today.year, today.month, today.day, 23, 59, 59);
     final rangeStart = hasData ? _dataRangeStart() : _dummyRangeStart(today);
 
-    final spanDays = rangeEnd.difference(rangeStart).inDays.clamp(1, 999999);
+    final totalDays = rangeEnd.difference(rangeStart).inDays.toDouble();
+    final spanDays = totalDays.toInt().clamp(1, 999999);
     final useWeekly = spanDays <= 365;
 
     final buckets = useWeekly
@@ -78,12 +79,20 @@ class MoodOverTimeChart extends StatelessWidget {
 
     if (buckets.isEmpty) return const SizedBox.shrink();
 
-    final spots =
-        hasData ? _computeSpots(buckets) : _dummySpots(buckets.length);
+    final spots = hasData
+        ? _computeSpots(buckets, rangeStart)
+        : _dummySpots(buckets, rangeStart);
 
-    final markerSet = _computeMarkerIndices(buckets, spanDays).toSet();
-    final labelIndices =
-        _computeLabelIndices(markerSet.toList()..sort()).toSet();
+    final markerDates = _computeMarkerDates(rangeStart, rangeEnd, spanDays);
+    final labelDates = _computeLabelDates(markerDates, spanDays);
+
+    final labelTextMap = <int, String>{
+      for (final d in labelDates)
+        d.difference(rangeStart).inDays: _formatLabel(d, spanDays, context),
+    };
+    final markerDayOffsets = markerDates
+        .map((d) => d.difference(rangeStart).inDays.toDouble())
+        .toList();
 
     final color = Theme.of(context).colorScheme.primary;
     final surfaceColor =
@@ -96,13 +105,22 @@ class MoodOverTimeChart extends StatelessWidget {
         child: LineChart(
           LineChartData(
             minX: 0,
-            maxX: (buckets.length - 1).toDouble(),
+            maxX: totalDays,
             minY: -2,
             maxY: 2,
             lineTouchData: const LineTouchData(enabled: false),
             lineBarsData: hasData
                 ? _buildSegments(spots, color)
                 : [_makeSegment(spots.whereType<FlSpot>().toList(), color)],
+            extraLinesData: ExtraLinesData(
+              verticalLines: markerDayOffsets
+                  .map((x) => VerticalLine(
+                        x: x,
+                        color: surfaceColor,
+                        strokeWidth: 1,
+                      ))
+                  .toList(),
+            ),
             titlesData: FlTitlesData(
               bottomTitles: AxisTitles(
                 sideTitles: SideTitles(
@@ -110,15 +128,12 @@ class MoodOverTimeChart extends StatelessWidget {
                   interval: 1,
                   reservedSize: 32,
                   getTitlesWidget: (value, _) {
-                    final i = value.toInt();
-                    if (i < 0 || i >= buckets.length) {
-                      return const SizedBox.shrink();
-                    }
-                    if (labelIndices.contains(i)) {
+                    final label = labelTextMap[value.toInt()];
+                    if (label != null) {
                       return Padding(
                         padding: const EdgeInsets.only(top: 8.0),
                         child: Text(
-                          _formatLabel(buckets[i], spanDays, context),
+                          label,
                           textScaler: TextScaler.noScaling,
                         ),
                       );
@@ -148,16 +163,9 @@ class MoodOverTimeChart extends StatelessWidget {
               show: true,
               drawHorizontalLine: true,
               horizontalInterval: 1,
-              drawVerticalLine: true,
-              verticalInterval: 1,
+              drawVerticalLine: false,
               getDrawingHorizontalLine: (_) =>
                   FlLine(color: surfaceColor, strokeWidth: 1),
-              getDrawingVerticalLine: (value) {
-                final i = value.toInt();
-                return markerSet.contains(i)
-                    ? FlLine(color: surfaceColor, strokeWidth: 1)
-                    : const FlLine(color: Colors.transparent, strokeWidth: 0);
-              },
             ),
             borderData: FlBorderData(
               show: true,
@@ -241,7 +249,7 @@ class MoodOverTimeChart extends StatelessWidget {
     return buckets;
   }
 
-  List<FlSpot?> _computeSpots(List<DateTime> buckets) {
+  List<FlSpot?> _computeSpots(List<DateTime> buckets, DateTime rangeStart) {
     final Map<int, List<double>> bucketMoods = {};
 
     for (final entry in entries) {
@@ -261,14 +269,18 @@ class MoodOverTimeChart extends StatelessWidget {
     return List.generate(buckets.length, (i) {
       final moods = bucketMoods[i];
       if (moods == null || moods.isEmpty) return null;
-      return FlSpot(i.toDouble(), moods.reduce((a, b) => a + b) / moods.length);
+      final x = buckets[i].difference(rangeStart).inDays.toDouble();
+      return FlSpot(x, moods.reduce((a, b) => a + b) / moods.length);
     });
   }
 
-  List<FlSpot?> _dummySpots(int count) {
+  List<FlSpot?> _dummySpots(List<DateTime> buckets, DateTime rangeStart) {
     return List.generate(
-      count,
-      (i) => FlSpot(i.toDouble(), _dummyYValues[i % _dummyYValues.length]),
+      buckets.length,
+      (i) {
+        final x = buckets[i].difference(rangeStart).inDays.toDouble();
+        return FlSpot(x, _dummyYValues[i % _dummyYValues.length]);
+      },
     );
   }
 
@@ -299,39 +311,46 @@ class MoodOverTimeChart extends StatelessWidget {
     );
   }
 
-  List<int> _computeMarkerIndices(List<DateTime> buckets, int spanDays) {
-    if (buckets.isEmpty) return [];
-    final markers = <int>[];
-    for (int i = 0; i < buckets.length; i++) {
-      final date = buckets[i];
-      if (spanDays <= _monthThreshold) {
-        markers.add(i);
-      } else if (spanDays <= _yearThreshold) {
-        if (i == 0 ||
-            date.month != buckets[i - 1].month ||
-            date.year != buckets[i - 1].year) {
-          markers.add(i);
+  List<DateTime> _computeMarkerDates(
+      DateTime rangeStart, DateTime rangeEnd, int spanDays) {
+    final markers = <DateTime>[];
+    if (spanDays <= _monthThreshold) {
+      DateTime current = rangeStart;
+      while (!current.isAfter(rangeEnd)) {
+        markers.add(current);
+        current = current.add(const Duration(days: 7));
+      }
+    } else if (spanDays <= _yearThreshold) {
+      DateTime current = DateTime(rangeStart.year, rangeStart.month, 1);
+      while (!current.isAfter(rangeEnd)) {
+        if (!current.isBefore(rangeStart)) markers.add(current);
+        current = DateTime(current.year, current.month + 1, 1);
+      }
+    } else {
+      // Quarterly markers for both the 1-3 year and >3 year ranges
+      for (int year = rangeStart.year; year <= rangeEnd.year + 1; year++) {
+        for (final month in [1, 4, 7, 10]) {
+          final d = DateTime(year, month, 1);
+          if (!d.isBefore(rangeStart) && !d.isAfter(rangeEnd)) {
+            markers.add(d);
+          }
         }
-      } else if (spanDays < 3 * _yearThreshold) {
-        if (date.month == 1 ||
-            date.month == 4 ||
-            date.month == 7 ||
-            date.month == 10) {
-          markers.add(i);
-        }
-      } else {
-        if (date.month == 1) markers.add(i);
       }
     }
     return markers;
   }
 
-  List<int> _computeLabelIndices(List<int> markerIndices) {
-    if (markerIndices.length <= 6) return List.from(markerIndices);
-    final result = <int>[];
-    final step = (markerIndices.length / 6).ceil();
-    for (int i = 0; i < markerIndices.length; i += step) {
-      result.add(markerIndices[i]);
+  List<DateTime> _computeLabelDates(
+      List<DateTime> markerDates, int spanDays) {
+    if (spanDays > 3 * _yearThreshold) {
+      // Only label year starts for very long ranges
+      return markerDates.where((d) => d.month == 1).toList();
+    }
+    if (markerDates.length <= 6) return List.from(markerDates);
+    final result = <DateTime>[];
+    final step = (markerDates.length / 6).ceil();
+    for (int i = 0; i < markerDates.length; i += step) {
+      result.add(markerDates[i]);
     }
     return result;
   }
