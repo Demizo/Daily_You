@@ -1,3 +1,4 @@
+import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
@@ -5,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class MoodOverTimeChart extends StatelessWidget {
   final List<Entry> entries;
@@ -65,6 +67,8 @@ class MoodOverTimeChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final _ = context.watch<ConfigProvider>();
+
     final today = DateTime.now();
     final rangeEnd = DateTime(today.year, today.month, today.day, 23, 59, 59);
     final rangeStart = hasData ? _dataRangeStart() : _dummyRangeStart(today);
