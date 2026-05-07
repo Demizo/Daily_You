@@ -45,7 +45,7 @@ class _StatsPageState extends State<StatsPage>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(left: 2.0, right: 2.0),
+          padding: const EdgeInsets.symmetric(horizontal: 2.0),
           child: Wrap(
             children: [
               StreakCard(
@@ -112,6 +112,7 @@ class _StatsPageState extends State<StatsPage>
             hasData: getMoodTotals(entriesInRange).values.any((v) => v > 0),
           ),
         ),
+        SizedBox(height: 8.0),
       ],
     );
   }
