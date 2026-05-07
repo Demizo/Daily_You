@@ -6,7 +6,7 @@ const double _kInnerRadius = 8.0;
 const double _kHPad = 16.0;
 const double _kVPad = 10.0;
 const double _kMinButtonWidth = _kFullRadius + _kInnerRadius + 4.0;
-const Duration _kAnimDuration = Duration(milliseconds: 300);
+const Duration _kAnimDuration = Duration(milliseconds: 200);
 
 class _DynamicPillBorder extends ShapeBorder {
   final double leftRadius;
@@ -163,7 +163,7 @@ class _ConnectedButton extends StatelessWidget {
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0.0, end: isSelected ? 1.0 : 0.0),
       duration: _kAnimDuration,
-      curve: Curves.easeOutBack,
+      curve: !isSelected ? Curves.easeOutBack : Curves.easeInBack,
       builder: (context, selFrac, _) {
         final shape = _computeBorder(
           index: index,
@@ -172,14 +172,14 @@ class _ConnectedButton extends StatelessWidget {
         );
 
         final Color bgColor = Color.lerp(
-          cs.secondaryContainer,
-          cs.primaryContainer,
+          cs.surfaceContainer,
+          cs.primary,
           selFrac.clamp(0.0, 1.0),
         )!;
 
         final Color fgColor = Color.lerp(
-          cs.onSecondaryContainer,
-          cs.onPrimaryContainer,
+          cs.onSurfaceVariant,
+          cs.onPrimary,
           selFrac.clamp(0.0, 1.0),
         )!;
 
