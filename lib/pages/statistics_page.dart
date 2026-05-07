@@ -19,7 +19,7 @@ class StatsPage extends StatefulWidget {
 
 class _StatsPageState extends State<StatsPage>
     with AutomaticKeepAliveClientMixin {
-  StatsRange statsRange = StatsRange.month;
+  StatsRange statsRange = StatsRange.allTime;
   List<Entry> entriesInRange = List.empty();
 
   @override
