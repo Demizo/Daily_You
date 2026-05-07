@@ -28,6 +28,7 @@ class StreakCard extends StatelessWidget {
 
     return isVisible
         ? Card.filled(
+            margin: EdgeInsets.all(2),
             color: Theme.of(context).colorScheme.secondaryContainer,
             child: Padding(
               padding: const EdgeInsets.all(4.0),
@@ -35,7 +36,7 @@ class StreakCard extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(right: 4.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 2.0),
                     child: Icon(
                       icon,
                       color: Theme.of(context).colorScheme.secondary,
@@ -43,7 +44,7 @@ class StreakCard extends StatelessWidget {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(right: 4.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 2.0),
                     child: Text.rich(TextSpan(children: [
                       TextSpan(
                           text: title.substring(0, numberStart),
