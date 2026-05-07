@@ -128,5 +128,6 @@
     "settingsGalleryViewLayout": "Rozložení zobrazení galerie",
     "viewLayoutList": "Seznam",
     "settingsHideImagesInGallery": "Skrýt obrázky v galerii",
-    "settingsAlwaysSendReminderDescription": "Poslat připomenutí i když už byl vytvořený zápis"
+    "settingsAlwaysSendReminderDescription": "Poslat připomenutí i když už byl vytvořený zápis",
+    "actionTakePhoto": "Udělej fotku"
 }
