@@ -142,5 +142,6 @@
     "settingsGalleryViewLayout": "Vista de Galería",
     "viewLayoutGrid": "Cuadrícula",
     "viewLayoutList": "Lista",
-    "settingsHideImagesInGallery": "Ocultar Imágenes en Galería"
+    "settingsHideImagesInGallery": "Ocultar Imágenes en Galería",
+    "actionTakePhoto": "Tomar foto"
 }
