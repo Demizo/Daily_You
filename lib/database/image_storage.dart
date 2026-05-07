@@ -231,12 +231,12 @@ class ImageStorage {
     }
 
     if (garbageCollect) {
-      return await _garbageCollectImages();
+      return await garbageCollectImages();
     }
     return true;
   }
 
-  Future<bool> _garbageCollectImages() async {
+  Future<bool> garbageCollectImages() async {
     var entryImages = EntryImagesProvider.instance.images;
     var entryImageNames =
         entryImages.map((entryImage) => entryImage.imgPath).toList();
