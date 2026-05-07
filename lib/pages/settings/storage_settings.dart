@@ -237,6 +237,9 @@ class _StorageSettingsState extends State<StorageSettings> {
       statusNotifier.value = status;
     });
 
+    await ImageStorage.instance.garbageCollectImages();
+
+    if (!context.mounted) return;
     Navigator.of(context).pop();
   }
 
