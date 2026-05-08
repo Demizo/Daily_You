@@ -150,5 +150,9 @@
     "templateDefaultReflectionTitle": "Remarque",
     "templateDefaultReflectionBody": "### Qu'est-ce qui vous a plu aujourd'hui ?\n- \n\n### Pour quoi avez-vous de la reconnaissance ?\n- \n\n### Qu'est-ce qu'il vous tarde ?\n- ",
     "actionTakePhoto": "Prendre une photo",
-    "flashbackOnThisDay": "Ce jour-ci"
+    "flashbackOnThisDay": "Il y a 1 an",
+    "actionToday": "Aujourd'hui",
+    "actionOtherDay": "Autre jour",
+    "chartOverTimeTitle": "{tag} sur la durée",
+    "settingsOnThisDayDescription": "Revisiter des mémoires d'avant"
 }
