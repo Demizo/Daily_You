@@ -18,7 +18,7 @@ class AppLocalizationsCs extends AppLocalizations {
   String get dailyReminderDescription => 'Zapiš si svůj den…';
 
   @override
-  String get actionTakePhoto => 'Take photo';
+  String get actionTakePhoto => 'Udělej fotku';
 
   @override
   String get actionToday => 'Today';

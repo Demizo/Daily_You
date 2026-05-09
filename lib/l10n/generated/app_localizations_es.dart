@@ -18,7 +18,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get dailyReminderDescription => 'Anota tu entrada diaria…';
 
   @override
-  String get actionTakePhoto => 'Take photo';
+  String get actionTakePhoto => 'Tomar foto';
 
   @override
   String get actionToday => 'Today';

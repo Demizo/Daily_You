@@ -18,7 +18,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dailyReminderDescription => '今天的日迹还没写呢…';
 
   @override
-  String get actionTakePhoto => 'Take photo';
+  String get actionTakePhoto => '拍张照';
 
   @override
   String get actionToday => 'Today';
@@ -78,7 +78,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get flashbackOnThisDay => 'On This Day';
+  String get flashbackOnThisDay => '在这一天';
 
   @override
   String get pageGalleryTitle => '迹忆';
@@ -284,7 +284,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsDailyReminderTitle => '每日提醒';
 
   @override
-  String get settingsOnThisDayDescription => 'Revisit past memories';
+  String get settingsOnThisDayDescription => '重温过去的记忆';
 
   @override
   String get settingsDailyReminderDescription => '每天一次温和的提醒';
@@ -329,10 +329,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get noTemplatesDescription => '尚未创建任何模板…';
 
   @override
-  String get templateVariableTime => 'Time';
+  String get templateVariableTime => '时间';
 
   @override
-  String get templateDefaultTimestampTitle => 'Timestamp';
+  String get templateDefaultTimestampTitle => '时间戳';
 
   @override
   String templateDefaultTimestampBody(Object date, Object time) {
@@ -340,17 +340,17 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get templateDefaultSummaryTitle => 'Day Summary';
+  String get templateDefaultSummaryTitle => '每日总结';
 
   @override
-  String get templateDefaultSummaryBody => '### Summary\n- \n\n### Quote\n> ';
+  String get templateDefaultSummaryBody => '### 摘要\n- \n\n### 引用\n> ';
 
   @override
-  String get templateDefaultReflectionTitle => 'Reflection';
+  String get templateDefaultReflectionTitle => '反思';
 
   @override
   String get templateDefaultReflectionBody =>
-      '### What did you enjoy about today?\n- \n\n### What are you thankful for?\n- \n\n### What are you looking forward to?\n- ';
+      '### 你今天最享受的是什么？\n- \n\n### 你感恩什么？\n- \n\n### 你期待什么？\n- ';
 
   @override
   String get settingsStorageTitle => '存储';
@@ -647,7 +647,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   }
 
   @override
-  String get flashbackOnThisDay => '這一天';
+  String get flashbackOnThisDay => '在這一天';
 
   @override
   String get pageGalleryTitle => '紀錄';
@@ -847,6 +847,9 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get settingsDailyReminderTitle => '每日提醒';
+
+  @override
+  String get settingsOnThisDayDescription => '重溫過去的回憶';
 
   @override
   String get settingsDailyReminderDescription => '每日的溫馨提醒';

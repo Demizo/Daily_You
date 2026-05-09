@@ -22,10 +22,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get actionTakePhoto => 'Prendre une photo';
 
   @override
-  String get actionToday => 'Today';
+  String get actionToday => 'Aujourd\'hui';
 
   @override
-  String get actionOtherDay => 'Other day';
+  String get actionOtherDay => 'Autre jour';
 
   @override
   String get pageHomeTitle => 'Accueil';
@@ -79,7 +79,7 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get flashbackOnThisDay => 'Ce jour-ci';
+  String get flashbackOnThisDay => 'Il y a 1 an';
 
   @override
   String get pageGalleryTitle => 'Galerie';
@@ -151,7 +151,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String chartOverTimeTitle(Object tag) {
-    return '$tag Over Time';
+    return '$tag sur la durée';
   }
 
   @override
@@ -292,7 +292,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settingsDailyReminderTitle => 'Rappel quotidien';
 
   @override
-  String get settingsOnThisDayDescription => 'Revisit past memories';
+  String get settingsOnThisDayDescription => 'Revisiter des mémoires d\'avant';
 
   @override
   String get settingsDailyReminderDescription =>

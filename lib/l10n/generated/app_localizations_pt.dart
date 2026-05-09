@@ -607,6 +607,9 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get actionTakePhoto => 'Tirar uma foto';
 
   @override
+  String get actionToday => 'Hoje';
+
+  @override
   String get pageHomeTitle => 'Início';
 
   @override

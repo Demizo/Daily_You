@@ -18,7 +18,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get dailyReminderDescription => 'Mache deinen Eintrag …';
 
   @override
-  String get actionTakePhoto => 'Take photo';
+  String get actionTakePhoto => 'Foto machen';
 
   @override
   String get actionToday => 'Today';
@@ -78,7 +78,7 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get flashbackOnThisDay => 'On This Day';
+  String get flashbackOnThisDay => 'An diesem Tag';
 
   @override
   String get pageGalleryTitle => 'Galerie';
@@ -288,7 +288,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsDailyReminderTitle => 'Tägliche Erinnerung';
 
   @override
-  String get settingsOnThisDayDescription => 'Revisit past memories';
+  String get settingsOnThisDayDescription => 'Erlebe alte Erinnerungen neu';
 
   @override
   String get settingsDailyReminderDescription =>
@@ -352,14 +352,14 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get templateDefaultSummaryBody =>
-      '### Zusammenfassung\n-•\n### Zitat\n> ';
+      '### Zusammenfassung\n- \n\n### Zitat\n> ';
 
   @override
   String get templateDefaultReflectionTitle => 'Rückblick';
 
   @override
   String get templateDefaultReflectionBody =>
-      '-•\n\n### Wofür bist Du dankbar?\n-•\n\n### Worauf freust Du Dich?\n-• ';
+      '### Was hat dir heute spaß gemachty?\n- \n\n### Wofür bist du heute Dankbar?\n- \n\n### Worauf Freist du dich?\n- ';
 
   @override
   String get settingsStorageTitle => 'Speicher';
