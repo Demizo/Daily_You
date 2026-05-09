@@ -1,0 +1,8 @@
+Daily You v2.21.1 has arrived! More memories and a new look:
+
+• Revamped the home page
+• Allow for multiple logs per day
+• View "On This Day" for any date
+• Reworked the statistics page and charts
+• Many user interface improvements
+• Updated translations
