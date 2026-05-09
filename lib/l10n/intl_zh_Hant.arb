@@ -151,5 +151,6 @@
     "templateDefaultReflectionTitle": "反思",
     "templateDefaultReflectionBody": "### 你今天最開心的是什麼？\n- \n\n### 你感恩什麼？\n- \n\n### 你最期待什麼？\n- ",
     "actionTakePhoto": "拍照",
-    "flashbackOnThisDay": "這一天"
+    "flashbackOnThisDay": "在這一天",
+    "settingsOnThisDayDescription": "重溫過去的回憶"
 }
