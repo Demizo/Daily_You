@@ -13,6 +13,10 @@ read -rp "Version name (e.g. 1.23.4): " VERSION_NAME
 echo
 echo "Running Flutter builds..."
 
+export PUB_CACHE=$(pwd)/.pub-cache
+flutter pub get
+sed -i -e 's/-Wl,/-Wl,--build-id=none,/' $PUB_CACHE/hosted/pub.dev/jni-*/src/CMakeLists.txt
+
 flutter build apk \
   --flavor independent \
   --release \
