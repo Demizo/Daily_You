@@ -266,6 +266,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsHideImagesInGallery => '隐藏图库中的图片';
 
   @override
+  String get settingsHideImages => 'Hide Images';
+
+  @override
+  String get pageCalendarTitle => 'Calendar';
+
+  @override
   String get viewLayoutList => '列表';
 
   @override

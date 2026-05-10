@@ -287,8 +287,10 @@ class _VerticalCalendarState extends State<VerticalCalendar>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final firstDayIndex =
-        context.watch<ConfigProvider>().getFirstDayOfWeekIndex(context);
+    final configProvider = context.watch<ConfigProvider>();
+    final firstDayIndex = configProvider.getFirstDayOfWeekIndex(context);
+    final hideImages =
+        configProvider.get(ConfigKey.hideImagesInCalendar) == true;
     final entriesProvider = context.watch<EntriesProvider>();
     final imagesProvider = context.watch<EntryImagesProvider>();
 
@@ -335,7 +337,7 @@ class _VerticalCalendarState extends State<VerticalCalendar>
                           itemExtent: _weekRowHeight,
                           delegate: SliverChildBuilderDelegate(
                             (context, index) => _buildItem(context, index,
-                                entriesProvider, imagesProvider),
+                                entriesProvider, imagesProvider, hideImages),
                             childCount: _items.length,
                           ),
                         ),
@@ -525,11 +527,13 @@ class _VerticalCalendarState extends State<VerticalCalendar>
   }
 
   Widget _buildItem(BuildContext context, int index,
-      EntriesProvider entriesProvider, EntryImagesProvider imagesProvider) {
+      EntriesProvider entriesProvider, EntryImagesProvider imagesProvider,
+      bool hideImages) {
     final item = _items[index];
     if (item is _MonthHeaderItem) return _buildMonthHeader(context, item.month);
     if (item is _WeekRowItem) {
-      return _buildWeekRow(context, item, entriesProvider, imagesProvider);
+      return _buildWeekRow(
+          context, item, entriesProvider, imagesProvider, hideImages);
     }
     return const SizedBox.shrink();
   }
@@ -562,8 +566,12 @@ class _VerticalCalendarState extends State<VerticalCalendar>
     );
   }
 
-  Widget _buildWeekRow(BuildContext context, _WeekRowItem item,
-      EntriesProvider entriesProvider, EntryImagesProvider imagesProvider) {
+  Widget _buildWeekRow(
+      BuildContext context,
+      _WeekRowItem item,
+      EntriesProvider entriesProvider,
+      EntryImagesProvider imagesProvider,
+      bool hideImages) {
     return RepaintBoundary(
       child: _WeekRow(
         days: item.days,
@@ -572,6 +580,7 @@ class _VerticalCalendarState extends State<VerticalCalendar>
         dayNumberCache: _dayNumberCache,
         entriesProvider: entriesProvider,
         imagesProvider: imagesProvider,
+        hideImages: hideImages,
       ),
     );
   }
@@ -584,6 +593,7 @@ class _WeekRow extends StatelessWidget {
   final Map<int, ui.Image> dayNumberCache;
   final EntriesProvider entriesProvider;
   final EntryImagesProvider imagesProvider;
+  final bool hideImages;
 
   const _WeekRow({
     required this.days,
@@ -592,6 +602,7 @@ class _WeekRow extends StatelessWidget {
     required this.dayNumberCache,
     required this.entriesProvider,
     required this.imagesProvider,
+    required this.hideImages,
   });
 
   @override
@@ -639,7 +650,7 @@ class _WeekRow extends StatelessWidget {
 
           final entries = entriesProvider.getEntriesForDate(day);
           final firstEntry = entries.firstOrNull;
-          final firstImage = firstEntry == null
+          final firstImage = hideImages || firstEntry == null
               ? null
               : imagesProvider.getFirstImageForEntry(firstEntry.id!);
 

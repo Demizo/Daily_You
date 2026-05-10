@@ -58,6 +58,8 @@ class ConfigKey {
   static const String showflashbackGoodDay = "showflashbackGoodDay";
   static const String showflashbackRandomDay = "showflashbackRandomDay";
   static const String hideImagesInGallery = "hideImagesInGallery";
+  static const String hideImagesInCalendar = "hideImagesInCalendar";
+  static const String hideImagesInFlashbacks = "hideImagesInFlashbacks";
   static const String lastDismissedSupportBannerDate =
       "lastDismissedSupportBannerDate";
   // Secure Configuration Values
@@ -128,6 +130,8 @@ class ConfigProvider with ChangeNotifier {
     ConfigKey.showflashbackGoodDay: true,
     ConfigKey.showflashbackRandomDay: true,
     ConfigKey.hideImagesInGallery: false,
+    ConfigKey.hideImagesInCalendar: false,
+    ConfigKey.hideImagesInFlashbacks: false,
     ConfigKey.lastDismissedSupportBannerDate: null,
   };
 

@@ -268,6 +268,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsHideImagesInGallery => 'Bilder in der Galerie verbergen';
 
   @override
+  String get settingsHideImages => 'Hide Images';
+
+  @override
+  String get pageCalendarTitle => 'Calendar';
+
+  @override
   String get viewLayoutList => 'Liste';
 
   @override

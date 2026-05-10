@@ -266,6 +266,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get settingsHideImagesInGallery => '갤러리에서 이미지 숨김';
 
   @override
+  String get settingsHideImages => 'Hide Images';
+
+  @override
+  String get pageCalendarTitle => 'Calendar';
+
+  @override
   String get viewLayoutList => '리스트';
 
   @override

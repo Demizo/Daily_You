@@ -1,3 +1,4 @@
+import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
@@ -17,12 +18,16 @@ class FlashbackCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final imagesProvider = EntryImagesProvider.instance;
+    final hideImages =
+        ConfigProvider.instance.get(ConfigKey.hideImagesInFlashbacks) == true;
 
-    final coverImages = entries
-        .map((e) => imagesProvider.getForEntry(e).firstOrNull)
-        .whereType<EntryImage>()
-        .take(4)
-        .toList();
+    final coverImages = hideImages
+        ? <EntryImage>[]
+        : entries
+            .map((e) => imagesProvider.getForEntry(e).firstOrNull)
+            .whereType<EntryImage>()
+            .take(4)
+            .toList();
 
     final hasImages = coverImages.isNotEmpty;
     final showCount = entries.length > 1;
