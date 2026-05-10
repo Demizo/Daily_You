@@ -534,6 +534,18 @@ abstract class AppLocalizations {
   /// **'Hide Images In Gallery'**
   String get settingsHideImagesInGallery;
 
+  /// No description provided for @settingsHideImages.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide Images'**
+  String get settingsHideImages;
+
+  /// No description provided for @pageCalendarTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Calendar'**
+  String get pageCalendarTitle;
+
   /// No description provided for @viewLayoutList.
   ///
   /// In en, this message translates to:

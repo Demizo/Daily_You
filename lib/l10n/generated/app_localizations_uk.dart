@@ -274,6 +274,12 @@ class AppLocalizationsUk extends AppLocalizations {
   String get settingsHideImagesInGallery => 'Приховати зображення в галереї';
 
   @override
+  String get settingsHideImages => 'Hide Images';
+
+  @override
+  String get pageCalendarTitle => 'Calendar';
+
+  @override
   String get viewLayoutList => 'Список';
 
   @override

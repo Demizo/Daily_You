@@ -273,6 +273,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsHideImagesInGallery => 'إخفاء الصور من معرض الصور';
 
   @override
+  String get settingsHideImages => 'Hide Images';
+
+  @override
+  String get pageCalendarTitle => 'Calendar';
+
+  @override
   String get viewLayoutList => 'قائمة';
 
   @override
