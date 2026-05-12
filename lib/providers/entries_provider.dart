@@ -339,6 +339,11 @@ class EntriesProvider with ChangeNotifier {
     return (currentStreak, longestStreak, daysSinceBadDay);
   }
 
+  /// Return the number of days with entries
+  int getEntryDayCount() {
+    return _entriesByDay.length;
+  }
+
   // Helper functions
 
   int getIndexOfEntry(int entryId) {

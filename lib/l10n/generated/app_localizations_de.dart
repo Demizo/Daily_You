@@ -98,6 +98,17 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String dayCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count days',
+      one: '$count day',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String wordCount(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
