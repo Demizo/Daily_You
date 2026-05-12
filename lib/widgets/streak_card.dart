@@ -70,6 +70,6 @@ class StreakCard extends StatelessWidget {
               ),
             ),
           )
-        : Container();
+        : SizedBox.shrink();
   }
 }
