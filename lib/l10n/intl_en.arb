@@ -37,6 +37,8 @@
   "@searchLogsHint": {},
   "logCount": "{count, plural, one{{count} log} other{{count} logs}}",
   "@logCount": {},
+  "dayCount": "{count, plural, one{{count} day} other{{count} days}}",
+  "@dayCount": {},
   "wordCount": "{count, plural, one{{count} word} other{{count} words}}",
   "@wordCount": {},
   "noLogs": "No Logs…",

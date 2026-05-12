@@ -270,6 +270,12 @@ abstract class AppLocalizations {
   /// **'{count, plural, one{{count} log} other{{count} logs}}'**
   String logCount(num count);
 
+  /// No description provided for @dayCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} day} other{{count} days}}'**
+  String dayCount(num count);
+
   /// No description provided for @wordCount.
   ///
   /// In en, this message translates to:

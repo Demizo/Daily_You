@@ -41,6 +41,9 @@ class _StatsPageState extends State<StatsPage>
     var (currentStreak, longestStreak, daysSinceBadDay) =
         entriesProvider.getStreaks();
 
+    final logCount = entriesProvider.entries.length;
+    final entryDayCount = entriesProvider.getEntryDayCount();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -65,10 +68,14 @@ class _StatsPageState extends State<StatsPage>
                   isVisible: daysSinceBadDay != null && daysSinceBadDay > 3,
                   icon: Icons.timeline_rounded),
               StreakCard(
-                title: AppLocalizations.of(context)!
-                    .logCount(entriesProvider.entries.length),
-                isVisible: entriesProvider.entries.isNotEmpty,
+                title: AppLocalizations.of(context)!.logCount(logCount),
+                isVisible: logCount > 0,
                 icon: Icons.description_outlined,
+              ),
+              StreakCard(
+                title: AppLocalizations.of(context)!.dayCount(entryDayCount),
+                isVisible: (entryDayCount > 0) && (entryDayCount != logCount),
+                icon: Icons.today_rounded,
               ),
               StreakCard(
                 title: AppLocalizations.of(context)!
