@@ -27,7 +27,6 @@ class ConfigKey {
   static const String neutralIcon = "neutralIcon";
   static const String sadIcon = "sadIcon";
   static const String verySadIcon = "verySadIcon";
-  static const String noMoodIcon = "noMoodIcon";
   static const String followSystemColor = "followSystemColor";
   static const String accentColor = "accentColor";
   static const String dailyReminders = "dailyReminders";
@@ -70,6 +69,7 @@ class ConfigKey {
   static const String imageQuality = "imageQuality";
   static const String homePageViewMode = "homePageViewMode";
   static const String calendarViewMode = "calendarViewMode";
+  static const String noMoodIcon = "noMoodIcon";
 }
 
 class ImageQuality {
@@ -102,7 +102,6 @@ class ConfigProvider with ChangeNotifier {
     ConfigKey.neutralIcon: '😐',
     ConfigKey.sadIcon: '😕',
     ConfigKey.verySadIcon: '😔',
-    ConfigKey.noMoodIcon: '?',
     ConfigKey.followSystemColor: true,
     ConfigKey.accentColor: 0xff62A0EA,
     ConfigKey.dailyReminders: false,
@@ -157,7 +156,6 @@ class ConfigProvider with ChangeNotifier {
     ConfigKey.neutralIcon: '😐',
     ConfigKey.sadIcon: '😕',
     ConfigKey.verySadIcon: '😔',
-    ConfigKey.noMoodIcon: '?',
   };
 
   static final imageQualityCompressionMapping = {
