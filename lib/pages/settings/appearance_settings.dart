@@ -92,9 +92,6 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
                   if (value != null) {
                     await ConfigProvider.instance.set(
                         ConfigProvider.moodValueFieldMapping[value]!, newEmoji);
-                  } else {
-                    await ConfigProvider.instance
-                        .set(ConfigKey.noMoodIcon, newEmoji);
                   }
                 }
                 if (!context.mounted) return;
@@ -124,8 +121,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title:
-              Text(AppLocalizations.of(context)!.settingsHideImages),
+          title: Text(AppLocalizations.of(context)!.settingsHideImages),
           content: StatefulBuilder(
             builder: (context, setDialogState) {
               return Column(
@@ -136,7 +132,8 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
                     AppLocalizations.of(context)!.flashbacksTitle,
                     configProvider.get(ConfigKey.hideImagesInFlashbacks),
                     (value) {
-                      configProvider.set(ConfigKey.hideImagesInFlashbacks, value);
+                      configProvider.set(
+                          ConfigKey.hideImagesInFlashbacks, value);
                       setDialogState(() {});
                     },
                   ),
@@ -164,8 +161,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
           ),
           actions: [
             TextButton(
-              child:
-                  Text(MaterialLocalizations.of(context).okButtonLabel),
+              child: Text(MaterialLocalizations.of(context).okButtonLabel),
               onPressed: () => Navigator.pop(context),
             ),
           ],
@@ -346,7 +342,6 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
                     moodIconButton(0),
                     moodIconButton(1),
                     moodIconButton(2),
-                    moodIconButton(null),
                   ],
                 ),
                 IconButton(

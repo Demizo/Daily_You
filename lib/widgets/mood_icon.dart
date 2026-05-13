@@ -22,7 +22,7 @@ class MoodIcon extends StatefulWidget {
       moodIcon = ConfigProvider.instance
           .get(ConfigProvider.moodValueFieldMapping[moodValue]!);
     }
-    return moodIcon ?? ConfigProvider.instance.get(ConfigKey.noMoodIcon);
+    return moodIcon ?? "";
   }
 }
 
