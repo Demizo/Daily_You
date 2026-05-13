@@ -40,44 +40,63 @@ class LargeEntryCardWidget extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                     child: ImageGrid(images: images))),
           Expanded(
-            child: Wrap(children: [
-              Padding(
-                padding: const EdgeInsets.all(2.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 4.0),
-                      child: Text(
-                        title == null ? time : title!,
-                        style: TextStyle(
-                            color: theme.textTheme.labelSmall?.color,
-                            fontWeight: FontWeight.bold),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(2.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 4.0),
+                        child: Text(
+                          title == null ? time : title!,
+                          style: TextStyle(
+                              color: theme.textTheme.labelSmall?.color,
+                              fontWeight: FontWeight.bold),
+                        ),
                       ),
-                    ),
-                    Container(
-                      constraints: const BoxConstraints(minWidth: 16),
-                      child: MoodIcon(
-                        moodValue: entry.mood,
+                      Container(
+                        constraints: const BoxConstraints(minWidth: 16),
+                        child: MoodIcon(
+                          moodValue: entry.mood,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-                child: Wrap(children: [
-                  IgnorePointer(
-                      child: (entry.text.isNotEmpty)
-                          ? ScaledMarkdown(data: entry.text)
-                          : Text(
-                              AppLocalizations.of(context)!.writeSomethingHint,
-                              style: TextStyle(
-                                  color: theme.disabledColor, fontSize: 16),
-                            ))
-                ]),
-              ),
-            ]),
+                Expanded(
+                  child: ShaderMask(
+                    shaderCallback: (Rect bounds) {
+                      return const LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [Colors.black, Colors.transparent],
+                        stops: [0.8, 0.95],
+                      ).createShader(bounds);
+                    },
+                    blendMode: BlendMode.dstIn,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                      child: IgnorePointer(
+                        child: (entry.text.isNotEmpty)
+                            ? OverflowBox(
+                                alignment: AlignmentDirectional.topStart,
+                                maxHeight: double.infinity,
+                                child: ScaledMarkdown(data: entry.text))
+                            : Text(
+                                AppLocalizations.of(context)!
+                                    .writeSomethingHint,
+                                style: TextStyle(
+                                    color: theme.disabledColor, fontSize: 16),
+                              ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
