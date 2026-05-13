@@ -39,22 +39,36 @@ class EntryCardWidget extends StatelessWidget {
               child: (images.isNotEmpty && !hideImage)
                   ? ImageGrid(images: images)
                   : (entry.text.isNotEmpty)
-                      ? Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Wrap(children: [
-                            IgnorePointer(
-                                child: SizedBox(
-                              width: double.maxFinite,
-                              child: ScaledMarkdown(data: entry.text),
-                            ))
-                          ]),
+                      ? ShaderMask(
+                          shaderCallback: (Rect bounds) {
+                            return const LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [Colors.black, Colors.transparent],
+                              stops: [0.85, 1.0],
+                            ).createShader(bounds);
+                          },
+                          blendMode: BlendMode.dstIn,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Wrap(children: [
+                              IgnorePointer(
+                                  child: SizedBox(
+                                width: double.maxFinite,
+                                child: ScaledMarkdown(data: entry.text),
+                              ))
+                            ]),
+                          ),
                         )
                       : Padding(
                           padding: EdgeInsets.all(8.0),
-                          child: Text(
-                            AppLocalizations.of(context)!.writeSomethingHint,
-                            style: TextStyle(
-                                color: theme.disabledColor, fontSize: 16),
+                          child: Align(
+                            alignment: AlignmentDirectional.topStart,
+                            child: Text(
+                              AppLocalizations.of(context)!.writeSomethingHint,
+                              style: TextStyle(
+                                  color: theme.disabledColor, fontSize: 16),
+                            ),
                           ),
                         ),
             ),
