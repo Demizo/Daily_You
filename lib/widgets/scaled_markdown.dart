@@ -14,16 +14,19 @@ class ScaledMarkdown extends StatelessWidget {
       config: theme.brightness == Brightness.light
           ? MarkdownConfig.defaultConfig
           : MarkdownConfig.darkConfig,
-      generator: MarkdownGenerator(richTextBuilder: (span) {
-        return Builder(builder: (context) {
-          final shouldIgnoreTextScaler =
-              context.getInheritedWidgetOfExactType<_WithTextScalar>() != null;
-          final child = Text.rich(span);
-          return shouldIgnoreTextScaler
-              ? MediaQuery.withNoTextScaling(child: child)
-              : _WithTextScalar(child: child);
-        });
-      }),
+      generator: MarkdownGenerator(
+          richTextBuilder: (span) {
+            return Builder(builder: (context) {
+              final shouldIgnoreTextScaler =
+                  context.getInheritedWidgetOfExactType<_WithTextScalar>() !=
+                      null;
+              final child = Text.rich(span);
+              return shouldIgnoreTextScaler
+                  ? MediaQuery.withNoTextScaling(child: child)
+                  : _WithTextScalar(child: child);
+            });
+          },
+          linesMargin: EdgeInsets.only(bottom: 8, top: 2)),
       data: data,
     );
   }
