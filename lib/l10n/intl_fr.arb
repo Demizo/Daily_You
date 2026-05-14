@@ -154,5 +154,8 @@
     "actionToday": "Aujourd'hui",
     "actionOtherDay": "Autre jour",
     "chartOverTimeTitle": "{tag} sur la durée",
-    "settingsOnThisDayDescription": "Revisiter des mémoires d'avant"
+    "settingsOnThisDayDescription": "Revisiter des mémoires d'avant",
+    "dayCount": "{count, plural, one{{count} jour} other{{count} jours}}",
+    "settingsHideImages": "Masquer les images",
+    "pageCalendarTitle": "Agenda"
 }
