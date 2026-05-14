@@ -91,8 +91,10 @@ class FlashbackCard extends StatelessWidget {
                           child: Container(
                             height: 20,
                             width: 20,
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
+                            decoration: BoxDecoration(
+                              color: hasImages
+                                  ? Colors.white
+                                  : Theme.of(context).colorScheme.onSurface,
                               shape: BoxShape.circle,
                             ),
                             child: Center(
