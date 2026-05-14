@@ -24,7 +24,7 @@
     "flashbacksTitle": "الذكريات",
     "settingsFlashbacksExcludeBadDays": "استبعد الأيام السيئة",
     "flaskbacksEmpty": "لا توجد ذكريات حتى الآن…",
-    "flashbackWeek": "{count, plural,\n  zero{منذ {count} أسبوع}\n  one{منذ أسبوع واحد}\n  two{منذ أسبوعين}\n  few{منذ {count} أسابيع}\n  many{منذ {count} أسبوعًا}\n  other{منذ {count} أسبوع}\n}",
+    "flashbackWeek": "{count, plural, zero{منذ {count} أسبوع} one{منذ أسبوع واحد} two{منذ أسبوعين} few{منذ {count} أسابيع} many{منذ {count} أسبوعًا} other{منذ {count} أسبوع}}",
     "flashbackMonth": "{count, plural, one{منذ شهر واحد} other{منذ {count} أشهر}}",
     "flashbackYear": "{count, plural, one{منذ سنة واحدة} other{منذ {count} سنوات}}",
     "pageGalleryTitle": "المعرض",
@@ -136,5 +136,18 @@
     "settingsHideImagesInGallery": "إخفاء الصور من معرض الصور",
     "templateVariableTime": "الوقت",
     "templateDefaultTimestampTitle": "الطابع الزمني",
-    "templateDefaultSummaryTitle": "ملخص اليوم"
+    "templateDefaultSummaryTitle": "ملخص اليوم",
+    "actionTakePhoto": "التقط صورة",
+    "actionToday": "اليوم",
+    "actionOtherDay": "يوم آخر",
+    "flashbackOnThisDay": "في مثل هذا اليوم",
+    "dayCount": "{count, plural, one{{count} يوم} other{{count} أيام}}",
+    "chartOverTimeTitle": "{tag} بمرور الوقت",
+    "settingsHideImages": "إخفاء الصور",
+    "pageCalendarTitle": "التقويم",
+    "settingsOnThisDayDescription": "استرجع الذكريات الماضية",
+    "templateDefaultTimestampBody": "{date} - {time}:",
+    "templateDefaultSummaryBody": "### ملخص\n-\n\n### اقتباس\n> ",
+    "templateDefaultReflectionTitle": "تأمل",
+    "templateDefaultReflectionBody": "### ما الذي استمتعت به اليوم؟\n- \n\n### ما الذي تشعر بالامتنان تجاهه؟\n- \n\n### ما الذي تتطلع إليه؟\n- "
 }
