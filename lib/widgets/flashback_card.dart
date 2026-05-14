@@ -3,6 +3,7 @@ import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/widgets/image_grid.dart';
+import 'package:daily_you/widgets/scaled_markdown.dart';
 import 'package:flutter/material.dart';
 
 class FlashbackCard extends StatelessWidget {
@@ -42,11 +43,29 @@ class FlashbackCard extends StatelessWidget {
           children: [
             hasImages
                 ? ImageGrid(images: coverImages)
-                : Center(
-                    child: Icon(
-                      Icons.history_rounded,
-                      color: Theme.of(context).disabledColor,
-                      size: 36,
+                : ShaderMask(
+                    shaderCallback: (Rect bounds) {
+                      return const LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [Colors.black, Colors.transparent],
+                        stops: [0.70, 0.75],
+                      ).createShader(bounds);
+                    },
+                    blendMode: BlendMode.dstIn,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Wrap(children: [
+                        IgnorePointer(
+                            child: SizedBox(
+                          width: double.maxFinite,
+                          child: Padding(
+                            padding:
+                                EdgeInsets.only(top: showCount ? 20.0 : 0.0),
+                            child: ScaledMarkdown(data: entries.first.text),
+                          ),
+                        ))
+                      ]),
                     ),
                   ),
             if (hasImages)
