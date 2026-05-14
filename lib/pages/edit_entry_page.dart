@@ -173,138 +173,170 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   }
 
   @override
-  Widget build(BuildContext context) => _loadingEntry
-      ? Scaffold()
-      : PopScope(
-          onPopInvokedWithResult: (didPop, result) async {
-            if (!_deletingEntry) {
-              await _saveEntry();
-            }
-          },
-          child: Scaffold(
-            appBar: AppBar(
-                leading: BackButton(
-                  onPressed: () {
-                    // Pop edit page
-                    Navigator.of(context).pop();
-                    if (!_creatingNewEntry) {
-                      // Pop view page
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return _loadingEntry
+        ? Scaffold()
+        : PopScope(
+            onPopInvokedWithResult: (didPop, result) async {
+              if (!_deletingEntry) {
+                await _saveEntry();
+              }
+            },
+            child: Scaffold(
+              appBar: AppBar(
+                  leading: BackButton(
+                    onPressed: () {
+                      // Pop edit page
                       Navigator.of(context).pop();
-                    }
-                  },
-                ),
-                actions: [_deleteButton(), _saveButton()]),
-            body: Column(children: [
-              Expanded(
-                child: Container(
-                  constraints: BoxConstraints.loose(const Size.fromWidth(800)),
-                  child: ListView(
-                    padding: const EdgeInsets.only(left: 8, right: 8),
-                    children: [
-                      if (_currentImages.isNotEmpty)
-                        EntryImageEditableList(
-                            images: _currentImages,
-                            onImagesChanged: (images) async {
-                              _currentImages = images;
-                              await _saveEntry();
-                            }),
-                      StatefulBuilder(
-                        builder: (context, setState) => Card.filled(
-                          color: Theme.of(context).colorScheme.surfaceContainer,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      _changeDateButton(),
-                                      IntrinsicHeight(
+                      if (!_creatingNewEntry) {
+                        // Pop view page
+                        Navigator.of(context).pop();
+                      }
+                    },
+                  ),
+                  actions: [_deleteButton(), _saveButton()]),
+              body: Column(children: [
+                Expanded(
+                  child: Container(
+                    constraints:
+                        BoxConstraints.loose(const Size.fromWidth(800)),
+                    child: ListView(
+                      padding: const EdgeInsets.only(left: 8, right: 8),
+                      children: [
+                        if (_currentImages.isNotEmpty)
+                          EntryImageEditableList(
+                              images: _currentImages,
+                              onImagesChanged: (images) async {
+                                _currentImages = images;
+                                await _saveEntry();
+                              }),
+                        StatefulBuilder(
+                          builder: (context, setState) => Card.filled(
+                            color: theme.colorScheme.surfaceContainer,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    IntrinsicHeight(
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 4.0),
                                         child: Row(
+                                          mainAxisSize: MainAxisSize.min,
                                           children: [
-                                            Text(
-                                              DateFormat.yMMMEd(
-                                                      TimeManager.currentLocale(
-                                                          context))
-                                                  .format(entryDate!),
-                                              style: const TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold),
+                                            FilledButton(
+                                              onPressed: () async {
+                                                _chooseDate();
+                                              },
+                                              style: FilledButton.styleFrom(
+                                                  visualDensity:
+                                                      VisualDensity.compact,
+                                                  backgroundColor: theme
+                                                      .colorScheme
+                                                      .primaryContainer,
+                                                  padding: EdgeInsets.all(12)),
+                                              child: Text(
+                                                DateFormat.yMMMEd(TimeManager
+                                                        .currentLocale(context))
+                                                    .format(entryDate!),
+                                                style: TextStyle(
+                                                    color: theme.colorScheme
+                                                        .onPrimaryContainer,
+                                                    fontSize: 16,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
                                             ),
                                             VerticalDivider(
-                                              width: 16,
+                                              width: 12,
+                                              indent: 8,
+                                              endIndent: 8,
                                               thickness: 2,
                                               radius: BorderRadius.circular(4),
                                             ),
-                                            Text(
-                                              DateFormat.jm(
-                                                      TimeManager.currentLocale(
-                                                          context))
-                                                  .format(entryDate!),
-                                              style: TextStyle(
+                                            FilledButton(
+                                              onPressed: () async {
+                                                _chooseTime();
+                                              },
+                                              style: FilledButton.styleFrom(
+                                                  visualDensity:
+                                                      VisualDensity.compact,
+                                                  backgroundColor: theme
+                                                      .colorScheme
+                                                      .primaryContainer,
+                                                  padding: EdgeInsets.all(12)),
+                                              child: Text(
+                                                DateFormat.jm(TimeManager
+                                                        .currentLocale(context))
+                                                    .format(entryDate!),
+                                                style: TextStyle(
+                                                  color: theme.colorScheme
+                                                      .onPrimaryContainer,
                                                   fontSize: 16,
-                                                  color: Theme.of(context)
-                                                      .dividerColor),
+                                                ),
+                                              ),
                                             ),
                                           ],
                                         ),
                                       ),
-                                    ],
-                                  ),
-                                  EntryImagePicker(
-                                    onChangedImage: (newImages) {
-                                      _openedCamera = true;
-                                      _addImage(newImages);
-                                    },
-                                    openCamera:
-                                        widget.openCamera && !_openedCamera,
-                                  )
-                                ],
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 4.0),
-                                child: EntryMoodPicker(
-                                    moodValue: mood,
-                                    onChangedMood: (mood) {
-                                      setState(() => this.mood = mood);
-                                      EasyDebounce.debounce(
-                                          "save-entry",
-                                          Duration(seconds: 5),
-                                          () => _saveEntry());
-                                    }),
-                              )
-                            ],
+                                    ),
+                                    EntryImagePicker(
+                                      onChangedImage: (newImages) {
+                                        _openedCamera = true;
+                                        _addImage(newImages);
+                                      },
+                                      openCamera:
+                                          widget.openCamera && !_openedCamera,
+                                    )
+                                  ],
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 4.0),
+                                  child: EntryMoodPicker(
+                                      moodValue: mood,
+                                      onChangedMood: (mood) {
+                                        setState(() => this.mood = mood);
+                                        EasyDebounce.debounce(
+                                            "save-entry",
+                                            Duration(seconds: 5),
+                                            () => _saveEntry());
+                                      }),
+                                )
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                      StatefulBuilder(
-                          builder: (context, setState) => EntryTextEditor(
-                                text: text,
-                                focusNode: _focusNode,
-                                textEditingController: _textEditingController,
-                                undoHistoryController: _undoController,
-                              )),
-                      const SizedBox(height: 16),
-                    ],
+                        StatefulBuilder(
+                            builder: (context, setState) => EntryTextEditor(
+                                  text: text,
+                                  focusNode: _focusNode,
+                                  textEditingController: _textEditingController,
+                                  undoHistoryController: _undoController,
+                                )),
+                        const SizedBox(height: 16),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              SafeArea(
-                top: false,
-                child: EditToolbar(
-                  controller: _textEditingController,
-                  undoController: _undoController,
-                  focusNode: _focusNode,
-                  trailer:
-                      TemplateSelectButton(controller: _textEditingController),
+                SafeArea(
+                  top: false,
+                  child: EditToolbar(
+                    controller: _textEditingController,
+                    undoController: _undoController,
+                    focusNode: _focusNode,
+                    trailer: TemplateSelectButton(
+                        controller: _textEditingController),
+                  ),
                 ),
-              ),
-            ]),
-          ),
-        );
+              ]),
+            ),
+          );
+  }
 
   Widget _deleteButton() => IconButton(
         icon: const Icon(Icons.delete),
@@ -316,46 +348,34 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
         onPressed: () => Navigator.of(context).pop(),
       );
 
-  Widget _changeDateButton() {
-    final theme = Theme.of(context);
-    final entriesProvider = Provider.of<EntriesProvider>(context);
-
-    return IconButton(
-      icon: Icon(
-        Icons.event_rounded,
-        size: 24,
-        color: theme.colorScheme.primary,
-      ),
-      style: IconButton.styleFrom(
-          backgroundColor: Theme.of(context).colorScheme.surfaceContainer),
-      onPressed: () async {
-        DateTime? pickedDate = await showDatePicker(
-          selectableDayPredicate: (date) =>
-              entriesProvider.getEntryForDate(date) == null ||
-              TimeManager.isSameDay(date, entryDate!),
-          initialDatePickerMode: DatePickerMode.day,
-          context: context,
-          initialDate: entryDate,
-          firstDate: DateTime.utc(2000),
-          lastDate: DateTime.now(),
-        );
-        if (pickedDate == null) return;
-
-        if (!mounted) return;
-        final pickedTime = await showTimePicker(
-            context: context, initialTime: TimeOfDay.fromDateTime(entryDate!));
-        if (pickedTime == null) return;
-
-        entryDate = entryDate!.copyWith(
-          year: pickedDate.year,
-          month: pickedDate.month,
-          day: pickedDate.day,
-          hour: pickedTime.hour,
-          minute: pickedTime.minute,
-        );
-        await _saveEntry();
-      },
+  Future<void> _chooseDate() async {
+    DateTime? pickedDate = await showDatePicker(
+      initialDatePickerMode: DatePickerMode.day,
+      context: context,
+      initialDate: entryDate,
+      firstDate: DateTime.utc(2000),
+      lastDate: DateTime.now(),
     );
+    if (pickedDate == null) return;
+
+    entryDate = entryDate!.copyWith(
+      year: pickedDate.year,
+      month: pickedDate.month,
+      day: pickedDate.day,
+    );
+    await _saveEntry();
+  }
+
+  Future<void> _chooseTime() async {
+    final pickedTime = await showTimePicker(
+        context: context, initialTime: TimeOfDay.fromDateTime(entryDate!));
+    if (pickedTime == null) return;
+
+    entryDate = entryDate!.copyWith(
+      hour: pickedTime.hour,
+      minute: pickedTime.minute,
+    );
+    await _saveEntry();
   }
 
   Future<void> _saveEntry() async {
