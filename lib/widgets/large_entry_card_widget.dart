@@ -9,12 +9,13 @@ import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
 
 class LargeEntryCardWidget extends StatelessWidget {
-  const LargeEntryCardWidget(
-      {super.key,
-      this.title,
-      required this.entry,
-      required this.images,
-      this.hideImage = false});
+  const LargeEntryCardWidget({
+    super.key,
+    this.title,
+    required this.entry,
+    required this.images,
+    this.hideImage = false,
+  });
 
   final Entry entry;
   final List<EntryImage> images;
@@ -24,8 +25,9 @@ class LargeEntryCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final time = DateFormat.yMMMd(TimeManager.currentLocale(context))
-        .format(entry.timeCreate);
+    final time = DateFormat.yMMMd(
+      TimeManager.currentLocale(context),
+    ).format(entry.timeCreate);
     return Card.filled(
       color: Theme.of(context).colorScheme.surfaceContainer,
       clipBehavior: Clip.antiAlias,
@@ -36,9 +38,11 @@ class LargeEntryCardWidget extends StatelessWidget {
         children: [
           if (images.isNotEmpty && !hideImage)
             Expanded(
-                child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: ImageGrid(images: images))),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: ImageGrid(images: images),
+              ),
+            ),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -53,15 +57,14 @@ class LargeEntryCardWidget extends StatelessWidget {
                         child: Text(
                           title == null ? time : title!,
                           style: TextStyle(
-                              color: theme.textTheme.labelSmall?.color,
-                              fontWeight: FontWeight.bold),
+                            color: theme.textTheme.labelSmall?.color,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                       Container(
                         constraints: const BoxConstraints(minWidth: 16),
-                        child: MoodIcon(
-                          moodValue: entry.mood,
-                        ),
+                        child: MoodIcon(moodValue: entry.mood),
                       ),
                     ],
                   ),
@@ -77,20 +80,31 @@ class LargeEntryCardWidget extends StatelessWidget {
                       ).createShader(bounds);
                     },
                     blendMode: BlendMode.dstIn,
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-                      child: IgnorePointer(
-                        child: (entry.text.isNotEmpty)
-                            ? OverflowBox(
-                                alignment: AlignmentDirectional.topStart,
-                                maxHeight: double.infinity,
-                                child: ScaledMarkdown(data: entry.text))
-                            : Text(
-                                AppLocalizations.of(context)!
-                                    .writeSomethingHint,
-                                style: TextStyle(
-                                    color: theme.disabledColor, fontSize: 16),
-                              ),
+                    child: ClipRect(
+                      clipBehavior: Clip.hardEdge,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                        child: IgnorePointer(
+                          child: (entry.text.isNotEmpty)
+                              ? OverflowBox(
+                                  alignment: AlignmentDirectional.topStart,
+                                  maxHeight: double.infinity,
+                                  child: ScaledMarkdown(
+                                    data: entry.text,
+                                    maxCharacters: 500,
+                                  ),
+                                )
+                              : Text(
+                                  AppLocalizations.of(
+                                    context,
+                                  )!
+                                      .writeSomethingHint,
+                                  style: TextStyle(
+                                    color: theme.disabledColor,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                        ),
                       ),
                     ),
                   ),

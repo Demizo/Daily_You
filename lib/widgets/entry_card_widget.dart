@@ -35,6 +35,7 @@ class EntryCardWidget extends StatelessWidget {
         children: [
           Expanded(
             child: ClipRRect(
+              clipBehavior: Clip.hardEdge,
               borderRadius: BorderRadius.circular(12),
               child: (images.isNotEmpty && !hideImage)
                   ? ImageGrid(images: images)
@@ -55,7 +56,10 @@ class EntryCardWidget extends StatelessWidget {
                               IgnorePointer(
                                   child: SizedBox(
                                 width: double.maxFinite,
-                                child: ScaledMarkdown(data: entry.text),
+                                child: ScaledMarkdown(
+                                  data: entry.text,
+                                  maxCharacters: 250,
+                                ),
                               ))
                             ]),
                           ),
