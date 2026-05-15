@@ -54,7 +54,7 @@ class FlashbackCard extends StatelessWidget {
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                           colors: [Colors.black, Colors.transparent],
-                          stops: [0.65, 0.75],
+                          stops: [0.60, 0.75],
                         ).createShader(bounds);
                       },
                       blendMode: BlendMode.dstIn,
@@ -70,7 +70,9 @@ class FlashbackCard extends StatelessWidget {
                                 child: (text.isNotEmpty)
                                     ? ScaledMarkdown(
                                         data: text,
-                                        maxCharacters: 100,
+                                        maxCharacters: 120,
+                                        scaleFactor: 0.9,
+                                        compact: true,
                                       )
                                     : Text(
                                         AppLocalizations.of(
