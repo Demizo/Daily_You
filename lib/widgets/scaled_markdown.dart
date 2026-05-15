@@ -5,11 +5,18 @@ import 'package:markdown_widget/markdown_widget.dart';
 // See: https://github.com/asjqkkkk/markdown_widget/issues/208
 class ScaledMarkdown extends StatelessWidget {
   final String data;
-  const ScaledMarkdown({super.key, required this.data});
+  final int? maxCharacters;
+  const ScaledMarkdown({super.key, required this.data, this.maxCharacters});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    String text = data;
+
+    if (maxCharacters != null && text.length > maxCharacters!) {
+      text = "${text.substring(0, maxCharacters)}…";
+    }
+
     return MarkdownBlock(
       config: theme.brightness == Brightness.light
           ? MarkdownConfig.defaultConfig
@@ -27,7 +34,7 @@ class ScaledMarkdown extends StatelessWidget {
             });
           },
           linesMargin: EdgeInsets.only(bottom: 8, top: 2)),
-      data: data,
+      data: text,
     );
   }
 }

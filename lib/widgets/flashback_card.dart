@@ -1,3 +1,4 @@
+import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/image.dart';
@@ -21,6 +22,8 @@ class FlashbackCard extends StatelessWidget {
     final imagesProvider = EntryImagesProvider.instance;
     final hideImages =
         ConfigProvider.instance.get(ConfigKey.hideImagesInFlashbacks) == true;
+    final theme = Theme.of(context);
+    final text = entries.first.text;
 
     final coverImages = hideImages
         ? <EntryImage>[]
@@ -36,36 +39,52 @@ class FlashbackCard extends StatelessWidget {
     return AspectRatio(
       aspectRatio: 3.7 / 4,
       child: Card.filled(
-        color: Theme.of(context).colorScheme.surfaceContainer,
+        color: theme.colorScheme.surfaceContainer,
         clipBehavior: Clip.antiAlias,
         child: Stack(
           fit: StackFit.expand,
           children: [
             hasImages
                 ? ImageGrid(images: coverImages)
-                : ShaderMask(
-                    shaderCallback: (Rect bounds) {
-                      return const LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [Colors.black, Colors.transparent],
-                        stops: [0.70, 0.75],
-                      ).createShader(bounds);
-                    },
-                    blendMode: BlendMode.dstIn,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Wrap(children: [
-                        IgnorePointer(
-                            child: SizedBox(
-                          width: double.maxFinite,
-                          child: Padding(
-                            padding:
-                                EdgeInsets.only(top: showCount ? 20.0 : 0.0),
-                            child: ScaledMarkdown(data: entries.first.text),
-                          ),
-                        ))
-                      ]),
+                : ClipRect(
+                    clipBehavior: Clip.hardEdge,
+                    child: ShaderMask(
+                      shaderCallback: (Rect bounds) {
+                        return const LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [Colors.black, Colors.transparent],
+                          stops: [0.65, 0.75],
+                        ).createShader(bounds);
+                      },
+                      blendMode: BlendMode.dstIn,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Wrap(children: [
+                          IgnorePointer(
+                              child: SizedBox(
+                            width: double.maxFinite,
+                            child: Padding(
+                                padding: EdgeInsets.only(
+                                    top: showCount ? 20.0 : 0.0),
+                                child: (text.isNotEmpty)
+                                    ? ScaledMarkdown(
+                                        data: text,
+                                        maxCharacters: 100,
+                                      )
+                                    : Text(
+                                        AppLocalizations.of(
+                                          context,
+                                        )!
+                                            .writeSomethingHint,
+                                        style: TextStyle(
+                                          color: theme.disabledColor,
+                                          fontSize: 16,
+                                        ),
+                                      )),
+                          ))
+                        ]),
+                      ),
                     ),
                   ),
             if (hasImages)
@@ -86,7 +105,7 @@ class FlashbackCard extends StatelessWidget {
                       style: TextStyle(
                         color: hasImages
                             ? Colors.white
-                            : Theme.of(context).colorScheme.onSurface,
+                            : theme.colorScheme.onSurface,
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
                       ),
@@ -113,7 +132,7 @@ class FlashbackCard extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: hasImages
                                   ? Colors.white
-                                  : Theme.of(context).colorScheme.onSurface,
+                                  : theme.colorScheme.onSurface,
                               shape: BoxShape.circle,
                             ),
                             child: Center(
