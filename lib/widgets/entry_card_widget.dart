@@ -59,6 +59,7 @@ class EntryCardWidget extends StatelessWidget {
                                 child: ScaledMarkdown(
                                   data: entry.text,
                                   maxCharacters: 250,
+                                  scaleFactor: 0.95,
                                 ),
                               ))
                             ]),

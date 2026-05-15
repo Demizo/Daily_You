@@ -92,6 +92,7 @@ class LargeEntryCardWidget extends StatelessWidget {
                                   child: ScaledMarkdown(
                                     data: entry.text,
                                     maxCharacters: 500,
+                                    scaleFactor: 0.95,
                                   ),
                                 )
                               : Text(
