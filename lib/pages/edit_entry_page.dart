@@ -219,64 +219,59 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     IntrinsicHeight(
                                       child: Padding(
                                         padding: const EdgeInsets.symmetric(
-                                            horizontal: 4.0),
+                                            horizontal: 2.0),
                                         child: Row(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
-                                            FilledButton(
+                                            TextButton(
                                               onPressed: () async {
                                                 _chooseDate();
                                               },
-                                              style: FilledButton.styleFrom(
+                                              style: TextButton.styleFrom(
                                                   visualDensity:
                                                       VisualDensity.compact,
-                                                  backgroundColor: theme
-                                                      .colorScheme
-                                                      .primaryContainer,
-                                                  padding: EdgeInsets.all(12)),
+                                                  padding: EdgeInsets.all(6)),
                                               child: Text(
                                                 DateFormat.yMMMEd(TimeManager
                                                         .currentLocale(context))
                                                     .format(entryDate!),
                                                 style: TextStyle(
-                                                    color: theme.colorScheme
-                                                        .onPrimaryContainer,
+                                                    color: theme
+                                                        .colorScheme.primary,
                                                     fontSize: 16,
                                                     fontWeight:
                                                         FontWeight.bold),
                                               ),
                                             ),
                                             VerticalDivider(
-                                              width: 12,
+                                              width: 6,
                                               indent: 8,
                                               endIndent: 8,
                                               thickness: 2,
                                               radius: BorderRadius.circular(4),
                                             ),
-                                            FilledButton(
+                                            TextButton(
                                               onPressed: () async {
                                                 _chooseTime();
                                               },
-                                              style: FilledButton.styleFrom(
+                                              style: TextButton.styleFrom(
                                                   visualDensity:
                                                       VisualDensity.compact,
-                                                  backgroundColor: theme
-                                                      .colorScheme
-                                                      .primaryContainer,
-                                                  padding: EdgeInsets.all(12)),
+                                                  padding: EdgeInsets.all(6)),
                                               child: Text(
                                                 DateFormat.jm(TimeManager
                                                         .currentLocale(context))
                                                     .format(entryDate!),
                                                 style: TextStyle(
-                                                  color: theme.colorScheme
-                                                      .onPrimaryContainer,
+                                                  color:
+                                                      theme.colorScheme.primary,
                                                   fontSize: 16,
                                                 ),
                                               ),
