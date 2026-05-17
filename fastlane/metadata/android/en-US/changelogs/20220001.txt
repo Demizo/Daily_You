@@ -1,0 +1,8 @@
+Daily You v2.22.0 has arrived! Improved text journaling:
+
+• Added controls to hide images in various parts of the app
+• Flashbacks without images now show text previews
+• Split date and time controls when editing logs
+• Added the number of days logged to the statistics page
+• Text preview improvements
+• Updated translations
