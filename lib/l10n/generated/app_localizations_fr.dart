@@ -103,8 +103,8 @@ class AppLocalizationsFr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count days',
-      one: '$count day',
+      other: '$count jours',
+      one: '$count jour',
     );
     return '$_temp0';
   }
@@ -283,10 +283,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settingsHideImagesInGallery => 'Cacher les images dans la galerie';
 
   @override
-  String get settingsHideImages => 'Hide Images';
+  String get settingsHideImages => 'Masquer les images';
 
   @override
-  String get pageCalendarTitle => 'Calendar';
+  String get pageCalendarTitle => 'Agenda';
 
   @override
   String get viewLayoutList => 'Liste';

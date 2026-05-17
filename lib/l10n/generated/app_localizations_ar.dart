@@ -18,13 +18,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get dailyReminderDescription => 'خذ سجل يومياتك…';
 
   @override
-  String get actionTakePhoto => 'Take photo';
+  String get actionTakePhoto => 'التقط صورة';
 
   @override
-  String get actionToday => 'Today';
+  String get actionToday => 'اليوم';
 
   @override
-  String get actionOtherDay => 'Other day';
+  String get actionOtherDay => 'يوم آخر';
 
   @override
   String get pageHomeTitle => 'الرئيسية';
@@ -82,7 +82,7 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get flashbackOnThisDay => 'On This Day';
+  String get flashbackOnThisDay => 'في مثل هذا اليوم';
 
   @override
   String get pageGalleryTitle => 'المعرض';
@@ -106,8 +106,8 @@ class AppLocalizationsAr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count days',
-      one: '$count day',
+      other: '$count أيام',
+      one: '$count يوم',
     );
     return '$_temp0';
   }
@@ -165,7 +165,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String chartOverTimeTitle(Object tag) {
-    return '$tag Over Time';
+    return '$tag بمرور الوقت';
   }
 
   @override
@@ -284,10 +284,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsHideImagesInGallery => 'إخفاء الصور من معرض الصور';
 
   @override
-  String get settingsHideImages => 'Hide Images';
+  String get settingsHideImages => 'إخفاء الصور';
 
   @override
-  String get pageCalendarTitle => 'Calendar';
+  String get pageCalendarTitle => 'التقويم';
 
   @override
   String get viewLayoutList => 'قائمة';
@@ -310,7 +310,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsDailyReminderTitle => 'تذكير يومي';
 
   @override
-  String get settingsOnThisDayDescription => 'Revisit past memories';
+  String get settingsOnThisDayDescription => 'استرجع الذكريات الماضية';
 
   @override
   String get settingsDailyReminderDescription => 'تذكير لطيف كل يوم';
@@ -371,14 +371,14 @@ class AppLocalizationsAr extends AppLocalizations {
   String get templateDefaultSummaryTitle => 'ملخص اليوم';
 
   @override
-  String get templateDefaultSummaryBody => '### Summary\n- \n\n### Quote\n> ';
+  String get templateDefaultSummaryBody => '### ملخص\n-\n\n### اقتباس\n> ';
 
   @override
-  String get templateDefaultReflectionTitle => 'Reflection';
+  String get templateDefaultReflectionTitle => 'تأمل';
 
   @override
   String get templateDefaultReflectionBody =>
-      '### What did you enjoy about today?\n- \n\n### What are you thankful for?\n- \n\n### What are you looking forward to?\n- ';
+      '### ما الذي استمتعت به اليوم؟\n- \n\n### ما الذي تشعر بالامتنان تجاهه؟\n- \n\n### ما الذي تتطلع إليه؟\n- ';
 
   @override
   String get settingsStorageTitle => 'التخزين';
