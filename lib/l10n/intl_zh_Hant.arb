@@ -152,5 +152,11 @@
     "templateDefaultReflectionBody": "### 你今天最開心的是什麼？\n- \n\n### 你感恩什麼？\n- \n\n### 你最期待什麼？\n- ",
     "actionTakePhoto": "拍照",
     "flashbackOnThisDay": "在這一天",
-    "settingsOnThisDayDescription": "重溫過去的回憶"
+    "settingsOnThisDayDescription": "重溫過去的回憶",
+    "actionToday": "今天",
+    "actionOtherDay": "其他天",
+    "dayCount": "{count, plural, one{{count} 天} other{{count} 天}}",
+    "chartOverTimeTitle": "{tag} 隨著時間的變化",
+    "settingsHideImages": "隱藏圖片",
+    "pageCalendarTitle": "月曆"
 }
