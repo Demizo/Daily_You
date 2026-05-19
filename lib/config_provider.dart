@@ -8,6 +8,7 @@ import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:logging/logging.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -92,6 +93,8 @@ class ConfigProvider with ChangeNotifier {
   static final ConfigProvider instance = ConfigProvider._init();
 
   ConfigProvider._init();
+
+  final Logger _logger = Logger('ConfigProvider');
 
   String configFilePath = '';
 
@@ -209,17 +212,43 @@ class ConfigProvider with ChangeNotifier {
   Future<void> init() async {
     initializeDateFormatting();
 
-    Directory dbPath;
-    if (Platform.isAndroid) {
-      dbPath = (await getExternalStorageDirectory())!;
-    } else {
-      dbPath = await getApplicationSupportDirectory();
-    }
+    final dbPath = await getApplicationSupportDirectory();
+    if (!dbPath.existsSync()) dbPath.createSync(recursive: true);
     configFilePath = join(dbPath.path, 'config.json');
+
+    if (Platform.isAndroid) {
+      await _migrateConfigFromExternalStorage(dbPath);
+    }
 
     await readConfig();
     await loadSecureConfig();
     await poplulateDefaults();
+  }
+
+  Future<void> _migrateConfigFromExternalStorage(Directory newDir) async {
+    final newFile = File(join(newDir.path, 'config.json'));
+    if (newFile.existsSync()) return;
+
+    final oldDir = await getExternalStorageDirectory();
+    if (oldDir == null) return;
+    final oldFile = File(join(oldDir.path, 'config.json'));
+    if (!oldFile.existsSync()) return;
+
+    // Never let a migration failure abort startup; settings fall back to
+    // defaults via readConfig() if the config can't be moved.
+    try {
+      _logger.info('Config migration started: ${oldFile.path} -> ${newFile.path}');
+      await oldFile.copy(newFile.path);
+      if (newFile.existsSync() && newFile.lengthSync() > 0) {
+        await oldFile.delete();
+        _logger.info('Config migration finished successfully');
+      } else {
+        _logger.severe(
+            'Config migration failed: copied file missing or empty, kept original');
+      }
+    } catch (error, stackTrace) {
+      _logger.severe('Config migration failed', error, stackTrace);
+    }
   }
 
   Future<void> poplulateDefaults() async {

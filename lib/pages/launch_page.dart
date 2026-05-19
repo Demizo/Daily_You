@@ -5,11 +5,16 @@ import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/database/image_storage.dart';
 import 'package:daily_you/device_info_service.dart';
 import 'package:daily_you/launch_intent.dart';
+import 'package:daily_you/utils/backup_restore_utils.dart';
 import 'package:daily_you/widgets/auth_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
+import 'package:logging/logging.dart';
 import 'package:quick_actions/quick_actions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+enum _LaunchErrorType { externalAccess, migrationFailed }
 
 class LaunchPage extends StatefulWidget {
   final Widget nextPage;
@@ -20,8 +25,10 @@ class LaunchPage extends StatefulWidget {
 }
 
 class _LaunchPageState extends State<LaunchPage> {
+  final Logger _logger = Logger('LaunchPage');
   bool isLoading = true;
   bool _initialized = false;
+  _LaunchErrorType _errorType = _LaunchErrorType.externalAccess;
 
   @override
   void initState() {
@@ -104,24 +111,82 @@ class _LaunchPageState extends State<LaunchPage> {
               ));
     }
     //Initialize Database
-    if (await AppDatabase.instance.init()) {
+    bool initialized;
+    try {
+      initialized = await AppDatabase.instance.init();
+    } catch (error, stackTrace) {
+      _logger.severe('Database initialization failed', error, stackTrace);
+      initialized = false;
+    }
+
+    if (initialized) {
+      await _migrateImagesFromExternalStorage();
       if (ImageStorage.instance.usingExternalLocation()) {
         if (await ImageStorage.instance.hasExternalLocationPermission()) {
           await _nextPage();
+          return;
         }
+        _errorType = _LaunchErrorType.externalAccess;
       } else {
         await _nextPage();
+        return;
       }
+    } else {
+      _errorType = AppDatabase.instance.migrationFailed
+          ? _LaunchErrorType.migrationFailed
+          : _LaunchErrorType.externalAccess;
     }
 
+    if (!mounted) return;
     setState(() {
       isLoading = false;
     });
   }
 
+  Future<void> _retryDatabaseConnection() async {
+    setState(() {
+      isLoading = true;
+    });
+    await _checkDatabaseConnection();
+  }
+
+  Future<void> _reportIssue() async {
+    await launchUrl(Uri.https("github.com", "/Demizo/Daily_You/issues"),
+        mode: LaunchMode.externalApplication);
+  }
+
+  Future<void> _migrateImagesFromExternalStorage() async {
+    if (!await ImageStorage.instance.needsImageMigration()) return;
+    if (!mounted) return;
+
+    final statusNotifier = ValueNotifier<String>("");
+    BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
+
+    try {
+      await ImageStorage.instance.migrateImagesFromExternalStorage(
+        updateStatus: (migrated, total) {
+          if (!mounted) return;
+          statusNotifier.value = AppLocalizations.of(context)!
+              .migratingImagesStatus(migrated, total);
+        },
+      );
+    } finally {
+      if (mounted) Navigator.of(context).pop();
+    }
+  }
+
   Future _forceLocalDatabase() async {
-    await AppDatabase.instance.init(forceWithoutSync: true);
-    await _nextPage();
+    try {
+      await AppDatabase.instance.init(forceWithoutSync: true);
+      await _nextPage();
+    } catch (error, stackTrace) {
+      _logger.severe(
+          'Forced local database initialization failed', error, stackTrace);
+      if (!mounted) return;
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   Future<void> _nextPage() async {
@@ -129,40 +194,67 @@ class _LaunchPageState extends State<LaunchPage> {
         builder: (context) => widget.nextPage, allowSnapshotting: false));
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return isLoading
-        ? const Scaffold(body: SizedBox())
-        : Scaffold(
-            extendBody: true,
-            body: Center(
-              child: Card(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      AppLocalizations.of(context)!
-                          .errorExternalStorageAccessTitle,
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(
-                        32.0,
-                      ),
-                      child: Text(
-                        AppLocalizations.of(context)!
-                            .errorExternalStorageAccessDescription,
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
-                    TextButton(
-                        onPressed: _forceLocalDatabase,
-                        child: Text(AppLocalizations.of(context)!
-                            .errorExternalStorageAccessContinue)),
-                  ],
+  Widget _buildErrorScaffold({
+    required String title,
+    required String description,
+    required List<Widget> actions,
+  }) {
+    return Scaffold(
+      extendBody: true,
+      body: Center(
+        child: Card(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                title,
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              Padding(
+                padding: EdgeInsets.all(32.0),
+                child: Text(
+                  description,
+                  style: TextStyle(fontSize: 16),
                 ),
               ),
-            ));
+              ...actions,
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (isLoading) return const Scaffold(body: SizedBox());
+
+    final localizations = AppLocalizations.of(context)!;
+
+    switch (_errorType) {
+      case _LaunchErrorType.migrationFailed:
+        return _buildErrorScaffold(
+          title: localizations.databaseMigrationErrorTitle,
+          description: localizations.databaseMigrationErrorDescription,
+          actions: [
+            TextButton(
+                onPressed: _retryDatabaseConnection,
+                child: Text(localizations.databaseMigrationErrorRetry)),
+            TextButton(
+                onPressed: _reportIssue,
+                child: Text(localizations.errorReport)),
+          ],
+        );
+      case _LaunchErrorType.externalAccess:
+        return _buildErrorScaffold(
+          title: localizations.errorExternalStorageAccessTitle,
+          description: localizations.errorExternalStorageAccessDescription,
+          actions: [
+            TextButton(
+                onPressed: _forceLocalDatabase,
+                child: Text(localizations.errorExternalStorageAccessContinue)),
+          ],
+        );
+    }
   }
 }

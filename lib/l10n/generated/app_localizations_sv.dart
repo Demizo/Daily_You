@@ -244,6 +244,19 @@ class AppLocalizationsSv extends AppLocalizations {
       'Continue With Local Database';
 
   @override
+  String get databaseMigrationErrorTitle => 'Couldn\'t Move Your Data';
+
+  @override
+  String get databaseMigrationErrorDescription =>
+      'Your entries are safe but couldn\'t be moved to the app\'s storage.\n\nTry again, and report the issue if it keeps happening.';
+
+  @override
+  String get databaseMigrationErrorRetry => 'Retry';
+
+  @override
+  String get errorReport => 'Report Issue';
+
+  @override
   String get lastModified => 'Modified';
 
   @override
@@ -672,6 +685,11 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get cleanUpStatus => 'Cleaning Up…';
+
+  @override
+  String migratingImagesStatus(Object current, Object total) {
+    return 'Migrating photos… $current/$total';
+  }
 
   @override
   String get settingsExport => 'Export';

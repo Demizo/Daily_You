@@ -36,6 +36,7 @@ dependencies:
   markdown_widget: ^2.3.2+8
 
   intl: ^0.20.0
+  logging: ^1.3.0
   share_plus: ^12.0.2
   time_range_picker: ^2.3.0
   package_info_plus: ^9.0.1
