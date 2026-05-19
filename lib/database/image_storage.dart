@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/file_bytes_cache.dart';
 import 'package:daily_you/utils/file_layer.dart';
+import 'package:logging/logging.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
@@ -18,6 +19,8 @@ class ImageStorage {
 
   ImageStorage._init();
 
+  final Logger _logger = Logger('ImageStorage');
+
   final FileBytesCache imageCache =
       FileBytesCache(maxCacheSize: 10 * 1024 * 1024);
   final Pool imgFetchPool = Pool(3);
@@ -27,23 +30,98 @@ class ImageStorage {
   }
 
   Future<String> getInternalFolder() async {
-    Directory basePath;
-    if (Platform.isAndroid) {
-      basePath = (await getExternalStorageDirectory())!;
-      basePath = Directory('${basePath.path}/Images');
-      if (!basePath.existsSync()) {
-        basePath.createSync(recursive: true);
-      }
-      return basePath.path;
-    } else {
-      basePath = await getApplicationSupportDirectory();
-      basePath = Directory('${basePath.path}/Images');
-      if (!basePath.existsSync()) {
-        basePath.createSync(recursive: true);
-      }
+    final basePath = await getApplicationSupportDirectory();
+    final imagesDir = Directory('${basePath.path}/Images');
+    if (!imagesDir.existsSync()) imagesDir.createSync(recursive: true);
+    return imagesDir.path;
+  }
 
-      return basePath.path;
+  Future<Directory?> _oldExternalImagesDirectory() async {
+    if (!Platform.isAndroid) return null;
+    final oldBaseDir = await getExternalStorageDirectory();
+    if (oldBaseDir == null) return null;
+    final oldImagesDir = Directory('${oldBaseDir.path}/Images');
+    if (!oldImagesDir.existsSync()) return null;
+    return oldImagesDir;
+  }
+
+  Future<bool> needsImageMigration() async {
+    final oldImagesDir = await _oldExternalImagesDirectory();
+    if (oldImagesDir == null) return false;
+    return oldImagesDir.list().any((entity) => entity is File);
+  }
+
+  Future<void> migrateImagesFromExternalStorage(
+      {Function(int migrated, int total)? updateStatus}) async {
+    final oldImagesDir = await _oldExternalImagesDirectory();
+    if (oldImagesDir == null) return;
+
+    final newImagesDir = Directory(await getInternalFolder());
+
+    final imageFiles =
+        await oldImagesDir.list().where((entity) => entity is File).toList();
+
+    final totalImages = imageFiles.length;
+    var migratedImages = 0;
+    var failedImages = 0;
+    updateStatus?.call(migratedImages, totalImages);
+
+    _logger.info(
+        'Image migration started: $totalImages file(s) in ${oldImagesDir.path} -> ${newImagesDir.path}');
+
+    for (final entity in imageFiles) {
+      final imageFile = entity as File;
+      try {
+        final dest = File('${newImagesDir.path}/${basename(imageFile.path)}');
+        final sourceLength = await imageFile.length();
+
+        // Image names are immutable, so a same-name file that differs in size
+        // is a corrupt copy from an interrupted run. Trust the external
+        // original in that case and repair the internal copy.
+        if (!dest.existsSync() || await dest.length() != sourceLength) {
+          // Copy to a temp file first, then rename so a partial copy is never
+          // mistaken for a finished one.
+          final temp = File('${dest.path}.migrating');
+          if (temp.existsSync()) await temp.delete();
+          await imageFile.copy(temp.path);
+          if (await temp.length() != sourceLength) {
+            if (temp.existsSync()) await temp.delete();
+            failedImages += 1;
+            _logger.warning(
+                'Image migration: size mismatch after copy, will retry ${basename(imageFile.path)}');
+            continue;
+          }
+          await temp.rename(dest.path);
+        }
+
+        // A confirmed, size-matching copy now exists internally; the external
+        // original is a duplicate and can be removed so migration terminates.
+        if (dest.existsSync() && await dest.length() == sourceLength) {
+          await imageFile.delete();
+        }
+      } catch (error, stackTrace) {
+        // Skip this file; a later launch will retry it.
+        failedImages += 1;
+        _logger.severe('Image migration failed for ${basename(imageFile.path)}',
+            error, stackTrace);
+      } finally {
+        migratedImages += 1;
+        updateStatus?.call(migratedImages, totalImages);
+      }
     }
+
+    // Remove the old folder after a complete migration
+    try {
+      if (await oldImagesDir.list().isEmpty) {
+        await oldImagesDir.delete();
+      }
+    } catch (error) {
+      // Directory not empty or inaccessible; leave it in place.
+      _logger.warning('Image migration: could not remove old directory', error);
+    }
+
+    _logger.info(
+        'Image migration finished: ${totalImages - failedImages}/$totalImages migrated, $failedImages failed');
   }
 
   String _getExternalFolder() {

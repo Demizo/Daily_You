@@ -242,6 +242,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get errorExternalStorageAccessContinue => '继续使用本地数据库';
 
   @override
+  String get databaseMigrationErrorTitle => 'Couldn\'t Move Your Data';
+
+  @override
+  String get databaseMigrationErrorDescription =>
+      'Your entries are safe but couldn\'t be moved to the app\'s storage.\n\nTry again, and report the issue if it keeps happening.';
+
+  @override
+  String get databaseMigrationErrorRetry => 'Retry';
+
+  @override
+  String get errorReport => 'Report Issue';
+
+  @override
   String get lastModified => '最后修改时间';
 
   @override
@@ -665,6 +678,11 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get cleanUpStatus => '正在清理…';
+
+  @override
+  String migratingImagesStatus(Object current, Object total) {
+    return 'Migrating photos… $current/$total';
+  }
 
   @override
   String get settingsExport => '导出数据';

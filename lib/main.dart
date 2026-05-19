@@ -13,6 +13,7 @@ import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/providers/templates_provider.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:daily_you/utils/logging.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
@@ -30,95 +31,106 @@ import 'package:provider/provider.dart';
 @pragma('vm:entry-point')
 void onThisDayCallbackDispatcher() async {
   await ConfigProvider.instance.init();
-  // Skip syncing for the alarm background task
-  await AppDatabase.instance.init(forceWithoutSync: true);
+  // Skip syncing and migration for the alarm background task
+  final ready = await AppDatabase.instance
+      .init(forceWithoutSync: true, allowMigration: false);
 
-  final now = DateTime.now();
-  final isJalali = TimeManager.isJalaliCalendarFromPlatform();
-  final hasOnThisDayEntries = EntriesProvider.instance.entries.any((e) =>
-      TimeManager.isSameCalendarDayOfYear(e.timeCreate, now, isJalali) &&
-      TimeManager.calendarYearOf(e.timeCreate, isJalali) !=
-          TimeManager.calendarYearOf(now, isJalali));
+  if (ready) {
+    final now = DateTime.now();
+    final isJalali = TimeManager.isJalaliCalendarFromPlatform();
+    final hasOnThisDayEntries = EntriesProvider.instance.entries.any((e) =>
+        TimeManager.isSameCalendarDayOfYear(e.timeCreate, now, isJalali) &&
+        TimeManager.calendarYearOf(e.timeCreate, isJalali) !=
+            TimeManager.calendarYearOf(now, isJalali));
 
-  if (hasOnThisDayEntries) {
-    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-        FlutterLocalNotificationsPlugin();
-    await flutterLocalNotificationsPlugin.initialize(
-        settings: const InitializationSettings(
-            android: AndroidInitializationSettings('@drawable/ic_notification'),
-            linux:
-                LinuxInitializationSettings(defaultActionName: 'On This Day')));
+    if (hasOnThisDayEntries) {
+      FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+          FlutterLocalNotificationsPlugin();
+      await flutterLocalNotificationsPlugin.initialize(
+          settings: const InitializationSettings(
+              android:
+                  AndroidInitializationSettings('@drawable/ic_notification'),
+              linux: LinuxInitializationSettings(
+                  defaultActionName: 'On This Day')));
 
-    // Localized notification text is stored in SharedPreferences upon startup
-    var prefs = await SharedPreferences.getInstance();
-    var title = prefs.getString('onThisDayNotificationTitle');
-    var description = prefs.getString('onThisDayNotificationDescription');
+      // Localized notification text is stored in SharedPreferences upon startup
+      var prefs = await SharedPreferences.getInstance();
+      var title = prefs.getString('onThisDayNotificationTitle');
+      var description = prefs.getString('onThisDayNotificationDescription');
 
-    var androidDetails = AndroidNotificationDetails(
-      'daily_you_on_this_day',
-      title ?? 'On This Day',
-      icon: '@drawable/ic_notification',
-      importance: Importance.defaultImportance,
-      priority: Priority.defaultPriority,
-    );
+      var androidDetails = AndroidNotificationDetails(
+        'daily_you_on_this_day',
+        title ?? 'On This Day',
+        icon: '@drawable/ic_notification',
+        importance: Importance.defaultImportance,
+        priority: Priority.defaultPriority,
+      );
 
-    if (title != null && description != null) {
-      await flutterLocalNotificationsPlugin.show(
-          id: 1,
-          title: title,
-          body: description,
-          notificationDetails: NotificationDetails(android: androidDetails),
-          payload: DateTime.now().toIso8601String());
+      if (title != null && description != null) {
+        await flutterLocalNotificationsPlugin.show(
+            id: 1,
+            title: title,
+            body: description,
+            notificationDetails: NotificationDetails(android: androidDetails),
+            payload: DateTime.now().toIso8601String());
+      }
     }
+
+    AppDatabase.instance.close();
   }
 
-  AppDatabase.instance.close();
   setOnThisDayAlarm(firstSet: false);
 }
 
 @pragma('vm:entry-point')
 void callbackDispatcher() async {
   await ConfigProvider.instance.init();
-  // Skip syncing for the alarm background task
-  await AppDatabase.instance.init(forceWithoutSync: true);
-  if (EntriesProvider.instance.getEntryForDate(DateTime.now()) == null ||
-      ConfigProvider.instance.get(ConfigKey.alwaysRemind)) {
-    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-        FlutterLocalNotificationsPlugin();
+  // Skip syncing and migration for the alarm background task
+  final ready = await AppDatabase.instance
+      .init(forceWithoutSync: true, allowMigration: false);
 
-    await flutterLocalNotificationsPlugin.initialize(
-        settings: const InitializationSettings(
-            android: AndroidInitializationSettings('@drawable/ic_notification'),
-            linux:
-                LinuxInitializationSettings(defaultActionName: 'Log Today')));
+  if (ready) {
+    if (EntriesProvider.instance.getEntryForDate(DateTime.now()) == null ||
+        ConfigProvider.instance.get(ConfigKey.alwaysRemind)) {
+      FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+          FlutterLocalNotificationsPlugin();
 
-    // Localized notification text is stored in SharedPreferences upon startup
-    var prefs = await SharedPreferences.getInstance();
-    var title = prefs.getString('dailyReminderTitle');
-    var description = prefs.getString('dailyReminderDescription');
+      await flutterLocalNotificationsPlugin.initialize(
+          settings: const InitializationSettings(
+              android:
+                  AndroidInitializationSettings('@drawable/ic_notification'),
+              linux:
+                  LinuxInitializationSettings(defaultActionName: 'Log Today')));
 
-    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-      'daily_you_reminder',
-      title ?? "Log Today!",
-      icon: '@drawable/ic_notification',
-      importance: Importance.defaultImportance,
-      priority: Priority.defaultPriority,
-    );
+      // Localized notification text is stored in SharedPreferences upon startup
+      var prefs = await SharedPreferences.getInstance();
+      var title = prefs.getString('dailyReminderTitle');
+      var description = prefs.getString('dailyReminderDescription');
 
-    var platformChannelSpecifics = NotificationDetails(
-      android: androidPlatformChannelSpecifics,
-    );
+      var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+        'daily_you_reminder',
+        title ?? "Log Today!",
+        icon: '@drawable/ic_notification',
+        importance: Importance.defaultImportance,
+        priority: Priority.defaultPriority,
+      );
 
-    if (title != null && description != null) {
-      await flutterLocalNotificationsPlugin.show(
-          id: 0,
-          title: title,
-          body: description,
-          notificationDetails: platformChannelSpecifics,
-          payload: DateTime.now().toIso8601String());
+      var platformChannelSpecifics = NotificationDetails(
+        android: androidPlatformChannelSpecifics,
+      );
+
+      if (title != null && description != null) {
+        await flutterLocalNotificationsPlugin.show(
+            id: 0,
+            title: title,
+            body: description,
+            notificationDetails: platformChannelSpecifics,
+            payload: DateTime.now().toIso8601String());
+      }
     }
+    AppDatabase.instance.close();
   }
-  AppDatabase.instance.close();
+
   setAlarm(firstSet: false);
 }
 
@@ -129,6 +141,8 @@ void main() async {
   }
   databaseFactory = databaseFactoryFfi;
   WidgetsFlutterBinding.ensureInitialized();
+
+  configureLogging();
 
   // Create the config file if it doesn't exist
   await ConfigProvider.instance.init();

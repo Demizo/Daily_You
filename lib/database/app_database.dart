@@ -16,6 +16,7 @@ import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/providers/templates_provider.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/widgets.dart';
+import 'package:logging/logging.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -25,14 +26,38 @@ class AppDatabase {
   static final AppDatabase instance = AppDatabase._init();
   AppDatabase._init();
 
+  final Logger _logger = Logger('AppDatabase');
+
+  /// True when a migration from external storage was attempted on the last
+  /// [init] but failed.
+  bool migrationFailed = false;
+
   static Database? _database;
   Database? get database => _database;
 
   String? _internalPath;
 
-  Future<bool> init({bool forceWithoutSync = false}) async {
+  Future<bool> init(
+      {bool forceWithoutSync = false, bool allowMigration = true}) async {
     _internalPath = await getInternalPath();
+    migrationFailed = false;
     bool success = true;
+
+    if (Platform.isAndroid && allowMigration) {
+      final migrated = await _migrateDbFromExternalStorage();
+      if (!migrated && !forceWithoutSync) {
+        // Migration was attempted but failed
+        migrationFailed = true;
+        return false;
+      }
+    }
+
+    // Migration is foreground-only. A background task (allowMigration: false)
+    // must never create a fresh database before the user has migrated their
+    // data, so bail if there is nothing to open yet.
+    if (!allowMigration && !await File(_internalPath!).exists()) {
+      return false;
+    }
 
     if (usingExternalLocation() && !forceWithoutSync) {
       if (await hasExternalLocationPermission()) {
@@ -44,6 +69,41 @@ class AppDatabase {
 
     await AppDatabase.instance.open();
     return success;
+  }
+
+  /// Returns whether it is safe to open the internal database. False means a
+  /// migration was needed but failed, so the caller must not create a fresh
+  /// database over the still-intact external copy.
+  Future<bool> _migrateDbFromExternalStorage() async {
+    if (await File(_internalPath!).exists()) return true;
+
+    final oldDir = await getExternalStorageDirectory();
+    if (oldDir == null) return true;
+    final oldPath = join(oldDir.path, 'daily_you.db');
+    if (!await File(oldPath).exists()) return true;
+
+    _logger.info('Database migration started: $oldPath -> $_internalPath');
+    try {
+      await File(oldPath).copy(_internalPath!);
+      if (await _validateSqliteDatabase(_internalPath!)) {
+        await File(oldPath).delete();
+        _logger.info('Database migration finished successfully');
+        return true;
+      }
+      // Integrity check failed: discard the bad copy and keep the external
+      // original so the migration can be retried instead of proceeding.
+      await File(_internalPath!).delete();
+      _logger.severe(
+          'Database migration failed: integrity check failed, kept original external database');
+      return false;
+    } catch (error, stackTrace) {
+      // Remove any partial copy so the migration is retried on relaunch.
+      if (await File(_internalPath!).exists()) {
+        await File(_internalPath!).delete();
+      }
+      _logger.severe('Database migration failed', error, stackTrace);
+      return false;
+    }
   }
 
   Future<void> open() async {
@@ -79,15 +139,8 @@ class AppDatabase {
   }
 
   Future<String> getInternalPath() async {
-    Directory basePath;
-    if (Platform.isAndroid) {
-      basePath = (await getExternalStorageDirectory())!;
-    } else {
-      basePath = await getApplicationSupportDirectory();
-      if (!basePath.existsSync()) {
-        basePath.createSync(recursive: true);
-      }
-    }
+    final basePath = await getApplicationSupportDirectory();
+    if (!basePath.existsSync()) basePath.createSync(recursive: true);
     return join(basePath.path, 'daily_you.db');
   }
 
