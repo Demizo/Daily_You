@@ -151,5 +151,10 @@
     "templateDefaultSummaryTitle": "每日总结",
     "templateDefaultSummaryBody": "### 摘要\n- \n\n### 引用\n> ",
     "templateDefaultReflectionTitle": "反思",
-    "templateDefaultReflectionBody": "### 你今天最享受的是什么？\n- \n\n### 你感恩什么？\n- \n\n### 你期待什么？\n- "
+    "templateDefaultReflectionBody": "### 你今天最享受的是什么？\n- \n\n### 你感恩什么？\n- \n\n### 你期待什么？\n- ",
+    "actionToday": "今天",
+    "actionOtherDay": "前几天",
+    "settingsHideImages": "隐藏图片",
+    "pageCalendarTitle": "月历",
+    "dayCount": "{count, plural, one{{count} 天} other{{count} 天}}"
 }
