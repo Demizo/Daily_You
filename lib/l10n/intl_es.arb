@@ -143,5 +143,9 @@
     "viewLayoutGrid": "Cuadrícula",
     "viewLayoutList": "Lista",
     "settingsHideImagesInGallery": "Ocultar Imágenes en Galería",
-    "actionTakePhoto": "Tomar foto"
+    "actionTakePhoto": "Tomar foto",
+    "actionToday": "Hoy",
+    "actionOtherDay": "Otro día",
+    "settingsHideImages": "Ocultar imágenes",
+    "pageCalendarTitle": "Calendario"
 }
