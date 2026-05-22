@@ -147,5 +147,14 @@
     "actionToday": "Hoy",
     "actionOtherDay": "Otro día",
     "settingsHideImages": "Ocultar imágenes",
-    "pageCalendarTitle": "Calendario"
+    "pageCalendarTitle": "Calendario",
+    "templateDefaultTimestampTitle": "Fecha y hora",
+    "templateDefaultSummaryTitle": "Resumen del día",
+    "templateDefaultSummaryBody": "### Resumen\n- \n\n### Cita\n> ",
+    "templateDefaultReflectionTitle": "Reflexión",
+    "flashbackOnThisDay": "En este día",
+    "chartOverTimeTitle": "{tag} a lo largo del tiempo",
+    "settingsOnThisDayDescription": "Revive recuerdos del pasado",
+    "templateVariableTime": "Tiempo",
+    "templateDefaultTimestampBody": "{date} - {time}:"
 }
