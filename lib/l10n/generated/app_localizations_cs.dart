@@ -21,10 +21,10 @@ class AppLocalizationsCs extends AppLocalizations {
   String get actionTakePhoto => 'Udělej fotku';
 
   @override
-  String get actionToday => 'Today';
+  String get actionToday => 'Dnes';
 
   @override
-  String get actionOtherDay => 'Other day';
+  String get actionOtherDay => 'Jiný den';
 
   @override
   String get pageHomeTitle => 'Hlavní stránka';
@@ -78,7 +78,7 @@ class AppLocalizationsCs extends AppLocalizations {
   }
 
   @override
-  String get flashbackOnThisDay => 'On This Day';
+  String get flashbackOnThisDay => 'Tohoto dne';
 
   @override
   String get pageGalleryTitle => 'Galerie';
@@ -91,8 +91,8 @@ class AppLocalizationsCs extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count logs',
-      one: '$count log',
+      other: '$count záznamů',
+      one: '$count záznam',
     );
     return '$_temp0';
   }
@@ -102,21 +102,15 @@ class AppLocalizationsCs extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count days',
-      one: '$count day',
+      other: '$count dní/ů',
+      one: '$count den',
     );
     return '$_temp0';
   }
 
   @override
   String wordCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count words',
-      one: '$count word',
-    );
-    return '$_temp0';
+    return '$count slov';
   }
 
   @override
@@ -161,7 +155,7 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String chartOverTimeTitle(Object tag) {
-    return '$tag Over Time';
+    return '$tag Během Času';
   }
 
   @override
@@ -169,7 +163,7 @@ class AppLocalizationsCs extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Current Streak $count',
+      other: 'Současný Streak $count',
     );
     return '$_temp0';
   }
@@ -179,7 +173,7 @@ class AppLocalizationsCs extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Longest Streak $count',
+      other: 'Nejdelší Streak $count',
     );
     return '$_temp0';
   }
@@ -189,7 +183,7 @@ class AppLocalizationsCs extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Days Since a Bad Day $count',
+      other: 'Dnů od špatného dne $count',
     );
     return '$_temp0';
   }
@@ -261,7 +255,7 @@ class AppLocalizationsCs extends AppLocalizations {
   String get settingsShowMarkdownToolbar => 'Zobrazit panel nástrojů';
 
   @override
-  String get settingsShowFlashbacks => 'Ukázat vzpomínky';
+  String get settingsShowFlashbacks => 'Zobrazit vzpomínky';
 
   @override
   String get settingsChangeMoodIcons => 'Změnit ikony nálad';
@@ -279,10 +273,10 @@ class AppLocalizationsCs extends AppLocalizations {
   String get settingsHideImagesInGallery => 'Skrýt obrázky v galerii';
 
   @override
-  String get settingsHideImages => 'Hide Images';
+  String get settingsHideImages => 'Skrýt obrázky';
 
   @override
-  String get pageCalendarTitle => 'Calendar';
+  String get pageCalendarTitle => 'Kalendář';
 
   @override
   String get viewLayoutList => 'Seznam';
@@ -305,7 +299,7 @@ class AppLocalizationsCs extends AppLocalizations {
   String get settingsDailyReminderTitle => 'Denní připomenutí';
 
   @override
-  String get settingsOnThisDayDescription => 'Revisit past memories';
+  String get settingsOnThisDayDescription => 'Připomeňte si minulé vzpomínky';
 
   @override
   String get settingsDailyReminderDescription => 'Jemné každodenní připomenutí';
@@ -352,10 +346,10 @@ class AppLocalizationsCs extends AppLocalizations {
   String get noTemplatesDescription => 'Zatím nebyly vytvořeny žádné šablony…';
 
   @override
-  String get templateVariableTime => 'Time';
+  String get templateVariableTime => 'Čas';
 
   @override
-  String get templateDefaultTimestampTitle => 'Timestamp';
+  String get templateDefaultTimestampTitle => 'Časový údaj';
 
   @override
   String templateDefaultTimestampBody(Object date, Object time) {
@@ -363,10 +357,10 @@ class AppLocalizationsCs extends AppLocalizations {
   }
 
   @override
-  String get templateDefaultSummaryTitle => 'Day Summary';
+  String get templateDefaultSummaryTitle => 'Shrnutí dne';
 
   @override
-  String get templateDefaultSummaryBody => '### Summary\n- \n\n### Quote\n> ';
+  String get templateDefaultSummaryBody => '### Shrnutí\n- \n\n### Citace\n> ';
 
   @override
   String get templateDefaultReflectionTitle => 'Reflection';

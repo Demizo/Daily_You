@@ -12,7 +12,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get appTitle => 'Daily You';
 
   @override
-  String get dailyReminderTitle => 'Heute Eintragen!';
+  String get dailyReminderTitle => 'Heute eintragen!';
 
   @override
   String get dailyReminderDescription => 'Mache deinen Eintrag …';
@@ -21,10 +21,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get actionTakePhoto => 'Foto machen';
 
   @override
-  String get actionToday => 'Today';
+  String get actionToday => 'Heute';
 
   @override
-  String get actionOtherDay => 'Other day';
+  String get actionOtherDay => 'Anderer Tag';
 
   @override
   String get pageHomeTitle => 'Start';
@@ -84,7 +84,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get pageGalleryTitle => 'Galerie';
 
   @override
-  String get searchLogsHint => 'Durchsuchen der Einträge …';
+  String get searchLogsHint => 'Einträge durchsuchen …';
 
   @override
   String logCount(num count) {
@@ -102,8 +102,8 @@ class AppLocalizationsDe extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count days',
-      one: '$count day',
+      other: '$count Tage',
+      one: '$count Tag',
     );
     return '$_temp0';
   }
@@ -161,7 +161,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String chartOverTimeTitle(Object tag) {
-    return '$tag Over Time';
+    return '$tag Über die Zeit';
   }
 
   @override
@@ -279,10 +279,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsHideImagesInGallery => 'Bilder in der Galerie verbergen';
 
   @override
-  String get settingsHideImages => 'Hide Images';
+  String get settingsHideImages => 'Bilder verbergen';
 
   @override
-  String get pageCalendarTitle => 'Calendar';
+  String get pageCalendarTitle => 'Kalender';
 
   @override
   String get viewLayoutList => 'Liste';

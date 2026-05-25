@@ -18,13 +18,13 @@ class AppLocalizationsPl extends AppLocalizations {
   String get dailyReminderDescription => 'Zrób dzisiejszy wpis…';
 
   @override
-  String get actionTakePhoto => 'Take photo';
+  String get actionTakePhoto => 'Zrób zdjęcie';
 
   @override
-  String get actionToday => 'Today';
+  String get actionToday => 'Dziś';
 
   @override
-  String get actionOtherDay => 'Other day';
+  String get actionOtherDay => 'Inny dzień';
 
   @override
   String get pageHomeTitle => 'Strona domowa';
@@ -78,7 +78,7 @@ class AppLocalizationsPl extends AppLocalizations {
   }
 
   @override
-  String get flashbackOnThisDay => 'On This Day';
+  String get flashbackOnThisDay => 'Tego dnia';
 
   @override
   String get pageGalleryTitle => 'Galeria';
@@ -279,10 +279,10 @@ class AppLocalizationsPl extends AppLocalizations {
   String get settingsHideImagesInGallery => 'Ukryj zdjęcia w galerii';
 
   @override
-  String get settingsHideImages => 'Hide Images';
+  String get settingsHideImages => 'Ukryj zdjęcia';
 
   @override
-  String get pageCalendarTitle => 'Calendar';
+  String get pageCalendarTitle => 'Kalendarz';
 
   @override
   String get viewLayoutList => 'Lista';
@@ -305,7 +305,8 @@ class AppLocalizationsPl extends AppLocalizations {
   String get settingsDailyReminderTitle => 'Codzienne przypomnienie';
 
   @override
-  String get settingsOnThisDayDescription => 'Revisit past memories';
+  String get settingsOnThisDayDescription =>
+      'Przeglądaj poprzednie wspomnienia';
 
   @override
   String get settingsDailyReminderDescription =>
@@ -353,7 +354,7 @@ class AppLocalizationsPl extends AppLocalizations {
   String get noTemplatesDescription => 'Brak utworzonych szablonów…';
 
   @override
-  String get templateVariableTime => 'Time';
+  String get templateVariableTime => 'Czas';
 
   @override
   String get templateDefaultTimestampTitle => 'Timestamp';
@@ -364,13 +365,13 @@ class AppLocalizationsPl extends AppLocalizations {
   }
 
   @override
-  String get templateDefaultSummaryTitle => 'Day Summary';
+  String get templateDefaultSummaryTitle => 'Podsumowanie dnia';
 
   @override
   String get templateDefaultSummaryBody => '### Summary\n- \n\n### Quote\n> ';
 
   @override
-  String get templateDefaultReflectionTitle => 'Reflection';
+  String get templateDefaultReflectionTitle => 'Refleksja';
 
   @override
   String get templateDefaultReflectionBody =>

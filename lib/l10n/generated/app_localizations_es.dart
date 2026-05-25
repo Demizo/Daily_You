@@ -21,10 +21,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get actionTakePhoto => 'Tomar foto';
 
   @override
-  String get actionToday => 'Today';
+  String get actionToday => 'Hoy';
 
   @override
-  String get actionOtherDay => 'Other day';
+  String get actionOtherDay => 'Otro día';
 
   @override
   String get pageHomeTitle => 'Inicio';
@@ -78,7 +78,7 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get flashbackOnThisDay => 'On This Day';
+  String get flashbackOnThisDay => 'En este día';
 
   @override
   String get pageGalleryTitle => 'Galería';
@@ -161,7 +161,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String chartOverTimeTitle(Object tag) {
-    return '$tag Over Time';
+    return '$tag a lo largo del tiempo';
   }
 
   @override
@@ -280,10 +280,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsHideImagesInGallery => 'Ocultar Imágenes en Galería';
 
   @override
-  String get settingsHideImages => 'Hide Images';
+  String get settingsHideImages => 'Ocultar imágenes';
 
   @override
-  String get pageCalendarTitle => 'Calendar';
+  String get pageCalendarTitle => 'Calendario';
 
   @override
   String get viewLayoutList => 'Lista';
@@ -306,7 +306,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsDailyReminderTitle => 'Recordatorio diario';
 
   @override
-  String get settingsOnThisDayDescription => 'Revisit past memories';
+  String get settingsOnThisDayDescription => 'Revive recuerdos del pasado';
 
   @override
   String get settingsDailyReminderDescription => 'Breve recordatorio diario';
@@ -354,10 +354,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get noTemplatesDescription => 'Aún no se han creado plantillas…';
 
   @override
-  String get templateVariableTime => 'Time';
+  String get templateVariableTime => 'Tiempo';
 
   @override
-  String get templateDefaultTimestampTitle => 'Timestamp';
+  String get templateDefaultTimestampTitle => 'Fecha y hora';
 
   @override
   String templateDefaultTimestampBody(Object date, Object time) {
@@ -365,13 +365,13 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get templateDefaultSummaryTitle => 'Day Summary';
+  String get templateDefaultSummaryTitle => 'Resumen del día';
 
   @override
-  String get templateDefaultSummaryBody => '### Summary\n- \n\n### Quote\n> ';
+  String get templateDefaultSummaryBody => '### Resumen\n- \n\n### Cita\n> ';
 
   @override
-  String get templateDefaultReflectionTitle => 'Reflection';
+  String get templateDefaultReflectionTitle => 'Reflexión';
 
   @override
   String get templateDefaultReflectionBody =>

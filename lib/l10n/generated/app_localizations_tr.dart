@@ -21,7 +21,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get actionTakePhoto => 'Fotoğraf çek';
 
   @override
-  String get actionToday => 'Today';
+  String get actionToday => 'Bugün';
 
   @override
   String get actionOtherDay => 'Other day';

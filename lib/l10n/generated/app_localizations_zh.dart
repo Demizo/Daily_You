@@ -21,10 +21,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get actionTakePhoto => '拍张照';
 
   @override
-  String get actionToday => 'Today';
+  String get actionToday => '今天';
 
   @override
-  String get actionOtherDay => 'Other day';
+  String get actionOtherDay => '前几天';
 
   @override
   String get pageHomeTitle => '主页';
@@ -102,8 +102,8 @@ class AppLocalizationsZh extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count days',
-      one: '$count day',
+      other: '$count 天',
+      one: '$count 天',
     );
     return '$_temp0';
   }
@@ -161,7 +161,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String chartOverTimeTitle(Object tag) {
-    return '$tag Over Time';
+    return '$tag 起伏';
   }
 
   @override
@@ -277,10 +277,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsHideImagesInGallery => '隐藏图库中的图片';
 
   @override
-  String get settingsHideImages => 'Hide Images';
+  String get settingsHideImages => '隐藏图片';
 
   @override
-  String get pageCalendarTitle => 'Calendar';
+  String get pageCalendarTitle => '月历';
 
   @override
   String get viewLayoutList => '列表';
@@ -613,6 +613,12 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get actionTakePhoto => '拍照';
 
   @override
+  String get actionToday => '今天';
+
+  @override
+  String get actionOtherDay => '其他天';
+
+  @override
   String get pageHomeTitle => '主頁';
 
   @override
@@ -684,6 +690,17 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   }
 
   @override
+  String dayCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 天',
+      one: '$count 天',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String wordCount(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -732,6 +749,11 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   @override
   String chartByDayTitle(Object tag) {
     return '$tag 每日分布';
+  }
+
+  @override
+  String chartOverTimeTitle(Object tag) {
+    return '$tag 隨著時間的變化';
   }
 
   @override
@@ -845,6 +867,12 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get settingsHideImagesInGallery => '隱藏紀錄頁中的圖片';
+
+  @override
+  String get settingsHideImages => '隱藏圖片';
+
+  @override
+  String get pageCalendarTitle => '月曆';
 
   @override
   String get viewLayoutList => '清單';
