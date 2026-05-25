@@ -156,5 +156,6 @@
     "actionOtherDay": "前几天",
     "settingsHideImages": "隐藏图片",
     "pageCalendarTitle": "月历",
-    "dayCount": "{count, plural, one{{count} 天} other{{count} 天}}"
+    "dayCount": "{count, plural, one{{count} 天} other{{count} 天}}",
+    "chartOverTimeTitle": "{tag} 起伏"
 }
