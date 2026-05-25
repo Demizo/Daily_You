@@ -291,6 +291,9 @@ class _VerticalCalendarState extends State<VerticalCalendar>
     final firstDayIndex = configProvider.getFirstDayOfWeekIndex(context);
     final hideImages =
         configProvider.get(ConfigKey.hideImagesInCalendar) == true;
+    final isMoodFocus =
+        (configProvider.get(ConfigKey.calendarFocusMode) ?? 'images') ==
+            'moods';
     final entriesProvider = context.watch<EntriesProvider>();
     final imagesProvider = context.watch<EntryImagesProvider>();
 
@@ -337,7 +340,8 @@ class _VerticalCalendarState extends State<VerticalCalendar>
                           itemExtent: _weekRowHeight,
                           delegate: SliverChildBuilderDelegate(
                             (context, index) => _buildItem(context, index,
-                                entriesProvider, imagesProvider, hideImages),
+                                entriesProvider, imagesProvider, hideImages,
+                                isMoodFocus),
                             childCount: _items.length,
                           ),
                         ),
@@ -346,7 +350,7 @@ class _VerticalCalendarState extends State<VerticalCalendar>
                   ),
                 ],
               ),
-              _buildCalendarControls(context),
+              _buildCalendarControls(context, isMoodFocus),
               _buildJumpToTodayButton(context),
             ]);
       },
@@ -383,7 +387,7 @@ class _VerticalCalendarState extends State<VerticalCalendar>
     );
   }
 
-  Widget _buildCalendarControls(BuildContext context) {
+  Widget _buildCalendarControls(BuildContext context, bool isMoodFocus) {
     final theme = Theme.of(context);
     return Row(
       children: [
@@ -407,6 +411,19 @@ class _VerticalCalendarState extends State<VerticalCalendar>
                 IconButton(
                   onPressed: () => _onCalendarIconTap(context),
                   icon: Icon(Icons.event_rounded),
+                  color: theme.colorScheme.primary,
+                  padding: const EdgeInsets.all(8),
+                ),
+                IconButton(
+                  onPressed: () {
+                    context.read<ConfigProvider>().set(
+                          ConfigKey.calendarFocusMode,
+                          isMoodFocus ? 'images' : 'moods',
+                        );
+                  },
+                  icon: Icon(isMoodFocus
+                      ? Icons.image_rounded
+                      : Icons.mood_rounded),
                   color: theme.colorScheme.primary,
                   padding: const EdgeInsets.all(8),
                 ),
@@ -528,12 +545,12 @@ class _VerticalCalendarState extends State<VerticalCalendar>
 
   Widget _buildItem(BuildContext context, int index,
       EntriesProvider entriesProvider, EntryImagesProvider imagesProvider,
-      bool hideImages) {
+      bool hideImages, bool isMoodFocus) {
     final item = _items[index];
     if (item is _MonthHeaderItem) return _buildMonthHeader(context, item.month);
     if (item is _WeekRowItem) {
-      return _buildWeekRow(
-          context, item, entriesProvider, imagesProvider, hideImages);
+      return _buildWeekRow(context, item, entriesProvider, imagesProvider,
+          hideImages, isMoodFocus);
     }
     return const SizedBox.shrink();
   }
@@ -571,7 +588,8 @@ class _VerticalCalendarState extends State<VerticalCalendar>
       _WeekRowItem item,
       EntriesProvider entriesProvider,
       EntryImagesProvider imagesProvider,
-      bool hideImages) {
+      bool hideImages,
+      bool isMoodFocus) {
     return RepaintBoundary(
       child: _WeekRow(
         days: item.days,
@@ -581,6 +599,7 @@ class _VerticalCalendarState extends State<VerticalCalendar>
         entriesProvider: entriesProvider,
         imagesProvider: imagesProvider,
         hideImages: hideImages,
+        isMoodFocus: isMoodFocus,
       ),
     );
   }
@@ -594,6 +613,7 @@ class _WeekRow extends StatelessWidget {
   final EntriesProvider entriesProvider;
   final EntryImagesProvider imagesProvider;
   final bool hideImages;
+  final bool isMoodFocus;
 
   const _WeekRow({
     required this.days,
@@ -603,6 +623,7 @@ class _WeekRow extends StatelessWidget {
     required this.entriesProvider,
     required this.imagesProvider,
     required this.hideImages,
+    required this.isMoodFocus,
   });
 
   @override
@@ -650,7 +671,7 @@ class _WeekRow extends StatelessWidget {
 
           final entries = entriesProvider.getEntriesForDate(day);
           final firstEntry = entries.firstOrNull;
-          final firstImage = hideImages || firstEntry == null
+          final firstImage = hideImages || isMoodFocus || firstEntry == null
               ? null
               : imagesProvider.getFirstImageForEntry(firstEntry.id!);
 
@@ -664,6 +685,7 @@ class _WeekRow extends StatelessWidget {
               firstImage: firstImage,
               cellSize: cellSize,
               dayNumber: dayNumberCache[day.day],
+              isMoodFocus: isMoodFocus,
             ),
           );
         }).toList(),
