@@ -311,7 +311,12 @@ class _HomePageState extends State<HomePage>
             ExpressiveFabMenuItem(
                 icon: Icons.schedule_rounded,
                 label: AppLocalizations.of(context)!.actionToday,
-                onTap: () async => await _addNewEntryForToday()),
+                onTap: () async => await _addNewEntryForToday(),
+                secondaryIcon:
+                    todayEntry != null ? Icons.edit_rounded : null,
+                secondaryOnTap: todayEntry != null
+                    ? () async => await _editEntry(todayEntry, todayImages)
+                    : null),
           ]),
         ),
       )

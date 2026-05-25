@@ -152,7 +152,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                 Navigator.of(context).pop();
                 // Pop edit page
                 Navigator.of(context).pop();
-                if (!_creatingNewEntry) {
+                if (!_creatingNewEntry && Navigator.of(context).canPop()) {
                   // Pop view page
                   Navigator.of(context).pop();
                 }
@@ -190,7 +190,8 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                     onPressed: () {
                       // Pop edit page
                       Navigator.of(context).pop();
-                      if (!_creatingNewEntry) {
+                      if (!_creatingNewEntry &&
+                          Navigator.of(context).canPop()) {
                         // Pop view page
                         Navigator.of(context).pop();
                       }

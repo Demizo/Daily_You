@@ -6,11 +6,15 @@ class ExpressiveFabMenuItem {
   final IconData icon;
   final String label;
   final VoidCallback onTap;
+  final IconData? secondaryIcon;
+  final VoidCallback? secondaryOnTap;
 
   const ExpressiveFabMenuItem({
     required this.icon,
     required this.label,
     required this.onTap,
+    this.secondaryIcon,
+    this.secondaryOnTap,
   });
 }
 
@@ -136,6 +140,8 @@ class _ExpressiveFabMenuState extends State<ExpressiveFabMenu>
           final item = widget.items[index];
           final scaleAnimation = _itemScaleAnimations[index];
           final fadeAnimation = _itemFadeAnimations[index];
+          final hasSecondary =
+              item.secondaryIcon != null && item.secondaryOnTap != null;
 
           return AnimatedBuilder(
             animation: _controller,
@@ -144,17 +150,56 @@ class _ExpressiveFabMenuState extends State<ExpressiveFabMenu>
                 return const SizedBox.shrink();
               }
 
-              return Transform(
-                // Diagonal3Values ensures strict horizontal (X-axis) expansion without vertical scaling
-                transform:
-                    Matrix4.diagonal3Values(scaleAnimation.value, 1.0, 1.0),
-                alignment: AlignmentDirectional.centerEnd,
-                child: FadeTransition(
-                  opacity: fadeAnimation,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 12.0),
-                    child: child,
-                  ),
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12.0),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    if (hasSecondary) ...[
+                      Transform.scale(
+                        scale: scaleAnimation.value,
+                        child: FadeTransition(
+                          opacity: fadeAnimation,
+                          child: Material(
+                            color: colorScheme.primaryContainer,
+                            shape: const CircleBorder(),
+                            elevation: 2,
+                            shadowColor:
+                                theme.shadowColor.withValues(alpha: 0.4),
+                            clipBehavior: Clip.antiAlias,
+                            child: InkWell(
+                              onTap: () {
+                                _toggle();
+                                item.secondaryOnTap!();
+                              },
+                              customBorder: const CircleBorder(),
+                              child: SizedBox(
+                                width: 48,
+                                height: 48,
+                                child: Icon(
+                                  item.secondaryIcon,
+                                  color: colorScheme.primary,
+                                  size: 24,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                    ],
+                    // Diagonal3Values ensures strict horizontal (X-axis) expansion without vertical scaling
+                    Transform(
+                      transform: Matrix4.diagonal3Values(
+                          scaleAnimation.value, 1.0, 1.0),
+                      alignment: AlignmentDirectional.centerEnd,
+                      child: FadeTransition(
+                        opacity: fadeAnimation,
+                        child: child,
+                      ),
+                    ),
+                  ],
                 ),
               );
             },
