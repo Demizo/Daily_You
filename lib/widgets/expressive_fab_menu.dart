@@ -180,7 +180,7 @@ class _ExpressiveFabMenuState extends State<ExpressiveFabMenu>
                     children: [
                       Icon(
                         item.icon,
-                        color: colorScheme.onPrimaryContainer,
+                        color: colorScheme.primary,
                         size: 24,
                       ),
                       const SizedBox(width: 12),
@@ -188,7 +188,7 @@ class _ExpressiveFabMenuState extends State<ExpressiveFabMenu>
                         item.label,
                         style: theme.textTheme.labelLarge?.copyWith(
                           fontSize: 16,
-                          color: colorScheme.onPrimaryContainer,
+                          color: colorScheme.primary,
                           fontWeight: FontWeight.w500,
                           letterSpacing: 0.15,
                         ),
