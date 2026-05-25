@@ -136,5 +136,15 @@
     "viewLayoutList": "Lista",
     "viewLayoutGrid": "Siatka",
     "settingsFlashbacksViewLayout": "Układ widoku wspomnień",
-    "settingsHideImagesInGallery": "Ukryj zdjęcia w galerii"
+    "settingsHideImagesInGallery": "Ukryj zdjęcia w galerii",
+    "actionTakePhoto": "Zrób zdjęcie",
+    "actionToday": "Dziś",
+    "actionOtherDay": "Inny dzień",
+    "flashbackOnThisDay": "Tego dnia",
+    "settingsHideImages": "Ukryj zdjęcia",
+    "pageCalendarTitle": "Kalendarz",
+    "settingsOnThisDayDescription": "Przeglądaj poprzednie wspomnienia",
+    "templateVariableTime": "Czas",
+    "templateDefaultSummaryTitle": "Podsumowanie dnia",
+    "templateDefaultReflectionTitle": "Refleksja"
 }
