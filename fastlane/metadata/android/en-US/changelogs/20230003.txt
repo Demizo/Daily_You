@@ -1,0 +1,7 @@
+Daily You v2.23.0 has arrived! View your mood:
+
+• Added a mood view option to the calendar
+• Added a quick action to edit today's current log
+• Improved support for large text sizes
+• Minor UI improvements
+• Updated translations
