@@ -118,24 +118,37 @@ class ConnectedButtonGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IntrinsicHeight(
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: List.generate(
-          labels.length,
-          (i) => Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 1.0),
-            child: _ConnectedButton(
-              label: labels[i],
-              index: i,
-              count: labels.length,
-              selectedIndex: selectedIndex,
-              onTap: () => onSelectionChanged(i),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minWidth: constraints.maxWidth,
+            ),
+            child: IntrinsicHeight(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: List.generate(
+                  labels.length,
+                  (i) => Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 1.0),
+                    child: _ConnectedButton(
+                      label: labels[i],
+                      index: i,
+                      count: labels.length,
+                      selectedIndex: selectedIndex,
+                      onTap: () => onSelectionChanged(i),
+                    ),
+                  ),
+                ),
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

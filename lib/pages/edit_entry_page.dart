@@ -19,7 +19,6 @@ import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/widgets/entry_image_picker.dart';
 import 'package:daily_you/widgets/entry_text_edit.dart';
 import 'package:daily_you/widgets/entry_mood_picker.dart';
-import 'package:provider/provider.dart';
 
 class AddEditEntryPage extends StatefulWidget {
   final Entry? entry;
@@ -219,77 +218,84 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    IntrinsicHeight(
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 2.0),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            TextButton(
-                                              onPressed: () async {
-                                                _chooseDate();
-                                              },
-                                              style: TextButton.styleFrom(
-                                                  visualDensity:
-                                                      VisualDensity.compact,
-                                                  padding: EdgeInsets.all(6)),
-                                              child: Text(
-                                                DateFormat.yMMMEd(TimeManager
-                                                        .currentLocale(context))
-                                                    .format(entryDate!),
-                                                style: TextStyle(
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: Wrap(
+                                    crossAxisAlignment:
+                                        WrapCrossAlignment.start,
+                                    alignment: WrapAlignment.spaceBetween,
+                                    runSpacing: 8.0,
+                                    children: [
+                                      IntrinsicHeight(
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 2.0),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              TextButton(
+                                                onPressed: () async {
+                                                  _chooseDate();
+                                                },
+                                                style: TextButton.styleFrom(
+                                                    visualDensity:
+                                                        VisualDensity.compact,
+                                                    padding: EdgeInsets.all(6)),
+                                                child: Text(
+                                                  DateFormat.yMMMEd(TimeManager
+                                                          .currentLocale(
+                                                              context))
+                                                      .format(entryDate!),
+                                                  style: TextStyle(
+                                                      color: theme
+                                                          .colorScheme.primary,
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              ),
+                                              VerticalDivider(
+                                                width: 6,
+                                                indent: 8,
+                                                endIndent: 8,
+                                                thickness: 2,
+                                                radius:
+                                                    BorderRadius.circular(4),
+                                              ),
+                                              TextButton(
+                                                onPressed: () async {
+                                                  _chooseTime();
+                                                },
+                                                style: TextButton.styleFrom(
+                                                    visualDensity:
+                                                        VisualDensity.compact,
+                                                    padding: EdgeInsets.all(6)),
+                                                child: Text(
+                                                  DateFormat.jm(TimeManager
+                                                          .currentLocale(
+                                                              context))
+                                                      .format(entryDate!),
+                                                  style: TextStyle(
                                                     color: theme
                                                         .colorScheme.primary,
                                                     fontSize: 16,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                            ),
-                                            VerticalDivider(
-                                              width: 6,
-                                              indent: 8,
-                                              endIndent: 8,
-                                              thickness: 2,
-                                              radius: BorderRadius.circular(4),
-                                            ),
-                                            TextButton(
-                                              onPressed: () async {
-                                                _chooseTime();
-                                              },
-                                              style: TextButton.styleFrom(
-                                                  visualDensity:
-                                                      VisualDensity.compact,
-                                                  padding: EdgeInsets.all(6)),
-                                              child: Text(
-                                                DateFormat.jm(TimeManager
-                                                        .currentLocale(context))
-                                                    .format(entryDate!),
-                                                style: TextStyle(
-                                                  color:
-                                                      theme.colorScheme.primary,
-                                                  fontSize: 16,
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    EntryImagePicker(
-                                      onChangedImage: (newImages) {
-                                        _openedCamera = true;
-                                        _addImage(newImages);
-                                      },
-                                      openCamera:
-                                          widget.openCamera && !_openedCamera,
-                                    )
-                                  ],
+                                      EntryImagePicker(
+                                        onChangedImage: (newImages) {
+                                          _openedCamera = true;
+                                          _addImage(newImages);
+                                        },
+                                        openCamera:
+                                            widget.openCamera && !_openedCamera,
+                                      )
+                                    ],
+                                  ),
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.only(bottom: 4.0),

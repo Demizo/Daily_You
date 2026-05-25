@@ -87,38 +87,44 @@ class _EntryViewPageState extends State<EntryViewPage> {
                 child: Padding(
                   padding: const EdgeInsets.only(
                       left: 8, top: 4, bottom: 4, right: 8),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IntrinsicHeight(
-                        child: Row(
-                          children: [
-                            Text(
-                              DateFormat.yMMMEd(
-                                      TimeManager.currentLocale(context))
-                                  .format(entry.timeCreate),
-                              style: const TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold),
-                            ),
-                            VerticalDivider(
-                              width: 16,
-                              thickness: 2,
-                              radius: BorderRadius.circular(4),
-                            ),
-                            Text(
-                              DateFormat.jm(TimeManager.currentLocale(context))
-                                  .format(entry.timeCreate),
-                              style: TextStyle(
-                                  fontSize: 16, color: theme.dividerColor),
-                            ),
-                          ],
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      alignment: WrapAlignment.spaceBetween,
+                      children: [
+                        IntrinsicHeight(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                DateFormat.yMMMEd(
+                                        TimeManager.currentLocale(context))
+                                    .format(entry.timeCreate),
+                                style: const TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                              VerticalDivider(
+                                width: 16,
+                                thickness: 2,
+                                radius: BorderRadius.circular(4),
+                              ),
+                              Text(
+                                DateFormat.jm(
+                                        TimeManager.currentLocale(context))
+                                    .format(entry.timeCreate),
+                                style: TextStyle(
+                                    fontSize: 16, color: theme.dividerColor),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      MoodIcon(
-                        moodValue: entry.mood,
-                        size: 24,
-                      ),
-                    ],
+                        MoodIcon(
+                          moodValue: entry.mood,
+                          size: 24,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

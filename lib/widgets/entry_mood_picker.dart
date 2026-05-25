@@ -56,7 +56,11 @@ class _EntryMoodPickerState extends State<EntryMoodPicker> {
             trigger: isSelected,
             child: Opacity(
                 opacity: isSelected ? 1.0 : 0.6,
-                child: MoodIcon(moodValue: index, size: 24)),
+                child: MoodIcon(
+                  moodValue: index,
+                  size: 24,
+                  allowScaling: false,
+                )),
           ),
         ),
       ),
