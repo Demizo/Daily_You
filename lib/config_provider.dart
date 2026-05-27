@@ -291,6 +291,7 @@ class ConfigProvider with ChangeNotifier {
   }
 
   bool is24HourFormat() {
+    if (PlatformDispatcher.instance.alwaysUse24HourFormat) return true;
     String formattedTime =
         DateFormat.jm(PlatformDispatcher.instance.locale.toString())
             .format(DateTime.now());

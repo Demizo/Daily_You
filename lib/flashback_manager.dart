@@ -6,7 +6,6 @@ import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/flashback.dart';
 import 'package:daily_you/time_manager.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class FlashbackManager {
@@ -136,7 +135,7 @@ class FlashbackManager {
         entryLabels: entries.length == 1
             ? [label]
             : entries
-                .map((e) => DateFormat.jm(locale).format(e.timeCreate))
+                .map((e) => TimeManager.localizedTimeFormat(locale).format(e.timeCreate))
                 .toList(),
       ));
     });

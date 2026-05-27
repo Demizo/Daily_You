@@ -1,3 +1,4 @@
+import 'package:daily_you/time_manager.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
@@ -63,6 +64,6 @@ class TemplateRenderer {
       // Do nothing
     }
 
-    return DateFormat.jm(locale.toString()).format(dt);
+    return TimeManager.localizedTimeFormat(locale.toString()).format(dt);
   }
 }

@@ -21,7 +21,6 @@ import 'package:daily_you/pages/entries_list_page.dart';
 import 'package:daily_you/pages/entry_timeline_page.dart';
 import 'package:daily_you/pages/edit_entry_page.dart';
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -239,7 +238,7 @@ class _HomePageState extends State<HomePage>
                               .reversed
                               .toList(),
                           labelBuilder: (e) =>
-                              DateFormat.jm(locale).format(e.timeCreate),
+                              TimeManager.localizedTimeFormat(locale).format(e.timeCreate),
                         ),
                       ));
                     } else {
