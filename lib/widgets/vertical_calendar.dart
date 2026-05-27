@@ -494,7 +494,7 @@ class _VerticalCalendarState extends State<VerticalCalendar>
             .toList()
             .reversed
             .toList(),
-        labelBuilder: (e) => DateFormat.jm(locale).format(e.timeCreate),
+        labelBuilder: (e) => TimeManager.localizedTimeFormat(locale).format(e.timeCreate),
       ),
     ));
   }

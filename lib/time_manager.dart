@@ -1,3 +1,5 @@
+import 'dart:ui' show PlatformDispatcher;
+
 import 'package:daily_you/config_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -75,8 +77,15 @@ class TimeManager {
   }
 
   static String timeOfDayString(BuildContext context, TimeOfDay timeOfDay) {
-    return DateFormat.jm(TimeManager.currentLocale(context))
+    return localizedTimeFormat(TimeManager.currentLocale(context))
         .format(addTimeOfDay(startOfDay(DateTime.now()), timeOfDay));
+  }
+
+  static DateFormat localizedTimeFormat(String locale) {
+    if (PlatformDispatcher.instance.alwaysUse24HourFormat) {
+      return DateFormat.Hm(locale);
+    }
+    return DateFormat.jm(locale);
   }
 
   static final Map<int, String> dayOfWeekIndexMapping = {

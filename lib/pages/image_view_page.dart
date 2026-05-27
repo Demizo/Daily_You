@@ -141,7 +141,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
                     const SizedBox(height: 8),
                     _infoRow(
                       Icons.schedule_rounded,
-                      "${DateFormat.yMMMEd(TimeManager.currentLocale(context)).format(imageEntry.timeCreate)} ${DateFormat.jm(TimeManager.currentLocale(context)).format(imageEntry.timeCreate)}",
+                      "${DateFormat.yMMMEd(TimeManager.currentLocale(context)).format(imageEntry.timeCreate)} ${TimeManager.localizedTimeFormat(TimeManager.currentLocale(context)).format(imageEntry.timeCreate)}",
                     ),
                   ],
                 ),

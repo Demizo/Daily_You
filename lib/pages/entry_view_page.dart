@@ -110,7 +110,7 @@ class _EntryViewPageState extends State<EntryViewPage> {
                                 radius: BorderRadius.circular(4),
                               ),
                               Text(
-                                DateFormat.jm(
+                                TimeManager.localizedTimeFormat(
                                         TimeManager.currentLocale(context))
                                     .format(entry.timeCreate),
                                 style: TextStyle(
@@ -141,7 +141,7 @@ class _EntryViewPageState extends State<EntryViewPage> {
                 padding: const EdgeInsets.only(
                     left: 8, top: 4, bottom: 18, right: 8),
                 child: Text(
-                  "${AppLocalizations.of(context)!.lastModified}: ${DateFormat.yMMMEd(TimeManager.currentLocale(context)).format(entry.timeModified)} ${DateFormat.jm(TimeManager.currentLocale(context)).format(entry.timeModified)}",
+                  "${AppLocalizations.of(context)!.lastModified}: ${DateFormat.yMMMEd(TimeManager.currentLocale(context)).format(entry.timeModified)} ${TimeManager.localizedTimeFormat(TimeManager.currentLocale(context)).format(entry.timeModified)}",
                   style: TextStyle(fontSize: 12, color: theme.disabledColor),
                 ),
               ),

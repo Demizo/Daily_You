@@ -271,7 +271,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                                                         VisualDensity.compact,
                                                     padding: EdgeInsets.all(6)),
                                                 child: Text(
-                                                  DateFormat.jm(TimeManager
+                                                  TimeManager.localizedTimeFormat(TimeManager
                                                           .currentLocale(
                                                               context))
                                                       .format(entryDate!),
