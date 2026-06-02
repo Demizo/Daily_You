@@ -256,6 +256,15 @@ class AppLocalizationsUk extends AppLocalizations {
   String get settingsFirstDayOfWeek => 'Перший день тижня';
 
   @override
+  String get settingsCalendarSystem => 'Calendar System';
+
+  @override
+  String get calendarSystemGregorian => 'Gregorian';
+
+  @override
+  String get calendarSystemJalali => 'Jalali';
+
+  @override
   String get settingsUseSystemAccentColor =>
       'Використовувати колір акценту як в системі';
 

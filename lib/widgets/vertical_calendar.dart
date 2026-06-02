@@ -10,8 +10,8 @@ import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/entry_day_cell.dart';
 import 'package:daily_you/widgets/year_month_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:shamsi_date/shamsi_date.dart';
 
 sealed class _CalendarItem {
   const _CalendarItem();
@@ -49,6 +49,7 @@ class _VerticalCalendarState extends State<VerticalCalendar>
   int _cacheGeneration = 0;
 
   bool _initialScrollDone = false;
+  bool _isJalali = false;
 
   List<_CalendarItem> _items = [];
   List<(double, DateTime)> _monthOffsets = [];
@@ -88,13 +89,17 @@ class _VerticalCalendarState extends State<VerticalCalendar>
     final localeChanged = newLocale != _cachedLocale;
     _cachedLocale = newLocale;
 
-    if (firstDayChanged) {
+    final newIsJalali = TimeManager.isJalaliCalendar(context);
+    final jalaliChanged = newIsJalali != _isJalali;
+    _isJalali = newIsJalali;
+
+    if (firstDayChanged || jalaliChanged) {
       _lastFirstDayIndex = firstDayIndex;
       _buildCalendarItems(firstDayIndex);
       _visibleMonth = DateTime.now();
     }
 
-    if (firstDayChanged || localeChanged) {
+    if (firstDayChanged || localeChanged || jalaliChanged) {
       final allLabels = TimeManager.daysOfWeekLabels(context);
       _dayLabels = [
         ...allLabels.sublist(firstDayIndex),
@@ -155,6 +160,14 @@ class _VerticalCalendarState extends State<VerticalCalendar>
   }
 
   void _buildCalendarItems(int firstDayIndex) {
+    if (_isJalali) {
+      _buildCalendarItemsJalali(firstDayIndex);
+    } else {
+      _buildCalendarItemsGregorian(firstDayIndex);
+    }
+  }
+
+  void _buildCalendarItemsGregorian(int firstDayIndex) {
     final firstDayDart = firstDayIndex == 6 ? 7 : firstDayIndex + 1;
 
     final items = <_CalendarItem>[];
@@ -216,6 +229,66 @@ class _VerticalCalendarState extends State<VerticalCalendar>
       offset += _weekRowHeight;
 
       current = DateTime(current.year, current.month - 1, 1);
+    }
+
+    _items = items;
+    _monthOffsets = monthOffsets;
+  }
+
+  void _buildCalendarItemsJalali(int firstDayIndex) {
+    final firstDayDart = firstDayIndex == 6 ? 7 : firstDayIndex + 1;
+
+    final items = <_CalendarItem>[];
+    final monthOffsets = <(double, DateTime)>[];
+    double offset = 0;
+
+    final todayJ = Jalali.fromDateTime(_today);
+    final firstDateJ = Jalali.fromDateTime(_firstDate);
+
+    Jalali current = Jalali(todayJ.year, todayJ.month, 1);
+    final end = Jalali(firstDateJ.year, firstDateJ.month, 1);
+
+    while (current >= end) {
+      final monthStart = current.toDateTime();
+      monthOffsets.add((offset, monthStart));
+
+      final lastDayGreg =
+          Jalali(current.year, current.month, current.monthLength).toDateTime();
+
+      final daysFromWeekStart = (lastDayGreg.weekday - firstDayDart + 7) % 7;
+      DateTime weekIter = DateTime(lastDayGreg.year, lastDayGreg.month,
+          lastDayGreg.day - daysFromWeekStart);
+
+      final daysBeforeFirst = (monthStart.weekday - firstDayDart + 7) % 7;
+      final firstWeekStart = DateTime(
+          monthStart.year, monthStart.month, monthStart.day - daysBeforeFirst);
+
+      while (!weekIter.isBefore(firstWeekStart)) {
+        final days = List<DateTime?>.generate(7, (i) {
+          final day =
+              DateTime(weekIter.year, weekIter.month, weekIter.day + i);
+          final jDay = Jalali.fromDateTime(day);
+          return (jDay.year == current.year && jDay.month == current.month)
+              ? day
+              : null;
+        });
+
+        if (current.year == todayJ.year && current.month == todayJ.month) {
+          if (days.any((d) => d != null && TimeManager.isSameDay(d, _today))) {
+            _todayOffset = (offset -= _weekRowHeight).clamp(0, double.infinity);
+          }
+        }
+
+        items.add(_WeekRowItem(days));
+        offset += _weekRowHeight;
+        weekIter =
+            DateTime(weekIter.year, weekIter.month, weekIter.day - 7);
+      }
+
+      items.add(_MonthHeaderItem(monthStart));
+      offset += _weekRowHeight;
+
+      current = current.addMonths(-1);
     }
 
     _items = items;
@@ -481,7 +554,7 @@ class _VerticalCalendarState extends State<VerticalCalendar>
 
   Future<void> _openTimeline(BuildContext context, DateTime date) async {
     final locale = TimeManager.currentLocale(context);
-    final title = DateFormat.yMMMd(locale).format(date);
+    final title = TimeManager.formatDate(date, context);
     await Navigator.of(context).push(MaterialPageRoute(
       allowSnapshotting: false,
       builder: (context) => EntryTimelinePage(
@@ -537,8 +610,8 @@ class _VerticalCalendarState extends State<VerticalCalendar>
   }
 
   Future<void> _onMonthLabelTap(BuildContext context) async {
-    final DateTime? selected =
-        await showYearMonthPicker(context, initialDate: _visibleMonth);
+    final DateTime? selected = await showYearMonthPicker(context,
+        initialDate: _visibleMonth, isJalali: _isJalali);
     if (selected == null) return;
     _jumpToMonth(selected);
   }
@@ -574,7 +647,7 @@ class _VerticalCalendarState extends State<VerticalCalendar>
           ),
           child: Center(
             child: Text(
-              DateFormat('MMMM y', _cachedLocale).format(month),
+              TimeManager.formatMonthYear(month, context),
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
           ),
@@ -600,6 +673,7 @@ class _VerticalCalendarState extends State<VerticalCalendar>
         imagesProvider: imagesProvider,
         hideImages: hideImages,
         isMoodFocus: isMoodFocus,
+        isJalali: _isJalali,
       ),
     );
   }
@@ -614,6 +688,7 @@ class _WeekRow extends StatelessWidget {
   final EntryImagesProvider imagesProvider;
   final bool hideImages;
   final bool isMoodFocus;
+  final bool isJalali;
 
   const _WeekRow({
     required this.days,
@@ -624,6 +699,7 @@ class _WeekRow extends StatelessWidget {
     required this.imagesProvider,
     required this.hideImages,
     required this.isMoodFocus,
+    this.isJalali = false,
   });
 
   @override
@@ -649,6 +725,8 @@ class _WeekRow extends StatelessWidget {
           final isFuture =
               day.isAfter(today) && !TimeManager.isSameDay(day, today);
           if (isFuture) {
+            final futureDayNum =
+                isJalali ? TimeManager.jalaliDayNumber(day) : day.day;
             return SizedBox(
               width: cellSize,
               height: cellSize,
@@ -660,7 +738,7 @@ class _WeekRow extends StatelessWidget {
                 ),
                 child: Center(
                   child: Text(
-                    '${day.day}',
+                    '$futureDayNum',
                     style: TextStyle(
                         fontSize: 16, color: Theme.of(context).disabledColor),
                   ),
@@ -675,6 +753,10 @@ class _WeekRow extends StatelessWidget {
               ? null
               : imagesProvider.getFirstImageForEntry(firstEntry.id!);
 
+          final displayDayNum = isJalali
+              ? TimeManager.jalaliDayNumber(day)
+              : day.day;
+
           return SizedBox(
             width: cellSize,
             height: cellSize,
@@ -684,8 +766,9 @@ class _WeekRow extends StatelessWidget {
               entries: entries,
               firstImage: firstImage,
               cellSize: cellSize,
-              dayNumber: dayNumberCache[day.day],
+              dayNumber: dayNumberCache[displayDayNum],
               isMoodFocus: isMoodFocus,
+              isJalali: isJalali,
             ),
           );
         }).toList(),

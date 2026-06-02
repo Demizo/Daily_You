@@ -298,6 +298,28 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
                 }),
           ),
           Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: SettingsDropdown<String>(
+                title: AppLocalizations.of(context)!.settingsCalendarSystem,
+                value: configProvider.get(ConfigKey.calendarSystem),
+                options: [
+                  DropdownMenuItem<String>(
+                      value: "system",
+                      child: Text(AppLocalizations.of(context)!.themeSystem)),
+                  DropdownMenuItem<String>(
+                      value: "gregorian",
+                      child: Text(AppLocalizations.of(context)!
+                          .calendarSystemGregorian)),
+                  DropdownMenuItem<String>(
+                      value: "jalali",
+                      child: Text(
+                          AppLocalizations.of(context)!.calendarSystemJalali)),
+                ],
+                onChanged: (String? newValue) async {
+                  await configProvider.set(ConfigKey.calendarSystem, newValue);
+                }),
+          ),
+          Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: SettingsDropdown<String>(
                 title: AppLocalizations.of(context)!.settingsGalleryViewLayout,

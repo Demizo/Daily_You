@@ -152,5 +152,11 @@
     "tagMoodTitle": "حس و حال",
     "@tagMoodTitle": {},
     "dailyReminderTitle": "امروز را ثبت کن!",
-    "@dailyReminderTitle": {}
+    "@dailyReminderTitle": {},
+    "settingsCalendarSystem": "سیستم تقویم",
+    "@settingsCalendarSystem": {},
+    "calendarSystemGregorian": "میلادی",
+    "@calendarSystemGregorian": {},
+    "calendarSystemJalali": "جلالی",
+    "@calendarSystemJalali": {}
 }

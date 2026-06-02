@@ -252,6 +252,15 @@ class AppLocalizationsTr extends AppLocalizations {
   String get settingsFirstDayOfWeek => 'Haftanın ilk günü';
 
   @override
+  String get settingsCalendarSystem => 'Calendar System';
+
+  @override
+  String get calendarSystemGregorian => 'Gregorian';
+
+  @override
+  String get calendarSystemJalali => 'Jalali';
+
+  @override
   String get settingsUseSystemAccentColor => 'Sistem vurgu rengini kullan';
 
   @override

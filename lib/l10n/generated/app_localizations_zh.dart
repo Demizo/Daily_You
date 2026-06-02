@@ -250,6 +250,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsFirstDayOfWeek => '一周开始日';
 
   @override
+  String get settingsCalendarSystem => 'Calendar System';
+
+  @override
+  String get calendarSystemGregorian => 'Gregorian';
+
+  @override
+  String get calendarSystemJalali => 'Jalali';
+
+  @override
   String get settingsUseSystemAccentColor => '使用系统强调色';
 
   @override

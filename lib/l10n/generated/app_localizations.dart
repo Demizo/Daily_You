@@ -486,6 +486,24 @@ abstract class AppLocalizations {
   /// **'First Day Of Week'**
   String get settingsFirstDayOfWeek;
 
+  /// No description provided for @settingsCalendarSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'Calendar System'**
+  String get settingsCalendarSystem;
+
+  /// No description provided for @calendarSystemGregorian.
+  ///
+  /// In en, this message translates to:
+  /// **'Gregorian'**
+  String get calendarSystemGregorian;
+
+  /// No description provided for @calendarSystemJalali.
+  ///
+  /// In en, this message translates to:
+  /// **'Jalali'**
+  String get calendarSystemJalali;
+
   /// No description provided for @settingsUseSystemAccentColor.
   ///
   /// In en, this message translates to:

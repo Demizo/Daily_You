@@ -12,7 +12,6 @@ import 'package:daily_you/widgets/local_image_loader.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
 import 'package:daily_you/widgets/scaled_markdown.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -98,9 +97,10 @@ class _EntryViewPageState extends State<EntryViewPage> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                DateFormat.yMMMEd(
-                                        TimeManager.currentLocale(context))
-                                    .format(entry.timeCreate),
+                                TimeManager.formatDateWithWeekday(
+                                  entry.timeCreate,
+                                  context,
+                                ),
                                 style: const TextStyle(
                                     fontSize: 16, fontWeight: FontWeight.bold),
                               ),
@@ -141,7 +141,7 @@ class _EntryViewPageState extends State<EntryViewPage> {
                 padding: const EdgeInsets.only(
                     left: 8, top: 4, bottom: 18, right: 8),
                 child: Text(
-                  "${AppLocalizations.of(context)!.lastModified}: ${DateFormat.yMMMEd(TimeManager.currentLocale(context)).format(entry.timeModified)} ${TimeManager.localizedTimeFormat(TimeManager.currentLocale(context)).format(entry.timeModified)}",
+                  "${AppLocalizations.of(context)!.lastModified}: ${TimeManager.formatDateWithWeekday(entry.timeModified, context)} ${TimeManager.localizedTimeFormat(TimeManager.currentLocale(context)).format(entry.timeModified)}",
                   style: TextStyle(fontSize: 12, color: theme.disabledColor),
                 ),
               ),
@@ -185,7 +185,7 @@ class _EntryViewPageState extends State<EntryViewPage> {
               sharedText = "${MoodIcon.getMoodIcon(entry.mood)} ";
             }
             sharedText =
-                "$sharedText${DateFormat.yMMMEd(TimeManager.currentLocale(context)).format(entry.timeCreate)}\n${entry.text}";
+                "$sharedText${TimeManager.formatDateWithWeekday(entry.timeCreate, context)}\n${entry.text}";
 
             if (images.isNotEmpty) {
               var bytes =

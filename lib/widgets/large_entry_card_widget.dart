@@ -4,7 +4,6 @@ import 'package:daily_you/widgets/image_grid.dart';
 import 'package:daily_you/widgets/scaled_markdown.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
-import 'package:intl/intl.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
 
@@ -25,9 +24,7 @@ class LargeEntryCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final time = DateFormat.yMMMd(
-      TimeManager.currentLocale(context),
-    ).format(entry.timeCreate);
+    final time = TimeManager.formatDate(entry.timeCreate, context);
     return Card.filled(
       color: Theme.of(context).colorScheme.surfaceContainer,
       clipBehavior: Clip.antiAlias,

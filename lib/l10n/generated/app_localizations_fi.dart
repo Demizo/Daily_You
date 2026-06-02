@@ -253,6 +253,15 @@ class AppLocalizationsFi extends AppLocalizations {
   String get settingsFirstDayOfWeek => 'Viikon ensimmäinen päivä';
 
   @override
+  String get settingsCalendarSystem => 'Calendar System';
+
+  @override
+  String get calendarSystemGregorian => 'Gregorian';
+
+  @override
+  String get calendarSystemJalali => 'Jalali';
+
+  @override
   String get settingsUseSystemAccentColor => 'Käytä järjestelmän korostusväriä';
 
   @override

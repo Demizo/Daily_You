@@ -246,6 +246,15 @@ class AppLocalizationsCs extends AppLocalizations {
   String get settingsFirstDayOfWeek => 'První den v týdnu';
 
   @override
+  String get settingsCalendarSystem => 'Calendar System';
+
+  @override
+  String get calendarSystemGregorian => 'Gregorian';
+
+  @override
+  String get calendarSystemJalali => 'Jalali';
+
+  @override
   String get settingsUseSystemAccentColor => 'Použít barvu systému';
 
   @override

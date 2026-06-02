@@ -256,6 +256,15 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsFirstDayOfWeek => 'Первый день недели';
 
   @override
+  String get settingsCalendarSystem => 'Calendar System';
+
+  @override
+  String get calendarSystemGregorian => 'Gregorian';
+
+  @override
+  String get calendarSystemJalali => 'Jalali';
+
+  @override
   String get settingsUseSystemAccentColor =>
       'Использовать акцентный цвет как в системе';
 
