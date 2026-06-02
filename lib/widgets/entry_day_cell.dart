@@ -10,7 +10,6 @@ import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/local_image_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:daily_you/pages/entries_list_page.dart';
 
@@ -23,6 +22,7 @@ class EntryDayCell extends StatelessWidget {
   final EntryImage? firstImage;
 
   final bool isMoodFocus;
+  final bool isJalali;
 
   const EntryDayCell({
     super.key,
@@ -33,6 +33,7 @@ class EntryDayCell extends StatelessWidget {
     required this.entries,
     required this.firstImage,
     this.isMoodFocus = false,
+    this.isJalali = false,
   });
 
   String _countLabel(int count) => count > 99 ? '99+' : '$count';
@@ -61,7 +62,7 @@ class EntryDayCell extends StatelessWidget {
 
   Future<void> _openTimeline(BuildContext context) async {
     final locale = TimeManager.currentLocale(context);
-    final title = DateFormat.yMMMd(locale).format(date);
+    final title = TimeManager.formatDate(date, context);
     await Navigator.of(context).push(MaterialPageRoute(
       allowSnapshotting: false,
       builder: (context) => EntryTimelinePage(
@@ -83,8 +84,7 @@ class EntryDayCell extends StatelessWidget {
     BuildContext context,
     EntriesProvider entriesProvider,
   ) async {
-    final locale = TimeManager.currentLocale(context);
-    final formattedDate = DateFormat.yMMMd(locale).format(date);
+    final formattedDate = TimeManager.formatDate(date, context);
 
     final hasOnThisDay = entriesProvider.entries.any((e) =>
         e.timeCreate.day == date.day &&
@@ -145,7 +145,7 @@ class EntryDayCell extends StatelessWidget {
       await Navigator.of(context).push(MaterialPageRoute(
         allowSnapshotting: false,
         builder: (context) => EntryTimelinePage(
-          header: DateFormat.MMMd(locale).format(date),
+          header: TimeManager.formatMonthDay(date, context),
           getEntries: () => entriesProvider.entries
               .where((e) =>
                   e.timeCreate.day == date.day &&
@@ -153,7 +153,8 @@ class EntryDayCell extends StatelessWidget {
               .toList()
               .reversed
               .toList(),
-          labelBuilder: (e) => DateFormat.y(locale).format(e.timeCreate),
+          labelBuilder: (e) =>
+              TimeManager.formatYear(e.timeCreate, context),
         ),
       ));
     } else if (result == 'new_entry') {
@@ -227,7 +228,8 @@ class EntryDayCell extends StatelessWidget {
                                   ),
                                 ),
                               )
-                            : Text('${date.day}',
+                            : Text(
+                                '${isJalali ? TimeManager.jalaliDayNumber(date) : date.day}',
                                 style: TextStyle(
                                     color: isMoodFocus
                                         ? null
@@ -293,7 +295,8 @@ class EntryDayCell extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Center(
-                    child: Text('${date.day}',
+                    child: Text(
+                        '${isJalali ? TimeManager.jalaliDayNumber(date) : date.day}',
                         style: TimeManager.isSameDay(date, today)
                             ? TextStyle(
                                 fontSize: 16,

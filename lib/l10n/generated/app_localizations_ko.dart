@@ -250,6 +250,15 @@ class AppLocalizationsKo extends AppLocalizations {
   String get settingsFirstDayOfWeek => '한 주의 시작';
 
   @override
+  String get settingsCalendarSystem => 'Calendar System';
+
+  @override
+  String get calendarSystemGregorian => 'Gregorian';
+
+  @override
+  String get calendarSystemJalali => 'Jalali';
+
+  @override
   String get settingsUseSystemAccentColor => '시스템 강조 색상 사용';
 
   @override

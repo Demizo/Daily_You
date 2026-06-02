@@ -62,6 +62,7 @@ class ConfigKey {
   static const String lastDismissedSupportBannerDate =
       "lastDismissedSupportBannerDate";
   static const String calendarFocusMode = "calendarFocusMode";
+  static const String calendarSystem = "calendarSystem";
   // Secure Configuration Values
   static const String requirePassword = "requirePassword";
   static const String biometricUnlock = "biometricUnlock";
@@ -134,6 +135,7 @@ class ConfigProvider with ChangeNotifier {
     ConfigKey.hideImagesInFlashbacks: false,
     ConfigKey.lastDismissedSupportBannerDate: null,
     ConfigKey.calendarFocusMode: 'images',
+    ConfigKey.calendarSystem: 'system',
   };
 
   final Map<String, dynamic> _secureConfig = {

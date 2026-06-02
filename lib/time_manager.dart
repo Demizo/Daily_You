@@ -3,6 +3,7 @@ import 'dart:ui' show PlatformDispatcher;
 import 'package:daily_you/config_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shamsi_date/shamsi_date.dart';
 import 'package:time_range_picker/time_range_picker.dart';
 
 class TimeManager {
@@ -132,5 +133,77 @@ class TimeManager {
       return Locale("fr").toString();
     }
     return platformLocale.toString();
+  }
+
+  static bool isJalaliCalendar(BuildContext context) {
+    final setting =
+        ConfigProvider.instance.get(ConfigKey.calendarSystem) ?? 'system';
+    if (setting == 'jalali') return true;
+    if (setting == 'gregorian') return false;
+    return Localizations.localeOf(context).languageCode == 'fa';
+  }
+
+  // Returns the Jalali month name. Uses Persian script for fa locale,
+  // Finglish (Latin) otherwise.
+  static String jalaliMonthName(int month, String locale) {
+    final f = Jalali(1400, month, 1).formatter;
+    return locale.startsWith('fa') ? f.mN : f.mNFn;
+  }
+
+  static int jalaliDayNumber(DateTime date) => Jalali.fromDateTime(date).day;
+
+  static String formatDate(DateTime date, BuildContext context) =>
+      _formatDate(date, currentLocale(context),
+          isJalali: isJalaliCalendar(context));
+
+  static String formatDateWithWeekday(DateTime date, BuildContext context) =>
+      _formatDateWithWeekday(date, currentLocale(context),
+          isJalali: isJalaliCalendar(context));
+
+  static String formatMonthDay(DateTime date, BuildContext context) =>
+      _formatMonthDay(date, currentLocale(context),
+          isJalali: isJalaliCalendar(context));
+
+  static String formatYear(DateTime date, BuildContext context) =>
+      _formatYear(date, currentLocale(context),
+          isJalali: isJalaliCalendar(context));
+
+  static String formatMonthYear(DateTime date, BuildContext context) =>
+      _formatMonthYear(date, currentLocale(context),
+          isJalali: isJalaliCalendar(context));
+
+  static String _formatDate(DateTime date, String locale,
+      {bool isJalali = false}) {
+    if (!isJalali) return DateFormat.yMMMd(locale).format(date);
+    final j = Jalali.fromDateTime(date);
+    return '${j.formatter.d} ${jalaliMonthName(j.month, locale)} ${j.formatter.yyyy}';
+  }
+
+  static String _formatDateWithWeekday(DateTime date, String locale,
+      {bool isJalali = false}) {
+    if (!isJalali) return DateFormat.yMMMEd(locale).format(date);
+    final j = Jalali.fromDateTime(date);
+    final weekday = DateFormat.E(locale).format(date);
+    return '$weekday ${j.formatter.d} ${jalaliMonthName(j.month, locale)} ${j.formatter.yyyy}';
+  }
+
+  static String _formatMonthDay(DateTime date, String locale,
+      {bool isJalali = false}) {
+    if (!isJalali) return DateFormat.MMMd(locale).format(date);
+    final j = Jalali.fromDateTime(date);
+    return '${j.formatter.d} ${jalaliMonthName(j.month, locale)}';
+  }
+
+  static String _formatYear(DateTime date, String locale,
+      {bool isJalali = false}) {
+    if (!isJalali) return DateFormat.y(locale).format(date);
+    return Jalali.fromDateTime(date).formatter.yyyy;
+  }
+
+  static String _formatMonthYear(DateTime date, String locale,
+      {bool isJalali = false}) {
+    if (!isJalali) return DateFormat('MMMM y', locale).format(date);
+    final j = Jalali.fromDateTime(date);
+    return '${jalaliMonthName(j.month, locale)} ${j.formatter.yyyy}';
   }
 }

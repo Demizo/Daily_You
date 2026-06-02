@@ -251,6 +251,15 @@ class AppLocalizationsFa extends AppLocalizations {
   String get settingsFirstDayOfWeek => 'First Day Of Week';
 
   @override
+  String get settingsCalendarSystem => 'سیستم تقویم';
+
+  @override
+  String get calendarSystemGregorian => 'میلادی';
+
+  @override
+  String get calendarSystemJalali => 'جلالی';
+
+  @override
   String get settingsUseSystemAccentColor => 'Use System Accent Color';
 
   @override

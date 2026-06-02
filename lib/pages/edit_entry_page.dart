@@ -14,7 +14,6 @@ import 'package:daily_you/widgets/template_select_button.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
-import 'package:intl/intl.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/widgets/entry_image_picker.dart';
 import 'package:daily_you/widgets/entry_text_edit.dart';
@@ -242,10 +241,10 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                                                         VisualDensity.compact,
                                                     padding: EdgeInsets.all(6)),
                                                 child: Text(
-                                                  DateFormat.yMMMEd(TimeManager
-                                                          .currentLocale(
-                                                              context))
-                                                      .format(entryDate!),
+                                                  TimeManager.formatDateWithWeekday(
+                                                    entryDate!,
+                                                    context,
+                                                  ),
                                                   style: TextStyle(
                                                       color: theme
                                                           .colorScheme.primary,
