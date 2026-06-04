@@ -32,15 +32,19 @@ class FlashbackManager {
     if (filteredEntries.isEmpty) return flashbacksList;
 
     final locale = TimeManager.currentLocale(context);
+    final isJalali = TimeManager.isJalaliCalendar(context);
+    final now = DateTime.now();
 
     // Time based memories
     for (var entry in filteredEntries.reversed.toList()) {
       if (usedEntries.contains(entry)) continue;
       if (configProvider.get(ConfigKey.showflashbackYearsAgo) &&
-          entry.timeCreate.day == DateTime.now().day &&
-          entry.timeCreate.month == DateTime.now().month &&
-          entry.timeCreate.year != DateTime.now().year) {
-        var yearsAgo = DateTime.now().year - entry.timeCreate.year;
+          TimeManager.isSameCalendarDayOfYear(
+              entry.timeCreate, now, isJalali) &&
+          TimeManager.calendarYearOf(entry.timeCreate, isJalali) !=
+              TimeManager.calendarYearOf(now, isJalali)) {
+        var yearsAgo = TimeManager.calendarYearOf(now, isJalali) -
+            TimeManager.calendarYearOf(entry.timeCreate, isJalali);
         onThisDayEntries.add(entry);
         onThisDayLabels
             .add(AppLocalizations.of(context)!.flashbackYear(yearsAgo));
@@ -48,7 +52,8 @@ class FlashbackManager {
         continue;
       }
       if (configProvider.get(ConfigKey.showflashback6MonthsAgo) &&
-          TimeManager.datesExactMonthDiff(entry.timeCreate, DateTime.now()) ==
+          TimeManager.datesExactCalendarMonthDiff(
+                  entry.timeCreate, now, isJalali) ==
               6) {
         final label = AppLocalizations.of(context)!.flashbackMonth(6);
         singleFlashbacks.putIfAbsent(label, () => []).add(entry);
@@ -56,7 +61,8 @@ class FlashbackManager {
         continue;
       }
       if (configProvider.get(ConfigKey.showflashback1MonthAgo) &&
-          TimeManager.datesExactMonthDiff(entry.timeCreate, DateTime.now()) ==
+          TimeManager.datesExactCalendarMonthDiff(
+                  entry.timeCreate, now, isJalali) ==
               1) {
         final label = AppLocalizations.of(context)!.flashbackMonth(1);
         singleFlashbacks.putIfAbsent(label, () => []).add(entry);

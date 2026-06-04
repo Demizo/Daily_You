@@ -33,10 +33,11 @@ void onThisDayCallbackDispatcher() async {
   await AppDatabase.instance.init(forceWithoutSync: true);
 
   final now = DateTime.now();
+  final isJalali = TimeManager.isJalaliCalendarFromPlatform();
   final hasOnThisDayEntries = EntriesProvider.instance.entries.any((e) =>
-      e.timeCreate.day == now.day &&
-      e.timeCreate.month == now.month &&
-      e.timeCreate.year != now.year);
+      TimeManager.isSameCalendarDayOfYear(e.timeCreate, now, isJalali) &&
+      TimeManager.calendarYearOf(e.timeCreate, isJalali) !=
+          TimeManager.calendarYearOf(now, isJalali));
 
   if (hasOnThisDayEntries) {
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =

@@ -560,10 +560,7 @@ class _VerticalCalendarState extends State<VerticalCalendar>
       builder: (context) => EntryTimelinePage(
         header: title,
         getEntries: () => EntriesProvider.instance.entries
-            .where((e) =>
-                e.timeCreate.day == date.day &&
-                e.timeCreate.month == date.month &&
-                e.timeCreate.year == date.year)
+            .where((e) => TimeManager.isSameDay(e.timeCreate, date))
             .toList()
             .reversed
             .toList(),

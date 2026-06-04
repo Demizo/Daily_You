@@ -128,10 +128,11 @@ class _HomePageState extends State<HomePage>
   }
 
   Future<void> _openOnThisDayTimeline(DateTime referenceDate) async {
-    final hasEntries = EntriesProvider.instance.entries.any((e) =>
-        e.timeCreate.day == referenceDate.day &&
-        e.timeCreate.month == referenceDate.month &&
-        e.timeCreate.year != referenceDate.year);
+    final isJalali = TimeManager.isJalaliCalendar(context);
+    final refYear = TimeManager.calendarYearOf(referenceDate, isJalali);
+
+    final hasEntries = EntriesProvider.instance.entries
+        .any((e) => TimeManager.isOnThisDayMatch(e.timeCreate, referenceDate, isJalali));
     if (!hasEntries || !mounted) return;
 
     await Navigator.of(context).push(MaterialPageRoute(
@@ -139,13 +140,11 @@ class _HomePageState extends State<HomePage>
       builder: (context) => EntryTimelinePage(
         header: AppLocalizations.of(context)!.flashbackOnThisDay,
         getEntries: () => EntriesProvider.instance.entries
-            .where((e) =>
-                e.timeCreate.day == referenceDate.day &&
-                e.timeCreate.month == referenceDate.month &&
-                e.timeCreate.year != referenceDate.year)
+            .where((e) => TimeManager.isOnThisDayMatch(
+                e.timeCreate, referenceDate, isJalali))
             .toList(),
-        labelBuilder: (e) => AppLocalizations.of(context)!
-            .flashbackYear(referenceDate.year - e.timeCreate.year),
+        labelBuilder: (e) => AppLocalizations.of(context)!.flashbackYear(
+            refYear - TimeManager.calendarYearOf(e.timeCreate, isJalali)),
       ),
     ));
   }

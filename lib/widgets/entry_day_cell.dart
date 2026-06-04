@@ -68,10 +68,7 @@ class EntryDayCell extends StatelessWidget {
       builder: (context) => EntryTimelinePage(
         header: title,
         getEntries: () => EntriesProvider.instance.entries
-            .where((e) =>
-                e.timeCreate.day == date.day &&
-                e.timeCreate.month == date.month &&
-                e.timeCreate.year == date.year)
+            .where((e) => TimeManager.isSameDay(e.timeCreate, date))
             .toList()
             .reversed
             .toList(),
@@ -86,10 +83,8 @@ class EntryDayCell extends StatelessWidget {
   ) async {
     final formattedDate = TimeManager.formatDate(date, context);
 
-    final hasOnThisDay = entriesProvider.entries.any((e) =>
-        e.timeCreate.day == date.day &&
-        e.timeCreate.month == date.month &&
-        e.timeCreate.year != date.year);
+    final hasOnThisDay = entriesProvider.entries
+        .any((e) => TimeManager.isOnThisDayMatch(e.timeCreate, date, isJalali));
 
     if (!context.mounted) return;
 
@@ -148,8 +143,7 @@ class EntryDayCell extends StatelessWidget {
           header: TimeManager.formatMonthDay(date, context),
           getEntries: () => entriesProvider.entries
               .where((e) =>
-                  e.timeCreate.day == date.day &&
-                  e.timeCreate.month == date.month)
+                  TimeManager.isSameCalendarDayOfYear(e.timeCreate, date, isJalali))
               .toList()
               .reversed
               .toList(),

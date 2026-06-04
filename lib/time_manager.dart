@@ -143,6 +143,48 @@ class TimeManager {
     return Localizations.localeOf(context).languageCode == 'fa';
   }
 
+  static bool isJalaliCalendarFromPlatform() {
+    final setting =
+        ConfigProvider.instance.get(ConfigKey.calendarSystem) ?? 'system';
+    if (setting == 'jalali') return true;
+    if (setting == 'gregorian') return false;
+    return PlatformDispatcher.instance.locale.languageCode == 'fa';
+  }
+
+  // Returns true if entryDate falls on the same calendar day+month as referenceDate
+  // but in a different calendar year
+  static bool isOnThisDayMatch(
+      DateTime entryDate, DateTime referenceDate, bool isJalali) {
+    return isSameCalendarDayOfYear(entryDate, referenceDate, isJalali) &&
+        calendarYearOf(entryDate, isJalali) !=
+            calendarYearOf(referenceDate, isJalali);
+  }
+
+  static bool isSameCalendarDayOfYear(
+      DateTime date1, DateTime date2, bool isJalali) {
+    if (!isJalali) {
+      return date1.day == date2.day && date1.month == date2.month;
+    }
+    final j1 = Jalali.fromDateTime(date1);
+    final j2 = Jalali.fromDateTime(date2);
+    return j1.day == j2.day && j1.month == j2.month;
+  }
+
+  static int calendarYearOf(DateTime date, bool isJalali) {
+    if (!isJalali) return date.year;
+    return Jalali.fromDateTime(date).year;
+  }
+
+  static int datesExactCalendarMonthDiff(
+      DateTime date1, DateTime date2, bool isJalali) {
+    if (!isJalali) return datesExactMonthDiff(date1, date2);
+    final j1 = Jalali.fromDateTime(date1);
+    final j2 = Jalali.fromDateTime(date2);
+    if (j1.day != j2.day) return -1;
+    if (j1.year == j2.year && j1.month == j2.month) return -1;
+    return ((j2.year - j1.year) * 12 + j2.month - j1.month).abs();
+  }
+
   // Returns the Jalali month name. Uses Persian script for fa locale,
   // Finglish (Latin) otherwise.
   static String jalaliMonthName(int month, String locale) {
