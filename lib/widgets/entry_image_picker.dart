@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/database/image_storage.dart';
@@ -84,15 +85,31 @@ class _EntryImagePickerState extends State<EntryImagePicker> {
     } else {
       if (Platform.isAndroid) {
         return await FlutterImageCompress.compressWithFile(image.path,
-                quality: quality, minWidth: width, minHeight: width) ??
+                quality: quality,
+                minWidth: width,
+                minHeight: width,
+                keepExif: true) ??
             await image.readAsBytes();
       } else {
-        final cmd = img.Command()
-          ..decodeJpgFile(image.path)
-          ..copyResize(width: width, interpolation: img.Interpolation.average)
-          ..encodeJpgFile(image.path, quality: quality);
-        await cmd.executeThread();
-        return await image.readAsBytes();
+        return await Isolate.run(() async {
+          final originalImage = await img.decodeImageFile(image.path);
+
+          if (originalImage == null) return File(image.path).readAsBytesSync();
+
+          final resizedImage = img.copyResize(
+            originalImage,
+            width: width,
+            interpolation: img.Interpolation.average,
+          );
+
+          resizedImage.exif = originalImage.exif;
+
+          final compressedBytes = img.encodeJpg(resizedImage, quality: quality);
+
+          File(image.path).writeAsBytesSync(compressedBytes);
+
+          return compressedBytes;
+        });
       }
     }
   }
