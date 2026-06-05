@@ -372,11 +372,11 @@ class AppLocalizationsCs extends AppLocalizations {
   String get templateDefaultSummaryBody => '### Shrnutí\n- \n\n### Citace\n> ';
 
   @override
-  String get templateDefaultReflectionTitle => 'Reflection';
+  String get templateDefaultReflectionTitle => 'Ohlédnutí za dnem';
 
   @override
   String get templateDefaultReflectionBody =>
-      '### What did you enjoy about today?\n- \n\n### What are you thankful for?\n- \n\n### What are you looking forward to?\n- ';
+      '### Co jsem si dnes užil?\n- \n\n### Za co jsem rád?\n- \n\n### Na co se těším?\n- ';
 
   @override
   String get settingsStorageTitle => 'Uložiště';

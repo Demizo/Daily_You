@@ -37,6 +37,7 @@ class LanguageOption {
     LanguageOption(languageCode: "pl"): "polski",
     LanguageOption(languageCode: "pt"): "português",
     LanguageOption(languageCode: "pt", countryCode: "BR"): "português (Brasil)",
+    LanguageOption(languageCode: "ro"): "română",
     LanguageOption(languageCode: "ru"): "русский",
     LanguageOption(languageCode: "sv"): "svenska",
     LanguageOption(languageCode: "ta"): "தமிழ்",
