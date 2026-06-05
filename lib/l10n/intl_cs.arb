@@ -147,5 +147,7 @@
     "settingsOnThisDayDescription": "Připomeňte si minulé vzpomínky",
     "templateDefaultTimestampBody": "{date} - {time}:",
     "templateDefaultSummaryBody": "### Shrnutí\n- \n\n### Citace\n> ",
-    "templateDefaultTimestampTitle": "Časový údaj"
+    "templateDefaultTimestampTitle": "Časový údaj",
+    "templateDefaultReflectionTitle": "Ohlédnutí za dnem",
+    "templateDefaultReflectionBody": "### Co jsem si dnes užil?\n- \n\n### Za co jsem rád?\n- \n\n### Na co se těším?\n- "
 }
