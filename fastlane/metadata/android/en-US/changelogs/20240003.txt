@@ -1,0 +1,7 @@
+Daily You v2.24.0 has arrived! It's about time:
+
+• Added support for the Jalali Calendar
+• Respect the system's time format
+• Preserve location data when importing photos
+• Keep EXIF data when compression is enabled
+• Updated translations
