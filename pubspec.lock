@@ -877,6 +877,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.2.1"
+  persian_datetime_picker:
+    dependency: "direct main"
+    description:
+      name: persian_datetime_picker
+      sha256: "6a5ae6b9f717a6619ae29e65e4c8074285865a88d339dd05c91b9a5b6f8f47d7"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.2.0"
   petitparser:
     dependency: transitive
     description:

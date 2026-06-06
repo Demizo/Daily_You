@@ -88,8 +88,8 @@ class _HomePageState extends State<HomePage>
 
   Future<void> _addEntryForPickedDay() async {
     _closeFab();
-    final picked = await showDatePicker(
-      context: context,
+    final picked = await TimeManager.pickDate(
+      context,
       initialDate: DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime.now(),

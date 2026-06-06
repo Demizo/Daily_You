@@ -350,11 +350,10 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
       );
 
   Future<void> _chooseDate() async {
-    DateTime? pickedDate = await showDatePicker(
-      initialDatePickerMode: DatePickerMode.day,
-      context: context,
-      initialDate: entryDate,
-      firstDate: DateTime.utc(2000),
+    DateTime? pickedDate = await TimeManager.pickDate(
+      context,
+      initialDate: entryDate!,
+      firstDate: DateTime(2000),
       lastDate: DateTime.now(),
     );
     if (pickedDate == null) return;

@@ -4,6 +4,7 @@ import 'package:daily_you/config_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shamsi_date/shamsi_date.dart';
+import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 import 'package:time_range_picker/time_range_picker.dart';
 
 class TimeManager {
@@ -149,6 +150,37 @@ class TimeManager {
     if (setting == 'jalali') return true;
     if (setting == 'gregorian') return false;
     return PlatformDispatcher.instance.locale.languageCode == 'fa';
+  }
+
+  static Future<DateTime?> pickDate(
+    BuildContext context, {
+    required DateTime initialDate,
+    required DateTime firstDate,
+    required DateTime lastDate,
+    bool Function(DateTime)? selectableDayPredicate,
+  }) async {
+    if (isJalaliCalendar(context)) {
+      PersianSelectableDayPredicate? jalaliPredicate;
+      if (selectableDayPredicate != null) {
+        jalaliPredicate =
+            (Jalali day) => selectableDayPredicate(day.toDateTime());
+      }
+      final Jalali? picked = await showPersianDatePicker(
+        context: context,
+        initialDate: Jalali.fromDateTime(initialDate),
+        firstDate: Jalali.fromDateTime(firstDate),
+        lastDate: Jalali.fromDateTime(lastDate),
+        selectableDayPredicate: jalaliPredicate,
+      );
+      return picked?.toDateTime();
+    }
+    return showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: firstDate,
+      lastDate: lastDate,
+      selectableDayPredicate: selectableDayPredicate,
+    );
   }
 
   // Returns true if entryDate falls on the same calendar day+month as referenceDate

@@ -571,13 +571,12 @@ class _VerticalCalendarState extends State<VerticalCalendar>
 
   Future<void> _onCalendarIconTap(BuildContext context) async {
     final entriesProvider = context.read<EntriesProvider>();
-    final DateTime? picked = await showDatePicker(
-      context: context,
+    final DateTime? picked = await TimeManager.pickDate(
+      context,
       selectableDayPredicate: (date) {
         if (entriesProvider.entries.isEmpty) return true;
         return entriesProvider.getEntryForDate(date) != null;
       },
-      initialDatePickerMode: DatePickerMode.day,
       initialDate: entriesProvider.entries.isNotEmpty
           ? entriesProvider.entries.first.timeCreate
           : DateTime.now(),
