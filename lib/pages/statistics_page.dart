@@ -149,7 +149,7 @@ class _StatsPageState extends State<StatsPage>
 
     for (Entry entry in entriesInRange) {
       if (entry.mood == null) continue;
-      String dayKey = DateFormat('EEE').format(entry.timeCreate);
+      String dayKey = DateFormat('EEE', 'en').format(entry.timeCreate);
 
       if (moodsByDay[dayKey] == null) {
         moodsByDay[dayKey] = List.empty(growable: true);

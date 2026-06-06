@@ -7,6 +7,7 @@ import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:shamsi_date/shamsi_date.dart';
 
 class MoodOverTimeChart extends StatelessWidget {
   final List<Entry> entries;
@@ -69,9 +70,11 @@ class MoodOverTimeChart extends StatelessWidget {
   Widget build(BuildContext context) {
     final _ = context.watch<ConfigProvider>();
 
+    final isJalali = TimeManager.isJalaliCalendar(context);
     final today = DateTime.now();
     final rangeEnd = DateTime(today.year, today.month, today.day, 23, 59, 59);
-    final rangeStart = hasData ? _dataRangeStart() : _dummyRangeStart(today);
+    final rangeStart =
+        hasData ? _dataRangeStart() : _dummyRangeStart(today, isJalali);
 
     final totalDays = rangeEnd.difference(rangeStart).inDays.toDouble();
     final spanDays = totalDays.toInt().clamp(1, 999999);
@@ -79,7 +82,7 @@ class MoodOverTimeChart extends StatelessWidget {
 
     final buckets = useWeekly
         ? _generateWeeklyBuckets(rangeStart, rangeEnd)
-        : _generateMonthlyBuckets(rangeStart, rangeEnd);
+        : _generateMonthlyBuckets(rangeStart, rangeEnd, isJalali: isJalali);
 
     if (buckets.isEmpty) return const SizedBox.shrink();
 
@@ -87,8 +90,9 @@ class MoodOverTimeChart extends StatelessWidget {
         ? _computeSpots(buckets, rangeStart)
         : _dummySpots(buckets, rangeStart);
 
-    final markerDates = _computeMarkerDates(rangeStart, rangeEnd, spanDays);
-    final labelDates = _computeLabelDates(markerDates, spanDays);
+    final markerDates =
+        _computeMarkerDates(rangeStart, rangeEnd, spanDays, isJalali);
+    final labelDates = _computeLabelDates(markerDates, spanDays, isJalali);
 
     final labelTextMap = <int, String>{
       for (final d in labelDates)
@@ -102,84 +106,97 @@ class MoodOverTimeChart extends StatelessWidget {
     final surfaceColor =
         Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2);
 
-    final chartWidget = Padding(
-      padding: const EdgeInsets.only(right: 42, top: 8),
-      child: AspectRatio(
-        aspectRatio: 2,
-        child: LineChart(
-          LineChartData(
-            minX: 0,
-            maxX: totalDays,
-            minY: -2,
-            maxY: 2,
-            lineTouchData: const LineTouchData(enabled: false),
-            lineBarsData: hasData
-                ? _buildSegments(spots, color)
-                : [_makeSegment(spots.whereType<FlSpot>().toList(), color)],
-            extraLinesData: ExtraLinesData(
-              verticalLines: markerDayOffsets
-                  .map((x) => VerticalLine(
-                        x: x,
-                        color: surfaceColor,
-                        strokeWidth: 1,
-                      ))
-                  .toList(),
-            ),
-            titlesData: FlTitlesData(
-              bottomTitles: AxisTitles(
-                sideTitles: SideTitles(
-                  showTitles: true,
-                  interval: 1,
-                  reservedSize: 32,
-                  getTitlesWidget: (value, _) {
-                    final label = labelTextMap[value.toInt()];
-                    if (label != null) {
-                      return Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
-                        child: Text(
-                          label,
-                          textScaler: TextScaler.noScaling,
-                        ),
-                      );
-                    }
-                    return const SizedBox.shrink();
-                  },
+    final labelCount = labelDates.length.clamp(1, 6);
+    final chartWidget = LayoutBuilder(
+      builder: (context, constraints) {
+        // Plot area = total width minus right padding (42) and left axis (42).
+        final maxLabelWidth = ((constraints.maxWidth - 84) / labelCount);
+        return Padding(
+          padding: const EdgeInsets.only(right: 42, top: 8),
+          child: AspectRatio(
+            aspectRatio: 2,
+            child: LineChart(
+              LineChartData(
+                minX: 0,
+                maxX: totalDays,
+                minY: -2,
+                maxY: 2,
+                lineTouchData: const LineTouchData(enabled: false),
+                lineBarsData: hasData
+                    ? _buildSegments(spots, color)
+                    : [_makeSegment(spots.whereType<FlSpot>().toList(), color)],
+                extraLinesData: ExtraLinesData(
+                  verticalLines: markerDayOffsets
+                      .map((x) => VerticalLine(
+                            x: x,
+                            color: surfaceColor,
+                            strokeWidth: 1,
+                          ))
+                      .toList(),
                 ),
-              ),
-              leftTitles: AxisTitles(
-                sideTitles: SideTitles(
-                  showTitles: true,
-                  interval: 1,
-                  reservedSize: 42,
-                  getTitlesWidget: (value, meta) => SideTitleWidget(
-                    meta: meta,
-                    child: MoodIcon(
-                      moodValue: value.toInt(),
-                      allowScaling: false,
+                titlesData: FlTitlesData(
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      interval: 1,
+                      reservedSize: 32,
+                      getTitlesWidget: (value, _) {
+                        final label = labelTextMap[value.toInt()];
+                        if (label != null) {
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: SizedBox(
+                              width: maxLabelWidth,
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  label,
+                                  textScaler: TextScaler.noScaling,
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+                        return const SizedBox.shrink();
+                      },
                     ),
+                  ),
+                  leftTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      interval: 1,
+                      reservedSize: 42,
+                      getTitlesWidget: (value, meta) => SideTitleWidget(
+                        meta: meta,
+                        child: MoodIcon(
+                          moodValue: value.toInt(),
+                          allowScaling: false,
+                        ),
+                      ),
+                    ),
+                  ),
+                  topTitles: const AxisTitles(),
+                  rightTitles: const AxisTitles(),
+                ),
+                gridData: FlGridData(
+                  show: true,
+                  drawHorizontalLine: true,
+                  horizontalInterval: 1,
+                  drawVerticalLine: false,
+                  getDrawingHorizontalLine: (_) =>
+                      FlLine(color: surfaceColor, strokeWidth: 1),
+                ),
+                borderData: FlBorderData(
+                  show: true,
+                  border: Border.symmetric(
+                    horizontal: BorderSide(color: surfaceColor, width: 1),
                   ),
                 ),
               ),
-              topTitles: const AxisTitles(),
-              rightTitles: const AxisTitles(),
-            ),
-            gridData: FlGridData(
-              show: true,
-              drawHorizontalLine: true,
-              horizontalInterval: 1,
-              drawVerticalLine: false,
-              getDrawingHorizontalLine: (_) =>
-                  FlLine(color: surfaceColor, strokeWidth: 1),
-            ),
-            borderData: FlBorderData(
-              show: true,
-              border: Border.symmetric(
-                horizontal: BorderSide(color: surfaceColor, width: 1),
-              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
 
     return Card.filled(
@@ -229,7 +246,13 @@ class MoodOverTimeChart extends StatelessWidget {
         .let((d) => DateTime(d.year, d.month, d.day));
   }
 
-  DateTime _dummyRangeStart(DateTime today) {
+  DateTime _dummyRangeStart(DateTime today, bool isJalali) {
+    if (isJalali) {
+      final j = Jalali.fromDateTime(today);
+      final prev = Jalali(j.year - 1, j.month, j.day);
+      final dt = prev.toDateTime();
+      return DateTime(dt.year, dt.month, dt.day);
+    }
     return DateTime(today.year, today.month - 12, today.day);
   }
 
@@ -243,8 +266,23 @@ class MoodOverTimeChart extends StatelessWidget {
     return buckets;
   }
 
-  List<DateTime> _generateMonthlyBuckets(DateTime start, DateTime end) {
+  List<DateTime> _generateMonthlyBuckets(DateTime start, DateTime end,
+      {bool isJalali = false}) {
     final buckets = <DateTime>[];
+    if (isJalali) {
+      final jStart = Jalali.fromDateTime(start);
+      Jalali current = Jalali(jStart.year, jStart.month, 1);
+      while (!current.toDateTime().isAfter(end)) {
+        buckets.add(current.toDateTime());
+        int m = current.month + 1, y = current.year;
+        if (m > 12) {
+          m = 1;
+          y++;
+        }
+        current = Jalali(y, m, 1);
+      }
+      return buckets;
+    }
     DateTime current = DateTime(start.year, start.month, 1);
     while (!current.isAfter(end)) {
       buckets.add(current);
@@ -316,7 +354,7 @@ class MoodOverTimeChart extends StatelessWidget {
   }
 
   List<DateTime> _computeMarkerDates(
-      DateTime rangeStart, DateTime rangeEnd, int spanDays) {
+      DateTime rangeStart, DateTime rangeEnd, int spanDays, bool isJalali) {
     final markers = <DateTime>[];
     if (spanDays <= _monthThreshold) {
       DateTime current = rangeStart;
@@ -325,18 +363,46 @@ class MoodOverTimeChart extends StatelessWidget {
         current = current.add(const Duration(days: 7));
       }
     } else if (spanDays <= _yearThreshold) {
-      DateTime current = DateTime(rangeStart.year, rangeStart.month, 1);
-      while (!current.isAfter(rangeEnd)) {
-        if (!current.isBefore(rangeStart)) markers.add(current);
-        current = DateTime(current.year, current.month + 1, 1);
+      if (isJalali) {
+        final jStart = Jalali.fromDateTime(rangeStart);
+        Jalali current = Jalali(jStart.year, jStart.month, 1);
+        while (!current.toDateTime().isAfter(rangeEnd)) {
+          final dt = current.toDateTime();
+          if (!dt.isBefore(rangeStart)) markers.add(dt);
+          int m = current.month + 1, y = current.year;
+          if (m > 12) {
+            m = 1;
+            y++;
+          }
+          current = Jalali(y, m, 1);
+        }
+      } else {
+        DateTime current = DateTime(rangeStart.year, rangeStart.month, 1);
+        while (!current.isAfter(rangeEnd)) {
+          if (!current.isBefore(rangeStart)) markers.add(current);
+          current = DateTime(current.year, current.month + 1, 1);
+        }
       }
     } else {
       // Quarterly markers for both the 1-3 year and >3 year ranges
-      for (int year = rangeStart.year; year <= rangeEnd.year + 1; year++) {
-        for (final month in [1, 4, 7, 10]) {
-          final d = DateTime(year, month, 1);
-          if (!d.isBefore(rangeStart) && !d.isAfter(rangeEnd)) {
-            markers.add(d);
+      if (isJalali) {
+        final jStart = Jalali.fromDateTime(rangeStart);
+        final jEnd = Jalali.fromDateTime(rangeEnd);
+        for (int year = jStart.year; year <= jEnd.year + 1; year++) {
+          for (final month in [1, 4, 7, 10]) {
+            final dt = Jalali(year, month, 1).toDateTime();
+            if (!dt.isBefore(rangeStart) && !dt.isAfter(rangeEnd)) {
+              markers.add(dt);
+            }
+          }
+        }
+      } else {
+        for (int year = rangeStart.year; year <= rangeEnd.year + 1; year++) {
+          for (final month in [1, 4, 7, 10]) {
+            final d = DateTime(year, month, 1);
+            if (!d.isBefore(rangeStart) && !d.isAfter(rangeEnd)) {
+              markers.add(d);
+            }
           }
         }
       }
@@ -344,9 +410,15 @@ class MoodOverTimeChart extends StatelessWidget {
     return markers;
   }
 
-  List<DateTime> _computeLabelDates(List<DateTime> markerDates, int spanDays) {
+  List<DateTime> _computeLabelDates(
+      List<DateTime> markerDates, int spanDays, bool isJalali) {
     if (spanDays > 3 * _yearThreshold) {
       // Only label year starts for very long ranges
+      if (isJalali) {
+        return markerDates
+            .where((d) => Jalali.fromDateTime(d).month == 1)
+            .toList();
+      }
       return markerDates.where((d) => d.month == 1).toList();
     }
     if (markerDates.length <= 6) return List.from(markerDates);
@@ -360,6 +432,19 @@ class MoodOverTimeChart extends StatelessWidget {
 
   String _formatLabel(DateTime date, int spanDays, BuildContext context) {
     final locale = TimeManager.currentLocale(context);
+    if (TimeManager.isJalaliCalendar(context)) {
+      final j = Jalali.fromDateTime(date);
+      final monthName = TimeManager.jalaliMonthName(j.month, locale);
+      if (spanDays <= _monthThreshold) {
+        return '${j.formatter.d} $monthName';
+      } else if (spanDays <= _yearThreshold) {
+        return monthName;
+      } else if (spanDays < 3 * _yearThreshold) {
+        return "$monthName '${j.formatter.yyyy.substring(2)}";
+      } else {
+        return j.formatter.yyyy;
+      }
+    }
     if (spanDays <= _monthThreshold) {
       return DateFormat('MMM d', locale).format(date);
     } else if (spanDays <= _yearThreshold) {
