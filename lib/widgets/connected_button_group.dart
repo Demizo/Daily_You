@@ -90,16 +90,21 @@ ShapeBorder _computeBorder({
   required int index,
   required int count,
   required double selFrac,
+  required bool isRtl,
 }) {
   final bool isFirst = index == 0;
   final bool isLast = index == count - 1;
   final double clamped = selFrac.clamp(0.0, 1.0);
 
-  final double leftR = isFirst
+  final bool fullLeft = isRtl ? isLast : isFirst;
+  final bool fullRight = isRtl ? isFirst : isLast;
+
+  final double leftR = fullLeft
       ? _kFullRadius
       : lerpDouble(_kInnerRadius, _kFullRadius, clamped)!;
-  final double rightR =
-      isLast ? _kFullRadius : lerpDouble(_kInnerRadius, _kFullRadius, clamped)!;
+  final double rightR = fullRight
+      ? _kFullRadius
+      : lerpDouble(_kInnerRadius, _kFullRadius, clamped)!;
 
   return _DynamicPillBorder(leftRadius: leftR, rightRadius: rightR);
 }
@@ -178,10 +183,12 @@ class _ConnectedButton extends StatelessWidget {
       duration: _kAnimDuration,
       curve: !isSelected ? Curves.easeOutBack : Curves.easeInBack,
       builder: (context, selFrac, _) {
+        final isRtl = Directionality.of(context) == TextDirection.rtl;
         final shape = _computeBorder(
           index: index,
           count: count,
           selFrac: selFrac,
+          isRtl: isRtl,
         );
 
         final Color bgColor = Color.lerp(
