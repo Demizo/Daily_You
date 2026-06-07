@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/database/image_storage.dart';
@@ -44,6 +46,7 @@ class _LaunchPageState extends State<LaunchPage> {
   }
 
   Future _updateAppShortcuts() async {
+    if (!Platform.isAndroid) return;
     final QuickActions quickActions = const QuickActions();
     await quickActions.initialize((shortcutType) {
       if (shortcutType == 'action_log_today') {
