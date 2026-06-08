@@ -146,5 +146,8 @@
     "wordCount": "{count, plural, one{{count} žodis} few{{count} žodžiai} many{{count} žodžių} other{{count} žodis}}",
     "streakCurrent": "{count, plural, other{Dabartinė seka {count}}}",
     "streakLongest": "{count, plural, other{Ilgiausia seka {count}}}",
-    "streakSinceBadDay": "{count, plural, other{Praėjo dienų nuo paskutinės blogos dienos: {count}}}"
+    "streakSinceBadDay": "{count, plural, other{Praėjo dienų nuo paskutinės blogos dienos: {count}}}",
+    "settingsCalendarSystem": "Kalendoriaus sistema",
+    "calendarSystemGregorian": "Grigaliaus",
+    "calendarSystemJalali": "Jalali"
 }
