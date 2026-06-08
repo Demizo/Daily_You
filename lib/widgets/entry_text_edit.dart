@@ -10,6 +10,7 @@ class EntryTextEditor extends StatefulWidget {
   final FocusNode focusNode;
   final TextEditingController textEditingController;
   final UndoHistoryController undoHistoryController;
+  final VoidCallback? onExpand;
 
   const EntryTextEditor({
     super.key,
@@ -17,6 +18,7 @@ class EntryTextEditor extends StatefulWidget {
     required this.focusNode,
     required this.textEditingController,
     required this.undoHistoryController,
+    this.onExpand,
   });
 
   @override
@@ -41,17 +43,36 @@ class _EntryTextEditorState extends State<EntryTextEditor> {
 
   @override
   Widget build(BuildContext context) {
-    return Card.filled(
-        color: Theme.of(context).colorScheme.surfaceContainer,
-        child: Padding(
-          padding: const EdgeInsets.only(left: 8, top: 2, bottom: 0, right: 8),
-          child: entryTextField(),
-        ));
+    final isWide = MediaQuery.of(context).size.width >= 600;
+    final card = Card.filled(
+      color: Theme.of(context).colorScheme.surfaceContainer,
+      child: Padding(
+        padding: const EdgeInsets.only(left: 8, top: 2, bottom: 0, right: 8),
+        child: entryTextField(),
+      ),
+    );
+
+    if (!isWide || widget.onExpand == null) return card;
+
+    return Stack(
+      children: [
+        card,
+        Positioned(
+          top: 4,
+          right: 4,
+          child: IconButton(
+            icon: const Icon(Icons.open_in_full_rounded, size: 20),
+            visualDensity: VisualDensity.compact,
+            padding: EdgeInsets.zero,
+            onPressed: widget.onExpand,
+          ),
+        ),
+      ],
+    );
   }
 
   Widget entryTextField() {
     return TextField(
-      scrollPadding: EdgeInsets.zero,
       controller: widget.textEditingController,
       undoController: widget.undoHistoryController,
       focusNode: widget.focusNode,

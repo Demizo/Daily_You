@@ -8,6 +8,7 @@ import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/templates_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:daily_you/pages/full_screen_text_editor_page.dart';
 import 'package:daily_you/widgets/edit_toolbar.dart';
 import 'package:daily_you/widgets/entry_image_editable_list.dart';
 import 'package:daily_you/widgets/template_select_button.dart';
@@ -127,6 +128,20 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.hidden) {
       _saveEntry();
+    }
+  }
+
+  Future<void> _openFullScreenEditor() async {
+    final result = await Navigator.of(context).push<String>(
+      MaterialPageRoute(
+        allowSnapshotting: false,
+        builder: (context) => FullScreenTextEditorPage(
+          initialText: _textEditingController.text,
+        ),
+      ),
+    );
+    if (result != null) {
+      _textEditingController.text = result;
     }
   }
 
@@ -318,6 +333,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                                   focusNode: _focusNode,
                                   textEditingController: _textEditingController,
                                   undoHistoryController: _undoController,
+                                  onExpand: _openFullScreenEditor,
                                 )),
                         const SizedBox(height: 16),
                       ],
