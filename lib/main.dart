@@ -353,7 +353,18 @@ class _MainAppState extends State<MainApp> {
                       .where((locale) => locale.languageCode != "en")
                 ],
                 localeResolutionCallback: (locale, supportedLocales) {
-                  return configProvider.getOverrideLanguage();
+                  final override = configProvider.getOverrideLanguage();
+                  if (override != null) return override;
+
+                  if (locale != null) {
+                    for (final supported in supportedLocales) {
+                      if (supported.languageCode == locale.languageCode) {
+                        return supported;
+                      }
+                    }
+                  }
+
+                  return const Locale('en');
                 },
                 theme: lightTheme,
                 darkTheme: darkTheme,
