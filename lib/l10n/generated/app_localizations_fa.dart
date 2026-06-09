@@ -15,28 +15,28 @@ class AppLocalizationsFa extends AppLocalizations {
   String get dailyReminderTitle => 'امروز را ثبت کن!';
 
   @override
-  String get dailyReminderDescription => 'Take your daily log…';
+  String get dailyReminderDescription => 'گزارش روزانه ات رو ثبت کن…';
 
   @override
-  String get actionTakePhoto => 'Take photo';
+  String get actionTakePhoto => 'عکس بگیر';
 
   @override
-  String get actionToday => 'Today';
+  String get actionToday => 'امروز';
 
   @override
-  String get actionOtherDay => 'Other day';
+  String get actionOtherDay => 'روز دیگر';
 
   @override
   String get pageHomeTitle => 'خانه';
 
   @override
-  String get flashbacksTitle => 'Flashbacks';
+  String get flashbacksTitle => 'فلش بک ها';
 
   @override
   String get settingsFlashbacksExcludeBadDays => 'مستثنی کردن روزهای بد';
 
   @override
-  String get flaskbacksEmpty => 'No Flashbacks Yet…';
+  String get flaskbacksEmpty => 'هنوز هیچ فلش بکی وجود ندارد…';
 
   @override
   String get flashbackGoodDay => 'یک روز خوب';
@@ -49,8 +49,8 @@ class AppLocalizationsFa extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count Weeks Ago',
-      one: '$count Week Ago',
+      other: '$count هفته قبل',
+      one: '$count هفته قبل',
     );
     return '$_temp0';
   }
@@ -60,8 +60,8 @@ class AppLocalizationsFa extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count Months Ago',
-      one: '$count Month Ago',
+      other: '$count ماه قبل',
+      one: '$count ماه قبل',
     );
     return '$_temp0';
   }
@@ -71,28 +71,28 @@ class AppLocalizationsFa extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count Years Ago',
-      one: '$count Year Ago',
+      other: '$count سال قبل',
+      one: '$count سال قبل',
     );
     return '$_temp0';
   }
 
   @override
-  String get flashbackOnThisDay => 'On This Day';
+  String get flashbackOnThisDay => 'در این روز';
 
   @override
   String get pageGalleryTitle => 'گالری';
 
   @override
-  String get searchLogsHint => 'Search Logs…';
+  String get searchLogsHint => 'جستوجوی گزارش ها…';
 
   @override
   String logCount(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count logs',
-      one: '$count log',
+      other: '$count گزارش ها',
+      one: '$count گزارش',
     );
     return '$_temp0';
   }
@@ -102,8 +102,8 @@ class AppLocalizationsFa extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count days',
-      one: '$count day',
+      other: '$count روز ها',
+      one: '$count روز',
     );
     return '$_temp0';
   }
@@ -113,14 +113,14 @@ class AppLocalizationsFa extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count words',
-      one: '$count word',
+      other: '$count کلمات',
+      one: '$count کلمه',
     );
     return '$_temp0';
   }
 
   @override
-  String get noLogs => 'No Logs…';
+  String get noLogs => 'هیچ گزارشی وجود ندارد…';
 
   @override
   String get sortDateTitle => 'تاریخ';
@@ -147,7 +147,7 @@ class AppLocalizationsFa extends AppLocalizations {
   String get statisticsRangeOneYear => '۱ سال';
 
   @override
-  String get statisticsRangeAllTime => 'تمام زمان';
+  String get statisticsRangeAllTime => 'کل بازه زمانی';
 
   @override
   String chartSummaryTitle(Object tag) {
@@ -161,7 +161,7 @@ class AppLocalizationsFa extends AppLocalizations {
 
   @override
   String chartOverTimeTitle(Object tag) {
-    return '$tag Over Time';
+    return '$tag در طول زمان';
   }
 
   @override
@@ -169,7 +169,7 @@ class AppLocalizationsFa extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Current Streak $count',
+      other: 'توالی کنونی $count',
     );
     return '$_temp0';
   }
@@ -179,7 +179,7 @@ class AppLocalizationsFa extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Longest Streak $count',
+      other: 'طولانی ترین پیوستگی $count',
     );
     return '$_temp0';
   }
@@ -189,18 +189,18 @@ class AppLocalizationsFa extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Days Since a Bad Day $count',
+      other: 'روز از اخرین روز بد $count',
     );
     return '$_temp0';
   }
 
   @override
   String get errorExternalStorageAccessTitle =>
-      'امکان دسترسی به ذخیره ساز خارجی وجود ندارد';
+      'امکان دسترسی به حافظه خارجی وجود ندارد';
 
   @override
   String get errorExternalStorageAccessDescription =>
-      'If you are using network storage make sure the service is online and you have network access.\n\nOtherwise, the app may have lost permissions for the external folder. Go to settings, and reselect the external folder to grant access.\n\nWarning, changes will not be synced until you restore access to the external storage location!';
+      'اگر از فضای ذخیره‌سازی شبکه استفاده می‌کنید، مطمئن شوید سرویس آنلاین است و به شبکه دسترسی دارید.\n\nدر غیر این صورت، ممکن است اپلیکیشن مجوزهای مربوط به پوشهٔ خارجی ز دست داده باشد. به بخش تنظیمات بروید و پوشهٔ خارجی را دوباره انتخاب کنید تا دسترسی مجدد بدهید.\n\nهشدار: تا زمانی که دسترسی به محل ذخیره‌سازی خارجی را بازیابی نکنید، تغییرات همگام‌سازی نخواهند شد.';
 
   @override
   String get errorExternalStorageAccessContinue => 'ادامه با پایگاه داده محلی';
@@ -215,40 +215,40 @@ class AppLocalizationsFa extends AppLocalizations {
   String get titleHint => 'عنوان…';
 
   @override
-  String get deleteLogTitle => 'Delete Log';
+  String get deleteLogTitle => 'حذف گزارش';
 
   @override
-  String get deleteLogDescription => 'Do you want to delete this log?';
+  String get deleteLogDescription => 'ایا میخواهید این گزارش را حذف کنید؟';
 
   @override
-  String get deletePhotoTitle => 'Delete Photo';
+  String get deletePhotoTitle => 'حذف عکس';
 
   @override
-  String get deletePhotoDescription => 'Do you want to delete this photo?';
+  String get deletePhotoDescription => 'ایا میخواهید این عکس را حذف کنید؟';
 
   @override
-  String get pageSettingsTitle => 'Settings';
+  String get pageSettingsTitle => 'تنظیمات';
 
   @override
-  String get settingsAppearanceTitle => 'Appearance';
+  String get settingsAppearanceTitle => 'ظاهر';
 
   @override
-  String get settingsTheme => 'Theme';
+  String get settingsTheme => 'تم';
 
   @override
-  String get themeSystem => 'System';
+  String get themeSystem => 'سیستم';
 
   @override
-  String get themeLight => 'Light';
+  String get themeLight => 'روشن';
 
   @override
-  String get themeDark => 'Dark';
+  String get themeDark => 'تاریک';
 
   @override
-  String get themeAmoled => 'AMOLED';
+  String get themeAmoled => 'امولد';
 
   @override
-  String get settingsFirstDayOfWeek => 'First Day Of Week';
+  String get settingsFirstDayOfWeek => 'اولین روز هفته';
 
   @override
   String get settingsCalendarSystem => 'سیستم تقویم';
@@ -257,19 +257,19 @@ class AppLocalizationsFa extends AppLocalizations {
   String get calendarSystemGregorian => 'میلادی';
 
   @override
-  String get calendarSystemJalali => 'جلالی';
+  String get calendarSystemJalali => 'شمسی (جلالی)';
 
   @override
-  String get settingsUseSystemAccentColor => 'Use System Accent Color';
+  String get settingsUseSystemAccentColor => 'استفاده از رنگ بندی سیستم';
 
   @override
-  String get settingsCustomAccentColor => 'Custom Accent Color';
+  String get settingsCustomAccentColor => 'شخصی سازی رنگ بندی';
 
   @override
   String get settingsShowMarkdownToolbar => 'Show Markdown Toolbar';
 
   @override
-  String get settingsShowFlashbacks => 'Show Flashbacks';
+  String get settingsShowFlashbacks => 'نمایش فلش بک ها';
 
   @override
   String get settingsChangeMoodIcons => 'تغییر آیکن حس و حال';
@@ -281,59 +281,59 @@ class AppLocalizationsFa extends AppLocalizations {
   String get settingsFlashbacksViewLayout => 'Flashbacks View Layout';
 
   @override
-  String get settingsGalleryViewLayout => 'Gallery View Layout';
+  String get settingsGalleryViewLayout => 'سبک نمایش گالری';
 
   @override
-  String get settingsHideImagesInGallery => 'Hide Images In Gallery';
+  String get settingsHideImagesInGallery => 'پنهان کردن عکس های درون گالری';
 
   @override
-  String get settingsHideImages => 'Hide Images';
+  String get settingsHideImages => 'پنهان کردن عکس ها';
 
   @override
-  String get pageCalendarTitle => 'Calendar';
+  String get pageCalendarTitle => 'تقویم';
 
   @override
-  String get viewLayoutList => 'فهرست';
+  String get viewLayoutList => 'لیست';
 
   @override
   String get viewLayoutGrid => 'مشبک';
 
   @override
-  String get settingsNotificationsTitle => 'آگاه‌سازها';
+  String get settingsNotificationsTitle => 'نوتیفیکشن ها';
 
   @override
   String get settingsDailyReminderOnboarding =>
-      'Enable daily reminders to keep yourself consistent!';
+      'یاداوری روزانه را فعال کن تا همیشه منظم باشی!';
 
   @override
   String get settingsNotificationsPermissionsPrompt =>
-      'اجازه \" زنگ هشدار\" درخواست خواهد شد تا یادآوری را در یک لحظه تصادفی یا در زمان مورد نظر شما ارسال شود.';
+      'مجوز «برنامه‌ریزی هشدارها» درخواست می‌شود تا یادآوری را در یک لحظهٔ تصادفی یا در زمان دلخواه شما ارسال کند.';
 
   @override
   String get settingsDailyReminderTitle => 'یادآوری روزانه';
 
   @override
-  String get settingsOnThisDayDescription => 'Revisit past memories';
+  String get settingsOnThisDayDescription => 'مرور خاطرات گذشته';
 
   @override
-  String get settingsDailyReminderDescription => 'A gentle reminder each day';
+  String get settingsDailyReminderDescription => 'یه یادآوری کوچولو روزانه';
 
   @override
   String get settingsReminderTime => 'زمان یادآوری';
 
   @override
-  String get settingsFixedReminderTimeTitle => 'اصلاح زمان یادآوری';
+  String get settingsFixedReminderTimeTitle => 'زمان یادآوری ثابت';
 
   @override
   String get settingsFixedReminderTimeDescription =>
-      'انتخاب یک زمان ثابت برای یادآوری';
+      'یک زمان ثابت برای یادآوری انتخاب کنید';
 
   @override
   String get settingsAlwaysSendReminderTitle => 'همیشه یادآور ارسال شود';
 
   @override
   String get settingsAlwaysSendReminderDescription =>
-      'Send reminder even if a log was already started';
+      'یادآوری را بفرست، حتی اگر قبلاً یک لاگ شروع شده باشد';
 
   @override
   String get settingsCustomizeNotificationTitle => 'سفارشی سازی اعلان ها';
@@ -360,10 +360,10 @@ class AppLocalizationsFa extends AppLocalizations {
   String get noTemplatesDescription => 'هیچ الگویی هنوز ایجاد نشده است…';
 
   @override
-  String get templateVariableTime => 'Time';
+  String get templateVariableTime => 'زمان';
 
   @override
-  String get templateDefaultTimestampTitle => 'Timestamp';
+  String get templateDefaultTimestampTitle => 'زمان ثبت';
 
   @override
   String templateDefaultTimestampBody(Object date, Object time) {
@@ -371,17 +371,17 @@ class AppLocalizationsFa extends AppLocalizations {
   }
 
   @override
-  String get templateDefaultSummaryTitle => 'Day Summary';
+  String get templateDefaultSummaryTitle => 'خلاصه روز';
 
   @override
-  String get templateDefaultSummaryBody => '### Summary\n- \n\n### Quote\n> ';
+  String get templateDefaultSummaryBody => '### خلاصه\n- \n\n### نقل‌قول\n> ';
 
   @override
-  String get templateDefaultReflectionTitle => 'Reflection';
+  String get templateDefaultReflectionTitle => 'بازتاب';
 
   @override
   String get templateDefaultReflectionBody =>
-      '### What did you enjoy about today?\n- \n\n### What are you thankful for?\n- \n\n### What are you looking forward to?\n- ';
+      '### چه چیزی امروز لذت بخش بود؟\n- \n\n### بابت چه چیزی شکرگزارید؟\n- \n\n### منتظر چه چیزی هستید؟\n- ';
 
   @override
   String get settingsStorageTitle => 'ذخیره سازی';
@@ -402,7 +402,7 @@ class AppLocalizationsFa extends AppLocalizations {
   String get imageQualityNoCompression => 'بدون فشرده سازی';
 
   @override
-  String get settingsLogFolder => 'Log Folder';
+  String get settingsLogFolder => 'پوشه گزارش';
 
   @override
   String get settingsImageFolder => 'پوشه تصاویر';
@@ -412,22 +412,22 @@ class AppLocalizationsFa extends AppLocalizations {
 
   @override
   String get logFolderWarningDescription =>
-      'If the selected folder already contains a \'daily_you.db\' file, it will be used to overwrite your existing logs!';
+      'اگر پوشهٔ انتخابی از قبل شامل فایل \'daily_you.db\' باشد، از آن فایل برای بازنویسی (overwrite) گزارش های موجود شما استفاده خواهد شد!';
 
   @override
   String get errorTitle => 'خطا';
 
   @override
-  String get logFolderErrorDescription => 'Failed to change log folder!';
+  String get logFolderErrorDescription => 'خطا در تغییر پوشه گزارش!';
 
   @override
-  String get imageFolderErrorDescription => 'Failed to change image folder!';
+  String get imageFolderErrorDescription => 'خطا در تغییر پوشه عکس!';
 
   @override
-  String get backupErrorDescription => 'Failed to create backup!';
+  String get backupErrorDescription => 'خطا در پشتیبانی گیری!';
 
   @override
-  String get restoreErrorDescription => 'Failed to restore backup!';
+  String get restoreErrorDescription => 'خطا در بازیابی پشتیبانی!';
 
   @override
   String get settingsBackupRestoreTitle => 'پشتیبان گیری و بازیابی';
@@ -440,7 +440,7 @@ class AppLocalizationsFa extends AppLocalizations {
 
   @override
   String get settingsRestorePromptDescription =>
-      'Restoring a backup will overwrite your existing data!';
+      'بازیابی پشتیبان اطلاعات موجود را بازنویسی خواهد کرد!';
 
   @override
   String tranferStatus(Object percent) {
@@ -449,12 +449,12 @@ class AppLocalizationsFa extends AppLocalizations {
 
   @override
   String creatingBackupStatus(Object percent) {
-    return 'Creating Backup… $percent%';
+    return 'درحال پشتیبانی گیری… $percent%';
   }
 
   @override
   String restoringBackupStatus(Object percent) {
-    return 'Restoring Backup… $percent%';
+    return 'درحال بازیابی اطلاعات… $percent%';
   }
 
   @override
@@ -464,7 +464,7 @@ class AppLocalizationsFa extends AppLocalizations {
   String get settingsExport => 'Export';
 
   @override
-  String get settingsExportToAnotherFormat => 'Export To Another Format';
+  String get settingsExportToAnotherFormat => 'خروجی به فرمت دیگر';
 
   @override
   String get settingsExportFormatDescription =>
@@ -480,11 +480,11 @@ class AppLocalizationsFa extends AppLocalizations {
   String get settingsImport => 'Import';
 
   @override
-  String get settingsImportFromAnotherApp => 'Import From Another App';
+  String get settingsImportFromAnotherApp => 'ورودی از یک برنامه دیگر';
 
   @override
   String get settingsTranslateCallToAction =>
-      'Everyone should have access to a journal!';
+      'همه باید به یه یادداشت روزانه دسترسی داشته باشه!';
 
   @override
   String get settingsHelpTranslate => 'کمک به ترجمه';
@@ -500,7 +500,7 @@ class AppLocalizationsFa extends AppLocalizations {
 
   @override
   String get logFormatDescription =>
-      'Another app\'s format may not support all features. Please report any issues since third party formats may change at any time. This will not impact existing logs!';
+      'فرمت اپلیکیشن دیگر ممکن است همهٔ قابلیت‌ها را پشتیبانی نکند. لطفاً مشکلات را گزارش دهید، چون فرمت‌های شخص ثالث ممکن است هر لحظه تغییر کنند. این کار به گزارش های فعلی شما آسیبی نمی‌زند!';
 
   @override
   String get formatDailyYouJson => 'Daily You (JSON)';
@@ -527,18 +527,18 @@ class AppLocalizationsFa extends AppLocalizations {
   String get formatPixels => 'Pixels';
 
   @override
-  String get formatMarkdown => 'Markdown';
+  String get formatMarkdown => 'مارک داون';
 
   @override
-  String get settingsDeleteAllLogsTitle => 'Delete All Logs';
+  String get settingsDeleteAllLogsTitle => 'حذف همه گزارش ها';
 
   @override
   String get settingsDeleteAllLogsDescription =>
-      'Do you want to delete all of your logs?';
+      'ایا می‌خواهید همه گزارش ها را حذف کنید؟';
 
   @override
   String settingsDeleteAllLogsPrompt(Object prompt) {
-    return 'Enter \'$prompt\' to confirm. This cannot be undone!';
+    return 'برای تأیید \'$prompt\' را وارد کنید. این عمل قابل بازگشت نیست!';
   }
 
   @override
@@ -548,7 +548,7 @@ class AppLocalizationsFa extends AppLocalizations {
   String get settingsAppLanguageTitle => 'زبان برنامه';
 
   @override
-  String get settingsOverrideAppLanguageTitle => 'Override App Language';
+  String get settingsOverrideAppLanguageTitle => 'نادیده گرفتن زبان برنامه';
 
   @override
   String get settingsSecurityTitle => 'امنیت';
@@ -575,7 +575,7 @@ class AppLocalizationsFa extends AppLocalizations {
   String get settingsSecurityOldPassword => 'گذرواژه قدیمی';
 
   @override
-  String get settingsSecurityIncorrectPassword => 'Incorrect Password';
+  String get settingsSecurityIncorrectPassword => 'رمز اشتباه';
 
   @override
   String get settingsSecurityPasswordsDoNotMatch => 'گذرواژه منطبق نیست';
@@ -584,10 +584,10 @@ class AppLocalizationsFa extends AppLocalizations {
   String get requiredPrompt => 'نیاز است';
 
   @override
-  String get settingsSecurityBiometricUnlock => 'Biometric Unlock';
+  String get settingsSecurityBiometricUnlock => 'بازکردن بایومتریک';
 
   @override
-  String get unlockAppPrompt => 'Unlock the app';
+  String get unlockAppPrompt => 'قفل برنامه را باز کنید';
 
   @override
   String get settingsAboutTitle => 'درباره';

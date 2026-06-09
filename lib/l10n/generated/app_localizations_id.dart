@@ -18,13 +18,13 @@ class AppLocalizationsId extends AppLocalizations {
   String get dailyReminderDescription => 'Ambil log harian Anda…';
 
   @override
-  String get actionTakePhoto => 'Take photo';
+  String get actionTakePhoto => 'Ambil foto';
 
   @override
-  String get actionToday => 'Today';
+  String get actionToday => 'Hari ini';
 
   @override
-  String get actionOtherDay => 'Other day';
+  String get actionOtherDay => 'Hari lain';
 
   @override
   String get pageHomeTitle => 'Beranda';
@@ -78,7 +78,7 @@ class AppLocalizationsId extends AppLocalizations {
   }
 
   @override
-  String get flashbackOnThisDay => 'On This Day';
+  String get flashbackOnThisDay => 'Pada Hari Ini';
 
   @override
   String get pageGalleryTitle => 'Galeri';
@@ -102,8 +102,8 @@ class AppLocalizationsId extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count days',
-      one: '$count day',
+      other: '$count hari',
+      one: '$count hari',
     );
     return '$_temp0';
   }
@@ -161,7 +161,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String chartOverTimeTitle(Object tag) {
-    return '$tag Over Time';
+    return '$tag Seiring Waktu';
   }
 
   @override
@@ -252,7 +252,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get settingsFirstDayOfWeek => 'Hari pertama dalam seminggu';
 
   @override
-  String get settingsCalendarSystem => 'Calendar System';
+  String get settingsCalendarSystem => 'Sistem Kalender';
 
   @override
   String get calendarSystemGregorian => 'Gregorian';
@@ -288,10 +288,10 @@ class AppLocalizationsId extends AppLocalizations {
   String get settingsHideImagesInGallery => 'Sembunyikan Gambar di Galeri';
 
   @override
-  String get settingsHideImages => 'Hide Images';
+  String get settingsHideImages => 'Sembunyikan Gambar';
 
   @override
-  String get pageCalendarTitle => 'Calendar';
+  String get pageCalendarTitle => 'Kalender';
 
   @override
   String get viewLayoutList => 'Daftar';
@@ -314,7 +314,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get settingsDailyReminderTitle => 'Pengingat harian';
 
   @override
-  String get settingsOnThisDayDescription => 'Revisit past memories';
+  String get settingsOnThisDayDescription => 'Kunjungi kembali kenangan lama';
 
   @override
   String get settingsDailyReminderDescription => 'Pengingat lembut setiap hari';
@@ -361,10 +361,10 @@ class AppLocalizationsId extends AppLocalizations {
   String get noTemplatesDescription => 'Belum ada template yang dibuat…';
 
   @override
-  String get templateVariableTime => 'Time';
+  String get templateVariableTime => 'Waktu';
 
   @override
-  String get templateDefaultTimestampTitle => 'Timestamp';
+  String get templateDefaultTimestampTitle => 'Stempel waktu';
 
   @override
   String templateDefaultTimestampBody(Object date, Object time) {
@@ -372,17 +372,18 @@ class AppLocalizationsId extends AppLocalizations {
   }
 
   @override
-  String get templateDefaultSummaryTitle => 'Day Summary';
+  String get templateDefaultSummaryTitle => 'Ringkasan Hari';
 
   @override
-  String get templateDefaultSummaryBody => '### Summary\n- \n\n### Quote\n> ';
+  String get templateDefaultSummaryBody =>
+      '### Ringkasan\n- \n\n### Kutipan\n> ';
 
   @override
-  String get templateDefaultReflectionTitle => 'Reflection';
+  String get templateDefaultReflectionTitle => 'Refleksi';
 
   @override
   String get templateDefaultReflectionBody =>
-      '### What did you enjoy about today?\n- \n\n### What are you thankful for?\n- \n\n### What are you looking forward to?\n- ';
+      '### Apa yang Anda nikmati hari ini?\n- \n\n### Apa yang Anda syukuri?\n- \n\n### Apa yang Anda nantikan?\n- ';
 
   @override
   String get settingsStorageTitle => 'Penyimpanan';

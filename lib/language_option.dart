@@ -31,6 +31,7 @@ class LanguageOption {
     LanguageOption(languageCode: "ja"): "日本語",
     LanguageOption(languageCode: "ko"): "한국어",
     LanguageOption(languageCode: "lt"): "lietuvių",
+    LanguageOption(languageCode: "ms"): "Bahasa Melayu",
     LanguageOption(languageCode: "nb"): "norsk bokmål",
     LanguageOption(languageCode: "nl"): "Nederlands",
     LanguageOption(languageCode: "oc"): "Occitan",

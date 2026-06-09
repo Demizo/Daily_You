@@ -250,13 +250,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsFirstDayOfWeek => '一周开始日';
 
   @override
-  String get settingsCalendarSystem => 'Calendar System';
+  String get settingsCalendarSystem => '历法系统';
 
   @override
-  String get calendarSystemGregorian => 'Gregorian';
+  String get calendarSystemGregorian => '公历';
 
   @override
-  String get calendarSystemJalali => 'Jalali';
+  String get calendarSystemJalali => '波斯历';
 
   @override
   String get settingsUseSystemAccentColor => '使用系统强调色';
@@ -849,6 +849,15 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get settingsFirstDayOfWeek => '一週的起始日';
+
+  @override
+  String get settingsCalendarSystem => '曆法系統';
+
+  @override
+  String get calendarSystemGregorian => '公曆';
+
+  @override
+  String get calendarSystemJalali => '波斯曆';
 
   @override
   String get settingsUseSystemAccentColor => '使用系統強調色';

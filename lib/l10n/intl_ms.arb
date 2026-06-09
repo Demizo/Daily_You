@@ -125,7 +125,7 @@
     "formatMarkdown": "Markdown",
     "settingsDeleteAllLogsTitle": "Padam Semua Log",
     "settingsDeleteAllLogsDescription": "Adakah anda ingin memadam semua log anda?",
-    "settingsDeleteAllLogsPrompt": "Masukkan '{gesaan}' untuk meneruskan. Ini tidak dapat dibatalkan!",
+    "settingsDeleteAllLogsPrompt": "Masukkan '{prompt}' untuk meneruskan. Ini tidak dapat dibatalkan!",
     "settingsLanguageTitle": "Bahasa",
     "settingsAppLanguageTitle": "Bahasa Apl",
     "settingsOverrideAppLanguageTitle": "Bahasa Aplikasi Ganti",

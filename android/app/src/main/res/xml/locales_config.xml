@@ -18,6 +18,7 @@
   <locale android:name="ja" />
   <locale android:name="ko" />
   <locale android:name="lt" />
+  <locale android:name="ms" />
   <locale android:name="nb" />
   <locale android:name="nl" />
   <locale android:name="oc" />

@@ -264,10 +264,10 @@ class AppLocalizationsLt extends AppLocalizations {
   String get settingsFirstDayOfWeek => 'Pirmoji savaitės diena';
 
   @override
-  String get settingsCalendarSystem => 'Calendar System';
+  String get settingsCalendarSystem => 'Kalendoriaus sistema';
 
   @override
-  String get calendarSystemGregorian => 'Gregorian';
+  String get calendarSystemGregorian => 'Grigaliaus';
 
   @override
   String get calendarSystemJalali => 'Jalali';
