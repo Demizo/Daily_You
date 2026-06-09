@@ -1,0 +1,6 @@
+Daily You v2.24.1 has arrived! It's about time:
+
+• Improved Jalali calendar support
+• Explicitly set a language fallback
+• Minor UI fixes
+• Updated translations
