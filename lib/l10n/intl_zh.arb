@@ -157,5 +157,8 @@
     "settingsHideImages": "隐藏图片",
     "pageCalendarTitle": "月历",
     "dayCount": "{count, plural, one{{count} 天} other{{count} 天}}",
-    "chartOverTimeTitle": "{tag} 起伏"
+    "chartOverTimeTitle": "{tag} 起伏",
+    "settingsCalendarSystem": "历法系统",
+    "calendarSystemGregorian": "公历",
+    "calendarSystemJalali": "波斯历"
 }

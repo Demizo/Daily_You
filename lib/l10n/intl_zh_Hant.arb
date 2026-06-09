@@ -158,5 +158,8 @@
     "dayCount": "{count, plural, one{{count} 天} other{{count} 天}}",
     "chartOverTimeTitle": "{tag} 隨著時間的變化",
     "settingsHideImages": "隱藏圖片",
-    "pageCalendarTitle": "月曆"
+    "pageCalendarTitle": "月曆",
+    "settingsCalendarSystem": "曆法系統",
+    "calendarSystemGregorian": "公曆",
+    "calendarSystemJalali": "波斯曆"
 }
