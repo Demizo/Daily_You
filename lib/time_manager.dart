@@ -133,6 +133,11 @@ class TimeManager {
     if (platformLocale.languageCode == "oc") {
       return Locale("fr").toString();
     }
+    // Map zh_Hant to zh_TW which has Traditional Chinese data.
+    if (platformLocale.languageCode == "zh" &&
+        platformLocale.scriptCode == "Hant") {
+      return const Locale("zh", "TW").toString();
+    }
     return platformLocale.toString();
   }
 
