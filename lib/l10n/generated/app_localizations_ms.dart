@@ -563,5 +563,8 @@ class AppLocalizationsMs extends AppLocalizations {
   String get settingsConsiderSupporting => 'pertimbangkan untuk menyokong';
 
   @override
+  String get imagesTitle => 'Images';
+
+  @override
   String get tagMoodTitle => 'Suasana';
 }

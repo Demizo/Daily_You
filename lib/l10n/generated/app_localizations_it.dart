@@ -622,5 +622,8 @@ class AppLocalizationsIt extends AppLocalizations {
       'Considera la possibilità di sostenere il progetto';
 
   @override
+  String get imagesTitle => 'Images';
+
+  @override
   String get tagMoodTitle => 'Stato d\'animo';
 }

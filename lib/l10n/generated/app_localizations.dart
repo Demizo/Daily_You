@@ -1168,6 +1168,12 @@ abstract class AppLocalizations {
   /// **'consider supporting'**
   String get settingsConsiderSupporting;
 
+  /// No description provided for @imagesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Images'**
+  String get imagesTitle;
+
   /// No description provided for @tagMoodTitle.
   ///
   /// In en, this message translates to:

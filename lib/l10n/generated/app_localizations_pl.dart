@@ -618,5 +618,8 @@ class AppLocalizationsPl extends AppLocalizations {
   String get settingsConsiderSupporting => 'rozważ wsparcie';
 
   @override
+  String get imagesTitle => 'Images';
+
+  @override
   String get tagMoodTitle => 'Nastrój';
 }

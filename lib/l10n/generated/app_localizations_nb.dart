@@ -612,5 +612,8 @@ class AppLocalizationsNb extends AppLocalizations {
   String get settingsConsiderSupporting => 'consider supporting';
 
   @override
+  String get imagesTitle => 'Images';
+
+  @override
   String get tagMoodTitle => 'Mood';
 }

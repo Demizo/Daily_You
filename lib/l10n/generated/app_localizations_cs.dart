@@ -608,5 +608,8 @@ class AppLocalizationsCs extends AppLocalizations {
   String get settingsConsiderSupporting => 'zvažte podporu';
 
   @override
+  String get imagesTitle => 'Images';
+
+  @override
   String get tagMoodTitle => 'Nálada';
 }

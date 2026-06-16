@@ -21,7 +21,8 @@ class EntryDayCell extends StatelessWidget {
   final List<Entry> entries;
   final EntryImage? firstImage;
 
-  final bool isMoodFocus;
+  final bool showImages;
+  final bool showMood;
   final bool isJalali;
 
   const EntryDayCell({
@@ -32,7 +33,8 @@ class EntryDayCell extends StatelessWidget {
     required this.cellSize,
     required this.entries,
     required this.firstImage,
-    this.isMoodFocus = false,
+    this.showImages = true,
+    this.showMood = true,
     this.isJalali = false,
   });
 
@@ -170,7 +172,7 @@ class EntryDayCell extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     if (entries.isNotEmpty) {
-      final showImage = !isMoodFocus && firstImage != null;
+      final showImageBg = showImages && firstImage != null;
       return MergeSemantics(
           child: GestureDetector(
         onTap: () async {
@@ -199,14 +201,14 @@ class EntryDayCell extends StatelessWidget {
                   color: colorScheme.secondaryContainer,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                clipBehavior: showImage ? Clip.hardEdge : Clip.none,
-                child: showImage
+                clipBehavior: showImageBg ? Clip.hardEdge : Clip.none,
+                child: showImageBg
                     ? LocalImageLoader(
                         imagePath: firstImage!.imgPath,
                         cacheSize: 100,
                       )
                     : Center(
-                        child: isMoodFocus && firstEntry?.mood != null
+                        child: !showImages && showMood && firstEntry?.mood != null
                             ? Container(
                                 width: 40,
                                 height: 40,
@@ -225,13 +227,11 @@ class EntryDayCell extends StatelessWidget {
                             : Text(
                                 '${isJalali ? TimeManager.jalaliDayNumber(date) : date.day}',
                                 style: TextStyle(
-                                    color: isMoodFocus
-                                        ? null
-                                        : colorScheme.onSecondaryContainer,
+                                    color: colorScheme.onSecondaryContainer,
                                     fontSize: 16)),
                       ),
               ),
-              if (showImage)
+              if (showImageBg)
                 ExcludeSemantics(
                   child: RawImage(
                     image: dayNumber,
@@ -242,7 +242,7 @@ class EntryDayCell extends StatelessWidget {
                 right: 0,
                 child: isMulti
                     ? _countBadge(context, entries.length)
-                    : !isMoodFocus && firstEntry!.mood != null
+                    : showImages && showMood && firstEntry!.mood != null
                         ? Container(
                             width: 23,
                             height: 23,

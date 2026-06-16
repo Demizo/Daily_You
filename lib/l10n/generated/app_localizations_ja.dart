@@ -604,5 +604,8 @@ class AppLocalizationsJa extends AppLocalizations {
   String get settingsConsiderSupporting => '支援の検討';
 
   @override
+  String get imagesTitle => 'Images';
+
+  @override
   String get tagMoodTitle => '気分';
 }

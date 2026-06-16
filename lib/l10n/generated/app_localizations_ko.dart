@@ -604,5 +604,8 @@ class AppLocalizationsKo extends AppLocalizations {
   String get settingsConsiderSupporting => '앱을 후원해주세요';
 
   @override
+  String get imagesTitle => 'Images';
+
+  @override
   String get tagMoodTitle => '기분';
 }

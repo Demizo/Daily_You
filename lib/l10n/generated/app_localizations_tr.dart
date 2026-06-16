@@ -612,5 +612,8 @@ class AppLocalizationsTr extends AppLocalizations {
   String get settingsConsiderSupporting => 'desteklemeyi düşünün';
 
   @override
+  String get imagesTitle => 'Images';
+
+  @override
   String get tagMoodTitle => 'Ruh hali';
 }

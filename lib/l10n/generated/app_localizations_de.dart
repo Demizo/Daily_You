@@ -619,5 +619,8 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsConsiderSupporting => 'unterstützen';
 
   @override
+  String get imagesTitle => 'Images';
+
+  @override
   String get tagMoodTitle => 'Stimmung';
 }

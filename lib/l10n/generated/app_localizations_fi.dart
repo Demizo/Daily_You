@@ -618,5 +618,8 @@ class AppLocalizationsFi extends AppLocalizations {
   String get settingsConsiderSupporting => 'harkitse tukemista';
 
   @override
+  String get imagesTitle => 'Images';
+
+  @override
   String get tagMoodTitle => 'Mieliala';
 }
