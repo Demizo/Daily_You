@@ -1,6 +1,7 @@
 import 'dart:ui' as ui;
 
 import 'package:daily_you/config_provider.dart';
+import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/pages/entries_list_page.dart';
 import 'package:daily_you/pages/entry_timeline_page.dart';
@@ -265,8 +266,7 @@ class _VerticalCalendarState extends State<VerticalCalendar>
 
       while (!weekIter.isBefore(firstWeekStart)) {
         final days = List<DateTime?>.generate(7, (i) {
-          final day =
-              DateTime(weekIter.year, weekIter.month, weekIter.day + i);
+          final day = DateTime(weekIter.year, weekIter.month, weekIter.day + i);
           final jDay = Jalali.fromDateTime(day);
           return (jDay.year == current.year && jDay.month == current.month)
               ? day
@@ -281,8 +281,7 @@ class _VerticalCalendarState extends State<VerticalCalendar>
 
         items.add(_WeekRowItem(days));
         offset += _weekRowHeight;
-        weekIter =
-            DateTime(weekIter.year, weekIter.month, weekIter.day - 7);
+        weekIter = DateTime(weekIter.year, weekIter.month, weekIter.day - 7);
       }
 
       items.add(_MonthHeaderItem(monthStart));
@@ -362,11 +361,9 @@ class _VerticalCalendarState extends State<VerticalCalendar>
     super.build(context);
     final configProvider = context.watch<ConfigProvider>();
     final firstDayIndex = configProvider.getFirstDayOfWeekIndex(context);
-    final hideImages =
-        configProvider.get(ConfigKey.hideImagesInCalendar) == true;
-    final isMoodFocus =
-        (configProvider.get(ConfigKey.calendarFocusMode) ?? 'images') ==
-            'moods';
+    final showImages =
+        configProvider.get(ConfigKey.hideImagesInCalendar) != true;
+    final showMood = configProvider.get(ConfigKey.calendarShowMood) != false;
     final entriesProvider = context.watch<EntriesProvider>();
     final imagesProvider = context.watch<EntryImagesProvider>();
 
@@ -412,9 +409,13 @@ class _VerticalCalendarState extends State<VerticalCalendar>
                         SliverFixedExtentList(
                           itemExtent: _weekRowHeight,
                           delegate: SliverChildBuilderDelegate(
-                            (context, index) => _buildItem(context, index,
-                                entriesProvider, imagesProvider, hideImages,
-                                isMoodFocus),
+                            (context, index) => _buildItem(
+                                context,
+                                index,
+                                entriesProvider,
+                                imagesProvider,
+                                showImages,
+                                showMood),
                             childCount: _items.length,
                           ),
                         ),
@@ -423,7 +424,7 @@ class _VerticalCalendarState extends State<VerticalCalendar>
                   ),
                 ],
               ),
-              _buildCalendarControls(context, isMoodFocus),
+              _buildCalendarControls(context, showImages, showMood),
               _buildJumpToTodayButton(context),
             ]);
       },
@@ -460,8 +461,10 @@ class _VerticalCalendarState extends State<VerticalCalendar>
     );
   }
 
-  Widget _buildCalendarControls(BuildContext context, bool isMoodFocus) {
+  Widget _buildCalendarControls(
+      BuildContext context, bool showImages, bool showMood) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return Row(
       children: [
         Padding(
@@ -487,18 +490,32 @@ class _VerticalCalendarState extends State<VerticalCalendar>
                   color: theme.colorScheme.primary,
                   padding: const EdgeInsets.all(8),
                 ),
-                IconButton(
-                  onPressed: () {
-                    context.read<ConfigProvider>().set(
-                          ConfigKey.calendarFocusMode,
-                          isMoodFocus ? 'images' : 'moods',
-                        );
-                  },
-                  icon: Icon(isMoodFocus
-                      ? Icons.image_rounded
-                      : Icons.mood_rounded),
-                  color: theme.colorScheme.primary,
+                PopupMenuButton<String>(
+                  icon: Icon(Icons.visibility_rounded,
+                      color: theme.colorScheme.primary),
                   padding: const EdgeInsets.all(8),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16)),
+                  itemBuilder: (context) => [
+                    CheckedPopupMenuItem<String>(
+                      value: 'images',
+                      checked: showImages,
+                      child: Text(l10n.imagesTitle),
+                    ),
+                    CheckedPopupMenuItem<String>(
+                      value: 'mood',
+                      checked: showMood,
+                      child: Text(l10n.tagMoodTitle),
+                    ),
+                  ],
+                  onSelected: (value) {
+                    final config = context.read<ConfigProvider>();
+                    if (value == 'images') {
+                      config.set(ConfigKey.hideImagesInCalendar, showImages);
+                    } else {
+                      config.set(ConfigKey.calendarShowMood, !showMood);
+                    }
+                  },
                 ),
               ],
             ),
@@ -564,7 +581,8 @@ class _VerticalCalendarState extends State<VerticalCalendar>
             .toList()
             .reversed
             .toList(),
-        labelBuilder: (e) => TimeManager.localizedTimeFormat(locale).format(e.timeCreate),
+        labelBuilder: (e) =>
+            TimeManager.localizedTimeFormat(locale).format(e.timeCreate),
       ),
     ));
   }
@@ -612,14 +630,18 @@ class _VerticalCalendarState extends State<VerticalCalendar>
     _jumpToMonth(selected);
   }
 
-  Widget _buildItem(BuildContext context, int index,
-      EntriesProvider entriesProvider, EntryImagesProvider imagesProvider,
-      bool hideImages, bool isMoodFocus) {
+  Widget _buildItem(
+      BuildContext context,
+      int index,
+      EntriesProvider entriesProvider,
+      EntryImagesProvider imagesProvider,
+      bool showImages,
+      bool showMood) {
     final item = _items[index];
     if (item is _MonthHeaderItem) return _buildMonthHeader(context, item.month);
     if (item is _WeekRowItem) {
-      return _buildWeekRow(context, item, entriesProvider, imagesProvider,
-          hideImages, isMoodFocus);
+      return _buildWeekRow(
+          context, item, entriesProvider, imagesProvider, showImages, showMood);
     }
     return const SizedBox.shrink();
   }
@@ -657,8 +679,8 @@ class _VerticalCalendarState extends State<VerticalCalendar>
       _WeekRowItem item,
       EntriesProvider entriesProvider,
       EntryImagesProvider imagesProvider,
-      bool hideImages,
-      bool isMoodFocus) {
+      bool showImages,
+      bool showMood) {
     return RepaintBoundary(
       child: _WeekRow(
         days: item.days,
@@ -667,8 +689,8 @@ class _VerticalCalendarState extends State<VerticalCalendar>
         dayNumberCache: _dayNumberCache,
         entriesProvider: entriesProvider,
         imagesProvider: imagesProvider,
-        hideImages: hideImages,
-        isMoodFocus: isMoodFocus,
+        showImages: showImages,
+        showMood: showMood,
         isJalali: _isJalali,
       ),
     );
@@ -682,8 +704,8 @@ class _WeekRow extends StatelessWidget {
   final Map<int, ui.Image> dayNumberCache;
   final EntriesProvider entriesProvider;
   final EntryImagesProvider imagesProvider;
-  final bool hideImages;
-  final bool isMoodFocus;
+  final bool showImages;
+  final bool showMood;
   final bool isJalali;
 
   const _WeekRow({
@@ -693,8 +715,8 @@ class _WeekRow extends StatelessWidget {
     required this.dayNumberCache,
     required this.entriesProvider,
     required this.imagesProvider,
-    required this.hideImages,
-    required this.isMoodFocus,
+    required this.showImages,
+    required this.showMood,
     this.isJalali = false,
   });
 
@@ -745,13 +767,12 @@ class _WeekRow extends StatelessWidget {
 
           final entries = entriesProvider.getEntriesForDate(day);
           final firstEntry = entries.firstOrNull;
-          final firstImage = hideImages || isMoodFocus || firstEntry == null
+          final firstImage = !showImages || firstEntry == null
               ? null
               : imagesProvider.getFirstImageForEntry(firstEntry.id!);
 
-          final displayDayNum = isJalali
-              ? TimeManager.jalaliDayNumber(day)
-              : day.day;
+          final displayDayNum =
+              isJalali ? TimeManager.jalaliDayNumber(day) : day.day;
 
           return SizedBox(
             width: cellSize,
@@ -763,7 +784,8 @@ class _WeekRow extends StatelessWidget {
               firstImage: firstImage,
               cellSize: cellSize,
               dayNumber: dayNumberCache[displayDayNum],
-              isMoodFocus: isMoodFocus,
+              showImages: showImages,
+              showMood: showMood,
               isJalali: isJalali,
             ),
           );

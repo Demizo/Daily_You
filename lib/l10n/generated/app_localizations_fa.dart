@@ -611,5 +611,8 @@ class AppLocalizationsFa extends AppLocalizations {
   String get settingsConsiderSupporting => 'حمایت را در نظر بگیرید';
 
   @override
+  String get imagesTitle => 'Images';
+
+  @override
   String get tagMoodTitle => 'حس و حال';
 }

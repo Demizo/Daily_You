@@ -620,5 +620,8 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settingsConsiderSupporting => 'overweeg te ondersteunen';
 
   @override
+  String get imagesTitle => 'Images';
+
+  @override
   String get tagMoodTitle => 'Humeur';
 }

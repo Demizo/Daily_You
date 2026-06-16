@@ -622,5 +622,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsConsiderSupporting => 'подумайте о поддержке проекта';
 
   @override
+  String get imagesTitle => 'Images';
+
+  @override
   String get tagMoodTitle => 'Настроение';
 }

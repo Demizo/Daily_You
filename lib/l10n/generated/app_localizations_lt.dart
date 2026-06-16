@@ -630,5 +630,8 @@ class AppLocalizationsLt extends AppLocalizations {
   String get settingsConsiderSupporting => 'apsvarstykite galimybę paremti';
 
   @override
+  String get imagesTitle => 'Images';
+
+  @override
   String get tagMoodTitle => 'Nuotaika';
 }

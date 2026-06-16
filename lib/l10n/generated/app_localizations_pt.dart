@@ -616,6 +616,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settingsConsiderSupporting => 'Considere Apoiar';
 
   @override
+  String get imagesTitle => 'Images';
+
+  @override
   String get tagMoodTitle => 'Humor';
 }
 

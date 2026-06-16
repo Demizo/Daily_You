@@ -602,6 +602,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsConsiderSupporting => '考虑支持';
 
   @override
+  String get imagesTitle => 'Images';
+
+  @override
   String get tagMoodTitle => '心情';
 }
 

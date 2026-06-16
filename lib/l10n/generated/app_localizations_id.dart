@@ -613,5 +613,8 @@ class AppLocalizationsId extends AppLocalizations {
   String get settingsConsiderSupporting => 'pertimbangkan untuk mendukung';
 
   @override
+  String get imagesTitle => 'Images';
+
+  @override
   String get tagMoodTitle => 'Perasaan';
 }

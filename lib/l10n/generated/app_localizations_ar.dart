@@ -617,5 +617,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsConsiderSupporting => 'فكر في الدعم';
 
   @override
+  String get imagesTitle => 'Images';
+
+  @override
   String get tagMoodTitle => 'المزاج';
 }

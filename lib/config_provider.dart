@@ -61,7 +61,7 @@ class ConfigKey {
   static const String hideImagesInFlashbacks = "hideImagesInFlashbacks";
   static const String lastDismissedSupportBannerDate =
       "lastDismissedSupportBannerDate";
-  static const String calendarFocusMode = "calendarFocusMode";
+  static const String calendarShowMood = "calendarShowMood";
   static const String calendarSystem = "calendarSystem";
   // Secure Configuration Values
   static const String requirePassword = "requirePassword";
@@ -72,6 +72,7 @@ class ConfigKey {
   static const String homePageViewMode = "homePageViewMode";
   static const String calendarViewMode = "calendarViewMode";
   static const String noMoodIcon = "noMoodIcon";
+  static const String calendarFocusMode = "calendarFocusMode";
 }
 
 class ImageQuality {
@@ -134,7 +135,7 @@ class ConfigProvider with ChangeNotifier {
     ConfigKey.hideImagesInCalendar: false,
     ConfigKey.hideImagesInFlashbacks: false,
     ConfigKey.lastDismissedSupportBannerDate: null,
-    ConfigKey.calendarFocusMode: 'images',
+    ConfigKey.calendarShowMood: true,
     ConfigKey.calendarSystem: 'system',
   };
 

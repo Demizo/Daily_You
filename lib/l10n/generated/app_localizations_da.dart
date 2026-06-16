@@ -611,5 +611,8 @@ class AppLocalizationsDa extends AppLocalizations {
   String get settingsConsiderSupporting => 'overvej at støtte';
 
   @override
+  String get imagesTitle => 'Images';
+
+  @override
   String get tagMoodTitle => 'Humør';
 }

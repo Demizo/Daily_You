@@ -620,5 +620,8 @@ class AppLocalizationsUk extends AppLocalizations {
   String get settingsConsiderSupporting => 'розглянути можливість підтримки';
 
   @override
+  String get imagesTitle => 'Images';
+
+  @override
   String get tagMoodTitle => 'Настрій';
 }
