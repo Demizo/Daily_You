@@ -161,5 +161,6 @@
     "pageCalendarTitle": "月曆",
     "settingsCalendarSystem": "曆法系統",
     "calendarSystemGregorian": "公曆",
-    "calendarSystemJalali": "波斯曆"
+    "calendarSystemJalali": "波斯曆",
+    "imagesTitle": "影像"
 }
