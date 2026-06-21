@@ -45,13 +45,12 @@ class TemplateSelectButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-        padding: EdgeInsets.zero,
-        visualDensity: VisualDensity.compact,
-        onPressed: () => _showTemplateSelectPopup(context),
-        icon: Icon(
-          Icons.note_add_rounded,
-          color: Theme.of(context).colorScheme.primary,
-          size: 24,
-        ));
+      style: IconButton.styleFrom(
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+        foregroundColor: Theme.of(context).colorScheme.primary,
+      ),
+      onPressed: () => _showTemplateSelectPopup(context),
+      icon: const Icon(Icons.note_add_rounded, size: 24),
+    );
   }
 }

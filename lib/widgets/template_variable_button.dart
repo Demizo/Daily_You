@@ -29,16 +29,16 @@ class TemplateVariableButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<String>(
-      elevation: 1,
-      child: IconButton(
-          padding: EdgeInsets.zero,
-          visualDensity: VisualDensity.compact,
-          onPressed: null, // Do nothing
-          icon: Icon(
-            Icons.add_circle_rounded,
-            color: Theme.of(context).colorScheme.primary,
-            size: 24,
-          )),
+      icon:
+          Icon(Icons.add_rounded, color: Theme.of(context).colorScheme.primary),
+      iconSize: 24,
+      style: IconButton.styleFrom(
+        backgroundColor: Theme.of(context)
+            .colorScheme
+            .primaryContainer, // Your background color
+      ),
+      padding: const EdgeInsets.all(8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       onSelected: (String newValue) {
         _addVariableToText(context, newValue);
       },
