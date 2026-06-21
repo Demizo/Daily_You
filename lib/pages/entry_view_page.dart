@@ -50,104 +50,115 @@ class _EntryViewPageState extends State<EntryViewPage> {
           _editButton(context, entry, images),
         ],
       ),
-      body: Center(
-        child: Container(
-          constraints: BoxConstraints.loose(const Size.fromWidth(800)),
-          child: ListView(
-            padding: const EdgeInsets.only(left: 8, right: 8),
-            children: [
-              if (images.isNotEmpty && images.length > 1)
-                _imagesList(context, images),
-              if (images.isNotEmpty && images.length == 1)
-                GestureDetector(
-                  child: Center(
-                    child: SizedBox(
-                      height: 220,
-                      width: 220,
-                      child: Card.filled(
-                          clipBehavior: Clip.antiAlias,
-                          child: LocalImageLoader(
-                              imagePath: images.first.imgPath)),
-                    ),
-                  ),
-                  onTap: () async {
-                    await Navigator.of(context).push(MaterialPageRoute(
-                      allowSnapshotting: false,
-                      fullscreenDialog: true,
-                      builder: (context) => ImageViewPage(
-                        images: images,
-                        index: 0,
+      body: ListView(
+        children: [
+          Align(
+            alignment: Alignment.topCenter,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 800),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8, right: 8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (images.isNotEmpty && images.length > 1)
+                      _imagesList(context, images),
+                    if (images.isNotEmpty && images.length == 1)
+                      GestureDetector(
+                        child: Center(
+                          child: SizedBox(
+                            height: 220,
+                            width: 220,
+                            child: Card.filled(
+                                clipBehavior: Clip.antiAlias,
+                                child: LocalImageLoader(
+                                    imagePath: images.first.imgPath)),
+                          ),
+                        ),
+                        onTap: () async {
+                          await Navigator.of(context).push(MaterialPageRoute(
+                            allowSnapshotting: false,
+                            fullscreenDialog: true,
+                            builder: (context) => ImageViewPage(
+                              images: images,
+                              index: 0,
+                            ),
+                          ));
+                        },
                       ),
-                    ));
-                  },
-                ),
-              Card.filled(
-                color: Theme.of(context).colorScheme.surfaceContainer,
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                      left: 8, top: 4, bottom: 4, right: 8),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: Wrap(
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      alignment: WrapAlignment.spaceBetween,
-                      children: [
-                        IntrinsicHeight(
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
+                    Card.filled(
+                      color: Theme.of(context).colorScheme.surfaceContainer,
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            left: 8, top: 4, bottom: 4, right: 8),
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            alignment: WrapAlignment.spaceBetween,
                             children: [
-                              Text(
-                                TimeManager.formatDateWithWeekday(
-                                  entry.timeCreate,
-                                  context,
+                              IntrinsicHeight(
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      TimeManager.formatDateWithWeekday(
+                                        entry.timeCreate,
+                                        context,
+                                      ),
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    VerticalDivider(
+                                      width: 16,
+                                      thickness: 2,
+                                      radius: BorderRadius.circular(4),
+                                    ),
+                                    Text(
+                                      TimeManager.localizedTimeFormat(
+                                              TimeManager.currentLocale(context))
+                                          .format(entry.timeCreate),
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          color: theme.dividerColor),
+                                    ),
+                                  ],
                                 ),
-                                style: const TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.bold),
                               ),
-                              VerticalDivider(
-                                width: 16,
-                                thickness: 2,
-                                radius: BorderRadius.circular(4),
-                              ),
-                              Text(
-                                TimeManager.localizedTimeFormat(
-                                        TimeManager.currentLocale(context))
-                                    .format(entry.timeCreate),
-                                style: TextStyle(
-                                    fontSize: 16, color: theme.dividerColor),
+                              MoodIcon(
+                                moodValue: entry.mood,
+                                size: 24,
                               ),
                             ],
                           ),
                         ),
-                        MoodIcon(
-                          moodValue: entry.mood,
-                          size: 24,
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
+                    if (entry.text.isNotEmpty)
+                      Card.filled(
+                          color: Theme.of(context).colorScheme.surfaceContainer,
+                          child: Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 8, top: 4, bottom: 4, right: 8),
+                              child: ScaledMarkdown(
+                                data: entry.text,
+                              ))),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          left: 8, top: 4, bottom: 18, right: 8),
+                      child: Text(
+                        "${AppLocalizations.of(context)!.lastModified}: ${TimeManager.formatDateWithWeekday(entry.timeModified, context)} ${TimeManager.localizedTimeFormat(TimeManager.currentLocale(context)).format(entry.timeModified)}",
+                        style:
+                            TextStyle(fontSize: 12, color: theme.disabledColor),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              if (entry.text.isNotEmpty)
-                Card.filled(
-                    color: Theme.of(context).colorScheme.surfaceContainer,
-                    child: Padding(
-                        padding: const EdgeInsets.only(
-                            left: 8, top: 4, bottom: 4, right: 8),
-                        child: ScaledMarkdown(
-                          data: entry.text,
-                        ))),
-              Padding(
-                padding: const EdgeInsets.only(
-                    left: 8, top: 4, bottom: 18, right: 8),
-                child: Text(
-                  "${AppLocalizations.of(context)!.lastModified}: ${TimeManager.formatDateWithWeekday(entry.timeModified, context)} ${TimeManager.localizedTimeFormat(TimeManager.currentLocale(context)).format(entry.timeModified)}",
-                  style: TextStyle(fontSize: 12, color: theme.disabledColor),
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
