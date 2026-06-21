@@ -211,146 +211,179 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                     },
                   ),
                   actions: [_deleteButton(), _saveButton()]),
-              body: Column(children: [
-                Expanded(
-                  child: Container(
-                    constraints:
-                        BoxConstraints.loose(const Size.fromWidth(800)),
+              body: Column(
+                children: [
+                  Expanded(
                     child: ListView(
-                      padding: const EdgeInsets.only(left: 8, right: 8),
                       children: [
-                        if (_currentImages.isNotEmpty)
-                          EntryImageEditableList(
-                              images: _currentImages,
-                              onImagesChanged: (images) async {
-                                _currentImages = images;
-                                await _saveEntry();
-                              }),
-                        StatefulBuilder(
-                          builder: (context, setState) => Card.filled(
-                            color: theme.colorScheme.surfaceContainer,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                SizedBox(
-                                  width: double.infinity,
-                                  child: Wrap(
-                                    crossAxisAlignment:
-                                        WrapCrossAlignment.start,
-                                    alignment: WrapAlignment.spaceBetween,
-                                    runSpacing: 8.0,
-                                    children: [
-                                      IntrinsicHeight(
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 2.0),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              TextButton(
-                                                onPressed: () async {
-                                                  _chooseDate();
-                                                },
-                                                style: TextButton.styleFrom(
-                                                    visualDensity:
-                                                        VisualDensity.compact,
-                                                    padding: EdgeInsets.all(6)),
-                                                child: Text(
-                                                  TimeManager.formatDateWithWeekday(
-                                                    entryDate!,
-                                                    context,
+                        Align(
+                          alignment: Alignment.topCenter,
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 800),
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  if (_currentImages.isNotEmpty)
+                                    EntryImageEditableList(
+                                        images: _currentImages,
+                                        onImagesChanged: (images) async {
+                                          _currentImages = images;
+                                          await _saveEntry();
+                                        }),
+                                  StatefulBuilder(
+                                    builder: (context, setState) => Card.filled(
+                                      color: theme.colorScheme.surfaceContainer,
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          SizedBox(
+                                            width: double.infinity,
+                                            child: Wrap(
+                                              crossAxisAlignment:
+                                                  WrapCrossAlignment.start,
+                                              alignment:
+                                                  WrapAlignment.spaceBetween,
+                                              runSpacing: 8.0,
+                                              children: [
+                                                IntrinsicHeight(
+                                                  child: Padding(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 2.0),
+                                                    child: Row(
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      children: [
+                                                        TextButton(
+                                                          onPressed: () async {
+                                                            _chooseDate();
+                                                          },
+                                                          style: TextButton.styleFrom(
+                                                              visualDensity:
+                                                                  VisualDensity
+                                                                      .compact,
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .all(6)),
+                                                          child: Text(
+                                                            TimeManager
+                                                                .formatDateWithWeekday(
+                                                              entryDate!,
+                                                              context,
+                                                            ),
+                                                            style: TextStyle(
+                                                                color: theme
+                                                                    .colorScheme
+                                                                    .primary,
+                                                                fontSize: 16,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                          ),
+                                                        ),
+                                                        VerticalDivider(
+                                                          width: 6,
+                                                          indent: 8,
+                                                          endIndent: 8,
+                                                          thickness: 2,
+                                                          radius: BorderRadius
+                                                              .circular(4),
+                                                        ),
+                                                        TextButton(
+                                                          onPressed: () async {
+                                                            _chooseTime();
+                                                          },
+                                                          style: TextButton.styleFrom(
+                                                              visualDensity:
+                                                                  VisualDensity
+                                                                      .compact,
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .all(6)),
+                                                          child: Text(
+                                                            TimeManager.localizedTimeFormat(
+                                                                    TimeManager
+                                                                        .currentLocale(
+                                                                            context))
+                                                                .format(
+                                                                    entryDate!),
+                                                            style: TextStyle(
+                                                              color: theme
+                                                                  .colorScheme
+                                                                  .primary,
+                                                              fontSize: 16,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
                                                   ),
-                                                  style: TextStyle(
-                                                      color: theme
-                                                          .colorScheme.primary,
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.bold),
                                                 ),
-                                              ),
-                                              VerticalDivider(
-                                                width: 6,
-                                                indent: 8,
-                                                endIndent: 8,
-                                                thickness: 2,
-                                                radius:
-                                                    BorderRadius.circular(4),
-                                              ),
-                                              TextButton(
-                                                onPressed: () async {
-                                                  _chooseTime();
-                                                },
-                                                style: TextButton.styleFrom(
-                                                    visualDensity:
-                                                        VisualDensity.compact,
-                                                    padding: EdgeInsets.all(6)),
-                                                child: Text(
-                                                  TimeManager.localizedTimeFormat(TimeManager
-                                                          .currentLocale(
-                                                              context))
-                                                      .format(entryDate!),
-                                                  style: TextStyle(
-                                                    color: theme
-                                                        .colorScheme.primary,
-                                                    fontSize: 16,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
+                                                EntryImagePicker(
+                                                  onChangedImage: (newImages) {
+                                                    _openedCamera = true;
+                                                    _addImage(newImages);
+                                                  },
+                                                  openCamera:
+                                                      widget.openCamera &&
+                                                          !_openedCamera,
+                                                )
+                                              ],
+                                            ),
                                           ),
-                                        ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                bottom: 4.0),
+                                            child: EntryMoodPicker(
+                                                moodValue: mood,
+                                                onChangedMood: (mood) {
+                                                  setState(
+                                                      () => this.mood = mood);
+                                                  EasyDebounce.debounce(
+                                                      "save-entry",
+                                                      Duration(seconds: 5),
+                                                      () => _saveEntry());
+                                                }),
+                                          )
+                                        ],
                                       ),
-                                      EntryImagePicker(
-                                        onChangedImage: (newImages) {
-                                          _openedCamera = true;
-                                          _addImage(newImages);
-                                        },
-                                        openCamera:
-                                            widget.openCamera && !_openedCamera,
-                                      )
-                                    ],
+                                    ),
                                   ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 4.0),
-                                  child: EntryMoodPicker(
-                                      moodValue: mood,
-                                      onChangedMood: (mood) {
-                                        setState(() => this.mood = mood);
-                                        EasyDebounce.debounce(
-                                            "save-entry",
-                                            Duration(seconds: 5),
-                                            () => _saveEntry());
-                                      }),
-                                )
-                              ],
+                                  StatefulBuilder(
+                                      builder: (context, setState) =>
+                                          EntryTextEditor(
+                                            text: text,
+                                            focusNode: _focusNode,
+                                            textEditingController:
+                                                _textEditingController,
+                                            undoHistoryController:
+                                                _undoController,
+                                            onExpand: _openFullScreenEditor,
+                                          )),
+                                  const SizedBox(height: 16),
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                        StatefulBuilder(
-                            builder: (context, setState) => EntryTextEditor(
-                                  text: text,
-                                  focusNode: _focusNode,
-                                  textEditingController: _textEditingController,
-                                  undoHistoryController: _undoController,
-                                  onExpand: _openFullScreenEditor,
-                                )),
-                        const SizedBox(height: 16),
                       ],
                     ),
                   ),
-                ),
-                SafeArea(
-                  top: false,
-                  child: EditToolbar(
-                    controller: _textEditingController,
-                    undoController: _undoController,
-                    focusNode: _focusNode,
-                    trailer: TemplateSelectButton(
-                        controller: _textEditingController),
+                  SafeArea(
+                    top: false,
+                    child: EditToolbar(
+                      controller: _textEditingController,
+                      undoController: _undoController,
+                      focusNode: _focusNode,
+                      trailer: TemplateSelectButton(
+                          controller: _textEditingController),
+                    ),
                   ),
-                ),
-              ]),
+                ],
+              ),
             ),
           );
   }
