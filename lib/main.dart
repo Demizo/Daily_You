@@ -263,6 +263,7 @@ class _MainAppState extends State<MainApp> {
             (lightDynamic.primary.b == lightDynamic.primary.g);
         lightTheme = ThemeData(
             useMaterial3: true,
+            materialTapTargetSize: MaterialTapTargetSize.padded,
             colorScheme: ColorScheme.fromSeed(
                 seedColor: lightDynamic.primary,
                 primaryContainer: lightDynamic.primaryContainer,
@@ -273,6 +274,7 @@ class _MainAppState extends State<MainApp> {
       } else {
         lightTheme = ThemeData(
             useMaterial3: true,
+            materialTapTargetSize: MaterialTapTargetSize.padded,
             colorScheme: ColorScheme.fromSeed(
                 seedColor: themeModeProvider.accentColor,
                 brightness: Brightness.light));
@@ -285,6 +287,7 @@ class _MainAppState extends State<MainApp> {
             (darkDynamic.primary.b == darkDynamic.primary.g);
         darkTheme = ThemeData(
             useMaterial3: true,
+            materialTapTargetSize: MaterialTapTargetSize.padded,
             colorScheme: ColorScheme.fromSeed(
                 seedColor: darkDynamic.primary,
                 primaryContainer: darkDynamic.primaryContainer,
@@ -295,6 +298,7 @@ class _MainAppState extends State<MainApp> {
       } else {
         darkTheme = ThemeData(
           useMaterial3: true,
+          materialTapTargetSize: MaterialTapTargetSize.padded,
           colorScheme: ColorScheme.fromSeed(
               seedColor: themeModeProvider.accentColor,
               brightness: Brightness.dark),
@@ -305,6 +309,7 @@ class _MainAppState extends State<MainApp> {
       if (ConfigProvider.instance.get(ConfigKey.theme) == 'amoled') {
         darkTheme = ThemeData(
             useMaterial3: true,
+            materialTapTargetSize: MaterialTapTargetSize.padded,
             colorScheme: ColorScheme.fromSeed(
               seedColor: themeModeProvider.accentColor,
               brightness: Brightness.dark,
