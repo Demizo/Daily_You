@@ -38,6 +38,7 @@ class _MarkdownToolbarState extends State<MarkdownToolbar> {
   static const double _cardHorizontalPadding = 12.0;
   static const double _wideBreakpoint = 600.0;
   String _lastText = '';
+  OverlayEntry? _overflowOverlay;
 
   @override
   void initState() {
@@ -49,6 +50,7 @@ class _MarkdownToolbarState extends State<MarkdownToolbar> {
   @override
   void dispose() {
     widget.controller.removeListener(_onTextChanged);
+    _dismissOverflowOverlay();
     super.dispose();
   }
 
@@ -278,57 +280,81 @@ class _MarkdownToolbarState extends State<MarkdownToolbar> {
     return entries;
   }
 
+  void _dismissOverflowOverlay() {
+    _overflowOverlay?.remove();
+    _overflowOverlay = null;
+  }
+
   void _showOverflowPopup(
       BuildContext buttonContext, List<_ToolbarEntry> overflowEntries) {
+    _dismissOverflowOverlay();
+
     final button = buttonContext.findRenderObject()! as RenderBox;
-    final overlay = Navigator.of(buttonContext)
-        .overlay!
-        .context
-        .findRenderObject()! as RenderBox;
-    final position = RelativeRect.fromRect(
-      button.localToGlobal(Offset.zero, ancestor: overlay) & button.size,
-      Offset.zero & overlay.size,
-    );
+    final overlayState = Navigator.of(buttonContext).overlay!;
+    final overlayBox = overlayState.context.findRenderObject()! as RenderBox;
+
+    final buttonPos = button.localToGlobal(Offset.zero, ancestor: overlayBox);
+    final screenSize = MediaQuery.of(buttonContext).size;
 
     // Size the popup to exactly fit its buttons + 8px (4px padding each side).
     final contentWidth =
         overflowEntries.fold(0.0, (sum, e) => sum + e.width) + 8;
-    final maxScreenWidth = MediaQuery.of(buttonContext).size.width * 0.9;
-    final popupWidth = contentWidth.clamp(0.0, maxScreenWidth);
+    final popupWidth = contentWidth.clamp(0.0, screenSize.width * 0.9);
 
-    showMenu<void>(
-      context: buttonContext,
-      position: position,
-      constraints: BoxConstraints.tightFor(width: popupWidth),
-      items: [
-        PopupMenuItem<void>(
-          enabled: false,
-          height: 0,
-          padding: EdgeInsets.zero,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-            child: IconTheme.merge(
-              data: const IconThemeData(opacity: 1.0),
-              child: Builder(
-                builder: (popupCtx) => IntrinsicHeight(
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        for (final entry in overflowEntries)
-                          entry.build(popupCtx, () => Navigator.pop(popupCtx)),
-                      ],
+    // Clamp left edge so popup stays on screen.
+    final left = buttonPos.dx.clamp(0.0, screenSize.width - popupWidth);
+    // Show popup above the button.
+    final bottomOffset = screenSize.height - buttonPos.dy;
+    final popupTheme = Theme.of(buttonContext);
+
+    _overflowOverlay = OverlayEntry(
+      builder: (overlayContext) => Stack(
+        children: [
+          Positioned.fill(
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: _dismissOverflowOverlay,
+            ),
+          ),
+          Positioned(
+            left: left,
+            bottom: bottomOffset,
+            width: popupWidth,
+            child: Material(
+              color: Colors.transparent,
+              child: Card(
+                elevation: 8,
+                color: popupTheme.colorScheme.surfaceContainerHigh,
+                margin: EdgeInsets.zero,
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                  child: IconTheme.merge(
+                    data: const IconThemeData(opacity: 1.0),
+                    child: IntrinsicHeight(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            for (final entry in overflowEntries)
+                              entry.build(
+                                  overlayContext, _dismissOverflowOverlay),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
+
+    overlayState.insert(_overflowOverlay!);
   }
 
   Card _wrapInCard(BuildContext context, Widget child) {
