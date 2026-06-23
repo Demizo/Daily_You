@@ -67,5 +67,19 @@
     "settingsFixedReminderTimeTitle": "Oră fixă pentru memento",
     "settingsFixedReminderTimeDescription": "Alege o oră fixă pentru memento",
     "settingsAlwaysSendReminderTitle": "Trimite Întotdeauna Memento",
-    "settingsAlwaysSendReminderDescription": "Trimite memento chiar dacă o înregistrare a fost începută deja"
+    "settingsAlwaysSendReminderDescription": "Trimite memento chiar dacă o înregistrare a fost începută deja",
+    "dailyReminderTitle": "Înregistrează-te astăzi!",
+    "settingsCustomizeNotificationTitle": "Personalizează Notificările",
+    "settingsTemplatesTitle": "Șabloane",
+    "settingsDefaultTemplate": "Șablon Implicit",
+    "manageTemplates": "Gestionează Șabloane",
+    "addTemplate": "Adaugă un Șablon",
+    "noTemplateTitle": "Nici unul",
+    "noTemplatesDescription": "Nici un șablon creat încă…",
+    "templateVariableTime": "Timp",
+    "templateDefaultTimestampTitle": "Marcaj temporal",
+    "templateDefaultTimestampBody": "{dată} - {timp}:",
+    "templateDefaultSummaryTitle": "Rezumatul Zilei",
+    "templateDefaultSummaryBody": "### Rezumat\n- \n\n### Citat\n> ",
+    "templateDefaultReflectionTitle": "Reflecție"
 }

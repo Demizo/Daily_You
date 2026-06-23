@@ -157,5 +157,9 @@
     "settingsOnThisDayDescription": "Revisiter des mémoires d'avant",
     "dayCount": "{count, plural, one{{count} jour} other{{count} jours}}",
     "settingsHideImages": "Masquer les images",
-    "pageCalendarTitle": "Agenda"
+    "pageCalendarTitle": "Agenda",
+    "settingsCalendarSystem": "Système calendaire",
+    "calendarSystemGregorian": "Grégorien",
+    "calendarSystemJalali": "Jalali",
+    "imagesTitle": "Images"
 }

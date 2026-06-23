@@ -149,5 +149,8 @@
     "templateDefaultTimestampBody": "{date} - {time}:",
     "templateDefaultSummaryBody": "### ملخص\n-\n\n### اقتباس\n> ",
     "templateDefaultReflectionTitle": "تأمل",
-    "templateDefaultReflectionBody": "### ما الذي استمتعت به اليوم؟\n- \n\n### ما الذي تشعر بالامتنان تجاهه؟\n- \n\n### ما الذي تتطلع إليه؟\n- "
+    "templateDefaultReflectionBody": "### ما الذي استمتعت به اليوم؟\n- \n\n### ما الذي تشعر بالامتنان تجاهه؟\n- \n\n### ما الذي تتطلع إليه؟\n- ",
+    "settingsCalendarSystem": "نظام التاريخ",
+    "calendarSystemGregorian": "الميلادي",
+    "calendarSystemJalali": "جلالي"
 }
