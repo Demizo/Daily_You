@@ -1,0 +1,8 @@
+Daily You v2.25.0 has arrived! Scaling up:
+
+• Initial support for larger screen sizes
+• Added more options to customize the calendar view
+• Added a full screen text editor to larger displays
+• Improved the editor toolbar
+• Fixed locale issues
+• Updated translations
