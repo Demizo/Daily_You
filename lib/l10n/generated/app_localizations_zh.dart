@@ -1189,5 +1189,8 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get settingsConsiderSupporting => '考慮支持';
 
   @override
+  String get imagesTitle => '影像';
+
+  @override
   String get tagMoodTitle => '心情';
 }

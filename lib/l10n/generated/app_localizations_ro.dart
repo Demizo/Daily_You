@@ -12,7 +12,7 @@ class AppLocalizationsRo extends AppLocalizations {
   String get appTitle => 'Daily You';
 
   @override
-  String get dailyReminderTitle => 'Log Today!';
+  String get dailyReminderTitle => 'Înregistrează-te astăzi!';
 
   @override
   String get dailyReminderDescription => 'Completează-ți jurnalul zilnic…';
@@ -338,34 +338,35 @@ class AppLocalizationsRo extends AppLocalizations {
       'Trimite memento chiar dacă o înregistrare a fost începută deja';
 
   @override
-  String get settingsCustomizeNotificationTitle => 'Customize Notifications';
+  String get settingsCustomizeNotificationTitle =>
+      'Personalizează Notificările';
 
   @override
-  String get settingsTemplatesTitle => 'Templates';
+  String get settingsTemplatesTitle => 'Șabloane';
 
   @override
-  String get settingsDefaultTemplate => 'Default Template';
+  String get settingsDefaultTemplate => 'Șablon Implicit';
 
   @override
-  String get manageTemplates => 'Manage Templates';
+  String get manageTemplates => 'Gestionează Șabloane';
 
   @override
-  String get addTemplate => 'Add a Template';
+  String get addTemplate => 'Adaugă un Șablon';
 
   @override
   String get newTemplate => 'New Template';
 
   @override
-  String get noTemplateTitle => 'None';
+  String get noTemplateTitle => 'Nici unul';
 
   @override
-  String get noTemplatesDescription => 'No templates created yet…';
+  String get noTemplatesDescription => 'Nici un șablon creat încă…';
 
   @override
-  String get templateVariableTime => 'Time';
+  String get templateVariableTime => 'Timp';
 
   @override
-  String get templateDefaultTimestampTitle => 'Timestamp';
+  String get templateDefaultTimestampTitle => 'Marcaj temporal';
 
   @override
   String templateDefaultTimestampBody(Object date, Object time) {
@@ -373,13 +374,13 @@ class AppLocalizationsRo extends AppLocalizations {
   }
 
   @override
-  String get templateDefaultSummaryTitle => 'Day Summary';
+  String get templateDefaultSummaryTitle => 'Rezumatul Zilei';
 
   @override
-  String get templateDefaultSummaryBody => '### Summary\n- \n\n### Quote\n> ';
+  String get templateDefaultSummaryBody => '### Rezumat\n- \n\n### Citat\n> ';
 
   @override
-  String get templateDefaultReflectionTitle => 'Reflection';
+  String get templateDefaultReflectionTitle => 'Reflecție';
 
   @override
   String get templateDefaultReflectionBody =>

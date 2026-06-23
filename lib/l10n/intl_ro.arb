@@ -78,7 +78,7 @@
     "noTemplatesDescription": "Nici un șablon creat încă…",
     "templateVariableTime": "Timp",
     "templateDefaultTimestampTitle": "Marcaj temporal",
-    "templateDefaultTimestampBody": "{dată} - {timp}:",
+    "templateDefaultTimestampBody": "{date} - {time}:",
     "templateDefaultSummaryTitle": "Rezumatul Zilei",
     "templateDefaultSummaryBody": "### Rezumat\n- \n\n### Citat\n> ",
     "templateDefaultReflectionTitle": "Reflecție"

@@ -253,10 +253,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settingsFirstDayOfWeek => '1er jour de la semaine';
 
   @override
-  String get settingsCalendarSystem => 'Calendar System';
+  String get settingsCalendarSystem => 'Système calendaire';
 
   @override
-  String get calendarSystemGregorian => 'Gregorian';
+  String get calendarSystemGregorian => 'Grégorien';
 
   @override
   String get calendarSystemJalali => 'Jalali';

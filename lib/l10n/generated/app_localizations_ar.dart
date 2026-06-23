@@ -257,13 +257,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsFirstDayOfWeek => 'أول يوم في الأسبوع';
 
   @override
-  String get settingsCalendarSystem => 'Calendar System';
+  String get settingsCalendarSystem => 'نظام التاريخ';
 
   @override
-  String get calendarSystemGregorian => 'Gregorian';
+  String get calendarSystemGregorian => 'الميلادي';
 
   @override
-  String get calendarSystemJalali => 'Jalali';
+  String get calendarSystemJalali => 'جلالي';
 
   @override
   String get settingsUseSystemAccentColor => 'استخدم ألوان النظام';
