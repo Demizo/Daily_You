@@ -1,6 +1,6 @@
 import 'package:daily_you/models/template.dart';
+import 'package:daily_you/pages/settings/templates_page.dart';
 import 'package:daily_you/providers/templates_provider.dart';
-import 'package:daily_you/widgets/template_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:provider/provider.dart';
@@ -14,7 +14,7 @@ class TemplateSelect extends StatelessWidget {
     await Navigator.of(context).push(MaterialPageRoute(
         allowSnapshotting: false,
         fullscreenDialog: true,
-        builder: (context) => TemplateManager()));
+        builder: (context) => const TemplateSettings()));
   }
 
   Widget _buildTemplatesList(BuildContext context) {
