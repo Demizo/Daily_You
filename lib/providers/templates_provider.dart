@@ -11,7 +11,7 @@ class TemplatesProvider with ChangeNotifier {
 
   TemplatesProvider._init();
 
-  List<Template> templates = List.empty();
+  List<Template> templates = List.empty(growable: true);
 
   /// Load the provider's data from the app database
   Future<void> load() async {
