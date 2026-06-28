@@ -430,6 +430,12 @@ abstract class AppLocalizations {
   /// **'{count, plural, other{Longest Streak {count}}}'**
   String streakLongest(num count);
 
+  /// No description provided for @streakGreatDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, other{Great Days {count}}}'**
+  String streakGreatDays(num count);
+
   /// No description provided for @streakSinceBadDay.
   ///
   /// In en, this message translates to:

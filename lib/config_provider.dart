@@ -67,6 +67,7 @@ class ConfigKey {
   static const String moodOverTimeGrouping = "moodOverTimeGrouping";
   static const String moodOverTimeSmoothing = "moodOverTimeSmoothing";
   static const String statsRange = "statsRange";
+  static const String statsSubject = "statsSubject";
   static const String tagPickerSortMode = "tagPickerSortMode";
   // Secure Configuration Values
   static const String requirePassword = "requirePassword";
@@ -146,6 +147,7 @@ class ConfigProvider with ChangeNotifier {
     ConfigKey.moodOverTimeGrouping: null,
     ConfigKey.moodOverTimeSmoothing: true,
     ConfigKey.statsRange: 'allTime',
+    ConfigKey.statsSubject: 'mood',
     ConfigKey.tagPickerSortMode: 'manual',
   };
 

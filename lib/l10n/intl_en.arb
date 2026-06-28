@@ -89,6 +89,8 @@
   "@streakCurrent": {},
   "streakLongest": "{count, plural, other{Longest Streak {count}}}",
   "@streakLongest": {},
+  "streakGreatDays": "{count, plural, other{Great Days {count}}}",
+  "@streakGreatDays": {},
   "streakSinceBadDay": "{count, plural, other{Days Since a Bad Day {count}}}",
   "@streakSinceBadDay": {},
   "errorExternalStorageAccessTitle": "Can't Access External Storage",
