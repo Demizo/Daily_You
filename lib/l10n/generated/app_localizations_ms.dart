@@ -166,6 +166,16 @@ class AppLocalizationsMs extends AppLocalizations {
   }
 
   @override
+  String streakGreatDays(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Great Days $count',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String streakSinceBadDay(num count) {
     return 'Hari Semenjak Hari Yang Buruk $count';
   }
