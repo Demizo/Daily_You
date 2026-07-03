@@ -364,6 +364,36 @@ abstract class AppLocalizations {
   /// **'{tag} Over Time'**
   String chartOverTimeTitle(Object tag);
 
+  /// No description provided for @chartGroupingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Group by'**
+  String get chartGroupingLabel;
+
+  /// No description provided for @chartGroupingDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Day'**
+  String get chartGroupingDay;
+
+  /// No description provided for @chartGroupingWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Week'**
+  String get chartGroupingWeek;
+
+  /// No description provided for @chartGroupingMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Month'**
+  String get chartGroupingMonth;
+
+  /// No description provided for @chartGroupingYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Year'**
+  String get chartGroupingYear;
+
   /// No description provided for @streakCurrent.
   ///
   /// In en, this message translates to:

@@ -129,6 +129,21 @@ class AppLocalizationsMs extends AppLocalizations {
   }
 
   @override
+  String get chartGroupingLabel => 'Group by';
+
+  @override
+  String get chartGroupingDay => 'Day';
+
+  @override
+  String get chartGroupingWeek => 'Week';
+
+  @override
+  String get chartGroupingMonth => 'Month';
+
+  @override
+  String get chartGroupingYear => 'Year';
+
+  @override
   String streakCurrent(num count) {
     return 'Rentetan Semasa $count';
   }
