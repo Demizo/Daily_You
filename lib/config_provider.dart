@@ -65,6 +65,7 @@ class ConfigKey {
   static const String calendarSystem = "calendarSystem";
   static const String moodOverTimeGrouping = "moodOverTimeGrouping";
   static const String moodOverTimeSmoothing = "moodOverTimeSmoothing";
+  static const String statsRange = "statsRange";
   // Secure Configuration Values
   static const String requirePassword = "requirePassword";
   static const String biometricUnlock = "biometricUnlock";
@@ -141,6 +142,7 @@ class ConfigProvider with ChangeNotifier {
     ConfigKey.calendarSystem: 'system',
     ConfigKey.moodOverTimeGrouping: null,
     ConfigKey.moodOverTimeSmoothing: true,
+    ConfigKey.statsRange: 'allTime',
   };
 
   final Map<String, dynamic> _secureConfig = {
