@@ -30,6 +30,12 @@ class AppLocalizationsSv extends AppLocalizations {
   String get pageHomeTitle => 'Home';
 
   @override
+  String get jumpToMonthTitle => 'Jump to month';
+
+  @override
+  String get jumpToLogTitle => 'Jump to log';
+
+  @override
   String get flashbacksTitle => 'Flashbacks';
 
   @override

@@ -31,6 +31,12 @@ class AppLocalizationsVi extends AppLocalizations {
   String get pageHomeTitle => 'Trang chủ';
 
   @override
+  String get jumpToMonthTitle => 'Jump to month';
+
+  @override
+  String get jumpToLogTitle => 'Jump to log';
+
+  @override
   String get flashbacksTitle => 'Hồi tưởng';
 
   @override

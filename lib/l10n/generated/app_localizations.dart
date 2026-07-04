@@ -202,6 +202,18 @@ abstract class AppLocalizations {
   /// **'Home'**
   String get pageHomeTitle;
 
+  /// No description provided for @jumpToMonthTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Jump to month'**
+  String get jumpToMonthTitle;
+
+  /// No description provided for @jumpToLogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Jump to log'**
+  String get jumpToLogTitle;
+
   /// No description provided for @flashbacksTitle.
   ///
   /// In en, this message translates to:

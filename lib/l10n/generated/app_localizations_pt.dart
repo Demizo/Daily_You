@@ -30,6 +30,12 @@ class AppLocalizationsPt extends AppLocalizations {
   String get pageHomeTitle => 'Início';
 
   @override
+  String get jumpToMonthTitle => 'Jump to month';
+
+  @override
+  String get jumpToLogTitle => 'Jump to log';
+
+  @override
   String get flashbacksTitle => 'Recordações';
 
   @override

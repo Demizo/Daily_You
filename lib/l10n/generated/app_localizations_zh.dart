@@ -30,6 +30,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get pageHomeTitle => '主页';
 
   @override
+  String get jumpToMonthTitle => 'Jump to month';
+
+  @override
+  String get jumpToLogTitle => 'Jump to log';
+
+  @override
   String get flashbacksTitle => '往昔重现';
 
   @override

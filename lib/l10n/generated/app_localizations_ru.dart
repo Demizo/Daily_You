@@ -30,6 +30,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get pageHomeTitle => 'Дом';
 
   @override
+  String get jumpToMonthTitle => 'Jump to month';
+
+  @override
+  String get jumpToLogTitle => 'Jump to log';
+
+  @override
   String get flashbacksTitle => 'Воспоминания';
 
   @override

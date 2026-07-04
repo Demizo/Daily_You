@@ -30,6 +30,12 @@ class AppLocalizationsFa extends AppLocalizations {
   String get pageHomeTitle => 'خانه';
 
   @override
+  String get jumpToMonthTitle => 'Jump to month';
+
+  @override
+  String get jumpToLogTitle => 'Jump to log';
+
+  @override
   String get flashbacksTitle => 'فلش بک ها';
 
   @override

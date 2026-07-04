@@ -30,6 +30,12 @@ class AppLocalizationsCs extends AppLocalizations {
   String get pageHomeTitle => 'Hlavní stránka';
 
   @override
+  String get jumpToMonthTitle => 'Jump to month';
+
+  @override
+  String get jumpToLogTitle => 'Jump to log';
+
+  @override
   String get flashbacksTitle => 'Vzpomínky';
 
   @override

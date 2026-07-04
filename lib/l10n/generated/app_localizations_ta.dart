@@ -30,6 +30,12 @@ class AppLocalizationsTa extends AppLocalizations {
   String get pageHomeTitle => 'முகப்பு';
 
   @override
+  String get jumpToMonthTitle => 'Jump to month';
+
+  @override
+  String get jumpToLogTitle => 'Jump to log';
+
+  @override
   String get flashbacksTitle => 'நினைவலைகள்';
 
   @override

@@ -30,6 +30,12 @@ class AppLocalizationsOc extends AppLocalizations {
   String get pageHomeTitle => 'Acuèlh';
 
   @override
+  String get jumpToMonthTitle => 'Jump to month';
+
+  @override
+  String get jumpToLogTitle => 'Jump to log';
+
+  @override
   String get flashbacksTitle => 'Retorn enrèire';
 
   @override

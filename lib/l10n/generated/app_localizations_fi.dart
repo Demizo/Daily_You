@@ -30,6 +30,12 @@ class AppLocalizationsFi extends AppLocalizations {
   String get pageHomeTitle => 'Etusivu';
 
   @override
+  String get jumpToMonthTitle => 'Jump to month';
+
+  @override
+  String get jumpToLogTitle => 'Jump to log';
+
+  @override
   String get flashbacksTitle => 'Muistikuvat';
 
   @override

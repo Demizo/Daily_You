@@ -30,6 +30,12 @@ class AppLocalizationsId extends AppLocalizations {
   String get pageHomeTitle => 'Beranda';
 
   @override
+  String get jumpToMonthTitle => 'Jump to month';
+
+  @override
+  String get jumpToLogTitle => 'Jump to log';
+
+  @override
   String get flashbacksTitle => 'Kilas balik';
 
   @override

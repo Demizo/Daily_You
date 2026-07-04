@@ -30,6 +30,12 @@ class AppLocalizationsBg extends AppLocalizations {
   String get pageHomeTitle => 'У дома';
 
   @override
+  String get jumpToMonthTitle => 'Jump to month';
+
+  @override
+  String get jumpToLogTitle => 'Jump to log';
+
+  @override
   String get flashbacksTitle => 'Спомени';
 
   @override

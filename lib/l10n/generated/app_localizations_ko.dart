@@ -30,6 +30,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get pageHomeTitle => '홈';
 
   @override
+  String get jumpToMonthTitle => 'Jump to month';
+
+  @override
+  String get jumpToLogTitle => 'Jump to log';
+
+  @override
   String get flashbacksTitle => '회상';
 
   @override
