@@ -144,6 +144,9 @@ class AppLocalizationsMs extends AppLocalizations {
   String get chartGroupingYear => 'Year';
 
   @override
+  String get chartSmoothingLabel => 'Smoothing';
+
+  @override
   String streakCurrent(num count) {
     return 'Rentetan Semasa $count';
   }

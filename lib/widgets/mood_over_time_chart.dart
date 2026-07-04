@@ -27,8 +27,6 @@ class MoodOverTimeChart extends StatefulWidget {
 }
 
 class _MoodOverTimeChartState extends State<MoodOverTimeChart> {
-  ChartGrouping? _preferredGrouping;
-
   static const _dummyYValues = [
     -0.5,
     -0.4,
@@ -76,12 +74,33 @@ class _MoodOverTimeChartState extends State<MoodOverTimeChart> {
   static const int _monthThreshold = 35; // Catches 31-day months easily
   static const int _yearThreshold = 366; // Catches leap years
 
+  ChartGrouping? get _preferredGrouping {
+    final value = ConfigProvider.instance.get(ConfigKey.moodOverTimeGrouping);
+    return switch (value) {
+      'day' => ChartGrouping.day,
+      'week' => ChartGrouping.week,
+      'month' => ChartGrouping.month,
+      'year' => ChartGrouping.year,
+      _ => null,
+    };
+  }
+
+  bool get _smoothing =>
+      ConfigProvider.instance.get(ConfigKey.moodOverTimeSmoothing) ?? true;
+
+  static String _groupingToConfigString(ChartGrouping g) => switch (g) {
+        ChartGrouping.day => 'day',
+        ChartGrouping.week => 'week',
+        ChartGrouping.month => 'month',
+        ChartGrouping.year => 'year',
+      };
+
   List<ChartGrouping> _availableGroupings(int spanDays) {
     if (spanDays <= _monthThreshold) {
       return [ChartGrouping.day, ChartGrouping.week];
     }
     if (spanDays <= _yearThreshold) {
-      return [ChartGrouping.day, ChartGrouping.week, ChartGrouping.month];
+      return [ChartGrouping.week, ChartGrouping.month];
     }
     if (spanDays <= 2 * _yearThreshold) {
       return [ChartGrouping.week, ChartGrouping.month];
@@ -138,6 +157,7 @@ class _MoodOverTimeChartState extends State<MoodOverTimeChart> {
     final spanDays = totalDays.toInt().clamp(1, 999999);
     final available = _availableGroupings(spanDays);
     final effective = _effectiveGrouping(spanDays);
+    final smoothing = _smoothing;
 
     final buckets = switch (effective) {
       ChartGrouping.day => _generateDailyBuckets(rangeStart, rangeEnd),
@@ -185,10 +205,14 @@ class _MoodOverTimeChartState extends State<MoodOverTimeChart> {
                 maxX: totalDays,
                 minY: -2,
                 maxY: 2,
+                clipData: const FlClipData.all(),
                 lineTouchData: const LineTouchData(enabled: false),
                 lineBarsData: widget.hasData
-                    ? _buildSegments(spots, color)
-                    : [_makeSegment(spots.whereType<FlSpot>().toList(), color)],
+                    ? _buildSegments(spots, color, smoothing)
+                    : [
+                        _makeSegment(spots.whereType<FlSpot>().toList(), color,
+                            smoothing)
+                      ],
                 extraLinesData: ExtraLinesData(
                   verticalLines: markerDayOffsets
                       .map((x) => VerticalLine(
@@ -323,40 +347,58 @@ class _MoodOverTimeChartState extends State<MoodOverTimeChart> {
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setDialogState) {
+          final l10n = AppLocalizations.of(context)!;
+          final smoothingValue = _smoothing;
           final screenWidth = MediaQuery.of(context).size.width;
           final dialogWidth = (screenWidth - 80).clamp(240.0, 360.0);
           return Dialog(
             child: SizedBox(
               width: dialogWidth,
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
+                padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text(
-                      AppLocalizations.of(context)!.chartGroupingLabel,
-                      style: Theme.of(context).textTheme.titleLarge,
+                    Row(
+                      children: [
+                        Text(l10n.chartGroupingLabel,
+                            style: Theme.of(context).textTheme.bodyLarge),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: ConnectedButtonGroup(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            labels: available
+                                .map((g) => _groupingLabel(g, context))
+                                .toList(),
+                            selectedIndex: available.indexOf(selected),
+                            onSelectionChanged: (i) {
+                              final g = available[i];
+                              setDialogState(() => selected = g);
+                              ConfigProvider.instance.set(
+                                  ConfigKey.moodOverTimeGrouping,
+                                  _groupingToConfigString(g));
+                            },
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 16),
-                    ConnectedButtonGroup(
-                      labels: available
-                          .map((g) => _groupingLabel(g, context))
-                          .toList(),
-                      selectedIndex: available.indexOf(selected),
-                      onSelectionChanged: (i) =>
-                          setDialogState(() => selected = available[i]),
+                    SwitchListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(l10n.chartSmoothingLabel),
+                      value: smoothingValue,
+                      onChanged: (v) {
+                        setDialogState(() {});
+                        ConfigProvider.instance
+                            .set(ConfigKey.moodOverTimeSmoothing, v);
+                      },
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         TextButton(
-                          onPressed: () {
-                            setState(() => _preferredGrouping = selected);
-                            Navigator.of(dialogContext).pop();
-                          },
-                          child: Text(
-                              MaterialLocalizations.of(context).okButtonLabel),
+                          onPressed: () => Navigator.of(dialogContext).pop(),
+                          child: Text(MaterialLocalizations.of(context)
+                              .closeButtonLabel),
                         ),
                       ],
                     ),
@@ -488,30 +530,42 @@ class _MoodOverTimeChartState extends State<MoodOverTimeChart> {
     );
   }
 
-  List<LineChartBarData> _buildSegments(List<FlSpot?> spots, Color color) {
+  List<LineChartBarData> _buildSegments(
+      List<FlSpot?> spots, Color color, bool smoothing) {
     final segments = <LineChartBarData>[];
     var run = <FlSpot>[];
     for (final spot in spots) {
       if (spot != null) {
         run.add(spot);
       } else if (run.isNotEmpty) {
-        segments.add(_makeSegment(run, color));
+        segments.add(_makeSegment(run, color, smoothing));
         run = [];
       }
     }
-    if (run.isNotEmpty) segments.add(_makeSegment(run, color));
+    if (run.isNotEmpty) segments.add(_makeSegment(run, color, smoothing));
     return segments;
   }
 
-  LineChartBarData _makeSegment(List<FlSpot> spots, Color color) {
+  LineChartBarData _makeSegment(
+      List<FlSpot> spots, Color color, bool smoothing) {
     return LineChartBarData(
       spots: spots,
-      isCurved: true,
+      isCurved: smoothing,
       color: color,
       barWidth: 4,
       isStrokeCapRound: true,
       dotData: const FlDotData(show: false),
-      belowBarData: BarAreaData(show: false),
+      belowBarData: BarAreaData(
+        show: true,
+        gradient: LinearGradient(
+          colors: [
+            color.withValues(alpha: 0.35),
+            color.withValues(alpha: 0.0),
+          ],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
+      ),
     );
   }
 

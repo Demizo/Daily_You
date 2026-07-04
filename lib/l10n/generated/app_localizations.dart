@@ -394,6 +394,12 @@ abstract class AppLocalizations {
   /// **'Year'**
   String get chartGroupingYear;
 
+  /// No description provided for @chartSmoothingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Smoothing'**
+  String get chartSmoothingLabel;
+
   /// No description provided for @streakCurrent.
   ///
   /// In en, this message translates to:

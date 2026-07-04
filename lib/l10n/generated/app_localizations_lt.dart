@@ -192,6 +192,9 @@ class AppLocalizationsLt extends AppLocalizations {
   String get chartGroupingYear => 'Year';
 
   @override
+  String get chartSmoothingLabel => 'Smoothing';
+
+  @override
   String streakCurrent(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

@@ -77,6 +77,8 @@
   "@chartGroupingMonth": {},
   "chartGroupingYear": "Year",
   "@chartGroupingYear": {},
+  "chartSmoothingLabel": "Smoothing",
+  "@chartSmoothingLabel": {},
   "streakCurrent": "{count, plural, other{Current Streak {count}}}",
   "@streakCurrent": {},
   "streakLongest": "{count, plural, other{Longest Streak {count}}}",
