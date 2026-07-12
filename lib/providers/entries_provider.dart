@@ -12,7 +12,7 @@ import 'package:daily_you/widgets/stat_range_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:word_count/word_count.dart';
 
-enum OrderBy { date, mood }
+enum OrderBy { date, mood, tracker }
 
 enum SortOrder { ascending, descending }
 
@@ -53,6 +53,14 @@ class EntriesProvider with ChangeNotifier {
     if (_orderBy == newOrderBy) return;
     _orderBy = newOrderBy;
     _calculateFilteredEntries();
+    notifyListeners();
+  }
+
+  int? _trackerSortTagId;
+  int? get trackerSortTagId => _trackerSortTagId;
+  set trackerSortTagId(int? id) {
+    if (_trackerSortTagId == id) return;
+    _trackerSortTagId = id;
     notifyListeners();
   }
 
