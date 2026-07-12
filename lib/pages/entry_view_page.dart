@@ -11,6 +11,8 @@ import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/local_image_loader.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
 import 'package:daily_you/widgets/scaled_markdown.dart';
+import 'package:daily_you/widgets/entry_tag_chips.dart';
+import 'package:daily_you/widgets/tag_chip.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -91,47 +93,59 @@ class _EntryViewPageState extends State<EntryViewPage> {
                       child: Padding(
                         padding: const EdgeInsets.only(
                             left: 8, top: 4, bottom: 4, right: 8),
-                        child: SizedBox(
-                          width: double.infinity,
-                          child: Wrap(
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            alignment: WrapAlignment.spaceBetween,
-                            children: [
-                              IntrinsicHeight(
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      TimeManager.formatDateWithWeekday(
-                                        entry.timeCreate,
-                                        context,
-                                      ),
-                                      style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            SizedBox(
+                              width: double.infinity,
+                              child: Wrap(
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                alignment: WrapAlignment.spaceBetween,
+                                children: [
+                                  IntrinsicHeight(
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          TimeManager.formatDateWithWeekday(
+                                            entry.timeCreate,
+                                            context,
+                                          ),
+                                          style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        VerticalDivider(
+                                          width: 16,
+                                          thickness: 2,
+                                          radius: BorderRadius.circular(4),
+                                        ),
+                                        Text(
+                                          TimeManager.localizedTimeFormat(
+                                                  TimeManager.currentLocale(
+                                                      context))
+                                              .format(entry.timeCreate),
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              color: theme.dividerColor),
+                                        ),
+                                      ],
                                     ),
-                                    VerticalDivider(
-                                      width: 16,
-                                      thickness: 2,
-                                      radius: BorderRadius.circular(4),
-                                    ),
-                                    Text(
-                                      TimeManager.localizedTimeFormat(
-                                              TimeManager.currentLocale(context))
-                                          .format(entry.timeCreate),
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          color: theme.dividerColor),
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                  MoodIcon(
+                                    moodValue: entry.mood,
+                                    size: 24,
+                                  ),
+                                ],
                               ),
-                              MoodIcon(
-                                moodValue: entry.mood,
-                                size: 24,
-                              ),
-                            ],
-                          ),
+                            ),
+                            EntryTagChips(
+                              entryId: entry.id!,
+                              padding: const EdgeInsets.only(top: 2, bottom: 2),
+                              chipBuilder: (tag, entryTag) =>
+                                  TagChip(tag: tag, value: entryTag.value),
+                            ),
+                          ],
                         ),
                       ),
                     ),
