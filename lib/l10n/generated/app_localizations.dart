@@ -838,6 +838,90 @@ abstract class AppLocalizations {
   /// **'Icon'**
   String get tagIconLabel;
 
+  /// No description provided for @iconPickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose Icon'**
+  String get iconPickerTitle;
+
+  /// No description provided for @iconPickerIconsTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Icons'**
+  String get iconPickerIconsTab;
+
+  /// No description provided for @iconPickerCustomTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get iconPickerCustomTab;
+
+  /// No description provided for @iconPickerSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search icons'**
+  String get iconPickerSearchHint;
+
+  /// No description provided for @iconGroupMoodPeople.
+  ///
+  /// In en, this message translates to:
+  /// **'Mood & People'**
+  String get iconGroupMoodPeople;
+
+  /// No description provided for @iconGroupHabitsGoals.
+  ///
+  /// In en, this message translates to:
+  /// **'Habits & Goals'**
+  String get iconGroupHabitsGoals;
+
+  /// No description provided for @iconGroupActivities.
+  ///
+  /// In en, this message translates to:
+  /// **'Activities'**
+  String get iconGroupActivities;
+
+  /// No description provided for @iconGroupHealth.
+  ///
+  /// In en, this message translates to:
+  /// **'Health'**
+  String get iconGroupHealth;
+
+  /// No description provided for @iconGroupWorkFinance.
+  ///
+  /// In en, this message translates to:
+  /// **'Work & Finance'**
+  String get iconGroupWorkFinance;
+
+  /// No description provided for @iconGroupNatureWeather.
+  ///
+  /// In en, this message translates to:
+  /// **'Nature & Weather'**
+  String get iconGroupNatureWeather;
+
+  /// No description provided for @iconGroupFoodDrink.
+  ///
+  /// In en, this message translates to:
+  /// **'Food & Drink'**
+  String get iconGroupFoodDrink;
+
+  /// No description provided for @iconGroupHomeHobbies.
+  ///
+  /// In en, this message translates to:
+  /// **'Home & Hobbies'**
+  String get iconGroupHomeHobbies;
+
+  /// No description provided for @iconGroupTravel.
+  ///
+  /// In en, this message translates to:
+  /// **'Travel'**
+  String get iconGroupTravel;
+
+  /// No description provided for @iconGroupSymbols.
+  ///
+  /// In en, this message translates to:
+  /// **'Symbols'**
+  String get iconGroupSymbols;
+
   /// No description provided for @tagTypeLabel.
   ///
   /// In en, this message translates to:

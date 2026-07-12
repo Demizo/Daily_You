@@ -10,6 +10,7 @@ import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/pages/launch_page.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/providers/templates_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:dynamic_color/dynamic_color.dart';
@@ -158,6 +159,9 @@ void main() async {
     ),
     ChangeNotifierProvider<TemplatesProvider>(
       create: (_) => TemplatesProvider.instance,
+    ),
+    ChangeNotifierProvider<TagsProvider>(
+      create: (_) => TagsProvider.instance,
     ),
     ChangeNotifierProvider<ConfigProvider>(
       create: (_) => ConfigProvider.instance,
