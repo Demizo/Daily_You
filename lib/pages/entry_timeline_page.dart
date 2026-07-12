@@ -2,6 +2,7 @@ import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/pages/entries_list_page.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/large_entry_card_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -17,6 +18,26 @@ class EntryTimelinePage extends StatefulWidget {
   final String header;
   final List<Entry> Function() getEntries;
   final String Function(Entry) labelBuilder;
+
+  /// Pushes a timeline listing every entry created on [date], ordered
+  /// newest first, with each entry labeled by its time of day.
+  static Future<void> pushForDay(BuildContext context, DateTime date) {
+    final locale = TimeManager.currentLocale(context);
+    final title = TimeManager.formatDate(date, context);
+    return Navigator.of(context).push(MaterialPageRoute(
+      allowSnapshotting: false,
+      builder: (context) => EntryTimelinePage(
+        header: title,
+        getEntries: () => EntriesProvider.instance.entries
+            .where((entry) => TimeManager.isSameDay(entry.timeCreate, date))
+            .toList()
+            .reversed
+            .toList(),
+        labelBuilder: (entry) =>
+            TimeManager.localizedTimeFormat(locale).format(entry.timeCreate),
+      ),
+    ));
+  }
 
   @override
   State<EntryTimelinePage> createState() => _EntryTimelinePageState();
