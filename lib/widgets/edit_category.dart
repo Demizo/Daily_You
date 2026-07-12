@@ -1,0 +1,185 @@
+import 'package:daily_you/models/tag_category.dart';
+import 'package:daily_you/models/tag_icon_type.dart';
+import 'package:daily_you/providers/tags_provider.dart';
+import 'package:daily_you/widgets/icon_picker_dialog.dart';
+import 'package:daily_you/widgets/tag_icon_glyph.dart';
+import 'package:flutter/material.dart';
+import 'package:daily_you/l10n/generated/app_localizations.dart';
+
+class EditCategory extends StatefulWidget {
+  final TagCategory? category;
+
+  const EditCategory({super.key, this.category});
+
+  @override
+  State<EditCategory> createState() => _EditCategoryState();
+}
+
+class _EditCategoryState extends State<EditCategory> {
+  late TextEditingController _nameController;
+  String? _icon;
+  TagIconType _iconType = TagIconType.character;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(text: widget.category?.name ?? '');
+    _icon = widget.category?.icon;
+    _iconType = widget.category?.iconType ?? TagIconType.character;
+    _nameController.addListener(() => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    final name = _nameController.text.trim();
+    if (name.isEmpty) return;
+
+    final now = DateTime.now();
+
+    if (widget.category == null) {
+      await TagsProvider.instance.addCategory(TagCategory(
+        name: name,
+        icon: _icon,
+        iconType: _iconType,
+        timeCreate: now,
+        timeModified: now,
+      ));
+    } else {
+      // Construct directly so icon: null is honored when cleared
+      await TagsProvider.instance.updateCategory(TagCategory(
+        id: widget.category!.id,
+        name: name,
+        icon: _icon,
+        iconType: _iconType,
+        timeCreate: widget.category!.timeCreate,
+        timeModified: now,
+      ));
+    }
+
+    if (mounted) Navigator.of(context).pop();
+  }
+
+  Future<void> _showIconPicker() async {
+    final result = await showDialog<IconPickerResult>(
+      context: context,
+      builder: (context) => IconPickerDialog(
+        previewColor: Theme.of(context).colorScheme.onSurface,
+      ),
+    );
+    if (result != null) {
+      setState(() {
+        _icon = result.value;
+        _iconType = result.type;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final hasIcon = _icon != null && _icon!.isNotEmpty;
+
+    return AlertDialog(
+      title: Text(widget.category == null
+          ? l10n.newCategoryTitle
+          : l10n.editCategoryTitle),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Stack(
+                  children: [
+                    GestureDetector(
+                      onTap: _showIconPicker,
+                      child: Card.filled(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .surfaceContainerHighest,
+                        child: SizedBox(
+                          width: 44,
+                          height: 44,
+                          child: Center(
+                            child: TagIconGlyph(
+                              icon: _icon,
+                              iconType: _iconType,
+                              fallbackIcon: Icons.folder_rounded,
+                              color: Theme.of(context).colorScheme.onSurface,
+                              size: 28,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    if (hasIcon)
+                      Positioned(
+                        top: 0,
+                        right: 0,
+                        child: GestureDetector(
+                          onTap: () => setState(() {
+                            _icon = null;
+                            _iconType = TagIconType.character;
+                          }),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .surfaceContainer,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.close, size: 14),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Card.filled(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .surfaceContainerHighest,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                      child: TextField(
+                        controller: _nameController,
+                        autofocus: true,
+                        maxLines: 1,
+                        textCapitalization: TextCapitalization.words,
+                        decoration: InputDecoration(
+                          hintText: l10n.categoryNameHint,
+                          border: InputBorder.none,
+                        ),
+                        onSubmitted: (_) => _nameController.text.trim().isEmpty
+                            ? null
+                            : _save(),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        TextButton(
+          onPressed: _nameController.text.trim().isEmpty ? null : _save,
+          child: Text(MaterialLocalizations.of(context).okButtonLabel),
+        ),
+      ],
+    );
+  }
+}

@@ -7,6 +7,7 @@ import 'package:daily_you/pages/settings/language_settings.dart';
 import 'package:daily_you/pages/settings/notification_settings.dart';
 import 'package:daily_you/pages/settings/security_settings.dart';
 import 'package:daily_you/pages/settings/storage_settings.dart';
+import 'package:daily_you/pages/settings/tags_settings.dart';
 import 'package:daily_you/pages/settings/templates_page.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/widgets/settings_category.dart';
@@ -97,13 +98,17 @@ class _SettingsPageState extends State<SettingsPage> {
                 icon: Icons.notifications_rounded,
                 page: NotificationSettings()),
           SettingsCategory(
-              title: AppLocalizations.of(context)!.flashbacksTitle,
-              icon: Icons.history_rounded,
-              page: FlashbackSettings()),
+              title: AppLocalizations.of(context)!.settingsTagsTitle,
+              icon: Icons.local_offer_rounded,
+              page: TagsSettings()),
           SettingsCategory(
               title: AppLocalizations.of(context)!.settingsTemplatesTitle,
               icon: Icons.description_rounded,
               page: TemplateSettings()),
+          SettingsCategory(
+              title: AppLocalizations.of(context)!.flashbacksTitle,
+              icon: Icons.history_rounded,
+              page: FlashbackSettings()),
           SettingsCategory(
               title: AppLocalizations.of(context)!.settingsStorageTitle,
               icon: Icons.storage_rounded,

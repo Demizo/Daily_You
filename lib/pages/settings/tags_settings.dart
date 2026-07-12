@@ -1,0 +1,452 @@
+import 'package:daily_you/models/tag.dart';
+import 'package:daily_you/models/tag_category.dart';
+import 'package:daily_you/providers/tags_provider.dart';
+import 'package:daily_you/widgets/edit_category.dart';
+import 'package:daily_you/widgets/edit_tag.dart';
+import 'package:daily_you/widgets/tag_chip.dart';
+import 'package:daily_you/widgets/tag_icon_glyph.dart';
+import 'package:flutter/material.dart';
+import 'package:daily_you/l10n/generated/app_localizations.dart';
+import 'package:provider/provider.dart';
+
+sealed class _ListItem {
+  const _ListItem();
+}
+
+class _HeaderItem extends _ListItem {
+  final TagCategory? category; // null = Uncategorized section
+  const _HeaderItem(this.category);
+}
+
+class _TagItem extends _ListItem {
+  final Tag tag;
+  const _TagItem(this.tag);
+}
+
+class TagsSettings extends StatefulWidget {
+  const TagsSettings({super.key});
+
+  @override
+  State<TagsSettings> createState() => _TagsSettingsState();
+}
+
+class _TagsSettingsState extends State<TagsSettings> {
+  final Set<int?> _manuallyCollapsedIds = {};
+  bool _isDraggingCategory = false;
+
+  void _showEditTagDialog(BuildContext context, Tag? tag) {
+    showDialog(
+      context: context,
+      builder: (context) => EditTag(tag: tag),
+    );
+  }
+
+  void _showCategoryDialog(BuildContext context, TagCategory? category) {
+    showDialog(
+      context: context,
+      builder: (_) => EditCategory(category: category),
+    );
+  }
+
+  Future<void> _confirmDeleteTag(
+      BuildContext context, Tag tag, int entryCount) async {
+    final l10n = AppLocalizations.of(context)!;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.deleteTagTitle),
+        content: Text(l10n.deleteTagMessage(entryCount, tag.name)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child:
+                Text(MaterialLocalizations.of(dialogContext).cancelButtonLabel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(MaterialLocalizations.of(dialogContext).okButtonLabel),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) {
+      await TagsProvider.instance.remove(tag);
+    }
+  }
+
+  Future<void> _confirmDeleteCategory(
+      BuildContext context, TagCategory category, int tagCount) async {
+    final l10n = AppLocalizations.of(context)!;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.deleteCategoryTitle),
+        content: tagCount > 0
+            ? Text(l10n.deleteCategoryMessage(tagCount, category.name))
+            : null,
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child:
+                Text(MaterialLocalizations.of(dialogContext).cancelButtonLabel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(
+                MaterialLocalizations.of(dialogContext).deleteButtonTooltip),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      await TagsProvider.instance.removeCategoryAndTags(category);
+    }
+  }
+
+  void _toggleCollapse(int? categoryId) {
+    setState(() {
+      if (_manuallyCollapsedIds.contains(categoryId)) {
+        _manuallyCollapsedIds.remove(categoryId);
+      } else {
+        _manuallyCollapsedIds.add(categoryId);
+      }
+    });
+  }
+
+  List<_ListItem> _buildFlatItems(TagsProvider provider) {
+    final items = <_ListItem>[];
+    final hasCategories = provider.categories.isNotEmpty;
+
+    // Header only shown when named categories exist, to give uncategorized
+    // tags something to collapse under.
+    final uncategorizedTags =
+        provider.tags.where((tag) => tag.categoryId == null).toList();
+    if (hasCategories) {
+      items.add(const _HeaderItem(null));
+    }
+    if (!hasCategories || !_manuallyCollapsedIds.contains(null)) {
+      for (final tag in uncategorizedTags) {
+        items.add(_TagItem(tag));
+      }
+    }
+
+    for (final category in provider.categories) {
+      items.add(_HeaderItem(category));
+      if (!_manuallyCollapsedIds.contains(category.id)) {
+        final categoryTags = provider.tags
+            .where((tag) => tag.categoryId == category.id)
+            .toList();
+        for (final tag in categoryTags) {
+          items.add(_TagItem(tag));
+        }
+      }
+    }
+
+    return items;
+  }
+
+  Future<void> _onReorder(
+      int from, int to, TagsProvider provider, List<_ListItem> items) async {
+    if (from == to) return;
+
+    final movedItem = items[from];
+    items.removeAt(from);
+    items.insert(to, movedItem);
+
+    if (movedItem is _HeaderItem) {
+      // Uncategorized header is pinned, no-op if it was somehow moved
+      if (movedItem.category == null) return;
+
+      final orderedCategories = items
+          .whereType<_HeaderItem>()
+          .where((header) => header.category != null)
+          .map((header) => header.category!)
+          .toList();
+      await provider.updateCategorySortOrders(orderedCategories);
+    } else if (movedItem is _TagItem) {
+      TagCategory? currentCategory;
+      final Map<int?, List<Tag>> sectionTags = {};
+
+      for (final item in items) {
+        if (item is _HeaderItem) {
+          currentCategory = item.category;
+          sectionTags[currentCategory?.id] ??= [];
+        } else if (item is _TagItem) {
+          (sectionTags[currentCategory?.id] ??= []).add(item.tag);
+        }
+      }
+
+      final tagsToUpdate = <Tag>[];
+      for (final entry in sectionTags.entries) {
+        final categoryId = entry.key;
+        final tagsInSection = entry.value;
+        for (int index = 0; index < tagsInSection.length; index++) {
+          final tag = tagsInSection[index];
+          final categoryChanged = tag.categoryId != categoryId;
+          final orderChanged = tag.sortOrder != index;
+          if (categoryChanged || orderChanged) {
+            tagsToUpdate.add(Tag(
+              id: tag.id,
+              name: tag.name,
+              color: tag.color,
+              tagType: tag.tagType,
+              icon: tag.icon,
+              iconType: tag.iconType,
+              categoryId: categoryId,
+              sortOrder: index,
+              timeCreate: tag.timeCreate,
+              timeModified: categoryChanged ? DateTime.now() : tag.timeModified,
+            ));
+          }
+        }
+      }
+
+      if (tagsToUpdate.isNotEmpty) {
+        await provider.batchUpdateTags(tagsToUpdate);
+      }
+    }
+  }
+
+  Widget _buildHeaderRow(
+    BuildContext context,
+    int index,
+    TagCategory? category,
+    TagsProvider provider, {
+    required Key key,
+  }) {
+    final l10n = AppLocalizations.of(context)!;
+    final isUncategorized = category == null;
+    final isCollapsed = _manuallyCollapsedIds.contains(category?.id);
+    final name =
+        isUncategorized ? l10n.tagCategoryUncategorized : category.name;
+
+    return Material(
+      key: key,
+      color: Theme.of(context).colorScheme.surfaceContainerLow,
+      child: InkWell(
+        onTap: () => _toggleCollapse(category?.id),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 2),
+          child: Row(
+            children: [
+              const SizedBox(height: kMinInteractiveDimension),
+              if (!isUncategorized)
+                ReorderableDragStartListener(
+                  index: index,
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12.0),
+                    child: Icon(Icons.drag_handle_rounded, size: 20),
+                  ),
+                )
+              else
+                const SizedBox(width: 44),
+              if (!isUncategorized) ...[
+                TagIconGlyph(
+                  icon: category.icon,
+                  iconType: category.iconType,
+                  fallbackIcon: Icons.folder_rounded,
+                  color: Theme.of(context).colorScheme.onSurface,
+                  size: 20,
+                ),
+                const SizedBox(width: 10),
+              ],
+              Expanded(
+                child: Text(
+                  name,
+                  overflow: TextOverflow.fade,
+                  softWrap: false,
+                  maxLines: 1,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                ),
+              ),
+              // Delete before edit, matching the tag row action order below.
+              if (!isUncategorized) ...[
+                IconButton(
+                  icon: const Icon(Icons.delete_rounded),
+                  onPressed: () => _confirmDeleteCategory(
+                    context,
+                    category,
+                    provider.tags
+                        .where((tag) => tag.categoryId == category.id)
+                        .length,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.edit_rounded),
+                  onPressed: () => _showCategoryDialog(context, category),
+                ),
+              ],
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Icon(
+                  isCollapsed
+                      ? Icons.expand_more_rounded
+                      : Icons.expand_less_rounded,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTagRow(
+    BuildContext context,
+    int index,
+    Tag tag,
+    TagsProvider provider, {
+    required Key key,
+  }) {
+    // Hidden while a category header is being dragged
+    if (_isDraggingCategory) return SizedBox(key: key);
+    return Material(
+      key: key,
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => _showEditTagDialog(context, tag),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Row(
+            children: [
+              ReorderableDragStartListener(
+                index: index,
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 12.0),
+                  child: Icon(Icons.drag_handle_rounded, size: 20),
+                ),
+              ),
+              Expanded(
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: TagChip(tag: tag),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Text(
+                  AppLocalizations.of(context)!
+                      .logCount(provider.entryCountForTag(tag.id!)),
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.delete_rounded),
+                onPressed: () => _confirmDeleteTag(
+                    context, tag, provider.entryCountForTag(tag.id!)),
+              ),
+              IconButton(
+                icon: const Icon(Icons.edit_rounded),
+                onPressed: () => _showEditTagDialog(context, tag),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final provider = Provider.of<TagsProvider>(context);
+    final isEmpty = provider.tags.isEmpty && provider.categories.isEmpty;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(l10n.settingsTagsTitle),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.create_new_folder_rounded),
+            onPressed: () => _showCategoryDialog(context, null),
+          ),
+          IconButton(
+            icon: const Icon(Icons.add_rounded),
+            onPressed: () => _showEditTagDialog(context, null),
+          ),
+        ],
+      ),
+      body: isEmpty
+          ? Center(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 48),
+                child: Text(l10n.noResults),
+              ),
+            )
+          : Builder(builder: (context) {
+              final allItems = _buildFlatItems(provider);
+              // Keep the uncategorized header out of the reorderable range so
+              // nothing can be dragged above
+              final hasUncategorizedHeader = allItems.isNotEmpty &&
+                  allItems[0] is _HeaderItem &&
+                  (allItems[0] as _HeaderItem).category == null;
+              final items =
+                  hasUncategorizedHeader ? allItems.sublist(1) : allItems;
+
+              return CustomScrollView(
+                slivers: [
+                  if (hasUncategorizedHeader)
+                    SliverToBoxAdapter(
+                      child: _buildHeaderRow(
+                        context,
+                        0,
+                        null,
+                        provider,
+                        key: const ValueKey('hdr_null'),
+                      ),
+                    ),
+                  SliverReorderableList(
+                    itemCount: items.length,
+                    onReorderStart: (index) {
+                      if (!_isDraggingCategory &&
+                          index < items.length &&
+                          items[index] is _HeaderItem &&
+                          (items[index] as _HeaderItem).category != null) {
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          if (mounted) {
+                            setState(() => _isDraggingCategory = true);
+                          }
+                        });
+                      }
+                    },
+                    onReorderEnd: (_) {
+                      if (_isDraggingCategory) {
+                        setState(() => _isDraggingCategory = false);
+                      }
+                    },
+                    onReorderItem: (from, to) {
+                      final snapshot = List<_ListItem>.from(items);
+                      _onReorder(from, to, provider, snapshot);
+                    },
+                    itemBuilder: (context, index) {
+                      final item = items[index];
+                      if (item is _HeaderItem) {
+                        return _buildHeaderRow(
+                          context,
+                          index,
+                          item.category,
+                          provider,
+                          key: ValueKey('hdr_${item.category?.id ?? 'null'}'),
+                        );
+                      } else {
+                        final tagItem = item as _TagItem;
+                        return _buildTagRow(
+                          context,
+                          index,
+                          tagItem.tag,
+                          provider,
+                          key: ValueKey('tag_${tagItem.tag.id}'),
+                        );
+                      }
+                    },
+                  ),
+                ],
+              );
+            }),
+    );
+  }
+}
