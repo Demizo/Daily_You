@@ -62,6 +62,7 @@ class ConfigKey {
   static const String lastDismissedSupportBannerDate =
       "lastDismissedSupportBannerDate";
   static const String calendarShowMood = "calendarShowMood";
+  static const String calendarTagOverlay = "calendarTagOverlay";
   static const String calendarSystem = "calendarSystem";
   static const String moodOverTimeGrouping = "moodOverTimeGrouping";
   static const String moodOverTimeSmoothing = "moodOverTimeSmoothing";
@@ -140,6 +141,7 @@ class ConfigProvider with ChangeNotifier {
     ConfigKey.hideImagesInFlashbacks: false,
     ConfigKey.lastDismissedSupportBannerDate: null,
     ConfigKey.calendarShowMood: true,
+    ConfigKey.calendarTagOverlay: null,
     ConfigKey.calendarSystem: 'system',
     ConfigKey.moodOverTimeGrouping: null,
     ConfigKey.moodOverTimeSmoothing: true,
