@@ -129,6 +129,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get noLogs => '기록 없음…';
 
   @override
+  String get noResults => 'No Results…';
+
+  @override
   String get sortDateTitle => '날짜';
 
   @override
@@ -404,6 +407,127 @@ class AppLocalizationsKo extends AppLocalizations {
       '### 오늘 어떤 것이 즐거웠나요?\n- \n\n### 어떤 것에 감사하나요?\n- \n\n### 앞으로 무엇을 기대하나요?\n- ';
 
   @override
+  String get settingsTagsTitle => 'Tags';
+
+  @override
+  String get manageTags => 'Manage Tags';
+
+  @override
+  String get tagTypeLabelTitle => 'Label';
+
+  @override
+  String get tagTypeTrackerTitle => 'Tracker';
+
+  @override
+  String get tagNameHint => 'Tag name';
+
+  @override
+  String get tagColorLabel => 'Color';
+
+  @override
+  String get tagIconLabel => 'Icon';
+
+  @override
+  String get tagTypeLabel => 'Type';
+
+  @override
+  String get editTagTitle => 'Edit Tag';
+
+  @override
+  String get newTagTitle => 'New Tag';
+
+  @override
+  String get tagCategoryLabel => 'Category';
+
+  @override
+  String get tagCategoryNone => 'None';
+
+  @override
+  String get tagCategoryUncategorized => 'Uncategorized';
+
+  @override
+  String get newCategoryTitle => 'New Category';
+
+  @override
+  String get editCategoryTitle => 'Edit Category';
+
+  @override
+  String get categoryNameHint => 'Category name';
+
+  @override
+  String get deleteTagTitle => 'Delete Tag?';
+
+  @override
+  String deleteTagMessage(num count, Object name) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count logs',
+      one: '$count log',
+    );
+    return 'Delete \"$name\"? Used in $_temp0.';
+  }
+
+  @override
+  String get deleteCategoryTitle => 'Delete Category?';
+
+  @override
+  String deleteCategoryMessage(num count, Object name) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tags',
+      one: '$count tag',
+    );
+    return '\"$name\" contains $_temp0. What should happen to them?';
+  }
+
+  @override
+  String get deleteCategoryOnlyButton => 'Category only';
+
+  @override
+  String get deleteCategoryAndTagsButton => 'Category and all tags';
+
+  @override
+  String get filterTagsTitle => 'Filter by Tags';
+
+  @override
+  String get tagFilterModeAny => 'Any Tag';
+
+  @override
+  String get tagFilterModeAll => 'All Tags';
+
+  @override
+  String get clearAllFilters => 'Clear All';
+
+  @override
+  String get trackerSortLabel => 'Sort by tracker';
+
+  @override
+  String get addTagsTitle => 'Add Tags';
+
+  @override
+  String get addTagsSearchHint => 'Search tags…';
+
+  @override
+  String get addTagButton => 'Add';
+
+  @override
+  String get tagPickerSortManualLabel => 'Manual order';
+
+  @override
+  String get tagPickerSortUsageLabel => 'Sort by usage';
+
+  @override
+  String get trackerValueTitle => 'Set Value';
+
+  @override
+  String get trackerValueHint => 'Value';
+
+  @override
+  String get trackerFrequentValues => 'Frequent values';
+
+  @override
   String get settingsStorageTitle => '저장소';
 
   @override
@@ -632,4 +756,27 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get tagMoodTitle => '기분';
+
+  @override
+  String get calendarViewOptionsTitle => 'Display Options';
+
+  @override
+  String get calendarTagDisplayLabel => 'Tag';
+
+  @override
+  String get selectTagTitle => 'Select Tag';
+
+  @override
+  String get labelPresentLabel => 'Present';
+
+  @override
+  String get labelAbsentLabel => 'Absent';
+
+  @override
+  String get labelCoverageLabel => 'Coverage';
+
+  @override
+  String chartDistributionTitle(Object tag) {
+    return '$tag Distribution';
+  }
 }

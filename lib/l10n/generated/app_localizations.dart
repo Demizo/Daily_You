@@ -304,6 +304,12 @@ abstract class AppLocalizations {
   /// **'No Logs…'**
   String get noLogs;
 
+  /// No description provided for @noResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No Results…'**
+  String get noResults;
+
   /// No description provided for @sortDateTitle.
   ///
   /// In en, this message translates to:
@@ -790,6 +796,216 @@ abstract class AppLocalizations {
   /// **'### What did you enjoy about today?\n- \n\n### What are you thankful for?\n- \n\n### What are you looking forward to?\n- '**
   String get templateDefaultReflectionBody;
 
+  /// No description provided for @settingsTagsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tags'**
+  String get settingsTagsTitle;
+
+  /// No description provided for @manageTags.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Tags'**
+  String get manageTags;
+
+  /// No description provided for @tagTypeLabelTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Label'**
+  String get tagTypeLabelTitle;
+
+  /// No description provided for @tagTypeTrackerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tracker'**
+  String get tagTypeTrackerTitle;
+
+  /// No description provided for @tagNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag name'**
+  String get tagNameHint;
+
+  /// No description provided for @tagColorLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Color'**
+  String get tagColorLabel;
+
+  /// No description provided for @tagIconLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Icon'**
+  String get tagIconLabel;
+
+  /// No description provided for @tagTypeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get tagTypeLabel;
+
+  /// No description provided for @editTagTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Tag'**
+  String get editTagTitle;
+
+  /// No description provided for @newTagTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New Tag'**
+  String get newTagTitle;
+
+  /// No description provided for @tagCategoryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get tagCategoryLabel;
+
+  /// No description provided for @tagCategoryNone.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get tagCategoryNone;
+
+  /// No description provided for @tagCategoryUncategorized.
+  ///
+  /// In en, this message translates to:
+  /// **'Uncategorized'**
+  String get tagCategoryUncategorized;
+
+  /// No description provided for @newCategoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New Category'**
+  String get newCategoryTitle;
+
+  /// No description provided for @editCategoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Category'**
+  String get editCategoryTitle;
+
+  /// No description provided for @categoryNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Category name'**
+  String get categoryNameHint;
+
+  /// No description provided for @deleteTagTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Tag?'**
+  String get deleteTagTitle;
+
+  /// No description provided for @deleteTagMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete \"{name}\"? Used in {count, plural, one{{count} log} other{{count} logs}}.'**
+  String deleteTagMessage(num count, Object name);
+
+  /// No description provided for @deleteCategoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Category?'**
+  String get deleteCategoryTitle;
+
+  /// No description provided for @deleteCategoryMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'\"{name}\" contains {count, plural, one{{count} tag} other{{count} tags}}. What should happen to them?'**
+  String deleteCategoryMessage(num count, Object name);
+
+  /// No description provided for @deleteCategoryOnlyButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Category only'**
+  String get deleteCategoryOnlyButton;
+
+  /// No description provided for @deleteCategoryAndTagsButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Category and all tags'**
+  String get deleteCategoryAndTagsButton;
+
+  /// No description provided for @filterTagsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter by Tags'**
+  String get filterTagsTitle;
+
+  /// No description provided for @tagFilterModeAny.
+  ///
+  /// In en, this message translates to:
+  /// **'Any Tag'**
+  String get tagFilterModeAny;
+
+  /// No description provided for @tagFilterModeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All Tags'**
+  String get tagFilterModeAll;
+
+  /// No description provided for @clearAllFilters.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear All'**
+  String get clearAllFilters;
+
+  /// No description provided for @trackerSortLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort by tracker'**
+  String get trackerSortLabel;
+
+  /// No description provided for @addTagsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Tags'**
+  String get addTagsTitle;
+
+  /// No description provided for @addTagsSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search tags…'**
+  String get addTagsSearchHint;
+
+  /// No description provided for @addTagButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get addTagButton;
+
+  /// No description provided for @tagPickerSortManualLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Manual order'**
+  String get tagPickerSortManualLabel;
+
+  /// No description provided for @tagPickerSortUsageLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort by usage'**
+  String get tagPickerSortUsageLabel;
+
+  /// No description provided for @trackerValueTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set Value'**
+  String get trackerValueTitle;
+
+  /// No description provided for @trackerValueHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Value'**
+  String get trackerValueHint;
+
+  /// No description provided for @trackerFrequentValues.
+  ///
+  /// In en, this message translates to:
+  /// **'Frequent values'**
+  String get trackerFrequentValues;
+
   /// No description provided for @settingsStorageTitle.
   ///
   /// In en, this message translates to:
@@ -1227,6 +1443,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Mood'**
   String get tagMoodTitle;
+
+  /// No description provided for @calendarViewOptionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Display Options'**
+  String get calendarViewOptionsTitle;
+
+  /// No description provided for @calendarTagDisplayLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag'**
+  String get calendarTagDisplayLabel;
+
+  /// No description provided for @selectTagTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Tag'**
+  String get selectTagTitle;
+
+  /// No description provided for @labelPresentLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Present'**
+  String get labelPresentLabel;
+
+  /// No description provided for @labelAbsentLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Absent'**
+  String get labelAbsentLabel;
+
+  /// No description provided for @labelCoverageLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Coverage'**
+  String get labelCoverageLabel;
+
+  /// No description provided for @chartDistributionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{tag} Distribution'**
+  String chartDistributionTitle(Object tag);
 }
 
 class _AppLocalizationsDelegate
