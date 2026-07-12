@@ -1,7 +1,10 @@
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/models/entry.dart';
+import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/providers/tags_provider.dart';
+import 'package:daily_you/widgets/tag_picker_dialog.dart';
 import 'package:daily_you/widgets/hiding_widget.dart';
 import 'package:daily_you/widgets/large_entry_card_widget.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +27,11 @@ class _GalleryPageState extends State<GalleryPage>
   final ScrollController _scrollController = ScrollController();
   late final FocusNode _focusNode = FocusNode();
   double _searchElevation = 0.0;
+
+  List<int> _filterTagIds = [];
+  TagFilterMode _filterTagMode = TagFilterMode.any;
+
+  bool get _hasTagFilter => _filterTagIds.isNotEmpty;
 
   @override
   bool get wantKeepAlive => true;
@@ -51,64 +59,182 @@ class _GalleryPageState extends State<GalleryPage>
     super.dispose();
   }
 
+  List<Entry> _getVisibleEntries(
+      EntriesProvider entriesProvider, TagsProvider tagsProvider) {
+    final filtered =
+        _applyTagFilter(entriesProvider.getFilteredEntries(), tagsProvider);
+    return _applyTrackerSort(filtered, entriesProvider, tagsProvider);
+  }
+
+  List<Entry> _applyTagFilter(List<Entry> entries, TagsProvider tagsProvider) {
+    if (_filterTagIds.isEmpty) return entries;
+    return entries.where((entry) {
+      final entryTagIds = tagsProvider.entryTags
+          .where((entryTag) => entryTag.entryId == entry.id)
+          .map((entryTag) => entryTag.tagId)
+          .toSet();
+      return _filterTagMode == TagFilterMode.all
+          ? _filterTagIds.every((tagId) => entryTagIds.contains(tagId))
+          : _filterTagIds.any((tagId) => entryTagIds.contains(tagId));
+    }).toList();
+  }
+
+  List<Entry> _applyTrackerSort(List<Entry> entries,
+      EntriesProvider entriesProvider, TagsProvider tagsProvider) {
+    final trackerTagId = entriesProvider.trackerSortTagId;
+    if (entriesProvider.orderBy != OrderBy.tracker || trackerTagId == null) {
+      return entries;
+    }
+    final ascending = entriesProvider.sortOrder == SortOrder.ascending;
+
+    double? getTrackerValue(Entry entry) {
+      final rawValue = tagsProvider.entryTags
+          .where((entryTag) =>
+              entryTag.entryId == entry.id && entryTag.tagId == trackerTagId)
+          .firstOrNull
+          ?.value;
+      return double.tryParse(rawValue ?? '');
+    }
+
+    final withValue =
+        entries.where((entry) => getTrackerValue(entry) != null).toList();
+    final withoutValue =
+        entries.where((entry) => getTrackerValue(entry) == null).toList();
+
+    withValue.sort((a, b) {
+      final comparison = ascending
+          ? getTrackerValue(a)!.compareTo(getTrackerValue(b)!)
+          : getTrackerValue(b)!.compareTo(getTrackerValue(a)!);
+      if (comparison != 0) return comparison;
+      return ascending
+          ? a.timeCreate.compareTo(b.timeCreate)
+          : b.timeCreate.compareTo(a.timeCreate);
+    });
+
+    withoutValue.sort((a, b) => ascending
+        ? a.timeCreate.compareTo(b.timeCreate)
+        : b.timeCreate.compareTo(a.timeCreate));
+
+    // Entries without a numeric tracker value are always listed after those
+    // with one, regardless of sort direction.
+    return [...withValue, ...withoutValue];
+  }
+
+  void _showTagFilterDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => TagPickerDialog(
+        mode: TagPickerMode.filter,
+        initialSelectedTagIds: List.from(_filterTagIds),
+        initialFilterMode: _filterTagMode,
+        onFilterChanged: (tagIds, mode) {
+          setState(() {
+            _filterTagIds = tagIds;
+            _filterTagMode = mode;
+          });
+        },
+      ),
+    );
+  }
+
   void _showSortSelectionPopup(BuildContext context) {
     final entriesProvider =
         Provider.of<EntriesProvider>(context, listen: false);
+    final tagsProvider = Provider.of<TagsProvider>(context, listen: false);
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-            builder: (context, setState) => AlertDialog(
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      RadioListTile<OrderBy>(
-                        value: OrderBy.date,
-                        groupValue: entriesProvider.orderBy,
-                        onChanged: (value) => setState(() {
-                          if (value != null) {
-                            entriesProvider.orderBy = value;
-                          }
-                        }),
-                        title:
-                            Text(AppLocalizations.of(context)!.sortDateTitle),
-                      ),
-                      RadioListTile<OrderBy>(
-                        value: OrderBy.mood,
-                        groupValue: entriesProvider.orderBy,
-                        onChanged: (value) => setState(() {
-                          if (value != null) {
-                            entriesProvider.orderBy = value;
-                          }
-                        }),
-                        title: Text(AppLocalizations.of(context)!.tagMoodTitle),
-                      ),
-                      const Divider(),
-                      RadioListTile<SortOrder>(
-                        value: SortOrder.ascending,
-                        groupValue: entriesProvider.sortOrder,
-                        onChanged: (value) => setState(() {
-                          if (value != null) {
-                            entriesProvider.sortOrder = value;
-                          }
-                        }),
-                        title: Text(AppLocalizations.of(context)!
-                            .sortOrderAscendingTitle),
-                      ),
-                      RadioListTile<SortOrder>(
-                        value: SortOrder.descending,
-                        groupValue: entriesProvider.sortOrder,
-                        onChanged: (value) => setState(() {
-                          if (value != null) {
-                            entriesProvider.sortOrder = value;
-                          }
-                        }),
-                        title: Text(AppLocalizations.of(context)!
-                            .sortOrderDescendingTitle),
-                      ),
-                    ],
-                  ),
-                ));
+      builder: (context) {
+        return StatefulBuilder(builder: (context, setDialogState) {
+          final trackerTag = entriesProvider.trackerSortTagId != null
+              ? tagsProvider.tags
+                  .where((tag) => tag.id == entriesProvider.trackerSortTagId)
+                  .firstOrNull
+              : null;
+
+          Future<void> handleTrackerTap() async {
+            final previousOrderBy = entriesProvider.orderBy;
+            setDialogState(() => entriesProvider.orderBy = OrderBy.tracker);
+
+            final tag = await showDialog<Tag>(
+              context: context,
+              builder: (_) => TagPickerDialog(
+                mode: TagPickerMode.selectSingle,
+                tagTypeFilter: TagType.tracker,
+              ),
+            );
+
+            if (tag != null) {
+              setDialogState(() => entriesProvider.trackerSortTagId = tag.id);
+            } else if (previousOrderBy != OrderBy.tracker) {
+              setDialogState(() => entriesProvider.orderBy = previousOrderBy);
+            }
+          }
+
+          return AlertDialog(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                RadioListTile<OrderBy>(
+                  value: OrderBy.date,
+                  groupValue: entriesProvider.orderBy,
+                  onChanged: (value) => setDialogState(() {
+                    if (value != null) {
+                      entriesProvider.orderBy = value;
+                      entriesProvider.trackerSortTagId = null;
+                    }
+                  }),
+                  title: Text(AppLocalizations.of(context)!.sortDateTitle),
+                ),
+                RadioListTile<OrderBy>(
+                  value: OrderBy.mood,
+                  groupValue: entriesProvider.orderBy,
+                  onChanged: (value) => setDialogState(() {
+                    if (value != null) {
+                      entriesProvider.orderBy = value;
+                      entriesProvider.trackerSortTagId = null;
+                    }
+                  }),
+                  title: Text(AppLocalizations.of(context)!.tagMoodTitle),
+                ),
+                RadioListTile<OrderBy>(
+                  value: OrderBy.tracker,
+                  groupValue: entriesProvider.orderBy,
+                  toggleable: true,
+                  onChanged: (_) => handleTrackerTap(),
+                  title:
+                      Text(AppLocalizations.of(context)!.tagTypeTrackerTitle),
+                  subtitle: trackerTag != null
+                      ? Text(
+                          trackerTag.name,
+                          maxLines: 1,
+                          softWrap: false,
+                          overflow: TextOverflow.fade,
+                        )
+                      : null,
+                ),
+                const Divider(),
+                RadioListTile<SortOrder>(
+                  value: SortOrder.ascending,
+                  groupValue: entriesProvider.sortOrder,
+                  onChanged: (value) => setDialogState(() {
+                    if (value != null) entriesProvider.sortOrder = value;
+                  }),
+                  title: Text(
+                      AppLocalizations.of(context)!.sortOrderAscendingTitle),
+                ),
+                RadioListTile<SortOrder>(
+                  value: SortOrder.descending,
+                  groupValue: entriesProvider.sortOrder,
+                  onChanged: (value) => setDialogState(() {
+                    if (value != null) entriesProvider.sortOrder = value;
+                  }),
+                  title: Text(
+                      AppLocalizations.of(context)!.sortOrderDescendingTitle),
+                ),
+              ],
+            ),
+          );
+        });
       },
     );
   }
@@ -117,13 +243,15 @@ class _GalleryPageState extends State<GalleryPage>
   Widget build(BuildContext context) {
     super.build(context);
     final entriesProvider = Provider.of<EntriesProvider>(context);
+    final tagsProvider = Provider.of<TagsProvider>(context);
     final configProvider = Provider.of<ConfigProvider>(context);
     String viewMode = configProvider.get(ConfigKey.galleryPageViewMode);
     bool listView = viewMode == 'list';
-    var entries = entriesProvider.getFilteredEntries();
+    var entries = _getVisibleEntries(entriesProvider, tagsProvider);
+    final bool showClear = _searchController.text.isNotEmpty || _hasTagFilter;
     return Center(
       child: Stack(alignment: Alignment.topCenter, children: [
-        buildEntries(context, listView, entries),
+        buildEntries(context, listView, entries, tagsProvider),
         Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -173,7 +301,7 @@ class _GalleryPageState extends State<GalleryPage>
                         ),
                       );
                     },
-                    child: _searchController.text.isNotEmpty
+                    child: showClear
                         ? IconButton(
                             visualDensity: VisualDensity(
                                 horizontal: VisualDensity.minimumDensity),
@@ -182,21 +310,33 @@ class _GalleryPageState extends State<GalleryPage>
                             onPressed: () {
                               _searchController.clear();
                               entriesProvider.searchText = "";
-                              setState(() {});
+                              setState(() {
+                                _filterTagIds = [];
+                                _filterTagMode = TagFilterMode.any;
+                              });
                             },
                           )
-                        : SizedBox.shrink(
-                            key: ValueKey('empty')), // Empty widget
+                        : SizedBox.shrink(key: ValueKey('empty')),
                   ),
-                  if (entriesProvider.searchText.isNotEmpty)
+                  if (entriesProvider.searchText.isNotEmpty || _hasTagFilter)
                     Padding(
                       padding: const EdgeInsets.only(right: 8.0),
                       child: Text(AppLocalizations.of(context)!
                           .logCount(entries.length)),
                     ),
                   IconButton(
-                      icon: const Icon(Icons.sort_rounded),
-                      onPressed: () => _showSortSelectionPopup(context)),
+                    icon: Icon(
+                      Icons.filter_list_rounded,
+                      color: _hasTagFilter
+                          ? Theme.of(context).colorScheme.primary
+                          : null,
+                    ),
+                    onPressed: () => _showTagFilterDialog(context),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.sort_rounded),
+                    onPressed: () => _showSortSelectionPopup(context),
+                  ),
                 ],
                 hintText: AppLocalizations.of(context)!.searchLogsHint,
                 padding: WidgetStateProperty.all(
@@ -248,14 +388,16 @@ class _GalleryPageState extends State<GalleryPage>
     );
   }
 
-  Widget buildEntries(
-      BuildContext context, bool listView, List<Entry> entries) {
+  Widget buildEntries(BuildContext context, bool listView, List<Entry> entries,
+      TagsProvider tagsProvider) {
     final entryImagesProvider = Provider.of<EntryImagesProvider>(context);
     final configProvider = Provider.of<ConfigProvider>(context);
     return entries.isEmpty
         ? Center(
             child: Text(
-              AppLocalizations.of(context)!.noLogs,
+              _searchController.text.isNotEmpty || _hasTagFilter
+                  ? AppLocalizations.of(context)!.noResults
+                  : AppLocalizations.of(context)!.noLogs,
             ),
           )
         : GridView.builder(
@@ -265,8 +407,8 @@ class _GalleryPageState extends State<GalleryPage>
             shrinkWrap: true,
             gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
                 maxCrossAxisExtent: listView ? 500 : 300,
-                crossAxisSpacing: 1.0, // Spacing between columns
-                mainAxisSpacing: 1.0, // Spacing between rows
+                crossAxisSpacing: 1.0,
+                mainAxisSpacing: 1.0,
                 childAspectRatio: listView ? 2.0 : 1.0),
             itemCount: entries.length,
             itemBuilder: (context, index) {
@@ -277,8 +419,10 @@ class _GalleryPageState extends State<GalleryPage>
                       allowSnapshotting: false,
                       builder: (context) => EntriesListPage(
                             index: index,
-                            getEntries: () =>
-                                EntriesProvider.instance.getFilteredEntries(),
+                            getEntries: () => _getVisibleEntries(
+                              EntriesProvider.instance,
+                              TagsProvider.instance,
+                            ),
                           )));
                 },
                 child: listView
