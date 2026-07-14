@@ -3,9 +3,8 @@ import 'dart:io';
 import 'package:daily_you/database/image_storage.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/utils/file_layer.dart';
-import 'package:daily_you/layouts/fast_page_view_scroll_physics.dart';
 import 'package:daily_you/models/image.dart';
-import 'package:extended_image/extended_image.dart';
+import 'package:daily_you/widgets/zoomable_image_page_view.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:media_scanner/media_scanner.dart';
@@ -26,13 +25,13 @@ class ImageViewPage extends StatefulWidget {
 }
 
 class _ImageViewPageState extends State<ImageViewPage> {
-  late ExtendedPageController _pageController;
+  late PageController _pageController;
   late ValueNotifier<int> _currentPageNotifier;
 
   @override
   void initState() {
     super.initState();
-    _pageController = ExtendedPageController(initialPage: widget.index);
+    _pageController = PageController(initialPage: widget.index);
     _currentPageNotifier = ValueNotifier<int>(widget.index);
   }
 
@@ -53,51 +52,13 @@ class _ImageViewPageState extends State<ImageViewPage> {
             downloadButton(context)
           ],
         ),
-        body: ExtendedImageGesturePageView.builder(
+        body: ZoomableImagePageView(
           controller: _pageController,
-          physics: FastPageViewScrollPhysics(),
-          itemCount: widget.images.length,
+          imageProviders: widget.images
+              .map((image) => EntryImageProvider(image.imgPath))
+              .toList(),
           onPageChanged: (int newIndex) {
             _currentPageNotifier.value = newIndex;
-          },
-          itemBuilder: (context, currentIndex) {
-            return FutureBuilder(
-                future: ImageStorage.instance
-                    .getBytes(widget.images[currentIndex].imgPath),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: SizedBox());
-                  } else if (snapshot.hasError) {
-                    return Text('${snapshot.error}');
-                  } else if (snapshot.hasData) {
-                    return ExtendedImage.memory(
-                      snapshot.data!,
-                      fit: BoxFit.contain,
-                      filterQuality: FilterQuality.high,
-                      mode: ExtendedImageMode.gesture,
-                      initGestureConfigHandler: (state) {
-                        return GestureConfig(
-                            minScale: 0.5,
-                            maxScale: 10,
-                            initialScale: 1,
-                            inPageView: true);
-                      },
-                      onDoubleTap: (state) {
-                        final double newScale =
-                            state.gestureDetails!.totalScale == 1.0 ? 2.0 : 1.0;
-                        state.handleDoubleTap(scale: newScale);
-                      },
-                    );
-                  } else {
-                    // Image not found
-                    return const Center(
-                      child: Icon(
-                        Icons.image_search_rounded,
-                        size: 36,
-                      ),
-                    );
-                  }
-                });
           },
         ));
   }
