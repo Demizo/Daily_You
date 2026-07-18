@@ -168,5 +168,7 @@
     "calendarSystemGregorian": "Gregoriano",
     "calendarSystemJalali": "Jalalí",
     "templateDefaultReflectionBody": "### ¿Qué te gustó hoy?\n- \n\n### ¿Por qué estás agradecido/a?\n- \n\n### ¿Qué estás esperando?\n- ",
-    "imagesTitle": "Imágenes"
+    "imagesTitle": "Imágenes",
+    "dayCount": "{count, plural, one{{count} día} other{{count} días}}",
+    "chartSmoothingLabel": "Suavizado"
 }
