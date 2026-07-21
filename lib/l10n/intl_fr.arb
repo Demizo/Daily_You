@@ -161,5 +161,13 @@
     "settingsCalendarSystem": "Système calendaire",
     "calendarSystemGregorian": "Grégorien",
     "calendarSystemJalali": "Jalali",
-    "imagesTitle": "Images"
+    "imagesTitle": "Images",
+    "jumpToMonthTitle": "Aller au mois",
+    "jumpToLogTitle": "Aller à l’entrée",
+    "chartGroupingLabel": "Grouper par",
+    "chartGroupingDay": "Jour",
+    "chartGroupingWeek": "Semaine",
+    "chartGroupingMonth": "Mois",
+    "chartGroupingYear": "Année",
+    "chartSmoothingLabel": "Lissage"
 }
