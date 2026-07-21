@@ -168,5 +168,6 @@
     "settingsCalendarSystem": "Kalendersystem",
     "calendarSystemGregorian": "Gregorianisch",
     "calendarSystemJalali": "Jalali",
-    "imagesTitle": "Bilder"
+    "imagesTitle": "Bilder",
+    "chartSmoothingLabel": "Glättung"
 }
