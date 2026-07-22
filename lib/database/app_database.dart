@@ -298,7 +298,7 @@ CREATE TABLE $tagsTable (
     ${TagFields.iconType} INTEGER NOT NULL DEFAULT 0,
     ${TagFields.name} TEXT NOT NULL,
     ${TagFields.tagType} INTEGER NOT NULL,
-    ${TagFields.color} INTEGER NOT NULL,
+    ${TagFields.color} INTEGER,
     ${TagFields.sortOrder} INTEGER NOT NULL DEFAULT 0,
     ${TagFields.timeCreate} DATETIME NOT NULL DEFAULT (DATETIME('now')),
     ${TagFields.timeModified} DATETIME NOT NULL DEFAULT (DATETIME('now')),

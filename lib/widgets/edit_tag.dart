@@ -46,8 +46,7 @@ class _EditTagState extends State<EditTag> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_colorInitialized) {
-      final tagColor = widget.tag?.color;
-      _color = (tagColor == null || tagColor == 0) ? null : tagColor;
+      _color = widget.tag?.color;
       _colorInitialized = true;
     }
   }
@@ -66,12 +65,11 @@ class _EditTagState extends State<EditTag> {
     if (name.isEmpty) return;
 
     final now = DateTime.now();
-    final colorToStore = _color ?? 0;
 
     if (widget.tag == null) {
       await TagsProvider.instance.add(Tag(
         name: name,
-        color: colorToStore,
+        color: _color,
         tagType: _tagType,
         icon: _icon,
         iconType: _iconType,
@@ -84,7 +82,7 @@ class _EditTagState extends State<EditTag> {
       await TagsProvider.instance.update(Tag(
         id: widget.tag!.id,
         name: name,
-        color: colorToStore,
+        color: _color,
         tagType: widget.tag!.tagType,
         icon: _icon,
         iconType: _iconType,

@@ -6,10 +6,10 @@ extension TagVisuals on Tag {
   IconData get typeIcon =>
       tagType == TagType.tracker ? Icons.timeline_rounded : Icons.label_rounded;
 
-  /// Resolves the tag's color against the theme, since a tag's stored
-  /// [Tag.color] of 0 means "use the theme default" rather than black.
+  /// Resolves the tag's color against the theme; a null [Tag.color] means
+  /// no color has been chosen, so the theme default applies instead.
   Color resolvedColor(BuildContext context, {Color? fallback}) {
-    if (color != 0) return Color(color);
+    if (color != null) return Color(color!);
     return fallback ?? Theme.of(context).colorScheme.primary;
   }
 }
