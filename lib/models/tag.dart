@@ -44,7 +44,7 @@ class Tag {
   final TagIconType iconType;
   final String name;
   final TagType tagType;
-  final int color;
+  final int? color;
   final int sortOrder;
   final DateTime timeCreate;
   final DateTime timeModified;
@@ -56,7 +56,7 @@ class Tag {
     this.iconType = TagIconType.character,
     required this.name,
     required this.tagType,
-    required this.color,
+    this.color,
     this.sortOrder = 0,
     required this.timeCreate,
     required this.timeModified,
@@ -94,7 +94,7 @@ class Tag {
         iconType: TagIconType.fromInt(json[TagFields.iconType] as int?),
         name: json[TagFields.name] as String,
         tagType: TagType.fromInt(json[TagFields.tagType] as int),
-        color: json[TagFields.color] as int,
+        color: json[TagFields.color] as int?,
         sortOrder: (json[TagFields.sortOrder] as int?) ?? 0,
         timeCreate: DateTime.parse(json[TagFields.timeCreate] as String),
         timeModified: DateTime.parse(json[TagFields.timeModified] as String),
