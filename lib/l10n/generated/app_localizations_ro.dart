@@ -554,7 +554,7 @@ class AppLocalizationsRo extends AppLocalizations {
   String get deleteCategoryAndTagsButton => 'Category and all tags';
 
   @override
-  String get filterTagsTitle => 'Filter by Tags';
+  String get filterTagsTitle => 'Filter';
 
   @override
   String get tagFilterModeAny => 'Any Tag';
@@ -564,6 +564,9 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get clearAllFilters => 'Clear All';
+
+  @override
+  String get noTagsFilterLabel => 'No Tags';
 
   @override
   String get trackerSortLabel => 'Sort by tracker';

@@ -24,7 +24,8 @@ class TagPickerDialog extends StatefulWidget {
   // filter
   final List<int> initialSelectedTagIds;
   final TagFilterMode initialFilterMode;
-  final void Function(List<int>, TagFilterMode)? onFilterChanged;
+  final bool initialNoTagsOnly;
+  final void Function(List<int>, TagFilterMode, bool)? onFilterChanged;
 
   final TagType? tagTypeFilter;
 
@@ -34,6 +35,7 @@ class TagPickerDialog extends StatefulWidget {
     this.entryId,
     this.initialSelectedTagIds = const [],
     this.initialFilterMode = TagFilterMode.any,
+    this.initialNoTagsOnly = false,
     this.onFilterChanged,
     this.tagTypeFilter,
   });
@@ -50,12 +52,14 @@ class _TagPickerDialogState extends State<TagPickerDialog> {
   // filter mode state
   late List<int> _selectedTagIds;
   late TagFilterMode _filterMode;
+  late bool _noTagsOnly;
 
   @override
   void initState() {
     super.initState();
     _selectedTagIds = List.from(widget.initialSelectedTagIds);
     _filterMode = widget.initialFilterMode;
+    _noTagsOnly = widget.initialNoTagsOnly;
     _sortMode =
         ConfigProvider.instance.get(ConfigKey.tagPickerSortMode) ?? 'manual';
     _searchController.addListener(() {
@@ -117,6 +121,8 @@ class _TagPickerDialogState extends State<TagPickerDialog> {
         .firstOrNull;
     if (newTag == null) return;
 
+    _searchController.clear();
+
     if (widget.mode == TagPickerMode.addToEntry) {
       final alreadyAdded = provider
           .getEntryTagsForEntry(widget.entryId!)
@@ -134,7 +140,7 @@ class _TagPickerDialogState extends State<TagPickerDialog> {
   // filter mode helpers
 
   void _notifyFilter() {
-    widget.onFilterChanged?.call(_selectedTagIds, _filterMode);
+    widget.onFilterChanged?.call(_selectedTagIds, _filterMode, _noTagsOnly);
   }
 
   void _addFilterTag(int tagId) {
@@ -147,10 +153,22 @@ class _TagPickerDialogState extends State<TagPickerDialog> {
     _notifyFilter();
   }
 
+  void _setNoTagsOnly(bool value) {
+    setState(() {
+      _noTagsOnly = value;
+      if (value) {
+        _selectedTagIds = [];
+        _filterMode = TagFilterMode.any;
+      }
+    });
+    _notifyFilter();
+  }
+
   void _clearAllFilters() {
     setState(() {
       _selectedTagIds = [];
       _filterMode = TagFilterMode.any;
+      _noTagsOnly = false;
     });
     _notifyFilter();
     Navigator.of(context).pop();
@@ -213,6 +231,27 @@ class _TagPickerDialogState extends State<TagPickerDialog> {
           _notifyFilter();
         },
       ),
+    );
+  }
+
+  Widget _buildNoTagsToggle(AppLocalizations l10n) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          l10n.noTagsFilterLabel,
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        const SizedBox(width: 4),
+        Transform.scale(
+          scale: 0.8,
+          child: Switch(
+            value: _noTagsOnly,
+            onChanged: _setNoTagsOnly,
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+        ),
+      ],
     );
   }
 
@@ -363,8 +402,18 @@ class _TagPickerDialogState extends State<TagPickerDialog> {
             title = l10n.filterTagsTitle;
         }
 
+        final titleWidget = widget.mode == TagPickerMode.filter
+            ? Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Flexible(child: Text(title, overflow: TextOverflow.ellipsis)),
+                  _buildNoTagsToggle(l10n),
+                ],
+              )
+            : Text(title);
+
         return AlertDialog(
-          title: Text(title),
+          title: titleWidget,
           contentPadding: widget.mode == TagPickerMode.selectSingle
               ? const EdgeInsets.fromLTRB(24, 16, 24, 0)
               : null,
@@ -413,36 +462,43 @@ class _TagPickerDialogState extends State<TagPickerDialog> {
     }
 
     return SingleChildScrollView(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          if (widget.mode == TagPickerMode.addToEntry)
-            _buildAddedChips(provider),
-          if (widget.mode == TagPickerMode.filter) ...[
-            _buildFilterSelectedChips(provider),
-            _buildFilterModeToggle(context),
-          ],
-          _buildSearchField(l10n, provider),
-          const SizedBox(height: 8),
-          TagGroupedChipList(
-            sections: sections,
-            chipBuilder: (tag) => TagChip(
-              tag: tag,
-              onTap: () async {
-                if (widget.mode == TagPickerMode.addToEntry) {
-                  if (tag.tagType == TagType.tracker) {
-                    await _addTrackerTag(provider, tag);
-                  } else {
-                    await _addLabelTag(provider, tag);
-                  }
-                } else {
-                  _addFilterTag(tag.id!);
-                }
-              },
-            ),
+      child: AnimatedOpacity(
+        duration: const Duration(milliseconds: 200),
+        opacity: _noTagsOnly ? 0.3 : 1.0,
+        child: IgnorePointer(
+          ignoring: _noTagsOnly,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (widget.mode == TagPickerMode.addToEntry)
+                _buildAddedChips(provider),
+              if (widget.mode == TagPickerMode.filter) ...[
+                _buildFilterSelectedChips(provider),
+                _buildFilterModeToggle(context),
+              ],
+              _buildSearchField(l10n, provider),
+              const SizedBox(height: 8),
+              TagGroupedChipList(
+                sections: sections,
+                chipBuilder: (tag) => TagChip(
+                  tag: tag,
+                  onTap: () async {
+                    if (widget.mode == TagPickerMode.addToEntry) {
+                      if (tag.tagType == TagType.tracker) {
+                        await _addTrackerTag(provider, tag);
+                      } else {
+                        await _addLabelTag(provider, tag);
+                      }
+                    } else {
+                      _addFilterTag(tag.id!);
+                    }
+                  },
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
