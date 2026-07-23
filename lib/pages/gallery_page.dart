@@ -30,8 +30,9 @@ class _GalleryPageState extends State<GalleryPage>
 
   List<int> _filterTagIds = [];
   TagFilterMode _filterTagMode = TagFilterMode.any;
+  bool _filterNoTags = false;
 
-  bool get _hasTagFilter => _filterTagIds.isNotEmpty;
+  bool get _hasTagFilter => _filterTagIds.isNotEmpty || _filterNoTags;
 
   @override
   bool get wantKeepAlive => true;
@@ -67,6 +68,12 @@ class _GalleryPageState extends State<GalleryPage>
   }
 
   List<Entry> _applyTagFilter(List<Entry> entries, TagsProvider tagsProvider) {
+    if (_filterNoTags) {
+      return entries
+          .where((entry) => tagsProvider.entryTags
+              .every((entryTag) => entryTag.entryId != entry.id))
+          .toList();
+    }
     if (_filterTagIds.isEmpty) return entries;
     return entries.where((entry) {
       final entryTagIds = tagsProvider.entryTags
@@ -127,10 +134,12 @@ class _GalleryPageState extends State<GalleryPage>
         mode: TagPickerMode.filter,
         initialSelectedTagIds: List.from(_filterTagIds),
         initialFilterMode: _filterTagMode,
-        onFilterChanged: (tagIds, mode) {
+        initialNoTagsOnly: _filterNoTags,
+        onFilterChanged: (tagIds, mode, noTagsOnly) {
           setState(() {
             _filterTagIds = tagIds;
             _filterTagMode = mode;
+            _filterNoTags = noTagsOnly;
           });
         },
       ),
@@ -313,6 +322,7 @@ class _GalleryPageState extends State<GalleryPage>
                               setState(() {
                                 _filterTagIds = [];
                                 _filterTagMode = TagFilterMode.any;
+                                _filterNoTags = false;
                               });
                             },
                           )

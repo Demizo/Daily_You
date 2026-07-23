@@ -1033,7 +1033,7 @@ abstract class AppLocalizations {
   /// No description provided for @filterTagsTitle.
   ///
   /// In en, this message translates to:
-  /// **'Filter by Tags'**
+  /// **'Filter'**
   String get filterTagsTitle;
 
   /// No description provided for @tagFilterModeAny.
@@ -1053,6 +1053,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Clear All'**
   String get clearAllFilters;
+
+  /// No description provided for @noTagsFilterLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'No Tags'**
+  String get noTagsFilterLabel;
 
   /// No description provided for @trackerSortLabel.
   ///
