@@ -910,11 +910,17 @@ abstract class AppLocalizations {
   /// **'Food & Drink'**
   String get iconGroupFoodDrink;
 
-  /// No description provided for @iconGroupHomeHobbies.
+  /// No description provided for @iconGroupHome.
   ///
   /// In en, this message translates to:
-  /// **'Home & Hobbies'**
-  String get iconGroupHomeHobbies;
+  /// **'Home'**
+  String get iconGroupHome;
+
+  /// No description provided for @iconGroupHobbies.
+  ///
+  /// In en, this message translates to:
+  /// **'Hobbies & Entertainment'**
+  String get iconGroupHobbies;
 
   /// No description provided for @iconGroupTravel.
   ///
@@ -1095,6 +1101,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Frequent values'**
   String get trackerFrequentValues;
+
+  /// No description provided for @tagFavoriteName.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorite'**
+  String get tagFavoriteName;
+
+  /// No description provided for @tagEnergyName.
+  ///
+  /// In en, this message translates to:
+  /// **'Energy'**
+  String get tagEnergyName;
+
+  /// No description provided for @tagCategoryActivitiesName.
+  ///
+  /// In en, this message translates to:
+  /// **'Activities'**
+  String get tagCategoryActivitiesName;
+
+  /// No description provided for @tagExerciseName.
+  ///
+  /// In en, this message translates to:
+  /// **'Exercise'**
+  String get tagExerciseName;
+
+  /// No description provided for @tagSocializingName.
+  ///
+  /// In en, this message translates to:
+  /// **'Socializing'**
+  String get tagSocializingName;
+
+  /// No description provided for @tagHobbyName.
+  ///
+  /// In en, this message translates to:
+  /// **'Hobby'**
+  String get tagHobbyName;
+
+  /// No description provided for @tagEntertainmentName.
+  ///
+  /// In en, this message translates to:
+  /// **'Entertainment'**
+  String get tagEntertainmentName;
+
+  /// No description provided for @tagDiningName.
+  ///
+  /// In en, this message translates to:
+  /// **'Dining'**
+  String get tagDiningName;
+
+  /// No description provided for @tagChoresName.
+  ///
+  /// In en, this message translates to:
+  /// **'Chores'**
+  String get tagChoresName;
+
+  /// No description provided for @tagCategoryEmotionsName.
+  ///
+  /// In en, this message translates to:
+  /// **'Emotions'**
+  String get tagCategoryEmotionsName;
+
+  /// No description provided for @tagExcitedName.
+  ///
+  /// In en, this message translates to:
+  /// **'Excited'**
+  String get tagExcitedName;
+
+  /// No description provided for @tagGratefulName.
+  ///
+  /// In en, this message translates to:
+  /// **'Grateful'**
+  String get tagGratefulName;
+
+  /// No description provided for @tagCalmName.
+  ///
+  /// In en, this message translates to:
+  /// **'Calm'**
+  String get tagCalmName;
+
+  /// No description provided for @tagTiredName.
+  ///
+  /// In en, this message translates to:
+  /// **'Tired'**
+  String get tagTiredName;
+
+  /// No description provided for @tagAnxiousName.
+  ///
+  /// In en, this message translates to:
+  /// **'Anxious'**
+  String get tagAnxiousName;
+
+  /// No description provided for @tagAnnoyedName.
+  ///
+  /// In en, this message translates to:
+  /// **'Annoyed'**
+  String get tagAnnoyedName;
 
   /// No description provided for @settingsStorageTitle.
   ///

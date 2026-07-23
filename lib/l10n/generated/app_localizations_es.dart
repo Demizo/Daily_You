@@ -478,7 +478,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get iconGroupFoodDrink => 'Food & Drink';
 
   @override
-  String get iconGroupHomeHobbies => 'Home & Hobbies';
+  String get iconGroupHome => 'Home';
+
+  @override
+  String get iconGroupHobbies => 'Hobbies & Entertainment';
 
   @override
   String get iconGroupTravel => 'Travel';
@@ -585,6 +588,54 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get trackerFrequentValues => 'Frequent values';
+
+  @override
+  String get tagFavoriteName => 'Favorite';
+
+  @override
+  String get tagEnergyName => 'Energy';
+
+  @override
+  String get tagCategoryActivitiesName => 'Activities';
+
+  @override
+  String get tagExerciseName => 'Exercise';
+
+  @override
+  String get tagSocializingName => 'Socializing';
+
+  @override
+  String get tagHobbyName => 'Hobby';
+
+  @override
+  String get tagEntertainmentName => 'Entertainment';
+
+  @override
+  String get tagDiningName => 'Dining';
+
+  @override
+  String get tagChoresName => 'Chores';
+
+  @override
+  String get tagCategoryEmotionsName => 'Emotions';
+
+  @override
+  String get tagExcitedName => 'Excited';
+
+  @override
+  String get tagGratefulName => 'Grateful';
+
+  @override
+  String get tagCalmName => 'Calm';
+
+  @override
+  String get tagTiredName => 'Tired';
+
+  @override
+  String get tagAnxiousName => 'Anxious';
+
+  @override
+  String get tagAnnoyedName => 'Annoyed';
 
   @override
   String get settingsStorageTitle => 'Almacenamiento';

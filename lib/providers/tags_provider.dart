@@ -4,8 +4,10 @@ import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/database/entry_tag_dao.dart';
 import 'package:daily_you/database/tag_category_dao.dart';
 import 'package:daily_you/database/tag_dao.dart';
+import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/models/tag_category.dart';
+import 'package:daily_you/models/tag_icon_type.dart';
 import 'package:flutter/material.dart';
 
 class TagSection {
@@ -31,7 +33,7 @@ class TagsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> addCategory(TagCategory category) async {
+  Future<TagCategory> addCategory(TagCategory category) async {
     final nextOrder = categories.isEmpty
         ? 0
         : categories.map((existing) => existing.sortOrder).reduce(max) + 1;
@@ -40,6 +42,7 @@ class TagsProvider with ChangeNotifier {
     categories = [...categories, withId];
     await AppDatabase.instance.updateExternalDatabase();
     notifyListeners();
+    return withId;
   }
 
   Future<void> updateCategory(TagCategory category) async {
@@ -213,5 +216,100 @@ class TagsProvider with ChangeNotifier {
         categories.where((existing) => existing.id != category.id).toList();
     await AppDatabase.instance.updateExternalDatabase();
     notifyListeners();
+  }
+
+  Future<void> createDefaultTags() async {
+    final deviceLocale = WidgetsBinding.instance.platformDispatcher.locale;
+    Locale locale;
+    if (AppLocalizations.delegate.isSupported(deviceLocale)) {
+      locale = deviceLocale;
+    } else {
+      final langOnly = Locale(deviceLocale.languageCode);
+      locale = AppLocalizations.delegate.isSupported(langOnly)
+          ? langOnly
+          : const Locale('en');
+    }
+    final l10n = await AppLocalizations.delegate.load(locale);
+    final now = DateTime.now();
+
+    final defaultTags = [
+      Tag(
+        name: l10n.tagFavoriteName,
+        tagType: TagType.label,
+        icon: 'favorite',
+        iconType: TagIconType.materialIcon,
+        color: Colors.pink.shade500.toARGB32(),
+        timeCreate: now,
+        timeModified: now,
+      ),
+      Tag(
+        name: l10n.tagEnergyName,
+        tagType: TagType.tracker,
+        icon: 'battery_charging_full',
+        iconType: TagIconType.materialIcon,
+        color: Colors.green.shade600.toARGB32(),
+        timeCreate: now,
+        timeModified: now,
+      ),
+    ];
+    for (final tag in defaultTags) {
+      await add(tag);
+    }
+
+    final emotionsCategory = await addCategory(TagCategory(
+      name: l10n.tagCategoryEmotionsName,
+      icon: 'sentiment_very_satisfied',
+      iconType: TagIconType.materialIcon,
+      timeCreate: now,
+      timeModified: now,
+    ));
+
+    final defaultEmotionTags = [
+      (l10n.tagExcitedName, 'celebration'),
+      (l10n.tagGratefulName, 'volunteer_activism'),
+      (l10n.tagCalmName, 'spa'),
+      (l10n.tagTiredName, 'nightlight'),
+      (l10n.tagAnxiousName, 'psychology'),
+      (l10n.tagAnnoyedName, 'thunderstorm'),
+    ];
+    for (final (name, icon) in defaultEmotionTags) {
+      await add(Tag(
+        categoryId: emotionsCategory.id,
+        name: name,
+        tagType: TagType.label,
+        icon: icon,
+        iconType: TagIconType.materialIcon,
+        timeCreate: now,
+        timeModified: now,
+      ));
+    }
+
+    final activitiesCategory = await addCategory(TagCategory(
+      name: l10n.tagCategoryActivitiesName,
+      icon: 'directions_run',
+      iconType: TagIconType.materialIcon,
+      timeCreate: now,
+      timeModified: now,
+    ));
+
+    final defaultActivityTags = [
+      (l10n.tagExerciseName, 'fitness_center'),
+      (l10n.tagSocializingName, 'groups'),
+      (l10n.tagHobbyName, 'palette'),
+      (l10n.tagEntertainmentName, 'theater_comedy'),
+      (l10n.tagDiningName, 'local_dining'),
+      (l10n.tagChoresName, 'cleaning_services'),
+    ];
+    for (final (name, icon) in defaultActivityTags) {
+      await add(Tag(
+        categoryId: activitiesCategory.id,
+        name: name,
+        tagType: TagType.label,
+        icon: icon,
+        iconType: TagIconType.materialIcon,
+        timeCreate: now,
+        timeModified: now,
+      ));
+    }
   }
 }
