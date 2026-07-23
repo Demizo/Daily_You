@@ -274,6 +274,7 @@ CREATE TABLE $imagesTable (
 ''');
 
     await _createTagTables(db);
+    await TagsProvider.instance.createDefaultTags();
   }
 
   Future<void> _createTagTables(Database db) async {
@@ -386,6 +387,7 @@ DROP TABLE old_entries;
     }
     if (oldVersion <= 3) {
       await _createTagTables(db);
+      await TagsProvider.instance.createDefaultTags();
     }
   }
 }
