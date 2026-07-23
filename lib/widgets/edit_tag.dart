@@ -2,13 +2,13 @@ import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/models/tag_category.dart';
 import 'package:daily_you/models/tag_icon_type.dart';
 import 'package:daily_you/providers/tags_provider.dart';
+import 'package:daily_you/widgets/color_picker_dialog.dart';
 import 'package:daily_you/widgets/connected_button_group.dart';
 import 'package:daily_you/widgets/edit_category.dart';
 import 'package:daily_you/widgets/icon_picker_dialog.dart';
 import 'package:daily_you/widgets/tag_icon_glyph.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 class EditTag extends StatefulWidget {
   final Tag? tag;
@@ -95,38 +95,17 @@ class _EditTagState extends State<EditTag> {
     if (mounted) Navigator.of(context).pop();
   }
 
-  void _showColorPicker() {
-    Color pickerColor = _effectiveColor(context);
-    showDialog(
+  Future<void> _showColorPicker() async {
+    final result = await showDialog<ColorPickerResult>(
       context: context,
-      builder: (context) => AlertDialog(
-        actions: [
-          TextButton(
-            child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
-            onPressed: () => Navigator.pop(context),
-          ),
-          TextButton(
-            child: Text(MaterialLocalizations.of(context).okButtonLabel),
-            onPressed: () {
-              setState(() => _color = pickerColor.toARGB32());
-              Navigator.pop(context);
-            },
-          ),
-        ],
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ColorPicker(
-              enableAlpha: false,
-              labelTypes: const [ColorLabelType.rgb, ColorLabelType.hex],
-              paletteType: PaletteType.hueWheel,
-              pickerColor: pickerColor,
-              onColorChanged: (color) => pickerColor = color,
-            ),
-          ],
-        ),
+      builder: (context) => ColorPickerDialog(
+        initialColor: _color != null ? Color(_color!) : null,
+        showNoneOption: true,
       ),
     );
+    if (result != null) {
+      setState(() => _color = result.color?.toARGB32());
+    }
   }
 
   Future<void> _showIconPicker() async {
