@@ -1,5 +1,6 @@
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:daily_you/widgets/color_picker_dialog.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
 import 'package:daily_you/widgets/settings_dropdown.dart';
 import 'package:daily_you/widgets/settings_icon_action.dart';
@@ -7,7 +8,6 @@ import 'package:daily_you/widgets/settings_toggle.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:provider/provider.dart';
 import 'package:daily_you/theme_mode_provider.dart';
 
@@ -24,46 +24,17 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
     super.initState();
   }
 
-  void _showAccentColorPopup(ThemeModeProvider themeProvider) {
-    Color accentColor =
+  Future<void> _showAccentColorPopup(ThemeModeProvider themeProvider) async {
+    final initialColor =
         Color(ConfigProvider.instance.get(ConfigKey.accentColor));
-    showDialog(
+    final result = await showDialog<ColorPickerResult>(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          actions: [
-            TextButton(
-              child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
-              onPressed: () async {
-                Navigator.pop(context);
-              },
-            ),
-            TextButton(
-              child: Text(MaterialLocalizations.of(context).okButtonLabel),
-              onPressed: () async {
-                themeProvider.accentColor = accentColor;
-                themeProvider.updateAccentColor();
-                Navigator.pop(context);
-              },
-            ),
-          ],
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ColorPicker(
-                  enableAlpha: false,
-                  labelTypes: const [ColorLabelType.rgb, ColorLabelType.hex],
-                  paletteType: PaletteType.hueWheel,
-                  pickerColor:
-                      Color(ConfigProvider.instance.get(ConfigKey.accentColor)),
-                  onColorChanged: (color) {
-                    accentColor = color;
-                  }),
-            ],
-          ),
-        );
-      },
+      builder: (context) => ColorPickerDialog(initialColor: initialColor),
     );
+    if (result?.color != null) {
+      themeProvider.accentColor = result!.color!;
+      themeProvider.updateAccentColor();
+    }
   }
 
   void _showMoodEmojiPopup(int? value) {

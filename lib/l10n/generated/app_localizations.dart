@@ -868,6 +868,30 @@ abstract class AppLocalizations {
   /// **'Search icons'**
   String get iconPickerSearchHint;
 
+  /// No description provided for @colorPickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose Color'**
+  String get colorPickerTitle;
+
+  /// No description provided for @colorPickerPaletteTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Colors'**
+  String get colorPickerPaletteTab;
+
+  /// No description provided for @colorPickerNoneOption.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get colorPickerNoneOption;
+
+  /// No description provided for @colorPickerCustomTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get colorPickerCustomTab;
+
   /// No description provided for @iconGroupMoodPeople.
   ///
   /// In en, this message translates to:

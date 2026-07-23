@@ -456,6 +456,18 @@ class AppLocalizationsId extends AppLocalizations {
   String get iconPickerSearchHint => 'Search icons';
 
   @override
+  String get colorPickerTitle => 'Choose Color';
+
+  @override
+  String get colorPickerPaletteTab => 'Colors';
+
+  @override
+  String get colorPickerNoneOption => 'None';
+
+  @override
+  String get colorPickerCustomTab => 'Custom';
+
+  @override
   String get iconGroupMoodPeople => 'Mood & People';
 
   @override
