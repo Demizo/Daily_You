@@ -1,6 +1,8 @@
 import 'package:daily_you/models/tag_category.dart';
 import 'package:daily_you/models/tag_icon_type.dart';
 import 'package:daily_you/providers/tags_provider.dart';
+import 'package:daily_you/widgets/color_picker_dialog.dart';
+import 'package:daily_you/widgets/color_swatch_row.dart';
 import 'package:daily_you/widgets/icon_picker_dialog.dart';
 import 'package:daily_you/widgets/tag_icon_glyph.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +21,7 @@ class _EditCategoryState extends State<EditCategory> {
   late TextEditingController _nameController;
   String? _icon;
   TagIconType _iconType = TagIconType.character;
+  int? _color;
 
   @override
   void initState() {
@@ -26,6 +29,7 @@ class _EditCategoryState extends State<EditCategory> {
     _nameController = TextEditingController(text: widget.category?.name ?? '');
     _icon = widget.category?.icon;
     _iconType = widget.category?.iconType ?? TagIconType.character;
+    _color = widget.category?.color;
     _nameController.addListener(() => setState(() {}));
   }
 
@@ -46,16 +50,18 @@ class _EditCategoryState extends State<EditCategory> {
         name: name,
         icon: _icon,
         iconType: _iconType,
+        color: _color,
         timeCreate: now,
         timeModified: now,
       ));
     } else {
-      // Construct directly so icon: null is honored when cleared
+      // Construct directly so null icon is honored when cleared
       await TagsProvider.instance.updateCategory(TagCategory(
         id: widget.category!.id,
         name: name,
         icon: _icon,
         iconType: _iconType,
+        color: _color,
         timeCreate: widget.category!.timeCreate,
         timeModified: now,
       ));
@@ -64,11 +70,14 @@ class _EditCategoryState extends State<EditCategory> {
     if (mounted) Navigator.of(context).pop();
   }
 
+  Color _effectiveColor(BuildContext context) =>
+      _color != null ? Color(_color!) : Theme.of(context).colorScheme.onSurface;
+
   Future<void> _showIconPicker() async {
     final result = await showDialog<IconPickerResult>(
       context: context,
       builder: (context) => IconPickerDialog(
-        previewColor: Theme.of(context).colorScheme.onSurface,
+        previewColor: _effectiveColor(context),
       ),
     );
     if (result != null) {
@@ -76,6 +85,19 @@ class _EditCategoryState extends State<EditCategory> {
         _icon = result.value;
         _iconType = result.type;
       });
+    }
+  }
+
+  Future<void> _showColorPicker() async {
+    final result = await showDialog<ColorPickerResult>(
+      context: context,
+      builder: (context) => ColorPickerDialog(
+        initialColor: _color != null ? Color(_color!) : null,
+        showNoneOption: true,
+      ),
+    );
+    if (result != null) {
+      setState(() => _color = result.color?.toARGB32());
     }
   }
 
@@ -112,7 +134,7 @@ class _EditCategoryState extends State<EditCategory> {
                               icon: _icon,
                               iconType: _iconType,
                               fallbackIcon: Icons.folder_rounded,
-                              color: Theme.of(context).colorScheme.onSurface,
+                              color: _effectiveColor(context),
                               size: 28,
                             ),
                           ),
@@ -166,6 +188,12 @@ class _EditCategoryState extends State<EditCategory> {
                   ),
                 ),
               ],
+            ),
+            const SizedBox(height: 12),
+            ColorSwatchRow(
+              label: l10n.tagColorLabel,
+              color: _effectiveColor(context),
+              onTap: _showColorPicker,
             ),
           ],
         ),

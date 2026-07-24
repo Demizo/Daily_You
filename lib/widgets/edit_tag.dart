@@ -3,6 +3,7 @@ import 'package:daily_you/models/tag_category.dart';
 import 'package:daily_you/models/tag_icon_type.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/widgets/color_picker_dialog.dart';
+import 'package:daily_you/widgets/color_swatch_row.dart';
 import 'package:daily_you/widgets/connected_button_group.dart';
 import 'package:daily_you/widgets/edit_category.dart';
 import 'package:daily_you/widgets/icon_picker_dialog.dart';
@@ -218,35 +219,10 @@ class _EditTagState extends State<EditTag> {
   }
 
   Widget _buildColorRow(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: Text(
-            AppLocalizations.of(context)!.tagColorLabel,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-          ),
-        ),
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (_color != null)
-              IconButton(
-                icon: const Icon(Icons.clear, size: 18),
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-                onPressed: () => setState(() => _color = null),
-              ),
-            const SizedBox(width: 8),
-            GestureDetector(
-              onTap: _showColorPicker,
-              child: CircleAvatar(
-                backgroundColor: _effectiveColor(context),
-                radius: 16,
-              ),
-            ),
-          ],
-        ),
-      ],
+    return ColorSwatchRow(
+      label: AppLocalizations.of(context)!.tagColorLabel,
+      color: _effectiveColor(context),
+      onTap: _showColorPicker,
     );
   }
 
