@@ -5,6 +5,7 @@ import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/widgets/color_picker_dialog.dart';
 import 'package:daily_you/widgets/color_swatch_row.dart';
 import 'package:daily_you/widgets/connected_button_group.dart';
+import 'package:daily_you/widgets/delete_confirm_dialog.dart';
 import 'package:daily_you/widgets/edit_category.dart';
 import 'package:daily_you/widgets/icon_picker_dialog.dart';
 import 'package:daily_you/widgets/tag_icon_glyph.dart';
@@ -97,6 +98,21 @@ class _EditTagState extends State<EditTag> {
     if (mounted) Navigator.of(context).pop();
   }
 
+  Future<void> _confirmDelete() async {
+    final tag = widget.tag;
+    if (tag == null) return;
+    final l10n = AppLocalizations.of(context)!;
+    final entryCount = TagsProvider.instance.entryCountForTag(tag.id!);
+    final confirmed = await showDeleteConfirmDialog(
+      context,
+      message: l10n.deleteTagMessage(entryCount, tag.name),
+    );
+    if (confirmed && mounted) {
+      await TagsProvider.instance.remove(tag);
+      if (mounted) Navigator.of(context).pop();
+    }
+  }
+
   Future<void> _showColorPicker() async {
     final result = await showDialog<ColorPickerResult>(
       context: context,
@@ -130,14 +146,26 @@ class _EditTagState extends State<EditTag> {
         TagType.label => l10n.tagTypeLabelTitle,
         TagType.tracker => l10n.tagTypeTrackerTitle,
       };
-      return Align(
-        alignment: Alignment.centerLeft,
-        child: Chip(
-          side: BorderSide.none,
-          label: Text(typeLabel),
-          padding: const EdgeInsets.symmetric(horizontal: 4),
-          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        ),
+      return Row(
+        children: [
+          Expanded(
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Chip(
+                side: BorderSide.none,
+                label: Text(typeLabel),
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+            ),
+          ),
+          IconButton(
+            visualDensity: VisualDensity.compact,
+            icon: const Icon(Icons.delete_rounded),
+            tooltip: MaterialLocalizations.of(context).deleteButtonTooltip,
+            onPressed: _confirmDelete,
+          ),
+        ],
       );
     }
     return ConnectedButtonGroup(
@@ -203,11 +231,12 @@ class _EditTagState extends State<EditTag> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12.0),
                 child: TextField(
+                  autofocus: true,
                   controller: _nameController,
                   maxLines: 1,
                   textCapitalization: TextCapitalization.words,
                   decoration: InputDecoration(
-                    hintText: AppLocalizations.of(context)!.tagNameHint,
+                    hintText: AppLocalizations.of(context)!.nameHint,
                     border: InputBorder.none,
                   ),
                 ),

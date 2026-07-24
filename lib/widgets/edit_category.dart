@@ -3,6 +3,7 @@ import 'package:daily_you/models/tag_icon_type.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/widgets/color_picker_dialog.dart';
 import 'package:daily_you/widgets/color_swatch_row.dart';
+import 'package:daily_you/widgets/delete_confirm_dialog.dart';
 import 'package:daily_you/widgets/icon_picker_dialog.dart';
 import 'package:daily_you/widgets/tag_icon_glyph.dart';
 import 'package:daily_you/utils/tag_name_sanitizer.dart';
@@ -72,6 +73,23 @@ class _EditCategoryState extends State<EditCategory> {
     if (mounted) Navigator.of(context).pop();
   }
 
+  Future<void> _confirmDelete() async {
+    final category = widget.category;
+    if (category == null) return;
+    final l10n = AppLocalizations.of(context)!;
+    final tagCount = TagsProvider.instance.tags
+        .where((tag) => tag.categoryId == category.id)
+        .length;
+    final confirmed = await showDeleteConfirmDialog(
+      context,
+      message: l10n.deleteCategoryMessage(tagCount, category.name),
+    );
+    if (confirmed && mounted) {
+      await TagsProvider.instance.removeCategoryAndTags(category);
+      if (mounted) Navigator.of(context).pop();
+    }
+  }
+
   Color _effectiveColor(BuildContext context) =>
       _color != null ? Color(_color!) : Theme.of(context).colorScheme.onSurface;
 
@@ -109,9 +127,22 @@ class _EditCategoryState extends State<EditCategory> {
     final hasIcon = _icon != null && _icon!.isNotEmpty;
 
     return AlertDialog(
-      title: Text(widget.category == null
-          ? l10n.newCategoryTitle
-          : l10n.tagCategoryLabel),
+      title: Row(
+        children: [
+          Expanded(
+            child: Text(widget.category == null
+                ? l10n.newCategoryTitle
+                : l10n.tagCategoryLabel),
+          ),
+          if (widget.category != null)
+            IconButton(
+              visualDensity: VisualDensity.compact,
+              icon: const Icon(Icons.delete_rounded),
+              tooltip: MaterialLocalizations.of(context).deleteButtonTooltip,
+              onPressed: _confirmDelete,
+            ),
+        ],
+      ),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -173,7 +204,7 @@ class _EditCategoryState extends State<EditCategory> {
                           maxLines: 1,
                           textCapitalization: TextCapitalization.words,
                           decoration: InputDecoration(
-                            hintText: l10n.categoryNameHint,
+                            hintText: l10n.nameHint,
                             border: InputBorder.none,
                           ),
                           onSubmitted: (_) =>

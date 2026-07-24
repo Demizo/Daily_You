@@ -436,7 +436,7 @@ class AppLocalizationsPl extends AppLocalizations {
   String get tagTypeTrackerTitle => 'Tracker';
 
   @override
-  String get tagNameHint => 'Tag name';
+  String get nameHint => 'Name';
 
   @override
   String get tagColorLabel => 'Color';
@@ -517,41 +517,31 @@ class AppLocalizationsPl extends AppLocalizations {
   String get editCategoryTitle => 'Edit Category';
 
   @override
-  String get categoryNameHint => 'Category name';
-
-  @override
-  String get deleteTagTitle => 'Delete Tag?';
+  String get deleteTitle => 'Delete';
 
   @override
   String deleteTagMessage(num count, Object name) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count logs',
-      one: '$count log',
+      other: ' It is used in $count logs.',
+      one: ' It is used in 1 log.',
+      zero: '',
     );
-    return 'Delete \"$name\"? Used in $_temp0.';
+    return 'Delete \"$name\"?$_temp0';
   }
-
-  @override
-  String get deleteCategoryTitle => 'Delete Category?';
 
   @override
   String deleteCategoryMessage(num count, Object name) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count tags',
-      one: '$count tag',
+      other: ' Its $count tags will also be deleted.',
+      one: ' Its 1 tag will also be deleted.',
+      zero: '',
     );
-    return '\"$name\" contains $_temp0. What should happen to them?';
+    return 'Delete \"$name\"?$_temp0';
   }
-
-  @override
-  String get deleteCategoryOnlyButton => 'Category only';
-
-  @override
-  String get deleteCategoryAndTagsButton => 'Category and all tags';
 
   @override
   String get filterTagsTitle => 'Filter';
