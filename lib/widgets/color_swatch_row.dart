@@ -19,12 +19,24 @@ class ColorSwatchRow extends StatelessWidget {
         Expanded(
           child: Text(
             label,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
           ),
         ),
         GestureDetector(
           onTap: onTap,
-          child: CircleAvatar(backgroundColor: color, radius: 16),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              CircleAvatar(backgroundColor: color, radius: 16),
+              Icon(
+                Icons.palette_rounded,
+                size: 20,
+                color: color.computeLuminance() > 0.5
+                    ? Colors.black
+                    : Colors.white,
+              ),
+            ],
+          ),
         ),
       ],
     );
