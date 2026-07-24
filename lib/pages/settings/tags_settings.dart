@@ -49,62 +49,6 @@ class _TagsSettingsState extends State<TagsSettings> {
     );
   }
 
-  Future<void> _confirmDeleteTag(
-      BuildContext context, Tag tag, int entryCount) async {
-    final l10n = AppLocalizations.of(context)!;
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(l10n.deleteTagTitle),
-        content: Text(l10n.deleteTagMessage(entryCount, tag.name)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child:
-                Text(MaterialLocalizations.of(dialogContext).cancelButtonLabel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: Text(MaterialLocalizations.of(dialogContext).okButtonLabel),
-          ),
-        ],
-      ),
-    );
-    if (confirmed == true) {
-      await TagsProvider.instance.remove(tag);
-    }
-  }
-
-  Future<void> _confirmDeleteCategory(
-      BuildContext context, TagCategory category, int tagCount) async {
-    final l10n = AppLocalizations.of(context)!;
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(l10n.deleteCategoryTitle),
-        content: tagCount > 0
-            ? Text(l10n.deleteCategoryMessage(tagCount, category.name))
-            : null,
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child:
-                Text(MaterialLocalizations.of(dialogContext).cancelButtonLabel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: Text(
-                MaterialLocalizations.of(dialogContext).deleteButtonTooltip),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed == true) {
-      await TagsProvider.instance.removeCategoryAndTags(category);
-    }
-  }
-
   void _toggleCollapse(int? categoryId) {
     setState(() {
       if (_manuallyCollapsedIds.contains(categoryId)) {
@@ -263,23 +207,11 @@ class _TagsSettingsState extends State<TagsSettings> {
                       ),
                 ),
               ),
-              // Delete before edit, matching the tag row action order below.
-              if (!isUncategorized) ...[
-                IconButton(
-                  icon: const Icon(Icons.delete_rounded),
-                  onPressed: () => _confirmDeleteCategory(
-                    context,
-                    category,
-                    provider.tags
-                        .where((tag) => tag.categoryId == category.id)
-                        .length,
-                  ),
-                ),
+              if (!isUncategorized)
                 IconButton(
                   icon: const Icon(Icons.edit_rounded),
                   onPressed: () => _showCategoryDialog(context, category),
                 ),
-              ],
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 child: Icon(
@@ -333,11 +265,6 @@ class _TagsSettingsState extends State<TagsSettings> {
                       .logCount(provider.entryCountForTag(tag.id!)),
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.delete_rounded),
-                onPressed: () => _confirmDeleteTag(
-                    context, tag, provider.entryCountForTag(tag.id!)),
               ),
               IconButton(
                 icon: const Icon(Icons.edit_rounded),

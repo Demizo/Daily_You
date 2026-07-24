@@ -826,11 +826,11 @@ abstract class AppLocalizations {
   /// **'Tracker'**
   String get tagTypeTrackerTitle;
 
-  /// No description provided for @tagNameHint.
+  /// No description provided for @nameHint.
   ///
   /// In en, this message translates to:
-  /// **'Tag name'**
-  String get tagNameHint;
+  /// **'Name'**
+  String get nameHint;
 
   /// No description provided for @tagColorLabel.
   ///
@@ -988,47 +988,23 @@ abstract class AppLocalizations {
   /// **'Edit Category'**
   String get editCategoryTitle;
 
-  /// No description provided for @categoryNameHint.
+  /// No description provided for @deleteTitle.
   ///
   /// In en, this message translates to:
-  /// **'Category name'**
-  String get categoryNameHint;
-
-  /// No description provided for @deleteTagTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete Tag?'**
-  String get deleteTagTitle;
+  /// **'Delete'**
+  String get deleteTitle;
 
   /// No description provided for @deleteTagMessage.
   ///
   /// In en, this message translates to:
-  /// **'Delete \"{name}\"? Used in {count, plural, one{{count} log} other{{count} logs}}.'**
+  /// **'Delete \"{name}\"?{count, plural, =0{} =1{ It is used in 1 log.} other{ It is used in {count} logs.}}'**
   String deleteTagMessage(num count, Object name);
-
-  /// No description provided for @deleteCategoryTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete Category?'**
-  String get deleteCategoryTitle;
 
   /// No description provided for @deleteCategoryMessage.
   ///
   /// In en, this message translates to:
-  /// **'\"{name}\" contains {count, plural, one{{count} tag} other{{count} tags}}. What should happen to them?'**
+  /// **'Delete \"{name}\"?{count, plural, =0{} =1{ Its 1 tag will also be deleted.} other{ Its {count} tags will also be deleted.}}'**
   String deleteCategoryMessage(num count, Object name);
-
-  /// No description provided for @deleteCategoryOnlyButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Category only'**
-  String get deleteCategoryOnlyButton;
-
-  /// No description provided for @deleteCategoryAndTagsButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Category and all tags'**
-  String get deleteCategoryAndTagsButton;
 
   /// No description provided for @filterTagsTitle.
   ///
