@@ -1,6 +1,7 @@
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/models/tag_category.dart';
 import 'package:daily_you/providers/tags_provider.dart';
+import 'package:daily_you/utils/tag_category_visuals.dart';
 import 'package:daily_you/widgets/edit_category.dart';
 import 'package:daily_you/widgets/edit_tag.dart';
 import 'package:daily_you/widgets/tag_chip.dart';
@@ -246,7 +247,7 @@ class _TagsSettingsState extends State<TagsSettings> {
                   icon: category.icon,
                   iconType: category.iconType,
                   fallbackIcon: Icons.folder_rounded,
-                  color: Theme.of(context).colorScheme.onSurface,
+                  color: category.resolvedColor(context),
                   size: 20,
                 ),
                 const SizedBox(width: 10),
