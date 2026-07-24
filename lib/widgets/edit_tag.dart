@@ -132,6 +132,7 @@ class _EditTagState extends State<EditTag> {
       return Align(
         alignment: Alignment.centerLeft,
         child: Chip(
+          side: BorderSide.none,
           label: Text(typeLabel),
           padding: const EdgeInsets.symmetric(horizontal: 4),
           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -152,69 +153,74 @@ class _EditTagState extends State<EditTag> {
     final fallbackIcon = _tagType == TagType.tracker
         ? Icons.timeline_rounded
         : Icons.label_rounded;
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Stack(
-          children: [
-            GestureDetector(
-              onTap: _showIconPicker,
-              child: Card.filled(
-                color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                child: SizedBox(
-                  width: 44,
-                  height: 44,
-                  child: Center(
-                    child: TagIconGlyph(
-                      icon: _icon,
-                      iconType: _iconType,
-                      fallbackIcon: fallbackIcon,
-                      color: tagColor,
-                      size: 28,
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          AspectRatio(
+            aspectRatio: 1,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                GestureDetector(
+                  onTap: _showIconPicker,
+                  child: Card.filled(
+                    margin: EdgeInsets.zero,
+                    color:
+                        Theme.of(context).colorScheme.surfaceContainerHighest,
+                    child: Center(
+                      child: TagIconGlyph(
+                        icon: _icon,
+                        iconType: _iconType,
+                        fallbackIcon: fallbackIcon,
+                        color: tagColor,
+                        size: 28,
+                      ),
                     ),
                   ),
                 ),
-              ),
+                if (hasIcon)
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: GestureDetector(
+                      onTap: () => setState(() {
+                        _icon = null;
+                        _iconType = TagIconType.character;
+                      }),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surfaceContainer,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.close, size: 14),
+                      ),
+                    ),
+                  ),
+              ],
             ),
-            if (hasIcon)
-              Positioned(
-                top: 0,
-                right: 0,
-                child: GestureDetector(
-                  onTap: () => setState(() {
-                    _icon = null;
-                    _iconType = TagIconType.character;
-                  }),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surfaceContainer,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(Icons.close, size: 14),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Card.filled(
+              margin: EdgeInsets.zero,
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                child: TextField(
+                  controller: _nameController,
+                  maxLines: 1,
+                  textCapitalization: TextCapitalization.words,
+                  decoration: InputDecoration(
+                    hintText: AppLocalizations.of(context)!.tagNameHint,
+                    border: InputBorder.none,
                   ),
-                ),
-              ),
-          ],
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Card.filled(
-            color: Theme.of(context).colorScheme.surfaceContainerHighest,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12.0),
-              child: TextField(
-                controller: _nameController,
-                maxLines: 1,
-                textCapitalization: TextCapitalization.words,
-                decoration: InputDecoration(
-                  hintText: AppLocalizations.of(context)!.tagNameHint,
-                  border: InputBorder.none,
                 ),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -245,52 +251,63 @@ class _EditTagState extends State<EditTag> {
     final l10n = AppLocalizations.of(context)!;
     return Row(
       children: [
-        Expanded(
-          child: Text(
-            l10n.tagCategoryLabel,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-          ),
+        Text(
+          l10n.tagCategoryLabel,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
         ),
-        DropdownButton<int?>(
-          value: _categoryId,
-          isDense: true,
-          underline: const SizedBox.shrink(),
-          elevation: 1,
-          borderRadius: BorderRadius.circular(20),
-          alignment: AlignmentDirectional.centerEnd,
-          onChanged: (value) async {
-            if (value == -1) {
-              await _createCategory(context);
-            } else {
-              setState(() => _categoryId = value);
-            }
-          },
-          items: [
-            DropdownMenuItem<int?>(
-              value: null,
-              alignment: AlignmentDirectional.centerEnd,
-              child: Text(l10n.tagCategoryNone),
-            ),
-            ...categories.map(
-              (c) => DropdownMenuItem<int?>(
-                value: c.id,
+        const SizedBox(width: 8),
+        Expanded(
+          child: DropdownButton<int?>(
+            value: _categoryId,
+            isDense: true,
+            isExpanded: true,
+            underline: const SizedBox.shrink(),
+            elevation: 1,
+            borderRadius: BorderRadius.circular(20),
+            alignment: AlignmentDirectional.centerEnd,
+            onChanged: (value) async {
+              if (value == -1) {
+                await _createCategory(context);
+              } else {
+                setState(() => _categoryId = value);
+              }
+            },
+            items: [
+              DropdownMenuItem<int?>(
+                value: null,
                 alignment: AlignmentDirectional.centerEnd,
-                child: Text(c.name),
+                child: Text(l10n.tagCategoryNone,
+                    overflow: TextOverflow.fade,
+                    softWrap: false,
+                    maxLines: 1),
               ),
-            ),
-            DropdownMenuItem<int?>(
-              value: -1,
-              alignment: AlignmentDirectional.centerEnd,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.add, size: 16),
-                  const SizedBox(width: 6),
-                  Text(l10n.newCategoryTitle),
-                ],
+              ...categories.map(
+                (c) => DropdownMenuItem<int?>(
+                  value: c.id,
+                  alignment: AlignmentDirectional.centerEnd,
+                  child: Text(c.name,
+                      overflow: TextOverflow.fade,
+                      softWrap: false,
+                      maxLines: 1),
+                ),
               ),
-            ),
-          ],
+              DropdownMenuItem<int?>(
+                value: -1,
+                alignment: AlignmentDirectional.centerEnd,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.add, size: 16),
+                    const SizedBox(width: 6),
+                    Text(l10n.newCategoryTitle,
+                        overflow: TextOverflow.fade,
+                        softWrap: false,
+                        maxLines: 1),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -318,7 +335,7 @@ class _EditTagState extends State<EditTag> {
               _buildColorRow(context),
               const SizedBox(height: 8),
               _buildCategoryRow(context, categories),
-              const SizedBox(height: 8),
+              const SizedBox(height: 24),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
