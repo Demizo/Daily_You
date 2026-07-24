@@ -111,7 +111,7 @@ class _EditCategoryState extends State<EditCategory> {
     return AlertDialog(
       title: Text(widget.category == null
           ? l10n.newCategoryTitle
-          : l10n.editCategoryTitle),
+          : l10n.tagCategoryLabel),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -153,15 +153,7 @@ class _EditCategoryState extends State<EditCategory> {
                                 _icon = null;
                                 _iconType = TagIconType.character;
                               }),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .surfaceContainer,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Icon(Icons.close, size: 14),
-                              ),
+                              child: const Icon(Icons.close, size: 14),
                             ),
                           ),
                       ],
@@ -171,9 +163,8 @@ class _EditCategoryState extends State<EditCategory> {
                   Expanded(
                     child: Card.filled(
                       margin: EdgeInsets.zero,
-                      color: Theme.of(context)
-                          .colorScheme
-                          .surfaceContainerHighest,
+                      color:
+                          Theme.of(context).colorScheme.surfaceContainerHighest,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 12.0),
                         child: TextField(
@@ -197,10 +188,13 @@ class _EditCategoryState extends State<EditCategory> {
               ),
             ),
             const SizedBox(height: 12),
-            ColorSwatchRow(
-              label: l10n.tagColorLabel,
-              color: _effectiveColor(context),
-              onTap: _showColorPicker,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4.0),
+              child: ColorSwatchRow(
+                label: l10n.tagColorLabel,
+                color: _effectiveColor(context),
+                onTap: _showColorPicker,
+              ),
             ),
           ],
         ),

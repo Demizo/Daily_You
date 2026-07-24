@@ -189,13 +189,7 @@ class _EditTagState extends State<EditTag> {
                         _icon = null;
                         _iconType = TagIconType.character;
                       }),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surfaceContainer,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(Icons.close, size: 14),
-                      ),
+                      child: const Icon(Icons.close, size: 14),
                     ),
                   ),
               ],
@@ -254,7 +248,7 @@ class _EditTagState extends State<EditTag> {
       children: [
         Text(
           l10n.tagCategoryLabel,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
         const SizedBox(width: 8),
         Expanded(
@@ -278,9 +272,7 @@ class _EditTagState extends State<EditTag> {
                 value: null,
                 alignment: AlignmentDirectional.centerEnd,
                 child: Text(l10n.tagCategoryNone,
-                    overflow: TextOverflow.fade,
-                    softWrap: false,
-                    maxLines: 1),
+                    overflow: TextOverflow.fade, softWrap: false, maxLines: 1),
               ),
               ...categories.map(
                 (c) => DropdownMenuItem<int?>(
@@ -333,9 +325,15 @@ class _EditTagState extends State<EditTag> {
               const SizedBox(height: 12),
               _buildTopRow(context),
               const SizedBox(height: 12),
-              _buildColorRow(context),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                child: _buildColorRow(context),
+              ),
               const SizedBox(height: 8),
-              _buildCategoryRow(context, categories),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                child: _buildCategoryRow(context, categories),
+              ),
               const SizedBox(height: 24),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
