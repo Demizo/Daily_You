@@ -869,6 +869,15 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get settingsFirstDayOfWeek => 'Primeiro Dia da Semana';
 
   @override
+  String get settingsCalendarSystem => 'Sistema de Calendário';
+
+  @override
+  String get calendarSystemGregorian => 'Gregoriano';
+
+  @override
+  String get calendarSystemJalali => 'Persa';
+
+  @override
   String get settingsUseSystemAccentColor => 'Usar Cores do Sistema';
 
   @override
@@ -895,6 +904,9 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get settingsHideImagesInGallery => 'Ocultar Imagens Na Galeria';
+
+  @override
+  String get settingsHideImages => 'Ocultar Imagens';
 
   @override
   String get viewLayoutList => 'Lista';
@@ -1158,7 +1170,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get settingsSecurityIncorrectPassword => 'Senha Incorreta';
 
   @override
-  String get settingsSecurityPasswordsDoNotMatch => 'Senhas Não Correspondem';
+  String get settingsSecurityPasswordsDoNotMatch => 'Senhas Não Coincidem';
 
   @override
   String get requiredPrompt => 'Obrigatório';

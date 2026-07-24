@@ -31,10 +31,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get pageHomeTitle => 'Accueil';
 
   @override
-  String get jumpToMonthTitle => 'Jump to month';
+  String get jumpToMonthTitle => 'Aller au mois';
 
   @override
-  String get jumpToLogTitle => 'Jump to log';
+  String get jumpToLogTitle => 'Aller à l’entrée';
 
   @override
   String get flashbacksTitle => 'Souvenirs';
@@ -172,22 +172,22 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get chartGroupingLabel => 'Group by';
+  String get chartGroupingLabel => 'Grouper par';
 
   @override
-  String get chartGroupingDay => 'Day';
+  String get chartGroupingDay => 'Jour';
 
   @override
-  String get chartGroupingWeek => 'Week';
+  String get chartGroupingWeek => 'Semaine';
 
   @override
-  String get chartGroupingMonth => 'Month';
+  String get chartGroupingMonth => 'Mois';
 
   @override
-  String get chartGroupingYear => 'Year';
+  String get chartGroupingYear => 'Année';
 
   @override
-  String get chartSmoothingLabel => 'Smoothing';
+  String get chartSmoothingLabel => 'Lissage';
 
   @override
   String streakCurrent(num count) {

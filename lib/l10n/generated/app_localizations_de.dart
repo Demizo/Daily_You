@@ -186,7 +186,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get chartGroupingYear => 'Jahr';
 
   @override
-  String get chartSmoothingLabel => 'Smoothing';
+  String get chartSmoothingLabel => 'Glättung';
 
   @override
   String streakCurrent(num count) {

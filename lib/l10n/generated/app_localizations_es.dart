@@ -108,8 +108,8 @@ class AppLocalizationsEs extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count days',
-      one: '$count day',
+      other: '$count días',
+      one: '$count día',
     );
     return '$_temp0';
   }
@@ -186,7 +186,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get chartGroupingYear => 'Año';
 
   @override
-  String get chartSmoothingLabel => 'Smoothing';
+  String get chartSmoothingLabel => 'Suavizado';
 
   @override
   String streakCurrent(num count) {

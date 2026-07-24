@@ -30,10 +30,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get pageHomeTitle => 'Ana';
 
   @override
-  String get jumpToMonthTitle => 'Jump to month';
+  String get jumpToMonthTitle => 'Aya git';
 
   @override
-  String get jumpToLogTitle => 'Jump to log';
+  String get jumpToLogTitle => 'Günlüğe git';
 
   @override
   String get flashbacksTitle => 'Geçmiş';
@@ -108,8 +108,8 @@ class AppLocalizationsTr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count days',
-      one: '$count day',
+      other: '$count gün',
+      one: '$count gün',
     );
     return '$_temp0';
   }
@@ -171,22 +171,22 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
-  String get chartGroupingLabel => 'Group by';
+  String get chartGroupingLabel => 'Gruplama ölçütü';
 
   @override
-  String get chartGroupingDay => 'Day';
+  String get chartGroupingDay => 'Gün';
 
   @override
-  String get chartGroupingWeek => 'Week';
+  String get chartGroupingWeek => 'Hafta';
 
   @override
-  String get chartGroupingMonth => 'Month';
+  String get chartGroupingMonth => 'Ay';
 
   @override
-  String get chartGroupingYear => 'Year';
+  String get chartGroupingYear => 'Yıl';
 
   @override
-  String get chartSmoothingLabel => 'Smoothing';
+  String get chartSmoothingLabel => 'Düzeltme';
 
   @override
   String streakCurrent(num count) {
@@ -636,7 +636,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get settingsConsiderSupporting => 'desteklemeyi düşünün';
 
   @override
-  String get imagesTitle => 'Images';
+  String get imagesTitle => 'Resimler';
 
   @override
   String get tagMoodTitle => 'Ruh hali';
