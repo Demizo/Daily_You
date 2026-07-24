@@ -59,12 +59,17 @@ class _PickerSectionHeader extends StatelessWidget {
             size: 16,
           ),
           const SizedBox(width: 6),
-          Text(
-            category.name,
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface,
-                  fontWeight: FontWeight.w600,
-                ),
+          Expanded(
+            child: Text(
+              category.name,
+              overflow: TextOverflow.fade,
+              softWrap: false,
+              maxLines: 1,
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontWeight: FontWeight.w600,
+                  ),
+            ),
           ),
         ],
       ),
