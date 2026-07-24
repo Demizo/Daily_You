@@ -159,5 +159,15 @@
     "calendarSystemJalali": "Celali",
     "settingsHideImages": "Resimleri gizle",
     "pageCalendarTitle": "Takvim",
-    "settingsOnThisDayDescription": "Geçmiş anılarını ziyaret et"
+    "settingsOnThisDayDescription": "Geçmiş anılarını ziyaret et",
+    "jumpToMonthTitle": "Aya git",
+    "jumpToLogTitle": "Günlüğe git",
+    "dayCount": "{count, plural, one{{count} gün} other{{count} gün}}",
+    "chartGroupingLabel": "Gruplama ölçütü",
+    "chartGroupingDay": "Gün",
+    "chartGroupingWeek": "Hafta",
+    "chartGroupingMonth": "Ay",
+    "chartGroupingYear": "Yıl",
+    "chartSmoothingLabel": "Düzeltme",
+    "imagesTitle": "Resimler"
 }

@@ -130,7 +130,7 @@
     "settingsSecurityConfirmPassword": "Confirmar Senha",
     "settingsSecurityOldPassword": "Senha Antiga",
     "settingsSecurityIncorrectPassword": "Senha Incorreta",
-    "settingsSecurityPasswordsDoNotMatch": "Senhas Não Correspondem",
+    "settingsSecurityPasswordsDoNotMatch": "Senhas Não Coincidem",
     "requiredPrompt": "Obrigatório",
     "settingsSecurityBiometricUnlock": "Desbloquear com Biometria",
     "unlockAppPrompt": "Desbloquear Aplicativo",
@@ -148,5 +148,9 @@
     "templateDefaultReflectionTitle": "Reflexão",
     "templateDefaultReflectionBody": "### O que você gostou sobre hoje?\n- \n\n### O que te deixou agradecido(a)?\n- \n\n### O que você espera para o futuro?\n- ",
     "templateDefaultSummaryBody": "### Resumo\n- \n\n### Citação\n> ",
-    "actionToday": "Hoje"
+    "actionToday": "Hoje",
+    "calendarSystemGregorian": "Gregoriano",
+    "calendarSystemJalali": "Persa",
+    "settingsCalendarSystem": "Sistema de Calendário",
+    "settingsHideImages": "Ocultar Imagens"
 }
