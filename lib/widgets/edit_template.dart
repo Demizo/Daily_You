@@ -79,39 +79,79 @@ class _EditTemplateState extends State<EditTemplate> {
       body: Column(
         children: [
           Expanded(
-            child: Container(
-              constraints: BoxConstraints.loose(const Size.fromWidth(800)),
-              child: ListView(
-                padding: const EdgeInsets.only(left: 8, right: 8),
-                children: [
-                  Card.filled(
-                    color: Theme.of(context).colorScheme.surfaceContainer,
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                        left: 8.0,
-                        right: 8.0,
-                      ),
-                      child: TextField(
-                        controller: _nameController,
-                        maxLines: 1,
-                        textCapitalization: TextCapitalization.words,
-                        spellCheckConfiguration: SpellCheckConfiguration(
-                            spellCheckService: DefaultSpellCheckService()),
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          hintText: AppLocalizations.of(context)!.titleHint,
+            child: CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 800),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: Card.filled(
+                          color: Theme.of(context).colorScheme.surfaceContainer,
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                              left: 8.0,
+                              right: 8.0,
+                            ),
+                            child: TextField(
+                              controller: _nameController,
+                              maxLines: 1,
+                              textCapitalization: TextCapitalization.words,
+                              spellCheckConfiguration: SpellCheckConfiguration(
+                                  spellCheckService: DefaultSpellCheckService()),
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText:
+                                    AppLocalizations.of(context)!.titleHint,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ),
                   ),
-                  EntryTextEditor(
-                    text: templateText,
-                    focusNode: _focusNode,
-                    textEditingController: _textEditingController,
-                    undoHistoryController: _undoController,
+                ),
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.translucent,
+                    onTap: () => _focusNode.requestFocus(),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Flexible(
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 800),
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  const SizedBox(height: 8),
+                                  Expanded(
+                                    child: EntryTextEditor(
+                                      text: templateText,
+                                      focusNode: _focusNode,
+                                      textEditingController:
+                                          _textEditingController,
+                                      undoHistoryController: _undoController,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
           SafeArea(
