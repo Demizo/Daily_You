@@ -12,11 +12,12 @@ class TagChip extends StatelessWidget {
   const TagChip(
       {super.key, required this.tag, this.value, this.onTap, this.onRemove});
 
-  Widget _buildTrackerValueBox(Color color, BuildContext context) {
+  Widget _buildTrackerValueBox(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(10),
       ),
       child: value != null
@@ -24,10 +25,10 @@ class TagChip extends StatelessWidget {
               style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: color,
+                  color: colorScheme.onSurface,
                   height: 1.0))
           : Icon(Icons.numbers_rounded,
-              size: 12, color: color.withValues(alpha: 0.6)),
+              size: 12, color: colorScheme.onSurface.withValues(alpha: 0.6)),
     );
   }
 
@@ -60,7 +61,7 @@ class TagChip extends StatelessWidget {
               Text(tag.name, style: const TextStyle(fontSize: 13)),
               if (tag.tagType == TagType.tracker) ...[
                 const SizedBox(width: 6),
-                _buildTrackerValueBox(color, context),
+                _buildTrackerValueBox(context),
               ] else if (value != null) ...[
                 const SizedBox(width: 4),
                 Text(value!,
