@@ -70,16 +70,41 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
               },
             ),
           ],
-          content: TextField(
-            inputFormatters: [
-              LengthLimitingTextInputFormatter(1), // Limit to one character
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                AppLocalizations.of(context)!.moodIconPrompt,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const SizedBox(height: 16),
+              Card.filled(
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                child: SizedBox(
+                  width: 96,
+                  height: 96,
+                  child: Center(
+                    child: TextField(
+                      autofocus: true,
+                      textAlign: TextAlign.center,
+                      textAlignVertical: TextAlignVertical.center,
+                      style: Theme.of(context).textTheme.headlineLarge,
+                      inputFormatters: [
+                        LengthLimitingTextInputFormatter(
+                            1), // Limit to one character
+                      ],
+                      onChanged: (value) {
+                        newEmoji = value;
+                      },
+                      decoration: const InputDecoration(
+                        hintText: '?',
+                        border: InputBorder.none,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ],
-            onChanged: (value) {
-              newEmoji = value;
-            },
-            decoration: InputDecoration(
-              hintText: AppLocalizations.of(context)!.moodIconPrompt,
-            ),
           ),
         );
       },

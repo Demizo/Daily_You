@@ -67,8 +67,8 @@ class _IconPickerDialogState extends State<IconPickerDialog>
         .where((group) => group.keys.isNotEmpty)
         .toList();
 
-    final canConfirmCustom = _tabController.index == 1 &&
-        _customController.text.trim().isNotEmpty;
+    final canConfirmCustom =
+        _tabController.index == 1 && _customController.text.trim().isNotEmpty;
 
     return AlertDialog(
       title: Text(l10n.iconPickerTitle),
@@ -185,26 +185,38 @@ class _IconPickerDialogState extends State<IconPickerDialog>
   }
 
   Widget _buildCustomTab(BuildContext context, AppLocalizations l10n) {
-    return Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: Center(
-        child: Card.filled(
-          color: Theme.of(context).colorScheme.surfaceContainerHighest,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0),
-            child: TextField(
-              controller: _customController,
-              autofocus: true,
-              textAlign: TextAlign.center,
-              inputFormatters: [LengthLimitingTextInputFormatter(1)],
-              onSubmitted: (_) => _confirmCustom(),
-              decoration: InputDecoration(
-                hintText: l10n.moodIconPrompt,
-                border: InputBorder.none,
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            l10n.moodIconPrompt,
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(height: 16),
+          Card.filled(
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            child: SizedBox(
+              width: 96,
+              height: 96,
+              child: Center(
+                child: TextField(
+                  controller: _customController,
+                  autofocus: true,
+                  textAlign: TextAlign.center,
+                  textAlignVertical: TextAlignVertical.center,
+                  style: Theme.of(context).textTheme.headlineLarge,
+                  inputFormatters: [LengthLimitingTextInputFormatter(1)],
+                  onSubmitted: (_) => _confirmCustom(),
+                  decoration: const InputDecoration(
+                    hintText: '?',
+                    border: InputBorder.none,
+                  ),
+                ),
               ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
