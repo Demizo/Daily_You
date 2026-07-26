@@ -462,28 +462,19 @@ class AppLocalizationsNl extends AppLocalizations {
   String get iconGroupMoodPeople => 'Mood & People';
 
   @override
-  String get iconGroupHabitsGoals => 'Habits & Goals';
-
-  @override
-  String get iconGroupActivities => 'Activities';
-
-  @override
   String get iconGroupHealth => 'Health';
 
   @override
   String get iconGroupWorkFinance => 'Work & Finance';
 
   @override
-  String get iconGroupNatureWeather => 'Nature & Weather';
+  String get iconGroupHabitsGoals => 'Habits & Goals';
+
+  @override
+  String get iconGroupNature => 'Nature';
 
   @override
   String get iconGroupFoodDrink => 'Food & Drink';
-
-  @override
-  String get iconGroupHome => 'Home';
-
-  @override
-  String get iconGroupHobbies => 'Hobbies & Entertainment';
 
   @override
   String get iconGroupTravel => 'Travel';

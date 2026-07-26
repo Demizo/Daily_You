@@ -1,0 +1,67 @@
+// GENERATED CODE - DO NOT MODIFY
+//
+// Generated from lib/utils/tag_icons.yaml by tool/generate_tag_icons.dart.
+// Run `dart run tool/generate_tag_icons.dart` to regenerate after editing
+// the yaml source.
+
+import 'package:daily_you/l10n/generated/app_localizations.dart';
+import 'package:flutter/material.dart';
+
+/// Identifies a curated icon group
+enum TagIconGroupId {
+{{#groups}}
+  {{id}},
+{{/groups}}
+}
+
+/// A group of icons shown together in the icon picker grid
+class TagIconGroup {
+  final TagIconGroupId id;
+  final List<String> keys;
+
+  const TagIconGroup({required this.id, required this.keys});
+}
+
+/// Resolves a group's display label through [AppLocalizations].
+String tagIconGroupLabel(AppLocalizations l10n, TagIconGroupId id) =>
+    switch (id) {
+{{#groups}}
+      TagIconGroupId.{{id}} => l10n.{{l10nKey}},
+{{/groups}}
+    };
+
+/// Constants for the string keys in [tagIconRegistry]
+class TagIconKey {
+  TagIconKey._();
+
+{{#groups}}
+{{#icons}}
+  static const String {{constantName}} = '{{key}}';
+{{/icons}}
+{{/groups}}
+}
+
+/// Stable string keys mapped to their [IconData]. Keys, not code points,
+/// are what gets persisted, so a future Material Icons update can't corrupt
+/// stored data.
+const Map<String, IconData> tagIconRegistry = {
+{{#groups}}
+{{#icons}}
+  '{{key}}': Icons.{{icon}},
+{{/icons}}
+{{/groups}}
+};
+
+/// Map keys into icon groups
+const List<TagIconGroup> tagIconGroups = [
+{{#groups}}
+  TagIconGroup(id: TagIconGroupId.{{id}}, keys: [
+{{#icons}}
+    '{{key}}',
+{{/icons}}
+  ]),
+{{/groups}}
+];
+
+IconData? lookupTagIcon(String? key) =>
+    key == null ? null : tagIconRegistry[key];

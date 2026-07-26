@@ -1,0 +1,494 @@
+# Define icons for the icon picker and their grouping
+#
+# Regenerate lib/utils/generated/tag_icon_registry.dart after editing this
+# file by running:
+#   dart run tool/generate_tag_icons.dart
+
+groups:
+  - id: moodPeople
+    l10nKey: iconGroupMoodPeople
+    icons:
+      - key: mood
+        icon: mood_rounded
+      - key: sentiment_very_satisfied
+        icon: sentiment_very_satisfied_rounded
+      - key: sentiment_satisfied
+        icon: sentiment_satisfied_rounded
+      - key: sentiment_neutral
+        icon: sentiment_neutral_rounded
+      - key: sentiment_dissatisfied
+        icon: sentiment_dissatisfied_rounded
+      - key: mood_bad
+        icon: mood_bad_rounded
+      - key: sentiment_very_dissatisfied
+        icon: sentiment_very_dissatisfied_rounded
+      - key: person
+        icon: person_rounded
+      - key: account_circle
+        icon: account_circle_rounded
+      - key: groups
+        icon: groups_rounded
+      - key: family_restroom
+        icon: family_restroom_rounded
+      - key: diversity_3
+        icon: diversity_3_rounded
+      - key: pregnant_woman
+        icon: pregnant_woman_rounded
+      - key: child_friendly
+        icon: child_friendly_rounded
+      - key: child_care
+        icon: child_care_rounded
+      - key: elderly
+        icon: elderly_rounded
+      - key: pets
+        icon: pets_rounded
+      - key: handshake
+        icon: handshake_rounded
+
+  - id: activities
+    l10nKey: tagCategoryActivitiesName
+    icons:
+      - key: directions_run
+        icon: directions_run_rounded
+      - key: directions_walk
+        icon: directions_walk_rounded
+      - key: hiking
+        icon: hiking_rounded
+      - key: directions_bike
+        icon: directions_bike_rounded
+      - key: fitness_center
+        icon: fitness_center_rounded
+      - key: sports_esports
+        icon: sports_esports_rounded
+      - key: phishing
+        icon: phishing_rounded
+      - key: sports_soccer
+        icon: sports_soccer_rounded
+      - key: sports_basketball
+        icon: sports_basketball_rounded
+      - key: sports_tennis
+        icon: sports_tennis_rounded
+      - key: sports_volleyball
+        icon: sports_volleyball_rounded
+      - key: sports_football
+        icon: sports_football_rounded
+      - key: sports_rugby
+        icon: sports_rugby_rounded
+      - key: sports_hockey
+        icon: sports_hockey_rounded
+      - key: sports_martial_arts
+        icon: sports_martial_arts_rounded
+      - key: pool
+        icon: pool_rounded
+      - key: self_improvement
+        icon: self_improvement_rounded
+      - key: golf_course
+        icon: golf_course_rounded
+      - key: rowing
+        icon: rowing_rounded
+      - key: sailing
+        icon: sailing_rounded
+      - key: kayaking
+        icon: kayaking_rounded
+      - key: surfing
+        icon: surfing_rounded
+      - key: skateboarding
+        icon: skateboarding_rounded
+      - key: snowboarding
+        icon: snowboarding_rounded
+      - key: downhill_skiing
+        icon: downhill_skiing_rounded
+      - key: sledding
+        icon: sledding_rounded
+      - key: nordic_walking
+        icon: nordic_walking_rounded
+      - key: scuba_diving
+        icon: scuba_diving_rounded
+      - key: snowshoeing
+        icon: snowshoeing_rounded
+      - key: roller_skating
+        icon: roller_skating_rounded
+
+  - id: health
+    l10nKey: iconGroupHealth
+    icons:
+      - key: favorite
+        icon: favorite_rounded
+      - key: local_hospital
+        icon: local_hospital_rounded
+      - key: medication
+        icon: medication_rounded
+      - key: medication_liquid
+        icon: medication_liquid_rounded
+      - key: monitor_heart
+        icon: monitor_heart_rounded
+      - key: monitor_weight
+        icon: monitor_weight_rounded
+      - key: bloodtype
+        icon: bloodtype_rounded
+      - key: vaccines
+        icon: vaccines_rounded
+      - key: bedtime
+        icon: bedtime_rounded
+      - key: spa
+        icon: spa_rounded
+      - key: bathtub
+        icon: bathtub_rounded
+      - key: soap
+        icon: soap_rounded
+      - key: shower
+        icon: shower_rounded
+      - key: water_drop
+        icon: water_drop_rounded
+      - key: smoking_rooms
+        icon: smoking_rooms_rounded
+      - key: smoke_free
+        icon: smoke_free_rounded
+      - key: local_bar
+        icon: local_bar_rounded
+      - key: no_drinks
+        icon: no_drinks_rounded
+      - key: psychology
+        icon: psychology_rounded
+      - key: healing
+        icon: healing_rounded
+      - key: masks
+        icon: masks_rounded
+      - key: device_thermostat
+        icon: device_thermostat_rounded
+      - key: coronavirus
+        icon: coronavirus_rounded
+
+  - id: workFinance
+    l10nKey: iconGroupWorkFinance
+    icons:
+      - key: work
+        icon: work_rounded
+      - key: business_center
+        icon: business_center_rounded
+      - key: meeting_room
+        icon: meeting_room_rounded
+      - key: school
+        icon: school_rounded
+      - key: menu_book
+        icon: menu_book_rounded
+      - key: edit_note
+        icon: edit_note_rounded
+      - key: assignment
+        icon: assignment_rounded
+      - key: assignment_turned_in
+        icon: assignment_turned_in_rounded
+      - key: checklist
+        icon: checklist_rounded
+      - key: laptop_mac
+        icon: laptop_mac_rounded
+      - key: attach_money
+        icon: attach_money_rounded
+      - key: trending_up
+        icon: trending_up_rounded
+      - key: savings
+        icon: savings_rounded
+      - key: credit_card
+        icon: credit_card_rounded
+      - key: paid
+        icon: paid_rounded
+      - key: shopping_cart
+        icon: shopping_cart_rounded
+      - key: shopping_bag
+        icon: shopping_bag_rounded
+      - key: receipt_long
+        icon: receipt_long_rounded
+      - key: account_balance
+        icon: account_balance_rounded
+
+  - id: habitsGoals
+    l10nKey: iconGroupHabitsGoals
+    icons:
+      - key: task_alt
+        icon: task_alt_rounded
+      - key: check_circle
+        icon: check_circle_rounded
+      - key: verified
+        icon: verified_rounded
+      - key: celebration
+        icon: celebration_rounded
+      - key: emoji_events
+        icon: emoji_events_rounded
+      - key: rocket_launch
+        icon: rocket_launch_rounded
+      - key: repeat
+        icon: repeat_rounded
+      - key: local_fire_department
+        icon: local_fire_department_rounded
+      - key: whatshot
+        icon: whatshot_rounded
+      - key: military_tech
+        icon: military_tech_rounded
+      - key: block
+        icon: block_rounded
+      - key: schedule
+        icon: schedule_rounded
+      - key: alarm
+        icon: alarm_rounded
+      - key: hourglass_bottom
+        icon: hourglass_bottom_rounded
+      - key: timeline
+        icon: timeline_rounded
+
+  - id: nature
+    l10nKey: iconGroupNature
+    icons:
+      - key: wb_sunny
+        icon: wb_sunny_rounded
+      - key: cloud
+        icon: cloud_rounded
+      - key: water
+        icon: water_rounded
+      - key: waves
+        icon: waves_rounded
+      - key: umbrella
+        icon: umbrella_rounded
+      - key: ac_unit
+        icon: ac_unit_rounded
+      - key: cyclone
+        icon: cyclone_rounded
+      - key: air
+        icon: air_rounded
+      - key: park
+        icon: park_rounded
+      - key: forest
+        icon: forest_rounded
+      - key: grass
+        icon: grass_rounded
+      - key: landscape
+        icon: landscape_rounded
+      - key: local_florist
+        icon: local_florist_rounded
+      - key: eco
+        icon: eco_rounded
+      - key: terrain
+        icon: terrain_rounded
+      - key: nightlight
+        icon: nightlight_rounded
+      - key: wb_twilight
+        icon: wb_twilight_rounded
+      - key: thunderstorm
+        icon: thunderstorm_rounded
+
+  - id: foodDrink
+    l10nKey: iconGroupFoodDrink
+    icons:
+      - key: local_dining
+        icon: local_dining_rounded
+      - key: restaurant
+        icon: restaurant_rounded
+      - key: no_meals
+        icon: no_meals_rounded
+      - key: local_pizza
+        icon: local_pizza_rounded
+      - key: ramen_dining
+        icon: ramen_dining_rounded
+      - key: fastfood
+        icon: fastfood_rounded
+      - key: no_food
+        icon: no_food_rounded
+      - key: cake
+        icon: cake_rounded
+      - key: icecream
+        icon: icecream_rounded
+      - key: wine_bar
+        icon: wine_bar_rounded
+      - key: sports_bar
+        icon: sports_bar_rounded
+      - key: coffee
+        icon: coffee_rounded
+      - key: lunch_dining
+        icon: lunch_dining_rounded
+      - key: bakery_dining
+        icon: bakery_dining_rounded
+      - key: set_meal
+        icon: set_meal_rounded
+      - key: brunch_dining
+        icon: brunch_dining_rounded
+      - key: liquor
+        icon: liquor_rounded
+      - key: dinner_dining
+        icon: dinner_dining_rounded
+      - key: local_cafe
+        icon: local_cafe_rounded
+      - key: emoji_food_beverage
+        icon: emoji_food_beverage_rounded
+      - key: local_drink
+        icon: local_drink_rounded
+      - key: outdoor_grill
+        icon: outdoor_grill_rounded
+
+  - id: home
+    l10nKey: pageHomeTitle
+    icons:
+      - key: home
+        icon: home_rounded
+      - key: apartment
+        icon: apartment_rounded
+      - key: bed
+        icon: bed_rounded
+      - key: chair
+        icon: chair_rounded
+      - key: checkroom
+        icon: checkroom_rounded
+      - key: cleaning_services
+        icon: cleaning_services_rounded
+      - key: local_laundry_service
+        icon: local_laundry_service_rounded
+      - key: iron
+        icon: iron_rounded
+      - key: build
+        icon: build_rounded
+      - key: handyman
+        icon: handyman_rounded
+      - key: construction
+        icon: construction_rounded
+      - key: plumbing
+        icon: plumbing_rounded
+      - key: carpenter
+        icon: carpenter_rounded
+      - key: yard
+        icon: yard_rounded
+      - key: countertops
+        icon: countertops_rounded
+      - key: dry_cleaning
+        icon: dry_cleaning_rounded
+      - key: deck
+        icon: deck_rounded
+
+  - id: hobbies
+    l10nKey: tagEntertainmentName
+    icons:
+      - key: palette
+        icon: palette_rounded
+      - key: brush
+        icon: brush_rounded
+      - key: draw
+        icon: draw_rounded
+      - key: theater_comedy
+        icon: theater_comedy_rounded
+      - key: theaters
+        icon: theaters_rounded
+      - key: camera_alt
+        icon: camera_alt_rounded
+      - key: piano
+        icon: piano_rounded
+      - key: music_note
+        icon: music_note_rounded
+      - key: movie
+        icon: movie_rounded
+      - key: videogame_asset
+        icon: videogame_asset_rounded
+      - key: headphones
+        icon: headphones_rounded
+      - key: casino
+        icon: casino_rounded
+      - key: book
+        icon: book_rounded
+      - key: auto_stories
+        icon: auto_stories_rounded
+      - key: mic
+        icon: mic_rounded
+
+  - id: travel
+    l10nKey: iconGroupTravel
+    icons:
+      - key: flight
+        icon: flight_rounded
+      - key: directions_car
+        icon: directions_car_rounded
+      - key: directions_boat
+        icon: directions_boat_rounded
+      - key: local_taxi
+        icon: local_taxi_rounded
+      - key: electric_scooter
+        icon: electric_scooter_rounded
+      - key: train
+        icon: train_rounded
+      - key: directions_bus
+        icon: directions_bus_rounded
+      - key: luggage
+        icon: luggage_rounded
+      - key: map
+        icon: map_rounded
+      - key: beach_access
+        icon: beach_access_rounded
+      - key: hotel
+        icon: hotel_rounded
+      - key: public
+        icon: public_rounded
+      - key: attractions
+        icon: attractions_rounded
+      - key: castle
+        icon: castle_rounded
+      - key: delivery_dining
+        icon: delivery_dining_rounded
+      - key: stadium
+        icon: stadium_rounded
+      - key: cabin
+        icon: cabin_rounded
+
+  - id: symbols
+    l10nKey: iconGroupSymbols
+    icons:
+      - key: star
+        icon: star_rounded
+      - key: bolt
+        icon: bolt_rounded
+      - key: diamond
+        icon: diamond_rounded
+      - key: auto_awesome
+        icon: auto_awesome_rounded
+      - key: flag
+        icon: flag_rounded
+      - key: warning
+        icon: warning_rounded
+      - key: bookmark
+        icon: bookmark_rounded
+      - key: event
+        icon: event_rounded
+      - key: today
+        icon: today_rounded
+      - key: label
+        icon: label_rounded
+      - key: lightbulb
+        icon: lightbulb_rounded
+      - key: volunteer_activism
+        icon: volunteer_activism_rounded
+      - key: church
+        icon: church_rounded
+      - key: phone_iphone
+        icon: phone_iphone_rounded
+      - key: memory
+        icon: memory_rounded
+      - key: settings
+        icon: settings_rounded
+      - key: chat
+        icon: chat_rounded
+      - key: email
+        icon: email_rounded
+      - key: folder
+        icon: folder_rounded
+      - key: category
+        icon: category_rounded
+      - key: push_pin
+        icon: push_pin_rounded
+      - key: battery_charging_full
+        icon: battery_charging_full_rounded
+      - key: battery_alert
+        icon: battery_alert_rounded
+      - key: battery_0_bar
+        icon: battery_0_bar_rounded
+      - key: battery_1_bar
+        icon: battery_1_bar_rounded
+      - key: battery_3_bar
+        icon: battery_3_bar_rounded
+      - key: battery_5_bar
+        icon: battery_5_bar_rounded
+      - key: battery_full
+        icon: battery_full_rounded
