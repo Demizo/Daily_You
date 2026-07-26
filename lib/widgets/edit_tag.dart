@@ -231,7 +231,7 @@ class _EditTagState extends State<EditTag> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12.0),
                 child: TextField(
-                  autofocus: true,
+                  autofocus: widget.tag == null,
                   controller: _nameController,
                   maxLines: 1,
                   textCapitalization: TextCapitalization.words,
