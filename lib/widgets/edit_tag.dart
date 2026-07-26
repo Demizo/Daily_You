@@ -8,6 +8,7 @@ import 'package:daily_you/widgets/connected_button_group.dart';
 import 'package:daily_you/widgets/edit_category.dart';
 import 'package:daily_you/widgets/icon_picker_dialog.dart';
 import 'package:daily_you/widgets/tag_icon_glyph.dart';
+import 'package:daily_you/utils/tag_name_sanitizer.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 
@@ -22,7 +23,7 @@ class EditTag extends StatefulWidget {
 }
 
 class _EditTagState extends State<EditTag> {
-  late TextEditingController _nameController;
+  late TagNameEditingController _nameController;
   late TagType _tagType;
   String? _icon;
   TagIconType _iconType = TagIconType.character;
@@ -34,7 +35,7 @@ class _EditTagState extends State<EditTag> {
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(
+    _nameController = TagNameEditingController(
         text: widget.tag?.name ?? widget.initialName ?? '');
     _icon = widget.tag?.icon;
     _iconType = widget.tag?.iconType ?? TagIconType.character;
@@ -62,7 +63,7 @@ class _EditTagState extends State<EditTag> {
       _color != null ? Color(_color!) : Theme.of(context).colorScheme.secondary;
 
   Future<void> _save() async {
-    final name = _nameController.text.trim();
+    final name = sanitizeTagName(_nameController.text);
     if (name.isEmpty) return;
 
     final now = DateTime.now();
@@ -345,8 +346,9 @@ class _EditTagState extends State<EditTag> {
                     onPressed: () => Navigator.of(context).pop(),
                   ),
                   TextButton(
-                    onPressed:
-                        _nameController.text.trim().isEmpty ? null : _save,
+                    onPressed: sanitizeTagName(_nameController.text).isEmpty
+                        ? null
+                        : _save,
                     child:
                         Text(MaterialLocalizations.of(context).okButtonLabel),
                   ),

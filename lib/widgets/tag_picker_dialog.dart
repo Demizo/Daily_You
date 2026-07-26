@@ -7,6 +7,7 @@ import 'package:daily_you/widgets/entry_tag_chips.dart';
 import 'package:daily_you/widgets/tag_chip.dart';
 import 'package:daily_you/widgets/tag_grouped_chip_list.dart';
 import 'package:daily_you/widgets/tracker_value_dialog.dart';
+import 'package:daily_you/utils/tag_name_sanitizer.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:provider/provider.dart';
@@ -45,7 +46,8 @@ class TagPickerDialog extends StatefulWidget {
 }
 
 class _TagPickerDialogState extends State<TagPickerDialog> {
-  final TextEditingController _searchController = TextEditingController();
+  final TagNameEditingController _searchController =
+      TagNameEditingController();
   String _searchText = '';
   late String _sortMode;
 
@@ -304,7 +306,7 @@ class _TagPickerDialogState extends State<TagPickerDialog> {
                     icon: const Icon(Icons.add_rounded),
                     tooltip: l10n.addTagButton,
                     onPressed: () => _createAndAddTagWithName(
-                        provider, _searchController.text.trim()),
+                        provider, sanitizeTagName(_searchController.text)),
                   )
                 : const SizedBox.shrink(key: ValueKey('empty')),
           ),
