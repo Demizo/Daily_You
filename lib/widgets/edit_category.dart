@@ -5,6 +5,7 @@ import 'package:daily_you/widgets/color_picker_dialog.dart';
 import 'package:daily_you/widgets/color_swatch_row.dart';
 import 'package:daily_you/widgets/icon_picker_dialog.dart';
 import 'package:daily_you/widgets/tag_icon_glyph.dart';
+import 'package:daily_you/utils/tag_name_sanitizer.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 
@@ -18,7 +19,7 @@ class EditCategory extends StatefulWidget {
 }
 
 class _EditCategoryState extends State<EditCategory> {
-  late TextEditingController _nameController;
+  late TagNameEditingController _nameController;
   String? _icon;
   TagIconType _iconType = TagIconType.character;
   int? _color;
@@ -26,7 +27,8 @@ class _EditCategoryState extends State<EditCategory> {
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.category?.name ?? '');
+    _nameController =
+        TagNameEditingController(text: widget.category?.name ?? '');
     _icon = widget.category?.icon;
     _iconType = widget.category?.iconType ?? TagIconType.character;
     _color = widget.category?.color;
@@ -40,7 +42,7 @@ class _EditCategoryState extends State<EditCategory> {
   }
 
   Future<void> _save() async {
-    final name = _nameController.text.trim();
+    final name = sanitizeTagName(_nameController.text);
     if (name.isEmpty) return;
 
     final now = DateTime.now();
@@ -184,7 +186,7 @@ class _EditCategoryState extends State<EditCategory> {
                             border: InputBorder.none,
                           ),
                           onSubmitted: (_) =>
-                              _nameController.text.trim().isEmpty
+                              sanitizeTagName(_nameController.text).isEmpty
                                   ? null
                                   : _save(),
                         ),
@@ -209,7 +211,8 @@ class _EditCategoryState extends State<EditCategory> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         TextButton(
-          onPressed: _nameController.text.trim().isEmpty ? null : _save,
+          onPressed:
+              sanitizeTagName(_nameController.text).isEmpty ? null : _save,
           child: Text(MaterialLocalizations.of(context).okButtonLabel),
         ),
       ],
