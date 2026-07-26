@@ -200,7 +200,7 @@ class _EditCategoryState extends State<EditCategory> {
                         padding: const EdgeInsets.symmetric(horizontal: 12.0),
                         child: TextField(
                           controller: _nameController,
-                          autofocus: true,
+                          autofocus: widget.category == null,
                           maxLines: 1,
                           textCapitalization: TextCapitalization.words,
                           decoration: InputDecoration(
