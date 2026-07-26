@@ -8,6 +8,7 @@ import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/models/tag_category.dart';
 import 'package:daily_you/models/tag_icon_type.dart';
+import 'package:daily_you/utils/generated/tag_icon_registry.dart';
 import 'package:flutter/material.dart';
 
 class TagSection {
@@ -236,7 +237,7 @@ class TagsProvider with ChangeNotifier {
       Tag(
         name: l10n.tagFavoriteName,
         tagType: TagType.label,
-        icon: 'favorite',
+        icon: TagIconKey.favorite,
         iconType: TagIconType.materialIcon,
         color: Colors.pink.shade500.toARGB32(),
         timeCreate: now,
@@ -245,7 +246,7 @@ class TagsProvider with ChangeNotifier {
       Tag(
         name: l10n.tagEnergyName,
         tagType: TagType.tracker,
-        icon: 'battery_charging_full',
+        icon: TagIconKey.batteryChargingFull,
         iconType: TagIconType.materialIcon,
         color: Colors.green.shade600.toARGB32(),
         timeCreate: now,
@@ -258,19 +259,19 @@ class TagsProvider with ChangeNotifier {
 
     final emotionsCategory = await addCategory(TagCategory(
       name: l10n.tagCategoryEmotionsName,
-      icon: 'sentiment_very_satisfied',
+      icon: TagIconKey.sentimentVerySatisfied,
       iconType: TagIconType.materialIcon,
       timeCreate: now,
       timeModified: now,
     ));
 
     final defaultEmotionTags = [
-      (l10n.tagExcitedName, 'celebration'),
-      (l10n.tagGratefulName, 'volunteer_activism'),
-      (l10n.tagCalmName, 'spa'),
-      (l10n.tagTiredName, 'nightlight'),
-      (l10n.tagAnxiousName, 'psychology'),
-      (l10n.tagAnnoyedName, 'thunderstorm'),
+      (l10n.tagExcitedName, TagIconKey.celebration),
+      (l10n.tagGratefulName, TagIconKey.volunteerActivism),
+      (l10n.tagCalmName, TagIconKey.spa),
+      (l10n.tagTiredName, TagIconKey.nightlight),
+      (l10n.tagAnxiousName, TagIconKey.psychology),
+      (l10n.tagAnnoyedName, TagIconKey.thunderstorm),
     ];
     for (final (name, icon) in defaultEmotionTags) {
       await add(Tag(
@@ -286,19 +287,19 @@ class TagsProvider with ChangeNotifier {
 
     final activitiesCategory = await addCategory(TagCategory(
       name: l10n.tagCategoryActivitiesName,
-      icon: 'directions_run',
+      icon: TagIconKey.directionsRun,
       iconType: TagIconType.materialIcon,
       timeCreate: now,
       timeModified: now,
     ));
 
     final defaultActivityTags = [
-      (l10n.tagExerciseName, 'fitness_center'),
-      (l10n.tagSocializingName, 'groups'),
-      (l10n.tagHobbyName, 'palette'),
-      (l10n.tagEntertainmentName, 'theater_comedy'),
-      (l10n.tagDiningName, 'local_dining'),
-      (l10n.tagChoresName, 'cleaning_services'),
+      (l10n.tagExerciseName, TagIconKey.fitnessCenter),
+      (l10n.tagSocializingName, TagIconKey.groups),
+      (l10n.tagHobbyName, TagIconKey.palette),
+      (l10n.tagEntertainmentName, TagIconKey.theaterComedy),
+      (l10n.tagDiningName, TagIconKey.localDining),
+      (l10n.tagChoresName, TagIconKey.cleaningServices),
     ];
     for (final (name, icon) in defaultActivityTags) {
       await add(Tag(

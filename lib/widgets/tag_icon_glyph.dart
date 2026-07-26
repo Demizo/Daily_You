@@ -1,5 +1,5 @@
 import 'package:daily_you/models/tag_icon_type.dart';
-import 'package:daily_you/utils/tag_icon_registry.dart';
+import 'package:daily_you/utils/generated/tag_icon_registry.dart';
 import 'package:flutter/material.dart';
 
 /// Renders a tag or category icon: a curated Material icon tinted in

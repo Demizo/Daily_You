@@ -874,18 +874,6 @@ abstract class AppLocalizations {
   /// **'Mood & People'**
   String get iconGroupMoodPeople;
 
-  /// No description provided for @iconGroupHabitsGoals.
-  ///
-  /// In en, this message translates to:
-  /// **'Habits & Goals'**
-  String get iconGroupHabitsGoals;
-
-  /// No description provided for @iconGroupActivities.
-  ///
-  /// In en, this message translates to:
-  /// **'Activities'**
-  String get iconGroupActivities;
-
   /// No description provided for @iconGroupHealth.
   ///
   /// In en, this message translates to:
@@ -898,29 +886,23 @@ abstract class AppLocalizations {
   /// **'Work & Finance'**
   String get iconGroupWorkFinance;
 
-  /// No description provided for @iconGroupNatureWeather.
+  /// No description provided for @iconGroupHabitsGoals.
   ///
   /// In en, this message translates to:
-  /// **'Nature & Weather'**
-  String get iconGroupNatureWeather;
+  /// **'Habits & Goals'**
+  String get iconGroupHabitsGoals;
+
+  /// No description provided for @iconGroupNature.
+  ///
+  /// In en, this message translates to:
+  /// **'Nature'**
+  String get iconGroupNature;
 
   /// No description provided for @iconGroupFoodDrink.
   ///
   /// In en, this message translates to:
   /// **'Food & Drink'**
   String get iconGroupFoodDrink;
-
-  /// No description provided for @iconGroupHome.
-  ///
-  /// In en, this message translates to:
-  /// **'Home'**
-  String get iconGroupHome;
-
-  /// No description provided for @iconGroupHobbies.
-  ///
-  /// In en, this message translates to:
-  /// **'Hobbies & Entertainment'**
-  String get iconGroupHobbies;
 
   /// No description provided for @iconGroupTravel.
   ///
