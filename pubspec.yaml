@@ -71,6 +71,8 @@ dev_dependencies:
 flutter:
   generate: true
   uses-material-design: true
+  assets:
+    - assets/daily_you_First_Steps.jpg
 
 icons_launcher:
   image_path: "assets/logo.png"

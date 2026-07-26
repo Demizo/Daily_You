@@ -10,7 +10,7 @@ class EntryImagesProvider with ChangeNotifier {
 
   EntryImagesProvider._init();
 
-  List<EntryImage> images = List.empty();
+  List<EntryImage> images = List.empty(growable: true);
   Map<int, EntryImage?> _firstImageByEntryId = {};
 
   void _rebuildCache() {
