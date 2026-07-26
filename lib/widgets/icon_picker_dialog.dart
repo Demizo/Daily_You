@@ -24,14 +24,22 @@ class _IconPickerDialogState extends State<IconPickerDialog>
   late final TabController _tabController;
   final TextEditingController _searchController = TextEditingController();
   final TextEditingController _customController = TextEditingController();
+  final FocusNode _customFocusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this)
-      ..addListener(() => setState(() {}));
+      ..addListener(_onTabChanged);
     _searchController.addListener(() => setState(() {}));
     _customController.addListener(() => setState(() {}));
+  }
+
+  void _onTabChanged() {
+    setState(() {});
+    if (_tabController.index == 0) {
+      _customFocusNode.unfocus();
+    }
   }
 
   @override
@@ -39,6 +47,7 @@ class _IconPickerDialogState extends State<IconPickerDialog>
     _tabController.dispose();
     _searchController.dispose();
     _customController.dispose();
+    _customFocusNode.dispose();
     super.dispose();
   }
 
@@ -154,7 +163,7 @@ class _IconPickerDialogState extends State<IconPickerDialog>
                         padding: const EdgeInsets.only(top: 8, bottom: 4),
                         child: Text(
                           tagIconGroupLabel(l10n, group.id),
-                          style: Theme.of(context).textTheme.labelMedium,
+                          style: Theme.of(context).textTheme.labelLarge,
                         ),
                       ),
                       GridView.builder(
@@ -202,7 +211,7 @@ class _IconPickerDialogState extends State<IconPickerDialog>
               child: Center(
                 child: TextField(
                   controller: _customController,
-                  autofocus: true,
+                  focusNode: _customFocusNode,
                   textAlign: TextAlign.center,
                   textAlignVertical: TextAlignVertical.center,
                   style: Theme.of(context).textTheme.headlineLarge,
