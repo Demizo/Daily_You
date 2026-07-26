@@ -595,6 +595,10 @@ class AppLocalizationsRo extends AppLocalizations {
   String get tagAnnoyedName => 'Annoyed';
 
   @override
+  String get welcomeLogBodyText =>
+      '## Welcome to Daily You\n\n> Every day is worth remembering, capture it!\n\n**Daily You** is free, [open source](https://github.com/Demizo/Daily_You), and community supported. Built around the belief that your diary should be yours, not a product:\n\n- No ads\n- No locked features\n- No tracking or data collection\n\nWhether you\'re journaling, reflecting, or just noting what made you smile, **Daily You** gives you a private space that\'s _truly your own_.';
+
+  @override
   String get settingsStorageTitle => 'Storage';
 
   @override

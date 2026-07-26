@@ -2,7 +2,9 @@ import 'dart:io';
 
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/database/image_storage.dart';
+import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/utils/file_layer.dart';
+import 'package:daily_you/utils/generated/tag_icon_registry.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/models/tag.dart';
@@ -13,6 +15,8 @@ import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/providers/templates_provider.dart';
 import 'package:easy_debounce/easy_debounce.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -275,6 +279,75 @@ CREATE TABLE $imagesTable (
 
     await _createTagTables(db);
     await TagsProvider.instance.createDefaultTags();
+
+    await _createWelcomeEntry();
+  }
+
+  Future<void> _createWelcomeEntry() async {
+    final deviceLocale = WidgetsBinding.instance.platformDispatcher.locale;
+    Locale locale;
+    if (AppLocalizations.delegate.isSupported(deviceLocale)) {
+      locale = deviceLocale;
+    } else {
+      final langOnly = Locale(deviceLocale.languageCode);
+      locale = AppLocalizations.delegate.isSupported(langOnly)
+          ? langOnly
+          : const Locale('en');
+    }
+    final l10n = await AppLocalizations.delegate.load(locale);
+    final now = DateTime.now();
+
+    final welcomeEntry = await EntriesProvider.instance.add(
+      Entry(
+        text: l10n.welcomeLogBodyText,
+        mood: 1,
+        timeCreate: now,
+        timeModified: now,
+      ),
+      skipUpdate: true,
+    );
+
+    final imageBytes =
+        await rootBundle.load('assets/daily_you_First_Steps.jpg');
+    final imageName = await ImageStorage.instance.create(
+      'daily_you_First_Steps.jpg',
+      imageBytes.buffer.asUint8List(),
+      currTime: now,
+    );
+    if (imageName != null) {
+      await EntryImagesProvider.instance.add(
+        EntryImage(
+          entryId: welcomeEntry.id,
+          imgPath: imageName,
+          imgRank: 0,
+          timeCreate: now,
+        ),
+        skipUpdate: true,
+      );
+    }
+
+    final favoriteTag = TagsProvider.instance.tags
+        .where((tag) => tag.icon == TagIconKey.favorite)
+        .firstOrNull;
+    if (favoriteTag != null) {
+      await TagsProvider.instance.addEntryTag(EntryTag(
+        entryId: welcomeEntry.id!,
+        tagId: favoriteTag.id!,
+        timeCreate: now,
+      ));
+    }
+
+    final energyTag = TagsProvider.instance.tags
+        .where((tag) => tag.icon == TagIconKey.batteryChargingFull)
+        .firstOrNull;
+    if (energyTag != null) {
+      await TagsProvider.instance.addEntryTag(EntryTag(
+        entryId: welcomeEntry.id!,
+        tagId: energyTag.id!,
+        value: '10',
+        timeCreate: now,
+      ));
+    }
   }
 
   Future<void> _createTagTables(Database db) async {

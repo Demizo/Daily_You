@@ -21,7 +21,7 @@ class EntriesProvider with ChangeNotifier {
 
   EntriesProvider._init();
 
-  List<Entry> entries = List.empty();
+  List<Entry> entries = List.empty(growable: true);
 
   Map<DateTime, List<Entry>> _entriesByDay = {};
 
