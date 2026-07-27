@@ -87,13 +87,13 @@ class CalendarViewOptionsDialog extends StatelessWidget {
       leadingIcon: Icons.local_offer_rounded,
       value: currentValue,
       options: [
-        DropdownMenuItem(value: 'none', child: Text(l10n.tagCategoryNone)),
+        DropdownMenuItem(value: 'none', child: Text(l10n.noTemplateTitle)),
         DropdownMenuItem(value: 'label', child: Text(l10n.tagTypeLabelTitle)),
         DropdownMenuItem(
             value: 'tracker', child: Text(l10n.tagTypeTrackerTitle)),
       ],
       selectedItemBuilder: (context) => [
-        Text(l10n.tagCategoryNone),
+        Text(l10n.noTemplateTitle),
         _buildDropdownValueText(overlayTag?.name ?? l10n.tagTypeLabelTitle),
         _buildDropdownValueText(overlayTag?.name ?? l10n.tagTypeTrackerTitle),
       ],
