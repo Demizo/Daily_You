@@ -70,14 +70,14 @@ class _GalleryPageState extends State<GalleryPage>
   List<Entry> _applyTagFilter(List<Entry> entries, TagsProvider tagsProvider) {
     if (_filterNoTags) {
       return entries
-          .where((entry) => tagsProvider.entryTags
-              .every((entryTag) => entryTag.entryId != entry.id))
+          .where((entry) =>
+              tagsProvider.getEntryTagsForEntry(entry.id ?? -1).isEmpty)
           .toList();
     }
     if (_filterTagIds.isEmpty) return entries;
     return entries.where((entry) {
-      final entryTagIds = tagsProvider.entryTags
-          .where((entryTag) => entryTag.entryId == entry.id)
+      final entryTagIds = tagsProvider
+          .getEntryTagsForEntry(entry.id ?? -1)
           .map((entryTag) => entryTag.tagId)
           .toSet();
       return _filterTagMode == TagFilterMode.all
@@ -94,24 +94,28 @@ class _GalleryPageState extends State<GalleryPage>
     }
     final ascending = entriesProvider.sortOrder == SortOrder.ascending;
 
-    double? getTrackerValue(Entry entry) {
-      final rawValue = tagsProvider.entryTags
-          .where((entryTag) =>
-              entryTag.entryId == entry.id && entryTag.tagId == trackerTagId)
+    double? trackerValue(Entry entry) {
+      final rawValue = tagsProvider
+          .getEntryTagsForEntry(entry.id ?? -1)
+          .where((entryTag) => entryTag.tagId == trackerTagId)
           .firstOrNull
           ?.value;
       return double.tryParse(rawValue ?? '');
     }
 
+    final valuesByEntryId = {
+      for (final entry in entries) entry.id: trackerValue(entry)
+    };
+
     final withValue =
-        entries.where((entry) => getTrackerValue(entry) != null).toList();
+        entries.where((entry) => valuesByEntryId[entry.id] != null).toList();
     final withoutValue =
-        entries.where((entry) => getTrackerValue(entry) == null).toList();
+        entries.where((entry) => valuesByEntryId[entry.id] == null).toList();
 
     withValue.sort((a, b) {
       final comparison = ascending
-          ? getTrackerValue(a)!.compareTo(getTrackerValue(b)!)
-          : getTrackerValue(b)!.compareTo(getTrackerValue(a)!);
+          ? valuesByEntryId[a.id]!.compareTo(valuesByEntryId[b.id]!)
+          : valuesByEntryId[b.id]!.compareTo(valuesByEntryId[a.id]!);
       if (comparison != 0) return comparison;
       return ascending
           ? a.timeCreate.compareTo(b.timeCreate)
