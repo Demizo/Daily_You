@@ -25,12 +25,25 @@ class TagsProvider with ChangeNotifier {
 
   List<TagCategory> categories = List.empty();
   List<Tag> tags = List.empty();
-  List<EntryTag> entryTags = List.empty();
+
+  List<EntryTag> _entryTags = List.empty();
+  List<EntryTag> get entryTags => _entryTags;
+
+  Map<int, List<EntryTag>> _entryTagsByEntry = const {};
+
+  void _setEntryTags(List<EntryTag> updated) {
+    _entryTags = updated;
+    final grouped = <int, List<EntryTag>>{};
+    for (final entryTag in updated) {
+      (grouped[entryTag.entryId] ??= []).add(entryTag);
+    }
+    _entryTagsByEntry = grouped;
+  }
 
   Future<void> load() async {
     categories = await TagCategoryDao.getAll();
     tags = await TagDao.getAll();
-    entryTags = await EntryTagDao.getAll();
+    _setEntryTags(await EntryTagDao.getAll());
     notifyListeners();
   }
 
@@ -85,8 +98,8 @@ class TagsProvider with ChangeNotifier {
 
   Future<void> remove(Tag tag) async {
     await EntryTagDao.removeAllForTag(tag.id!);
-    entryTags =
-        entryTags.where((entryTag) => entryTag.tagId != tag.id).toList();
+    _setEntryTags(
+        entryTags.where((entryTag) => entryTag.tagId != tag.id).toList());
     await TagDao.remove(tag.id!);
     tags = tags.where((existing) => existing.id != tag.id).toList();
     await AppDatabase.instance.updateExternalDatabase();
@@ -117,39 +130,39 @@ class TagsProvider with ChangeNotifier {
 
   Future<void> addEntryTag(EntryTag entryTag) async {
     final entryTagWithId = await EntryTagDao.add(entryTag);
-    entryTags = [...entryTags, entryTagWithId];
+    _setEntryTags([...entryTags, entryTagWithId]);
     await AppDatabase.instance.updateExternalDatabase();
     notifyListeners();
   }
 
   Future<void> updateEntryTag(EntryTag entryTag) async {
     await EntryTagDao.update(entryTag);
-    entryTags = [
+    _setEntryTags([
       for (final existing in entryTags)
         existing.id == entryTag.id ? entryTag : existing
-    ];
+    ]);
     await AppDatabase.instance.updateExternalDatabase();
     notifyListeners();
   }
 
   Future<void> removeEntryTag(EntryTag entryTag) async {
     await EntryTagDao.remove(entryTag.id!);
-    entryTags =
-        entryTags.where((existing) => existing.id != entryTag.id).toList();
+    _setEntryTags(
+        entryTags.where((existing) => existing.id != entryTag.id).toList());
     await AppDatabase.instance.updateExternalDatabase();
     notifyListeners();
   }
 
   Future<void> removeAllEntryTagsForEntry(int entryId) async {
     await EntryTagDao.removeAllForEntry(entryId);
-    entryTags =
-        entryTags.where((entryTag) => entryTag.entryId != entryId).toList();
+    _setEntryTags(
+        entryTags.where((entryTag) => entryTag.entryId != entryId).toList());
     await AppDatabase.instance.updateExternalDatabase();
     notifyListeners();
   }
 
   List<EntryTag> getEntryTagsForEntry(int entryId) {
-    return entryTags.where((entryTag) => entryTag.entryId == entryId).toList();
+    return _entryTagsByEntry[entryId] ?? const [];
   }
 
   int entryCountForTag(int tagId) {
@@ -204,9 +217,9 @@ class TagsProvider with ChangeNotifier {
     for (final tag in affected) {
       await EntryTagDao.removeAllForTag(tag.id!);
     }
-    entryTags = entryTags
+    _setEntryTags(entryTags
         .where((entryTag) => !affected.any((tag) => tag.id == entryTag.tagId))
-        .toList();
+        .toList());
     for (final tag in affected) {
       await TagDao.remove(tag.id!);
     }
