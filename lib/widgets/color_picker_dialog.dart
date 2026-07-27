@@ -88,7 +88,7 @@ class _ColorPickerDialogState extends State<ColorPickerDialog>
               controller: _tabController,
               tabs: [
                 Tab(text: l10n.colorPickerPaletteTab),
-                Tab(text: l10n.colorPickerCustomTab),
+                Tab(text: l10n.iconPickerCustomTab),
               ],
             ),
             Expanded(
@@ -123,7 +123,7 @@ class _ColorPickerDialogState extends State<ColorPickerDialog>
       child: OutlinedButton.icon(
         onPressed: () => setState(() => _selectedColor = null),
         icon: Icon(isSelected ? Icons.check_rounded : Icons.block_rounded),
-        label: Text(AppLocalizations.of(context)!.colorPickerNoneOption),
+        label: Text(AppLocalizations.of(context)!.noTemplateTitle),
       ),
     );
   }

@@ -838,12 +838,6 @@ abstract class AppLocalizations {
   /// **'Color'**
   String get tagColorLabel;
 
-  /// No description provided for @tagIconLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Icon'**
-  String get tagIconLabel;
-
   /// No description provided for @iconPickerTitle.
   ///
   /// In en, this message translates to:
@@ -879,18 +873,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Colors'**
   String get colorPickerPaletteTab;
-
-  /// No description provided for @colorPickerNoneOption.
-  ///
-  /// In en, this message translates to:
-  /// **'None'**
-  String get colorPickerNoneOption;
-
-  /// No description provided for @colorPickerCustomTab.
-  ///
-  /// In en, this message translates to:
-  /// **'Custom'**
-  String get colorPickerCustomTab;
 
   /// No description provided for @iconGroupMoodPeople.
   ///
@@ -940,18 +922,6 @@ abstract class AppLocalizations {
   /// **'Symbols'**
   String get iconGroupSymbols;
 
-  /// No description provided for @tagTypeLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Type'**
-  String get tagTypeLabel;
-
-  /// No description provided for @editTagTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Edit Tag'**
-  String get editTagTitle;
-
   /// No description provided for @newTagTitle.
   ///
   /// In en, this message translates to:
@@ -964,12 +934,6 @@ abstract class AppLocalizations {
   /// **'Category'**
   String get tagCategoryLabel;
 
-  /// No description provided for @tagCategoryNone.
-  ///
-  /// In en, this message translates to:
-  /// **'None'**
-  String get tagCategoryNone;
-
   /// No description provided for @tagCategoryUncategorized.
   ///
   /// In en, this message translates to:
@@ -981,12 +945,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'New Category'**
   String get newCategoryTitle;
-
-  /// No description provided for @editCategoryTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Edit Category'**
-  String get editCategoryTitle;
 
   /// No description provided for @deleteTitle.
   ///
@@ -1036,12 +994,6 @@ abstract class AppLocalizations {
   /// **'No Tags'**
   String get noTagsFilterLabel;
 
-  /// No description provided for @trackerSortLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Sort by tracker'**
-  String get trackerSortLabel;
-
   /// No description provided for @addTagsTitle.
   ///
   /// In en, this message translates to:
@@ -1071,24 +1023,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sort by usage'**
   String get tagPickerSortUsageLabel;
-
-  /// No description provided for @trackerValueTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Set Value'**
-  String get trackerValueTitle;
-
-  /// No description provided for @trackerValueHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Value'**
-  String get trackerValueHint;
-
-  /// No description provided for @trackerFrequentValues.
-  ///
-  /// In en, this message translates to:
-  /// **'Frequent values'**
-  String get trackerFrequentValues;
 
   /// No description provided for @tagFavoriteName.
   ///

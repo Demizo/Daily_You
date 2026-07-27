@@ -300,7 +300,7 @@ class _EditTagState extends State<EditTag> {
               DropdownMenuItem<int?>(
                 value: null,
                 alignment: AlignmentDirectional.centerEnd,
-                child: Text(l10n.tagCategoryNone,
+                child: Text(l10n.noTemplateTitle,
                     overflow: TextOverflow.fade, softWrap: false, maxLines: 1),
               ),
               ...categories.map(

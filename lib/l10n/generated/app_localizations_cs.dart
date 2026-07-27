@@ -434,9 +434,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get tagColorLabel => 'Color';
 
   @override
-  String get tagIconLabel => 'Icon';
-
-  @override
   String get iconPickerTitle => 'Choose Icon';
 
   @override
@@ -453,12 +450,6 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get colorPickerPaletteTab => 'Colors';
-
-  @override
-  String get colorPickerNoneOption => 'None';
-
-  @override
-  String get colorPickerCustomTab => 'Custom';
 
   @override
   String get iconGroupMoodPeople => 'Mood & People';
@@ -485,28 +476,16 @@ class AppLocalizationsCs extends AppLocalizations {
   String get iconGroupSymbols => 'Symbols';
 
   @override
-  String get tagTypeLabel => 'Type';
-
-  @override
-  String get editTagTitle => 'Edit Tag';
-
-  @override
   String get newTagTitle => 'New Tag';
 
   @override
   String get tagCategoryLabel => 'Category';
 
   @override
-  String get tagCategoryNone => 'None';
-
-  @override
   String get tagCategoryUncategorized => 'Uncategorized';
 
   @override
   String get newCategoryTitle => 'New Category';
-
-  @override
-  String get editCategoryTitle => 'Edit Category';
 
   @override
   String get deleteTitle => 'Delete';
@@ -551,9 +530,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get noTagsFilterLabel => 'No Tags';
 
   @override
-  String get trackerSortLabel => 'Sort by tracker';
-
-  @override
   String get addTagsTitle => 'Add Tags';
 
   @override
@@ -567,15 +543,6 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get tagPickerSortUsageLabel => 'Sort by usage';
-
-  @override
-  String get trackerValueTitle => 'Set Value';
-
-  @override
-  String get trackerValueHint => 'Value';
-
-  @override
-  String get trackerFrequentValues => 'Frequent values';
 
   @override
   String get tagFavoriteName => 'Favorite';
