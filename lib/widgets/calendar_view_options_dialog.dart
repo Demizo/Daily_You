@@ -25,7 +25,6 @@ class CalendarViewOptionsDialog extends StatelessWidget {
             : null;
 
         return AlertDialog(
-          title: Text(l10n.calendarViewOptionsTitle),
           contentPadding: const EdgeInsets.fromLTRB(0, 12, 0, 0),
           content: Column(
             mainAxisSize: MainAxisSize.min,

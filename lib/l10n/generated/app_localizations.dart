@@ -859,7 +859,7 @@ abstract class AppLocalizations {
   /// No description provided for @iconPickerSearchHint.
   ///
   /// In en, this message translates to:
-  /// **'Search icons'**
+  /// **'Search icons…'**
   String get iconPickerSearchHint;
 
   /// No description provided for @colorPickerTitle.
@@ -921,12 +921,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Symbols'**
   String get iconGroupSymbols;
-
-  /// No description provided for @newTagTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'New Tag'**
-  String get newTagTitle;
 
   /// No description provided for @tagCategoryLabel.
   ///
@@ -1005,12 +999,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Search tags…'**
   String get addTagsSearchHint;
-
-  /// No description provided for @addTagButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Add'**
-  String get addTagButton;
 
   /// No description provided for @tagPickerSortManualLabel.
   ///
@@ -1557,12 +1545,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Mood'**
   String get tagMoodTitle;
-
-  /// No description provided for @calendarViewOptionsTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Display Options'**
-  String get calendarViewOptionsTitle;
 
   /// No description provided for @calendarTagDisplayLabel.
   ///
