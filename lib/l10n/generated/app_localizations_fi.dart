@@ -451,7 +451,7 @@ class AppLocalizationsFi extends AppLocalizations {
   String get iconPickerCustomTab => 'Custom';
 
   @override
-  String get iconPickerSearchHint => 'Search icons';
+  String get iconPickerSearchHint => 'Search icons…';
 
   @override
   String get colorPickerTitle => 'Choose Color';
@@ -482,9 +482,6 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get iconGroupSymbols => 'Symbols';
-
-  @override
-  String get newTagTitle => 'New Tag';
 
   @override
   String get tagCategoryLabel => 'Category';
@@ -542,9 +539,6 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get addTagsSearchHint => 'Search tags…';
-
-  @override
-  String get addTagButton => 'Add';
 
   @override
   String get tagPickerSortManualLabel => 'Manual order';
@@ -836,9 +830,6 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get tagMoodTitle => 'Mieliala';
-
-  @override
-  String get calendarViewOptionsTitle => 'Display Options';
 
   @override
   String get calendarTagDisplayLabel => 'Tag';

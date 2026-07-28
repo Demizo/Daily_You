@@ -450,7 +450,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get iconPickerCustomTab => 'Custom';
 
   @override
-  String get iconPickerSearchHint => 'Search icons';
+  String get iconPickerSearchHint => 'Search icons…';
 
   @override
   String get colorPickerTitle => 'Choose Color';
@@ -481,9 +481,6 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get iconGroupSymbols => 'Symbols';
-
-  @override
-  String get newTagTitle => 'New Tag';
 
   @override
   String get tagCategoryLabel => 'Category';
@@ -541,9 +538,6 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get addTagsSearchHint => 'Search tags…';
-
-  @override
-  String get addTagButton => 'Add';
 
   @override
   String get tagPickerSortManualLabel => 'Manual order';
@@ -831,9 +825,6 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get tagMoodTitle => 'Tâm trạng';
-
-  @override
-  String get calendarViewOptionsTitle => 'Display Options';
 
   @override
   String get calendarTagDisplayLabel => 'Tag';

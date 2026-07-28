@@ -46,8 +46,7 @@ class TagPickerDialog extends StatefulWidget {
 }
 
 class _TagPickerDialogState extends State<TagPickerDialog> {
-  final TagNameEditingController _searchController =
-      TagNameEditingController();
+  final TagNameEditingController _searchController = TagNameEditingController();
   String _searchText = '';
   late String _sortMode;
 
@@ -304,7 +303,6 @@ class _TagPickerDialogState extends State<TagPickerDialog> {
                 ? IconButton(
                     key: const ValueKey('addButton'),
                     icon: const Icon(Icons.add_rounded),
-                    tooltip: l10n.addTagButton,
                     onPressed: () => _createAndAddTagWithName(
                         provider, sanitizeTagName(_searchController.text)),
                   )
