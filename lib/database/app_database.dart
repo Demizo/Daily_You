@@ -308,9 +308,9 @@ CREATE TABLE $imagesTable (
     );
 
     final imageBytes =
-        await rootBundle.load('assets/daily_you_First_Steps.jpg');
+        await rootBundle.load('assets/daily_you_First_Steps.webp');
     final imageName = await ImageStorage.instance.create(
-      'daily_you_First_Steps.jpg',
+      'daily_you_First_Steps.webp',
       imageBytes.buffer.asUint8List(),
       currTime: now,
     );
