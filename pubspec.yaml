@@ -72,7 +72,7 @@ flutter:
   generate: true
   uses-material-design: true
   assets:
-    - assets/daily_you_First_Steps.jpg
+    - assets/daily_you_First_Steps.webp
 
 icons_launcher:
   image_path: "assets/logo.png"
