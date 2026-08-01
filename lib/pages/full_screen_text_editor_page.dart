@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 import 'package:daily_you/widgets/edit_toolbar.dart';
-import 'package:daily_you/widgets/template_select_button.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:flutter/services.dart';
@@ -106,7 +105,6 @@ class _FullScreenTextEditorPageState extends State<FullScreenTextEditorPage> {
                     controller: _controller,
                     undoController: _undoController,
                     focusNode: _focusNode,
-                    trailer: TemplateSelectButton(controller: _controller),
                   ),
                 ),
               ],

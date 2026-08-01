@@ -1,4 +1,5 @@
 import 'package:daily_you/config_provider.dart';
+import 'package:daily_you/widgets/template_select_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -208,7 +209,23 @@ class _MarkdownToolbarState extends State<MarkdownToolbar> {
       ));
     }
 
+    // Template insert
+    entries.add(_ToolbarEntry(
+      width: _buttonWidth,
+      isDivider: false,
+      build: (ctx, closePopup) => IconButton(
+        padding: EdgeInsets.zero,
+        visualDensity: VisualDensity.compact,
+        icon: const Icon(Icons.note_add_rounded, size: 24),
+        onPressed: () {
+          closePopup?.call();
+          showTemplateSelectPopup(ctx, widget.controller);
+        },
+      ),
+    ));
+
     // Markdown controls
+    if (entries.isNotEmpty) addDivider();
     for (final (icon, action) in _formatButtonSpecs()) {
       entries.add(_ToolbarEntry(
         width: _buttonWidth,

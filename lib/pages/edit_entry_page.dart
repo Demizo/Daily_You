@@ -17,7 +17,6 @@ import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/pages/full_screen_text_editor_page.dart';
 import 'package:daily_you/widgets/edit_toolbar.dart';
 import 'package:daily_you/widgets/entry_image_editable_list.dart';
-import 'package:daily_you/widgets/template_select_button.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
@@ -262,8 +261,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                       controller: _textEditingController,
                       undoController: _undoController,
                       focusNode: _focusNode,
-                      trailer: TemplateSelectButton(
-                          controller: _textEditingController),
+                      trailer: _buildTagsButton(context, theme),
                     ),
                   ),
                 ],
@@ -294,7 +292,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
               runSpacing: 8.0,
               children: [
                 _buildDateTimeButtons(context, theme),
-                _buildTagAndImageButtons(context, theme),
+                _buildImageButton(context, theme),
               ],
             ),
           ),
@@ -385,40 +383,38 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     );
   }
 
-  Widget _buildTagAndImageButtons(BuildContext context, ThemeData theme) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        IconButton(
-          onPressed: () async {
-            if (id == -1) {
-              await _saveEntry(forceCreate: true);
-            }
-            if (id == -1) return;
-            if (context.mounted) {
-              await showDialog(
-                context: context,
-                builder: (_) => TagPickerDialog(
-                    mode: TagPickerMode.addToEntry, entryId: id),
-              );
-            }
-          },
-          icon: Icon(
-            Icons.local_offer_rounded,
-            color: theme.colorScheme.primary,
-            size: 24,
-          ),
-          style: IconButton.styleFrom(
-              backgroundColor: theme.colorScheme.primaryContainer),
-        ),
-        EntryImagePicker(
-          onChangedImage: (newImages) {
-            _openedCamera = true;
-            _addImage(newImages);
-          },
-          openCamera: widget.openCamera && !_openedCamera,
-        ),
-      ],
+  Widget _buildImageButton(BuildContext context, ThemeData theme) {
+    return EntryImagePicker(
+      onChangedImage: (newImages) {
+        _openedCamera = true;
+        _addImage(newImages);
+      },
+      openCamera: widget.openCamera && !_openedCamera,
+    );
+  }
+
+  Widget _buildTagsButton(BuildContext context, ThemeData theme) {
+    return IconButton(
+      onPressed: () async {
+        if (id == -1) {
+          await _saveEntry(forceCreate: true);
+        }
+        if (id == -1) return;
+        if (context.mounted) {
+          await showDialog(
+            context: context,
+            builder: (_) =>
+                TagPickerDialog(mode: TagPickerMode.addToEntry, entryId: id),
+          );
+        }
+      },
+      icon: Icon(
+        Icons.local_offer_rounded,
+        color: theme.colorScheme.primary,
+        size: 24,
+      ),
+      style: IconButton.styleFrom(
+          backgroundColor: theme.colorScheme.primaryContainer),
     );
   }
 
