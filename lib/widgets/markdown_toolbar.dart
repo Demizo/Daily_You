@@ -191,10 +191,10 @@ class _MarkdownToolbarState extends State<MarkdownToolbar> {
         (Icons.text_fields_rounded, _showHeaderDialog),
         (Icons.format_bold_rounded, () => _wrapSelection('**')),
         (Icons.format_italic_rounded, () => _wrapSelection('_')),
-        (Icons.format_strikethrough_rounded, () => _wrapSelection('~~')),
         (Icons.format_list_bulleted_rounded, () => _insertLinePrefix('-')),
-        (Icons.link_rounded, () => _wrapSelection('[', ']()')),
         (Icons.format_quote_rounded, () => _insertLinePrefix('>')),
+        (Icons.link_rounded, () => _wrapSelection('[', ']()')),
+        (Icons.format_strikethrough_rounded, () => _wrapSelection('~~')),
       ];
 
   List<_ToolbarEntry> _buildEntries(
