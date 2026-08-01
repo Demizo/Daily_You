@@ -10,6 +10,7 @@
    <application
         android:label="Daily You"
         android:name="${applicationName}"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
 	android:roundIcon="@mipmap/ic_launcher_round"
 	android:localeConfig="@xml/locales_config"
