@@ -229,10 +229,6 @@ class ImageStorage {
         internalFolder, newImageName, bytes,
         useExternalPath: false);
     if (imageFilePath == null) return null;
-    if (Platform.isAndroid) {
-      // Add image to media store
-      MediaScanner.loadMedia(path: imageFilePath);
-    }
     return newImageName;
   }
 
