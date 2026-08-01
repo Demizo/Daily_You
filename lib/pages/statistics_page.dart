@@ -258,7 +258,7 @@ class _StatsPageState extends State<StatsPage>
         .map((entry) => (date: entry.timeCreate, value: entry.mood!.toDouble()))
         .toList();
     final moodTotals = _getMoodTotals(entries);
-    final hasData = moodTotals.values.any((count) => count > 0);
+    final hasData = moodPoints.length > 1;
 
     return [
       ValueOverTimeChart(
@@ -272,7 +272,10 @@ class _StatsPageState extends State<StatsPage>
           child: MoodIcon(moodValue: value.toInt(), allowScaling: false),
         ),
       ),
-      MoodSummaryChart(moodCounts: moodTotals),
+      MoodSummaryChart(
+        moodCounts: moodTotals,
+        hasData: hasData,
+      ),
       ValueByDayChart(
         averageValues: _averageByDayOfWeek(
             entries, (entry) => entry.mood?.toDouble(),
@@ -314,7 +317,7 @@ class _StatsPageState extends State<StatsPage>
     ];
     final rawValues = dataPoints.map((point) => point.value).toList();
 
-    final hasData = dataPoints.isNotEmpty;
+    final hasData = dataPoints.length > 1;
     final (minY, maxY) = _computeTrackerYRange(rawValues);
     final trackerRange = FixedYRange(minY: minY, maxY: maxY);
 

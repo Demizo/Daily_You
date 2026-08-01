@@ -142,7 +142,7 @@ class DistributionChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final hasData = values.isNotEmpty;
+    final hasData = values.length > 1;
     final displayValues = hasData ? values : _dummyValues;
     final bins = _computeBins(displayValues);
     if (bins.isEmpty) return const SizedBox.shrink();

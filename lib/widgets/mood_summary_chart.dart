@@ -7,8 +7,10 @@ import 'package:provider/provider.dart';
 
 class MoodSummaryChart extends StatelessWidget {
   final Map<int, int> moodCounts;
+  final bool hasData;
 
-  const MoodSummaryChart({super.key, required this.moodCounts});
+  const MoodSummaryChart(
+      {super.key, required this.moodCounts, required this.hasData});
 
   static const _moodOrder = [2, 1, 0, -1, -2];
   static const _barHeight = 44.0;
@@ -26,7 +28,6 @@ class MoodSummaryChart extends StatelessWidget {
   }
 
   Widget _buildChart(BuildContext context) {
-    final hasData = moodCounts.values.any((v) => v > 0);
     final isRtl = Directionality.of(context) == TextDirection.rtl;
     final displayCounts = hasData ? moodCounts : _dummyMoodCounts;
     final maxCount = displayCounts.values.reduce((a, b) => a > b ? a : b);
