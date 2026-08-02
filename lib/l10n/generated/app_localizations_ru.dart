@@ -30,10 +30,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get pageHomeTitle => 'Дом';
 
   @override
-  String get jumpToMonthTitle => 'Jump to month';
+  String get jumpToMonthTitle => 'Выбрать месяц';
 
   @override
-  String get jumpToLogTitle => 'Jump to log';
+  String get jumpToLogTitle => 'Выбрать день';
 
   @override
   String get flashbacksTitle => 'Воспоминания';
@@ -87,7 +87,7 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get flashbackOnThisDay => 'On This Day';
+  String get flashbackOnThisDay => 'В этот день';
 
   @override
   String get pageGalleryTitle => 'Галерея';
@@ -112,8 +112,8 @@ class AppLocalizationsRu extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count days',
-      one: '$count day',
+      other: '$count дней',
+      one: '$count день',
     );
     return '$_temp0';
   }
@@ -124,6 +124,8 @@ class AppLocalizationsRu extends AppLocalizations {
       count,
       locale: localeName,
       other: '$count слов',
+      many: '$count слов',
+      few: '$count слова',
       one: '$count слово',
     );
     return '$_temp0';
@@ -178,19 +180,19 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get chartGroupingLabel => 'Group by';
+  String get chartGroupingLabel => 'Сгруппировать по';
 
   @override
-  String get chartGroupingDay => 'Day';
+  String get chartGroupingDay => 'День';
 
   @override
-  String get chartGroupingWeek => 'Week';
+  String get chartGroupingWeek => 'Неделя';
 
   @override
-  String get chartGroupingMonth => 'Month';
+  String get chartGroupingMonth => 'Месяц';
 
   @override
-  String get chartGroupingYear => 'Year';
+  String get chartGroupingYear => 'Год';
 
   @override
   String get chartSmoothingLabel => 'Smoothing';
@@ -344,10 +346,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsHideImagesInGallery => 'Скрыть изображения в галерее';
 
   @override
-  String get settingsHideImages => 'Hide Images';
+  String get settingsHideImages => 'Скрыть изображения';
 
   @override
-  String get pageCalendarTitle => 'Calendar';
+  String get pageCalendarTitle => 'Календарь';
 
   @override
   String get viewLayoutList => 'Список';
@@ -370,7 +372,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsDailyReminderTitle => 'Ежедневное напоминание';
 
   @override
-  String get settingsOnThisDayDescription => 'Revisit past memories';
+  String get settingsOnThisDayDescription =>
+      'Вернитесь к прошлым воспоминаниям';
 
   @override
   String get settingsDailyReminderDescription =>
@@ -852,7 +855,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsConsiderSupporting => 'подумайте о поддержке проекта';
 
   @override
-  String get imagesTitle => 'Images';
+  String get imagesTitle => 'Изображения';
 
   @override
   String get tagMoodTitle => 'Настроение';
