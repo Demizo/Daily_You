@@ -169,5 +169,6 @@
     "chartGroupingMonth": "月",
     "chartGroupingWeek": "周",
     "chartGroupingDay": "天",
-    "chartGroupingLabel": "群组"
+    "chartGroupingLabel": "群组",
+    "noResults": "无结果…"
 }
