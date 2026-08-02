@@ -1,0 +1,9 @@
+Daily You v3.0.0 has arrived: Celebrating 3 years!
+
+• Added tags: labels & trackers!
+• Labels track when something occurs (e.g. an activity)
+• Trackers trace values over time (e.g. how energized you feel each day)
+• Tags can be organized into categories
+• Added an initial log and default tags to get users started
+• Use internal app storage for improved privacy
+• Updated translations
