@@ -150,10 +150,17 @@
     "templateDefaultSummaryBody": "### Итог\n- \n\n### Цитата\n> ",
     "actionToday": "Сегодня",
     "actionOtherDay": "Другой день",
-    "dayCount": "{count, plural, one{{count} день} few{{count} дня} many{{count} дней} other{{count} дней}}",
+    "dayCount": "{count, plural, one{{count} день} other{{count} дней}}",
     "settingsHideImages": "Скрыть изображения",
     "pageCalendarTitle": "Календарь",
-    "jumpToMonthTitle": "Перейти к месяцу",
-    "jumpToLogTitle": "Перейти к записи",
-    "flashbackOnThisDay": "В этот день"
+    "jumpToMonthTitle": "Выбрать месяц",
+    "jumpToLogTitle": "Выбрать день",
+    "flashbackOnThisDay": "В этот день",
+    "chartGroupingLabel": "Сгруппировать по",
+    "chartGroupingDay": "День",
+    "chartGroupingWeek": "Неделя",
+    "chartGroupingMonth": "Месяц",
+    "chartGroupingYear": "Год",
+    "settingsOnThisDayDescription": "Вернитесь к прошлым воспоминаниям",
+    "imagesTitle": "Изображения"
 }
