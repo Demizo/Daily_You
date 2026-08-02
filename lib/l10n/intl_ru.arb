@@ -115,7 +115,7 @@
     "settingsMadeWithLove": "Сделано с ❤️",
     "settingsConsiderSupporting": "подумайте о поддержке проекта",
     "settingsFlashbacksExcludeBadDays": "Не учитывать плохие дни",
-    "wordCount": "{count, plural, one{{count} слово} other{{count} слов}}",
+    "wordCount": "{count, plural, one{{count} слово} few{{count} слова} many{{count} слов} other{{count} слов}}",
     "settingsShowFlashbacks": "Показать воспоминания",
     "settingsDailyReminderOnboarding": "Включи ежедневные напоминания, чтобы оставаться последовательным!",
     "settingsNotificationsPermissionsPrompt": "Будет запрошено разрешение «Планирование будильников» для отправки напоминания в случайный момент или в выбранное время.",
@@ -149,5 +149,18 @@
     "templateDefaultSummaryTitle": "Итог дня",
     "templateDefaultSummaryBody": "### Итог\n- \n\n### Цитата\n> ",
     "actionToday": "Сегодня",
-    "actionOtherDay": "Другой день"
+    "actionOtherDay": "Другой день",
+    "dayCount": "{count, plural, one{{count} день} other{{count} дней}}",
+    "settingsHideImages": "Скрыть изображения",
+    "pageCalendarTitle": "Календарь",
+    "jumpToMonthTitle": "Выбрать месяц",
+    "jumpToLogTitle": "Выбрать день",
+    "flashbackOnThisDay": "В этот день",
+    "chartGroupingLabel": "Сгруппировать по",
+    "chartGroupingDay": "День",
+    "chartGroupingWeek": "Неделя",
+    "chartGroupingMonth": "Месяц",
+    "chartGroupingYear": "Год",
+    "settingsOnThisDayDescription": "Вернитесь к прошлым воспоминаниям",
+    "imagesTitle": "Изображения"
 }
