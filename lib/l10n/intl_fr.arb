@@ -231,5 +231,8 @@
     "welcomeLogBodyText": "## Bienvenue dans Daily You\n\n> Chaque jour mérite qu'on s'en souvienne, immortalisez-le !\n\n**Daily You** est gratuit, [open source](https://github.com/Demizo/Daily_You) et soutenu par la communauté. Conçu avec la conviction que votre journal doit vous appartenir, et non être un produit :\n\n- Aucune publicité\n- Aucune fonctionnalité verrouillée\n- Aucun suivi ni collecte de données\n\nQue vous teniez un journal, que vous fassiez de l'introspection ou que vous notiez simplement ce qui vous a fait sourire, **Daily You** vous offre un espace privé qui est _vraiment le vôtre_.",
     "migratingImagesStatus": "Migration des photos… {current}/{total}",
     "selectTagTitle": "Sélectionner une étiquette",
-    "chartDistributionTitle": "Distribution de {tag}"
+    "chartDistributionTitle": "Distribution de {tag}",
+    "streakGreatDays": "{count, plural, other{Bonnes journées {count}}}",
+    "deleteTagMessage": "Supprimer \"{name}\"?{count, plural, =0{} =1{ Il est utilisé dans 1 enregistrement.} other{ Il est utilisé dans {count} enregistrements.}}",
+    "deleteCategoryMessage": "Supprimer \"{name}\"?{count, plural, =0{} =1{ Sa balise sera aussi supprimée.} other{ Les {count} seront aussi supprimées.}}"
 }
