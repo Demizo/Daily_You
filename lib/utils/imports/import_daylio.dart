@@ -2,12 +2,20 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:daily_you/database/app_database.dart';
+import 'package:daily_you/database/entry_tag_dao.dart';
 import 'package:daily_you/database/image_storage.dart';
+import 'package:daily_you/database/tag_category_dao.dart';
+import 'package:daily_you/database/tag_dao.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/image.dart';
+import 'package:daily_you/models/tag.dart';
+import 'package:daily_you/models/tag_category.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/utils/file_layer.dart';
+import 'package:daily_you/utils/tag_name_sanitizer.dart';
 import 'package:daily_you/utils/zip_utils.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -73,6 +81,11 @@ Future<bool> importFromDaylio(
       for (var asset in assets) asset['id']: asset,
     };
 
+    final Map<int, int> tagIdMapping = await _importTags(
+      (parsed['tags'] as List?) ?? const [],
+      (parsed['tag_groups'] as List?) ?? const [],
+    );
+
     const Map<int, int> moodValueMapping = {
       1: 2,
       2: 1,
@@ -132,6 +145,19 @@ Future<bool> importFromDaylio(
                 skipUpdate: true);
           }
         }
+
+        final tagIds = (entry['tags'] as List?)?.cast<int>() ?? [];
+        final addedTagIds = <int>{};
+        for (final tagId in tagIds) {
+          final mappedTagId = tagIdMapping[tagId];
+          if (mappedTagId == null || !addedTagIds.add(mappedTagId)) continue;
+
+          await EntryTagDao.add(EntryTag(
+            entryId: addedEntry.id!,
+            tagId: mappedTagId,
+            timeCreate: datetime,
+          ));
+        }
       }
 
       processedEntries++;
@@ -147,6 +173,8 @@ Future<bool> importFromDaylio(
 
   await EntriesProvider.instance.load();
   await EntryImagesProvider.instance.load();
+  await TagsProvider.instance.load();
+  await AppDatabase.instance.updateExternalDatabase();
 
   if (await File(join(tempDir.path, tempDaylioZip)).exists()) {
     await File(join(tempDir.path, tempDaylioZip)).delete();
@@ -156,4 +184,90 @@ Future<bool> importFromDaylio(
   }
 
   return success;
+}
+
+Future<Map<int, int>> _importTags(
+    List<dynamic> daylioTags, List<dynamic> daylioTagGroups) async {
+  final Map<String, int> categoryIdByName = {};
+  int nextCategoryOrder = 0;
+  for (final category in TagsProvider.instance.categories) {
+    categoryIdByName.putIfAbsent(
+        category.name.toLowerCase(), () => category.id!);
+    if (category.sortOrder >= nextCategoryOrder) {
+      nextCategoryOrder = category.sortOrder + 1;
+    }
+  }
+
+  final Map<String, int> tagIdByName = {};
+  final Map<int?, int> nextTagOrderByCategory = {};
+  for (final tag in TagsProvider.instance.tags) {
+    if (tag.tagType == TagType.label) {
+      tagIdByName.putIfAbsent(tag.name.toLowerCase(), () => tag.id!);
+    }
+    if (tag.sortOrder >= (nextTagOrderByCategory[tag.categoryId] ?? 0)) {
+      nextTagOrderByCategory[tag.categoryId] = tag.sortOrder + 1;
+    }
+  }
+
+  final sortedGroups = List<dynamic>.from(daylioTagGroups)
+    ..sort((a, b) =>
+        ((a['order'] as int?) ?? 0).compareTo((b['order'] as int?) ?? 0));
+
+  final Map<int, int> categoryIdMapping = {};
+  for (final group in sortedGroups) {
+    final groupId = group['id'] as int?;
+    final name = sanitizeTagName((group['name'] as String?) ?? '');
+    if (groupId == null || name.isEmpty) continue;
+
+    var categoryId = categoryIdByName[name.toLowerCase()];
+    if (categoryId == null) {
+      final now = DateTime.now();
+      final addedCategory = await TagCategoryDao.add(TagCategory(
+        name: name,
+        sortOrder: nextCategoryOrder++,
+        timeCreate: now,
+        timeModified: now,
+      ));
+      categoryId = addedCategory.id!;
+      categoryIdByName[name.toLowerCase()] = categoryId;
+    }
+    categoryIdMapping[groupId] = categoryId;
+  }
+
+  final sortedTags = List<dynamic>.from(daylioTags)
+    ..sort((a, b) =>
+        ((a['order'] as int?) ?? 0).compareTo((b['order'] as int?) ?? 0));
+
+  final Map<int, int> tagIdMapping = {};
+  for (final daylioTag in sortedTags) {
+    final daylioTagId = daylioTag['id'] as int?;
+    final name = sanitizeTagName((daylioTag['name'] as String?) ?? '');
+    if (daylioTagId == null || name.isEmpty) continue;
+
+    var tagId = tagIdByName[name.toLowerCase()];
+    if (tagId == null) {
+      // Tags whose group is missing from the backup stay uncategorized
+      final categoryId = categoryIdMapping[daylioTag['id_tag_group']];
+      final createdAt = daylioTag['createdAt'] as int?;
+      final timeCreate = createdAt != null
+          ? DateTime.fromMillisecondsSinceEpoch(createdAt)
+          : DateTime.now();
+      final sortOrder = nextTagOrderByCategory[categoryId] ?? 0;
+      nextTagOrderByCategory[categoryId] = sortOrder + 1;
+
+      final addedTag = await TagDao.add(Tag(
+        categoryId: categoryId,
+        name: name,
+        tagType: TagType.label,
+        sortOrder: sortOrder,
+        timeCreate: timeCreate,
+        timeModified: timeCreate,
+      ));
+      tagId = addedTag.id!;
+      tagIdByName[name.toLowerCase()] = tagId;
+    }
+    tagIdMapping[daylioTagId] = tagId;
+  }
+
+  return tagIdMapping;
 }
