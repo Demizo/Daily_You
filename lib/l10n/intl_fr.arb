@@ -214,7 +214,7 @@
     "noResults": "Aucun résultat…",
     "databaseMigrationErrorTitle": "Déplacement des données impossible",
     "databaseMigrationErrorDescription": "Vos entrées sont en sécurité mais n'ont pas pu être déplacées dans le stockage applicatif.\n\nEssayez de nouveau et signaler ce souci s’il continue de se produire.",
-    "tagTypeTrackerTitle": "Tracker",
+    "tagTypeTrackerTitle": "Compteur",
     "iconPickerTitle": "Choisir une icône",
     "tagFilterModeAny": "N’importe quelle étiquette",
     "tagPickerSortManualLabel": "Ordre manuel",
@@ -233,6 +233,6 @@
     "selectTagTitle": "Sélectionner une étiquette",
     "chartDistributionTitle": "Distribution de {tag}",
     "streakGreatDays": "{count, plural, other{Bonnes journées {count}}}",
-    "deleteTagMessage": "Supprimer \"{name}\"?{count, plural, =0{} =1{ Il est utilisé dans 1 enregistrement.} other{ Il est utilisé dans {count} enregistrements.}}",
-    "deleteCategoryMessage": "Supprimer \"{name}\"?{count, plural, =0{} =1{ Sa balise sera aussi supprimée.} other{ Les {count} seront aussi supprimées.}}"
+    "deleteTagMessage": "Supprimer « {name} » ?{count, plural, =0{} =1{ Il est utilisé dans 1 enregistrement.} other{ Il est utilisé dans {count} enregistrements.}}",
+    "deleteCategoryMessage": "Supprimer « {name} » ?{count, plural, =0{} =1{ Son étiquette  sera aussi supprimée.} other{ Les {count} étiquettes seront aussi supprimées.}}"
 }
