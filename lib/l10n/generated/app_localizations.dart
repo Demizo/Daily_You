@@ -934,6 +934,12 @@ abstract class AppLocalizations {
   /// **'Food & Drink'**
   String get iconGroupFoodDrink;
 
+  /// No description provided for @iconGroupHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get iconGroupHome;
+
   /// No description provided for @iconGroupTravel.
   ///
   /// In en, this message translates to:

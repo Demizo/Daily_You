@@ -440,6 +440,9 @@ class AppLocalizationsMs extends AppLocalizations {
   String get iconGroupFoodDrink => 'Food & Drink';
 
   @override
+  String get iconGroupHome => 'Home';
+
+  @override
   String get iconGroupTravel => 'Travel';
 
   @override
