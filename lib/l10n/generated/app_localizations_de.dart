@@ -492,6 +492,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get iconGroupFoodDrink => 'Essen & Trinken';
 
   @override
+  String get iconGroupHome => 'Home';
+
+  @override
   String get iconGroupTravel => 'Reisen';
 
   @override
