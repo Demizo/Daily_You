@@ -234,5 +234,6 @@
     "chartDistributionTitle": "Distribution de {tag}",
     "streakGreatDays": "{count, plural, other{Bonnes journées {count}}}",
     "deleteTagMessage": "Supprimer « {name} » ?{count, plural, =0{} =1{ Il est utilisé dans 1 enregistrement.} other{ Il est utilisé dans {count} enregistrements.}}",
-    "deleteCategoryMessage": "Supprimer « {name} » ?{count, plural, =0{} =1{ Son étiquette  sera aussi supprimée.} other{ Les {count} étiquettes seront aussi supprimées.}}"
+    "deleteCategoryMessage": "Supprimer « {name} » ?{count, plural, =0{} =1{ Son étiquette  sera aussi supprimée.} other{ Les {count} étiquettes seront aussi supprimées.}}",
+    "iconGroupHome": "Maison"
 }
