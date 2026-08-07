@@ -130,5 +130,10 @@
     "tranferStatus": "転送中...{percent}%",
     "creatingBackupStatus": "バックアップを作成中... {percent}%",
     "restoringBackupStatus": "バックアップを復元中... {percent}%",
-    "cleanUpStatus": "クリーンアップ中…"
+    "cleanUpStatus": "クリーンアップ中…",
+    "actionTakePhoto": "写真を撮る",
+    "actionToday": "今日",
+    "noResults": "結果はありません…",
+    "chartGroupingDay": "日",
+    "chartGroupingWeek": "週"
 }
