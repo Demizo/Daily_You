@@ -4,7 +4,8 @@ import 'package:daily_you/widgets/template_select.dart';
 import 'package:flutter/material.dart';
 
 void showTemplateSelectPopup(
-    BuildContext context, TextEditingController controller) {
+    BuildContext context, TextEditingController controller,
+    {void Function(Template template)? onTemplateSelected}) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -26,6 +27,7 @@ void showTemplateSelectPopup(
           } else {
             controller.text = templateText;
           }
+          onTemplateSelected?.call(template);
         },
       );
     },

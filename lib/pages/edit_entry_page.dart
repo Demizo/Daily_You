@@ -7,13 +7,15 @@ import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/models/template.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/providers/templates_provider.dart';
-import 'package:daily_you/widgets/entry_tag_chips.dart';
+import 'package:daily_you/widgets/tag_attachment_source.dart';
+import 'package:daily_you/widgets/tag_grouped_chip_list.dart';
 import 'package:daily_you/widgets/tag_picker_dialog.dart';
 import 'package:daily_you/widgets/tag_chip.dart';
-import 'package:daily_you/widgets/tracker_value_dialog.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:provider/provider.dart';
 import 'package:daily_you/pages/full_screen_text_editor_page.dart';
 import 'package:daily_you/widgets/edit_toolbar.dart';
 import 'package:daily_you/widgets/entry_image_editable_list.dart';
@@ -64,6 +66,9 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   bool _newEntry = false;
   bool _creatingNewEntry = false;
   Timer? _debounceTimer;
+  late TagAttachmentSource _tagSource;
+  // Tag ids seeded from the default template, or already on the entry
+  late Set<int> _seededTagIds;
 
   Future<void> _initEntry() async {
     if (widget.entry == null) {
@@ -73,9 +78,15 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
               : (widget.overrideCreateDate ?? DateTime.now());
       var text = "";
       final defaultTemplate = TemplatesProvider.instance.getDefaultTemplate();
+      final defaultTagIds = <int>[];
       if (defaultTemplate != null) {
         text = defaultTemplate.text ?? "";
+        defaultTagIds.addAll(TagsProvider.instance
+            .getTemplateTagsForTemplate(defaultTemplate.id!)
+            .map((templateTag) => templateTag.tagId));
       }
+      _tagSource = TagAttachmentSource(
+          supportsValues: true, initialTagIds: defaultTagIds);
       _entry = Entry(
         text: text,
         mood: null,
@@ -88,7 +99,11 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     } else {
       _entry = widget.entry!;
       id = _entry.id ?? -1;
+      _tagSource = TagAttachmentSource.fromEntryTags(
+          TagsProvider.instance.getEntryTagsForEntry(id));
     }
+    _seededTagIds = _tagSource.attachedTagIds.toSet();
+    _tagSource.addListener(_onTagsChanged);
     _lastMood = _entry.mood;
     mood = _entry.mood;
     _lastEntryDate = _entry.timeCreate;
@@ -126,6 +141,8 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     _textEditingController.dispose();
     _undoController.dispose();
     _debounceTimer?.cancel();
+    _tagSource.removeListener(_onTagsChanged);
+    _tagSource.dispose();
     super.dispose();
   }
 
@@ -261,6 +278,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                       controller: _textEditingController,
                       undoController: _undoController,
                       focusNode: _focusNode,
+                      onTemplateInserted: _applyInsertedTemplateTags,
                       trailer: _buildTagsButton(context, theme),
                     ),
                   ),
@@ -306,28 +324,40 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                       "save-entry", Duration(seconds: 5), () => _saveEntry());
                 }),
           ),
-          EntryTagChips(
-            entryId: id,
-            padding: const EdgeInsets.only(left: 8, right: 8, bottom: 8),
-            chipBuilder: (tag, entryTag) => TagChip(
-              tag: tag,
-              value: entryTag.value,
-              onTap: tag.tagType == TagType.tracker
-                  ? () async {
-                      final newValue = await showTrackerValueDialog(
-                          context, tag,
-                          initialValue: entryTag.value);
-                      if (newValue != null) {
-                        await TagsProvider.instance
-                            .updateEntryTag(entryTag.copy(value: newValue));
-                      }
-                    }
-                  : null,
-              onRemove: () => TagsProvider.instance.removeEntryTag(entryTag),
-            ),
-          )
+          _buildTagChips(),
         ],
       ),
+    );
+  }
+
+  Widget _buildTagChips() {
+    const padding = EdgeInsets.only(left: 8, right: 8, bottom: 8);
+    return ListenableBuilder(
+      listenable: _tagSource,
+      builder: (context, _) {
+        final attachedIds = _tagSource.attachedTagIds;
+        if (attachedIds.isEmpty) return const SizedBox.shrink();
+        final tagsProvider = Provider.of<TagsProvider>(context);
+        final attachedSet = attachedIds.toSet();
+        final tagPool = tagsProvider.tags
+            .where((tag) => attachedSet.contains(tag.id))
+            .toList();
+        final sections = tagsProvider.buildSections('', tagPool: tagPool);
+        return Padding(
+          padding: padding,
+          child: TagGroupedChipList(
+            sections: sections,
+            chipBuilder: (tag) => TagChip(
+              tag: tag,
+              value: _tagSource.valueFor(tag.id!),
+              onTap: tag.tagType == TagType.tracker
+                  ? () => _tagSource.editValue(context, tag)
+                  : null,
+              onRemove: () => _tagSource.detach(tag.id!),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -396,17 +426,11 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   Widget _buildTagsButton(BuildContext context, ThemeData theme) {
     return IconButton(
       onPressed: () async {
-        if (id == -1) {
-          await _saveEntry(forceCreate: true);
-        }
-        if (id == -1) return;
-        if (context.mounted) {
-          await showDialog(
-            context: context,
-            builder: (_) =>
-                TagPickerDialog(mode: TagPickerMode.addToEntry, entryId: id),
-          );
-        }
+        await showDialog(
+          context: context,
+          builder: (_) =>
+              TagPickerDialog(mode: TagPickerMode.attach, source: _tagSource),
+        );
       },
       icon: Icon(
         Icons.local_offer_rounded,
@@ -498,7 +522,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     await _saveEntry();
   }
 
-  Future<void> _saveEntry({bool forceCreate = false}) async {
+  Future<void> _saveEntry() async {
     // Saving is guarded since quickly entering and exiting the app could trigger
     // multiple async saves.
     if (_savingEntry == false) {
@@ -515,11 +539,13 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
       final hasMoodChange = updatedEntry.mood != _lastMood;
       final hasDateChange = updatedEntry.timeCreate != _lastEntryDate;
 
+      final hasTagChange = _tagsExceedSeed();
+
       if (_newEntry) {
-        if (forceCreate ||
-            hasTextChange ||
+        if (hasTextChange ||
             hasMoodChange ||
             hasDateChange ||
+            hasTagChange ||
             _currentImages.isNotEmpty) {
           if (Platform.isAndroid &&
               TimeManager.isSameDay(DateTime.now(), updatedEntry.timeCreate)) {
@@ -531,6 +557,8 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
           _lastText = _entry.text;
           _lastMood = _entry.mood;
           _lastEntryDate = _entry.timeCreate;
+          await TagsProvider.instance
+              .setEntryTags(id, _tagSource.toEntryTags(id));
         }
       } else {
         if (hasTextChange || hasMoodChange || hasDateChange) {
@@ -543,6 +571,8 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
           _lastEntryDate = updatedEntry.timeCreate;
           await EntriesProvider.instance.update(updatedEntry);
         }
+        await TagsProvider.instance
+            .setEntryTags(id, _tagSource.toEntryTags(id));
       }
       // Images will update if they changed
       await _saveOrUpdateImage(id);
@@ -592,6 +622,30 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     }
     if (mounted) {
       setState(() {});
+    }
+  }
+
+  void _onTagsChanged() {
+    EasyDebounce.debounce(
+        "save-entry", const Duration(seconds: 5), () => _saveEntry());
+  }
+
+  // Whether the working set holds anything beyond the seeded default tags
+  bool _tagsExceedSeed() {
+    for (final tagId in _tagSource.attachedTagIds) {
+      if (!_seededTagIds.contains(tagId)) return true;
+      if (_tagSource.valueFor(tagId) != null) return true;
+    }
+    return false;
+  }
+
+  void _applyInsertedTemplateTags(Template template) {
+    if (template.id == null) return;
+    final templateTagIds = TagsProvider.instance
+        .getTemplateTagsForTemplate(template.id!)
+        .map((templateTag) => templateTag.tagId);
+    for (final tagId in templateTagIds) {
+      _tagSource.addTagId(tagId);
     }
   }
 

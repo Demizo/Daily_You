@@ -3,24 +3,23 @@ import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/pages/settings/tags_settings.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/widgets/edit_tag.dart';
-import 'package:daily_you/widgets/entry_tag_chips.dart';
+import 'package:daily_you/widgets/tag_attachment_source.dart';
 import 'package:daily_you/widgets/tag_chip.dart';
 import 'package:daily_you/widgets/tag_grouped_chip_list.dart';
-import 'package:daily_you/widgets/tracker_value_dialog.dart';
 import 'package:daily_you/utils/tag_name_sanitizer.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:provider/provider.dart';
 
-enum TagPickerMode { addToEntry, selectSingle, filter }
+enum TagPickerMode { attach, selectSingle, filter }
 
 enum TagFilterMode { all, any }
 
 class TagPickerDialog extends StatefulWidget {
   final TagPickerMode mode;
 
-  // addToEntry
-  final int? entryId;
+  // attach
+  final TagAttachmentSource? source;
 
   // filter
   final List<int> initialSelectedTagIds;
@@ -33,7 +32,7 @@ class TagPickerDialog extends StatefulWidget {
   const TagPickerDialog({
     super.key,
     required this.mode,
-    this.entryId,
+    this.source,
     this.initialSelectedTagIds = const [],
     this.initialFilterMode = TagFilterMode.any,
     this.initialNoTagsOnly = false,
@@ -80,34 +79,7 @@ class _TagPickerDialogState extends State<TagPickerDialog> {
     ConfigProvider.instance.set(ConfigKey.tagPickerSortMode, newMode);
   }
 
-  // addToEntry mode helpers
-
-  Future<void> _addLabelTag(TagsProvider provider, Tag tag) async {
-    await provider.addEntryTag(EntryTag(
-      entryId: widget.entryId!,
-      tagId: tag.id!,
-      timeCreate: DateTime.now(),
-    ));
-  }
-
-  Future<void> _addTrackerTag(TagsProvider provider, Tag tag) async {
-    final value = await showTrackerValueDialog(context, tag);
-    if (value == null) return;
-    await provider.addEntryTag(EntryTag(
-      entryId: widget.entryId!,
-      tagId: tag.id!,
-      value: value,
-      timeCreate: DateTime.now(),
-    ));
-  }
-
-  Future<void> _editTrackerValue(
-      TagsProvider provider, EntryTag entryTag, Tag tag) async {
-    final value = await showTrackerValueDialog(context, tag,
-        initialValue: entryTag.value);
-    if (value == null) return;
-    await provider.updateEntryTag(entryTag.copy(value: value));
-  }
+  // attach mode helpers
 
   Future<void> _createAndAddTagWithName(
       TagsProvider provider, String name) async {
@@ -124,17 +96,10 @@ class _TagPickerDialogState extends State<TagPickerDialog> {
 
     _searchController.clear();
 
-    if (widget.mode == TagPickerMode.addToEntry) {
-      final alreadyAdded = provider
-          .getEntryTagsForEntry(widget.entryId!)
-          .any((entryTag) => entryTag.tagId == newTag.id);
-      if (alreadyAdded) return;
-
-      if (newTag.tagType == TagType.tracker) {
-        if (context.mounted) await _addTrackerTag(provider, newTag);
-      } else {
-        await _addLabelTag(provider, newTag);
-      }
+    if (widget.mode == TagPickerMode.attach) {
+      final source = widget.source!;
+      if (source.contains(newTag.id!)) return;
+      if (mounted) await source.attach(context, newTag);
     }
   }
 
@@ -177,17 +142,26 @@ class _TagPickerDialogState extends State<TagPickerDialog> {
 
   // builders
 
-  Widget _buildAddedChips(TagsProvider provider) {
-    return EntryTagChips(
-      entryId: widget.entryId!,
+  Widget _buildAttachedChips(TagsProvider provider) {
+    final source = widget.source!;
+    final attachedIds = source.attachedTagIds;
+    if (attachedIds.isEmpty) return const SizedBox.shrink();
+    final attachedSet = attachedIds.toSet();
+    final tagPool =
+        provider.tags.where((tag) => attachedSet.contains(tag.id)).toList();
+    final sections = provider.buildSections('', tagPool: tagPool);
+    return Padding(
       padding: const EdgeInsets.only(bottom: 8),
-      chipBuilder: (tag, entryTag) => TagChip(
-        tag: tag,
-        value: entryTag.value,
-        onTap: tag.tagType == TagType.tracker
-            ? () => _editTrackerValue(provider, entryTag, tag)
-            : null,
-        onRemove: () => provider.removeEntryTag(entryTag),
+      child: TagGroupedChipList(
+        sections: sections,
+        chipBuilder: (tag) => TagChip(
+          tag: tag,
+          value: source.valueFor(tag.id!),
+          onTap: (source.supportsValues && tag.tagType == TagType.tracker)
+              ? () => source.editValue(context, tag)
+              : null,
+          onRemove: () => source.detach(tag.id!),
+        ),
       ),
     );
   }
@@ -258,7 +232,7 @@ class _TagPickerDialogState extends State<TagPickerDialog> {
 
   Widget _buildSearchField(AppLocalizations l10n, TagsProvider provider) {
     final showAdd = _searchText.isNotEmpty &&
-        widget.mode == TagPickerMode.addToEntry &&
+        widget.mode == TagPickerMode.attach &&
         !provider.tags
             .any((tag) => tag.name.toLowerCase() == _searchText.toLowerCase());
 
@@ -351,16 +325,25 @@ class _TagPickerDialogState extends State<TagPickerDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final source = widget.source;
+    if (source != null) {
+      // Rebuild when source mutates
+      return ListenableBuilder(
+        listenable: source,
+        builder: (context, _) => _buildDialog(context),
+      );
+    }
+    return _buildDialog(context);
+  }
+
+  Widget _buildDialog(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Consumer<TagsProvider>(
       builder: (context, provider, _) {
-        // Available pool excludes tags already selected/added
+        // Available pool excludes tags already selected/attached
         final List<int> excludedIds;
-        if (widget.mode == TagPickerMode.addToEntry) {
-          excludedIds = provider
-              .getEntryTagsForEntry(widget.entryId!)
-              .map((entryTag) => entryTag.tagId)
-              .toList();
+        if (widget.mode == TagPickerMode.attach) {
+          excludedIds = widget.source!.attachedTagIds;
         } else if (widget.mode == TagPickerMode.filter) {
           excludedIds = _selectedTagIds;
         } else {
@@ -394,7 +377,7 @@ class _TagPickerDialogState extends State<TagPickerDialog> {
 
         final String title;
         switch (widget.mode) {
-          case TagPickerMode.addToEntry:
+          case TagPickerMode.attach:
             title = l10n.addTagsTitle;
           case TagPickerMode.selectSingle:
             title = l10n.selectTagTitle;
@@ -471,8 +454,8 @@ class _TagPickerDialogState extends State<TagPickerDialog> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              if (widget.mode == TagPickerMode.addToEntry)
-                _buildAddedChips(provider),
+              if (widget.mode == TagPickerMode.attach)
+                _buildAttachedChips(provider),
               if (widget.mode == TagPickerMode.filter) ...[
                 _buildFilterSelectedChips(provider),
                 _buildFilterModeToggle(context),
@@ -484,12 +467,8 @@ class _TagPickerDialogState extends State<TagPickerDialog> {
                 chipBuilder: (tag) => TagChip(
                   tag: tag,
                   onTap: () async {
-                    if (widget.mode == TagPickerMode.addToEntry) {
-                      if (tag.tagType == TagType.tracker) {
-                        await _addTrackerTag(provider, tag);
-                      } else {
-                        await _addLabelTag(provider, tag);
-                      }
+                    if (widget.mode == TagPickerMode.attach) {
+                      await widget.source!.attach(context, tag);
                     } else {
                       _addFilterTag(tag.id!);
                     }
@@ -518,7 +497,7 @@ class _TagPickerDialogState extends State<TagPickerDialog> {
     );
 
     switch (widget.mode) {
-      case TagPickerMode.addToEntry:
+      case TagPickerMode.attach:
         return [manageTags, close];
       case TagPickerMode.selectSingle:
         return [close];

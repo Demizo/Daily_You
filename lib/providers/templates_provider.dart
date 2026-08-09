@@ -4,6 +4,7 @@ import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/database/template_dao.dart';
 import 'package:daily_you/models/template.dart';
+import 'package:daily_you/providers/tags_provider.dart';
 import 'package:flutter/material.dart';
 
 class TemplatesProvider with ChangeNotifier {
@@ -21,15 +22,18 @@ class TemplatesProvider with ChangeNotifier {
 
   // CRUD operations
 
-  Future<void> add(Template template) async {
+  Future<Template> add(Template template) async {
     // Insert the template into the database so that it has an ID
     final templateWithId = await TemplateDao.add(template);
     templates.add(templateWithId);
     await AppDatabase.instance.updateExternalDatabase();
     notifyListeners();
+    return templateWithId;
   }
 
   Future<void> remove(Template template) async {
+    await TagsProvider.instance
+        .removeAllTemplateTagsForTemplate(template.id!);
     await TemplateDao.remove(template.id!);
     templates.removeWhere((x) => x.id == template.id);
     await AppDatabase.instance.updateExternalDatabase();

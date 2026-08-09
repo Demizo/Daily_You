@@ -1,13 +1,18 @@
 import 'package:daily_you/template_renderer.dart';
 import 'package:flutter/material.dart';
+import 'package:daily_you/l10n/generated/app_localizations.dart';
 
 class TemplateVariableButton extends StatelessWidget {
   const TemplateVariableButton({
     super.key,
     required this.controller,
+    this.onAddTags,
   });
 
   final TextEditingController controller;
+
+  final VoidCallback? onAddTags;
+  static const String _addTagsAction = '__add_tags__';
 
   void _addVariableToText(BuildContext context, String variable) {
     if (controller.text.isNotEmpty) {
@@ -40,13 +45,25 @@ class TemplateVariableButton extends StatelessWidget {
       padding: const EdgeInsets.all(8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       onSelected: (String newValue) {
+        if (newValue == _addTagsAction) {
+          onAddTags?.call();
+          return;
+        }
         _addVariableToText(context, newValue);
       },
       itemBuilder: (BuildContext context) {
         final options = TemplateRenderer.getVariableList(context);
-        return options.map((TemplateVariable option) {
-          return PopupMenuItem(value: option.value, child: Text(option.label));
-        }).toList();
+        return [
+          ...options.map((TemplateVariable option) {
+            return PopupMenuItem(
+                value: option.value, child: Text(option.label));
+          }),
+          if (onAddTags != null)
+            PopupMenuItem(
+              value: _addTagsAction,
+              child: Text(AppLocalizations.of(context)!.settingsTagsTitle),
+            ),
+        ];
       },
     );
   }
