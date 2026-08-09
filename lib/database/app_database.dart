@@ -108,7 +108,7 @@ class AppDatabase {
 
   Future<void> open() async {
     _database = await openDatabase(_internalPath!,
-        version: 4, onCreate: _createDatabase, onUpgrade: _onUpgrade);
+        version: 5, onCreate: _createDatabase, onUpgrade: _onUpgrade);
 
     await EntriesProvider.instance.load();
     await EntryImagesProvider.instance.load();
@@ -331,6 +331,7 @@ CREATE TABLE $imagesTable (
 ''');
 
     await _createTagTables(db);
+    await _createTemplateTagTable(db);
     await TagsProvider.instance.createDefaultTags();
 
     await _createWelcomeEntry();
@@ -446,6 +447,19 @@ CREATE TABLE $entryTagsTable (
 ''');
   }
 
+  Future<void> _createTemplateTagTable(Database db) async {
+    await db.execute('''
+CREATE TABLE $templateTagsTable (
+    ${TemplateTagFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    ${TemplateTagFields.templateId} INTEGER NOT NULL,
+    ${TemplateTagFields.tagId} INTEGER NOT NULL,
+    ${TemplateTagFields.timeCreate} DATETIME NOT NULL DEFAULT (DATETIME('now')),
+    FOREIGN KEY (${TemplateTagFields.templateId}) REFERENCES $templatesTable (id),
+    FOREIGN KEY (${TemplateTagFields.tagId}) REFERENCES $tagsTable (id)
+)
+''');
+  }
+
   void _onUpgrade(Database db, int oldVersion, int newVersion) async {
     _database = db;
     // In this case, oldVersion is 1, newVersion is 2
@@ -514,6 +528,9 @@ DROP TABLE old_entries;
     if (oldVersion <= 3) {
       await _createTagTables(db);
       await TagsProvider.instance.createDefaultTags();
+    }
+    if (oldVersion <= 4) {
+      await _createTemplateTagTable(db);
     }
   }
 }

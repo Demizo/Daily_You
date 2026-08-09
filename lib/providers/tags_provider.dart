@@ -4,6 +4,7 @@ import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/database/entry_tag_dao.dart';
 import 'package:daily_you/database/tag_category_dao.dart';
 import 'package:daily_you/database/tag_dao.dart';
+import 'package:daily_you/database/template_tag_dao.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/models/tag_category.dart';
@@ -31,6 +32,11 @@ class TagsProvider with ChangeNotifier {
 
   Map<int, List<EntryTag>> _entryTagsByEntry = const {};
 
+  List<TemplateTag> _templateTags = List.empty();
+  List<TemplateTag> get templateTags => _templateTags;
+
+  Map<int, List<TemplateTag>> _templateTagsByTemplate = const {};
+
   void _setEntryTags(List<EntryTag> updated) {
     _entryTags = updated;
     final grouped = <int, List<EntryTag>>{};
@@ -40,10 +46,20 @@ class TagsProvider with ChangeNotifier {
     _entryTagsByEntry = grouped;
   }
 
+  void _setTemplateTags(List<TemplateTag> updated) {
+    _templateTags = updated;
+    final grouped = <int, List<TemplateTag>>{};
+    for (final templateTag in updated) {
+      (grouped[templateTag.templateId] ??= []).add(templateTag);
+    }
+    _templateTagsByTemplate = grouped;
+  }
+
   Future<void> load() async {
     categories = await TagCategoryDao.getAll();
     tags = await TagDao.getAll();
     _setEntryTags(await EntryTagDao.getAll());
+    _setTemplateTags(await TemplateTagDao.getAll());
     notifyListeners();
   }
 
@@ -100,6 +116,10 @@ class TagsProvider with ChangeNotifier {
     await EntryTagDao.removeAllForTag(tag.id!);
     _setEntryTags(
         entryTags.where((entryTag) => entryTag.tagId != tag.id).toList());
+    await TemplateTagDao.removeAllForTag(tag.id!);
+    _setTemplateTags(templateTags
+        .where((templateTag) => templateTag.tagId != tag.id)
+        .toList());
     await TagDao.remove(tag.id!);
     tags = tags.where((existing) => existing.id != tag.id).toList();
     await AppDatabase.instance.updateExternalDatabase();
@@ -165,6 +185,107 @@ class TagsProvider with ChangeNotifier {
     return _entryTagsByEntry[entryId] ?? const [];
   }
 
+  /// Reconciles the tags stored for [entryId] with [desired], adding, removing,
+  /// and updating rows so the database matches.
+  Future<void> setEntryTags(int entryId, List<EntryTag> desired) async {
+    final current = getEntryTagsForEntry(entryId);
+    final currentByTag = {
+      for (final entryTag in current) entryTag.tagId: entryTag
+    };
+    final desiredByTag = {
+      for (final entryTag in desired) entryTag.tagId: entryTag
+    };
+    var changed = false;
+
+    for (final entryTag in current) {
+      if (!desiredByTag.containsKey(entryTag.tagId)) {
+        await EntryTagDao.remove(entryTag.id!);
+        changed = true;
+      }
+    }
+
+    final result = <EntryTag>[];
+    for (final wanted in desired) {
+      final existing = currentByTag[wanted.tagId];
+      if (existing == null) {
+        result.add(await EntryTagDao.add(EntryTag(
+          entryId: entryId,
+          tagId: wanted.tagId,
+          value: wanted.value,
+          timeCreate: wanted.timeCreate,
+        )));
+        changed = true;
+      } else if (existing.value != wanted.value) {
+        final updated = EntryTag(
+          id: existing.id,
+          entryId: entryId,
+          tagId: wanted.tagId,
+          value: wanted.value,
+          timeCreate: existing.timeCreate,
+        );
+        await EntryTagDao.update(updated);
+        result.add(updated);
+        changed = true;
+      } else {
+        result.add(existing);
+      }
+    }
+
+    if (!changed) return;
+
+    final retained =
+        entryTags.where((entryTag) => entryTag.entryId != entryId).toList();
+    _setEntryTags([...retained, ...result]);
+    await AppDatabase.instance.updateExternalDatabase();
+    notifyListeners();
+  }
+
+  /// Reconciles the tags stored for [templateId] with [tagIds], adding and
+  /// removing rows so the database matches.
+  Future<void> setTemplateTags(int templateId, List<int> tagIds) async {
+    final current = getTemplateTagsForTemplate(templateId);
+    final currentIds = current.map((templateTag) => templateTag.tagId).toSet();
+    final desiredIds = tagIds.toSet();
+
+    for (final templateTag in current) {
+      if (!desiredIds.contains(templateTag.tagId)) {
+        await TemplateTagDao.remove(templateTag.id!);
+      }
+    }
+
+    final added = <TemplateTag>[];
+    for (final tagId in tagIds) {
+      if (currentIds.contains(tagId)) continue;
+      added.add(await TemplateTagDao.add(TemplateTag(
+        templateId: templateId,
+        tagId: tagId,
+        timeCreate: DateTime.now(),
+      )));
+    }
+
+    final retained = templateTags
+        .where((templateTag) =>
+            templateTag.templateId != templateId ||
+            desiredIds.contains(templateTag.tagId))
+        .toList();
+    _setTemplateTags([...retained, ...added]);
+    await AppDatabase.instance.updateExternalDatabase();
+    notifyListeners();
+  }
+
+  Future<void> removeAllTemplateTagsForTemplate(int templateId) async {
+    await TemplateTagDao.removeAllForTemplate(templateId);
+    _setTemplateTags(templateTags
+        .where((templateTag) => templateTag.templateId != templateId)
+        .toList());
+    await AppDatabase.instance.updateExternalDatabase();
+    notifyListeners();
+  }
+
+  List<TemplateTag> getTemplateTagsForTemplate(int templateId) {
+    return _templateTagsByTemplate[templateId] ?? const [];
+  }
+
   int entryCountForTag(int tagId) {
     return entryTags
         .where((entryTag) => entryTag.tagId == tagId)
@@ -216,9 +337,14 @@ class TagsProvider with ChangeNotifier {
         tags.where((tag) => tag.categoryId == category.id).toList();
     for (final tag in affected) {
       await EntryTagDao.removeAllForTag(tag.id!);
+      await TemplateTagDao.removeAllForTag(tag.id!);
     }
     _setEntryTags(entryTags
         .where((entryTag) => !affected.any((tag) => tag.id == entryTag.tagId))
+        .toList());
+    _setTemplateTags(templateTags
+        .where((templateTag) =>
+            !affected.any((tag) => tag.id == templateTag.tagId))
         .toList());
     for (final tag in affected) {
       await TagDao.remove(tag.id!);

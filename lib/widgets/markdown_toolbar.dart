@@ -1,4 +1,5 @@
 import 'package:daily_you/config_provider.dart';
+import 'package:daily_you/models/template.dart';
 import 'package:daily_you/widgets/template_select_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -21,12 +22,16 @@ class MarkdownToolbar extends StatefulWidget {
   final TextEditingController controller;
   final FocusNode focusNode;
   final UndoHistoryController? undoController;
+  final bool showTemplateButton;
+  final void Function(Template template)? onTemplateInserted;
 
   const MarkdownToolbar({
     super.key,
     required this.controller,
     required this.focusNode,
     this.undoController,
+    this.showTemplateButton = true,
+    this.onTemplateInserted,
   });
 
   @override
@@ -210,19 +215,22 @@ class _MarkdownToolbarState extends State<MarkdownToolbar> {
     }
 
     // Template insert
-    entries.add(_ToolbarEntry(
-      width: _buttonWidth,
-      isDivider: false,
-      build: (ctx, closePopup) => IconButton(
-        padding: EdgeInsets.zero,
-        visualDensity: VisualDensity.compact,
-        icon: const Icon(Icons.note_add_rounded, size: 24),
-        onPressed: () {
-          closePopup?.call();
-          showTemplateSelectPopup(ctx, widget.controller);
-        },
-      ),
-    ));
+    if (widget.showTemplateButton) {
+      entries.add(_ToolbarEntry(
+        width: _buttonWidth,
+        isDivider: false,
+        build: (ctx, closePopup) => IconButton(
+          padding: EdgeInsets.zero,
+          visualDensity: VisualDensity.compact,
+          icon: const Icon(Icons.note_add_rounded, size: 24),
+          onPressed: () {
+            closePopup?.call();
+            showTemplateSelectPopup(ctx, widget.controller,
+                onTemplateSelected: widget.onTemplateInserted);
+          },
+        ),
+      ));
+    }
 
     // Markdown controls
     if (entries.isNotEmpty) addDivider();

@@ -2,6 +2,7 @@ import 'package:daily_you/models/tag_icon_type.dart';
 
 const String tagsTable = 'tags';
 const String entryTagsTable = 'entry_tags';
+const String templateTagsTable = 'template_tags';
 
 enum TagType {
   label,
@@ -167,5 +168,55 @@ class EntryTag {
         EntryTagFields.tagId: tagId,
         EntryTagFields.value: value,
         EntryTagFields.timeCreate: timeCreate.toIso8601String(),
+      };
+}
+
+class TemplateTagFields {
+  static const List<String> values = [id, templateId, tagId, timeCreate];
+  static const String id = 'id';
+  static const String templateId = 'template_id';
+  static const String tagId = 'tag_id';
+  static const String timeCreate = 'time_create';
+}
+
+class TemplateTag {
+  final int? id;
+  final int templateId;
+  final int tagId;
+  final DateTime timeCreate;
+
+  const TemplateTag({
+    this.id,
+    required this.templateId,
+    required this.tagId,
+    required this.timeCreate,
+  });
+
+  TemplateTag copy({
+    int? id,
+    int? templateId,
+    int? tagId,
+    DateTime? timeCreate,
+  }) =>
+      TemplateTag(
+        id: id ?? this.id,
+        templateId: templateId ?? this.templateId,
+        tagId: tagId ?? this.tagId,
+        timeCreate: timeCreate ?? this.timeCreate,
+      );
+
+  static TemplateTag fromJson(Map<String, Object?> json) => TemplateTag(
+        id: json[TemplateTagFields.id] as int?,
+        templateId: json[TemplateTagFields.templateId] as int,
+        tagId: json[TemplateTagFields.tagId] as int,
+        timeCreate:
+            DateTime.parse(json[TemplateTagFields.timeCreate] as String),
+      );
+
+  Map<String, Object?> toJson() => {
+        TemplateTagFields.id: id,
+        TemplateTagFields.templateId: templateId,
+        TemplateTagFields.tagId: tagId,
+        TemplateTagFields.timeCreate: timeCreate.toIso8601String(),
       };
 }
