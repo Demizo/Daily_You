@@ -235,5 +235,6 @@
     "labelPresentLabel": "已設定",
     "labelAbsentLabel": "未設定",
     "labelCoverageLabel": "覆蓋率",
-    "chartDistributionTitle": "{tag} 分佈"
+    "chartDistributionTitle": "{tag} 分佈",
+    "iconGroupHome": "家"
 }
