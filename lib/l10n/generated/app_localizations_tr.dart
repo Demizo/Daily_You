@@ -42,7 +42,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get settingsFlashbacksExcludeBadDays => 'Kötü günleri çıkar';
 
   @override
-  String get flaskbacksEmpty => 'Henüz geçmiş yok…';
+  String get flaskbacksEmpty => 'Henüz Geçmiş Yok…';
 
   @override
   String get flashbackGoodDay => 'İyi Bir Gün';
@@ -90,7 +90,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get pageGalleryTitle => 'Galeri';
 
   @override
-  String get searchLogsHint => 'Kayıt ara…';
+  String get searchLogsHint => 'Kayıt Ara…';
 
   @override
   String logCount(num count) {
@@ -156,7 +156,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get statisticsRangeOneYear => '1 yıl';
 
   @override
-  String get statisticsRangeAllTime => 'Tüm zamanlar';
+  String get statisticsRangeAllTime => 'Tüm Zamanlar';
 
   @override
   String chartSummaryTitle(Object tag) {
@@ -170,7 +170,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String chartOverTimeTitle(Object tag) {
-    return '$tag zaman içerisinde';
+    return '$tag Zaman İçerisinde';
   }
 
   @override
@@ -233,7 +233,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get errorExternalStorageAccessTitle =>
-      'Harici depolamaya erişilemiyor';
+      'Harici Depolamaya Erişilemiyor';
 
   @override
   String get errorExternalStorageAccessDescription =>
@@ -241,20 +241,20 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get errorExternalStorageAccessContinue =>
-      'Yerel veri tabanı ile devam edin';
+      'Yerel Veri Tabanı ile Devam Edin';
 
   @override
-  String get databaseMigrationErrorTitle => 'Couldn\'t Move Your Data';
+  String get databaseMigrationErrorTitle => 'Verinizi Taşıyamadık';
 
   @override
   String get databaseMigrationErrorDescription =>
       'Your entries are safe but couldn\'t be moved to the app\'s storage.\n\nTry again, and report the issue if it keeps happening.';
 
   @override
-  String get databaseMigrationErrorRetry => 'Retry';
+  String get databaseMigrationErrorRetry => 'Yeniden Dene';
 
   @override
-  String get errorReport => 'Report Issue';
+  String get errorReport => 'Sorun Bildir';
 
   @override
   String get lastModified => 'Değişiklik';
@@ -266,16 +266,16 @@ class AppLocalizationsTr extends AppLocalizations {
   String get titleHint => 'Başlık…';
 
   @override
-  String get deleteLogTitle => 'Kaydı sil';
+  String get deleteLogTitle => 'Kaydı Sil';
 
   @override
-  String get deleteLogDescription => 'Bu kaydı silmek istiyor musun?';
+  String get deleteLogDescription => 'Bu kaydı silmek istiyor musunuz?';
 
   @override
-  String get deletePhotoTitle => 'Fotoğrafı sil';
+  String get deletePhotoTitle => 'Fotoğrafı Sil';
 
   @override
-  String get deletePhotoDescription => 'Bu fotoğrafı silmek istiyor musun?';
+  String get deletePhotoDescription => 'Bu fotoğrafı silmek istiyor musunuz?';
 
   @override
   String get pageSettingsTitle => 'Ayarlar';
@@ -299,22 +299,22 @@ class AppLocalizationsTr extends AppLocalizations {
   String get themeAmoled => 'AMOLED';
 
   @override
-  String get settingsFirstDayOfWeek => 'Haftanın ilk günü';
+  String get settingsFirstDayOfWeek => 'Haftanın İlk Günü';
 
   @override
   String get settingsCalendarSystem => 'Takvim Sistemi';
 
   @override
-  String get calendarSystemGregorian => 'Gregoryen';
+  String get calendarSystemGregorian => 'Miladi';
 
   @override
   String get calendarSystemJalali => 'Celali';
 
   @override
-  String get settingsUseSystemAccentColor => 'Sistem vurgu rengini kullan';
+  String get settingsUseSystemAccentColor => 'Sistem Vurgu Rengini Kullan';
 
   @override
-  String get settingsCustomAccentColor => 'Özel vurgu rengi';
+  String get settingsCustomAccentColor => 'Özel Vurgu Rengi';
 
   @override
   String get settingsShowMarkdownToolbar => 'Markdown araç çubuğunu göster';
@@ -323,7 +323,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get settingsShowFlashbacks => 'Bilgi Kartlarını Göster';
 
   @override
-  String get settingsChangeMoodIcons => 'Ruh hali simgelerini değiştir';
+  String get settingsChangeMoodIcons => 'Ruh Hali Simgelerini Değiştir';
 
   @override
   String get moodIconPrompt => 'Bir simge belirleyin';
@@ -335,10 +335,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get settingsGalleryViewLayout => 'Galeri Görünüm Düzeni';
 
   @override
-  String get settingsHideImagesInGallery => 'Görüntüleri galeride gizle';
+  String get settingsHideImagesInGallery => 'Görüntüleri Galeride Gizle';
 
   @override
-  String get settingsHideImages => 'Resimleri gizle';
+  String get settingsHideImages => 'Resimleri Gizle';
 
   @override
   String get pageCalendarTitle => 'Takvim';
@@ -370,36 +370,36 @@ class AppLocalizationsTr extends AppLocalizations {
   String get settingsDailyReminderDescription => 'Her gün nazik bir hatırlatma';
 
   @override
-  String get settingsReminderTime => 'Hatırlatma zamanı';
+  String get settingsReminderTime => 'Hatırlatma Zamanı';
 
   @override
-  String get settingsFixedReminderTimeTitle => 'Sabit hatırlatma zamanı';
+  String get settingsFixedReminderTimeTitle => 'Sabit Hatırlatma Zamanı';
 
   @override
   String get settingsFixedReminderTimeDescription =>
       'Hatırlatma için sabit bir zaman seçin';
 
   @override
-  String get settingsAlwaysSendReminderTitle => 'Daima hatırlatma gönder';
+  String get settingsAlwaysSendReminderTitle => 'Daima Hatırlatma Gönder';
 
   @override
   String get settingsAlwaysSendReminderDescription =>
       'Bir kayıt açılmış olsa bile hatırlatma gönder';
 
   @override
-  String get settingsCustomizeNotificationTitle => 'Bildirimleri özelleştirin';
+  String get settingsCustomizeNotificationTitle => 'Bildirimleri Özelleştirin';
 
   @override
   String get settingsTemplatesTitle => 'Şablonlar';
 
   @override
-  String get settingsDefaultTemplate => 'Varsayılan şablon';
+  String get settingsDefaultTemplate => 'Varsayılan Şablon';
 
   @override
-  String get manageTemplates => 'Şablonları yönet';
+  String get manageTemplates => 'Şablonları Yönet';
 
   @override
-  String get addTemplate => 'Bir şablon ekle';
+  String get addTemplate => 'Bir Şablon Ekle';
 
   @override
   String get newTemplate => 'Yeni şablon';
@@ -436,79 +436,79 @@ class AppLocalizationsTr extends AppLocalizations {
       '### Bugün hakkında neyi sevdiniz?\n- \n\n### Ne için şükrediyorsunuz?\n- \n\n### Neyi dört gözle bekliyorsunuz?\n- ';
 
   @override
-  String get settingsTagsTitle => 'Tags';
+  String get settingsTagsTitle => 'Etiketler';
 
   @override
-  String get manageTags => 'Manage Tags';
+  String get manageTags => 'Etiketleri Yönet';
 
   @override
-  String get tagTypeLabelTitle => 'Label';
+  String get tagTypeLabelTitle => '';
 
   @override
-  String get tagTypeTrackerTitle => 'Tracker';
+  String get tagTypeTrackerTitle => 'İzleyici';
 
   @override
-  String get nameHint => 'Name';
+  String get nameHint => 'İsim';
 
   @override
-  String get tagColorLabel => 'Color';
+  String get tagColorLabel => 'Renk';
 
   @override
-  String get iconPickerTitle => 'Choose Icon';
+  String get iconPickerTitle => 'Simge Seç';
 
   @override
-  String get iconPickerIconsTab => 'Icons';
+  String get iconPickerIconsTab => 'Simgeler';
 
   @override
-  String get iconPickerCustomTab => 'Custom';
+  String get iconPickerCustomTab => 'Özel';
 
   @override
-  String get iconPickerSearchHint => 'Search icons…';
+  String get iconPickerSearchHint => 'Simge ara…';
 
   @override
-  String get colorPickerTitle => 'Choose Color';
+  String get colorPickerTitle => 'Renk Seç';
 
   @override
-  String get colorPickerPaletteTab => 'Colors';
+  String get colorPickerPaletteTab => 'Renkler';
 
   @override
-  String get iconGroupMoodPeople => 'Mood & People';
+  String get iconGroupMoodPeople => 'Ruh Hâli & İnsanlar';
 
   @override
-  String get iconGroupHealth => 'Health';
+  String get iconGroupHealth => 'Sağlık';
 
   @override
-  String get iconGroupWorkFinance => 'Work & Finance';
+  String get iconGroupWorkFinance => 'İş & Finans';
 
   @override
-  String get iconGroupHabitsGoals => 'Habits & Goals';
+  String get iconGroupHabitsGoals => 'Alışkanlıklar & Hedefler';
 
   @override
-  String get iconGroupNature => 'Nature';
+  String get iconGroupNature => 'Doğa';
 
   @override
-  String get iconGroupFoodDrink => 'Food & Drink';
+  String get iconGroupFoodDrink => 'Yemek & İçecek';
 
   @override
-  String get iconGroupHome => 'Home';
+  String get iconGroupHome => 'Ev';
 
   @override
-  String get iconGroupTravel => 'Travel';
+  String get iconGroupTravel => 'Yolculuk';
 
   @override
-  String get iconGroupSymbols => 'Symbols';
+  String get iconGroupSymbols => 'Semboller';
 
   @override
-  String get tagCategoryLabel => 'Category';
+  String get tagCategoryLabel => 'Kategori';
 
   @override
-  String get tagCategoryUncategorized => 'Uncategorized';
+  String get tagCategoryUncategorized => 'Kategori edilmemiş';
 
   @override
-  String get newCategoryTitle => 'New Category';
+  String get newCategoryTitle => 'Yeni Kategori';
 
   @override
-  String get deleteTitle => 'Delete';
+  String get deleteTitle => 'Sil';
 
   @override
   String deleteTagMessage(num count, Object name) {
@@ -535,79 +535,79 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
-  String get filterTagsTitle => 'Filter';
+  String get filterTagsTitle => 'Filtre';
 
   @override
-  String get tagFilterModeAny => 'Any Tag';
+  String get tagFilterModeAny => 'Herhangi Bir Etiket';
 
   @override
-  String get tagFilterModeAll => 'All Tags';
+  String get tagFilterModeAll => 'Bütün Etiketler';
 
   @override
-  String get clearAllFilters => 'Clear All';
+  String get clearAllFilters => 'Hepsini Temizle';
 
   @override
-  String get noTagsFilterLabel => 'No Tags';
+  String get noTagsFilterLabel => 'Etiket Yok';
 
   @override
-  String get addTagsTitle => 'Add Tags';
+  String get addTagsTitle => 'Etiketler Ekle';
 
   @override
-  String get addTagsSearchHint => 'Search tags…';
+  String get addTagsSearchHint => 'Etiketleri ara…';
 
   @override
-  String get tagPickerSortManualLabel => 'Manual order';
+  String get tagPickerSortManualLabel => 'Manuel sıralama';
 
   @override
-  String get tagPickerSortUsageLabel => 'Sort by usage';
+  String get tagPickerSortUsageLabel => 'Kullanıma göre sırala';
 
   @override
-  String get tagFavoriteName => 'Favorite';
+  String get tagFavoriteName => 'Favori';
 
   @override
-  String get tagEnergyName => 'Energy';
+  String get tagEnergyName => 'Enerji';
 
   @override
-  String get tagCategoryActivitiesName => 'Activities';
+  String get tagCategoryActivitiesName => 'Aktiviteler';
 
   @override
-  String get tagExerciseName => 'Exercise';
+  String get tagExerciseName => 'Egzersiz';
 
   @override
-  String get tagSocializingName => 'Socializing';
+  String get tagSocializingName => 'Sosyalleşme';
 
   @override
-  String get tagHobbyName => 'Hobby';
+  String get tagHobbyName => 'Hobi';
 
   @override
-  String get tagEntertainmentName => 'Entertainment';
+  String get tagEntertainmentName => 'Eğlence';
 
   @override
-  String get tagDiningName => 'Dining';
+  String get tagDiningName => 'Yemek';
 
   @override
-  String get tagChoresName => 'Chores';
+  String get tagChoresName => 'Ev işleri';
 
   @override
-  String get tagCategoryEmotionsName => 'Emotions';
+  String get tagCategoryEmotionsName => 'Duygular';
 
   @override
-  String get tagExcitedName => 'Excited';
+  String get tagExcitedName => 'Heyecanlı';
 
   @override
-  String get tagGratefulName => 'Grateful';
+  String get tagGratefulName => 'Minnettar';
 
   @override
-  String get tagCalmName => 'Calm';
+  String get tagCalmName => 'Sakin';
 
   @override
-  String get tagTiredName => 'Tired';
+  String get tagTiredName => 'Yorgun';
 
   @override
-  String get tagAnxiousName => 'Anxious';
+  String get tagAnxiousName => 'Kaygılı';
 
   @override
-  String get tagAnnoyedName => 'Annoyed';
+  String get tagAnnoyedName => 'Sinirli';
 
   @override
   String get welcomeLogBodyText =>
@@ -617,7 +617,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get settingsStorageTitle => 'Depolama';
 
   @override
-  String get settingsImageQuality => 'Görüntü kalitesi';
+  String get settingsImageQuality => 'Görüntü Kalitesi';
 
   @override
   String get imageQualityHigh => 'Yüksek';
@@ -632,10 +632,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get imageQualityNoCompression => 'Sıkıştırmadan';
 
   @override
-  String get settingsLogFolder => 'Kayıt klasörü';
+  String get settingsLogFolder => 'Kayıt Klasörü';
 
   @override
-  String get settingsImageFolder => 'Görüntü klasörü';
+  String get settingsImageFolder => 'Görüntü Klasörü';
 
   @override
   String get warningTitle => 'Uyarı';
@@ -679,12 +679,12 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String creatingBackupStatus(Object percent) {
-    return 'Yedekleme oluşturuluyor… $percent%';
+    return 'Yedekleme Oluşturuluyor… $percent%';
   }
 
   @override
   String restoringBackupStatus(Object percent) {
-    return 'Yedekleme geri yükleniyor… $percent%';
+    return 'Yedekleme Geri Yükleniyor… $percent%';
   }
 
   @override
@@ -692,7 +692,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String migratingImagesStatus(Object current, Object total) {
-    return 'Migrating photos… $current/$total';
+    return 'Fotoğraflar aktarılıyor… $current/$total';
   }
 
   @override
@@ -715,13 +715,13 @@ class AppLocalizationsTr extends AppLocalizations {
   String get settingsImport => 'İçe aktar';
 
   @override
-  String get settingsImportFromAnotherApp => 'Başka bir uygulamadan içe aktar';
+  String get settingsImportFromAnotherApp => 'Başka Bir Uygulamadan İçe Aktar';
 
   @override
   String get settingsTranslateCallToAction => 'Herkes bir günlüğe erişebilir!';
 
   @override
-  String get settingsHelpTranslate => 'Çeviri yardımı';
+  String get settingsHelpTranslate => 'Çeviri Yardımı';
 
   @override
   String get importLogs => 'Kayıtları içe aktar';
@@ -730,7 +730,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get importImages => 'Görselleri içe aktar';
 
   @override
-  String get logFormatTitle => 'Biçim seçin';
+  String get logFormatTitle => 'Biçim Seçin';
 
   @override
   String get logFormatDescription =>
@@ -764,7 +764,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get formatMarkdown => 'Markdown';
 
   @override
-  String get settingsDeleteAllLogsTitle => 'Tüm kayıtları sil';
+  String get settingsDeleteAllLogsTitle => 'Tüm Kayıtları Sil';
 
   @override
   String get settingsDeleteAllLogsDescription =>
@@ -821,7 +821,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get settingsSecurityBiometricUnlock => 'Biyometrik Açma';
 
   @override
-  String get unlockAppPrompt => 'Uygulamayı Aç';
+  String get unlockAppPrompt => 'Uygulamayı aç';
 
   @override
   String get settingsAboutTitle => 'Hakkında';
@@ -836,7 +836,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get licenseGPLv3 => 'GPL-3.0';
 
   @override
-  String get settingsSourceCode => 'Kaynak kodu';
+  String get settingsSourceCode => 'Kaynak Kodu';
 
   @override
   String get settingsMadeWithLove => '❤️ ile yapılmıştır';
@@ -848,16 +848,16 @@ class AppLocalizationsTr extends AppLocalizations {
   String get imagesTitle => 'Resimler';
 
   @override
-  String get tagMoodTitle => 'Ruh hali';
+  String get tagMoodTitle => 'Ruh hâli';
 
   @override
-  String get calendarTagDisplayLabel => 'Tag';
+  String get calendarTagDisplayLabel => 'Etiket';
 
   @override
-  String get selectTagTitle => 'Select Tag';
+  String get selectTagTitle => 'Etiket Seç';
 
   @override
-  String get labelPresentLabel => 'Present';
+  String get labelPresentLabel => 'Şimdi';
 
   @override
   String get labelAbsentLabel => 'Absent';

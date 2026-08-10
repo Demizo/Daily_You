@@ -216,7 +216,7 @@ class AppLocalizationsDe extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Great Days $count',
+      other: 'Großartige Tage $count',
     );
     return '$_temp0';
   }
@@ -492,7 +492,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get iconGroupFoodDrink => 'Essen & Trinken';
 
   @override
-  String get iconGroupHome => 'Home';
+  String get iconGroupHome => 'Start';
 
   @override
   String get iconGroupTravel => 'Reisen';

@@ -18,10 +18,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get dailyReminderDescription => '今日の日記を残しましょう…';
 
   @override
-  String get actionTakePhoto => 'Take photo';
+  String get actionTakePhoto => '写真を撮る';
 
   @override
-  String get actionToday => 'Today';
+  String get actionToday => '今日';
 
   @override
   String get actionOtherDay => 'Other day';
@@ -129,7 +129,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get noLogs => 'まだ記録はありません…';
 
   @override
-  String get noResults => 'No Results…';
+  String get noResults => '結果はありません…';
 
   @override
   String get sortDateTitle => '日付';
@@ -177,10 +177,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get chartGroupingLabel => 'Group by';
 
   @override
-  String get chartGroupingDay => 'Day';
+  String get chartGroupingDay => '日';
 
   @override
-  String get chartGroupingWeek => 'Week';
+  String get chartGroupingWeek => '週';
 
   @override
   String get chartGroupingMonth => 'Month';

@@ -129,7 +129,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get noLogs => '暂无日迹…';
 
   @override
-  String get noResults => 'No Results…';
+  String get noResults => '无结果…';
 
   @override
   String get sortDateTitle => '日期';
@@ -216,7 +216,7 @@ class AppLocalizationsZh extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Great Days $count',
+      other: '美好的日子 $count',
     );
     return '$_temp0';
   }
@@ -242,17 +242,17 @@ class AppLocalizationsZh extends AppLocalizations {
   String get errorExternalStorageAccessContinue => '继续使用本地数据库';
 
   @override
-  String get databaseMigrationErrorTitle => 'Couldn\'t Move Your Data';
+  String get databaseMigrationErrorTitle => '无法移动你的数据';
 
   @override
   String get databaseMigrationErrorDescription =>
-      'Your entries are safe but couldn\'t be moved to the app\'s storage.\n\nTry again, and report the issue if it keeps happening.';
+      '您的数据是安全的，但无法移动到应用的储存中。\n\n请重试，如果问题复现，请报告这个问题。';
 
   @override
-  String get databaseMigrationErrorRetry => 'Retry';
+  String get databaseMigrationErrorRetry => '重试';
 
   @override
-  String get errorReport => 'Report Issue';
+  String get errorReport => '报告问题';
 
   @override
   String get lastModified => '最后修改时间';
@@ -429,90 +429,90 @@ class AppLocalizationsZh extends AppLocalizations {
       '### 你今天最享受的是什么？\n- \n\n### 你感恩什么？\n- \n\n### 你期待什么？\n- ';
 
   @override
-  String get settingsTagsTitle => 'Tags';
+  String get settingsTagsTitle => '标签';
 
   @override
-  String get manageTags => 'Manage Tags';
+  String get manageTags => '管理标签';
 
   @override
-  String get tagTypeLabelTitle => 'Label';
+  String get tagTypeLabelTitle => '标签';
 
   @override
-  String get tagTypeTrackerTitle => 'Tracker';
+  String get tagTypeTrackerTitle => '追踪器';
 
   @override
-  String get nameHint => 'Name';
+  String get nameHint => '名称';
 
   @override
-  String get tagColorLabel => 'Color';
+  String get tagColorLabel => '颜色';
 
   @override
-  String get iconPickerTitle => 'Choose Icon';
+  String get iconPickerTitle => '选择图标';
 
   @override
-  String get iconPickerIconsTab => 'Icons';
+  String get iconPickerIconsTab => '图标';
 
   @override
-  String get iconPickerCustomTab => 'Custom';
+  String get iconPickerCustomTab => '自定义';
 
   @override
-  String get iconPickerSearchHint => 'Search icons…';
+  String get iconPickerSearchHint => '搜索图标…';
 
   @override
-  String get colorPickerTitle => 'Choose Color';
+  String get colorPickerTitle => '选择颜色';
 
   @override
-  String get colorPickerPaletteTab => 'Colors';
+  String get colorPickerPaletteTab => '颜色';
 
   @override
-  String get iconGroupMoodPeople => 'Mood & People';
+  String get iconGroupMoodPeople => '心情与人物';
 
   @override
-  String get iconGroupHealth => 'Health';
+  String get iconGroupHealth => '健康';
 
   @override
-  String get iconGroupWorkFinance => 'Work & Finance';
+  String get iconGroupWorkFinance => '工作&金融';
 
   @override
-  String get iconGroupHabitsGoals => 'Habits & Goals';
+  String get iconGroupHabitsGoals => '习惯&目标';
 
   @override
-  String get iconGroupNature => 'Nature';
+  String get iconGroupNature => '自然';
 
   @override
-  String get iconGroupFoodDrink => 'Food & Drink';
+  String get iconGroupFoodDrink => '餐饮';
 
   @override
   String get iconGroupHome => 'Home';
 
   @override
-  String get iconGroupTravel => 'Travel';
+  String get iconGroupTravel => '旅行';
 
   @override
-  String get iconGroupSymbols => 'Symbols';
+  String get iconGroupSymbols => '符号';
 
   @override
-  String get tagCategoryLabel => 'Category';
+  String get tagCategoryLabel => '分类';
 
   @override
-  String get tagCategoryUncategorized => 'Uncategorized';
+  String get tagCategoryUncategorized => '未分类';
 
   @override
-  String get newCategoryTitle => 'New Category';
+  String get newCategoryTitle => '新分类';
 
   @override
-  String get deleteTitle => 'Delete';
+  String get deleteTitle => '删除';
 
   @override
   String deleteTagMessage(num count, Object name) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: ' It is used in $count logs.',
-      one: ' It is used in 1 log.',
+      other: ' 它被用于 $count 条记录中。',
+      one: ' 它被用于 1 条记录中。',
       zero: '',
     );
-    return 'Delete \"$name\"?$_temp0';
+    return '删除「$name」？$_temp0';
   }
 
   @override
@@ -520,91 +520,91 @@ class AppLocalizationsZh extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: ' Its $count tags will also be deleted.',
-      one: ' Its 1 tag will also be deleted.',
+      other: '其 $count 个标签也将被删除。',
+      one: '其 1 个标签也将被删除。',
       zero: '',
     );
-    return 'Delete \"$name\"?$_temp0';
+    return '删除「$name」？$_temp0';
   }
 
   @override
-  String get filterTagsTitle => 'Filter';
+  String get filterTagsTitle => '过滤器';
 
   @override
-  String get tagFilterModeAny => 'Any Tag';
+  String get tagFilterModeAny => '任意标签';
 
   @override
-  String get tagFilterModeAll => 'All Tags';
+  String get tagFilterModeAll => '所有标签';
 
   @override
-  String get clearAllFilters => 'Clear All';
+  String get clearAllFilters => '清除全部';
 
   @override
-  String get noTagsFilterLabel => 'No Tags';
+  String get noTagsFilterLabel => '无标签';
 
   @override
-  String get addTagsTitle => 'Add Tags';
+  String get addTagsTitle => '添加标签';
 
   @override
-  String get addTagsSearchHint => 'Search tags…';
+  String get addTagsSearchHint => '搜索标签…';
 
   @override
-  String get tagPickerSortManualLabel => 'Manual order';
+  String get tagPickerSortManualLabel => '手动排序';
 
   @override
-  String get tagPickerSortUsageLabel => 'Sort by usage';
+  String get tagPickerSortUsageLabel => '按使用次数排序';
 
   @override
-  String get tagFavoriteName => 'Favorite';
+  String get tagFavoriteName => '我的最爱';
 
   @override
-  String get tagEnergyName => 'Energy';
+  String get tagEnergyName => '能量';
 
   @override
-  String get tagCategoryActivitiesName => 'Activities';
+  String get tagCategoryActivitiesName => '活动';
 
   @override
-  String get tagExerciseName => 'Exercise';
+  String get tagExerciseName => '锻炼';
 
   @override
-  String get tagSocializingName => 'Socializing';
+  String get tagSocializingName => '社交';
 
   @override
-  String get tagHobbyName => 'Hobby';
+  String get tagHobbyName => '爱好';
 
   @override
-  String get tagEntertainmentName => 'Entertainment';
+  String get tagEntertainmentName => '娱乐';
 
   @override
-  String get tagDiningName => 'Dining';
+  String get tagDiningName => '用餐';
 
   @override
-  String get tagChoresName => 'Chores';
+  String get tagChoresName => '家务';
 
   @override
-  String get tagCategoryEmotionsName => 'Emotions';
+  String get tagCategoryEmotionsName => '情绪';
 
   @override
-  String get tagExcitedName => 'Excited';
+  String get tagExcitedName => '激动';
 
   @override
-  String get tagGratefulName => 'Grateful';
+  String get tagGratefulName => '感激';
 
   @override
-  String get tagCalmName => 'Calm';
+  String get tagCalmName => '冷静';
 
   @override
-  String get tagTiredName => 'Tired';
+  String get tagTiredName => '疲倦';
 
   @override
-  String get tagAnxiousName => 'Anxious';
+  String get tagAnxiousName => '焦虑';
 
   @override
-  String get tagAnnoyedName => 'Annoyed';
+  String get tagAnnoyedName => '懊恼';
 
   @override
   String get welcomeLogBodyText =>
-      '## Welcome to Daily You\n\n> Every day is worth remembering, capture it!\n\n**Daily You** is free, [open source](https://github.com/Demizo/Daily_You), and community supported. Built around the belief that your diary should be yours, not a product:\n\n- No ads\n- No locked features\n- No tracking or data collection\n\nWhether you\'re journaling, reflecting, or just noting what made you smile, **Daily You** gives you a private space that\'s _truly your own_.';
+      '## 欢迎使用 Daily You\n\n> 每一天都值得被记住、捕捉下来！\n\n**Daily You** 是免费的、[开源](https://github.com/Demizo/Daily_You)的，并由社区支持。建立在「你的日记应该属于你，而不是某个产品」这样的理念之上：\n\n- 无广告\n- 无锁定功能\n- 无追踪或资料收集\n\n无论你是在写日记、反思，或者只是记录让你开心的瞬间，**Daily You** 都为你提供一个_真正属于你_的私密空间。';
 
   @override
   String get settingsStorageTitle => '存储';
@@ -684,7 +684,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String migratingImagesStatus(Object current, Object total) {
-    return 'Migrating photos… $current/$total';
+    return '正在移动图片… $current/$total';
   }
 
   @override
@@ -841,23 +841,23 @@ class AppLocalizationsZh extends AppLocalizations {
   String get tagMoodTitle => '心情';
 
   @override
-  String get calendarTagDisplayLabel => 'Tag';
+  String get calendarTagDisplayLabel => '标签';
 
   @override
-  String get selectTagTitle => 'Select Tag';
+  String get selectTagTitle => '选择标签';
 
   @override
-  String get labelPresentLabel => 'Present';
+  String get labelPresentLabel => '已设定';
 
   @override
-  String get labelAbsentLabel => 'Absent';
+  String get labelAbsentLabel => '未设定';
 
   @override
-  String get labelCoverageLabel => 'Coverage';
+  String get labelCoverageLabel => '覆盖率';
 
   @override
   String chartDistributionTitle(Object tag) {
-    return '$tag Distribution';
+    return '$tag 分布';
   }
 }
 
@@ -986,6 +986,9 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get noLogs => '無紀錄…';
 
   @override
+  String get noResults => '無結果…';
+
+  @override
   String get sortDateTitle => '日期';
 
   @override
@@ -1066,6 +1069,16 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   }
 
   @override
+  String streakGreatDays(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '美好的日子 $count',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String streakSinceBadDay(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -1084,6 +1097,19 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get errorExternalStorageAccessContinue => '繼續使用本地資料庫';
+
+  @override
+  String get databaseMigrationErrorTitle => '無法移動你的資料';
+
+  @override
+  String get databaseMigrationErrorDescription =>
+      '您的條目是安全的，但無法移至應用程式的儲存空間。\n\n請再試一次，如果問題持續發生，請回報該問題。';
+
+  @override
+  String get databaseMigrationErrorRetry => '重試';
+
+  @override
+  String get errorReport => '報告問題';
 
   @override
   String get lastModified => '已修改';
@@ -1261,6 +1287,184 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
       '### 你今天最開心的是什麼？\n- \n\n### 你感恩什麼？\n- \n\n### 你最期待什麼？\n- ';
 
   @override
+  String get settingsTagsTitle => '標籤';
+
+  @override
+  String get manageTags => '管理標籤';
+
+  @override
+  String get tagTypeLabelTitle => '標籤';
+
+  @override
+  String get tagTypeTrackerTitle => '追蹤器';
+
+  @override
+  String get nameHint => '名稱';
+
+  @override
+  String get tagColorLabel => '顏色';
+
+  @override
+  String get iconPickerTitle => '選擇圖示';
+
+  @override
+  String get iconPickerIconsTab => '圖示';
+
+  @override
+  String get iconPickerCustomTab => '自訂';
+
+  @override
+  String get iconPickerSearchHint => '搜尋圖示…';
+
+  @override
+  String get colorPickerTitle => '選擇顏色';
+
+  @override
+  String get colorPickerPaletteTab => '顏色';
+
+  @override
+  String get iconGroupMoodPeople => '心情與人物';
+
+  @override
+  String get iconGroupHealth => '健康';
+
+  @override
+  String get iconGroupWorkFinance => '工作&金融';
+
+  @override
+  String get iconGroupHabitsGoals => '習慣&目標';
+
+  @override
+  String get iconGroupNature => '自然';
+
+  @override
+  String get iconGroupFoodDrink => '餐飲';
+
+  @override
+  String get iconGroupHome => '家';
+
+  @override
+  String get iconGroupTravel => '旅行';
+
+  @override
+  String get iconGroupSymbols => '符號';
+
+  @override
+  String get tagCategoryLabel => '分類';
+
+  @override
+  String get tagCategoryUncategorized => '未分類';
+
+  @override
+  String get newCategoryTitle => '新分類';
+
+  @override
+  String get deleteTitle => '刪除';
+
+  @override
+  String deleteTagMessage(num count, Object name) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: ' 它被用於 $count 條紀錄中。',
+      one: ' 它被用於 1 條紀錄中。',
+      zero: '',
+    );
+    return '刪除「$name」？$_temp0';
+  }
+
+  @override
+  String deleteCategoryMessage(num count, Object name) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '其 $count 個標籤也將被刪除。',
+      one: '其 1 個標籤也將被刪除。',
+      zero: '',
+    );
+    return '刪除「$name」？$_temp0';
+  }
+
+  @override
+  String get filterTagsTitle => '過濾器';
+
+  @override
+  String get tagFilterModeAny => '任意標籤';
+
+  @override
+  String get tagFilterModeAll => '所有標籤';
+
+  @override
+  String get clearAllFilters => '清除全部';
+
+  @override
+  String get noTagsFilterLabel => '無標籤';
+
+  @override
+  String get addTagsTitle => '新增標籤';
+
+  @override
+  String get addTagsSearchHint => '搜尋標籤…';
+
+  @override
+  String get tagPickerSortManualLabel => '手動排序';
+
+  @override
+  String get tagPickerSortUsageLabel => '依使用次數排序';
+
+  @override
+  String get tagFavoriteName => '我的最愛';
+
+  @override
+  String get tagEnergyName => '能量';
+
+  @override
+  String get tagCategoryActivitiesName => '活動';
+
+  @override
+  String get tagExerciseName => '鍛煉';
+
+  @override
+  String get tagSocializingName => '社交';
+
+  @override
+  String get tagHobbyName => '愛好';
+
+  @override
+  String get tagEntertainmentName => '娛樂';
+
+  @override
+  String get tagDiningName => '用餐';
+
+  @override
+  String get tagChoresName => '家務';
+
+  @override
+  String get tagCategoryEmotionsName => '情緒';
+
+  @override
+  String get tagExcitedName => '激動';
+
+  @override
+  String get tagGratefulName => '感激';
+
+  @override
+  String get tagCalmName => '冷靜';
+
+  @override
+  String get tagTiredName => '疲倦';
+
+  @override
+  String get tagAnxiousName => '焦慮';
+
+  @override
+  String get tagAnnoyedName => '懊惱';
+
+  @override
+  String get welcomeLogBodyText =>
+      '## 歡迎使用 Daily You\n\n> 每一天都值得被記住、被捕捉下來！\n\n**Daily You** 是免費的、[開源](https://github.com/Demizo/Daily_You)的，並由社群支援。建立在「你的日記應該屬於你，而不是某個產品」這樣的信念之上：\n\n- 無廣告\n- 無鎖定功能\n- 無追蹤或資料蒐集\n\n無論你是在寫日誌、反思，還是只是記錄讓你微笑的事，**Daily You** 都為你提供一個_真正屬於你_的私密空間。';
+
+  @override
   String get settingsStorageTitle => '存儲';
 
   @override
@@ -1335,6 +1539,11 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get cleanUpStatus => '正在清理…';
+
+  @override
+  String migratingImagesStatus(Object current, Object total) {
+    return '正在移轉照片… $current/$total';
+  }
 
   @override
   String get settingsExport => '匯出';
@@ -1470,4 +1679,24 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get tagMoodTitle => '心情';
+
+  @override
+  String get calendarTagDisplayLabel => '標籤';
+
+  @override
+  String get selectTagTitle => '選擇標籤';
+
+  @override
+  String get labelPresentLabel => '已設定';
+
+  @override
+  String get labelAbsentLabel => '未設定';
+
+  @override
+  String get labelCoverageLabel => '覆蓋率';
+
+  @override
+  String chartDistributionTitle(Object tag) {
+    return '$tag 分佈';
+  }
 }

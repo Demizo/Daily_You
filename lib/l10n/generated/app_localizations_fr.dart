@@ -130,7 +130,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get noLogs => 'Aucun souvenir…';
 
   @override
-  String get noResults => 'No Results…';
+  String get noResults => 'Aucun résultat…';
 
   @override
   String get sortDateTitle => 'Date';
@@ -217,7 +217,7 @@ class AppLocalizationsFr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Great Days $count',
+      other: 'Bonnes journées $count',
     );
     return '$_temp0';
   }
@@ -245,17 +245,18 @@ class AppLocalizationsFr extends AppLocalizations {
       'Poursuivre avec la base de données locale';
 
   @override
-  String get databaseMigrationErrorTitle => 'Couldn\'t Move Your Data';
+  String get databaseMigrationErrorTitle =>
+      'Déplacement des données impossible';
 
   @override
   String get databaseMigrationErrorDescription =>
-      'Your entries are safe but couldn\'t be moved to the app\'s storage.\n\nTry again, and report the issue if it keeps happening.';
+      'Vos entrées sont en sécurité mais n\'ont pas pu être déplacées dans le stockage applicatif.\n\nEssayez de nouveau et signaler ce souci s’il continue de se produire.';
 
   @override
-  String get databaseMigrationErrorRetry => 'Retry';
+  String get databaseMigrationErrorRetry => 'Réessayer';
 
   @override
-  String get errorReport => 'Report Issue';
+  String get errorReport => 'Signaler un problème';
 
   @override
   String get lastModified => 'Modification';
@@ -441,90 +442,90 @@ class AppLocalizationsFr extends AppLocalizations {
       '### Qu\'est-ce qui vous a plu aujourd\'hui ?\n- \n\n### Pour quoi avez-vous de la reconnaissance ?\n- \n\n### Qu\'est-ce qu\'il vous tarde ?\n- ';
 
   @override
-  String get settingsTagsTitle => 'Tags';
+  String get settingsTagsTitle => 'Étiquettes';
 
   @override
-  String get manageTags => 'Manage Tags';
+  String get manageTags => 'Gestion des étiquettes';
 
   @override
   String get tagTypeLabelTitle => 'Label';
 
   @override
-  String get tagTypeTrackerTitle => 'Tracker';
+  String get tagTypeTrackerTitle => 'Compteur';
 
   @override
-  String get nameHint => 'Name';
+  String get nameHint => 'Nom';
 
   @override
-  String get tagColorLabel => 'Color';
+  String get tagColorLabel => 'Couleur';
 
   @override
-  String get iconPickerTitle => 'Choose Icon';
+  String get iconPickerTitle => 'Choisir une icône';
 
   @override
-  String get iconPickerIconsTab => 'Icons';
+  String get iconPickerIconsTab => 'Icône';
 
   @override
-  String get iconPickerCustomTab => 'Custom';
+  String get iconPickerCustomTab => 'Personnalisée';
 
   @override
-  String get iconPickerSearchHint => 'Search icons…';
+  String get iconPickerSearchHint => 'Chercher des icônes…';
 
   @override
-  String get colorPickerTitle => 'Choose Color';
+  String get colorPickerTitle => 'Choisir une couleur';
 
   @override
-  String get colorPickerPaletteTab => 'Colors';
+  String get colorPickerPaletteTab => 'Couleurs';
 
   @override
-  String get iconGroupMoodPeople => 'Mood & People';
+  String get iconGroupMoodPeople => 'Humeur et gens';
 
   @override
-  String get iconGroupHealth => 'Health';
+  String get iconGroupHealth => 'Santé';
 
   @override
-  String get iconGroupWorkFinance => 'Work & Finance';
+  String get iconGroupWorkFinance => 'Travail et finance';
 
   @override
-  String get iconGroupHabitsGoals => 'Habits & Goals';
+  String get iconGroupHabitsGoals => 'Habitudes et objectifs';
 
   @override
   String get iconGroupNature => 'Nature';
 
   @override
-  String get iconGroupFoodDrink => 'Food & Drink';
+  String get iconGroupFoodDrink => 'Boire et manger';
 
   @override
-  String get iconGroupHome => 'Home';
+  String get iconGroupHome => 'Maison';
 
   @override
-  String get iconGroupTravel => 'Travel';
+  String get iconGroupTravel => 'Voyage';
 
   @override
-  String get iconGroupSymbols => 'Symbols';
+  String get iconGroupSymbols => 'Symboles';
 
   @override
-  String get tagCategoryLabel => 'Category';
+  String get tagCategoryLabel => 'Catégorie';
 
   @override
-  String get tagCategoryUncategorized => 'Uncategorized';
+  String get tagCategoryUncategorized => 'Sans catégorie';
 
   @override
-  String get newCategoryTitle => 'New Category';
+  String get newCategoryTitle => 'Nouvelle catégorie';
 
   @override
-  String get deleteTitle => 'Delete';
+  String get deleteTitle => 'Supprimer';
 
   @override
   String deleteTagMessage(num count, Object name) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: ' It is used in $count logs.',
-      one: ' It is used in 1 log.',
+      other: ' Il est utilisé dans $count enregistrements.',
+      one: ' Il est utilisé dans 1 enregistrement.',
       zero: '',
     );
-    return 'Delete \"$name\"?$_temp0';
+    return 'Supprimer « $name » ?$_temp0';
   }
 
   @override
@@ -532,91 +533,91 @@ class AppLocalizationsFr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: ' Its $count tags will also be deleted.',
-      one: ' Its 1 tag will also be deleted.',
+      other: ' Les $count étiquettes seront aussi supprimées.',
+      one: ' Son étiquette  sera aussi supprimée.',
       zero: '',
     );
-    return 'Delete \"$name\"?$_temp0';
+    return 'Supprimer « $name » ?$_temp0';
   }
 
   @override
-  String get filterTagsTitle => 'Filter';
+  String get filterTagsTitle => 'Filtrer';
 
   @override
-  String get tagFilterModeAny => 'Any Tag';
+  String get tagFilterModeAny => 'N’importe quelle étiquette';
 
   @override
-  String get tagFilterModeAll => 'All Tags';
+  String get tagFilterModeAll => 'Toutes les étiquettes';
 
   @override
-  String get clearAllFilters => 'Clear All';
+  String get clearAllFilters => 'Tout effacer';
 
   @override
-  String get noTagsFilterLabel => 'No Tags';
+  String get noTagsFilterLabel => 'Aucune étiquette';
 
   @override
-  String get addTagsTitle => 'Add Tags';
+  String get addTagsTitle => 'Ajouter des étiquettes';
 
   @override
-  String get addTagsSearchHint => 'Search tags…';
+  String get addTagsSearchHint => 'Chercher des étiquettes…';
 
   @override
-  String get tagPickerSortManualLabel => 'Manual order';
+  String get tagPickerSortManualLabel => 'Ordre manuel';
 
   @override
-  String get tagPickerSortUsageLabel => 'Sort by usage';
+  String get tagPickerSortUsageLabel => 'Trier par utilisation';
 
   @override
-  String get tagFavoriteName => 'Favorite';
+  String get tagFavoriteName => 'Favoris';
 
   @override
-  String get tagEnergyName => 'Energy';
+  String get tagEnergyName => 'Énergie';
 
   @override
-  String get tagCategoryActivitiesName => 'Activities';
+  String get tagCategoryActivitiesName => 'Activités';
 
   @override
-  String get tagExerciseName => 'Exercise';
+  String get tagExerciseName => 'Exercice';
 
   @override
-  String get tagSocializingName => 'Socializing';
+  String get tagSocializingName => 'Vie sociale';
 
   @override
-  String get tagHobbyName => 'Hobby';
+  String get tagHobbyName => 'Loisir';
 
   @override
-  String get tagEntertainmentName => 'Entertainment';
+  String get tagEntertainmentName => 'Divertissement';
 
   @override
-  String get tagDiningName => 'Dining';
+  String get tagDiningName => 'Dîner';
 
   @override
-  String get tagChoresName => 'Chores';
+  String get tagChoresName => 'Tâches ménagères';
 
   @override
-  String get tagCategoryEmotionsName => 'Emotions';
+  String get tagCategoryEmotionsName => 'Émotions';
 
   @override
-  String get tagExcitedName => 'Excited';
+  String get tagExcitedName => 'Impatience';
 
   @override
-  String get tagGratefulName => 'Grateful';
+  String get tagGratefulName => 'Reconnaissance';
 
   @override
-  String get tagCalmName => 'Calm';
+  String get tagCalmName => 'Calme';
 
   @override
-  String get tagTiredName => 'Tired';
+  String get tagTiredName => 'Fatigue';
 
   @override
-  String get tagAnxiousName => 'Anxious';
+  String get tagAnxiousName => 'Anxiété';
 
   @override
-  String get tagAnnoyedName => 'Annoyed';
+  String get tagAnnoyedName => 'Ennui';
 
   @override
   String get welcomeLogBodyText =>
-      '## Welcome to Daily You\n\n> Every day is worth remembering, capture it!\n\n**Daily You** is free, [open source](https://github.com/Demizo/Daily_You), and community supported. Built around the belief that your diary should be yours, not a product:\n\n- No ads\n- No locked features\n- No tracking or data collection\n\nWhether you\'re journaling, reflecting, or just noting what made you smile, **Daily You** gives you a private space that\'s _truly your own_.';
+      '## Bienvenue dans Daily You\n\n> Chaque jour mérite qu\'on s\'en souvienne, immortalisez-le !\n\n**Daily You** est gratuit, [open source](https://github.com/Demizo/Daily_You) et soutenu par la communauté. Conçu avec la conviction que votre journal doit vous appartenir, et non être un produit :\n\n- Aucune publicité\n- Aucune fonctionnalité verrouillée\n- Aucun suivi ni collecte de données\n\nQue vous teniez un journal, que vous fassiez de l\'introspection ou que vous notiez simplement ce qui vous a fait sourire, **Daily You** vous offre un espace privé qui est _vraiment le vôtre_.';
 
   @override
   String get settingsStorageTitle => 'Stockage';
@@ -701,7 +702,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String migratingImagesStatus(Object current, Object total) {
-    return 'Migrating photos… $current/$total';
+    return 'Migration des photos… $current/$total';
   }
 
   @override
@@ -863,22 +864,22 @@ class AppLocalizationsFr extends AppLocalizations {
   String get tagMoodTitle => 'Humeur';
 
   @override
-  String get calendarTagDisplayLabel => 'Tag';
+  String get calendarTagDisplayLabel => 'Étiquette';
 
   @override
-  String get selectTagTitle => 'Select Tag';
+  String get selectTagTitle => 'Sélectionner une étiquette';
 
   @override
-  String get labelPresentLabel => 'Present';
+  String get labelPresentLabel => 'Présent';
 
   @override
   String get labelAbsentLabel => 'Absent';
 
   @override
-  String get labelCoverageLabel => 'Coverage';
+  String get labelCoverageLabel => 'Couverture';
 
   @override
   String chartDistributionTitle(Object tag) {
-    return '$tag Distribution';
+    return 'Distribution de $tag';
   }
 }

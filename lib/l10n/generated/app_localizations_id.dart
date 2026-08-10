@@ -30,10 +30,10 @@ class AppLocalizationsId extends AppLocalizations {
   String get pageHomeTitle => 'Beranda';
 
   @override
-  String get jumpToMonthTitle => 'Jump to month';
+  String get jumpToMonthTitle => 'Lompat ke bulan';
 
   @override
-  String get jumpToLogTitle => 'Jump to log';
+  String get jumpToLogTitle => 'Lompat ke log';
 
   @override
   String get flashbacksTitle => 'Kilas balik';
@@ -129,7 +129,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get noLogs => 'Tidak ada log…';
 
   @override
-  String get noResults => 'No Results…';
+  String get noResults => 'Tidak Ada Hasil…';
 
   @override
   String get sortDateTitle => 'Tanggal';
@@ -174,22 +174,22 @@ class AppLocalizationsId extends AppLocalizations {
   }
 
   @override
-  String get chartGroupingLabel => 'Group by';
+  String get chartGroupingLabel => 'Kelompokkan berdasarkan';
 
   @override
-  String get chartGroupingDay => 'Day';
+  String get chartGroupingDay => 'Hari';
 
   @override
-  String get chartGroupingWeek => 'Week';
+  String get chartGroupingWeek => 'Minggu';
 
   @override
-  String get chartGroupingMonth => 'Month';
+  String get chartGroupingMonth => 'Bulan';
 
   @override
-  String get chartGroupingYear => 'Year';
+  String get chartGroupingYear => 'Tahun';
 
   @override
-  String get chartSmoothingLabel => 'Smoothing';
+  String get chartSmoothingLabel => 'Penghalusan';
 
   @override
   String streakCurrent(num count) {
@@ -216,7 +216,7 @@ class AppLocalizationsId extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Great Days $count',
+      other: 'Hari Hebat $count',
     );
     return '$_temp0';
   }
@@ -244,17 +244,17 @@ class AppLocalizationsId extends AppLocalizations {
       'Lanjutkan dengan database lokal';
 
   @override
-  String get databaseMigrationErrorTitle => 'Couldn\'t Move Your Data';
+  String get databaseMigrationErrorTitle => 'Tidak Dapat Memindahkan Data Anda';
 
   @override
   String get databaseMigrationErrorDescription =>
-      'Your entries are safe but couldn\'t be moved to the app\'s storage.\n\nTry again, and report the issue if it keeps happening.';
+      'Entri Anda aman tetapi tidak dapat dipindahkan ke penyimpanan aplikasi.\n\nCoba lagi, dan laporkan masalah ini jika terus terjadi.';
 
   @override
-  String get databaseMigrationErrorRetry => 'Retry';
+  String get databaseMigrationErrorRetry => 'Coba Lagi';
 
   @override
-  String get errorReport => 'Report Issue';
+  String get errorReport => 'Laporkan Masalah';
 
   @override
   String get lastModified => 'Diubah';
@@ -436,90 +436,90 @@ class AppLocalizationsId extends AppLocalizations {
       '### Apa yang Anda nikmati hari ini?\n- \n\n### Apa yang Anda syukuri?\n- \n\n### Apa yang Anda nantikan?\n- ';
 
   @override
-  String get settingsTagsTitle => 'Tags';
+  String get settingsTagsTitle => 'Tag';
 
   @override
-  String get manageTags => 'Manage Tags';
+  String get manageTags => 'Kelola Tag';
 
   @override
   String get tagTypeLabelTitle => 'Label';
 
   @override
-  String get tagTypeTrackerTitle => 'Tracker';
+  String get tagTypeTrackerTitle => 'Pelacak';
 
   @override
-  String get nameHint => 'Name';
+  String get nameHint => 'Nama';
 
   @override
-  String get tagColorLabel => 'Color';
+  String get tagColorLabel => 'Warna';
 
   @override
-  String get iconPickerTitle => 'Choose Icon';
+  String get iconPickerTitle => 'Pilih Ikon';
 
   @override
-  String get iconPickerIconsTab => 'Icons';
+  String get iconPickerIconsTab => 'Ikon';
 
   @override
-  String get iconPickerCustomTab => 'Custom';
+  String get iconPickerCustomTab => 'Kustom';
 
   @override
-  String get iconPickerSearchHint => 'Search icons…';
+  String get iconPickerSearchHint => 'Cari ikon…';
 
   @override
-  String get colorPickerTitle => 'Choose Color';
+  String get colorPickerTitle => 'Pilih Warna';
 
   @override
-  String get colorPickerPaletteTab => 'Colors';
+  String get colorPickerPaletteTab => 'Warna';
 
   @override
-  String get iconGroupMoodPeople => 'Mood & People';
+  String get iconGroupMoodPeople => 'Suasana Hati & Orang';
 
   @override
-  String get iconGroupHealth => 'Health';
+  String get iconGroupHealth => 'Kesehatan';
 
   @override
-  String get iconGroupWorkFinance => 'Work & Finance';
+  String get iconGroupWorkFinance => 'Pekerjaan & Keuangan';
 
   @override
-  String get iconGroupHabitsGoals => 'Habits & Goals';
+  String get iconGroupHabitsGoals => 'Kebiasaan & Sasaran';
 
   @override
-  String get iconGroupNature => 'Nature';
+  String get iconGroupNature => 'Alam';
 
   @override
-  String get iconGroupFoodDrink => 'Food & Drink';
+  String get iconGroupFoodDrink => 'Makanan & Minuman';
 
   @override
   String get iconGroupHome => 'Home';
 
   @override
-  String get iconGroupTravel => 'Travel';
+  String get iconGroupTravel => 'Perjalanan';
 
   @override
-  String get iconGroupSymbols => 'Symbols';
+  String get iconGroupSymbols => 'Simbol';
 
   @override
-  String get tagCategoryLabel => 'Category';
+  String get tagCategoryLabel => 'Kategori';
 
   @override
-  String get tagCategoryUncategorized => 'Uncategorized';
+  String get tagCategoryUncategorized => 'Tanpa Kategori';
 
   @override
-  String get newCategoryTitle => 'New Category';
+  String get newCategoryTitle => 'Kategori Baru';
 
   @override
-  String get deleteTitle => 'Delete';
+  String get deleteTitle => 'Hapus';
 
   @override
   String deleteTagMessage(num count, Object name) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: ' It is used in $count logs.',
-      one: ' It is used in 1 log.',
+      other: ' Ini digunakan dalam $count log.',
+      one: ' Ini digunakan dalam 1 log.',
       zero: '',
     );
-    return 'Delete \"$name\"?$_temp0';
+    return 'Hapus \"$name\"?$_temp0';
   }
 
   @override
@@ -527,91 +527,91 @@ class AppLocalizationsId extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: ' Its $count tags will also be deleted.',
-      one: ' Its 1 tag will also be deleted.',
+      other: ' $count tag miliknya juga akan dihapus.',
+      one: ' 1 tag miliknya juga akan dihapus.',
       zero: '',
     );
-    return 'Delete \"$name\"?$_temp0';
+    return 'Hapus \"$name\"?$_temp0';
   }
 
   @override
   String get filterTagsTitle => 'Filter';
 
   @override
-  String get tagFilterModeAny => 'Any Tag';
+  String get tagFilterModeAny => 'Tag Apa Pun';
 
   @override
-  String get tagFilterModeAll => 'All Tags';
+  String get tagFilterModeAll => 'Semua Tag';
 
   @override
-  String get clearAllFilters => 'Clear All';
+  String get clearAllFilters => 'Bersihkan Semua';
 
   @override
-  String get noTagsFilterLabel => 'No Tags';
+  String get noTagsFilterLabel => 'Tanpa Tag';
 
   @override
-  String get addTagsTitle => 'Add Tags';
+  String get addTagsTitle => 'Tambahkan Tag';
 
   @override
-  String get addTagsSearchHint => 'Search tags…';
+  String get addTagsSearchHint => 'Cari tag…';
 
   @override
-  String get tagPickerSortManualLabel => 'Manual order';
+  String get tagPickerSortManualLabel => 'Urutan manual';
 
   @override
-  String get tagPickerSortUsageLabel => 'Sort by usage';
+  String get tagPickerSortUsageLabel => 'Urutkan berdasarkan penggunaan';
 
   @override
-  String get tagFavoriteName => 'Favorite';
+  String get tagFavoriteName => 'Favorit';
 
   @override
-  String get tagEnergyName => 'Energy';
+  String get tagEnergyName => 'Energi';
 
   @override
-  String get tagCategoryActivitiesName => 'Activities';
+  String get tagCategoryActivitiesName => 'Aktivitas';
 
   @override
-  String get tagExerciseName => 'Exercise';
+  String get tagExerciseName => 'Olahraga';
 
   @override
-  String get tagSocializingName => 'Socializing';
+  String get tagSocializingName => 'Bersosialisasi';
 
   @override
-  String get tagHobbyName => 'Hobby';
+  String get tagHobbyName => 'Hobi';
 
   @override
-  String get tagEntertainmentName => 'Entertainment';
+  String get tagEntertainmentName => 'Hiburan';
 
   @override
-  String get tagDiningName => 'Dining';
+  String get tagDiningName => 'Bersantap';
 
   @override
-  String get tagChoresName => 'Chores';
+  String get tagChoresName => 'Pekerjaan rumah';
 
   @override
-  String get tagCategoryEmotionsName => 'Emotions';
+  String get tagCategoryEmotionsName => 'Emosi';
 
   @override
-  String get tagExcitedName => 'Excited';
+  String get tagExcitedName => 'Bersemangat';
 
   @override
-  String get tagGratefulName => 'Grateful';
+  String get tagGratefulName => 'Bersyukur';
 
   @override
-  String get tagCalmName => 'Calm';
+  String get tagCalmName => 'Tenang';
 
   @override
-  String get tagTiredName => 'Tired';
+  String get tagTiredName => 'Lelah';
 
   @override
-  String get tagAnxiousName => 'Anxious';
+  String get tagAnxiousName => 'Cemas';
 
   @override
-  String get tagAnnoyedName => 'Annoyed';
+  String get tagAnnoyedName => 'Kesal';
 
   @override
   String get welcomeLogBodyText =>
-      '## Welcome to Daily You\n\n> Every day is worth remembering, capture it!\n\n**Daily You** is free, [open source](https://github.com/Demizo/Daily_You), and community supported. Built around the belief that your diary should be yours, not a product:\n\n- No ads\n- No locked features\n- No tracking or data collection\n\nWhether you\'re journaling, reflecting, or just noting what made you smile, **Daily You** gives you a private space that\'s _truly your own_.';
+      '## Selamat datang di Daily You\n\n> Setiap hari layak untuk dikenang, abadikanlah!\n\n**Daily You** gratis, [open source](https://github.com/Demizo/Daily_You), dan didukung oleh komunitas. Dibangun berdasarkan keyakinan bahwa buku harian Anda harus benar-benar menjadi milik Anda, bukan sebuah produk:\n\n- Tanpa iklan\n- Tanpa fitur terkunci\n- Tanpa pelacakan atau pengumpulan data\n\nBaik Anda menulis jurnal, berefleksi, atau sekadar mencatat hal yang membuat Anda tersenyum, **Daily You** memberi Anda ruang pribadi yang _benar-benar milik Anda sendiri_.';
 
   @override
   String get settingsStorageTitle => 'Penyimpanan';
@@ -692,7 +692,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String migratingImagesStatus(Object current, Object total) {
-    return 'Migrating photos… $current/$total';
+    return 'Memigrasikan foto… $current/$total';
   }
 
   @override
@@ -846,7 +846,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get settingsConsiderSupporting => 'pertimbangkan untuk mendukung';
 
   @override
-  String get imagesTitle => 'Images';
+  String get imagesTitle => 'Gambar';
 
   @override
   String get tagMoodTitle => 'Perasaan';
@@ -855,19 +855,19 @@ class AppLocalizationsId extends AppLocalizations {
   String get calendarTagDisplayLabel => 'Tag';
 
   @override
-  String get selectTagTitle => 'Select Tag';
+  String get selectTagTitle => 'Pilih Tag';
 
   @override
-  String get labelPresentLabel => 'Present';
+  String get labelPresentLabel => 'Ada';
 
   @override
-  String get labelAbsentLabel => 'Absent';
+  String get labelAbsentLabel => 'Tidak Ada';
 
   @override
-  String get labelCoverageLabel => 'Coverage';
+  String get labelCoverageLabel => 'Cakupan';
 
   @override
   String chartDistributionTitle(Object tag) {
-    return '$tag Distribution';
+    return 'Distribusi $tag';
   }
 }

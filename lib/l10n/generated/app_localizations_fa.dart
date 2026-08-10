@@ -30,10 +30,10 @@ class AppLocalizationsFa extends AppLocalizations {
   String get pageHomeTitle => 'خانه';
 
   @override
-  String get jumpToMonthTitle => 'Jump to month';
+  String get jumpToMonthTitle => 'پرش به ماه';
 
   @override
-  String get jumpToLogTitle => 'Jump to log';
+  String get jumpToLogTitle => 'پرش به تاریخچه';
 
   @override
   String get flashbacksTitle => 'فلش بک';
@@ -129,7 +129,7 @@ class AppLocalizationsFa extends AppLocalizations {
   String get noLogs => 'تاریخچه ای وجود ندارد…';
 
   @override
-  String get noResults => 'No Results…';
+  String get noResults => 'بدون نتیجه…';
 
   @override
   String get sortDateTitle => 'تاریخ';
@@ -174,19 +174,19 @@ class AppLocalizationsFa extends AppLocalizations {
   }
 
   @override
-  String get chartGroupingLabel => 'Group by';
+  String get chartGroupingLabel => 'گروه‌بندی بر اساس';
 
   @override
-  String get chartGroupingDay => 'Day';
+  String get chartGroupingDay => 'روز';
 
   @override
-  String get chartGroupingWeek => 'Week';
+  String get chartGroupingWeek => 'هفته';
 
   @override
-  String get chartGroupingMonth => 'Month';
+  String get chartGroupingMonth => 'ماه';
 
   @override
-  String get chartGroupingYear => 'Year';
+  String get chartGroupingYear => 'سال';
 
   @override
   String get chartSmoothingLabel => 'Smoothing';
@@ -237,23 +237,24 @@ class AppLocalizationsFa extends AppLocalizations {
 
   @override
   String get errorExternalStorageAccessDescription =>
-      'اگر از فضای ذخیره‌سازی شبکه استفاده می‌کنید، مطمئن شوید سرویس آنلاین است و به شبکه دسترسی دارید.\n\nدر غیر این صورت، ممکن است اپلیکیشن مجوزهای مربوط به پوشهٔ خارجی ز دست داده باشد. به بخش تنظیمات بروید و پوشهٔ خارجی را دوباره انتخاب کنید تا دسترسی مجدد بدهید.\n\nهشدار: تا زمانی که دسترسی به محل ذخیره‌سازی خارجی را بازیابی نکنید، تغییرات همگام‌سازی نخواهند شد.';
+      'اگر از فضای ذخیره‌سازی شبکه استفاده می‌کنید، مطمئن شوید سرویس آنلاین است و به شبکه دسترسی دارید.\n\nدر غیر این صورت، ممکن است اپلیکیشن مجوزهای مربوط به پوشهٔ خارجی ز دست داده باشد. به بخش تنظیمات بروید و پوشهٔ خارجی را دوباره انتخاب کنید تا دسترسی مجدد بدهید.\n\nهشدار: تا زمانی که دسترسی به محل ذخیره‌سازی خارجی را بازیابی نکنید، تغییرات همگام‌سازی نخواهند شد!';
 
   @override
   String get errorExternalStorageAccessContinue => 'ادامه با پایگاه داده محلی';
 
   @override
-  String get databaseMigrationErrorTitle => 'Couldn\'t Move Your Data';
+  String get databaseMigrationErrorTitle =>
+      'نتوانستم داده‌های شما را منتقل کنم';
 
   @override
   String get databaseMigrationErrorDescription =>
-      'Your entries are safe but couldn\'t be moved to the app\'s storage.\n\nTry again, and report the issue if it keeps happening.';
+      'ورودی‌های شما امن هستند اما امکان انتقال آنها به حافظه برنامه وجود ندارد.\n\nدوباره امتحان کنید و اگر مشکل ادامه داشت، آن را گزارش دهید.';
 
   @override
-  String get databaseMigrationErrorRetry => 'Retry';
+  String get databaseMigrationErrorRetry => 'تلاش دوباره';
 
   @override
-  String get errorReport => 'Report Issue';
+  String get errorReport => 'گزارش مشکل';
 
   @override
   String get lastModified => 'تغییریافته';
@@ -434,10 +435,10 @@ class AppLocalizationsFa extends AppLocalizations {
       '### چه چیزی امروز لذت بخش بود؟\n- \n\n### بابت چه چیزی شکرگزارید؟\n- \n\n### منتظر چه چیزی هستید؟\n- ';
 
   @override
-  String get settingsTagsTitle => 'Tags';
+  String get settingsTagsTitle => 'برچسب‌ها';
 
   @override
-  String get manageTags => 'Manage Tags';
+  String get manageTags => 'مدیریت برچسب‌ها';
 
   @override
   String get tagTypeLabelTitle => 'Label';
@@ -446,67 +447,67 @@ class AppLocalizationsFa extends AppLocalizations {
   String get tagTypeTrackerTitle => 'Tracker';
 
   @override
-  String get nameHint => 'Name';
+  String get nameHint => 'نام';
 
   @override
-  String get tagColorLabel => 'Color';
+  String get tagColorLabel => 'رنگ';
 
   @override
-  String get iconPickerTitle => 'Choose Icon';
+  String get iconPickerTitle => 'انتخاب آیکن';
 
   @override
-  String get iconPickerIconsTab => 'Icons';
+  String get iconPickerIconsTab => 'آیکن‌ها';
 
   @override
-  String get iconPickerCustomTab => 'Custom';
+  String get iconPickerCustomTab => 'شخصی‌سازی';
 
   @override
-  String get iconPickerSearchHint => 'Search icons…';
+  String get iconPickerSearchHint => 'جستجوی آیکن‌ها…';
 
   @override
-  String get colorPickerTitle => 'Choose Color';
+  String get colorPickerTitle => 'انتخاب رنگ';
 
   @override
-  String get colorPickerPaletteTab => 'Colors';
+  String get colorPickerPaletteTab => 'رنگ‌ها';
 
   @override
   String get iconGroupMoodPeople => 'Mood & People';
 
   @override
-  String get iconGroupHealth => 'Health';
+  String get iconGroupHealth => 'سلامت';
 
   @override
-  String get iconGroupWorkFinance => 'Work & Finance';
+  String get iconGroupWorkFinance => 'کار و امور مالی';
 
   @override
-  String get iconGroupHabitsGoals => 'Habits & Goals';
+  String get iconGroupHabitsGoals => 'عادات و اهداف';
 
   @override
-  String get iconGroupNature => 'Nature';
+  String get iconGroupNature => 'طبیعت';
 
   @override
-  String get iconGroupFoodDrink => 'Food & Drink';
+  String get iconGroupFoodDrink => 'غذا و نوشیدنی‌';
 
   @override
-  String get iconGroupHome => 'Home';
+  String get iconGroupHome => 'خانه';
 
   @override
-  String get iconGroupTravel => 'Travel';
+  String get iconGroupTravel => 'سفر';
 
   @override
-  String get iconGroupSymbols => 'Symbols';
+  String get iconGroupSymbols => 'نمادها';
 
   @override
-  String get tagCategoryLabel => 'Category';
+  String get tagCategoryLabel => 'دسته بندی';
 
   @override
-  String get tagCategoryUncategorized => 'Uncategorized';
+  String get tagCategoryUncategorized => 'دسته بندی نشده';
 
   @override
-  String get newCategoryTitle => 'New Category';
+  String get newCategoryTitle => 'دسته بندی جدید';
 
   @override
-  String get deleteTitle => 'Delete';
+  String get deleteTitle => 'پاک کردن';
 
   @override
   String deleteTagMessage(num count, Object name) {
@@ -533,49 +534,49 @@ class AppLocalizationsFa extends AppLocalizations {
   }
 
   @override
-  String get filterTagsTitle => 'Filter';
+  String get filterTagsTitle => 'فیلتر';
 
   @override
-  String get tagFilterModeAny => 'Any Tag';
+  String get tagFilterModeAny => 'هر برچسبی';
 
   @override
-  String get tagFilterModeAll => 'All Tags';
+  String get tagFilterModeAll => 'همه برچسب‌ها';
 
   @override
-  String get clearAllFilters => 'Clear All';
+  String get clearAllFilters => 'پاک کردن همه';
 
   @override
-  String get noTagsFilterLabel => 'No Tags';
+  String get noTagsFilterLabel => 'بدون برچسب';
 
   @override
-  String get addTagsTitle => 'Add Tags';
+  String get addTagsTitle => 'افزودن برچسب';
 
   @override
-  String get addTagsSearchHint => 'Search tags…';
+  String get addTagsSearchHint => 'جستجوی برچسب‌ها…';
 
   @override
-  String get tagPickerSortManualLabel => 'Manual order';
+  String get tagPickerSortManualLabel => 'ترتیب دستی';
 
   @override
-  String get tagPickerSortUsageLabel => 'Sort by usage';
+  String get tagPickerSortUsageLabel => 'مرتب کردن بر اساس استفاده';
 
   @override
-  String get tagFavoriteName => 'Favorite';
+  String get tagFavoriteName => 'مورد علاقه‌ها';
 
   @override
-  String get tagEnergyName => 'Energy';
+  String get tagEnergyName => 'انرژی';
 
   @override
-  String get tagCategoryActivitiesName => 'Activities';
+  String get tagCategoryActivitiesName => 'فعالیت‌ها';
 
   @override
-  String get tagExerciseName => 'Exercise';
+  String get tagExerciseName => 'ورزش';
 
   @override
-  String get tagSocializingName => 'Socializing';
+  String get tagSocializingName => 'معاشرت';
 
   @override
-  String get tagHobbyName => 'Hobby';
+  String get tagHobbyName => '';
 
   @override
   String get tagEntertainmentName => 'Entertainment';
@@ -587,29 +588,29 @@ class AppLocalizationsFa extends AppLocalizations {
   String get tagChoresName => 'Chores';
 
   @override
-  String get tagCategoryEmotionsName => 'Emotions';
+  String get tagCategoryEmotionsName => 'احساساتی';
 
   @override
-  String get tagExcitedName => 'Excited';
+  String get tagExcitedName => 'هیجان‌زده';
 
   @override
-  String get tagGratefulName => 'Grateful';
+  String get tagGratefulName => 'سپاسگزار';
 
   @override
-  String get tagCalmName => 'Calm';
+  String get tagCalmName => 'آرام';
 
   @override
-  String get tagTiredName => 'Tired';
+  String get tagTiredName => 'خسته';
 
   @override
-  String get tagAnxiousName => 'Anxious';
+  String get tagAnxiousName => 'مضطرب';
 
   @override
-  String get tagAnnoyedName => 'Annoyed';
+  String get tagAnnoyedName => 'آزرده خاطر';
 
   @override
   String get welcomeLogBodyText =>
-      '## Welcome to Daily You\n\n> Every day is worth remembering, capture it!\n\n**Daily You** is free, [open source](https://github.com/Demizo/Daily_You), and community supported. Built around the belief that your diary should be yours, not a product:\n\n- No ads\n- No locked features\n- No tracking or data collection\n\nWhether you\'re journaling, reflecting, or just noting what made you smile, **Daily You** gives you a private space that\'s _truly your own_.';
+      '## به Daily You خوش آمدید\n\n> هر روز ارزش به خاطر سپردن دارد، آن را ثبت کنید!\n\n**Daily You** رایگان، [متن‌باز] (https://github.com/Demizo/Daily_You) و تحت حمایت جامعه است. بر اساس این باور ساخته شده است که دفتر خاطرات شما باید متعلق به خودتان باشد، نه یک محصول:\n\n- بدون تبلیغات\n- بدون ویژگی‌های قفل‌شده\n- بدون ردیابی یا جمع‌آوری داده‌ها\n\nچه در حال نوشتن خاطرات روزانه باشید، چه در حال تفکر، یا فقط یادداشت کردن آنچه که باعث لبخند شما شده است، **Daily You** به شما یک فضای خصوصی می‌دهد که _واقعاً متعلق به خودتان_ است.';
 
   @override
   String get settingsStorageTitle => 'ذخیره سازی';
@@ -690,7 +691,7 @@ class AppLocalizationsFa extends AppLocalizations {
 
   @override
   String migratingImagesStatus(Object current, Object total) {
-    return 'Migrating photos… $current/$total';
+    return 'در حال انتقال تصاویر… $current/$total';
   }
 
   @override
@@ -844,28 +845,28 @@ class AppLocalizationsFa extends AppLocalizations {
   String get settingsConsiderSupporting => 'حمایت را در نظر بگیرید';
 
   @override
-  String get imagesTitle => 'Images';
+  String get imagesTitle => 'تصاویر';
 
   @override
   String get tagMoodTitle => 'حس و حال';
 
   @override
-  String get calendarTagDisplayLabel => 'Tag';
+  String get calendarTagDisplayLabel => 'برچسب';
 
   @override
-  String get selectTagTitle => 'Select Tag';
+  String get selectTagTitle => 'انتخاب برچسب';
 
   @override
-  String get labelPresentLabel => 'Present';
+  String get labelPresentLabel => 'حال حاضر';
 
   @override
-  String get labelAbsentLabel => 'Absent';
+  String get labelAbsentLabel => 'غایب';
 
   @override
-  String get labelCoverageLabel => 'Coverage';
+  String get labelCoverageLabel => 'پوشش';
 
   @override
   String chartDistributionTitle(Object tag) {
-    return '$tag Distribution';
+    return '$tag توزیع';
   }
 }

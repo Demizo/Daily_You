@@ -892,7 +892,16 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get actionToday => 'Hoje';
 
   @override
+  String get actionOtherDay => 'Outro dia';
+
+  @override
   String get pageHomeTitle => 'Início';
+
+  @override
+  String get jumpToMonthTitle => 'Pular para o mês';
+
+  @override
+  String get jumpToLogTitle => 'Ir para registro';
 
   @override
   String get flashbacksTitle => 'Recordações';
@@ -943,6 +952,9 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   }
 
   @override
+  String get flashbackOnThisDay => 'Neste dia';
+
+  @override
   String get pageGalleryTitle => 'Galeria';
 
   @override
@@ -972,6 +984,9 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get noLogs => 'Sem Registros…';
+
+  @override
+  String get noResults => 'Sem resultados…';
 
   @override
   String get sortDateTitle => 'Data';
@@ -1009,6 +1024,21 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String chartByDayTitle(Object tag) {
     return '$tag Por Dia';
   }
+
+  @override
+  String get chartGroupingLabel => 'Agrupar por';
+
+  @override
+  String get chartGroupingDay => 'Dia';
+
+  @override
+  String get chartGroupingWeek => 'Semana';
+
+  @override
+  String get chartGroupingMonth => 'Mês';
+
+  @override
+  String get chartGroupingYear => 'Ano';
 
   @override
   String streakCurrent(num count) {
