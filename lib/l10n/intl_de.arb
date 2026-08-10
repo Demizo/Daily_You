@@ -232,5 +232,8 @@
     "labelPresentLabel": "Anwesend",
     "labelAbsentLabel": "Abwesend",
     "labelCoverageLabel": "Abdeckung",
-    "chartDistributionTitle": "{tag}-Verteilung"
+    "chartDistributionTitle": "{tag}-Verteilung",
+    "streakGreatDays": "{count, plural, other{Großartige Tage {count}}}",
+    "tagTypeTrackerTitle": "Tracker",
+    "iconGroupHome": "Start"
 }
