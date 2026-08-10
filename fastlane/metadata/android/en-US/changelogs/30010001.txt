@@ -1,0 +1,4 @@
+Daily You v3.1.0 has arrived! Tags & Templates:
+
+• Tags can now be attached to templates
+• Updated translations
