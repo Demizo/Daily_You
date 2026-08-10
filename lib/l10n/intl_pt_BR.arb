@@ -152,5 +152,15 @@
     "calendarSystemGregorian": "Gregoriano",
     "calendarSystemJalali": "Persa",
     "settingsCalendarSystem": "Sistema de Calendário",
-    "settingsHideImages": "Ocultar Imagens"
+    "settingsHideImages": "Ocultar Imagens",
+    "actionOtherDay": "Outro dia",
+    "jumpToMonthTitle": "Pular para o mês",
+    "jumpToLogTitle": "Ir para registro",
+    "flashbackOnThisDay": "Neste dia",
+    "noResults": "Sem resultados…",
+    "chartGroupingLabel": "Agrupar por",
+    "chartGroupingDay": "Dia",
+    "chartGroupingWeek": "Semana",
+    "chartGroupingMonth": "Mês",
+    "chartGroupingYear": "Ano"
 }
