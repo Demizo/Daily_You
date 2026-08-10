@@ -208,7 +208,7 @@
     "labelAbsentLabel": "غایب",
     "labelCoverageLabel": "پوشش",
     "chartDistributionTitle": "{tag} توزیع",
-    "jumpToLogTitle": "پرش به گزارشات",
+    "jumpToLogTitle": "پرش به تاریخچه",
     "databaseMigrationErrorTitle": "نتوانستم داده‌های شما را منتقل کنم",
     "databaseMigrationErrorDescription": "ورودی‌های شما امن هستند اما امکان انتقال آنها به حافظه برنامه وجود ندارد.\n\nدوباره امتحان کنید و اگر مشکل ادامه داشت، آن را گزارش دهید.",
     "iconGroupSymbols": "نمادها",
