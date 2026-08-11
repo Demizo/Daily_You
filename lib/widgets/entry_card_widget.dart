@@ -1,11 +1,11 @@
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:daily_you/widgets/entry_card_header_row.dart';
 import 'package:daily_you/widgets/image_grid.dart';
 import 'package:daily_you/widgets/scaled_markdown.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/models/entry.dart';
-import 'package:daily_you/widgets/mood_icon.dart';
 
 class EntryCardWidget extends StatelessWidget {
   const EntryCardWidget(
@@ -76,28 +76,13 @@ class EntryCardWidget extends StatelessWidget {
                         ),
             ),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                child: Text(
-                  title == null ? time : title!,
-                  style: TextStyle(
-                      color: theme.textTheme.labelSmall?.color,
-                      fontWeight: FontWeight.bold),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 2.0),
-                child: Container(
-                  constraints: const BoxConstraints(minWidth: 16),
-                  child: MoodIcon(
-                    moodValue: entry.mood,
-                  ),
-                ),
-              ),
-            ],
+          EntryCardHeaderRow(
+            entry: entry,
+            title: title == null ? time : title!,
+            titlePadding: const EdgeInsets.symmetric(horizontal: 4.0),
+            titleStyle: TextStyle(
+                color: theme.textTheme.labelSmall?.color,
+                fontWeight: FontWeight.bold),
           ),
         ],
       ),
