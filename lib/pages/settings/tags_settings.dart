@@ -426,6 +426,9 @@ class _TagsSettingsState extends State<TagsSettings> {
                       }
                     },
                   ),
+                  const SliverToBoxAdapter(
+                    child: SizedBox(height: 90),
+                  ),
                 ],
               );
             }),

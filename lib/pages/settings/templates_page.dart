@@ -143,7 +143,12 @@ class _TemplateSettingsState extends State<TemplateSettings> {
         ],
       ),
       body: SingleChildScrollView(
-        child: _templateList(context),
+        child: Column(
+          children: [
+            _templateList(context),
+            const SizedBox(height: 90),
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showEditTemplatePopup(context, null),
