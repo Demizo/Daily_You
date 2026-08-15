@@ -24,13 +24,13 @@ class AppLocalizationsHi extends AppLocalizations {
   String get actionToday => 'आज';
 
   @override
-  String get actionOtherDay => 'Other day';
+  String get actionOtherDay => 'अगले दिन';
 
   @override
   String get pageHomeTitle => 'होम';
 
   @override
-  String get jumpToMonthTitle => 'Jump to month';
+  String get jumpToMonthTitle => 'महीने पर जाएं';
 
   @override
   String get jumpToLogTitle => 'Jump to log';

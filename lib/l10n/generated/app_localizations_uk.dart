@@ -18,22 +18,22 @@ class AppLocalizationsUk extends AppLocalizations {
   String get dailyReminderDescription => 'Час написати про сьогодні…';
 
   @override
-  String get actionTakePhoto => 'Take photo';
+  String get actionTakePhoto => 'Зробити фото';
 
   @override
-  String get actionToday => 'Today';
+  String get actionToday => 'Сьогодні';
 
   @override
-  String get actionOtherDay => 'Other day';
+  String get actionOtherDay => 'Іншого дня';
 
   @override
   String get pageHomeTitle => 'Домашня';
 
   @override
-  String get jumpToMonthTitle => 'Jump to month';
+  String get jumpToMonthTitle => 'Перейти до місяця';
 
   @override
-  String get jumpToLogTitle => 'Jump to log';
+  String get jumpToLogTitle => 'Перейти до журналу';
 
   @override
   String get flashbacksTitle => 'Спогади';
@@ -87,7 +87,7 @@ class AppLocalizationsUk extends AppLocalizations {
   }
 
   @override
-  String get flashbackOnThisDay => 'On This Day';
+  String get flashbackOnThisDay => 'Цього дня';
 
   @override
   String get pageGalleryTitle => 'Галерея';
@@ -112,8 +112,9 @@ class AppLocalizationsUk extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count days',
-      one: '$count day',
+      other: '$count днів',
+      few: '$count дні',
+      one: '$count день',
     );
     return '$_temp0';
   }
@@ -133,7 +134,7 @@ class AppLocalizationsUk extends AppLocalizations {
   String get noLogs => 'Немає записів…';
 
   @override
-  String get noResults => 'No Results…';
+  String get noResults => 'Немає результатів…';
 
   @override
   String get sortDateTitle => 'За датою';
@@ -174,26 +175,26 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String chartOverTimeTitle(Object tag) {
-    return '$tag Over Time';
+    return '$tag За часом';
   }
 
   @override
-  String get chartGroupingLabel => 'Group by';
+  String get chartGroupingLabel => 'Згрупувати за';
 
   @override
-  String get chartGroupingDay => 'Day';
+  String get chartGroupingDay => 'День';
 
   @override
-  String get chartGroupingWeek => 'Week';
+  String get chartGroupingWeek => 'Тиждень';
 
   @override
-  String get chartGroupingMonth => 'Month';
+  String get chartGroupingMonth => 'Місяць';
 
   @override
-  String get chartGroupingYear => 'Year';
+  String get chartGroupingYear => 'Рік';
 
   @override
-  String get chartSmoothingLabel => 'Smoothing';
+  String get chartSmoothingLabel => 'Згладжування';
 
   @override
   String streakCurrent(num count) {
@@ -220,7 +221,7 @@ class AppLocalizationsUk extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Great Days $count',
+      other: 'Чудові дні $count',
     );
     return '$_temp0';
   }
@@ -248,17 +249,17 @@ class AppLocalizationsUk extends AppLocalizations {
       'Використовувати натомість локальне сховище';
 
   @override
-  String get databaseMigrationErrorTitle => 'Couldn\'t Move Your Data';
+  String get databaseMigrationErrorTitle => 'Не вдалося перемістити ваші дані';
 
   @override
   String get databaseMigrationErrorDescription =>
-      'Your entries are safe but couldn\'t be moved to the app\'s storage.\n\nTry again, and report the issue if it keeps happening.';
+      'Ваші записи в безпеці, але не можуть бути переміщенні до сховища додатка.\n\nСпробуйте знову та повідомте про проблему, якщо вона повториться.';
 
   @override
-  String get databaseMigrationErrorRetry => 'Retry';
+  String get databaseMigrationErrorRetry => 'Спробувати знову';
 
   @override
-  String get errorReport => 'Report Issue';
+  String get errorReport => 'Повідомити про проблему';
 
   @override
   String get lastModified => 'Востаннє змінено';
@@ -306,10 +307,10 @@ class AppLocalizationsUk extends AppLocalizations {
   String get settingsFirstDayOfWeek => 'Перший день тижня';
 
   @override
-  String get settingsCalendarSystem => 'Calendar System';
+  String get settingsCalendarSystem => 'Календарна система';
 
   @override
-  String get calendarSystemGregorian => 'Gregorian';
+  String get calendarSystemGregorian => 'Григоріанський';
 
   @override
   String get calendarSystemJalali => 'Jalali';
@@ -344,10 +345,10 @@ class AppLocalizationsUk extends AppLocalizations {
   String get settingsHideImagesInGallery => 'Приховати зображення в галереї';
 
   @override
-  String get settingsHideImages => 'Hide Images';
+  String get settingsHideImages => 'Сховати зображення';
 
   @override
-  String get pageCalendarTitle => 'Calendar';
+  String get pageCalendarTitle => 'Календар';
 
   @override
   String get viewLayoutList => 'Список';
@@ -417,7 +418,7 @@ class AppLocalizationsUk extends AppLocalizations {
   String get noTemplatesDescription => 'Жодного шаблону немає…';
 
   @override
-  String get templateVariableTime => 'Time';
+  String get templateVariableTime => 'Час';
 
   @override
   String get templateDefaultTimestampTitle => 'Timestamp';
@@ -428,7 +429,7 @@ class AppLocalizationsUk extends AppLocalizations {
   }
 
   @override
-  String get templateDefaultSummaryTitle => 'Day Summary';
+  String get templateDefaultSummaryTitle => 'Підсумок дня';
 
   @override
   String get templateDefaultSummaryBody => '### Summary\n- \n\n### Quote\n> ';

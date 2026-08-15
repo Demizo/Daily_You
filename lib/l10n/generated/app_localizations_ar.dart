@@ -33,7 +33,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get jumpToMonthTitle => 'ذهاب إلى الشهر';
 
   @override
-  String get jumpToLogTitle => 'Jump to log';
+  String get jumpToLogTitle => 'الإنتقال إلى السجل';
 
   @override
   String get flashbacksTitle => 'الذكريات';
