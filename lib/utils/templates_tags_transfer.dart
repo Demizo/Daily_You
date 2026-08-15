@@ -14,9 +14,22 @@ const String _tagsFileType = "daily_you_tags";
 const String _templatesFileType = "daily_you_templates";
 const int _transferFileVersion = 1;
 
+typedef _ItemIdentity = (
+  String name,
+  String iconType,
+  String? icon,
+  int? color
+);
+
+_ItemIdentity _itemIdentity(
+    String name, String iconType, String? icon, int? color) {
+  return (name, iconType, icon, color);
+}
+
 class TemplatesTagsTransfer {
-  static Map<String, dynamic> _serializeCategory(TagCategory category) {
+  static Map<String, dynamic> _serializeCategory(int id, TagCategory category) {
     return {
+      "id": id,
       "name": category.name,
       "icon": category.icon,
       "iconType": category.iconType.name,
@@ -25,14 +38,16 @@ class TemplatesTagsTransfer {
   }
 
   static Map<String, dynamic> _serializeTag(
-      Tag tag, Map<int?, TagCategory> categoriesById) {
+      int id, Tag tag, Map<int, int> categoryIdByDbId) {
     return {
+      "id": id,
       "name": tag.name,
       "tagType": tag.tagType.name,
       "icon": tag.icon,
       "iconType": tag.iconType.name,
       "color": tag.color,
-      "categoryName": categoriesById[tag.categoryId]?.name,
+      "categoryId":
+          tag.categoryId != null ? categoryIdByDbId[tag.categoryId] : null,
     };
   }
 
@@ -44,23 +59,25 @@ class TemplatesTagsTransfer {
     final tags = TagsProvider.instance.tags
         .where((tag) => selectedTagIds.contains(tag.id))
         .toList();
-    final categoryIds =
+    final categoryDbIds =
         tags.map((tag) => tag.categoryId).whereType<int>().toSet();
     final categories = TagsProvider.instance.categories
-        .where((category) => categoryIds.contains(category.id))
+        .where((category) => categoryDbIds.contains(category.id))
         .toList();
-    final categoriesById = {
-      for (final category in categories) category.id: category,
+    final categoryIdByDbId = {
+      for (var i = 0; i < categories.length; i++) categories[i].id!: i,
     };
 
     final data = {
       "type": _tagsFileType,
       "version": _transferFileVersion,
       "categories": [
-        for (final category in categories) _serializeCategory(category),
+        for (var i = 0; i < categories.length; i++)
+          _serializeCategory(i, categories[i]),
       ],
       "tags": [
-        for (final tag in tags) _serializeTag(tag, categoriesById),
+        for (var i = 0; i < tags.length; i++)
+          _serializeTag(i, tags[i], categoryIdByDbId),
       ],
     };
 
@@ -72,45 +89,49 @@ class TemplatesTagsTransfer {
         .where((template) => selectedTemplateIds.contains(template.id))
         .toList();
 
-    final tagIds = <int>{};
+    final tagDbIds = <int>{};
     for (final template in templates) {
       for (final templateTag
           in TagsProvider.instance.getTemplateTagsForTemplate(template.id!)) {
-        tagIds.add(templateTag.tagId);
+        tagDbIds.add(templateTag.tagId);
       }
     }
     final tags = TagsProvider.instance.tags
-        .where((tag) => tagIds.contains(tag.id))
+        .where((tag) => tagDbIds.contains(tag.id))
         .toList();
-    final tagsById = {for (final tag in tags) tag.id: tag};
+    final tagIdByDbId = {
+      for (var i = 0; i < tags.length; i++) tags[i].id!: i,
+    };
 
-    final categoryIds =
+    final categoryDbIds =
         tags.map((tag) => tag.categoryId).whereType<int>().toSet();
     final categories = TagsProvider.instance.categories
-        .where((category) => categoryIds.contains(category.id))
+        .where((category) => categoryDbIds.contains(category.id))
         .toList();
-    final categoriesById = {
-      for (final category in categories) category.id: category,
+    final categoryIdByDbId = {
+      for (var i = 0; i < categories.length; i++) categories[i].id!: i,
     };
 
     final data = {
       "type": _templatesFileType,
       "version": _transferFileVersion,
       "categories": [
-        for (final category in categories) _serializeCategory(category),
+        for (var i = 0; i < categories.length; i++)
+          _serializeCategory(i, categories[i]),
       ],
       "tags": [
-        for (final tag in tags) _serializeTag(tag, categoriesById),
+        for (var i = 0; i < tags.length; i++)
+          _serializeTag(i, tags[i], categoryIdByDbId),
       ],
       "templates": [
         for (final template in templates)
           {
             "name": template.name,
             "text": template.text,
-            "tagNames": TagsProvider.instance
+            "tagIds": TagsProvider.instance
                 .getTemplateTagsForTemplate(template.id!)
-                .map((templateTag) => tagsById[templateTag.tagId]?.name)
-                .whereType<String>()
+                .map((templateTag) => tagIdByDbId[templateTag.tagId])
+                .whereType<int>()
                 .toList(),
           },
       ],
@@ -167,48 +188,74 @@ class TemplatesTagsTransfer {
 
       updateStatus("25%");
 
-      final categoryIdByName = <String, int>{
+      final categoryIdByIdentity = <_ItemIdentity, int>{
         for (final category in TagsProvider.instance.categories)
-          category.name: category.id!,
+          _itemIdentity(category.name, category.iconType.name, category.icon,
+              category.color): category.id!,
       };
+      final categoryRealIdByFileId = <int, int>{};
       for (final rawCategory in (jsonData['categories'] as List? ?? [])) {
         final categoryJson = rawCategory as Map<String, dynamic>;
+        final fileId = categoryJson['id'] as int;
         final name = categoryJson['name'] as String;
-        if (categoryIdByName.containsKey(name)) continue;
+        final iconType = categoryJson['iconType'] as String;
+        final icon = categoryJson['icon'] as String?;
+        final color = categoryJson['color'] as int?;
+        final identity = _itemIdentity(name, iconType, icon, color);
+        final existingId = categoryIdByIdentity[identity];
+        if (existingId != null) {
+          categoryRealIdByFileId[fileId] = existingId;
+          continue;
+        }
         final created = await TagsProvider.instance.addCategory(TagCategory(
           name: name,
-          icon: categoryJson['icon'] as String?,
-          iconType:
-              TagIconType.values.byName(categoryJson['iconType'] as String),
-          color: categoryJson['color'] as int?,
+          icon: icon,
+          iconType: TagIconType.values.byName(iconType),
+          color: color,
           timeCreate: DateTime.now(),
           timeModified: DateTime.now(),
         ));
-        categoryIdByName[name] = created.id!;
+        categoryRealIdByFileId[fileId] = created.id!;
+        categoryIdByIdentity[identity] = created.id!;
       }
 
       updateStatus("50%");
 
-      final tagIdByName = <String, int>{
-        for (final tag in TagsProvider.instance.tags) tag.name: tag.id!,
+      final tagIdByIdentity = <_ItemIdentity, int>{
+        for (final tag in TagsProvider.instance.tags)
+          _itemIdentity(tag.name, tag.iconType.name, tag.icon, tag.color):
+              tag.id!,
       };
+      final tagRealIdByFileId = <int, int>{};
       for (final rawTag in (jsonData['tags'] as List? ?? [])) {
         final tagJson = rawTag as Map<String, dynamic>;
+        final fileId = tagJson['id'] as int;
         final name = tagJson['name'] as String;
-        if (tagIdByName.containsKey(name)) continue;
-        final categoryName = tagJson['categoryName'] as String?;
+        final iconType = tagJson['iconType'] as String;
+        final icon = tagJson['icon'] as String?;
+        final color = tagJson['color'] as int?;
+        final identity = _itemIdentity(name, iconType, icon, color);
+        final existingId = tagIdByIdentity[identity];
+        if (existingId != null) {
+          tagRealIdByFileId[fileId] = existingId;
+          continue;
+        }
+        final categoryFileId = tagJson['categoryId'] as int?;
         await TagsProvider.instance.add(Tag(
-          categoryId:
-              categoryName != null ? categoryIdByName[categoryName] : null,
-          icon: tagJson['icon'] as String?,
-          iconType: TagIconType.values.byName(tagJson['iconType'] as String),
+          categoryId: categoryFileId != null
+              ? categoryRealIdByFileId[categoryFileId]
+              : null,
+          icon: icon,
+          iconType: TagIconType.values.byName(iconType),
           name: name,
           tagType: TagType.values.byName(tagJson['tagType'] as String),
-          color: tagJson['color'] as int?,
+          color: color,
           timeCreate: DateTime.now(),
           timeModified: DateTime.now(),
         ));
-        tagIdByName[name] = TagsProvider.instance.tags.last.id!;
+        final createdId = TagsProvider.instance.tags.last.id!;
+        tagRealIdByFileId[fileId] = createdId;
+        tagIdByIdentity[identity] = createdId;
       }
 
       updateStatus("75%");
@@ -221,10 +268,9 @@ class TemplatesTagsTransfer {
           timeCreate: DateTime.now(),
           timeModified: DateTime.now(),
         ));
-        final tagNames =
-            (templateJson['tagNames'] as List? ?? []).cast<String>();
-        final tagIds = tagNames
-            .map((tagName) => tagIdByName[tagName])
+        final tagFileIds = (templateJson['tagIds'] as List? ?? []).cast<int>();
+        final tagIds = tagFileIds
+            .map((tagFileId) => tagRealIdByFileId[tagFileId])
             .whereType<int>()
             .toList();
         if (tagIds.isNotEmpty) {
