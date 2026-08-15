@@ -1,9 +1,13 @@
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/models/tag_category.dart';
 import 'package:daily_you/providers/tags_provider.dart';
+import 'package:daily_you/utils/backup_restore_utils.dart';
 import 'package:daily_you/utils/tag_category_visuals.dart';
+import 'package:daily_you/utils/templates_tags_transfer.dart';
 import 'package:daily_you/widgets/edit_category.dart';
 import 'package:daily_you/widgets/edit_tag.dart';
+import 'package:daily_you/widgets/expressive_fab_menu.dart';
+import 'package:daily_you/widgets/share_tags_dialog.dart';
 import 'package:daily_you/widgets/tag_chip.dart';
 import 'package:daily_you/widgets/tag_icon_glyph.dart';
 import 'package:flutter/material.dart';
@@ -47,6 +51,46 @@ class _TagsSettingsState extends State<TagsSettings> {
       context: context,
       builder: (_) => EditCategory(category: category),
     );
+  }
+
+  void _showShareDialog(BuildContext context) async {
+    await Navigator.of(context).push(MaterialPageRoute(
+        allowSnapshotting: false,
+        fullscreenDialog: true,
+        builder: (context) => const ShareTagsDialog()));
+  }
+
+  Future<void> _importFile(BuildContext context) async {
+    ValueNotifier<String> statusNotifier = ValueNotifier<String>("");
+
+    BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
+
+    bool success = await TemplatesTagsTransfer.importTransferFile((status) {
+      statusNotifier.value = status;
+    });
+
+    if (!context.mounted) return;
+    Navigator.of(context).pop();
+
+    if (!success) {
+      await showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+                title: Text(AppLocalizations.of(context)!.errorTitle),
+                actions: [
+                  TextButton(
+                    child:
+                        Text(MaterialLocalizations.of(context).okButtonLabel),
+                    onPressed: () async {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+                content:
+                    Text(AppLocalizations.of(context)!.importErrorDescription));
+          });
+    }
   }
 
   void _toggleCollapse(int? categoryId) {
@@ -289,15 +333,25 @@ class _TagsSettingsState extends State<TagsSettings> {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.create_new_folder_rounded),
-            onPressed: () => _showCategoryDialog(context, null),
+            icon: const Icon(Icons.file_open_outlined),
+            onPressed: () => _importFile(context),
           ),
           IconButton(
-            icon: const Icon(Icons.add_rounded),
-            onPressed: () => _showEditTagDialog(context, null),
+            icon: const Icon(Icons.share_rounded),
+            onPressed: () => _showShareDialog(context),
           ),
         ],
       ),
+      floatingActionButton: ExpressiveFabMenu(items: [
+        ExpressiveFabMenuItem(
+            icon: Icons.folder_rounded,
+            label: l10n.tagCategoryLabel,
+            onTap: () => _showCategoryDialog(context, null)),
+        ExpressiveFabMenuItem(
+            icon: Icons.local_offer_rounded,
+            label: l10n.tagLabel,
+            onTap: () => _showEditTagDialog(context, null)),
+      ]),
       body: isEmpty
           ? Center(
               child: Padding(

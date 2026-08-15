@@ -1,6 +1,8 @@
+import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/providers/templates_provider.dart';
+import 'package:daily_you/widgets/delete_confirm_dialog.dart';
 import 'package:daily_you/widgets/edit_toolbar.dart';
 import 'package:daily_you/widgets/entry_text_edit.dart';
 import 'package:daily_you/widgets/tag_attachment_source.dart';
@@ -83,6 +85,25 @@ class _EditTemplateState extends State<EditTemplate> {
     Navigator.of(context).pop();
   }
 
+  Future<void> _confirmDelete() async {
+    final template = widget.template;
+    if (template == null) return;
+    final l10n = AppLocalizations.of(context)!;
+    final confirmed = await showDeleteConfirmDialog(
+      context,
+      message: l10n.deleteTemplateMessage(template.name),
+    );
+    if (confirmed && mounted) {
+      final defaultTemplateId =
+          ConfigProvider.instance.get(ConfigKey.defaultTemplate) as int?;
+      if (defaultTemplateId == template.id) {
+        await ConfigProvider.instance.set(ConfigKey.defaultTemplate, -1);
+      }
+      await TemplatesProvider.instance.remove(template);
+      if (mounted) Navigator.of(context).pop();
+    }
+  }
+
   Future<void> _openTagPicker() async {
     await showDialog(
       context: context,
@@ -126,11 +147,22 @@ class _EditTemplateState extends State<EditTemplate> {
     );
   }
 
+  Widget deleteButton() {
+    return IconButton(
+      icon: const Icon(Icons.delete_rounded),
+      tooltip: MaterialLocalizations.of(context).deleteButtonTooltip,
+      onPressed: _confirmDelete,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        actions: [saveButton()],
+        actions: [
+          if (widget.template != null) deleteButton(),
+          saveButton(),
+        ],
       ),
       body: Column(
         children: [

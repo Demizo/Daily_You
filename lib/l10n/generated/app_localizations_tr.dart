@@ -502,10 +502,22 @@ class AppLocalizationsTr extends AppLocalizations {
   String get tagCategoryLabel => 'Kategori';
 
   @override
+  String get tagLabel => 'Tag';
+
+  @override
   String get tagCategoryUncategorized => 'Kategori edilmemiş';
 
   @override
   String get newCategoryTitle => 'Yeni Kategori';
+
+  @override
+  String get shareButtonLabel => 'Share';
+
+  @override
+  String get importErrorDescription => 'Failed to import file!';
+
+  @override
+  String get exportErrorDescription => 'Failed to export file!';
 
   @override
   String get deleteTitle => 'Sil';
@@ -532,6 +544,11 @@ class AppLocalizationsTr extends AppLocalizations {
       zero: '',
     );
     return 'Delete \"$name\"?$_temp0';
+  }
+
+  @override
+  String deleteTemplateMessage(Object name) {
+    return 'Delete \"$name\"?';
   }
 
   @override

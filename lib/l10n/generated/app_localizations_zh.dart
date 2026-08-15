@@ -495,10 +495,22 @@ class AppLocalizationsZh extends AppLocalizations {
   String get tagCategoryLabel => '分类';
 
   @override
+  String get tagLabel => 'Tag';
+
+  @override
   String get tagCategoryUncategorized => '未分类';
 
   @override
   String get newCategoryTitle => '新分类';
+
+  @override
+  String get shareButtonLabel => 'Share';
+
+  @override
+  String get importErrorDescription => 'Failed to import file!';
+
+  @override
+  String get exportErrorDescription => 'Failed to export file!';
 
   @override
   String get deleteTitle => '删除';
@@ -525,6 +537,11 @@ class AppLocalizationsZh extends AppLocalizations {
       zero: '',
     );
     return '删除「$name」？$_temp0';
+  }
+
+  @override
+  String deleteTemplateMessage(Object name) {
+    return 'Delete \"$name\"?';
   }
 
   @override
