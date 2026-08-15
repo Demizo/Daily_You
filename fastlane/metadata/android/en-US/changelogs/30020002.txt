@@ -1,0 +1,6 @@
+Daily You v3.2.0 has arrived! Sharing is caring:
+
+• Tags & templates can now be exported and shared with others
+• Logs will now show a preview of the tags they contain
+• UI improvements for the template and tag settings
+• Updated translations
