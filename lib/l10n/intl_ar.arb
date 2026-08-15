@@ -153,5 +153,6 @@
     "settingsCalendarSystem": "نظام التاريخ",
     "calendarSystemGregorian": "الميلادي",
     "calendarSystemJalali": "جلالي",
-    "jumpToMonthTitle": "ذهاب إلى الشهر"
+    "jumpToMonthTitle": "ذهاب إلى الشهر",
+    "jumpToLogTitle": "الإنتقال إلى السجل"
 }

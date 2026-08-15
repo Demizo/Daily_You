@@ -82,5 +82,7 @@
     "calendarSystemGregorian": "ग्रेगोरियन",
     "calendarSystemJalali": "जलाली",
     "settingsUseSystemAccentColor": "सिस्टम का निजी रंग उपयोग करें",
-    "actionTakePhoto": "फोटो लें"
+    "actionTakePhoto": "फोटो लें",
+    "actionOtherDay": "अगले दिन",
+    "jumpToMonthTitle": "महीने पर जाएं"
 }
