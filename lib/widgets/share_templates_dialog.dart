@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:daily_you/providers/templates_provider.dart';
 import 'package:daily_you/utils/backup_restore_utils.dart';
 import 'package:daily_you/utils/templates_tags_transfer.dart';
@@ -123,14 +125,15 @@ class _ShareTemplatesDialogState extends State<ShareTemplatesDialog> {
                     onPressed: hasSelection ? _save : null,
                   ),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: FilledButton.icon(
-                    icon: const Icon(Icons.share_rounded),
-                    label: Text(l10n.shareButtonLabel),
-                    onPressed: hasSelection ? _share : null,
+                if (Platform.isAndroid) const SizedBox(width: 12),
+                if (Platform.isAndroid)
+                  Expanded(
+                    child: FilledButton.icon(
+                      icon: const Icon(Icons.share_rounded),
+                      label: Text(l10n.shareButtonLabel),
+                      onPressed: hasSelection ? _share : null,
+                    ),
                   ),
-                ),
               ],
             ),
           ),

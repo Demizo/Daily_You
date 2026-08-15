@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/utils/backup_restore_utils.dart';
 import 'package:daily_you/utils/tag_category_visuals.dart';
@@ -185,14 +187,15 @@ class _ShareTagsDialogState extends State<ShareTagsDialog> {
                     onPressed: hasSelection ? _save : null,
                   ),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: FilledButton.icon(
-                    icon: const Icon(Icons.share_rounded),
-                    label: Text(l10n.shareButtonLabel),
-                    onPressed: hasSelection ? _share : null,
+                if (Platform.isAndroid) const SizedBox(width: 12),
+                if (Platform.isAndroid)
+                  Expanded(
+                    child: FilledButton.icon(
+                      icon: const Icon(Icons.share_rounded),
+                      label: Text(l10n.shareButtonLabel),
+                      onPressed: hasSelection ? _share : null,
+                    ),
                   ),
-                ),
               ],
             ),
           ),
