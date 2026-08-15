@@ -502,10 +502,22 @@ class AppLocalizationsId extends AppLocalizations {
   String get tagCategoryLabel => 'Kategori';
 
   @override
+  String get tagLabel => 'Tag';
+
+  @override
   String get tagCategoryUncategorized => 'Tanpa Kategori';
 
   @override
   String get newCategoryTitle => 'Kategori Baru';
+
+  @override
+  String get shareButtonLabel => 'Share';
+
+  @override
+  String get importErrorDescription => 'Failed to import file!';
+
+  @override
+  String get exportErrorDescription => 'Failed to export file!';
 
   @override
   String get deleteTitle => 'Hapus';
@@ -532,6 +544,11 @@ class AppLocalizationsId extends AppLocalizations {
       zero: '',
     );
     return 'Hapus \"$name\"?$_temp0';
+  }
+
+  @override
+  String deleteTemplateMessage(Object name) {
+    return 'Delete \"$name\"?';
   }
 
   @override

@@ -958,6 +958,12 @@ abstract class AppLocalizations {
   /// **'Category'**
   String get tagCategoryLabel;
 
+  /// No description provided for @tagLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag'**
+  String get tagLabel;
+
   /// No description provided for @tagCategoryUncategorized.
   ///
   /// In en, this message translates to:
@@ -969,6 +975,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'New Category'**
   String get newCategoryTitle;
+
+  /// No description provided for @shareButtonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get shareButtonLabel;
+
+  /// No description provided for @importErrorDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to import file!'**
+  String get importErrorDescription;
+
+  /// No description provided for @exportErrorDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to export file!'**
+  String get exportErrorDescription;
 
   /// No description provided for @deleteTitle.
   ///
@@ -987,6 +1011,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete \"{name}\"?{count, plural, =0{} =1{ Its 1 tag will also be deleted.} other{ Its {count} tags will also be deleted.}}'**
   String deleteCategoryMessage(num count, Object name);
+
+  /// No description provided for @deleteTemplateMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete \"{name}\"?'**
+  String deleteTemplateMessage(Object name);
 
   /// No description provided for @filterTagsTitle.
   ///

@@ -501,10 +501,22 @@ class AppLocalizationsFa extends AppLocalizations {
   String get tagCategoryLabel => 'دسته بندی';
 
   @override
+  String get tagLabel => 'Tag';
+
+  @override
   String get tagCategoryUncategorized => 'دسته بندی نشده';
 
   @override
   String get newCategoryTitle => 'دسته بندی جدید';
+
+  @override
+  String get shareButtonLabel => 'Share';
+
+  @override
+  String get importErrorDescription => 'Failed to import file!';
+
+  @override
+  String get exportErrorDescription => 'Failed to export file!';
 
   @override
   String get deleteTitle => 'پاک کردن';
@@ -531,6 +543,11 @@ class AppLocalizationsFa extends AppLocalizations {
       zero: '',
     );
     return 'Delete \"$name\"?$_temp0';
+  }
+
+  @override
+  String deleteTemplateMessage(Object name) {
+    return 'Delete \"$name\"?';
   }
 
   @override
