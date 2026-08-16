@@ -74,6 +74,7 @@ class ConfigKey {
   static const String requirePassword = "requirePassword";
   static const String biometricUnlock = "biometricUnlock";
   static const String passwordHash = "passwordHash";
+  static const String passwordIsPin = "passwordIsPin";
   // DEPRECATED
   static const String imageQuality = "imageQuality";
   static const String homePageViewMode = "homePageViewMode";
@@ -157,7 +158,8 @@ class ConfigProvider with ChangeNotifier {
   final Map<String, dynamic> _secureConfig = {
     ConfigKey.requirePassword: false,
     ConfigKey.biometricUnlock: false,
-    ConfigKey.passwordHash: ""
+    ConfigKey.passwordHash: "",
+    ConfigKey.passwordIsPin: false,
   };
 
   bool _isSecureKey(String key) => _secureConfig.containsKey(key);
@@ -237,7 +239,8 @@ class ConfigProvider with ChangeNotifier {
     // Never let a migration failure abort startup; settings fall back to
     // defaults via readConfig() if the config can't be moved.
     try {
-      _logger.info('Config migration started: ${oldFile.path} -> ${newFile.path}');
+      _logger
+          .info('Config migration started: ${oldFile.path} -> ${newFile.path}');
       await oldFile.copy(newFile.path);
       if (newFile.existsSync() && newFile.lengthSync() > 0) {
         await oldFile.delete();
