@@ -178,5 +178,6 @@
     "colorPickerTitle": "اختار اللون",
     "colorPickerPaletteTab": "الوان",
     "iconGroupMoodPeople": "المزاج والناس",
-    "iconGroupHealth": "الصحة"
+    "iconGroupHealth": "الصحة",
+    "streakGreatDays": "{count, plural, other{أيام عظيمة {count}}}"
 }
