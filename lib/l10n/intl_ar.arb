@@ -179,5 +179,6 @@
     "colorPickerPaletteTab": "الوان",
     "iconGroupMoodPeople": "المزاج والناس",
     "iconGroupHealth": "الصحة",
-    "streakGreatDays": "{count, plural, other{أيام عظيمة {count}}}"
+    "streakGreatDays": "{count, plural, other{أيام عظيمة {count}}}",
+    "databaseMigrationErrorRetry": "عيد"
 }
