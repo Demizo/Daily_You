@@ -236,5 +236,10 @@
     "labelAbsentLabel": "未設定",
     "labelCoverageLabel": "覆蓋率",
     "chartDistributionTitle": "{tag} 分佈",
-    "iconGroupHome": "家"
+    "iconGroupHome": "家",
+    "tagLabel": "標籤",
+    "shareButtonLabel": "分享",
+    "importErrorDescription": "檔案匯入失敗！",
+    "exportErrorDescription": "檔案匯出失敗！",
+    "deleteTemplateMessage": "刪除「{name}」？"
 }

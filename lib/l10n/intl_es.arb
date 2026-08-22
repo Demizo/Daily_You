@@ -236,5 +236,10 @@
     "labelPresentLabel": "Presente",
     "labelAbsentLabel": "Ausente",
     "labelCoverageLabel": "Cobertura",
-    "chartDistributionTitle": "Distribución de {tag}"
+    "chartDistributionTitle": "Distribución de {tag}",
+    "tagLabel": "Etiqueta",
+    "shareButtonLabel": "Compartir",
+    "importErrorDescription": "¡No se pudo importar el archivo!",
+    "exportErrorDescription": "¡No se pudo exportar el archivo!",
+    "deleteTemplateMessage": "¿Borrar \"{nombre}\"?"
 }

@@ -235,5 +235,10 @@
     "labelAbsentLabel": "未设定",
     "labelCoverageLabel": "覆盖率",
     "chartDistributionTitle": "{tag} 分布",
-    "iconGroupHome": "家居"
+    "iconGroupHome": "家居",
+    "exportErrorDescription": "文件导出失败！",
+    "importErrorDescription": "文件导入失败！",
+    "deleteTemplateMessage": "删除「{name}」？",
+    "tagLabel": "标签",
+    "shareButtonLabel": "分享"
 }

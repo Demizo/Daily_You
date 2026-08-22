@@ -235,5 +235,10 @@
     "chartDistributionTitle": "{tag}-Verteilung",
     "streakGreatDays": "{count, plural, other{Großartige Tage {count}}}",
     "tagTypeTrackerTitle": "Tracker",
-    "iconGroupHome": "Start"
+    "iconGroupHome": "Start",
+    "tagLabel": "Schlagwort",
+    "shareButtonLabel": "Teilen",
+    "importErrorDescription": "Konnte Datei nicht importieren!",
+    "exportErrorDescription": "Konnte Datei nicht exportieren!",
+    "deleteTemplateMessage": "Lösche „{name}“?"
 }
