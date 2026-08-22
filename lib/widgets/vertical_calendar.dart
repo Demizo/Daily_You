@@ -806,10 +806,12 @@ class _WeekRow extends StatelessWidget {
           }
 
           final entries = entriesProvider.getEntriesForDate(day);
-          final firstEntry = entries.firstOrNull;
-          final firstImage = !showImages || firstEntry == null
+          final firstImage = !showImages
               ? null
-              : imagesProvider.getFirstImageForEntry(firstEntry.id!);
+              : entries
+                  .map((entry) =>
+                      imagesProvider.getFirstImageForEntry(entry.id!))
+                  .firstWhere((image) => image != null, orElse: () => null);
 
           final displayDayNum =
               isJalali ? TimeManager.jalaliDayNumber(day) : day.day;
