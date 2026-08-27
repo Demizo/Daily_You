@@ -2,12 +2,17 @@ import 'dart:io';
 
 import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/database/image_storage.dart';
+import 'package:daily_you/models/entry.dart';
+import 'package:daily_you/models/image.dart';
+import 'package:daily_you/providers/entries_provider.dart';
+import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/utils/file_layer.dart';
 import 'package:daily_you/utils/zip_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 class BackupRestoreUtils {
   static Future<bool> backupToZip(
@@ -92,8 +97,7 @@ class BackupRestoreUtils {
       if (await tempDb.exists()) {
         // Import database
         await AppDatabase.instance.close();
-        await File(await AppDatabase.instance.getInternalPath())
-            .writeAsBytes(await tempDb.readAsBytes());
+        await mergeDatabases(tempDb);
         await AppDatabase.instance.open();
         await AppDatabase.instance.updateExternalDatabase();
 
@@ -164,5 +168,36 @@ class BackupRestoreUtils {
         );
       },
     );
+  }
+
+  static Future<void> mergeDatabases(File newEntriesFile) async {
+    final newDb = await openDatabase(newEntriesFile.path, readOnly: true);
+
+    final List<Map<String, Object?>> newEntries = await newDb.query("entries");
+    final List<Map<String, Object?>> newImages = await newDb.query("entry_images");
+    
+    // Entry workingEntry = Entry(text: "", timeCreate: DateTime.now(), timeModified: DateTime.now());
+    for (var entryMap in newEntries) {
+      final newEntry = Entry(
+        text: entryMap[EntryFields.text].toString(),
+        timeCreate: DateTime.parse(entryMap[EntryFields.timeCreate].toString()),
+        timeModified: DateTime.parse(entryMap[EntryFields.timeModified].toString()),
+        mood: entryMap[EntryFields.mood] != null ? int.parse(entryMap[EntryFields.mood].toString()) : null
+      );
+
+      final createdEntry = await EntriesProvider.instance.add(newEntry);
+
+      final relevantImages = newImages.where((image) => image[EntryImageFields.entryId] == createdEntry.id);
+
+      for (var img in relevantImages) {
+        final newImage = EntryImage(
+          entryId: int.parse(img[EntryImageFields.entryId].toString()),
+          imgPath: img[EntryImageFields.imgPath].toString(),
+          imgRank: int.parse(img[EntryImageFields.imgRank].toString()),
+          timeCreate: DateTime.parse(img[EntryImageFields.timeCreate].toString())
+        );
+        await EntryImagesProvider.instance.add(newImage);
+      }
+    }
   }
 }
