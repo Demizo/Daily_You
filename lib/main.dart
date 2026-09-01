@@ -358,9 +358,10 @@ class _MainAppState extends State<MainApp> {
       return StatsFl(
         isEnabled: false,
         child: GestureDetector(
-            onTap: () {
-              FocusManager.instance.primaryFocus?.unfocus();
-            },
+            onTap: Platform.isAndroid
+                ? () => FocusManager.instance.primaryFocus
+                    ?.unfocus(disposition: UnfocusDisposition.scope)
+                : null,
             child: MaterialApp(
                 onGenerateTitle: (context) =>
                     AppLocalizations.of(context)!.appTitle,
