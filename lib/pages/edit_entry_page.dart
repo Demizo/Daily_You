@@ -17,13 +17,14 @@ import 'package:daily_you/widgets/tag_chip.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:provider/provider.dart';
 import 'package:daily_you/pages/full_screen_text_editor_page.dart';
-import 'package:daily_you/widgets/edit_toolbar.dart';
+import 'package:daily_you/widgets/editor_action_bar.dart';
+import 'package:daily_you/widgets/editor_action_bar/editor_keyboard_session.dart';
 import 'package:daily_you/widgets/entry_image_editable_list.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/models/entry.dart';
-import 'package:daily_you/widgets/entry_image_picker.dart';
+import 'package:daily_you/widgets/entry_image_actions.dart';
 import 'package:daily_you/widgets/entry_text_edit.dart';
 import 'package:daily_you/widgets/entry_mood_picker.dart';
 
@@ -120,6 +121,11 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     setState(() {
       _loadingEntry = false;
     });
+
+    if (widget.openCamera && !_openedCamera) {
+      _openedCamera = true;
+      EntryImageActions.takePhoto(_addImage);
+    }
   }
 
   @override
@@ -210,6 +216,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final keyboardInset = EditorActionBarOverlay.keyboardInsetOf(context);
 
     return _loadingEntry
         ? Scaffold()
@@ -233,62 +240,54 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                     },
                   ),
                   actions: [_deleteButton(), _saveButton()]),
-              body: Column(
-                children: [
-                  Expanded(
-                    child: CustomScrollView(
-                      slivers: [
-                        SliverToBoxAdapter(
-                          child: Align(
-                            alignment: Alignment.topCenter,
-                            child: ConstrainedBox(
-                              constraints: const BoxConstraints(maxWidth: 800),
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8),
-                                child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: [
-                                    if (_currentImages.isNotEmpty)
-                                      EntryImageEditableList(
-                                          images: _currentImages,
-                                          onImagesChanged: (images) async {
-                                            _currentImages = images;
-                                            await _saveEntry();
-                                          }),
-                                    StatefulBuilder(
-                                      builder: (context, setLocalState) =>
-                                          _buildMetadataCard(
-                                              context, theme, setLocalState),
-                                    ),
-                                  ],
+              body: EditorActionBarOverlay(
+                keyboardInset: keyboardInset,
+                body: CustomScrollView(
+                  slivers: [
+                    SliverToBoxAdapter(
+                      child: Align(
+                        alignment: Alignment.topCenter,
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 800),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                if (_currentImages.isNotEmpty)
+                                  EntryImageEditableList(
+                                      images: _currentImages,
+                                      onImagesChanged: (images) async {
+                                        _currentImages = images;
+                                        await _saveEntry();
+                                      }),
+                                StatefulBuilder(
+                                  builder: (context, setLocalState) =>
+                                      _buildMetadataCard(
+                                          context, theme, setLocalState),
                                 ),
-                              ),
+                              ],
                             ),
                           ),
                         ),
-                        _buildTextEditorSliver(),
-                      ],
+                      ),
                     ),
-                  ),
-                  SafeArea(
-                    top: false,
-                    child: EditToolbar(
-                      controller: _textEditingController,
-                      undoController: _undoController,
-                      focusNode: _focusNode,
-                      onTemplateInserted: _applyInsertedTemplateTags,
-                      trailer: _buildTagsButton(context, theme),
-                    ),
-                  ),
-                ],
+                    _buildTextEditorSliver(context),
+                  ],
+                ),
+                actionBar: EditorActionBar(
+                  controller: _textEditingController,
+                  undoController: _undoController,
+                  focusNode: _focusNode,
+                  onTemplateInserted: _applyInsertedTemplateTags,
+                  mainActions: _buildMainActions(context),
+                ),
               ),
             ),
           );
   }
 
-  // The card showing entry date/time, tag/image actions, mood, and tags.
+  // The card showing entry date/time, mood, and tags.
   // setLocalState is the StatefulBuilder's setter, so a mood change only
   // rebuilds this card instead of the whole scroll view.
   Widget _buildMetadataCard(
@@ -304,15 +303,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
         children: [
           SizedBox(
             width: double.infinity,
-            child: Wrap(
-              crossAxisAlignment: WrapCrossAlignment.start,
-              alignment: WrapAlignment.spaceBetween,
-              runSpacing: 8.0,
-              children: [
-                _buildDateTimeButtons(context, theme),
-                _buildImageButton(context, theme),
-              ],
-            ),
+            child: _buildDateTimeButtons(context, theme),
           ),
           Padding(
             padding: const EdgeInsets.only(top: 4.0, bottom: 4.0),
@@ -413,71 +404,73 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     );
   }
 
-  Widget _buildImageButton(BuildContext context, ThemeData theme) {
-    return EntryImagePicker(
-      onChangedImage: (newImages) {
-        _openedCamera = true;
-        _addImage(newImages);
-      },
-      openCamera: widget.openCamera && !_openedCamera,
-    );
-  }
-
-  Widget _buildTagsButton(BuildContext context, ThemeData theme) {
-    return IconButton(
-      onPressed: () async {
-        await showDialog(
+  List<ToolbarAction> _buildMainActions(BuildContext context) {
+    return [
+      ToolbarAction(
+        icon: Icons.local_offer_rounded,
+        onPressed: () => showDialog(
           context: context,
           builder: (_) =>
               TagPickerDialog(mode: TagPickerMode.attach, source: _tagSource),
-        );
-      },
-      icon: Icon(
-        Icons.local_offer_rounded,
-        color: theme.colorScheme.primary,
-        size: 24,
+        ),
       ),
-      style: IconButton.styleFrom(
-          backgroundColor: theme.colorScheme.primaryContainer),
-    );
+      ToolbarAction(
+        icon: Icons.photo,
+        mayLeaveApp: true,
+        onPressed: () => EntryImageActions.pickFromGallery(_addImage),
+      ),
+      if (Platform.isAndroid)
+        ToolbarAction(
+          icon: Icons.photo_camera_rounded,
+          mayLeaveApp: true,
+          onPressed: () => EntryImageActions.takePhoto(_addImage),
+        ),
+    ];
   }
 
-  Widget _buildTextEditorSliver() {
+  Widget _buildTextEditorSliver(BuildContext context) {
     return SliverFillRemaining(
       hasScrollBody: false,
-      child: GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onTap: () => _focusNode.requestFocus(),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Flexible(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 800),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Expanded(
-                        child: StatefulBuilder(
-                          builder: (context, setState) => EntryTextEditor(
-                            text: text,
-                            focusNode: _focusNode,
-                            textEditingController: _textEditingController,
-                            undoHistoryController: _undoController,
-                            onExpand: _openFullScreenEditor,
+      child: Builder(
+        builder: (context) => GestureDetector(
+          behavior: HitTestBehavior.translucent,
+          onTap: () {
+            EditorKeyboardSessionScope.maybeOf(context)?.resume();
+            _focusNode.requestFocus();
+          },
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Flexible(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 800),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Expanded(
+                          child: StatefulBuilder(
+                            builder: (context, setState) => EntryTextEditor(
+                              text: text,
+                              focusNode: _focusNode,
+                              textEditingController: _textEditingController,
+                              undoHistoryController: _undoController,
+                              onExpand: _openFullScreenEditor,
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                    ],
+                        SizedBox(
+                            height:
+                                16 + EditorActionBar.reservedHeight(context)),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

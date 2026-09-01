@@ -1,9 +1,7 @@
-import 'dart:ui';
-
-import 'package:daily_you/widgets/edit_toolbar.dart';
+import 'package:daily_you/widgets/editor_action_bar.dart';
+import 'package:daily_you/widgets/entry_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
-import 'package:flutter/services.dart';
 import 'package:word_count/word_count.dart';
 
 class FullScreenTextEditorPage extends StatefulWidget {
@@ -49,6 +47,8 @@ class _FullScreenTextEditorPageState extends State<FullScreenTextEditorPage> {
 
   @override
   Widget build(BuildContext context) {
+    final keyboardInset = EditorActionBarOverlay.keyboardInsetOf(context);
+
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, _) {
@@ -71,43 +71,29 @@ class _FullScreenTextEditorPageState extends State<FullScreenTextEditorPage> {
         ),
         body: Builder(
           builder: (context) {
-            return Column(
-              children: [
-                Expanded(
-                  child: SafeArea(
-                    top: false,
-                    bottom: false,
-                    child: TextField(
-                      controller: _controller,
-                      undoController: _undoController,
-                      focusNode: _focusNode,
-                      maxLines: null,
-                      expands: true,
-                      selectionWidthStyle: BoxWidthStyle.tight,
-                      spellCheckConfiguration: SpellCheckConfiguration(
-                          spellCheckService: DefaultSpellCheckService()),
-                      textCapitalization: TextCapitalization.sentences,
-                      textAlignVertical: TextAlignVertical.top,
-                      style: const TextStyle(fontSize: 16),
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        contentPadding: const EdgeInsets.only(
-                            left: 16, right: 16, bottom: 8.0),
-                        hintText:
-                            AppLocalizations.of(context)!.writeSomethingHint,
-                      ),
-                    ),
-                  ),
-                ),
-                SafeArea(
-                  top: false,
-                  child: EditToolbar(
+            return EditorActionBarOverlay(
+              keyboardInset: keyboardInset,
+              body: SafeArea(
+                top: false,
+                bottom: false,
+                child: Padding(
+                  padding: EdgeInsets.only(
+                      bottom: EditorActionBar.reservedHeight(context)),
+                  child: EntryTextField(
                     controller: _controller,
                     undoController: _undoController,
                     focusNode: _focusNode,
+                    textAlignVertical: TextAlignVertical.top,
+                    contentPadding:
+                        const EdgeInsets.only(left: 16, right: 16, bottom: 8.0),
                   ),
                 ),
-              ],
+              ),
+              actionBar: EditorActionBar(
+                controller: _controller,
+                undoController: _undoController,
+                focusNode: _focusNode,
+              ),
             );
           },
         ),

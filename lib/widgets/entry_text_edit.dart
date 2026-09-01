@@ -1,9 +1,6 @@
-import 'dart:ui';
-
-import 'package:daily_you/models/template.dart';
+import 'package:daily_you/widgets/editor_action_bar.dart';
+import 'package:daily_you/widgets/entry_text_field.dart';
 import 'package:flutter/material.dart';
-import 'package:daily_you/l10n/generated/app_localizations.dart';
-import 'package:flutter/services.dart';
 
 class EntryTextEditor extends StatefulWidget {
   final String text;
@@ -27,8 +24,6 @@ class EntryTextEditor extends StatefulWidget {
 
 class _EntryTextEditorState extends State<EntryTextEditor> {
   final ScrollController _scrollController = ScrollController();
-  late List<Template> templates;
-  bool isLoading = true;
 
   @override
   void initState() {
@@ -38,56 +33,50 @@ class _EntryTextEditorState extends State<EntryTextEditor> {
 
   @override
   void dispose() {
+    _scrollController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final isWide = MediaQuery.of(context).size.width >= 600;
-    final card = Card.filled(
-      color: Theme.of(context).colorScheme.surfaceContainer,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 8, top: 2, bottom: 0, right: 8),
-        child: entryTextField(),
-      ),
-    );
-
-    if (!isWide || widget.onExpand == null) return card;
+    final isWide =
+        MediaQuery.sizeOf(context).width >= EditorActionBar.wideBreakpoint;
+    final showExpandButton = isWide && widget.onExpand != null;
 
     return Stack(
       children: [
-        card,
-        Positioned(
-          top: 4,
-          right: 4,
-          child: IconButton(
-            icon: const Icon(Icons.open_in_full_rounded, size: 20),
-            visualDensity: VisualDensity.compact,
-            padding: EdgeInsets.zero,
-            onPressed: widget.onExpand,
+        Card.filled(
+          color: Theme.of(context).colorScheme.surfaceContainer,
+          child: Padding(
+            padding:
+                const EdgeInsets.only(left: 8, top: 2, bottom: 0, right: 8),
+            child: EntryTextField(
+              controller: widget.textEditingController,
+              undoController: widget.undoHistoryController,
+              focusNode: widget.focusNode,
+              scrollController: _scrollController,
+              // Add padding so cursor avoids action bar
+              scrollPadding: EdgeInsets.only(
+                left: 20.0,
+                top: 20.0,
+                right: 20.0,
+                bottom: 20.0 + EditorActionBar.reservedHeight(context),
+              ),
+            ),
           ),
         ),
+        if (showExpandButton)
+          Positioned(
+            top: 4,
+            right: 4,
+            child: IconButton(
+              icon: const Icon(Icons.open_in_full_rounded, size: 20),
+              visualDensity: VisualDensity.compact,
+              padding: EdgeInsets.zero,
+              onPressed: widget.onExpand,
+            ),
+          ),
       ],
-    );
-  }
-
-  Widget entryTextField() {
-    return TextField(
-      controller: widget.textEditingController,
-      undoController: widget.undoHistoryController,
-      focusNode: widget.focusNode,
-      scrollController: _scrollController,
-      maxLines: null,
-      expands: true,
-      selectionWidthStyle: BoxWidthStyle.tight,
-      spellCheckConfiguration: SpellCheckConfiguration(
-          spellCheckService: DefaultSpellCheckService()),
-      textCapitalization: TextCapitalization.sentences,
-      style: const TextStyle(fontSize: 16),
-      decoration: InputDecoration(
-        border: InputBorder.none,
-        hintText: AppLocalizations.of(context)!.writeSomethingHint,
-      ),
     );
   }
 }

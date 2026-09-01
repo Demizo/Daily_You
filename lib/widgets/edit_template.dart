@@ -2,14 +2,15 @@ import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/providers/templates_provider.dart';
+import 'package:daily_you/utils/text_editing.dart';
 import 'package:daily_you/widgets/delete_confirm_dialog.dart';
-import 'package:daily_you/widgets/edit_toolbar.dart';
+import 'package:daily_you/widgets/editor_action_bar.dart';
+import 'package:daily_you/widgets/editor_action_bar/editor_keyboard_session.dart';
 import 'package:daily_you/widgets/entry_text_edit.dart';
 import 'package:daily_you/widgets/tag_attachment_source.dart';
 import 'package:daily_you/widgets/tag_chip.dart';
 import 'package:daily_you/widgets/tag_grouped_chip_list.dart';
 import 'package:daily_you/widgets/tag_picker_dialog.dart';
-import 'package:daily_you/widgets/template_variable_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
@@ -112,6 +113,23 @@ class _EditTemplateState extends State<EditTemplate> {
     );
   }
 
+  List<ToolbarAction> _buildMainActions() {
+    return [
+      ToolbarAction(
+        icon: Icons.today_rounded,
+        onPressed: () => insertAtCursor(_textEditingController, '{{date}}'),
+      ),
+      ToolbarAction(
+        icon: Icons.access_time_rounded,
+        onPressed: () => insertAtCursor(_textEditingController, '{{time}}'),
+      ),
+      ToolbarAction(
+        icon: Icons.local_offer_rounded,
+        onPressed: _openTagPicker,
+      ),
+    ];
+  }
+
   Widget _buildTagChips() {
     return ListenableBuilder(
       listenable: _tagSource,
@@ -157,6 +175,8 @@ class _EditTemplateState extends State<EditTemplate> {
 
   @override
   Widget build(BuildContext context) {
+    final keyboardInset = EditorActionBarOverlay.keyboardInsetOf(context);
+
     return Scaffold(
       appBar: AppBar(
         actions: [
@@ -164,114 +184,110 @@ class _EditTemplateState extends State<EditTemplate> {
           saveButton(),
         ],
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(
-                  child: Align(
-                    alignment: Alignment.topCenter,
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 800),
+      body: EditorActionBarOverlay(
+        keyboardInset: keyboardInset,
+        body: CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 800),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Card.filled(
+                      color: Theme.of(context).colorScheme.surfaceContainer,
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: Card.filled(
-                          color: Theme.of(context).colorScheme.surfaceContainer,
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                              left: 8.0,
-                              right: 8.0,
-                            ),
-                            child: TextField(
-                              controller: _nameController,
-                              maxLines: 1,
-                              textCapitalization: TextCapitalization.words,
-                              spellCheckConfiguration: SpellCheckConfiguration(
-                                  spellCheckService:
-                                      DefaultSpellCheckService()),
-                              decoration: InputDecoration(
-                                border: InputBorder.none,
-                                hintText:
-                                    AppLocalizations.of(context)!.titleHint,
-                              ),
-                            ),
+                        padding: const EdgeInsets.only(
+                          left: 8.0,
+                          right: 8.0,
+                        ),
+                        child: TextField(
+                          controller: _nameController,
+                          maxLines: 1,
+                          textCapitalization: TextCapitalization.words,
+                          spellCheckConfiguration: SpellCheckConfiguration(
+                              spellCheckService: DefaultSpellCheckService()),
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            hintText: AppLocalizations.of(context)!.titleHint,
                           ),
                         ),
                       ),
                     ),
                   ),
                 ),
-                SliverToBoxAdapter(
-                  child: Align(
-                    alignment: Alignment.topCenter,
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 800),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: _buildTagChips(),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.translucent,
-                    onTap: () => _focusNode.requestFocus(),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Flexible(
-                          child: ConstrainedBox(
-                            constraints: const BoxConstraints(maxWidth: 800),
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  const SizedBox(height: 8),
-                                  Expanded(
-                                    child: EntryTextEditor(
-                                      text: templateText,
-                                      focusNode: _focusNode,
-                                      textEditingController:
-                                          _textEditingController,
-                                      undoHistoryController: _undoController,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 16),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SafeArea(
-            top: false,
-            child: EditToolbar(
-              controller: _textEditingController,
-              undoController: _undoController,
-              focusNode: _focusNode,
-              showTemplateButton: false,
-              trailer: TemplateVariableButton(
-                controller: _textEditingController,
-                onAddTags: _openTagPicker,
               ),
             ),
-          ),
-        ],
+            SliverToBoxAdapter(
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 800),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: _buildTagChips(),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: Builder(
+                builder: (context) => GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onTap: () {
+                    EditorKeyboardSessionScope.maybeOf(context)?.resume();
+                    _focusNode.requestFocus();
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Flexible(
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 800),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                const SizedBox(height: 8),
+                                Expanded(
+                                  child: EntryTextEditor(
+                                    text: templateText,
+                                    focusNode: _focusNode,
+                                    textEditingController:
+                                        _textEditingController,
+                                    undoHistoryController: _undoController,
+                                  ),
+                                ),
+                                SizedBox(
+                                    height: 16 +
+                                        EditorActionBar.reservedHeight(
+                                            context)),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        actionBar: EditorActionBar(
+          controller: _textEditingController,
+          undoController: _undoController,
+          focusNode: _focusNode,
+          showTemplateButton: false,
+          mainActions: _buildMainActions(),
+        ),
       ),
     );
   }
