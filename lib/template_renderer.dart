@@ -1,13 +1,6 @@
 import 'package:daily_you/time_manager.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
-import 'package:daily_you/l10n/generated/app_localizations.dart';
-
-class TemplateVariable {
-  final String value;
-  final String label;
-  TemplateVariable(this.value, this.label);
-}
 
 class TemplateRenderer {
   static final RegExp _variablePattern = RegExp(r"\{\{(\w+)(?::([^}]+))?\}\}");
@@ -33,14 +26,6 @@ class TemplateRenderer {
           return match.group(0)!; // leave unknown variables unchanged
       }
     });
-  }
-
-  static List<TemplateVariable> getVariableList(BuildContext context) {
-    return [
-      TemplateVariable('{{date}}', AppLocalizations.of(context)!.sortDateTitle),
-      TemplateVariable(
-          '{{time}}', AppLocalizations.of(context)!.templateVariableTime),
-    ];
   }
 
   static String _formatDate(DateTime dt, Locale locale, String? format) {

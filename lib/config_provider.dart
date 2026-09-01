@@ -21,7 +21,6 @@ class ConfigKey {
   static const String useExternalImg = "useExternalImg";
   static const String externalImgUri = "externalImgUri";
   static const String startingDayOfWeek = "startingDayOfWeek";
-  static const String useMarkdownToolbar = "useMarkdownToolbar";
   static const String galleryPageViewMode = "galleryPageViewMode";
   static const String veryHappyIcon = "veryHappyIcon";
   static const String happyIcon = "happyIcon";
@@ -81,6 +80,7 @@ class ConfigKey {
   static const String calendarViewMode = "calendarViewMode";
   static const String noMoodIcon = "noMoodIcon";
   static const String calendarFocusMode = "calendarFocusMode";
+  static const String useMarkdownToolbar = "useMarkdownToolbar";
 }
 
 class ImageQuality {
@@ -108,7 +108,6 @@ class ConfigProvider with ChangeNotifier {
     ConfigKey.useExternalImg: false,
     ConfigKey.externalImgUri: '',
     ConfigKey.startingDayOfWeek: 'system',
-    ConfigKey.useMarkdownToolbar: true,
     ConfigKey.galleryPageViewMode: 'grid',
     ConfigKey.veryHappyIcon: '☺️',
     ConfigKey.happyIcon: '🙂',
