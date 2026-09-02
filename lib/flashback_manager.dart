@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:daily_you/config_provider.dart';
@@ -7,8 +8,88 @@ import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/flashback.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+class _DailyFlashbackPicks {
+  String date;
+  int? goodDayEntryId;
+  int? randomDayEntryId;
+
+  _DailyFlashbackPicks(this.date, {this.goodDayEntryId, this.randomDayEntryId});
+
+  factory _DailyFlashbackPicks.fromJson(Map<String, dynamic> json) =>
+      _DailyFlashbackPicks(
+        json['date'] as String,
+        goodDayEntryId: json['goodDayEntryId'] as int?,
+        randomDayEntryId: json['randomDayEntryId'] as int?,
+      );
+
+  Map<String, dynamic> toJson() => {
+        'date': date,
+        'goodDayEntryId': goodDayEntryId,
+        'randomDayEntryId': randomDayEntryId,
+      };
+}
 
 class FlashbackManager {
+  static const String _dailyPicksPrefsKey = 'flashbackDailyPickCache';
+
+  static _DailyFlashbackPicks _dailyPicks = _DailyFlashbackPicks('');
+  static SharedPreferences? _prefs;
+
+  static Future<void> init() async {
+    _prefs = await SharedPreferences.getInstance();
+    final raw = _prefs!.getString(_dailyPicksPrefsKey);
+    if (raw == null) return;
+    try {
+      final decoded = json.decode(raw);
+      if (decoded is Map<String, dynamic>) {
+        _dailyPicks = _DailyFlashbackPicks.fromJson(decoded);
+      }
+    } catch (_) {
+      // Fall back to empty
+    }
+  }
+
+  static void _persistDailyPicks() {
+    final encoded = json.encode(_dailyPicks.toJson());
+    final prefs = _prefs;
+    if (prefs != null) {
+      prefs.setString(_dailyPicksPrefsKey, encoded);
+    } else {
+      SharedPreferences.getInstance()
+          .then((p) => p.setString(_dailyPicksPrefsKey, encoded));
+    }
+  }
+
+  static Entry? _resolveDailyPick({
+    required int? cachedId,
+    required void Function(int? entryId) setCachedId,
+    required List<Entry> pool,
+    required Set<Entry> usedEntries,
+    required int? seed,
+  }) {
+    if (cachedId != null) {
+      for (final entry in pool) {
+        if (entry.id == cachedId && !usedEntries.contains(entry)) {
+          return entry;
+        }
+      }
+    }
+
+    if (pool.isEmpty) return null;
+    final random = Random(seed);
+    for (int attempt = 0; attempt < pool.length; attempt++) {
+      final candidate = pool[random.nextInt(pool.length)];
+      if (!usedEntries.contains(candidate)) {
+        setCachedId(candidate.id);
+        _persistDailyPicks();
+        return candidate;
+      }
+    }
+    return null;
+  }
+
   static List<Flashback> getFlashbacks(
       BuildContext context, List<Entry> entries) {
     final configProvider = Provider.of<ConfigProvider>(context);
@@ -95,41 +176,41 @@ class FlashbackManager {
 
     // Random Memories
     if (filteredEntries.length > 7) {
-      int? seed = int.tryParse(
-          "${DateTime.now().year}${DateTime.now().month}${DateTime.now().day}");
+      int? seed = int.tryParse("${now.year}${now.month}${now.day}");
+      final todayKey = "${now.year}-${now.month}-${now.day}";
+      if (_dailyPicks.date != todayKey) {
+        _dailyPicks = _DailyFlashbackPicks(todayKey);
+      }
 
       // A happy memory
       if (configProvider.get(ConfigKey.showflashbackGoodDay)) {
-        Random random = Random(seed);
-        int index = 0;
-        while (index < happyEntries.length) {
-          Entry randomEntry = happyEntries[random.nextInt(happyEntries.length)];
-          if (usedEntries.contains(randomEntry)) {
-            index++;
-            continue;
-          }
+        final goodDayEntry = _resolveDailyPick(
+          cachedId: _dailyPicks.goodDayEntryId,
+          setCachedId: (id) => _dailyPicks.goodDayEntryId = id,
+          pool: happyEntries,
+          usedEntries: usedEntries,
+          seed: seed,
+        );
+        if (goodDayEntry != null) {
           final label = AppLocalizations.of(context)!.flashbackGoodDay;
-          singleFlashbacks.putIfAbsent(label, () => []).add(randomEntry);
-          usedEntries.add(randomEntry);
-          break;
+          singleFlashbacks.putIfAbsent(label, () => []).add(goodDayEntry);
+          usedEntries.add(goodDayEntry);
         }
       }
 
       // A random memory
       if (configProvider.get(ConfigKey.showflashbackRandomDay)) {
-        Random random = Random(seed);
-        int index = 0;
-        while (index < filteredEntries.length) {
-          Entry randomEntry =
-              filteredEntries[random.nextInt(filteredEntries.length)];
-          if (usedEntries.contains(randomEntry)) {
-            index++;
-            continue;
-          }
+        final randomDayEntry = _resolveDailyPick(
+          cachedId: _dailyPicks.randomDayEntryId,
+          setCachedId: (id) => _dailyPicks.randomDayEntryId = id,
+          pool: filteredEntries,
+          usedEntries: usedEntries,
+          seed: seed,
+        );
+        if (randomDayEntry != null) {
           final label = AppLocalizations.of(context)!.flashbackRandomDay;
-          singleFlashbacks.putIfAbsent(label, () => []).add(randomEntry);
-          usedEntries.add(randomEntry);
-          break;
+          singleFlashbacks.putIfAbsent(label, () => []).add(randomDayEntry);
+          usedEntries.add(randomDayEntry);
         }
       }
     }
@@ -141,7 +222,8 @@ class FlashbackManager {
         entryLabels: entries.length == 1
             ? [label]
             : entries
-                .map((e) => TimeManager.localizedTimeFormat(locale).format(e.timeCreate))
+                .map((e) => TimeManager.localizedTimeFormat(locale)
+                    .format(e.timeCreate))
                 .toList(),
       ));
     });

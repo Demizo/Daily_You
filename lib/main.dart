@@ -6,6 +6,7 @@ import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/custom_locale_delegates.dart';
 import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/device_info_service.dart';
+import 'package:daily_you/flashback_manager.dart';
 import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/pages/launch_page.dart';
 import 'package:daily_you/providers/entries_provider.dart';
@@ -146,6 +147,9 @@ void main() async {
 
   // Create the config file if it doesn't exist
   await ConfigProvider.instance.init();
+
+  // Load any cached flashbacks
+  await FlashbackManager.init();
 
   final themeProvider = ThemeModeProvider();
   await themeProvider.initializeThemeFromConfig();
