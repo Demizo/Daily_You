@@ -50,7 +50,7 @@ class SecuritySettingsPageState extends State<SecuritySettings> {
                                 .settingsSecuritySetPassword,
                             showBiometrics: false,
                             dismissable: true,
-                            onSuccess: () {
+                            onSuccess: (_) {
                               setPassword = true;
                             },
                           ));
@@ -66,7 +66,7 @@ class SecuritySettingsPageState extends State<SecuritySettings> {
                                 .settingsSecurityEnterPassword,
                             showBiometrics: false,
                             dismissable: true,
-                            onSuccess: () {
+                            onSuccess: (_) {
                               configProvider.set(
                                   Settings.requirePassword, false);
                             },
@@ -87,7 +87,7 @@ class SecuritySettingsPageState extends State<SecuritySettings> {
                                 .settingsSecurityChangePassword,
                             showBiometrics: false,
                             dismissable: true,
-                            onSuccess: () {},
+                            onSuccess: (_) {},
                           ));
                 }),
           if (configProvider.get(Settings.requirePassword) &&
@@ -105,7 +105,7 @@ class SecuritySettingsPageState extends State<SecuritySettings> {
                                 .settingsSecurityEnterPassword,
                             showBiometrics: false,
                             dismissable: true,
-                            onSuccess: () async {
+                            onSuccess: (_) async {
                               bool success = true;
                               // Only require biometric authentication when enabling biometric unlock
                               if (value == true) {

@@ -1,26 +1,28 @@
-import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
+import 'package:daily_you/utils/password_store.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
-import 'dart:convert';
-import 'package:crypto/crypto.dart';
 
-enum AuthPopupMode { unlock, setPassword, changePassword }
+enum AuthPopupMode { unlock, enterPassword, setPassword, changePassword }
 
 class AuthPopup extends StatefulWidget {
   final AuthPopupMode mode;
   final String title;
+  final String? description;
   final bool showBiometrics;
   final bool dismissable;
-  final VoidCallback? onSuccess;
+  final PasswordStore store;
+  final void Function(String password)? onSuccess;
 
   const AuthPopup({
     super.key,
     required this.mode,
     required this.title,
+    this.description,
     required this.showBiometrics,
     required this.dismissable,
+    this.store = const AppPasswordStore(),
     this.onSuccess,
   });
 
@@ -43,11 +45,15 @@ class _AuthPopupState extends State<AuthPopup> {
   bool _passwordFocusRequested = false;
   Animation<double>? _routeAnimation;
 
+  bool get _asksForNewPassword =>
+      widget.mode == AuthPopupMode.setPassword ||
+      widget.mode == AuthPopupMode.changePassword;
+
   @override
   void initState() {
     super.initState();
     if (widget.mode == AuthPopupMode.unlock) {
-      _isPin = ConfigProvider.instance.get(Settings.passwordIsPin);
+      _isPin = widget.store.isPin;
     }
   }
 
@@ -55,7 +61,7 @@ class _AuthPopupState extends State<AuthPopup> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     // Request keyboard focus after dialog animation completes
-    if (widget.mode == AuthPopupMode.unlock && !widget.showBiometrics) {
+    if (!_asksForNewPassword && !widget.showBiometrics) {
       final animation = ModalRoute.of(context)?.animation;
       if (animation != _routeAnimation) {
         _routeAnimation?.removeStatusListener(_handleRouteAnimationStatus);
@@ -90,25 +96,6 @@ class _AuthPopupState extends State<AuthPopup> {
     super.dispose();
   }
 
-  Future<String> _hashPassword(String password) async {
-    return sha256.convert(utf8.encode(password)).toString();
-  }
-
-  bool _isNumericOnly(String value) => RegExp(r'^\d+$').hasMatch(value);
-
-  Future<void> savePassword(String password) async {
-    await ConfigProvider.instance
-        .set(Settings.passwordHash, await _hashPassword(password));
-    await ConfigProvider.instance
-        .set(Settings.passwordIsPin, _isNumericOnly(password));
-  }
-
-  Future<bool> validatePassword(String password) async {
-    final storedHash = ConfigProvider.instance.get(Settings.passwordHash);
-    if (storedHash.isEmpty) return false;
-    return storedHash == await _hashPassword(password);
-  }
-
   Future<bool> authenticateWithBiometrics() async {
     final auth = LocalAuthentication();
     final canCheck = await auth.canCheckBiometrics;
@@ -118,14 +105,21 @@ class _AuthPopupState extends State<AuthPopup> {
     bool success = false;
     try {
       final bool didAuthenticate = await auth.authenticate(
-          persistAcrossBackgrounding: false,
-          biometricOnly: true,
-          localizedReason: AppLocalizations.of(context)!.unlockAppPrompt);
+        persistAcrossBackgrounding: false,
+        biometricOnly: true,
+        localizedReason: AppLocalizations.of(context)!.unlockAppPrompt,
+      );
       success = didAuthenticate;
     } on PlatformException {
       success = false;
     }
     return success;
+  }
+
+  void _succeed(String password) {
+    if (!mounted) return;
+    widget.onSuccess?.call(password);
+    Navigator.of(context).pop();
   }
 
   Future<void> _handleSubmit() async {
@@ -137,46 +131,39 @@ class _AuthPopupState extends State<AuthPopup> {
     try {
       switch (widget.mode) {
         case AuthPopupMode.unlock:
-          final valid = await validatePassword(_passwordController.text);
-          if (!mounted) return;
-          if (valid) {
-            widget.onSuccess?.call();
-            Navigator.of(context).pop();
+          if (await widget.store.validate(_passwordController.text)) {
+            _succeed(_passwordController.text);
           } else {
-            setState(() => _error = AppLocalizations.of(context)!
-                .settingsSecurityIncorrectPassword);
+            setState(
+              () => _error = AppLocalizations.of(context)!
+                  .settingsSecurityIncorrectPassword,
+            );
           }
+          break;
+
+        case AuthPopupMode.enterPassword:
+          _succeed(_passwordController.text);
           break;
 
         case AuthPopupMode.setPassword:
-          if (_passwordController.text != _confirmController.text) {
-            setState(() => _error = AppLocalizations.of(context)!
-                .settingsSecurityPasswordsDoNotMatch);
-            break;
-          }
-          await savePassword(_passwordController.text);
-          if (!mounted) return;
-          widget.onSuccess?.call();
-          Navigator.of(context).pop();
-          break;
-
         case AuthPopupMode.changePassword:
-          final validOld = await validatePassword(_oldController.text);
-          if (!mounted) return;
-          if (!validOld) {
-            setState(() => _error = AppLocalizations.of(context)!
-                .settingsSecurityIncorrectPassword);
+          if (widget.mode == AuthPopupMode.changePassword &&
+              !await widget.store.validate(_oldController.text)) {
+            setState(
+              () => _error = AppLocalizations.of(context)!
+                  .settingsSecurityIncorrectPassword,
+            );
             break;
           }
           if (_passwordController.text != _confirmController.text) {
-            setState(() => _error = AppLocalizations.of(context)!
-                .settingsSecurityPasswordsDoNotMatch);
+            setState(
+              () => _error = AppLocalizations.of(context)!
+                  .settingsSecurityPasswordsDoNotMatch,
+            );
             break;
           }
-          await savePassword(_passwordController.text);
-          if (!mounted) return;
-          widget.onSuccess?.call();
-          Navigator.of(context).pop();
+          await widget.store.save(_passwordController.text);
+          _succeed(_passwordController.text);
           break;
       }
     } finally {
@@ -185,11 +172,8 @@ class _AuthPopupState extends State<AuthPopup> {
   }
 
   void _handleBiometric() async {
-    final ok = await authenticateWithBiometrics();
-    if (!mounted) return;
-    if (ok) {
-      widget.onSuccess?.call();
-      Navigator.of(context).pop();
+    if (await authenticateWithBiometrics()) {
+      _succeed('');
     }
   }
 
@@ -202,24 +186,30 @@ class _AuthPopupState extends State<AuthPopup> {
     return PopScope(
       canPop: widget.dismissable,
       child: AlertDialog(
-        title: Column(children: [
-          Center(
+        title: Column(
+          children: [
+            Center(
               child: Icon(
-            Icons.lock_rounded,
-            color: Theme.of(context).colorScheme.onSurface,
-            size: 32,
-          )),
-          SizedBox(
-            height: 4,
-          ),
-          Text(widget.title)
-        ]),
+                Icons.lock_rounded,
+                color: Theme.of(context).colorScheme.onSurface,
+                size: 32,
+              ),
+            ),
+            SizedBox(height: 4),
+            Text(widget.title),
+          ],
+        ),
         content: Form(
           key: _formKey,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (widget.mode == AuthPopupMode.changePassword)
+              if (widget.description != null)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Text(widget.description!),
+                ),
+              if (widget.mode == AuthPopupMode.changePassword) ...[
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TextFormField(
@@ -227,17 +217,19 @@ class _AuthPopupState extends State<AuthPopup> {
                     obscureText: !_showPassword,
                     autocorrect: false,
                     decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(12.0)),
-                        ),
-                        labelText: AppLocalizations.of(context)!
-                            .settingsSecurityOldPassword),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                      ),
+                      labelText: AppLocalizations.of(context)!
+                          .settingsSecurityOldPassword,
+                    ),
                     validator: (v) => v!.isEmpty
                         ? AppLocalizations.of(context)!.requiredPrompt
                         : null,
                   ),
                 ),
-              if (widget.mode == AuthPopupMode.changePassword) Divider(),
+                Divider(),
+              ],
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
@@ -249,17 +241,18 @@ class _AuthPopupState extends State<AuthPopup> {
                       ? TextInputType.number
                       : TextInputType.text,
                   decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(12.0)),
-                      ),
-                      labelText: AppLocalizations.of(context)!
-                          .settingsSecurityPassword),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                    ),
+                    labelText:
+                        AppLocalizations.of(context)!.settingsSecurityPassword,
+                  ),
                   validator: (v) => v!.isEmpty
                       ? AppLocalizations.of(context)!.requiredPrompt
                       : null,
                 ),
               ),
-              if (widget.mode != AuthPopupMode.unlock)
+              if (_asksForNewPassword)
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TextFormField(
@@ -267,11 +260,12 @@ class _AuthPopupState extends State<AuthPopup> {
                     obscureText: !_showPassword,
                     autocorrect: false,
                     decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(12.0)),
-                        ),
-                        labelText: AppLocalizations.of(context)!
-                            .settingsSecurityConfirmPassword),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                      ),
+                      labelText: AppLocalizations.of(context)!
+                          .settingsSecurityConfirmPassword,
+                    ),
                     validator: (v) => v!.isEmpty
                         ? AppLocalizations.of(context)!.requiredPrompt
                         : null,
@@ -280,8 +274,10 @@ class _AuthPopupState extends State<AuthPopup> {
               if (_error != null)
                 Padding(
                   padding: const EdgeInsets.all(8),
-                  child:
-                      Text(_error!, style: const TextStyle(color: Colors.red)),
+                  child: Text(
+                    _error!,
+                    style: const TextStyle(color: Colors.red),
+                  ),
                 ),
               if (widget.mode == AuthPopupMode.unlock && widget.showBiometrics)
                 IconButton(
@@ -292,26 +288,30 @@ class _AuthPopupState extends State<AuthPopup> {
               Padding(
                 padding: const EdgeInsets.only(top: 8.0, left: 8.0, right: 8.0),
                 child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButton(
-                          icon: Icon(!_showPassword
-                              ? Icons.visibility_rounded
-                              : Icons.visibility_off_rounded),
-                          onPressed: () {
-                            setState(() {
-                              _showPassword = !_showPassword;
-                            });
-                          }),
-                      _isLoading
-                          ? const CircularProgressIndicator()
-                          : IconButton.filled(
-                              onPressed: _handleSubmit,
-                              icon: Icon(Icons.check_rounded),
-                              iconSize: 28,
-                            ),
-                    ]),
-              )
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        !_showPassword
+                            ? Icons.visibility_rounded
+                            : Icons.visibility_off_rounded,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _showPassword = !_showPassword;
+                        });
+                      },
+                    ),
+                    _isLoading
+                        ? const CircularProgressIndicator()
+                        : IconButton.filled(
+                            onPressed: _handleSubmit,
+                            icon: Icon(Icons.check_rounded),
+                            iconSize: 28,
+                          ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),

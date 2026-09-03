@@ -107,7 +107,7 @@ class _LaunchPageState extends State<LaunchPage> {
                 showBiometrics:
                     ConfigProvider.instance.get(Settings.biometricUnlock),
                 dismissable: false,
-                onSuccess: () {},
+                onSuccess: (_) {},
               ));
     }
     //Initialize Database
