@@ -7,6 +7,8 @@ class SettingsToggle extends StatelessWidget {
   final String? hint;
   final Setting<bool> setting;
   final Function(bool) onChanged;
+  final Icon? secondaryIcon;
+  final Function()? onSecondaryPressed;
 
   const SettingsToggle({
     super.key,
@@ -14,6 +16,8 @@ class SettingsToggle extends StatelessWidget {
     this.hint,
     required this.setting,
     required this.onChanged,
+    this.secondaryIcon,
+    this.onSecondaryPressed,
   });
 
   @override
@@ -41,6 +45,8 @@ class SettingsToggle extends StatelessWidget {
               ],
             ),
           ),
+          if (secondaryIcon != null && onSecondaryPressed != null)
+            IconButton(onPressed: onSecondaryPressed, icon: secondaryIcon!),
           Switch(value: configProvider.get(setting), onChanged: onChanged)
         ],
       ),
