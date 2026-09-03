@@ -27,6 +27,7 @@ import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/widgets/entry_image_actions.dart';
 import 'package:daily_you/widgets/entry_mood_picker.dart';
 import 'package:daily_you/widgets/entry_text_edit.dart';
+import 'package:daily_you/widgets/markdown_preview_controller.dart';
 
 class AddEditEntryPage extends StatefulWidget {
   final Entry? entry;
@@ -62,7 +63,8 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   bool _openedCamera = false;
   final ScrollController _scrollController = ScrollController();
   final FocusNode _focusNode = FocusNode();
-  final TextEditingController _textEditingController = TextEditingController();
+  final MarkdownPreviewController _textEditingController =
+      MarkdownPreviewController();
   final UndoHistoryController _undoController = UndoHistoryController();
   bool _deletingEntry = false;
   bool _savingEntry = false;

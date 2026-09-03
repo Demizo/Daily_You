@@ -1,11 +1,12 @@
 import 'package:daily_you/widgets/editor_action_bar.dart';
 import 'package:daily_you/widgets/entry_text_field.dart';
+import 'package:daily_you/widgets/markdown_preview_controller.dart';
 import 'package:flutter/material.dart';
 
 class EntryTextEditor extends StatefulWidget {
   final String text;
   final FocusNode focusNode;
-  final TextEditingController textEditingController;
+  final MarkdownPreviewController textEditingController;
   final UndoHistoryController undoHistoryController;
   final VoidCallback? onExpand;
 
@@ -48,8 +49,7 @@ class _EntryTextEditorState extends State<EntryTextEditor> {
         Card.filled(
           color: Theme.of(context).colorScheme.surfaceContainer,
           child: Padding(
-            padding:
-                const EdgeInsets.only(left: 8, top: 2, bottom: 0, right: 8),
+            padding: const EdgeInsets.only(top: 2),
             child: EntryTextField(
               controller: widget.textEditingController,
               undoController: widget.undoHistoryController,

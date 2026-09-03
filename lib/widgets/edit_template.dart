@@ -7,6 +7,7 @@ import 'package:daily_you/widgets/delete_confirm_dialog.dart';
 import 'package:daily_you/widgets/editor_action_bar.dart';
 import 'package:daily_you/widgets/editor_action_bar/editor_keyboard_session.dart';
 import 'package:daily_you/widgets/entry_text_edit.dart';
+import 'package:daily_you/widgets/markdown_preview_controller.dart';
 import 'package:daily_you/widgets/tag_attachment_source.dart';
 import 'package:daily_you/widgets/tag_chip.dart';
 import 'package:daily_you/widgets/tag_grouped_chip_list.dart';
@@ -30,7 +31,8 @@ class _EditTemplateState extends State<EditTemplate> {
   late String templateText;
   late final TagAttachmentSource _tagSource;
   final FocusNode _focusNode = FocusNode();
-  final TextEditingController _textEditingController = TextEditingController();
+  final MarkdownPreviewController _textEditingController =
+      MarkdownPreviewController();
   final UndoHistoryController _undoController = UndoHistoryController();
 
   @override

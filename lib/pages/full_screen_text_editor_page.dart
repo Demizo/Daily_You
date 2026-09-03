@@ -1,5 +1,6 @@
 import 'package:daily_you/widgets/editor_action_bar.dart';
 import 'package:daily_you/widgets/entry_text_field.dart';
+import 'package:daily_you/widgets/markdown_preview_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:word_count/word_count.dart';
@@ -18,14 +19,14 @@ class FullScreenTextEditorPage extends StatefulWidget {
 }
 
 class _FullScreenTextEditorPageState extends State<FullScreenTextEditorPage> {
-  late final TextEditingController _controller;
+  late final MarkdownPreviewController _controller;
   late final UndoHistoryController _undoController;
   late final FocusNode _focusNode;
 
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController(text: widget.initialText);
+    _controller = MarkdownPreviewController(text: widget.initialText);
     _undoController = UndoHistoryController();
     _focusNode = FocusNode();
     WidgetsBinding.instance.addPostFrameCallback((_) {
