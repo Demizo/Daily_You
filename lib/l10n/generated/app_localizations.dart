@@ -1306,6 +1306,54 @@ abstract class AppLocalizations {
   /// **'This backup is password protected.'**
   String get backupEncryptedContent;
 
+  /// No description provided for @settingsAutoBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic Backups'**
+  String get settingsAutoBackup;
+
+  /// No description provided for @settingsAutoBackupLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup Location'**
+  String get settingsAutoBackupLocation;
+
+  /// No description provided for @settingsAutoBackupTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup Time'**
+  String get settingsAutoBackupTime;
+
+  /// No description provided for @settingsAutoBackupInterval.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup Interval'**
+  String get settingsAutoBackupInterval;
+
+  /// No description provided for @settingsAutoBackupIntervalDaily.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily'**
+  String get settingsAutoBackupIntervalDaily;
+
+  /// No description provided for @settingsAutoBackupIntervalWeekly.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly'**
+  String get settingsAutoBackupIntervalWeekly;
+
+  /// No description provided for @settingsAutoBackupIntervalMonthly.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly'**
+  String get settingsAutoBackupIntervalMonthly;
+
+  /// No description provided for @settingsAutoBackupMaxCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Backups To Keep'**
+  String get settingsAutoBackupMaxCount;
+
   /// No description provided for @settingsBackupLast.
   ///
   /// In en, this message translates to:
@@ -1317,6 +1365,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Never backed up'**
   String get settingsBackupNever;
+
+  /// No description provided for @settingsAutoBackupNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next backup {time}'**
+  String settingsAutoBackupNext(Object time);
+
+  /// No description provided for @settingsAutoBackupKeepAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get settingsAutoBackupKeepAll;
+
+  /// No description provided for @settingsAutoBackupLocationNotSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not configured'**
+  String get settingsAutoBackupLocationNotSet;
+
+  /// No description provided for @autoBackupProgressTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Backing Up…'**
+  String get autoBackupProgressTitle;
+
+  /// No description provided for @autoBackupFailedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup Failed'**
+  String get autoBackupFailedTitle;
 
   /// No description provided for @tranferStatus.
   ///

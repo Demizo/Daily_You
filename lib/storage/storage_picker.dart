@@ -54,6 +54,17 @@ class PickedDirectory {
 }
 
 class StoragePicker {
+  static String displayName(String uri) {
+    try {
+      final lastSegment = Uri.decodeFull(uri).split('/').last;
+      return lastSegment.contains(':')
+          ? lastSegment.split(':').last
+          : lastSegment;
+    } catch (e) {
+      return uri;
+    }
+  }
+
   static Future<PickedDirectory?> pickDirectory() async {
     if (Platform.isAndroid) {
       final pickedFolder = await SafUtil()

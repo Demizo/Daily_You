@@ -5,6 +5,8 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+const int backupNotificationId = 2;
+
 class NotificationManager {
   static final NotificationManager instance = NotificationManager._init();
 
@@ -118,5 +120,49 @@ class NotificationManager {
 
   Future<void> startOnThisDayNotifications() async {
     setOnThisDayAlarm(firstSet: true);
+  }
+
+  AndroidFlutterLocalNotificationsPlugin get _android =>
+      _notifications!.resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>()!;
+
+  Future<void> showBackupProgress(int percent, String title) async {
+    await _android.startForegroundService(
+      id: backupNotificationId,
+      title: title,
+      notificationDetails: AndroidNotificationDetails(
+        'daily_you_backup',
+        title,
+        icon: '@drawable/ic_notification',
+        importance: Importance.low,
+        priority: Priority.low,
+        showProgress: true,
+        maxProgress: 100,
+        progress: percent,
+        onlyAlertOnce: true,
+      ),
+      foregroundServiceTypes: const {
+        AndroidServiceForegroundType.foregroundServiceTypeDataSync
+      },
+    );
+  }
+
+  Future<void> stopBackupProgress() => _android.stopForegroundService();
+
+  Future<void> showBackupFailed(String title) async {
+    await _android.stopForegroundService();
+    await _notifications!.show(
+        id: backupNotificationId,
+        title: title,
+        body: null,
+        notificationDetails: NotificationDetails(
+            android: AndroidNotificationDetails(
+          'daily_you_backup',
+          title,
+          icon: '@drawable/ic_notification',
+          importance: Importance.defaultImportance,
+          priority: Priority.defaultPriority,
+        )),
+        payload: DateTime.now().toIso8601String());
   }
 }

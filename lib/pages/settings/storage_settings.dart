@@ -4,6 +4,7 @@ import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/database/image_storage.dart';
 import 'package:daily_you/providers/entries_provider.dart';
+import 'package:daily_you/storage/storage_picker.dart';
 import 'package:daily_you/widgets/failure_dialog.dart';
 import 'package:daily_you/widgets/settings_dropdown.dart';
 import 'package:daily_you/widgets/settings_icon_action.dart';
@@ -222,25 +223,6 @@ class _StorageSettingsState extends State<StorageSettings> {
     }
   }
 
-  String _displayNameFromUri(String uriString) {
-    try {
-      final decoded = Uri.decodeFull(uriString);
-
-      // Everything after the last slash
-      final lastSegment = decoded.split('/').last;
-
-      // Get the folder for directory URIs. URIs cannot be turned
-      // into full paths.
-      if (lastSegment.contains(':')) {
-        return lastSegment.split(':').last;
-      }
-      return lastSegment;
-    } catch (e) {
-      // Fall back to URI string when it cannot be parsed
-      return uriString;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final configProvider = Provider.of<ConfigProvider>(context);
@@ -283,7 +265,7 @@ class _StorageSettingsState extends State<StorageSettings> {
                 if (snapshot.hasData && snapshot.data != null) {
                   var folderText = snapshot.data!;
                   if (AppDatabase.instance.usingExternalLocation()) {
-                    folderText = _displayNameFromUri(
+                    folderText = StoragePicker.displayName(
                         configProvider.get(Settings.externalDbUri));
                   }
                   return SettingsIconAction(
@@ -311,7 +293,7 @@ class _StorageSettingsState extends State<StorageSettings> {
                 if (snapshot.hasData && snapshot.data != null) {
                   var folderText = snapshot.data!;
                   if (ImageStorage.instance.usingExternalLocation()) {
-                    folderText = _displayNameFromUri(
+                    folderText = StoragePicker.displayName(
                         configProvider.get(Settings.externalImgUri));
                   }
                   return SettingsIconAction(

@@ -108,7 +108,17 @@ class Settings {
       Setting<bool>("backupPasswordEnabled", false, secure: true);
   static const backupPassword =
       Setting<String>("backupPassword", "", secure: true);
+  static const autoBackupEnabled = Setting<bool>("autoBackupEnabled", false);
+  static const autoBackupLocationUri =
+      Setting<String>("autoBackupLocationUri", "");
+  static const autoBackupInterval =
+      Setting<String>("autoBackupInterval", "daily");
+  static const autoBackupHour = Setting<int>("autoBackupHour", 2);
+  static const autoBackupMinute = Setting<int>("autoBackupMinute", 0);
+  static const autoBackupMaxCount = Setting<int>("autoBackupMaxCount", 5);
   static const lastBackup = Setting<String>("lastBackup", "", secure: true);
+  static const lastAutoBackup =
+      Setting<String>("lastAutoBackup", "", secure: true);
 
   static const List<Setting<Object?>> all = [
     configVersion,
@@ -168,7 +178,14 @@ class Settings {
     passwordIsPin,
     backupPasswordEnabled,
     backupPassword,
+    autoBackupEnabled,
+    autoBackupLocationUri,
+    autoBackupInterval,
+    autoBackupHour,
+    autoBackupMinute,
+    autoBackupMaxCount,
     lastBackup,
+    lastAutoBackup,
   ];
 
   static const moodIcons = <int, Setting<String>>{

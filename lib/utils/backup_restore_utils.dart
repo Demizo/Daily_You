@@ -12,14 +12,118 @@ import 'package:daily_you/utils/zip_utils.dart';
 import 'package:daily_you/widgets/auth_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
+import 'package:logging/logging.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
 class _RestoreCancelled implements Exception {}
 
 class BackupRestoreUtils {
+  static final Logger _logger = Logger('BackupRestoreUtils');
+
+  static const String manualBackupPrefix = 'daily_you_backup_';
+  static const String autoBackupPrefix = 'daily_you_auto_backup_';
+
   static String? _backupPassword() =>
       BackupPasswordStore.isEnabled ? BackupPasswordStore.password : null;
+
+  static String _backupName(String prefix) =>
+      "$prefix${DateTime.now().toIso8601String().replaceAll(':', '-')}.zip";
+
+  static Future<void> _writeBackup({
+    required PickedDirectory destination,
+    required String name,
+    required void Function(double percent) onCompress,
+    required void Function(double percent) onTransfer,
+    required void Function() onCleanup,
+  }) async {
+    final tempDir = await getTemporaryDirectory();
+    final stagedArchive = File(join(tempDir.path, name));
+
+    try {
+      onCompress(0);
+      await ZipUtils.compress(
+          stagedArchive.path,
+          [await AppDatabase.instance.getInternalPath()],
+          [await ImageStorage.instance.getInternalFolder()],
+          password: _backupPassword(),
+          onProgress: onCompress);
+
+      if (await stagedArchive.length() == 0) {
+        throw Exception('Created backup is empty');
+      }
+
+      onTransfer(0);
+      await destination.copyFileInto(stagedArchive.path, name,
+          mimeType: "application/zip", onProgress: onTransfer);
+    } finally {
+      onCleanup();
+      if (await stagedArchive.exists()) {
+        await stagedArchive.delete();
+      }
+    }
+  }
+
+  static Future<void> _recordBackup({bool automatic = false}) async {
+    final now = DateTime.now().toIso8601String();
+    await ConfigProvider.instance.set(Settings.lastBackup, now);
+    if (automatic) {
+      await ConfigProvider.instance.set(Settings.lastAutoBackup, now);
+    }
+  }
+
+  static Future<bool> runAutoBackup(
+      {void Function(double percent)? onProgress}) async {
+    final destinationUri =
+        ConfigProvider.instance.get(Settings.autoBackupLocationUri);
+    if (destinationUri.isEmpty) return false;
+    final destination = PickedDirectory(destinationUri);
+    if (!await destination.store.isAvailable()) {
+      _logger.severe('Automatic backup skipped: no access to $destinationUri');
+      return false;
+    }
+    if (!await File(await AppDatabase.instance.getInternalPath()).exists()) {
+      _logger.info('Automatic backup skipped: no database yet');
+      return false;
+    }
+
+    try {
+      await _writeBackup(
+        destination: destination,
+        name: _backupName(autoBackupPrefix),
+        onCompress: (percent) => onProgress?.call(percent / 2),
+        onTransfer: (percent) => onProgress?.call(50 + percent / 2),
+        onCleanup: () {},
+      );
+    } catch (error, stackTrace) {
+      _logger.severe('Automatic backup failed', error, stackTrace);
+      return false;
+    }
+
+    await _recordBackup(automatic: true);
+
+    try {
+      await _pruneAutoBackups(destination.store,
+          ConfigProvider.instance.get(Settings.autoBackupMaxCount));
+    } catch (error, stackTrace) {
+      _logger.severe('Pruning old backups failed', error, stackTrace);
+    }
+    return true;
+  }
+
+  static Future<void> _pruneAutoBackups(FileStore destination, int keep) async {
+    if (keep <= 0) return;
+    final backups = (await destination.list())
+        .where((name) =>
+            name.startsWith(autoBackupPrefix) && name.endsWith('.zip'))
+        .toList()
+      ..sort();
+    if (backups.length <= keep) return;
+
+    for (final name in backups.take(backups.length - keep)) {
+      await destination.delete(name);
+    }
+  }
 
   static Future<void> _extractBackup(
       File archive,
@@ -50,50 +154,27 @@ class BackupRestoreUtils {
     return password;
   }
 
-  static Future<void> _recordBackup() async {
-    await ConfigProvider.instance
-        .set(Settings.lastBackup, DateTime.now().toIso8601String());
-  }
-
   static Future<OperationOutcome> backupToZip(
       BuildContext context, void Function(String) updateStatus) async {
     final localizations = AppLocalizations.of(context)!;
     var outcome = const OperationOutcome.succeeded();
-    var tempDir = await getTemporaryDirectory();
-    final exportedZipName =
-        "daily_you_backup_${DateTime.now().toIso8601String().replaceAll(':', '-')}.zip";
-    final tempExportZipFile = File(join(tempDir.path, exportedZipName));
 
     try {
       final saveDirectory = await StoragePicker.pickDirectory();
       if (saveDirectory == null) return const OperationOutcome.cancelled();
 
-      // Create archive
-      updateStatus(localizations.creatingBackupStatus("0"));
-      await ZipUtils.compress(tempExportZipFile.path, [
-        await AppDatabase.instance.getInternalPath()
-      ], [
-        await ImageStorage.instance.getInternalFolder()
-      ], password: _backupPassword(), onProgress: (percent) {
-        updateStatus(localizations.creatingBackupStatus("${percent.round()}"));
-      });
-
-      // Save archive
-      updateStatus(localizations.tranferStatus("0"));
-      await saveDirectory.copyFileInto(tempExportZipFile.path, exportedZipName,
-          mimeType: "application/zip", onProgress: (percent) {
-        updateStatus(localizations.tranferStatus("${percent.round()}"));
-      });
-
+      await _writeBackup(
+        destination: saveDirectory,
+        name: _backupName(manualBackupPrefix),
+        onCompress: (percent) => updateStatus(
+            localizations.creatingBackupStatus("${percent.round()}")),
+        onTransfer: (percent) =>
+            updateStatus(localizations.tranferStatus("${percent.round()}")),
+        onCleanup: () => updateStatus(localizations.cleanUpStatus),
+      );
       await _recordBackup();
     } catch (error) {
       outcome = OperationOutcome.failed(error);
-    }
-
-    // Delete temp files
-    updateStatus(localizations.cleanUpStatus);
-    if (await tempExportZipFile.exists()) {
-      await tempExportZipFile.delete();
     }
 
     return outcome;

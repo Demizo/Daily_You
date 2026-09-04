@@ -14,6 +14,8 @@ import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/providers/templates_provider.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:daily_you/utils/auto_backup_schedule.dart';
+import 'package:daily_you/utils/backup_restore_utils.dart';
 import 'package:daily_you/utils/logging.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
@@ -28,6 +30,44 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:statsfl/statsfl.dart';
 import 'package:time_range_picker/time_range_picker.dart';
 import 'package:provider/provider.dart';
+
+const int _autoBackupAlarmId = 2;
+
+@pragma('vm:entry-point')
+void autoBackupCallbackDispatcher() async {
+  await ConfigProvider.instance.init();
+
+  if (ConfigProvider.instance.get(Settings.autoBackupEnabled)) {
+    await NotificationManager.instance.init();
+
+    final prefs = await SharedPreferences.getInstance();
+    final progressTitle =
+        prefs.getString('autoBackupProgressTitle') ?? 'Backing Up…';
+    final failedTitle =
+        prefs.getString('autoBackupFailedTitle') ?? 'Backup Failed';
+
+    await NotificationManager.instance.showBackupProgress(0, progressTitle);
+
+    var success = false;
+    try {
+      var shownPercent = 0;
+      success = await BackupRestoreUtils.runAutoBackup(onProgress: (percent) {
+        if (percent - shownPercent < 5) return;
+        shownPercent = percent.round();
+        NotificationManager.instance
+            .showBackupProgress(shownPercent, progressTitle);
+      });
+    } finally {
+      if (success) {
+        await NotificationManager.instance.stopBackupProgress();
+      } else {
+        await NotificationManager.instance.showBackupFailed(failedTitle);
+      }
+    }
+  }
+
+  await setAutoBackupAlarm();
+}
 
 @pragma('vm:entry-point')
 void onThisDayCallbackDispatcher() async {
@@ -163,6 +203,7 @@ void main() async {
     await NotificationManager.instance.init();
 
     await AndroidAlarmManager.initialize();
+    await setAutoBackupAlarm();
   }
 
   runApp(MultiProvider(providers: [
@@ -256,6 +297,20 @@ Future<void> setOnThisDayAlarm({bool firstSet = false}) async {
   await AndroidAlarmManager.oneShotAt(
       reminderDateTime, 1, onThisDayCallbackDispatcher,
       allowWhileIdle: true, exact: exact, rescheduleOnReboot: true);
+}
+
+Future<void> setAutoBackupAlarm() async {
+  await AndroidAlarmManager.cancel(_autoBackupAlarmId);
+  if (!ConfigProvider.instance.get(Settings.autoBackupEnabled)) return;
+
+  final nextRun = nextAutoBackupTimeFromConfig(ConfigProvider.instance);
+
+  await AndroidAlarmManager.oneShotAt(
+      nextRun, _autoBackupAlarmId, autoBackupCallbackDispatcher,
+      allowWhileIdle: true,
+      exact: true,
+      rescheduleOnReboot: true,
+      wakeup: true);
 }
 
 class MainApp extends StatefulWidget {

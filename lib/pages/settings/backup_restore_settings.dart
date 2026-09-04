@@ -1,11 +1,17 @@
+import 'dart:io';
+
 import 'package:daily_you/config_provider.dart';
+import 'package:daily_you/main.dart';
+import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:daily_you/utils/auto_backup_schedule.dart';
 import 'package:daily_you/utils/backup_restore_utils.dart';
 import 'package:daily_you/utils/imports/import_registry.dart';
 import 'package:daily_you/utils/export_utils.dart';
 import 'package:daily_you/utils/operation_outcome.dart';
 import 'package:daily_you/utils/password_store.dart';
 import 'package:daily_you/widgets/auth_popup.dart';
+import 'package:daily_you/widgets/auto_backup_settings_dialog.dart';
 import 'package:daily_you/widgets/failure_dialog.dart';
 import 'package:daily_you/widgets/settings_icon_action.dart';
 import 'package:daily_you/widgets/settings_toggle.dart';
@@ -205,6 +211,12 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
         .settingsBackupLast(_dateTimeText(time));
   }
 
+  String _nextAutoBackupText(ConfigProvider configProvider) {
+    final next = nextAutoBackupTimeFromConfig(configProvider);
+    return AppLocalizations.of(context)!
+        .settingsAutoBackupNext(_dateTimeText(next));
+  }
+
   String _dateTimeText(DateTime time) =>
       "${TimeManager.formatDate(time, context)} "
       "${TimeManager.timeOfDayString(context, TimeOfDay.fromDateTime(time))}";
@@ -219,6 +231,12 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
               dismissable: true,
               store: const BackupPasswordStore(),
             ));
+  }
+
+  Future<void> _showAutoBackupSettings() async {
+    await showDialog(
+        context: context, builder: (context) => AutoBackupSettingsDialog());
+    await setAutoBackupAlarm();
   }
 
   @override
@@ -261,11 +279,40 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
                     BackupPasswordStore.password.isNotEmpty);
               } else {
                 await configProvider.set(Settings.backupPassword, "");
-                await configProvider.set(
-                    Settings.backupPasswordEnabled, false);
+                await configProvider.set(Settings.backupPasswordEnabled, false);
               }
             },
           ),
+          if (Platform.isAndroid)
+            SettingsToggle(
+              title: AppLocalizations.of(context)!.settingsAutoBackup,
+              hint: configProvider.get(Settings.autoBackupEnabled)
+                  ? _nextAutoBackupText(configProvider)
+                  : null,
+              setting: Settings.autoBackupEnabled,
+              secondaryIcon: configProvider.get(Settings.autoBackupEnabled)
+                  ? Icon(Icons.edit_rounded)
+                  : null,
+              onSecondaryPressed: _showAutoBackupSettings,
+              onChanged: (value) async {
+                if (value) {
+                  if (!await NotificationManager.instance
+                      .hasNotificationPermission()) {
+                    return;
+                  }
+                  if (configProvider.get(Settings.autoBackupLocationUri) ==
+                      '') {
+                    await _showAutoBackupSettings();
+                    if (configProvider.get(Settings.autoBackupLocationUri) ==
+                        '') {
+                      return;
+                    }
+                  }
+                }
+                await configProvider.set(Settings.autoBackupEnabled, value);
+                await setAutoBackupAlarm();
+              },
+            ),
           Padding(
             padding: const EdgeInsets.only(left: 8.0, right: 8.0),
             child: Divider(),
