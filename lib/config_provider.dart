@@ -104,6 +104,11 @@ class Settings {
   static const passwordHash = Setting<String>("passwordHash", "", secure: true);
   static const passwordIsPin =
       Setting<bool>("passwordIsPin", false, secure: true);
+  static const backupPasswordEnabled =
+      Setting<bool>("backupPasswordEnabled", false, secure: true);
+  static const backupPassword =
+      Setting<String>("backupPassword", "", secure: true);
+  static const lastBackup = Setting<String>("lastBackup", "", secure: true);
 
   static const List<Setting<Object?>> all = [
     configVersion,
@@ -161,6 +166,9 @@ class Settings {
     biometricUnlock,
     passwordHash,
     passwordIsPin,
+    backupPasswordEnabled,
+    backupPassword,
+    lastBackup,
   ];
 
   static const moodIcons = <int, Setting<String>>{
@@ -329,7 +337,6 @@ class ConfigProvider with ChangeNotifier {
 
   Future<void> writeConfig() async {
     EasyDebounce.debounce("save-config", Duration(seconds: 1), () async {
-      // Don't write secure configurations to the config file
       final filteredConfig = Map<String, dynamic>.from(_config)
         ..removeWhere((key, _) => _secureKeys.contains(key));
 

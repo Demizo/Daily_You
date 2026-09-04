@@ -700,6 +700,23 @@ class AppLocalizationsIt extends AppLocalizations {
       'Ripristinare un backup sovrascriverà i dati esistenti!';
 
   @override
+  String get settingsBackupPasswordProtect => 'Password Protect Backups';
+
+  @override
+  String get backupEncryptedTitle => 'Encrypted Backup';
+
+  @override
+  String get backupEncryptedContent => 'This backup is password protected.';
+
+  @override
+  String settingsBackupLast(Object time) {
+    return 'Last backup $time';
+  }
+
+  @override
+  String get settingsBackupNever => 'Never backed up';
+
+  @override
   String tranferStatus(Object percent) {
     return 'Trasferimento… $percent%';
   }

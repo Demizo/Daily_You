@@ -8,7 +8,7 @@ import 'package:path/path.dart';
 class ZipUtils {
   static Future<void> compress(
       String outputFile, List<String> inputFiles, List<String> inputFolders,
-      {Function(double percent)? onProgress}) async {
+      {Function(double percent)? onProgress, String? password}) async {
     var rxPort = ReceivePort();
 
     rxPort.listen((data) {
@@ -23,7 +23,8 @@ class ZipUtils {
         "outputFile": outputFile,
         "inputFiles": inputFiles,
         "inputFolders": inputFolders,
-        "port": rxPort.sendPort
+        "port": rxPort.sendPort,
+        "password": password,
       },
     );
 
@@ -31,7 +32,7 @@ class ZipUtils {
   }
 
   static Future<void> extract(String inputFile, String outputFolder,
-      {Function(double percent)? onProgress}) async {
+      {Function(double percent)? onProgress, String? password}) async {
     var rxPort = ReceivePort();
 
     rxPort.listen((data) {
@@ -43,7 +44,8 @@ class ZipUtils {
     await compute(decodeArchive, {
       "inputFile": inputFile,
       "outputFolder": outputFolder,
-      "port": rxPort.sendPort
+      "port": rxPort.sendPort,
+      "password": password,
     });
 
     rxPort.close();
@@ -51,7 +53,7 @@ class ZipUtils {
 
   static Future<void> encodeArchive(Map<String, dynamic> args) async {
     SendPort sendPort = args["port"];
-    var encoder = ZipFileEncoder();
+    var encoder = ZipFileEncoder(password: args["password"]);
     encoder.createWithStream(OutputFileStream(args["outputFile"]));
     for (var file in args["inputFiles"]) {
       await encoder.addFile(File(file));
@@ -67,7 +69,8 @@ class ZipUtils {
 
   static Future<void> decodeArchive(Map<String, dynamic> args) async {
     SendPort sendPort = args["port"];
-    var decoder = ZipDecoder().decodeStream(InputFileStream(args["inputFile"]));
+    var decoder = ZipDecoder().decodeStream(InputFileStream(args["inputFile"]),
+        password: args["password"]);
 
     // Track number of files for progress indication
     var totalFileCount = decoder.numberOfFiles();

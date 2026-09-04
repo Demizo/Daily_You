@@ -684,6 +684,23 @@ class AppLocalizationsKo extends AppLocalizations {
       '백업을 복구하면 이미 존재하는 데이터를 덮어쓰게 됩니다!';
 
   @override
+  String get settingsBackupPasswordProtect => 'Password Protect Backups';
+
+  @override
+  String get backupEncryptedTitle => 'Encrypted Backup';
+
+  @override
+  String get backupEncryptedContent => 'This backup is password protected.';
+
+  @override
+  String settingsBackupLast(Object time) {
+    return 'Last backup $time';
+  }
+
+  @override
+  String get settingsBackupNever => 'Never backed up';
+
+  @override
   String tranferStatus(Object percent) {
     return '전송중… $percent%';
   }

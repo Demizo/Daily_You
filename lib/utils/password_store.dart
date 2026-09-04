@@ -36,3 +36,22 @@ class AppPasswordStore extends PasswordStore {
   String _hash(String password) =>
       sha256.convert(utf8.encode(password)).toString();
 }
+
+class BackupPasswordStore extends PasswordStore {
+  const BackupPasswordStore();
+
+  static String get password =>
+      ConfigProvider.instance.get(Settings.backupPassword);
+
+  static bool get isEnabled =>
+      ConfigProvider.instance.get(Settings.backupPasswordEnabled) &&
+      password.isNotEmpty;
+
+  @override
+  Future<bool> validate(String password) async =>
+      BackupPasswordStore.password == password;
+
+  @override
+  Future<void> save(String password) async =>
+      ConfigProvider.instance.set(Settings.backupPassword, password);
+}

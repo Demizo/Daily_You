@@ -688,6 +688,23 @@ class AppLocalizationsDa extends AppLocalizations {
       'Gendannelse af en sikkerhedskopi overskriver dine eksisterende data!';
 
   @override
+  String get settingsBackupPasswordProtect => 'Password Protect Backups';
+
+  @override
+  String get backupEncryptedTitle => 'Encrypted Backup';
+
+  @override
+  String get backupEncryptedContent => 'This backup is password protected.';
+
+  @override
+  String settingsBackupLast(Object time) {
+    return 'Last backup $time';
+  }
+
+  @override
+  String get settingsBackupNever => 'Never backed up';
+
+  @override
   String tranferStatus(Object percent) {
     return 'Overfører… $percent%';
   }

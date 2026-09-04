@@ -682,6 +682,23 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsRestorePromptDescription => '恢复备份将覆盖您现有的数据！';
 
   @override
+  String get settingsBackupPasswordProtect => 'Password Protect Backups';
+
+  @override
+  String get backupEncryptedTitle => 'Encrypted Backup';
+
+  @override
+  String get backupEncryptedContent => 'This backup is password protected.';
+
+  @override
+  String settingsBackupLast(Object time) {
+    return 'Last backup $time';
+  }
+
+  @override
+  String get settingsBackupNever => 'Never backed up';
+
+  @override
   String tranferStatus(Object percent) {
     return '正在传输…$percent%';
   }

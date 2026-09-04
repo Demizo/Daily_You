@@ -1288,6 +1288,36 @@ abstract class AppLocalizations {
   /// **'Restoring a backup will overwrite your existing data!'**
   String get settingsRestorePromptDescription;
 
+  /// No description provided for @settingsBackupPasswordProtect.
+  ///
+  /// In en, this message translates to:
+  /// **'Password Protect Backups'**
+  String get settingsBackupPasswordProtect;
+
+  /// No description provided for @backupEncryptedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Encrypted Backup'**
+  String get backupEncryptedTitle;
+
+  /// No description provided for @backupEncryptedContent.
+  ///
+  /// In en, this message translates to:
+  /// **'This backup is password protected.'**
+  String get backupEncryptedContent;
+
+  /// No description provided for @settingsBackupLast.
+  ///
+  /// In en, this message translates to:
+  /// **'Last backup {time}'**
+  String settingsBackupLast(Object time);
+
+  /// No description provided for @settingsBackupNever.
+  ///
+  /// In en, this message translates to:
+  /// **'Never backed up'**
+  String get settingsBackupNever;
+
   /// No description provided for @tranferStatus.
   ///
   /// In en, this message translates to:
