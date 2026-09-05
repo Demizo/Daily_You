@@ -1,3 +1,4 @@
+import 'package:daily_you/utils/color_utils.dart';
 import 'package:flutter/material.dart';
 
 class ColorSwatchRow extends StatelessWidget {
@@ -31,9 +32,7 @@ class ColorSwatchRow extends StatelessWidget {
               Icon(
                 Icons.palette_rounded,
                 size: 20,
-                color: color.computeLuminance() > 0.5
-                    ? Colors.black
-                    : Colors.white,
+                color: contrastingTextColor(color),
               ),
             ],
           ),

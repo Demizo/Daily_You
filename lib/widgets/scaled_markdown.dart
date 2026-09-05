@@ -1,3 +1,4 @@
+import 'package:daily_you/widgets/markdown_highlight_syntax.dart';
 import 'package:flutter/material.dart';
 import 'package:markdown_widget/markdown_widget.dart';
 
@@ -36,6 +37,8 @@ class ScaledMarkdown extends StatelessWidget {
           ? MarkdownConfig.defaultConfig
           : MarkdownConfig.darkConfig,
       generator: MarkdownGenerator(
+        inlineSyntaxList: [HighlightSyntax()],
+        generators: [highlightGenerator(Colors.yellow.shade700)],
         richTextBuilder: (span) {
           return Builder(builder: (context) {
             final shouldIgnoreTextScaler =

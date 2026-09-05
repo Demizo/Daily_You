@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:daily_you/utils/color_utils.dart';
 import 'package:daily_you/utils/markdown_preview_scanner.dart';
 import 'package:flutter/material.dart';
 
@@ -11,6 +12,7 @@ class MarkdownPreviewStyles {
     required this.quote,
     required this.codeBackground,
     required this.misspelling,
+    required this.highlightBackground,
   });
 
   factory MarkdownPreviewStyles.fromTheme(BuildContext context) {
@@ -21,6 +23,7 @@ class MarkdownPreviewStyles {
       quote: colors.onSurfaceVariant,
       misspelling: colors.error,
       codeBackground: colors.surfaceContainerHighest,
+      highlightBackground: Colors.yellow.shade700,
     );
   }
 
@@ -38,6 +41,7 @@ class MarkdownPreviewStyles {
   final Color quote;
   final Color codeBackground;
   final Color misspelling;
+  final Color highlightBackground;
 
   TextStyle apply(TextStyle style, MarkdownSpan span) {
     final sized = span.construct == MarkdownConstruct.header
@@ -65,6 +69,11 @@ class MarkdownPreviewStyles {
         return sized.copyWith(fontStyle: FontStyle.italic);
       case MarkdownConstruct.strikethrough:
         return _decorate(sized, TextDecoration.lineThrough);
+      case MarkdownConstruct.highlight:
+        return sized.copyWith(
+          backgroundColor: highlightBackground,
+          color: contrastingTextColor(highlightBackground),
+        );
       case MarkdownConstruct.header:
         return sized.copyWith(fontWeight: FontWeight.bold);
       case MarkdownConstruct.link:

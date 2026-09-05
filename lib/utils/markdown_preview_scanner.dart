@@ -2,6 +2,7 @@ enum MarkdownConstruct {
   bold,
   italic,
   strikethrough,
+  highlight,
   header,
   link,
   inlineCode,
@@ -309,7 +310,7 @@ class _MarkdownScanner {
       final consumed = switch (text[index]) {
         '`' => _scanInlineCode(index, end),
         '[' => _scanLink(index, end),
-        '*' || '_' || '~' => _scanEmphasis(index, end),
+        '*' || '_' || '~' || '=' => _scanEmphasis(index, end),
         _ => 0,
       };
       index += consumed > 0 ? consumed : 1;
@@ -376,6 +377,10 @@ class _MarkdownScanner {
     if (character == '~') {
       if (runLength != 2) return 0;
       construct = MarkdownConstruct.strikethrough;
+      delimiterLength = 2;
+    } else if (character == '=') {
+      if (runLength != 2) return 0;
+      construct = MarkdownConstruct.highlight;
       delimiterLength = 2;
     } else if (runLength >= 2) {
       construct = MarkdownConstruct.bold;

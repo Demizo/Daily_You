@@ -64,6 +64,7 @@ dependencies:
   flutter_expandable_fab: ^2.3.0
   shamsi_date:
   persian_datetime_picker: ^3.2.0
+  markdown: ^7.3.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
