@@ -154,23 +154,23 @@ void main() {
     var entry = draftEntry(text: 'draft');
     var text = 'first edit';
     int? mood;
+    var editAgain = true;
+    late Future<Entry> secondSave;
 
     EntryDraft buildDraft(Entry? saved) {
       if (saved != null) entry = saved;
-      return EntryDraft(
+      final draft = EntryDraft(
           entry: entry.copy(text: text, mood: mood, timeModified: time));
+      if (editAgain) {
+        editAgain = false;
+        text = 'second edit';
+        mood = 2;
+        secondSave = store.save(buildDraft);
+      }
+      return draft;
     }
 
-    late Future<Entry> secondSave;
-    final firstSave = store.save((saved) {
-      final draft = buildDraft(saved);
-      text = 'second edit';
-      mood = 2;
-      secondSave = store.save(buildDraft);
-      return draft;
-    });
-
-    expect((await firstSave).text, 'first edit');
+    expect((await store.save(buildDraft)).text, 'first edit');
     await secondSave;
 
     await reloadEverything();
@@ -178,6 +178,43 @@ void main() {
     expect(store.entries, hasLength(1));
     expect(store.entries.single.text, 'second edit');
     expect(store.entries.single.mood, 2);
+  });
+
+  test('gives each concurrent saver its own queue slot', () async {
+    var firstEntry = draftEntry(text: 'first');
+    var secondEntry = draftEntry(text: 'second');
+    var queueOthers = true;
+    late Future<Entry> firstReplay;
+    late Future<Entry> secondSave;
+
+    EntryDraft buildSecond(Entry? saved) {
+      if (saved != null) secondEntry = saved;
+      return EntryDraft(entry: secondEntry.copy(text: 'second'));
+    }
+
+    EntryDraft buildFirst(Entry? saved) {
+      if (saved != null) firstEntry = saved;
+      if (queueOthers) {
+        queueOthers = false;
+        firstReplay = store.save(buildFirst);
+        secondSave = store.save(buildSecond);
+      }
+      return EntryDraft(entry: firstEntry.copy(text: 'first'));
+    }
+
+    final first = await store.save(buildFirst);
+    final replayed = await firstReplay;
+    final second = await secondSave;
+
+    expect(replayed.id, first.id);
+    expect(replayed.text, 'first');
+    expect(second.id, isNot(first.id));
+    expect(second.text, 'second');
+
+    await reloadEverything();
+
+    expect(store.entries.map((entry) => entry.text),
+        containsAll(['first', 'second']));
   });
 
   test('removes an entry with its tags, image rows, and image files', () async {

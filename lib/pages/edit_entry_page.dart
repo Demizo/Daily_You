@@ -531,7 +531,9 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
       await NotificationManager.instance.dismissReminderNotification();
     }
 
-    _adoptSavedEntry(await EntryStore.instance.save(_buildDraft));
+    final saved = await EntryStore.instance.save(_buildDraft);
+    _adoptSavedEntry(saved);
+    _adoptSavedImages(saved);
     if (mounted) {
       setState(() {});
     }
@@ -550,11 +552,10 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     return EntryDraft(
       entry: entry,
       tags: _tagSource.toEntryTags(id),
-      images: _currentImages,
+      images: [for (final image in _currentImages) image.copy()],
     );
   }
 
-  // Copied so the editor never mutates the provider's own image records.
   void _adoptSavedEntry(Entry saved) {
     _entry = saved;
     id = saved.id!;
@@ -562,6 +563,9 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     _lastText = saved.text;
     _lastMood = saved.mood;
     _lastEntryDate = saved.timeCreate;
+  }
+
+  void _adoptSavedImages(Entry saved) {
     _currentImages = [
       for (final image in EntryImagesProvider.instance.getForEntry(saved))
         image.copy()
