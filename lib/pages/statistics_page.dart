@@ -180,7 +180,7 @@ class _StatsPageState extends State<StatsPage>
                 onRangeChanged: (newRange) {
                   setState(() => statsRange = newRange);
                   ConfigProvider.instance
-                      .set(Settings.statsRange, _rangeToString[newRange]);
+                      .set(Settings.statsRange, _rangeToString[newRange]!);
                 },
                 onSubjectTypeSelected: (type) =>
                     _onSubjectTypeSelected(context, type),
