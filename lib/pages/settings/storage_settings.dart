@@ -279,7 +279,7 @@ class _StorageSettingsState extends State<StorageSettings> {
         children: [
           SettingsDropdown<String>(
               title: AppLocalizations.of(context)!.settingsImageQuality,
-              value: configProvider.get(ConfigKey.imageQualityLevel),
+              value: configProvider.get(Settings.imageQualityLevel),
               options: [
                 DropdownMenuItem<String>(
                     value: ImageQuality.noCompression,
@@ -299,7 +299,7 @@ class _StorageSettingsState extends State<StorageSettings> {
               ],
               onChanged: (String? newValue) {
                 if (newValue != null) {
-                  configProvider.set(ConfigKey.imageQualityLevel, newValue);
+                  configProvider.set(Settings.imageQualityLevel, newValue);
                 }
               }),
           FutureBuilder(
@@ -309,7 +309,7 @@ class _StorageSettingsState extends State<StorageSettings> {
                   var folderText = snapshot.data!;
                   if (AppDatabase.instance.usingExternalLocation()) {
                     folderText = _displayNameFromUri(
-                        configProvider.get(ConfigKey.externalDbUri));
+                        configProvider.get(Settings.externalDbUri));
                   }
                   return SettingsIconAction(
                     title: AppLocalizations.of(context)!.settingsLogFolder,
@@ -337,7 +337,7 @@ class _StorageSettingsState extends State<StorageSettings> {
                   var folderText = snapshot.data!;
                   if (ImageStorage.instance.usingExternalLocation()) {
                     folderText = _displayNameFromUri(
-                        configProvider.get(ConfigKey.externalImgUri));
+                        configProvider.get(Settings.externalImgUri));
                   }
                   return SettingsIconAction(
                     title: AppLocalizations.of(context)!.settingsImageFolder,

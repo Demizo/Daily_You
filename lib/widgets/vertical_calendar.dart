@@ -372,15 +372,13 @@ class _VerticalCalendarState extends State<VerticalCalendar>
     super.build(context);
     final configProvider = context.watch<ConfigProvider>();
     final firstDayIndex = configProvider.getFirstDayOfWeekIndex(context);
-    final showImages =
-        configProvider.get(ConfigKey.hideImagesInCalendar) != true;
-    final showMood = configProvider.get(ConfigKey.calendarShowMood) != false;
+    final showImages = !configProvider.get(Settings.hideImagesInCalendar);
+    final showMood = configProvider.get(Settings.calendarShowMood);
     final entriesProvider = context.watch<EntriesProvider>();
     final imagesProvider = context.watch<EntryImagesProvider>();
 
     final tagsProvider = context.watch<TagsProvider>();
-    final overlayTagId =
-        configProvider.get(ConfigKey.calendarTagOverlay) as int?;
+    final overlayTagId = configProvider.get(Settings.calendarTagOverlay);
     final calendarTagOverride = overlayTagId != null
         ? tagsProvider.tags.where((tag) => tag.id == overlayTagId).firstOrNull
         : null;
@@ -390,7 +388,7 @@ class _VerticalCalendarState extends State<VerticalCalendar>
     if (overlayTagId != null && calendarTagOverride == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
-          configProvider.set(ConfigKey.calendarTagOverlay, null);
+          configProvider.set(Settings.calendarTagOverlay, null);
         }
       });
     }

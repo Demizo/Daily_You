@@ -96,7 +96,7 @@ class _ValueOverTimeChartState extends State<ValueOverTimeChart> {
   static const int _yearThreshold = 366;
 
   ChartGrouping? get _preferredGrouping {
-    final value = ConfigProvider.instance.get(ConfigKey.moodOverTimeGrouping);
+    final value = ConfigProvider.instance.get(Settings.moodOverTimeGrouping);
     return switch (value) {
       'day' => ChartGrouping.day,
       'week' => ChartGrouping.week,
@@ -107,7 +107,7 @@ class _ValueOverTimeChartState extends State<ValueOverTimeChart> {
   }
 
   bool get _smoothing =>
-      ConfigProvider.instance.get(ConfigKey.moodOverTimeSmoothing) ?? true;
+      ConfigProvider.instance.get(Settings.moodOverTimeSmoothing);
 
   static String _groupingToConfigString(ChartGrouping grouping) =>
       switch (grouping) {
@@ -426,7 +426,7 @@ class _ValueOverTimeChartState extends State<ValueOverTimeChart> {
                               final grouping = available[index];
                               setDialogState(() => selected = grouping);
                               ConfigProvider.instance.set(
-                                  ConfigKey.moodOverTimeGrouping,
+                                  Settings.moodOverTimeGrouping,
                                   _groupingToConfigString(grouping));
                             },
                           ),
@@ -440,7 +440,7 @@ class _ValueOverTimeChartState extends State<ValueOverTimeChart> {
                       onChanged: (value) {
                         setDialogState(() {});
                         ConfigProvider.instance
-                            .set(ConfigKey.moodOverTimeSmoothing, value);
+                            .set(Settings.moodOverTimeSmoothing, value);
                       },
                     ),
                     Row(

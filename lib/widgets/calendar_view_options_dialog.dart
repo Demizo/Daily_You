@@ -15,9 +15,9 @@ class CalendarViewOptionsDialog extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     return Consumer2<ConfigProvider, TagsProvider>(
       builder: (context, config, tagsProvider, _) {
-        final showImages = config.get(ConfigKey.hideImagesInCalendar) != true;
-        final showMood = config.get(ConfigKey.calendarShowMood) != false;
-        final overlayTagId = config.get(ConfigKey.calendarTagOverlay) as int?;
+        final showImages = !config.get(Settings.hideImagesInCalendar);
+        final showMood = config.get(Settings.calendarShowMood);
+        final overlayTagId = config.get(Settings.calendarTagOverlay);
         final overlayTag = overlayTagId != null
             ? tagsProvider.tags
                 .where((tag) => tag.id == overlayTagId)
@@ -34,14 +34,14 @@ class CalendarViewOptionsDialog extends StatelessWidget {
                 title: Text(l10n.imagesTitle),
                 value: showImages,
                 onChanged: (value) =>
-                    config.set(ConfigKey.hideImagesInCalendar, !value),
+                    config.set(Settings.hideImagesInCalendar, !value),
               ),
               SwitchListTile(
                 secondary: const Icon(Icons.mood_rounded),
                 title: Text(l10n.tagMoodTitle),
                 value: showMood,
                 onChanged: (value) =>
-                    config.set(ConfigKey.calendarShowMood, value),
+                    config.set(Settings.calendarShowMood, value),
               ),
               _buildTagDisplayRow(context, l10n, config, overlayTag),
             ],
@@ -99,7 +99,7 @@ class CalendarViewOptionsDialog extends StatelessWidget {
       onChanged: (value) async {
         if (value == null) return;
         if (value == 'none') {
-          config.set(ConfigKey.calendarTagOverlay, null);
+          config.set(Settings.calendarTagOverlay, null);
           return;
         }
         final filter = value == 'tracker' ? TagType.tracker : TagType.label;
@@ -111,7 +111,7 @@ class CalendarViewOptionsDialog extends StatelessWidget {
           ),
         );
         if (tag != null) {
-          config.set(ConfigKey.calendarTagOverlay, tag.id);
+          config.set(Settings.calendarTagOverlay, tag.id);
         }
       },
     );

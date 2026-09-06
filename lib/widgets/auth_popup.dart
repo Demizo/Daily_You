@@ -47,7 +47,7 @@ class _AuthPopupState extends State<AuthPopup> {
   void initState() {
     super.initState();
     if (widget.mode == AuthPopupMode.unlock) {
-      _isPin = ConfigProvider.instance.get(ConfigKey.passwordIsPin) ?? false;
+      _isPin = ConfigProvider.instance.get(Settings.passwordIsPin);
     }
   }
 
@@ -98,14 +98,14 @@ class _AuthPopupState extends State<AuthPopup> {
 
   Future<void> savePassword(String password) async {
     await ConfigProvider.instance
-        .set(ConfigKey.passwordHash, await _hashPassword(password));
+        .set(Settings.passwordHash, await _hashPassword(password));
     await ConfigProvider.instance
-        .set(ConfigKey.passwordIsPin, _isNumericOnly(password));
+        .set(Settings.passwordIsPin, _isNumericOnly(password));
   }
 
   Future<bool> validatePassword(String password) async {
-    final storedHash = ConfigProvider.instance.get(ConfigKey.passwordHash);
-    if (storedHash == null) return false;
+    final storedHash = ConfigProvider.instance.get(Settings.passwordHash);
+    if (storedHash.isEmpty) return false;
     return storedHash == await _hashPassword(password);
   }
 

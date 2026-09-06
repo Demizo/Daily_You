@@ -128,7 +128,7 @@ class _MobileScaffoldState extends State<MobileScaffold> {
             TextButton(
               onPressed: () async {
                 await configProvider.set(
-                    ConfigKey.dismissedNotificationOnboarding, true);
+                    Settings.dismissedNotificationOnboarding, true);
                 if (context.mounted) Navigator.of(context).pop();
               },
               child: Text(MaterialLocalizations.of(context).closeButtonLabel),
@@ -165,9 +165,9 @@ class _MobileScaffoldState extends State<MobileScaffold> {
 
   bool _shouldShowNotificationButton(ConfigProvider configProvider) {
     return Platform.isAndroid &&
-        !configProvider.get(ConfigKey.dailyReminders) &&
-        !configProvider.get(ConfigKey.onThisDayNotifications) &&
-        !configProvider.get(ConfigKey.dismissedNotificationOnboarding);
+        !configProvider.get(Settings.dailyReminders) &&
+        !configProvider.get(Settings.onThisDayNotifications) &&
+        !configProvider.get(Settings.dismissedNotificationOnboarding);
   }
 
   Widget _buildNavItem(

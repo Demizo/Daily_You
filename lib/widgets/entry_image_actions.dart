@@ -13,7 +13,7 @@ class EntryImageActions {
   static Future<void> takePhoto(
       ValueChanged<List<String>> onChangedImage) async {
     final picker = ImagePicker();
-    final quality = ConfigProvider.instance.get(ConfigKey.imageQualityLevel);
+    final quality = ConfigProvider.instance.get(Settings.imageQualityLevel);
     final pickedFile = await picker.pickImage(source: ImageSource.camera);
 
     if (pickedFile != null) {
@@ -30,7 +30,7 @@ class EntryImageActions {
   static Future<void> pickFromGallery(
       ValueChanged<List<String>> onChangedImage) async {
     final picker = ImagePicker();
-    final quality = ConfigProvider.instance.get(ConfigKey.imageQualityLevel);
+    final quality = ConfigProvider.instance.get(Settings.imageQualityLevel);
     final pickedFiles = await picker.pickMultiImage();
 
     final newImages = <String>[];

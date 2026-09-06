@@ -26,7 +26,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
 
   Future<void> _showAccentColorPopup(ThemeModeProvider themeProvider) async {
     final initialColor =
-        Color(ConfigProvider.instance.get(ConfigKey.accentColor));
+        Color(ConfigProvider.instance.get(Settings.accentColor));
     final result = await showDialog<ColorPickerResult>(
       context: context,
       builder: (context) => ColorPickerDialog(initialColor: initialColor),
@@ -61,8 +61,8 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
               onPressed: () async {
                 if (newEmoji.isNotEmpty) {
                   if (value != null) {
-                    await ConfigProvider.instance.set(
-                        ConfigProvider.moodValueFieldMapping[value]!, newEmoji);
+                    await ConfigProvider.instance
+                        .set(Settings.moodIcons[value]!, newEmoji);
                   }
                 }
                 if (!context.mounted) return;
@@ -126,28 +126,28 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
                   _hideImagesToggleRow(
                     context,
                     AppLocalizations.of(context)!.flashbacksTitle,
-                    configProvider.get(ConfigKey.hideImagesInFlashbacks),
+                    configProvider.get(Settings.hideImagesInFlashbacks),
                     (value) {
                       configProvider.set(
-                          ConfigKey.hideImagesInFlashbacks, value);
+                          Settings.hideImagesInFlashbacks, value);
                       setDialogState(() {});
                     },
                   ),
                   _hideImagesToggleRow(
                     context,
                     AppLocalizations.of(context)!.pageCalendarTitle,
-                    configProvider.get(ConfigKey.hideImagesInCalendar),
+                    configProvider.get(Settings.hideImagesInCalendar),
                     (value) {
-                      configProvider.set(ConfigKey.hideImagesInCalendar, value);
+                      configProvider.set(Settings.hideImagesInCalendar, value);
                       setDialogState(() {});
                     },
                   ),
                   _hideImagesToggleRow(
                     context,
                     AppLocalizations.of(context)!.pageGalleryTitle,
-                    configProvider.get(ConfigKey.hideImagesInGallery),
+                    configProvider.get(Settings.hideImagesInGallery),
                     (value) {
-                      configProvider.set(ConfigKey.hideImagesInGallery, value);
+                      configProvider.set(Settings.hideImagesInGallery, value);
                       setDialogState(() {});
                     },
                   ),
@@ -178,8 +178,8 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
   }
 
   Future _resetMoodIcons() async {
-    for (var mood in ConfigProvider.defaultMoodIconFieldMapping.entries) {
-      await ConfigProvider.instance.set(mood.key, mood.value);
+    for (final setting in Settings.moodIcons.values) {
+      await ConfigProvider.instance.set(setting, setting.defaultValue);
     }
   }
 
@@ -232,7 +232,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
         children: [
           SettingsDropdown<String>(
               title: AppLocalizations.of(context)!.settingsTheme,
-              value: configProvider.get(ConfigKey.theme),
+              value: configProvider.get(Settings.theme),
               options: [
                 DropdownMenuItem<String>(
                     value: "system",
@@ -265,16 +265,16 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
                     break;
                 }
                 themeProvider.themeMode = themeMode;
-                configProvider.set(ConfigKey.theme, newValue);
+                configProvider.set(Settings.theme, newValue);
               }),
           SettingsToggle(
               title: AppLocalizations.of(context)!.settingsUseSystemAccentColor,
-              settingsKey: ConfigKey.followSystemColor,
+              setting: Settings.followSystemColor,
               onChanged: (value) {
-                configProvider.set(ConfigKey.followSystemColor, value);
+                configProvider.set(Settings.followSystemColor, value);
                 themeProvider.updateAccentColor();
               }),
-          if (!configProvider.get(ConfigKey.followSystemColor))
+          if (!configProvider.get(Settings.followSystemColor))
             SettingsIconAction(
               title: AppLocalizations.of(context)!.settingsCustomAccentColor,
               icon: Icon(Icons.colorize_rounded),
@@ -286,18 +286,18 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
             padding: const EdgeInsets.only(bottom: 8.0),
             child: SettingsDropdown<String>(
                 title: AppLocalizations.of(context)!.settingsFirstDayOfWeek,
-                value: configProvider.get(ConfigKey.startingDayOfWeek),
+                value: configProvider.get(Settings.startingDayOfWeek),
                 options: _buildFirstDayOfWeekDropdownItems(context),
                 onChanged: (String? newValue) async {
                   await configProvider.set(
-                      ConfigKey.startingDayOfWeek, newValue);
+                      Settings.startingDayOfWeek, newValue);
                 }),
           ),
           Padding(
             padding: const EdgeInsets.only(bottom: 8.0),
             child: SettingsDropdown<String>(
                 title: AppLocalizations.of(context)!.settingsCalendarSystem,
-                value: configProvider.get(ConfigKey.calendarSystem),
+                value: configProvider.get(Settings.calendarSystem),
                 options: [
                   DropdownMenuItem<String>(
                       value: "system",
@@ -312,14 +312,14 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
                           AppLocalizations.of(context)!.calendarSystemJalali)),
                 ],
                 onChanged: (String? newValue) async {
-                  await configProvider.set(ConfigKey.calendarSystem, newValue);
+                  await configProvider.set(Settings.calendarSystem, newValue);
                 }),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: SettingsDropdown<String>(
                 title: AppLocalizations.of(context)!.settingsGalleryViewLayout,
-                value: configProvider.get(ConfigKey.galleryPageViewMode),
+                value: configProvider.get(Settings.galleryPageViewMode),
                 options: [
                   DropdownMenuItem<String>(
                       value: "list",
@@ -332,7 +332,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
                 ],
                 onChanged: (String? newValue) {
                   if (newValue != null) {
-                    configProvider.set(ConfigKey.galleryPageViewMode, newValue);
+                    configProvider.set(Settings.galleryPageViewMode, newValue);
                   }
                 }),
           ),

@@ -47,30 +47,30 @@ class TimeManager {
 
   static TimeOfDay scheduledReminderTime() {
     return TimeOfDay(
-        hour: ConfigProvider.instance.get(ConfigKey.scheduledReminderHour),
-        minute: ConfigProvider.instance.get(ConfigKey.scheduledReminderMinute));
+        hour: ConfigProvider.instance.get(Settings.scheduledReminderHour),
+        minute: ConfigProvider.instance.get(Settings.scheduledReminderMinute));
   }
 
   static TimeRange getReminderTimeRange() {
     TimeOfDay startTime = TimeOfDay(
-        hour: ConfigProvider.instance.get(ConfigKey.reminderStartHour),
-        minute: ConfigProvider.instance.get(ConfigKey.reminderStartMinute));
+        hour: ConfigProvider.instance.get(Settings.reminderStartHour),
+        minute: ConfigProvider.instance.get(Settings.reminderStartMinute));
     TimeOfDay endTime = TimeOfDay(
-        hour: ConfigProvider.instance.get(ConfigKey.reminderEndHour),
-        minute: ConfigProvider.instance.get(ConfigKey.reminderEndMinute));
+        hour: ConfigProvider.instance.get(Settings.reminderEndHour),
+        minute: ConfigProvider.instance.get(Settings.reminderEndMinute));
 
     return TimeRange(startTime: startTime, endTime: endTime);
   }
 
   static Future<void> setReminderTimeRange(TimeRange range) async {
     await ConfigProvider.instance
-        .set(ConfigKey.reminderStartHour, range.startTime.hour);
+        .set(Settings.reminderStartHour, range.startTime.hour);
     await ConfigProvider.instance
-        .set(ConfigKey.reminderStartMinute, range.startTime.minute);
+        .set(Settings.reminderStartMinute, range.startTime.minute);
     await ConfigProvider.instance
-        .set(ConfigKey.reminderEndHour, range.endTime.hour);
+        .set(Settings.reminderEndHour, range.endTime.hour);
     await ConfigProvider.instance
-        .set(ConfigKey.reminderEndMinute, range.endTime.minute);
+        .set(Settings.reminderEndMinute, range.endTime.minute);
   }
 
   static String timeRangeString(BuildContext context, TimeRange timeRange) {
@@ -141,16 +141,14 @@ class TimeManager {
   }
 
   static bool isJalaliCalendar(BuildContext context) {
-    final setting =
-        ConfigProvider.instance.get(ConfigKey.calendarSystem) ?? 'system';
+    final setting = ConfigProvider.instance.get(Settings.calendarSystem);
     if (setting == 'jalali') return true;
     if (setting == 'gregorian') return false;
     return Localizations.localeOf(context).languageCode == 'fa';
   }
 
   static bool isJalaliCalendarFromPlatform() {
-    final setting =
-        ConfigProvider.instance.get(ConfigKey.calendarSystem) ?? 'system';
+    final setting = ConfigProvider.instance.get(Settings.calendarSystem);
     if (setting == 'jalali') return true;
     if (setting == 'gregorian') return false;
     return PlatformDispatcher.instance.locale.languageCode == 'fa';

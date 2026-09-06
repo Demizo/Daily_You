@@ -154,7 +154,7 @@ class AppDatabase {
   }
 
   bool usingExternalLocation() {
-    return ConfigProvider.instance.get(ConfigKey.useExternalDb) ?? false;
+    return ConfigProvider.instance.get(Settings.useExternalDb);
   }
 
   Future<String> getInternalPath() async {
@@ -164,7 +164,7 @@ class AppDatabase {
   }
 
   String getExternalPath() {
-    return ConfigProvider.instance.get(ConfigKey.externalDbUri);
+    return ConfigProvider.instance.get(Settings.externalDbUri);
   }
 
   /// Return whether the app has permission to access the external location
@@ -185,8 +185,8 @@ class AppDatabase {
       var selectedDirectory = await StoragePicker.pickDirectory();
       if (selectedDirectory != null) {
         await ConfigProvider.instance
-            .set(ConfigKey.externalDbUri, selectedDirectory.uri);
-        await ConfigProvider.instance.set(ConfigKey.useExternalDb, true);
+            .set(Settings.externalDbUri, selectedDirectory.uri);
+        await ConfigProvider.instance.set(Settings.useExternalDb, true);
 
         // Sync with external folder
         databaseUpdated = await _syncWithExternalDatabase(forceOverwrite: true);
@@ -200,9 +200,9 @@ class AppDatabase {
     if (!databaseUpdated) {
       // Restore state after failure
       await ConfigProvider.instance
-          .set(ConfigKey.externalDbUri, oldExternalPath);
+          .set(Settings.externalDbUri, oldExternalPath);
       await ConfigProvider.instance
-          .set(ConfigKey.useExternalDb, oldUseExternalPath);
+          .set(Settings.useExternalDb, oldUseExternalPath);
     } else {
       try {
         if (ImageStorage.instance.usingExternalLocation() &&
@@ -218,7 +218,7 @@ class AppDatabase {
   }
 
   void resetExternalLocation() async {
-    await ConfigProvider.instance.set(ConfigKey.useExternalDb, false);
+    await ConfigProvider.instance.set(Settings.useExternalDb, false);
   }
 
   /// Overwrite the external database with local changes

@@ -276,11 +276,11 @@ class _HomePageState extends State<HomePage>
     final List<Flashback> flashbacks =
         FlashbackManager.getFlashbacks(context, entriesProvider.entries);
     final bool showFlashbacks =
-        configProvider.get(ConfigKey.showFlashbacks) && flashbacks.isNotEmpty;
+        configProvider.get(Settings.showFlashbacks) && flashbacks.isNotEmpty;
     final bool showBanner = SupportBanner.shouldShowBanner(
       entryCount: entriesProvider.entries.length,
-      lastDismissedIso: configProvider
-          .get(ConfigKey.lastDismissedSupportBannerDate) as String?,
+      lastDismissedIso:
+          configProvider.get(Settings.lastDismissedSupportBannerDate),
     );
 
     return Stack(alignment: Alignment.bottomCenter, children: [

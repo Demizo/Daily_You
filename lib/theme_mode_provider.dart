@@ -11,7 +11,7 @@ class ThemeModeProvider with ChangeNotifier {
   Color _accentColor = const Color(0xff62A0EA);
   Color get accentColor => _accentColor;
   bool get usingSystemColor =>
-      ConfigProvider.instance.get(ConfigKey.followSystemColor);
+      ConfigProvider.instance.get(Settings.followSystemColor);
 
   set themeMode(ThemeMode value) {
     _themeMode = value;
@@ -19,15 +19,15 @@ class ThemeModeProvider with ChangeNotifier {
   }
 
   set accentColor(Color color) {
-    ConfigProvider.instance.set(ConfigKey.accentColor, color.toARGB32());
+    ConfigProvider.instance.set(Settings.accentColor, color.toARGB32());
     _accentColor = color;
   }
 
   void updateAccentColor() {
-    if (ConfigProvider.instance.get(ConfigKey.followSystemColor)) {
+    if (ConfigProvider.instance.get(Settings.followSystemColor)) {
       _accentColor = SystemTheme.accentColor.accent;
     } else {
-      _accentColor = Color(ConfigProvider.instance.get(ConfigKey.accentColor));
+      _accentColor = Color(ConfigProvider.instance.get(Settings.accentColor));
     }
     notifyListeners();
   }
@@ -35,13 +35,13 @@ class ThemeModeProvider with ChangeNotifier {
   Future<void> initializeThemeFromConfig() async {
     await SystemTheme.accentColor.load();
     SystemTheme.fallbackColor = _accentColor;
-    if (ConfigProvider.instance.get(ConfigKey.followSystemColor)) {
+    if (ConfigProvider.instance.get(Settings.followSystemColor)) {
       _accentColor = SystemTheme.accentColor.accent;
     } else {
-      _accentColor = Color(ConfigProvider.instance.get(ConfigKey.accentColor));
+      _accentColor = Color(ConfigProvider.instance.get(Settings.accentColor));
     }
 
-    final configTheme = ConfigProvider.instance.get(ConfigKey.theme);
+    final configTheme = ConfigProvider.instance.get(Settings.theme);
     if (configTheme == 'dark' || configTheme == 'amoled') {
       _themeMode = ThemeMode.dark;
     } else if (configTheme == 'light') {

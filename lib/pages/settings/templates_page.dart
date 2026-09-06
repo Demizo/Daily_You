@@ -68,8 +68,7 @@ class _TemplateSettingsState extends State<TemplateSettings> {
     final templatesProvider = Provider.of<TemplatesProvider>(context);
     final configProvider = Provider.of<ConfigProvider>(context);
     final templates = templatesProvider.templates;
-    final defaultTemplateId =
-        configProvider.get(ConfigKey.defaultTemplate) as int?;
+    final defaultTemplateId = configProvider.get(Settings.defaultTemplate);
 
     if (templates.isEmpty) {
       return Padding(
@@ -109,7 +108,7 @@ class _TemplateSettingsState extends State<TemplateSettings> {
                 ),
                 onPressed: () async {
                   await configProvider.set(
-                      ConfigKey.defaultTemplate, isDefault ? -1 : template.id);
+                      Settings.defaultTemplate, isDefault ? -1 : template.id);
                 },
               ),
               IconButton(

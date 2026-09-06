@@ -55,7 +55,7 @@ class ImageStorage {
   }
 
   bool usingExternalLocation() {
-    return ConfigProvider.instance.get(ConfigKey.useExternalImg) ?? false;
+    return ConfigProvider.instance.get(Settings.useExternalImg);
   }
 
   Future<String> getInternalFolder() async {
@@ -154,7 +154,7 @@ class ImageStorage {
   }
 
   String _getExternalFolder() {
-    return ConfigProvider.instance.get(ConfigKey.externalImgUri);
+    return ConfigProvider.instance.get(Settings.externalImgUri);
   }
 
   /// Return whether the app has permission to access the external location
@@ -169,21 +169,21 @@ class ImageStorage {
 
       // Save Old Settings
       var oldExternalImgUri =
-          ConfigProvider.instance.get(ConfigKey.externalImgUri);
+          ConfigProvider.instance.get(Settings.externalImgUri);
       var oldUseExternalImg = usingExternalLocation();
 
       await ConfigProvider.instance
-          .set(ConfigKey.externalImgUri, selectedDirectory.uri);
-      await ConfigProvider.instance.set(ConfigKey.useExternalImg, true);
+          .set(Settings.externalImgUri, selectedDirectory.uri);
+      await ConfigProvider.instance.set(Settings.useExternalImg, true);
       var synced = await syncImageFolder(true, updateStatus: updateStatus);
       if (synced) {
         return true;
       } else {
         // Restore Settings
         await ConfigProvider.instance
-            .set(ConfigKey.externalImgUri, oldExternalImgUri);
+            .set(Settings.externalImgUri, oldExternalImgUri);
         await ConfigProvider.instance
-            .set(ConfigKey.useExternalImg, oldUseExternalImg);
+            .set(Settings.useExternalImg, oldUseExternalImg);
         return false;
       }
     } catch (_) {
@@ -192,7 +192,7 @@ class ImageStorage {
   }
 
   void resetImageFolderLocation() async {
-    await ConfigProvider.instance.set(ConfigKey.useExternalImg, false);
+    await ConfigProvider.instance.set(Settings.useExternalImg, false);
   }
 
   Future<Uint8List?> getBytes(String imageName) async {

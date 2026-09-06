@@ -92,7 +92,7 @@ void callbackDispatcher() async {
 
   if (ready) {
     if (EntriesProvider.instance.getEntryForDate(DateTime.now()) == null ||
-        ConfigProvider.instance.get(ConfigKey.alwaysRemind)) {
+        ConfigProvider.instance.get(Settings.alwaysRemind)) {
       FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
           FlutterLocalNotificationsPlugin();
 
@@ -192,7 +192,7 @@ Future<void> setAlarm({bool firstSet = false}) async {
   Duration currentTime = DateTime.now().difference(referenceTime);
 
   Duration reminderTime;
-  if (ConfigProvider.instance.get(ConfigKey.setReminderTime)) {
+  if (ConfigProvider.instance.get(Settings.setReminderTime)) {
     reminderTime = TimeManager.addTimeOfDay(
             referenceTime, TimeManager.scheduledReminderTime())
         .difference(referenceTime);
@@ -240,9 +240,9 @@ Future<void> setOnThisDayAlarm({bool firstSet = false}) async {
   DateTime referenceTime = TimeManager.startOfDay(DateTime.now());
   Duration currentTime = DateTime.now().difference(referenceTime);
 
-  int hour = ConfigProvider.instance.get(ConfigKey.onThisDayNotificationHour);
+  int hour = ConfigProvider.instance.get(Settings.onThisDayNotificationHour);
   int minute =
-      ConfigProvider.instance.get(ConfigKey.onThisDayNotificationMinute);
+      ConfigProvider.instance.get(Settings.onThisDayNotificationMinute);
   Duration reminderTime = TimeManager.addTimeOfDay(
           referenceTime, TimeOfDay(hour: hour, minute: minute))
       .difference(referenceTime);
@@ -330,7 +330,7 @@ class _MainAppState extends State<MainApp> {
       }
 
       // amoled override
-      if (ConfigProvider.instance.get(ConfigKey.theme) == 'amoled') {
+      if (ConfigProvider.instance.get(Settings.theme) == 'amoled') {
         darkTheme = ThemeData(
             useMaterial3: true,
             materialTapTargetSize: MaterialTapTargetSize.padded,
