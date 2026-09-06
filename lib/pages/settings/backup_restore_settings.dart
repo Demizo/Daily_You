@@ -1,5 +1,5 @@
 import 'package:daily_you/utils/backup_restore_utils.dart';
-import 'package:daily_you/utils/import_utils.dart';
+import 'package:daily_you/utils/imports/import_registry.dart';
 import 'package:daily_you/utils/export_utils.dart';
 import 'package:daily_you/widgets/settings_icon_action.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +19,7 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
   }
 
   Future<void> _showImportSelectionPopup() async {
-    ImportFormat chosenFormat = ImportFormat.none;
+    ImportFormat? chosenFormat;
     await showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -31,103 +31,33 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
             children: [
               Text(AppLocalizations.of(context)!.logFormatDescription),
               Divider(),
-              ListTile(
-                  title: Text(AppLocalizations.of(context)!.formatDailyYouJson),
-                  onTap: () {
-                    chosenFormat = ImportFormat.dailyYouJson;
-                    Navigator.of(context).pop();
-                  }),
-              ListTile(
-                  title: Text(AppLocalizations.of(context)!.formatDaybook),
-                  onTap: () {
-                    chosenFormat = ImportFormat.daybook;
-                    Navigator.of(context).pop();
-                  }),
-              ListTile(
-                  title: Text(AppLocalizations.of(context)!.formatDaylio),
-                  onTap: () {
-                    chosenFormat = ImportFormat.daylio;
-                    Navigator.of(context).pop();
-                  }),
-              ListTile(
-                  title: Text(AppLocalizations.of(context)!.formatDiarium),
-                  onTap: () {
-                    chosenFormat = ImportFormat.diarium;
-                    Navigator.of(context).pop();
-                  }),
-              ListTile(
-                  title: Text(AppLocalizations.of(context)!.formatDiaro),
-                  onTap: () {
-                    chosenFormat = ImportFormat.diaro;
-                    Navigator.of(context).pop();
-                  }),
-              ListTile(
-                  title: Text(AppLocalizations.of(context)!.formatMyBrain),
-                  onTap: () {
-                    chosenFormat = ImportFormat.myBrain;
-                    Navigator.of(context).pop();
-                  }),
-              ListTile(
-                  title: Text(AppLocalizations.of(context)!.formatOneShot),
-                  onTap: () {
-                    chosenFormat = ImportFormat.oneShot;
-                    Navigator.of(context).pop();
-                  }),
-              ListTile(
-                  title: Text(AppLocalizations.of(context)!.formatPixels),
-                  onTap: () {
-                    chosenFormat = ImportFormat.pixels;
-                    Navigator.of(context).pop();
-                  }),
+              for (final option in ImportRegistry.instance.options)
+                ListTile(
+                    title: Text(option.name(AppLocalizations.of(context)!)),
+                    onTap: () {
+                      chosenFormat = option.format;
+                      Navigator.of(context).pop();
+                    }),
             ],
           ),
         );
       },
     );
 
-    if (chosenFormat != ImportFormat.none) {
-      if (!mounted) return;
-      ValueNotifier<String> statusNotifier = ValueNotifier<String>("");
+    final format = chosenFormat;
+    if (format == null) return;
+    if (!mounted) return;
 
-      BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
+    ValueNotifier<String> statusNotifier = ValueNotifier<String>("");
 
-      if (chosenFormat == ImportFormat.dailyYouJson) {
-        await ImportUtils.importFromJson((status) {
-          statusNotifier.value = status;
-        });
-      } else if (chosenFormat == ImportFormat.daybook) {
-        await ImportUtils.importFromDaybook(context, (status) {
-          statusNotifier.value = status;
-        });
-      } else if (chosenFormat == ImportFormat.daylio) {
-        await ImportUtils.importFromDaylio(context, (status) {
-          statusNotifier.value = status;
-        });
-      } else if (chosenFormat == ImportFormat.diarium) {
-        await ImportUtils.importFromDiarium(context, (status) {
-          statusNotifier.value = status;
-        });
-      } else if (chosenFormat == ImportFormat.diaro) {
-        await ImportUtils.importFromDiaro(context, (status) {
-          statusNotifier.value = status;
-        });
-      } else if (chosenFormat == ImportFormat.myBrain) {
-        await ImportUtils.importFromMyBrain((status) {
-          statusNotifier.value = status;
-        });
-      } else if (chosenFormat == ImportFormat.oneShot) {
-        await ImportUtils.importFromOneShot((status) {
-          statusNotifier.value = status;
-        });
-      } else if (chosenFormat == ImportFormat.pixels) {
-        await ImportUtils.importFromPixels((status) {
-          statusNotifier.value = status;
-        });
-      }
+    BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
 
-      if (!mounted) return;
-      Navigator.of(context).pop();
-    }
+    await ImportRegistry.instance.optionFor(format).run(context, (status) {
+      statusNotifier.value = status;
+    });
+
+    if (!mounted) return;
+    Navigator.of(context).pop();
   }
 
   Future<void> _showExportSelectionPopup() async {
