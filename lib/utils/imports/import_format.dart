@@ -1,5 +1,4 @@
 enum ImportFormat {
-  none,
   dailyYouJson,
   daybook,
   daylio,
