@@ -230,7 +230,7 @@ class AppDatabase {
     return outcome;
   }
 
-  void resetExternalLocation() async {
+  Future<void> resetExternalLocation() async {
     await ConfigProvider.instance.set(Settings.useExternalDb, false);
   }
 
