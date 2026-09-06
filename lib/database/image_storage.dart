@@ -1,10 +1,13 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/file_bytes_cache.dart';
-import 'package:daily_you/utils/file_layer.dart';
+import 'package:daily_you/storage/external_sync_health.dart';
+import 'package:daily_you/storage/file_store.dart';
+import 'package:daily_you/storage/local_file_store.dart';
+import 'package:daily_you/storage/storage_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/providers/entries_provider.dart';
@@ -23,6 +26,27 @@ class ImageStorage {
   final FileBytesCache imageCache =
       FileBytesCache(maxCacheSize: 10 * 1024 * 1024);
   final Pool imgFetchPool = Pool(3);
+
+  final ExternalSyncHealth externalSyncHealth =
+      ExternalSyncHealth('ImageStorage');
+
+  FileStore? _internalStore;
+  FileStore? _externalStoreOverride;
+
+  Future<FileStore> internalStore() async =>
+      _internalStore ??= LocalFileStore(await getInternalFolder());
+
+  FileStore? get externalStore =>
+      _externalStoreOverride ??
+      (usingExternalLocation()
+          ? FileStore.external(_getExternalFolder())
+          : null);
+
+  @visibleForTesting
+  void overrideStores(FileStore internal, FileStore external) {
+    _internalStore = internal;
+    _externalStoreOverride = external;
+  }
 
   bool usingExternalLocation() {
     return ConfigProvider.instance.get(ConfigKey.useExternalImg) ?? false;
@@ -129,12 +153,12 @@ class ImageStorage {
 
   /// Return whether the app has permission to access the external location
   Future<bool> hasExternalLocationPermission() async {
-    return FileLayer.hasPermission(_getExternalFolder());
+    return await externalStore?.isAvailable() ?? false;
   }
 
   Future<bool> selectExternalLocation(Function(String) updateStatus) async {
     try {
-      var selectedDirectory = await FileLayer.pickDirectory();
+      var selectedDirectory = await StoragePicker.pickDirectory();
       if (selectedDirectory == null) return false;
 
       // Save Old Settings
@@ -143,7 +167,7 @@ class ImageStorage {
       var oldUseExternalImg = usingExternalLocation();
 
       await ConfigProvider.instance
-          .set(ConfigKey.externalImgUri, selectedDirectory);
+          .set(ConfigKey.externalImgUri, selectedDirectory.uri);
       await ConfigProvider.instance.set(ConfigKey.useExternalImg, true);
       var synced = await syncImageFolder(true, updateStatus: updateStatus);
       if (synced) {
@@ -172,19 +196,16 @@ class ImageStorage {
       return bytes;
     }
     // Fetch local copy if present
-    var internalDir = await getInternalFolder();
-    bytes = await imgFetchPool.withResource(() => FileLayer.getFileBytes(
-        internalDir,
-        name: imageName,
-        useExternalPath: false));
+    final internal = await internalStore();
+    bytes = await imgFetchPool.withResource(() => internal.read(imageName));
+
     // Attempt to fetch file externally
-    if (bytes == null && usingExternalLocation()) {
+    final external = externalStore;
+    if (bytes == null && external != null) {
       // Get and cache external image
-      bytes = await FileLayer.getFileBytes(_getExternalFolder(),
-          name: imageName, useExternalPath: true);
+      bytes = await external.read(imageName);
       if (bytes != null) {
-        await FileLayer.createFile(internalDir, imageName, bytes,
-            useExternalPath: false);
+        await internal.write(imageName, bytes);
       }
     }
     if (bytes != null) {
@@ -197,62 +218,51 @@ class ImageStorage {
       {DateTime? currTime}) async {
     currTime ??= DateTime.now();
 
-    final internalFolder = await getInternalFolder();
+    final internal = await internalStore();
 
     // Don't make a copy of files already in the folder
-    if (imageName != null &&
-        await FileLayer.exists(internalFolder,
-            name: imageName, useExternalPath: false)) {
+    if (imageName != null && await internal.exists(imageName)) {
       return imageName;
     }
 
-    var extenstion = imageName != null ? extension(imageName) : ".jpg";
+    var fileExtension = imageName != null ? extension(imageName) : ".jpg";
 
     final timestamp =
         currTime.toIso8601String().split('.').first.replaceAll(':', '-');
 
-    var newImageName = "daily_you_$timestamp$extenstion";
+    var newImageName = "daily_you_$timestamp$fileExtension";
 
     // Ensure unique name
     int index = 1;
-    while (await FileLayer.exists(internalFolder,
-        name: newImageName, useExternalPath: false)) {
-      newImageName = "daily_you_${timestamp}_$index$extenstion";
+    while (await internal.exists(newImageName)) {
+      newImageName = "daily_you_${timestamp}_$index$fileExtension";
       index += 1;
     }
 
     // Do not await operation
-    unawaited(_createRemote(newImageName, bytes));
+    unawaited(_createExternal(newImageName, bytes));
 
-    var imageFilePath = await FileLayer.createFile(
-        internalFolder, newImageName, bytes,
-        useExternalPath: false);
-    if (imageFilePath == null) return null;
+    if (!await internal.write(newImageName, bytes)) return null;
     return newImageName;
   }
 
-  Future<void> _createRemote(String name, Uint8List bytes) async {
-    final externalFolder = _getExternalFolder();
-    if (usingExternalLocation() &&
-        !(await FileLayer.exists(externalFolder,
-            name: name, useExternalPath: true))) {
-      await FileLayer.createFile(externalFolder, name, bytes,
-          useExternalPath: true);
-    }
+  Future<void> _createExternal(String name, Uint8List bytes) async {
+    final external = externalStore;
+    if (external == null || await external.exists(name)) return;
+
+    await externalSyncHealth.record(
+        "external image write", () => external.write(name, bytes));
   }
 
   Future<bool> delete(String imageName) async {
-    final internalFolder = await getInternalFolder();
-    final externalFolder = _getExternalFolder();
-    // Delete local
-    await FileLayer.deleteFile(internalFolder,
-        name: imageName, useExternalPath: false);
+    final internal = await internalStore();
+    await internal.delete(imageName);
 
-    // Delete remote
-    if (usingExternalLocation()) {
+    final external = externalStore;
+    if (external != null) {
       // Do not await operation
-      unawaited(FileLayer.deleteFile(externalFolder,
-          name: imageName, useExternalPath: true));
+      unawaited(externalSyncHealth.record(
+          "external image delete", () => external.delete(imageName)));
     }
 
     return true;
@@ -260,43 +270,39 @@ class ImageStorage {
 
   Future<bool> syncImageFolder(bool garbageCollect,
       {Function(String)? updateStatus}) async {
+    final external = externalStore;
+    if (external == null) return false;
+    final internal = await internalStore();
+
     List<Entry> entries = EntriesProvider.instance.entries;
     updateStatus?.call("0/${entries.length}");
 
-    final internalFolder = await getInternalFolder();
-    final externalFolder = _getExternalFolder();
-
-    List<String> entryImages = List.empty(growable: true);
-
-    List<String> externalImages =
-        await FileLayer.listFiles(externalFolder, useExternalPath: true);
-    List<String> internalImages =
-        await FileLayer.listFiles(internalFolder, useExternalPath: false);
+    List<String> externalImages = await external.list();
+    List<String> internalImages = await internal.list();
 
     int syncedEntries = 0;
     for (Entry entry in entries) {
       var images = EntryImagesProvider.instance.getForEntry(entry);
       for (final image in images) {
-        var entryImg = image.imgPath;
-
-        entryImages.add(entryImg);
+        var entryImage = image.imgPath;
 
         // Export
-        if (internalImages.contains(entryImg) &&
-            !externalImages.contains(entryImg)) {
-          var bytes = await FileLayer.getFileBytes(internalFolder,
-              name: entryImg, useExternalPath: false);
-          await FileLayer.createFile(externalFolder, entryImg, bytes!,
-              useExternalPath: true);
+        if (internalImages.contains(entryImage) &&
+            !externalImages.contains(entryImage)) {
+          var bytes = await internal.read(entryImage);
+          if (bytes != null) {
+            await externalSyncHealth.record("external image write",
+                () => external.write(entryImage, bytes));
+          }
         }
 
         // Import
-        if (externalImages.contains(entryImg) &&
-            !internalImages.contains(entryImg)) {
-          var bytes = await FileLayer.getFileBytes(externalFolder,
-              name: entryImg, useExternalPath: true);
-          await FileLayer.createFile(internalFolder, entryImg, bytes!,
-              useExternalPath: false);
+        if (externalImages.contains(entryImage) &&
+            !internalImages.contains(entryImage)) {
+          var bytes = await external.read(entryImage);
+          if (bytes != null) {
+            await internal.write(entryImage, bytes);
+          }
         }
         syncedEntries += 1;
         updateStatus?.call("$syncedEntries/${entries.length}");
@@ -310,17 +316,16 @@ class ImageStorage {
   }
 
   Future<bool> garbageCollectImages() async {
-    var entryImages = EntryImagesProvider.instance.images;
-    var entryImageNames =
-        entryImages.map((entryImage) => entryImage.imgPath).toList();
-    // Get all internal photos
-    var internalImages = Directory(await getInternalFolder()).list();
-    await for (FileSystemEntity fileEntity in internalImages) {
-      if (fileEntity is File) {
-        // Delete any that aren't used
-        if (!entryImageNames.contains(basename(fileEntity.path))) {
-          await File(fileEntity.path).delete();
-        }
+    return deleteUnreferencedImages(EntryImagesProvider.instance.images
+        .map((entryImage) => entryImage.imgPath)
+        .toSet());
+  }
+
+  Future<bool> deleteUnreferencedImages(Set<String> referencedNames) async {
+    final internal = await internalStore();
+    for (final name in await internal.list()) {
+      if (!referencedNames.contains(name)) {
+        await internal.delete(name);
       }
     }
     return true;
