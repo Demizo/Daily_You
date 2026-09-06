@@ -7,6 +7,7 @@ import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/flashback.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -32,6 +33,8 @@ class _DailyFlashbackPicks {
 }
 
 class FlashbackManager {
+  static final Logger _logger = Logger('FlashbackManager');
+
   static const String _dailyPicksPrefsKey = 'flashbackDailyPickCache';
 
   static _DailyFlashbackPicks _dailyPicks = _DailyFlashbackPicks('');
@@ -46,8 +49,9 @@ class FlashbackManager {
       if (decoded is Map<String, dynamic>) {
         _dailyPicks = _DailyFlashbackPicks.fromJson(decoded);
       }
-    } catch (_) {
-      // Fall back to empty
+    } catch (error, stackTrace) {
+      _logger.warning(
+          'Stored daily flashback picks could not be read', error, stackTrace);
     }
   }
 

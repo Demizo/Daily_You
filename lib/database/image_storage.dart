@@ -186,7 +186,9 @@ class ImageStorage {
             .set(Settings.useExternalImg, oldUseExternalImg);
         return false;
       }
-    } catch (_) {
+    } catch (error, stackTrace) {
+      _logger.severe(
+          'Selecting an external image location failed', error, stackTrace);
       return false;
     }
   }
