@@ -173,14 +173,6 @@ class TagsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> removeAllEntryTagsForEntry(int entryId) async {
-    await EntryTagDao.removeAllForEntry(entryId);
-    _setEntryTags(
-        entryTags.where((entryTag) => entryTag.entryId != entryId).toList());
-    await AppDatabase.instance.updateExternalDatabase();
-    notifyListeners();
-  }
-
   List<EntryTag> getEntryTagsForEntry(int entryId) {
     return _entryTagsByEntry[entryId] ?? const [];
   }
@@ -190,61 +182,6 @@ class TagsProvider with ChangeNotifier {
     final retained =
         entryTags.where((entryTag) => entryTag.entryId != entryId).toList();
     _setEntryTags([...retained, ...written]);
-    notifyListeners();
-  }
-
-  /// Reconciles the tags stored for [entryId] with [desired], adding, removing,
-  /// and updating rows so the database matches.
-  Future<void> setEntryTags(int entryId, List<EntryTag> desired) async {
-    final current = getEntryTagsForEntry(entryId);
-    final currentByTag = {
-      for (final entryTag in current) entryTag.tagId: entryTag
-    };
-    final desiredByTag = {
-      for (final entryTag in desired) entryTag.tagId: entryTag
-    };
-    var changed = false;
-
-    for (final entryTag in current) {
-      if (!desiredByTag.containsKey(entryTag.tagId)) {
-        await EntryTagDao.remove(entryTag.id!);
-        changed = true;
-      }
-    }
-
-    final result = <EntryTag>[];
-    for (final wanted in desired) {
-      final existing = currentByTag[wanted.tagId];
-      if (existing == null) {
-        result.add(await EntryTagDao.add(EntryTag(
-          entryId: entryId,
-          tagId: wanted.tagId,
-          value: wanted.value,
-          timeCreate: wanted.timeCreate,
-        )));
-        changed = true;
-      } else if (existing.value != wanted.value) {
-        final updated = EntryTag(
-          id: existing.id,
-          entryId: entryId,
-          tagId: wanted.tagId,
-          value: wanted.value,
-          timeCreate: existing.timeCreate,
-        );
-        await EntryTagDao.update(updated);
-        result.add(updated);
-        changed = true;
-      } else {
-        result.add(existing);
-      }
-    }
-
-    if (!changed) return;
-
-    final retained =
-        entryTags.where((entryTag) => entryTag.entryId != entryId).toList();
-    _setEntryTags([...retained, ...result]);
-    await AppDatabase.instance.updateExternalDatabase();
     notifyListeners();
   }
 
