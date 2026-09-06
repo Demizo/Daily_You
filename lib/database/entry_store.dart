@@ -43,7 +43,15 @@ class EntryStore with ChangeNotifier {
 
   EntryStore._init();
 
-  List<Entry> entries = List.empty(growable: true);
+  List<Entry> _entries = List.empty(growable: true);
+
+  List<Entry> get entries => _entries;
+
+  @visibleForTesting
+  set entries(List<Entry> entries) {
+    _entries = entries;
+    _indexEntriesByDay();
+  }
 
   Map<DateTime, List<Entry>> _entriesByDay = {};
 
@@ -51,7 +59,7 @@ class EntryStore with ChangeNotifier {
   final Map<EntryDraftBuilder, Completer<Entry>> _queued = {};
 
   Future<void> load() async {
-    entries = await EntryDao.getAll();
+    _entries = await EntryDao.getAll();
     _indexEntriesByDay();
     notifyListeners();
   }
@@ -78,7 +86,7 @@ class EntryStore with ChangeNotifier {
 
     await _deleteImageFiles(images.map((image) => image.imgPath));
 
-    entries.removeWhere((existing) => existing.id == entry.id);
+    _entries = _entries.where((existing) => existing.id != entry.id).toList();
     _indexEntriesByDay();
     TagsProvider.instance.applyEntryTags(entry.id!, const []);
     EntryImagesProvider.instance.applyForEntry(entry.id!, const []);
@@ -88,7 +96,7 @@ class EntryStore with ChangeNotifier {
 
   Future<Entry> add(Entry entry, {bool skipUpdate = false}) async {
     final entryWithId = await EntryDao.add(entry);
-    entries.add(entryWithId);
+    _entries = [..._entries, entryWithId];
     await AppDatabase.instance.updateExternalDatabase();
 
     if (!skipUpdate) {
@@ -180,9 +188,9 @@ class EntryStore with ChangeNotifier {
 
     final index = getIndexOfEntry(saved.id!);
     if (index == -1) {
-      entries.add(saved);
+      _entries = [..._entries, saved];
     } else {
-      entries[index] = saved;
+      _entries = [..._entries]..[index] = saved;
     }
     _sortEntries();
     _indexEntriesByDay();
@@ -294,12 +302,12 @@ class EntryStore with ChangeNotifier {
   }
 
   void _sortEntries() {
-    entries.sort((a, b) => _compareDateOnly(b.timeCreate, a.timeCreate));
+    _entries.sort((a, b) => _compareDateOnly(b.timeCreate, a.timeCreate));
   }
 
   void _indexEntriesByDay() {
     final index = <DateTime, List<Entry>>{};
-    for (final entry in entries) {
+    for (final entry in _entries) {
       final key = DateTime(
           entry.timeCreate.year, entry.timeCreate.month, entry.timeCreate.day);
       index.putIfAbsent(key, () => []).add(entry);
