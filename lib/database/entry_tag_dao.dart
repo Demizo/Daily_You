@@ -11,14 +11,14 @@ class EntryTagDao {
 
   static Future<EntryTag> add(EntryTag entryTag,
       {DatabaseExecutor? executor}) async {
-    final id = await executorOrDatabase(executor)
+    final id = await AppDatabase.executorOr(executor)
         .insert(entryTagsTable, entryTag.toJson());
     return entryTag.copy(id: id);
   }
 
   static Future<void> update(EntryTag entryTag,
       {DatabaseExecutor? executor}) async {
-    await executorOrDatabase(executor).update(
+    await AppDatabase.executorOr(executor).update(
       entryTagsTable,
       entryTag.toJson(),
       where: '${EntryTagFields.id} = ?',
@@ -27,7 +27,7 @@ class EntryTagDao {
   }
 
   static Future<void> remove(int id, {DatabaseExecutor? executor}) async {
-    await executorOrDatabase(executor).delete(
+    await AppDatabase.executorOr(executor).delete(
       entryTagsTable,
       where: '${EntryTagFields.id} = ?',
       whereArgs: [id],
@@ -36,7 +36,7 @@ class EntryTagDao {
 
   static Future<void> removeAllForEntry(int entryId,
       {DatabaseExecutor? executor}) async {
-    await executorOrDatabase(executor).delete(
+    await AppDatabase.executorOr(executor).delete(
       entryTagsTable,
       where: '${EntryTagFields.entryId} = ?',
       whereArgs: [entryId],
