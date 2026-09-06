@@ -464,7 +464,7 @@ CREATE TABLE $templateTagsTable (
 ''');
   }
 
-  void _onUpgrade(Database db, int oldVersion, int newVersion) async {
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     _database = db;
     // In this case, oldVersion is 1, newVersion is 2
     if (oldVersion == 1) {
