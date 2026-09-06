@@ -248,6 +248,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
                     child: Text(AppLocalizations.of(context)!.themeAmoled)),
               ],
               onChanged: (String? newValue) {
+                if (newValue == null) return;
                 ThemeMode themeMode = ThemeMode.system;
                 switch (newValue) {
                   case "system":
@@ -289,6 +290,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
                 value: configProvider.get(Settings.startingDayOfWeek),
                 options: _buildFirstDayOfWeekDropdownItems(context),
                 onChanged: (String? newValue) async {
+                  if (newValue == null) return;
                   await configProvider.set(
                       Settings.startingDayOfWeek, newValue);
                 }),
@@ -312,6 +314,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
                           AppLocalizations.of(context)!.calendarSystemJalali)),
                 ],
                 onChanged: (String? newValue) async {
+                  if (newValue == null) return;
                   await configProvider.set(Settings.calendarSystem, newValue);
                 }),
           ),

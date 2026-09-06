@@ -108,7 +108,7 @@ class _TemplateSettingsState extends State<TemplateSettings> {
                 ),
                 onPressed: () async {
                   await configProvider.set(
-                      Settings.defaultTemplate, isDefault ? -1 : template.id);
+                      Settings.defaultTemplate, isDefault ? -1 : template.id!);
                 },
               ),
               IconButton(
