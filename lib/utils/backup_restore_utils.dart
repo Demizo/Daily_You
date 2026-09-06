@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/database/image_storage.dart';
+import 'package:daily_you/storage/file_store.dart';
 import 'package:daily_you/storage/local_file_store.dart';
 import 'package:daily_you/storage/storage_picker.dart';
 import 'package:daily_you/utils/zip_utils.dart';
@@ -102,13 +103,8 @@ class BackupRestoreUtils {
         if (await restoredImages.isAvailable()) {
           // Also show cleanup status here since images may take awhile
           updateStatus(localizations.cleanUpStatus);
-          final imageStore = await ImageStorage.instance.internalStore();
-          for (final imageName in await restoredImages.list()) {
-            final imageBytes = await restoredImages.read(imageName);
-            if (imageBytes != null) {
-              await imageStore.write(imageName, imageBytes);
-            }
-          }
+          await restoreImages(
+              restoredImages, await ImageStorage.instance.internalStore());
           if (ImageStorage.instance.usingExternalLocation()) {
             await ImageStorage.instance.syncImageFolder(true);
           }
@@ -132,6 +128,14 @@ class BackupRestoreUtils {
     }
 
     return importSuccessful;
+  }
+
+  static Future<void> restoreImages(
+      FileStore backup, FileStore destination) async {
+    for (final imageName in await backup.list()) {
+      final bytes = await backup.read(imageName);
+      if (bytes != null) await destination.write(imageName, bytes);
+    }
   }
 
   static void showLoadingStatus(

@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:daily_you/database/image_storage.dart';
+import 'package:daily_you/storage/file_store.dart';
 import 'package:daily_you/storage/local_file_store.dart';
 import 'package:daily_you/storage/storage_picker.dart';
 import 'package:daily_you/models/entry.dart';
@@ -57,37 +59,18 @@ class ExportUtils {
       final entries = EntriesProvider.instance.entries;
       final totalLogs = entries.length;
       int processedLogs = 0;
-      final Map<String, int> timestampCount = {};
+      final writer = MarkdownExportWriter(
+          noteStore: exportStore, imageStore: exportImageStore, locale: locale);
+
       for (Entry entry in entries) {
-        final images = EntryImagesProvider.instance.getForEntry(entry);
-        StringBuffer noteBody = StringBuffer();
-
-        final timestamp =
-            DateFormat("yyyy-MM-dd", locale).format(entry.timeCreate);
-        timestampCount[timestamp] = (timestampCount[timestamp] ?? 0) + 1;
-        final index = timestampCount[timestamp]!;
-        final indexSuffix = index > 1 ? "_$index" : "";
-
-        for (EntryImage image in images) {
+        final images = <(EntryImage, Uint8List)>[];
+        for (EntryImage image
+            in EntryImagesProvider.instance.getForEntry(entry)) {
           final bytes = await ImageStorage.instance.getBytes(image.imgPath);
-          final prettyName =
-              "image_$timestamp${indexSuffix}_${image.imgRank}${extension(image.imgPath)}";
-          if (bytes != null) {
-            noteBody.writeln('![](Images/$prettyName)');
-
-            await exportImageStore.write(prettyName, bytes);
-          }
+          if (bytes != null) images.add((image, bytes));
         }
 
-        String moodText = "";
-        if (entry.mood != null) {
-          moodText = "${MoodIcon.getMoodIcon(entry.mood)} ";
-        }
-        noteBody.writeln(
-            "$moodText${DateFormat.yMMMEd(locale).format(entry.timeCreate)}\n${entry.text}");
-
-        await exportStore.write(
-            "log_$timestamp$indexSuffix.md", utf8.encode(noteBody.toString()));
+        await writer.write(entry, images);
 
         processedLogs++;
         updateStatus("(1/2) ${((processedLogs / totalLogs) * 100).round()}%");
@@ -121,5 +104,41 @@ class ExportUtils {
     }
 
     return success;
+  }
+}
+
+class MarkdownExportWriter {
+  MarkdownExportWriter(
+      {required this.noteStore,
+      required this.imageStore,
+      required this.locale});
+
+  final FileStore noteStore;
+  final FileStore imageStore;
+  final String locale;
+
+  final Map<String, int> _timestampCount = {};
+
+  Future<void> write(Entry entry, List<(EntryImage, Uint8List)> images) async {
+    final timestamp = DateFormat("yyyy-MM-dd", locale).format(entry.timeCreate);
+    _timestampCount[timestamp] = (_timestampCount[timestamp] ?? 0) + 1;
+    final index = _timestampCount[timestamp]!;
+    final indexSuffix = index > 1 ? "_$index" : "";
+
+    final noteBody = StringBuffer();
+    for (final (image, bytes) in images) {
+      final prettyName =
+          "image_$timestamp${indexSuffix}_${image.imgRank}${extension(image.imgPath)}";
+      noteBody.writeln('![](Images/$prettyName)');
+      await imageStore.write(prettyName, bytes);
+    }
+
+    final moodText =
+        entry.mood != null ? "${MoodIcon.getMoodIcon(entry.mood)} " : "";
+    noteBody.writeln(
+        "$moodText${DateFormat.yMMMEd(locale).format(entry.timeCreate)}\n${entry.text}");
+
+    await noteStore.write(
+        "log_$timestamp$indexSuffix.md", utf8.encode(noteBody.toString()));
   }
 }
