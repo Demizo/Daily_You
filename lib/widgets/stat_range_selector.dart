@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
+import 'package:daily_you/stats/stats_range.dart';
 import 'package:daily_you/widgets/connected_button_group.dart';
-
-enum StatsRange { month, sixMonths, year, allTime }
 
 class StatsRangeSelector extends StatefulWidget {
   final StatsRange statsRange;

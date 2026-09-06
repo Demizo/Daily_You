@@ -1,4 +1,3 @@
-import 'dart:math' as math;
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/stats_subject.dart';
@@ -6,6 +5,9 @@ import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/models/tag_icon_type.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
+import 'package:daily_you/stats/entry_stats.dart';
+import 'package:daily_you/stats/stats_range.dart';
+import 'package:daily_you/stats/streaks.dart';
 import 'package:daily_you/widgets/distribution_chart.dart';
 import 'package:daily_you/widgets/label_summary_card.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
@@ -22,7 +24,6 @@ import 'package:daily_you/widgets/value_over_time_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class StatsPage extends StatefulWidget {
@@ -95,31 +96,31 @@ class _StatsPageState extends State<StatsPage>
 
     final subject =
         StatsSubject.fromConfigString(_subjectConfig, tagsProvider.tags);
-    final entriesInRange = entriesProvider.getEntriesInRange(statsRange);
-    final (currentStreak, longestStreak, daysSinceBadDay) =
-        entriesProvider.getStreaks();
+    final rangedEntries = entriesInRange(entriesProvider.entries, statsRange);
+    final streaks = calculateStreaks(entriesProvider.entries);
+    final daysSinceBadDay = streaks.daysSinceBadDay;
 
     final logCount = entriesProvider.entries.length;
     final entryDayCount = entriesProvider.getEntryDayCount();
-    final greatDayCount = _getGreatDayCount(entriesProvider.entries);
+    final wordCount = totalWordCount(entriesProvider.entries);
 
     final primaryStreakItem = logCount > 0
         ? StatItem(
             icon: Icons.bolt,
-            title: l10n.streakCurrent(currentStreak),
+            title: l10n.streakCurrent(streaks.current),
           )
         : null;
 
     final streakSideItems = <StatItem>[
-      if (longestStreak > 0)
+      if (streaks.longest > 0)
         StatItem(
           icon: Icons.history_rounded,
-          title: l10n.streakLongest(longestStreak),
+          title: l10n.streakLongest(streaks.longest),
         ),
       if (logCount > 0)
         StatItem(
           icon: Icons.mood_rounded,
-          title: l10n.streakGreatDays(greatDayCount),
+          title: l10n.streakGreatDays(greatDayCount(entriesProvider.entries)),
         ),
       if (daysSinceBadDay != null && daysSinceBadDay > 3)
         StatItem(
@@ -139,10 +140,10 @@ class _StatsPageState extends State<StatsPage>
           icon: Icons.today_rounded,
           title: l10n.dayCount(entryDayCount),
         ),
-      if (entriesProvider.wordCount > 100)
+      if (wordCount > 100)
         StatItem(
           icon: Icons.sort_rounded,
-          title: l10n.wordCount(entriesProvider.wordCount),
+          title: l10n.wordCount(wordCount),
         ),
     ];
 
@@ -183,7 +184,7 @@ class _StatsPageState extends State<StatsPage>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     ..._buildChartsForSubject(
-                        context, subject, entriesInRange, tagsProvider),
+                        context, subject, rangedEntries, tagsProvider),
                     const SizedBox(height: 8.0),
                   ],
                 ),
@@ -257,7 +258,6 @@ class _StatsPageState extends State<StatsPage>
         .where((entry) => entry.mood != null)
         .map((entry) => (date: entry.timeCreate, value: entry.mood!.toDouble()))
         .toList();
-    final moodTotals = _getMoodTotals(entries);
     final hasData = moodPoints.length > 1;
 
     return [
@@ -273,11 +273,11 @@ class _StatsPageState extends State<StatsPage>
         ),
       ),
       MoodSummaryChart(
-        moodCounts: moodTotals,
+        moodCounts: moodTotals(entries),
         hasData: hasData,
       ),
       ValueByDayChart(
-        averageValues: _averageByDayOfWeek(
+        averageValues: averageByDayOfWeek(
             entries, (entry) => entry.mood?.toDouble(),
             emptyDayValue: -2),
         hasData: hasData,
@@ -300,15 +300,8 @@ class _StatsPageState extends State<StatsPage>
     final l10n = AppLocalizations.of(context)!;
     final tagColor = tag.resolvedColor(context);
 
-    final entryIds = entries.map((entry) => entry.id).toSet();
-    final valueByEntryId = <int, double>{};
-    for (final entryTag in tagsProvider.entryTags) {
-      if (entryTag.tagId != tag.id) continue;
-      if (!entryIds.contains(entryTag.entryId)) continue;
-      final value = double.tryParse(entryTag.value ?? '');
-      if (value == null) continue;
-      valueByEntryId[entryTag.entryId] = value;
-    }
+    final valueByEntryId =
+        trackerValuesByEntry(entries, tagsProvider.entryTags, tag.id!);
 
     final dataPoints = [
       for (final entry in entries)
@@ -318,7 +311,7 @@ class _StatsPageState extends State<StatsPage>
     final rawValues = dataPoints.map((point) => point.value).toList();
 
     final hasData = dataPoints.length > 1;
-    final (minY, maxY) = _computeTrackerYRange(rawValues);
+    final (minY, maxY) = trackerYRange(rawValues);
     final trackerRange = FixedYRange(minY: minY, maxY: maxY);
 
     return [
@@ -338,7 +331,7 @@ class _StatsPageState extends State<StatsPage>
       ),
       ValueByDayChart(
         averageValues:
-            _averageByDayOfWeek(entries, (entry) => valueByEntryId[entry.id]),
+            averageByDayOfWeek(entries, (entry) => valueByEntryId[entry.id]),
         hasData: hasData,
         yRange: trackerRange,
         title: l10n.chartByDayTitle(tag.name),
@@ -357,10 +350,7 @@ class _StatsPageState extends State<StatsPage>
     final l10n = AppLocalizations.of(context)!;
     final tagColor = tag.resolvedColor(context);
 
-    final presentIds = tagsProvider.entryTags
-        .where((entryTag) => entryTag.tagId == tag.id)
-        .map((entryTag) => entryTag.entryId)
-        .toSet();
+    final presentIds = entryIdsWithTag(tagsProvider.entryTags, tag.id!);
 
     final presentCount =
         entries.where((entry) => presentIds.contains(entry.id)).length;
@@ -374,7 +364,7 @@ class _StatsPageState extends State<StatsPage>
         .toList();
 
     final dayCounts =
-        _countByDayOfWeek(entries, (entry) => presentIds.contains(entry.id));
+        countByDayOfWeek(entries, (entry) => presentIds.contains(entry.id));
 
     return [
       ValueOverTimeChart(
@@ -398,81 +388,6 @@ class _StatsPageState extends State<StatsPage>
         color: tagColor,
       ),
     ];
-  }
-
-  static const List<String> _weekdayKeys = [
-    'Mon',
-    'Tue',
-    'Wed',
-    'Thu',
-    'Fri',
-    'Sat',
-    'Sun',
-  ];
-
-  static int _getGreatDayCount(List<Entry> entries) {
-    final greatDays = <DateTime>{};
-    for (final entry in entries) {
-      if (entry.mood == null || entry.mood! < 1) continue;
-      final date = entry.timeCreate;
-      greatDays.add(DateTime(date.year, date.month, date.day));
-    }
-    return greatDays.length;
-  }
-
-  static Map<int, int> _getMoodTotals(List<Entry> entries) {
-    final moodTotals = {-2: 0, -1: 0, 0: 0, 1: 0, 2: 0};
-    for (final entry in entries) {
-      if (entry.mood == null) continue;
-      moodTotals.update(entry.mood!, (count) => count + 1);
-    }
-    return moodTotals;
-  }
-
-  // Averages [valueOf] per weekday across [entries]. A weekday with no
-  // contributing entries resolves to [emptyDayValue] (null by default) so
-  // charts can tell "no data that day" apart from a genuine zero average.
-  static Map<String, double?> _averageByDayOfWeek(
-    List<Entry> entries,
-    double? Function(Entry entry) valueOf, {
-    double? emptyDayValue,
-  }) {
-    final valuesByDay = <String, List<double>>{};
-    for (final entry in entries) {
-      final value = valueOf(entry);
-      if (value == null) continue;
-      final dayKey = DateFormat('EEE', 'en').format(entry.timeCreate);
-      (valuesByDay[dayKey] ??= []).add(value);
-    }
-
-    double? average(String dayKey) {
-      final values = valuesByDay[dayKey];
-      if (values == null || values.isEmpty) return emptyDayValue;
-      return values.reduce((a, b) => a + b) / values.length;
-    }
-
-    return {for (final dayKey in _weekdayKeys) dayKey: average(dayKey)};
-  }
-
-  // Counts entries matching [matches] per weekday across [entries].
-  static Map<String, double> _countByDayOfWeek(
-    List<Entry> entries,
-    bool Function(Entry entry) matches,
-  ) {
-    final counts = {for (final dayKey in _weekdayKeys) dayKey: 0};
-    for (final entry in entries) {
-      if (!matches(entry)) continue;
-      final dayKey = DateFormat('EEE', 'en').format(entry.timeCreate);
-      counts[dayKey] = (counts[dayKey] ?? 0) + 1;
-    }
-    return counts.map((key, value) => MapEntry(key, value.toDouble()));
-  }
-
-  static (double minY, double maxY) _computeTrackerYRange(List<double> values) {
-    if (values.isEmpty) return (0, 10);
-    final dataMin = values.reduce(math.min);
-    final dataMax = values.reduce(math.max);
-    return (dataMin >= 0 ? 0 : dataMin, dataMax);
   }
 }
 
