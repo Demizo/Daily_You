@@ -1,9 +1,9 @@
 import 'dart:typed_data';
 
+import 'package:daily_you/database/entry_store.dart';
 import 'package:daily_you/database/image_storage.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/image.dart';
-import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/storage/file_store.dart';
 import 'package:daily_you/storage/in_memory_file_store.dart';
@@ -33,7 +33,7 @@ void main() {
 
   void useImages(List<String> imageNames) {
     final createdTime = DateTime(2026, 1, 1);
-    EntriesProvider.instance.entries = [
+    EntryStore.instance.entries = [
       Entry(id: 1, text: '', timeCreate: createdTime, timeModified: createdTime)
     ];
     EntryImagesProvider.instance.images = [

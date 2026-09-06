@@ -9,8 +9,8 @@ import 'package:daily_you/storage/local_file_store.dart';
 import 'package:daily_you/storage/storage_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
+import 'package:daily_you/database/entry_store.dart';
 import 'package:daily_you/models/entry.dart';
-import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -280,7 +280,7 @@ class ImageStorage {
     if (external == null) return false;
     final internal = await internalStore();
 
-    List<Entry> entries = EntriesProvider.instance.entries;
+    List<Entry> entries = EntryStore.instance.entries;
     updateStatus?.call("0/${entries.length}");
 
     List<String> externalImages = await external.list();
