@@ -231,8 +231,9 @@ Future<void> setAlarm({bool firstSet = false}) async {
 
   DateTime reminderDateTime = DateTime.now().add(reminderTime - currentTime);
 
+  bool exact = await NotificationManager.instance.canScheduleExactAlarms();
   await AndroidAlarmManager.oneShotAt(reminderDateTime, 0, callbackDispatcher,
-      allowWhileIdle: true, exact: true, rescheduleOnReboot: true);
+      allowWhileIdle: true, exact: exact, rescheduleOnReboot: true);
 }
 
 Future<void> setOnThisDayAlarm({bool firstSet = false}) async {
@@ -251,9 +252,10 @@ Future<void> setOnThisDayAlarm({bool firstSet = false}) async {
   }
 
   DateTime reminderDateTime = DateTime.now().add(reminderTime - currentTime);
+  bool exact = await NotificationManager.instance.canScheduleExactAlarms();
   await AndroidAlarmManager.oneShotAt(
       reminderDateTime, 1, onThisDayCallbackDispatcher,
-      allowWhileIdle: true, exact: true, rescheduleOnReboot: true);
+      allowWhileIdle: true, exact: exact, rescheduleOnReboot: true);
 }
 
 class MainApp extends StatefulWidget {

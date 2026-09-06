@@ -46,30 +46,40 @@ class NotificationManager {
               AndroidFlutterLocalNotificationsPlugin>()!
           .requestNotificationsPermission();
 
-      if (hasPermissions != null && hasPermissions) {
-        return await requestAlarmPermission();
+      if (hasPermissions ?? false) {
+        await requestExactAlarmPermission();
+        return true;
       }
     }
     return false;
   }
 
-  Future<bool> requestAlarmPermission() async {
-    DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
-    AndroidDeviceInfo androidInfo = await deviceInfoPlugin.androidInfo;
-
-    if (androidInfo.version.sdkInt > 30) {
-      //Request alarm permission
-      var status = await Permission.scheduleExactAlarm.status;
-      if (!status.isGranted) {
-        status = await Permission.scheduleExactAlarm.request();
-      }
-      if (status.isGranted) {
-        return true;
-      }
-      return false;
+  /// Prompt the user to grant exact alarm scheduling.
+  /// It is not a requirement, reminders will fall back to inexact.
+  Future<void> requestExactAlarmPermission() async {
+    if (!await _supportsExactAlarmPermission()) {
+      return;
     }
 
-    return true;
+    var status = await Permission.scheduleExactAlarm.status;
+    if (!status.isGranted) {
+      await Permission.scheduleExactAlarm.request();
+    }
+  }
+
+  Future<bool> canScheduleExactAlarms() async {
+    if (!await _supportsExactAlarmPermission()) {
+      return true;
+    }
+    return (await Permission.scheduleExactAlarm.status).isGranted;
+  }
+
+  Future<bool> _supportsExactAlarmPermission() async {
+    if (!Platform.isAndroid) {
+      return false;
+    }
+    var androidInfo = await DeviceInfoPlugin().androidInfo;
+    return androidInfo.version.sdkInt > 30;
   }
 
   Future<void> dismissReminderNotification() async {
