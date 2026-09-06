@@ -236,14 +236,15 @@ class _StorageSettingsState extends State<StorageSettings> {
 
     BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
 
-    await EntriesProvider.instance.deleteAll((status) {
-      statusNotifier.value = status;
-    });
+    try {
+      await EntriesProvider.instance.deleteAll((status) {
+        statusNotifier.value = status;
+      });
 
-    await ImageStorage.instance.garbageCollectImages();
-
-    if (!context.mounted) return;
-    Navigator.of(context).pop();
+      await ImageStorage.instance.garbageCollectImages();
+    } finally {
+      if (context.mounted) Navigator.of(context).pop();
+    }
   }
 
   String _displayNameFromUri(String uriString) {
