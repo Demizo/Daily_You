@@ -1,13 +1,5 @@
-import 'dart:async';
-import 'dart:io';
-import 'package:daily_you/database/app_database.dart';
-import 'package:daily_you/database/entry_dao.dart';
+import 'package:daily_you/database/entry_store.dart';
 import 'package:daily_you/models/entry.dart';
-import 'package:daily_you/notification_manager.dart';
-import 'package:daily_you/providers/entry_images_provider.dart';
-import 'package:daily_you/providers/tags_provider.dart';
-import 'package:daily_you/providers/templates_provider.dart';
-import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/stat_range_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:word_count/word_count.dart';
@@ -19,23 +11,18 @@ enum SortOrder { ascending, descending }
 class EntriesProvider with ChangeNotifier {
   static final EntriesProvider instance = EntriesProvider._init();
 
-  EntriesProvider._init();
+  EntriesProvider._init() {
+    _store.addListener(_onStoreChanged);
+  }
 
-  List<Entry> entries = List.empty(growable: true);
+  final EntryStore _store = EntryStore.instance;
 
-  Map<DateTime, List<Entry>> _entriesByDay = {};
+  List<Entry> get entries => _store.entries;
 
   List<Entry> _filteredEntries = [];
 
   String _searchText = "";
-  String get searchText {
-    return _searchText;
-  }
-
-  int _wordCount = 0;
-  int get wordCount {
-    return _wordCount;
-  }
+  String get searchText => _searchText;
 
   set searchText(String newSearchText) {
     if (_searchText == newSearchText) return;
@@ -44,10 +31,11 @@ class EntriesProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  int _wordCount = 0;
+  int get wordCount => _wordCount;
+
   OrderBy _orderBy = OrderBy.date;
-  OrderBy get orderBy {
-    return _orderBy;
-  }
+  OrderBy get orderBy => _orderBy;
 
   set orderBy(OrderBy newOrderBy) {
     if (_orderBy == newOrderBy) return;
@@ -65,9 +53,7 @@ class EntriesProvider with ChangeNotifier {
   }
 
   SortOrder _sortOrder = SortOrder.descending;
-  SortOrder get sortOrder {
-    return _sortOrder;
-  }
+  SortOrder get sortOrder => _sortOrder;
 
   set sortOrder(SortOrder newSortOrder) {
     if (_sortOrder == newSortOrder) return;
@@ -76,127 +62,39 @@ class EntriesProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // Used for preserving calendar state
-  DateTime selectedDate = DateTime.now();
+  Future<void> load() => _store.load();
 
-  /// Load the provider's data from the app database
-  Future<void> load() async {
-    entries = await EntryDao.getAll();
-    _calculateWordCount();
-    _calculateEntriesByDay();
-    _calculateFilteredEntries();
-    notifyListeners();
-  }
+  Future<Entry> add(Entry entry, {bool skipUpdate = false}) =>
+      _store.add(entry, skipUpdate: skipUpdate);
 
-  // CRUD operations
+  Future<void> update(Entry entry) => _store.update(entry);
 
-  Future<Entry> add(Entry entry, {skipUpdate = false}) async {
-    // Insert the entry into the database so that it has an ID
-    final entryWithId = await EntryDao.add(entry);
-    entries.add(entryWithId);
-    await AppDatabase.instance.updateExternalDatabase();
+  Future<void> remove(Entry entry) => _store.remove(entry);
 
-    if (!skipUpdate) {
-      // Reverse chronological order such that the most recent day is first
-      entries.sort((a, b) => compareDateOnly(b.timeCreate, a.timeCreate));
+  Future<void> deleteAll(Function(String) updateStatus) =>
+      _store.deleteAll(updateStatus);
 
-      // Update stats
-      _calculateWordCount();
-      _calculateEntriesByDay();
-      _calculateFilteredEntries();
+  int getIndexOfEntry(int entryId) => _store.getIndexOfEntry(entryId);
 
-      notifyListeners();
-    }
-    return entryWithId;
-  }
+  Entry? getEntryForToday() => _store.getEntryForToday();
 
-  Future<void> update(Entry entry) async {
-    await EntryDao.update(entry);
-    final index = entries.indexWhere((x) => x.id == entry.id);
-    entries[index] = entry;
-    // Reverse chronological order such that the most recent day is first
-    entries.sort((a, b) => compareDateOnly(b.timeCreate, a.timeCreate));
-    await AppDatabase.instance.updateExternalDatabase();
+  Entry? getEntryForDate(DateTime date) => _store.getEntryForDate(date);
 
-    // Update stats
-    _calculateWordCount();
-    _calculateEntriesByDay();
-    _calculateFilteredEntries();
+  List<Entry> getEntriesForDate(DateTime date) =>
+      _store.getEntriesForDate(date);
 
-    notifyListeners();
-  }
+  int getEntryDayCount() => _store.getEntryDayCount();
 
-  Future<void> remove(Entry entry) async {
-    await EntryDao.remove(entry.id!);
-    entries.removeWhere((x) => x.id == entry.id);
-    await AppDatabase.instance.updateExternalDatabase();
-
-    // Update stats
-    _calculateWordCount();
-    _calculateEntriesByDay();
-    _calculateFilteredEntries();
-
-    notifyListeners();
-  }
-
-  Future<Entry> createNewEntry(DateTime? timeCreate) async {
-    var text = "";
-    final defaultTemplate = TemplatesProvider.instance.getDefaultTemplate();
-    if (defaultTemplate != null) {
-      text = defaultTemplate.text ?? "";
-    }
-
-    final newEntry = Entry(
-      text: text,
-      mood: null,
-      timeCreate: timeCreate ?? DateTime.now(),
-      timeModified: DateTime.now(),
-    );
-
-    if (Platform.isAndroid &&
-        TimeManager.isSameDay(DateTime.now(), newEntry.timeCreate)) {
-      await NotificationManager.instance.dismissReminderNotification();
-    }
-
-    return await add(newEntry);
-  }
-
-  Future<void> deleteAll(Function(String) updateStatus) async {
-    updateStatus("0%");
-    var processedEntries = 0;
-    for (Entry entry in entries) {
-      var images = EntryImagesProvider.instance.getForEntry(entry);
-      for (final image in images) {
-        await EntryImagesProvider.instance.remove(image);
-      }
-      await TagsProvider.instance.removeAllEntryTagsForEntry(entry.id!);
-      processedEntries += 1;
-      // The provider's remove function is not used to avoid editing the entries
-      // list while iterating over it.
-      await EntryDao.remove(entry.id!);
-      updateStatus("${((processedEntries / entries.length) * 100).round()}%");
-    }
-
-    // Reload the provider since all entries have been deleted
-    await load();
-    await AppDatabase.instance.updateExternalDatabase();
-  }
-
-  int compareDateOnly(DateTime a, DateTime b) {
-    if (a.year != b.year) return a.year.compareTo(b.year);
-    if (a.month != b.month) return a.month.compareTo(b.month);
-    if (a.day != b.day) return a.day.compareTo(b.day);
-    if (a.hour != b.hour) return a.hour.compareTo(b.hour);
-    return a.minute.compareTo(b.minute);
-  }
-
-  /// Set the selected date and update listening widgets
-  void setSelectedDate(DateTime date) {
-    selectedDate = date;
-    notifyListeners();
-  }
+  bool hasEntryAtTimestamp(DateTime timestamp) =>
+      _store.hasEntryAtTimestamp(timestamp);
 
   List<Entry> getFilteredEntries() => _filteredEntries;
+
+  void _onStoreChanged() {
+    _calculateWordCount();
+    _calculateFilteredEntries();
+    notifyListeners();
+  }
 
   void _calculateFilteredEntries() {
     List<Entry> filteredEntries;
@@ -347,48 +245,5 @@ class EntriesProvider with ChangeNotifier {
     }
 
     return (currentStreak, longestStreak, daysSinceBadDay);
-  }
-
-  /// Return the number of days with entries
-  int getEntryDayCount() {
-    return _entriesByDay.length;
-  }
-
-  // Helper functions
-
-  int getIndexOfEntry(int entryId) {
-    return entries.indexWhere((entry) => entry.id == entryId);
-  }
-
-  Entry? getEntryForToday() {
-    Entry? todayEntry;
-    if (entries.isNotEmpty && TimeManager.isToday(entries.first.timeCreate)) {
-      todayEntry = entries.first;
-    }
-    return todayEntry;
-  }
-
-  void _calculateEntriesByDay() {
-    final map = <DateTime, List<Entry>>{};
-    for (final e in entries) {
-      final key =
-          DateTime(e.timeCreate.year, e.timeCreate.month, e.timeCreate.day);
-      map.putIfAbsent(key, () => []).add(e);
-    }
-    _entriesByDay = map;
-  }
-
-  Entry? getEntryForDate(DateTime date) {
-    final target = DateTime(date.year, date.month, date.day);
-    return _entriesByDay[target]?.first;
-  }
-
-  List<Entry> getEntriesForDate(DateTime date) {
-    final target = DateTime(date.year, date.month, date.day);
-    return _entriesByDay[target] ?? [];
-  }
-
-  bool hasEntryAtTimestamp(DateTime timestamp) {
-    return entries.any((e) => e.timeCreate == timestamp);
   }
 }
