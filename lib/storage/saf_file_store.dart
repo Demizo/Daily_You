@@ -61,13 +61,14 @@ class SafFileStore implements FileStore {
   Future<bool> rename(String name, String newName) async {
     final document = await _child(name);
     if (document == null) return false;
-    await SafUtil().rename(document.uri.toString(), false, newName);
-    return true;
+    final renamed =
+        await SafUtil().rename(document.uri.toString(), false, newName);
+    return renamed.name == newName;
   }
 
   @override
   Future<bool> delete(String name) async {
-    final document = await _child(name);
+    final document = await _child(name, requiresWriteAccess: false);
     if (document == null) return true;
     return await document.delete() ?? false;
   }
