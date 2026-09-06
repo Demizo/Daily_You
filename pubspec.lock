@@ -677,14 +677,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.13.0"
-  media_scanner:
-    dependency: "direct main"
-    description:
-      name: media_scanner
-      sha256: "491b5eb792e836d63b13662dae9fe1c998b5a8b258fa72e78cf5aa692eec4a6c"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.2.1"
   meta:
     dependency: transitive
     description:
