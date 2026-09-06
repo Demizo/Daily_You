@@ -17,12 +17,9 @@ class MoodIcon extends StatefulWidget {
   State<MoodIcon> createState() => _MoodIconState();
 
   static String getMoodIcon(int? moodValue) {
-    String? moodIcon;
-    if (ConfigProvider.moodValueFieldMapping[moodValue] != null) {
-      moodIcon = ConfigProvider.instance
-          .get(ConfigProvider.moodValueFieldMapping[moodValue]!);
-    }
-    return moodIcon ?? "";
+    final setting = Settings.moodIcons[moodValue];
+    if (setting == null) return "";
+    return ConfigProvider.instance.get(setting);
   }
 }
 

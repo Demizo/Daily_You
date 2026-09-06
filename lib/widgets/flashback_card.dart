@@ -21,7 +21,7 @@ class FlashbackCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final imagesProvider = EntryImagesProvider.instance;
     final hideImages =
-        ConfigProvider.instance.get(ConfigKey.hideImagesInFlashbacks) == true;
+        ConfigProvider.instance.get(Settings.hideImagesInFlashbacks);
     final theme = Theme.of(context);
     final text = entries.first.text;
 

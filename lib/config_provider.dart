@@ -13,81 +13,170 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ConfigKey {
-  static const String configVersion = "configVersion";
-  static const String theme = "theme";
-  static const String useExternalDb = "useExternalDb";
-  static const String externalDbUri = "externalDbUri";
-  static const String useExternalImg = "useExternalImg";
-  static const String externalImgUri = "externalImgUri";
-  static const String startingDayOfWeek = "startingDayOfWeek";
-  static const String galleryPageViewMode = "galleryPageViewMode";
-  static const String veryHappyIcon = "veryHappyIcon";
-  static const String happyIcon = "happyIcon";
-  static const String neutralIcon = "neutralIcon";
-  static const String sadIcon = "sadIcon";
-  static const String verySadIcon = "verySadIcon";
-  static const String followSystemColor = "followSystemColor";
-  static const String accentColor = "accentColor";
-  static const String dailyReminders = "dailyReminders";
-  static const String setReminderTime = "setReminderTime";
-  static const String scheduledReminderHour = "scheduledReminderHour";
-  static const String scheduledReminderMinute = "scheduledReminderMinute";
-  static const String reminderStartHour = "reminderStartHour";
-  static const String reminderStartMinute = "reminderStartMinute";
-  static const String reminderEndHour = "reminderEndHour";
-  static const String reminderEndMinute = "reminderEndMinute";
-  static const String alwaysRemind = "alwaysRemind";
-  static const String onThisDayNotifications = "onThisDayNotifications";
-  static const String onThisDayNotificationHour = "onThisDayNotificationHour";
-  static const String onThisDayNotificationMinute =
-      "onThisDayNotificationMinute";
-  static const String dismissedNotificationOnboarding =
-      "dismissedNotificationOnboarding";
-  static const String defaultTemplate = "defaultTemplate";
-  static const String imageQualityLevel = "imageQualityLevel";
-  static const String overrideLanguage = "overrideLanguage";
-  static const String showFlashbacks = "showFlashbacks";
-  static const String excludeBadDaysFromFlashbacks =
-      "excludeBadDaysFromFlashbacks";
-  static const String showflashbackYearsAgo = "showflashbackYearsAgo";
-  static const String showflashback6MonthsAgo = "showflashback6MonthsAgo";
-  static const String showflashback1MonthAgo = "showflashback1MonthAgo";
-  static const String showflashback1WeekAgo = "showflashback1WeekAgo";
-  static const String showflashbackGoodDay = "showflashbackGoodDay";
-  static const String showflashbackRandomDay = "showflashbackRandomDay";
-  static const String hideImagesInGallery = "hideImagesInGallery";
-  static const String hideImagesInCalendar = "hideImagesInCalendar";
-  static const String hideImagesInFlashbacks = "hideImagesInFlashbacks";
-  static const String lastDismissedSupportBannerDate =
-      "lastDismissedSupportBannerDate";
-  static const String calendarShowMood = "calendarShowMood";
-  static const String calendarTagOverlay = "calendarTagOverlay";
-  static const String calendarSystem = "calendarSystem";
-  static const String moodOverTimeGrouping = "moodOverTimeGrouping";
-  static const String moodOverTimeSmoothing = "moodOverTimeSmoothing";
-  static const String statsRange = "statsRange";
-  static const String statsSubject = "statsSubject";
-  static const String tagPickerSortMode = "tagPickerSortMode";
-  // Secure Configuration Values
-  static const String requirePassword = "requirePassword";
-  static const String biometricUnlock = "biometricUnlock";
-  static const String passwordHash = "passwordHash";
-  static const String passwordIsPin = "passwordIsPin";
-  // DEPRECATED
-  static const String imageQuality = "imageQuality";
-  static const String homePageViewMode = "homePageViewMode";
-  static const String calendarViewMode = "calendarViewMode";
-  static const String noMoodIcon = "noMoodIcon";
-  static const String calendarFocusMode = "calendarFocusMode";
-  static const String useMarkdownToolbar = "useMarkdownToolbar";
+class Setting<T> {
+  const Setting(this.key, this.defaultValue, {this.secure = false});
+
+  final String key;
+  final T defaultValue;
+  final bool secure;
+}
+
+class Settings {
+  static const configVersion = Setting<String>("configVersion", "2");
+  static const theme = Setting<String>("theme", "system");
+  static const useExternalDb = Setting<bool>("useExternalDb", false);
+  static const externalDbUri = Setting<String>("externalDbUri", "");
+  static const useExternalImg = Setting<bool>("useExternalImg", false);
+  static const externalImgUri = Setting<String>("externalImgUri", "");
+  static const startingDayOfWeek =
+      Setting<String>("startingDayOfWeek", "system");
+  static const galleryPageViewMode =
+      Setting<String>("galleryPageViewMode", "grid");
+  static const veryHappyIcon = Setting<String>("veryHappyIcon", "☺️");
+  static const happyIcon = Setting<String>("happyIcon", "🙂");
+  static const neutralIcon = Setting<String>("neutralIcon", "😐");
+  static const sadIcon = Setting<String>("sadIcon", "😕");
+  static const verySadIcon = Setting<String>("verySadIcon", "😔");
+  static const followSystemColor = Setting<bool>("followSystemColor", true);
+  static const accentColor = Setting<int>("accentColor", 0xff62A0EA);
+  static const dailyReminders = Setting<bool>("dailyReminders", false);
+  static const setReminderTime = Setting<bool>("setReminderTime", false);
+  static const scheduledReminderHour =
+      Setting<int>("scheduledReminderHour", 12);
+  static const scheduledReminderMinute =
+      Setting<int>("scheduledReminderMinute", 0);
+  static const reminderStartHour = Setting<int>("reminderStartHour", 9);
+  static const reminderStartMinute = Setting<int>("reminderStartMinute", 0);
+  static const reminderEndHour = Setting<int>("reminderEndHour", 21);
+  static const reminderEndMinute = Setting<int>("reminderEndMinute", 0);
+  static const alwaysRemind = Setting<bool>("alwaysRemind", false);
+  static const onThisDayNotifications =
+      Setting<bool>("onThisDayNotifications", false);
+  static const onThisDayNotificationHour =
+      Setting<int>("onThisDayNotificationHour", 12);
+  static const onThisDayNotificationMinute =
+      Setting<int>("onThisDayNotificationMinute", 0);
+  static const dismissedNotificationOnboarding =
+      Setting<bool>("dismissedNotificationOnboarding", false);
+  static const defaultTemplate = Setting<int>("defaultTemplate", -1);
+  static const imageQualityLevel =
+      Setting<String>("imageQualityLevel", ImageQuality.medium);
+  static const overrideLanguage =
+      Setting<Map<String, dynamic>?>("overrideLanguage", null);
+  static const showFlashbacks = Setting<bool>("showFlashbacks", true);
+  static const excludeBadDaysFromFlashbacks =
+      Setting<bool>("excludeBadDaysFromFlashbacks", false);
+  static const showflashbackYearsAgo =
+      Setting<bool>("showflashbackYearsAgo", true);
+  static const showflashback6MonthsAgo =
+      Setting<bool>("showflashback6MonthsAgo", true);
+  static const showflashback1MonthAgo =
+      Setting<bool>("showflashback1MonthAgo", true);
+  static const showflashback1WeekAgo =
+      Setting<bool>("showflashback1WeekAgo", true);
+  static const showflashbackGoodDay =
+      Setting<bool>("showflashbackGoodDay", true);
+  static const showflashbackRandomDay =
+      Setting<bool>("showflashbackRandomDay", true);
+  static const hideImagesInGallery =
+      Setting<bool>("hideImagesInGallery", false);
+  static const hideImagesInCalendar =
+      Setting<bool>("hideImagesInCalendar", false);
+  static const hideImagesInFlashbacks =
+      Setting<bool>("hideImagesInFlashbacks", false);
+  static const lastDismissedSupportBannerDate =
+      Setting<String?>("lastDismissedSupportBannerDate", null);
+  static const calendarShowMood = Setting<bool>("calendarShowMood", true);
+  static const calendarTagOverlay = Setting<int?>("calendarTagOverlay", null);
+  static const calendarSystem = Setting<String>("calendarSystem", "system");
+  static const moodOverTimeGrouping =
+      Setting<String?>("moodOverTimeGrouping", null);
+  static const moodOverTimeSmoothing =
+      Setting<bool>("moodOverTimeSmoothing", true);
+  static const statsRange = Setting<String>("statsRange", "allTime");
+  static const statsSubject = Setting<String>("statsSubject", "mood");
+  static const tagPickerSortMode =
+      Setting<String>("tagPickerSortMode", "manual");
+  static const requirePassword =
+      Setting<bool>("requirePassword", false, secure: true);
+  static const biometricUnlock =
+      Setting<bool>("biometricUnlock", false, secure: true);
+  static const passwordHash = Setting<String>("passwordHash", "", secure: true);
+  static const passwordIsPin =
+      Setting<bool>("passwordIsPin", false, secure: true);
+
+  static const List<Setting<Object?>> all = [
+    configVersion,
+    theme,
+    useExternalDb,
+    externalDbUri,
+    useExternalImg,
+    externalImgUri,
+    startingDayOfWeek,
+    galleryPageViewMode,
+    veryHappyIcon,
+    happyIcon,
+    neutralIcon,
+    sadIcon,
+    verySadIcon,
+    followSystemColor,
+    accentColor,
+    dailyReminders,
+    setReminderTime,
+    scheduledReminderHour,
+    scheduledReminderMinute,
+    reminderStartHour,
+    reminderStartMinute,
+    reminderEndHour,
+    reminderEndMinute,
+    alwaysRemind,
+    onThisDayNotifications,
+    onThisDayNotificationHour,
+    onThisDayNotificationMinute,
+    dismissedNotificationOnboarding,
+    defaultTemplate,
+    imageQualityLevel,
+    overrideLanguage,
+    showFlashbacks,
+    excludeBadDaysFromFlashbacks,
+    showflashbackYearsAgo,
+    showflashback6MonthsAgo,
+    showflashback1MonthAgo,
+    showflashback1WeekAgo,
+    showflashbackGoodDay,
+    showflashbackRandomDay,
+    hideImagesInGallery,
+    hideImagesInCalendar,
+    hideImagesInFlashbacks,
+    lastDismissedSupportBannerDate,
+    calendarShowMood,
+    calendarTagOverlay,
+    calendarSystem,
+    moodOverTimeGrouping,
+    moodOverTimeSmoothing,
+    statsRange,
+    statsSubject,
+    tagPickerSortMode,
+    requirePassword,
+    biometricUnlock,
+    passwordHash,
+    passwordIsPin,
+  ];
+
+  static const moodIcons = <int, Setting<String>>{
+    2: veryHappyIcon,
+    1: happyIcon,
+    0: neutralIcon,
+    -1: sadIcon,
+    -2: verySadIcon,
+  };
 }
 
 class ImageQuality {
-  static final String noCompression = "noCompression";
-  static final String high = "high";
-  static final String medium = "medium";
-  static final String low = "low";
+  static const String noCompression = "noCompression";
+  static const String high = "high";
+  static const String medium = "medium";
+  static const String low = "low";
 }
 
 class ConfigProvider with ChangeNotifier {
@@ -100,83 +189,10 @@ class ConfigProvider with ChangeNotifier {
   String configFilePath = '';
 
   Map<String, dynamic> _config = {};
-  final Map<String, dynamic> _defaultConfig = {
-    ConfigKey.configVersion: '2',
-    ConfigKey.theme: 'system',
-    ConfigKey.useExternalDb: false,
-    ConfigKey.externalDbUri: '',
-    ConfigKey.useExternalImg: false,
-    ConfigKey.externalImgUri: '',
-    ConfigKey.startingDayOfWeek: 'system',
-    ConfigKey.galleryPageViewMode: 'grid',
-    ConfigKey.veryHappyIcon: '☺️',
-    ConfigKey.happyIcon: '🙂',
-    ConfigKey.neutralIcon: '😐',
-    ConfigKey.sadIcon: '😕',
-    ConfigKey.verySadIcon: '😔',
-    ConfigKey.followSystemColor: true,
-    ConfigKey.accentColor: 0xff62A0EA,
-    ConfigKey.dailyReminders: false,
-    ConfigKey.setReminderTime: false,
-    ConfigKey.scheduledReminderHour: 12,
-    ConfigKey.scheduledReminderMinute: 0,
-    ConfigKey.reminderStartHour: 9,
-    ConfigKey.reminderStartMinute: 0,
-    ConfigKey.reminderEndHour: 21,
-    ConfigKey.reminderEndMinute: 0,
-    ConfigKey.alwaysRemind: false,
-    ConfigKey.onThisDayNotifications: false,
-    ConfigKey.onThisDayNotificationHour: 12,
-    ConfigKey.onThisDayNotificationMinute: 0,
-    ConfigKey.dismissedNotificationOnboarding: false,
-    ConfigKey.defaultTemplate: -1,
-    ConfigKey.imageQualityLevel: ImageQuality.medium,
-    ConfigKey.overrideLanguage: null,
-    ConfigKey.showFlashbacks: true,
-    ConfigKey.excludeBadDaysFromFlashbacks: false,
-    ConfigKey.showflashbackYearsAgo: true,
-    ConfigKey.showflashback6MonthsAgo: true,
-    ConfigKey.showflashback1MonthAgo: true,
-    ConfigKey.showflashback1WeekAgo: true,
-    ConfigKey.showflashbackGoodDay: true,
-    ConfigKey.showflashbackRandomDay: true,
-    ConfigKey.hideImagesInGallery: false,
-    ConfigKey.hideImagesInCalendar: false,
-    ConfigKey.hideImagesInFlashbacks: false,
-    ConfigKey.lastDismissedSupportBannerDate: null,
-    ConfigKey.calendarShowMood: true,
-    ConfigKey.calendarTagOverlay: null,
-    ConfigKey.calendarSystem: 'system',
-    ConfigKey.moodOverTimeGrouping: null,
-    ConfigKey.moodOverTimeSmoothing: true,
-    ConfigKey.statsRange: 'allTime',
-    ConfigKey.statsSubject: 'mood',
-    ConfigKey.tagPickerSortMode: 'manual',
-  };
 
-  final Map<String, dynamic> _secureConfig = {
-    ConfigKey.requirePassword: false,
-    ConfigKey.biometricUnlock: false,
-    ConfigKey.passwordHash: "",
-    ConfigKey.passwordIsPin: false,
-  };
-
-  bool _isSecureKey(String key) => _secureConfig.containsKey(key);
-
-  static final moodValueFieldMapping = {
-    2: ConfigKey.veryHappyIcon,
-    1: ConfigKey.happyIcon,
-    0: ConfigKey.neutralIcon,
-    -1: ConfigKey.sadIcon,
-    -2: ConfigKey.verySadIcon,
-  };
-
-  static final defaultMoodIconFieldMapping = {
-    ConfigKey.veryHappyIcon: '☺️',
-    ConfigKey.happyIcon: '🙂',
-    ConfigKey.neutralIcon: '😐',
-    ConfigKey.sadIcon: '😕',
-    ConfigKey.verySadIcon: '😔',
+  static final Set<String> _secureKeys = {
+    for (final setting in Settings.all)
+      if (setting.secure) setting.key,
   };
 
   static final imageQualityCompressionMapping = {
@@ -193,18 +209,19 @@ class ConfigProvider with ChangeNotifier {
     ImageQuality.low: 1024.0,
   };
 
-  dynamic get(String field) {
-    return _config[field];
+  T get<T>(Setting<T> setting) {
+    final value = _config[setting.key];
+    return value is T ? value : setting.defaultValue;
   }
 
-  Future<void> set(String field, dynamic value) async {
-    _config[field] = value;
+  Future<void> set<T>(Setting<T> setting, T value) async {
+    _config[setting.key] = value;
     notifyListeners();
 
-    if (_isSecureKey(field)) {
+    if (setting.secure) {
       final prefs = await SharedPreferences.getInstance();
       // Store as JSON for type safety
-      await prefs.setString(field, json.encode(value));
+      await prefs.setString(setting.key, json.encode(value));
     } else {
       await writeConfig();
     }
@@ -223,7 +240,7 @@ class ConfigProvider with ChangeNotifier {
 
     await readConfig();
     await loadSecureConfig();
-    await poplulateDefaults();
+    await _pruneUnknownKeys();
   }
 
   Future<void> _migrateConfigFromExternalStorage(Directory newDir) async {
@@ -253,47 +270,34 @@ class ConfigProvider with ChangeNotifier {
     }
   }
 
-  Future<void> poplulateDefaults() async {
-    bool configChanged = false;
+  Future<void> _pruneUnknownKeys() async {
+    final declaredKeys = {for (final setting in Settings.all) setting.key};
+    final unknownKeys =
+        _config.keys.where((key) => !declaredKeys.contains(key)).toList();
+    if (unknownKeys.isEmpty) return;
 
-    // Set default config data
-    for (String key in _defaultConfig.keys) {
-      if (!_config.containsKey(key)) {
-        _config[key] = _defaultConfig[key];
-        configChanged = true;
-      }
-    }
-
-    // Remove old keys
-    List<String> oldKeys = [];
-    for (String key in _config.keys) {
-      if (!_defaultConfig.containsKey(key) && !_secureConfig.containsKey(key)) {
-        oldKeys.add(key);
-      }
-    }
-    for (String key in oldKeys) {
-      _config.remove(key);
-      configChanged = true;
-    }
-
-    if (configChanged) {
-      await writeConfig();
-    }
+    _config.removeWhere((key, _) => unknownKeys.contains(key));
+    await writeConfig();
   }
 
   Future<void> loadSecureConfig() async {
     final prefs = await SharedPreferences.getInstance();
-    for (final key in _secureConfig.keys) {
-      if (prefs.containsKey(key)) {
-        try {
-          _config[key] = json.decode(prefs.getString(key)!);
-        } catch (_) {
-          _config[key] = prefs.getString(key); // fallback to raw
-        }
-      } else {
-        _config[key] = _secureConfig[key];
+    for (final setting in Settings.all.where((setting) => setting.secure)) {
+      final stored = prefs.getString(setting.key);
+      if (stored == null) {
+        _config[setting.key] = setting.defaultValue;
         // Store as JSON for type safety
-        await prefs.setString(key, json.encode(_secureConfig[key]));
+        await prefs.setString(setting.key, json.encode(setting.defaultValue));
+        continue;
+      }
+      try {
+        _config[setting.key] = json.decode(stored);
+      } catch (error, stackTrace) {
+        _logger.warning(
+            'Secure setting ${setting.key} is not valid JSON, reading it raw',
+            error,
+            stackTrace);
+        _config[setting.key] = stored;
       }
     }
   }
@@ -315,8 +319,10 @@ class ConfigProvider with ChangeNotifier {
       } else {
         throw const FormatException('Config is not a map');
       }
-    } catch (e) {
+    } catch (error, stackTrace) {
       // Corrupted config: reset to defaults
+      _logger.severe('Config could not be read, falling back to defaults',
+          error, stackTrace);
       _config = {};
     }
   }
@@ -325,7 +331,7 @@ class ConfigProvider with ChangeNotifier {
     EasyDebounce.debounce("save-config", Duration(seconds: 1), () async {
       // Don't write secure configurations to the config file
       final filteredConfig = Map<String, dynamic>.from(_config)
-        ..removeWhere((key, _) => _isSecureKey(key));
+        ..removeWhere((key, _) => _secureKeys.contains(key));
 
       final tempFile = File('$configFilePath.tmp');
 
@@ -346,7 +352,7 @@ class ConfigProvider with ChangeNotifier {
   }
 
   int getFirstDayOfWeekIndex(BuildContext context) {
-    final startingDay = get("startingDayOfWeek");
+    final startingDay = get(Settings.startingDayOfWeek);
     if (startingDay == 'system') {
       return DateFormat.yMd(TimeManager.currentLocale(context))
           .dateSymbols
@@ -359,7 +365,7 @@ class ConfigProvider with ChangeNotifier {
 
   Locale? getOverrideLanguage() {
     LanguageOption? currentOverride =
-        LanguageOption.fromJsonOrNull(get(ConfigKey.overrideLanguage));
+        LanguageOption.fromJsonOrNull(get(Settings.overrideLanguage));
     if (currentOverride != null) {
       return currentOverride.toLocale();
     }

@@ -97,7 +97,7 @@ class _LaunchPageState extends State<LaunchPage> {
 
   Future _checkDatabaseConnection() async {
     // Prompt unlock before initializing database
-    if (await ConfigProvider.instance.get(ConfigKey.requirePassword)) {
+    if (ConfigProvider.instance.get(Settings.requirePassword)) {
       if (!mounted) return;
       await showDialog(
           context: context,
@@ -105,7 +105,7 @@ class _LaunchPageState extends State<LaunchPage> {
                 mode: AuthPopupMode.unlock,
                 title: AppLocalizations.of(context)!.unlockAppPrompt,
                 showBiometrics:
-                    ConfigProvider.instance.get(ConfigKey.biometricUnlock),
+                    ConfigProvider.instance.get(Settings.biometricUnlock),
                 dismissable: false,
                 onSuccess: () {},
               ));

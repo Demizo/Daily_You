@@ -96,7 +96,7 @@ class FlashbackManager {
 
     List<Entry> filteredEntries = entries;
 
-    if (configProvider.get(ConfigKey.excludeBadDaysFromFlashbacks)) {
+    if (configProvider.get(Settings.excludeBadDaysFromFlashbacks)) {
       // Filter out unhappy entries
       filteredEntries =
           filteredEntries.where((entry) => (entry.mood ?? 0) >= 0).toList();
@@ -119,7 +119,7 @@ class FlashbackManager {
     // Time based memories
     for (var entry in filteredEntries.reversed.toList()) {
       if (usedEntries.contains(entry)) continue;
-      if (configProvider.get(ConfigKey.showflashbackYearsAgo) &&
+      if (configProvider.get(Settings.showflashbackYearsAgo) &&
           TimeManager.isSameCalendarDayOfYear(
               entry.timeCreate, now, isJalali) &&
           TimeManager.calendarYearOf(entry.timeCreate, isJalali) !=
@@ -132,7 +132,7 @@ class FlashbackManager {
         usedEntries.add(entry);
         continue;
       }
-      if (configProvider.get(ConfigKey.showflashback6MonthsAgo) &&
+      if (configProvider.get(Settings.showflashback6MonthsAgo) &&
           TimeManager.datesExactCalendarMonthDiff(
                   entry.timeCreate, now, isJalali) ==
               6) {
@@ -141,7 +141,7 @@ class FlashbackManager {
         usedEntries.add(entry);
         continue;
       }
-      if (configProvider.get(ConfigKey.showflashback1MonthAgo) &&
+      if (configProvider.get(Settings.showflashback1MonthAgo) &&
           TimeManager.datesExactCalendarMonthDiff(
                   entry.timeCreate, now, isJalali) ==
               1) {
@@ -150,7 +150,7 @@ class FlashbackManager {
         usedEntries.add(entry);
         continue;
       }
-      if (configProvider.get(ConfigKey.showflashback1WeekAgo) &&
+      if (configProvider.get(Settings.showflashback1WeekAgo) &&
           TimeManager.isSameDay(entry.timeCreate,
               DateTime.now().subtract(const Duration(days: 7)))) {
         final label = AppLocalizations.of(context)!.flashbackWeek(1);
@@ -183,7 +183,7 @@ class FlashbackManager {
       }
 
       // A happy memory
-      if (configProvider.get(ConfigKey.showflashbackGoodDay)) {
+      if (configProvider.get(Settings.showflashbackGoodDay)) {
         final goodDayEntry = _resolveDailyPick(
           cachedId: _dailyPicks.goodDayEntryId,
           setCachedId: (id) => _dailyPicks.goodDayEntryId = id,
@@ -199,7 +199,7 @@ class FlashbackManager {
       }
 
       // A random memory
-      if (configProvider.get(ConfigKey.showflashbackRandomDay)) {
+      if (configProvider.get(Settings.showflashbackRandomDay)) {
         final randomDayEntry = _resolveDailyPick(
           cachedId: _dailyPicks.randomDayEntryId,
           setCachedId: (id) => _dailyPicks.randomDayEntryId = id,

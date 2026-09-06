@@ -49,7 +49,7 @@ class TemplatesProvider with ChangeNotifier {
 
   Template? getDefaultTemplate() {
     var defaultTemplateId =
-        ConfigProvider.instance.get(ConfigKey.defaultTemplate);
+        ConfigProvider.instance.get(Settings.defaultTemplate);
     return templates.where((t) => t.id == defaultTemplateId).firstOrNull;
   }
 

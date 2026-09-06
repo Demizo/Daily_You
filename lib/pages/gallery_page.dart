@@ -269,7 +269,7 @@ class _GalleryPageState extends State<GalleryPage>
     final entriesProvider = Provider.of<EntriesProvider>(context);
     final tagsProvider = Provider.of<TagsProvider>(context);
     final configProvider = Provider.of<ConfigProvider>(context);
-    String viewMode = configProvider.get(ConfigKey.galleryPageViewMode);
+    String viewMode = configProvider.get(Settings.galleryPageViewMode);
     bool listView = viewMode == 'list';
     var entries = _getVisibleEntries(entriesProvider, tagsProvider);
     final bool showClear = _searchController.text.isNotEmpty || _hasTagFilter;
@@ -455,13 +455,13 @@ class _GalleryPageState extends State<GalleryPage>
                         entry: entry,
                         images: entryImagesProvider.getForEntry(entry),
                         hideImage:
-                            configProvider.get(ConfigKey.hideImagesInGallery),
+                            configProvider.get(Settings.hideImagesInGallery),
                       )
                     : EntryCardWidget(
                         entry: entry,
                         images: entryImagesProvider.getForEntry(entry),
                         hideImage:
-                            configProvider.get(ConfigKey.hideImagesInGallery),
+                            configProvider.get(Settings.hideImagesInGallery),
                       ),
               );
             },

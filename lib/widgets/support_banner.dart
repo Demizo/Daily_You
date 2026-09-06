@@ -94,7 +94,7 @@ class SupportBanner extends StatelessWidget {
               color: Theme.of(context).colorScheme.onSecondaryContainer,
               onPressed: () async {
                 await configProvider.set(
-                  ConfigKey.lastDismissedSupportBannerDate,
+                  Settings.lastDismissedSupportBannerDate,
                   DateTime.now().toIso8601String(),
                 );
               },

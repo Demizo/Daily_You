@@ -78,7 +78,7 @@ class _AboutSettingsState extends State<AboutSettings> {
               if (versionTapCount > 5) {
                 versionTapCount = 0;
 
-                await configProvider.set(ConfigKey.followSystemColor, false);
+                await configProvider.set(Settings.followSystemColor, false);
 
                 themeProvider.accentColor = pinkAccentColor;
                 themeProvider.updateAccentColor();

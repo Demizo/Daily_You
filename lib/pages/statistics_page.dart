@@ -62,11 +62,9 @@ class _StatsPageState extends State<StatsPage>
   @override
   void initState() {
     super.initState();
-    final saved = ConfigProvider.instance.get(ConfigKey.statsRange) as String?;
+    final saved = ConfigProvider.instance.get(Settings.statsRange);
     statsRange = _stringToRange[saved] ?? StatsRange.allTime;
-    _subjectConfig =
-        ConfigProvider.instance.get(ConfigKey.statsSubject) as String? ??
-            'mood';
+    _subjectConfig = ConfigProvider.instance.get(Settings.statsSubject);
   }
 
   @override
@@ -182,7 +180,7 @@ class _StatsPageState extends State<StatsPage>
                 onRangeChanged: (newRange) {
                   setState(() => statsRange = newRange);
                   ConfigProvider.instance
-                      .set(ConfigKey.statsRange, _rangeToString[newRange]);
+                      .set(Settings.statsRange, _rangeToString[newRange]);
                 },
                 onSubjectTypeSelected: (type) =>
                     _onSubjectTypeSelected(context, type),
@@ -243,7 +241,7 @@ class _StatsPageState extends State<StatsPage>
 
   void _applySubject(StatsSubject subject) {
     setState(() => _subjectConfig = subject.toConfigString());
-    ConfigProvider.instance.set(ConfigKey.statsSubject, _subjectConfig);
+    ConfigProvider.instance.set(Settings.statsSubject, _subjectConfig);
   }
 
   List<Widget> _buildChartsForSubject(

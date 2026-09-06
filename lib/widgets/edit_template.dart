@@ -98,9 +98,9 @@ class _EditTemplateState extends State<EditTemplate> {
     );
     if (confirmed && mounted) {
       final defaultTemplateId =
-          ConfigProvider.instance.get(ConfigKey.defaultTemplate) as int?;
+          ConfigProvider.instance.get(Settings.defaultTemplate);
       if (defaultTemplateId == template.id) {
-        await ConfigProvider.instance.set(ConfigKey.defaultTemplate, -1);
+        await ConfigProvider.instance.set(Settings.defaultTemplate, -1);
       }
       await TemplatesProvider.instance.remove(template);
       if (mounted) Navigator.of(context).pop();

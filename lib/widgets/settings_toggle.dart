@@ -5,14 +5,14 @@ import 'package:provider/provider.dart';
 class SettingsToggle extends StatelessWidget {
   final String title;
   final String? hint;
-  final String settingsKey;
+  final Setting<bool> setting;
   final Function(bool) onChanged;
 
   const SettingsToggle({
     super.key,
     required this.title,
     this.hint,
-    required this.settingsKey,
+    required this.setting,
     required this.onChanged,
   });
 
@@ -41,7 +41,7 @@ class SettingsToggle extends StatelessWidget {
               ],
             ),
           ),
-          Switch(value: configProvider.get(settingsKey), onChanged: onChanged)
+          Switch(value: configProvider.get(setting), onChanged: onChanged)
         ],
       ),
     );

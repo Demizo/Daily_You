@@ -37,9 +37,9 @@ class SecuritySettingsPageState extends State<SecuritySettings> {
           SettingsToggle(
               title:
                   AppLocalizations.of(context)!.settingsSecurityRequirePassword,
-              settingsKey: ConfigKey.requirePassword,
+              setting: Settings.requirePassword,
               onChanged: (value) async {
-                if (!configProvider.get(ConfigKey.requirePassword)) {
+                if (!configProvider.get(Settings.requirePassword)) {
                   // Set a password
                   bool setPassword = false;
                   await showDialog(
@@ -55,7 +55,7 @@ class SecuritySettingsPageState extends State<SecuritySettings> {
                             },
                           ));
                   await configProvider.set(
-                      ConfigKey.requirePassword, setPassword);
+                      Settings.requirePassword, setPassword);
                 } else {
                   // Disable password
                   await showDialog(
@@ -68,12 +68,12 @@ class SecuritySettingsPageState extends State<SecuritySettings> {
                             dismissable: true,
                             onSuccess: () {
                               configProvider.set(
-                                  ConfigKey.requirePassword, false);
+                                  Settings.requirePassword, false);
                             },
                           ));
                 }
               }),
-          if (configProvider.get(ConfigKey.requirePassword))
+          if (configProvider.get(Settings.requirePassword))
             SettingsIconAction(
                 title: AppLocalizations.of(context)!
                     .settingsSecurityChangePassword,
@@ -90,12 +90,12 @@ class SecuritySettingsPageState extends State<SecuritySettings> {
                             onSuccess: () {},
                           ));
                 }),
-          if (configProvider.get(ConfigKey.requirePassword) &&
+          if (configProvider.get(Settings.requirePassword) &&
               (DeviceInfoService().supportsBiometrics ?? false))
             SettingsToggle(
                 title: AppLocalizations.of(context)!
                     .settingsSecurityBiometricUnlock,
-                settingsKey: ConfigKey.biometricUnlock,
+                setting: Settings.biometricUnlock,
                 onChanged: (value) async {
                   await showDialog(
                       context: context,
@@ -125,7 +125,7 @@ class SecuritySettingsPageState extends State<SecuritySettings> {
 
                               if (success) {
                                 configProvider.set(
-                                    ConfigKey.biometricUnlock, value);
+                                    Settings.biometricUnlock, value);
                               }
                             },
                           ));

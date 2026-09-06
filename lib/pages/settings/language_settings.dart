@@ -50,7 +50,7 @@ class _LanguageSettingsState extends State<LanguageSettings> {
                       .settingsOverrideAppLanguageTitle
                   : AppLocalizations.of(context)!.settingsAppLanguageTitle,
               value: LanguageOption.fromJsonOrNull(
-                  configProvider.get(ConfigKey.overrideLanguage)),
+                  configProvider.get(Settings.overrideLanguage)),
               options: [
                 DropdownMenuItem(
                     value: null,
@@ -63,7 +63,7 @@ class _LanguageSettingsState extends State<LanguageSettings> {
               ],
               onChanged: (LanguageOption? newValue) {
                 configProvider.set(
-                    ConfigKey.overrideLanguage, newValue?.toJson());
+                    Settings.overrideLanguage, newValue?.toJson());
               }),
           Padding(
             padding: const EdgeInsets.only(top: 16.0),

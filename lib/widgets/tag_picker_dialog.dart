@@ -60,8 +60,7 @@ class _TagPickerDialogState extends State<TagPickerDialog> {
     _selectedTagIds = List.from(widget.initialSelectedTagIds);
     _filterMode = widget.initialFilterMode;
     _noTagsOnly = widget.initialNoTagsOnly;
-    _sortMode =
-        ConfigProvider.instance.get(ConfigKey.tagPickerSortMode) ?? 'manual';
+    _sortMode = ConfigProvider.instance.get(Settings.tagPickerSortMode);
     _searchController.addListener(() {
       setState(() => _searchText = _searchController.text.toLowerCase());
     });
@@ -76,7 +75,7 @@ class _TagPickerDialogState extends State<TagPickerDialog> {
   void _toggleSortMode() {
     final newMode = _sortMode == 'manual' ? 'usage' : 'manual';
     setState(() => _sortMode = newMode);
-    ConfigProvider.instance.set(ConfigKey.tagPickerSortMode, newMode);
+    ConfigProvider.instance.set(Settings.tagPickerSortMode, newMode);
   }
 
   // attach mode helpers

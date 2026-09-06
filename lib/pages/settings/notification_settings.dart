@@ -24,10 +24,10 @@ class NotificationSettings extends StatefulWidget {
 
     if (picked != null) {
       await ConfigProvider.instance
-          .set(ConfigKey.scheduledReminderHour, picked.hour);
+          .set(Settings.scheduledReminderHour, picked.hour);
       await ConfigProvider.instance
-          .set(ConfigKey.scheduledReminderMinute, picked.minute);
-      if (ConfigProvider.instance.get(ConfigKey.dailyReminders)) {
+          .set(Settings.scheduledReminderMinute, picked.minute);
+      if (ConfigProvider.instance.get(Settings.dailyReminders)) {
         await NotificationManager.instance.stopDailyReminders();
         await NotificationManager.instance.startScheduledDailyReminders();
       }
@@ -36,9 +36,8 @@ class NotificationSettings extends StatefulWidget {
 
   static TimeOfDay _onThisDayNotificationTime() {
     return TimeOfDay(
-      hour: ConfigProvider.instance.get(ConfigKey.onThisDayNotificationHour),
-      minute:
-          ConfigProvider.instance.get(ConfigKey.onThisDayNotificationMinute),
+      hour: ConfigProvider.instance.get(Settings.onThisDayNotificationHour),
+      minute: ConfigProvider.instance.get(Settings.onThisDayNotificationMinute),
     );
   }
 
@@ -50,10 +49,10 @@ class NotificationSettings extends StatefulWidget {
 
     if (picked != null) {
       await ConfigProvider.instance
-          .set(ConfigKey.onThisDayNotificationHour, picked.hour);
+          .set(Settings.onThisDayNotificationHour, picked.hour);
       await ConfigProvider.instance
-          .set(ConfigKey.onThisDayNotificationMinute, picked.minute);
-      if (ConfigProvider.instance.get(ConfigKey.onThisDayNotifications)) {
+          .set(Settings.onThisDayNotificationMinute, picked.minute);
+      if (ConfigProvider.instance.get(Settings.onThisDayNotifications)) {
         await NotificationManager.instance.stopOnThisDayNotifications();
         await NotificationManager.instance.startOnThisDayNotifications();
       }
@@ -107,7 +106,7 @@ class NotificationSettings extends StatefulWidget {
         ]);
     if (range != null) {
       await TimeManager.setReminderTimeRange(range);
-      if (ConfigProvider.instance.get(ConfigKey.dailyReminders)) {
+      if (ConfigProvider.instance.get(Settings.dailyReminders)) {
         await NotificationManager.instance.stopDailyReminders();
         await NotificationManager.instance.startScheduledDailyReminders();
       }
@@ -120,7 +119,7 @@ class NotificationSettings extends StatefulWidget {
       SettingsToggle(
           title: AppLocalizations.of(context)!.settingsDailyReminderTitle,
           hint: AppLocalizations.of(context)!.settingsDailyReminderDescription,
-          settingsKey: ConfigKey.dailyReminders,
+          setting: Settings.dailyReminders,
           onChanged: (value) async {
             if (await NotificationManager.instance
                 .hasNotificationPermission()) {
@@ -130,11 +129,11 @@ class NotificationSettings extends StatefulWidget {
               } else {
                 await NotificationManager.instance.stopDailyReminders();
               }
-              await configProvider.set(ConfigKey.dailyReminders, value);
+              await configProvider.set(Settings.dailyReminders, value);
             }
           }),
-      if (configProvider.get(ConfigKey.dailyReminders))
-        configProvider.get(ConfigKey.setReminderTime)
+      if (configProvider.get(Settings.dailyReminders))
+        configProvider.get(Settings.setReminderTime)
             ? SettingsIconAction(
                 title: AppLocalizations.of(context)!.settingsReminderTime,
                 hint: TimeManager.timeOfDayString(
@@ -151,14 +150,14 @@ class NotificationSettings extends StatefulWidget {
                 onPressed: () async {
                   _selectTimeRange(context);
                 }),
-      if (configProvider.get(ConfigKey.dailyReminders))
+      if (configProvider.get(Settings.dailyReminders))
         SettingsToggle(
             title: AppLocalizations.of(context)!.settingsFixedReminderTimeTitle,
             hint: AppLocalizations.of(context)!
                 .settingsFixedReminderTimeDescription,
-            settingsKey: ConfigKey.setReminderTime,
+            setting: Settings.setReminderTime,
             onChanged: (value) async {
-              await configProvider.set(ConfigKey.setReminderTime, value);
+              await configProvider.set(Settings.setReminderTime, value);
               await NotificationManager.instance.stopDailyReminders();
               await NotificationManager.instance.startScheduledDailyReminders();
             }),
@@ -171,7 +170,7 @@ class NotificationSettings extends StatefulWidget {
       SettingsToggle(
           title: AppLocalizations.of(context)!.flashbackOnThisDay,
           hint: AppLocalizations.of(context)!.settingsOnThisDayDescription,
-          settingsKey: ConfigKey.onThisDayNotifications,
+          setting: Settings.onThisDayNotifications,
           onChanged: (value) async {
             if (await NotificationManager.instance
                 .hasNotificationPermission()) {
@@ -181,10 +180,10 @@ class NotificationSettings extends StatefulWidget {
               } else {
                 await NotificationManager.instance.stopOnThisDayNotifications();
               }
-              await configProvider.set(ConfigKey.onThisDayNotifications, value);
+              await configProvider.set(Settings.onThisDayNotifications, value);
             }
           }),
-      if (configProvider.get(ConfigKey.onThisDayNotifications))
+      if (configProvider.get(Settings.onThisDayNotifications))
         SettingsIconAction(
             title: AppLocalizations.of(context)!.settingsReminderTime,
             hint: TimeManager.timeOfDayString(
@@ -214,29 +213,29 @@ class _NotificationSettingsState extends State<NotificationSettings> {
       body: ListView(
         children: [
           ...NotificationSettings.buildCoreReminderSettings(context),
-          if (configProvider.get(ConfigKey.dailyReminders))
+          if (configProvider.get(Settings.dailyReminders))
             SettingsToggle(
                 title: AppLocalizations.of(context)!
                     .settingsAlwaysSendReminderTitle,
                 hint: AppLocalizations.of(context)!
                     .settingsAlwaysSendReminderDescription,
-                settingsKey: ConfigKey.alwaysRemind,
+                setting: Settings.alwaysRemind,
                 onChanged: (value) async {
-                  await configProvider.set(ConfigKey.alwaysRemind, value);
+                  await configProvider.set(Settings.alwaysRemind, value);
                 }),
           Padding(
             padding: const EdgeInsets.only(left: 8.0, right: 8.0),
             child: Divider(),
           ),
           ...NotificationSettings.buildOnThisDaySettings(context),
-          if (configProvider.get(ConfigKey.dailyReminders) ||
-              configProvider.get(ConfigKey.onThisDayNotifications))
+          if (configProvider.get(Settings.dailyReminders) ||
+              configProvider.get(Settings.onThisDayNotifications))
             Padding(
               padding: const EdgeInsets.only(left: 8.0, right: 8.0),
               child: Divider(),
             ),
-          if (configProvider.get(ConfigKey.dailyReminders) ||
-              configProvider.get(ConfigKey.onThisDayNotifications))
+          if (configProvider.get(Settings.dailyReminders) ||
+              configProvider.get(Settings.onThisDayNotifications))
             SettingsIconAction(
                 title: AppLocalizations.of(context)!
                     .settingsCustomizeNotificationTitle,

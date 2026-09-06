@@ -31,20 +31,20 @@ class _FlashbackSettingsPageState extends State<FlashbackSettings> {
         children: [
           SettingsToggle(
               title: AppLocalizations.of(context)!.settingsShowFlashbacks,
-              settingsKey: ConfigKey.showFlashbacks,
+              setting: Settings.showFlashbacks,
               onChanged: (value) {
-                configProvider.set(ConfigKey.showFlashbacks, value);
+                configProvider.set(Settings.showFlashbacks, value);
               }),
-          if (configProvider.get(ConfigKey.showFlashbacks))
+          if (configProvider.get(Settings.showFlashbacks))
             SettingsToggle(
                 title: AppLocalizations.of(context)!
                     .settingsFlashbacksExcludeBadDays,
-                settingsKey: ConfigKey.excludeBadDaysFromFlashbacks,
+                setting: Settings.excludeBadDaysFromFlashbacks,
                 onChanged: (value) {
                   configProvider.set(
-                      ConfigKey.excludeBadDaysFromFlashbacks, value);
+                      Settings.excludeBadDaysFromFlashbacks, value);
                 }),
-          if (configProvider.get(ConfigKey.showFlashbacks))
+          if (configProvider.get(Settings.showFlashbacks))
             ...buildFlashbackOptions(configProvider),
         ],
       ),
@@ -64,39 +64,39 @@ class _FlashbackSettingsPageState extends State<FlashbackSettings> {
       ),
       SettingsToggle(
           title: AppLocalizations.of(context)!.flashbackOnThisDay,
-          settingsKey: ConfigKey.showflashbackYearsAgo,
+          setting: Settings.showflashbackYearsAgo,
           onChanged: (value) {
-            configProvider.set(ConfigKey.showflashbackYearsAgo, value);
+            configProvider.set(Settings.showflashbackYearsAgo, value);
           }),
       SettingsToggle(
           title: AppLocalizations.of(context)!.flashbackMonth(6),
-          settingsKey: ConfigKey.showflashback6MonthsAgo,
+          setting: Settings.showflashback6MonthsAgo,
           onChanged: (value) {
-            configProvider.set(ConfigKey.showflashback6MonthsAgo, value);
+            configProvider.set(Settings.showflashback6MonthsAgo, value);
           }),
       SettingsToggle(
           title: AppLocalizations.of(context)!.flashbackMonth(1),
-          settingsKey: ConfigKey.showflashback1MonthAgo,
+          setting: Settings.showflashback1MonthAgo,
           onChanged: (value) {
-            configProvider.set(ConfigKey.showflashback1MonthAgo, value);
+            configProvider.set(Settings.showflashback1MonthAgo, value);
           }),
       SettingsToggle(
           title: AppLocalizations.of(context)!.flashbackWeek(1),
-          settingsKey: ConfigKey.showflashback1WeekAgo,
+          setting: Settings.showflashback1WeekAgo,
           onChanged: (value) {
-            configProvider.set(ConfigKey.showflashback1WeekAgo, value);
+            configProvider.set(Settings.showflashback1WeekAgo, value);
           }),
       SettingsToggle(
           title: AppLocalizations.of(context)!.flashbackGoodDay,
-          settingsKey: ConfigKey.showflashbackGoodDay,
+          setting: Settings.showflashbackGoodDay,
           onChanged: (value) {
-            configProvider.set(ConfigKey.showflashbackGoodDay, value);
+            configProvider.set(Settings.showflashbackGoodDay, value);
           }),
       SettingsToggle(
           title: AppLocalizations.of(context)!.flashbackRandomDay,
-          settingsKey: ConfigKey.showflashbackRandomDay,
+          setting: Settings.showflashbackRandomDay,
           onChanged: (value) {
-            configProvider.set(ConfigKey.showflashbackRandomDay, value);
+            configProvider.set(Settings.showflashbackRandomDay, value);
           }),
     ];
   }
