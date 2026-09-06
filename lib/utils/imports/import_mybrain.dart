@@ -4,29 +4,29 @@ import 'dart:typed_data';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/storage/storage_picker.dart';
 import 'package:daily_you/utils/imports/import_helpers.dart';
+import 'package:daily_you/utils/operation_outcome.dart';
 
-Future<bool> importFromMyBrain(Function(String) updateStatus) async {
+Future<OperationOutcome> importFromMyBrain(
+    Function(String) updateStatus) async {
   updateStatus("0%");
 
-  bool success = true;
+  var outcome = const OperationOutcome.succeeded();
 
   try {
-    var selectedFile = await StoragePicker.pickFile(
+    final selectedFile = await StoragePicker.pickFile(
         allowedExtensions: ['json'], mimeTypes: ['application/json']);
-    if (selectedFile == null) return false;
+    if (selectedFile == null) return const OperationOutcome.cancelled();
 
-    var bytes = await selectedFile.readBytes();
-    if (bytes == null) return false;
+    final bytes = await selectedFile.readBytes();
+    if (bytes == null) return const OperationOutcome.failed();
 
     await addImportedEntries(decodeMyBrainEntries(bytes), updateStatus);
-  } catch (e) {
-    updateStatus("$e");
-    await Future.delayed(const Duration(seconds: 5));
-    success = false;
+  } catch (error) {
+    outcome = OperationOutcome.failed(error);
   }
 
   await finishImport(updateStatus, syncImages: true);
-  return success;
+  return outcome;
 }
 
 List<ImportedEntry> decodeMyBrainEntries(Uint8List bytes) {

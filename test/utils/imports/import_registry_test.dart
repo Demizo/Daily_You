@@ -1,5 +1,6 @@
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/utils/imports/import_registry.dart';
+import 'package:daily_you/utils/operation_outcome.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -9,7 +10,7 @@ ImportFormatOption fakeOption(ImportFormat format, List<ImportFormat> calls) {
     (localizations) => format.name,
     (context, updateStatus) async {
       calls.add(format);
-      return true;
+      return const OperationOutcome.succeeded();
     },
   );
 }

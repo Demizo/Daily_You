@@ -8,11 +8,12 @@ import 'package:daily_you/utils/imports/import_json.dart' as json;
 import 'package:daily_you/utils/imports/import_mybrain.dart' as mybrain;
 import 'package:daily_you/utils/imports/import_oneshot.dart' as oneshot;
 import 'package:daily_you/utils/imports/import_pixels.dart' as pixels;
+import 'package:daily_you/utils/operation_outcome.dart';
 import 'package:flutter/widgets.dart';
 
 export 'package:daily_you/utils/imports/import_format.dart';
 
-typedef ImportRunner = Future<bool> Function(
+typedef ImportRunner = Future<OperationOutcome> Function(
     BuildContext context, Function(String) updateStatus);
 
 class ImportFormatOption {

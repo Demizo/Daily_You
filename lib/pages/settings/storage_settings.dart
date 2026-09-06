@@ -4,6 +4,7 @@ import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/database/image_storage.dart';
 import 'package:daily_you/providers/entries_provider.dart';
+import 'package:daily_you/widgets/failure_dialog.dart';
 import 'package:daily_you/widgets/settings_dropdown.dart';
 import 'package:daily_you/widgets/settings_icon_action.dart';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -95,7 +96,7 @@ class _StorageSettingsState extends State<StorageSettings> {
       ValueNotifier<String> statusNotifier = ValueNotifier<String>("");
 
       BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
-      bool locationSet =
+      final outcome =
           await AppDatabase.instance.selectExternalLocation((status) {
         statusNotifier.value = status;
       });
@@ -103,24 +104,11 @@ class _StorageSettingsState extends State<StorageSettings> {
       if (!mounted) return;
       Navigator.of(context).pop();
 
-      if (!locationSet) {
-        await showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                  title: Text(AppLocalizations.of(context)!.errorTitle),
-                  actions: [
-                    TextButton(
-                      child:
-                          Text(MaterialLocalizations.of(context).okButtonLabel),
-                      onPressed: () async {
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ],
-                  content: Text(
-                      AppLocalizations.of(context)!.logFolderErrorDescription));
-            });
+      if (outcome.failed) {
+        await showFailureDialog(context,
+            description:
+                AppLocalizations.of(context)!.logFolderErrorDescription,
+            error: outcome.error);
       }
     }
   }
@@ -129,7 +117,7 @@ class _StorageSettingsState extends State<StorageSettings> {
     ValueNotifier<String> statusNotifier = ValueNotifier<String>("");
 
     BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
-    bool locationSet =
+    final outcome =
         await ImageStorage.instance.selectExternalLocation((status) {
       statusNotifier.value = status;
     });
@@ -137,24 +125,11 @@ class _StorageSettingsState extends State<StorageSettings> {
     if (!mounted) return;
     Navigator.of(context).pop();
 
-    if (!locationSet) {
-      await showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-                title: Text(AppLocalizations.of(context)!.errorTitle),
-                actions: [
-                  TextButton(
-                    child:
-                        Text(MaterialLocalizations.of(context).okButtonLabel),
-                    onPressed: () async {
-                      Navigator.pop(context);
-                    },
-                  ),
-                ],
-                content: Text(
-                    AppLocalizations.of(context)!.imageFolderErrorDescription));
-          });
+    if (outcome.failed) {
+      await showFailureDialog(context,
+          description:
+              AppLocalizations.of(context)!.imageFolderErrorDescription,
+          error: outcome.error);
     }
   }
 

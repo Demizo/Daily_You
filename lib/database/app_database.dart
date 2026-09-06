@@ -7,6 +7,7 @@ import 'package:daily_you/storage/external_sync_health.dart';
 import 'package:daily_you/storage/file_store.dart';
 import 'package:daily_you/storage/local_file_store.dart';
 import 'package:daily_you/storage/storage_picker.dart';
+import 'package:daily_you/utils/operation_outcome.dart';
 import 'package:daily_you/utils/generated/tag_icon_registry.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/image.dart';
@@ -174,9 +175,10 @@ class AppDatabase {
     return await externalStore?.isAvailable() ?? false;
   }
 
-  /// Select an external database location. Returns whether a new location was set successfully.
-  Future<bool> selectExternalLocation(Function(String) updateStatus) async {
+  Future<OperationOutcome> selectExternalLocation(
+      Function(String) updateStatus) async {
     bool databaseUpdated = false;
+    var outcome = const OperationOutcome.succeeded();
 
     // Save old external path
     var oldExternalPath = getExternalPath();
@@ -185,17 +187,21 @@ class AppDatabase {
 
     try {
       var selectedDirectory = await StoragePicker.pickDirectory();
-      if (selectedDirectory != null) {
+      if (selectedDirectory == null) {
+        outcome = const OperationOutcome.cancelled();
+      } else {
         await ConfigProvider.instance
             .set(Settings.externalDbUri, selectedDirectory.uri);
         await ConfigProvider.instance.set(Settings.useExternalDb, true);
 
         // Sync with external folder
         databaseUpdated = await _syncWithExternalDatabase(forceOverwrite: true);
+        if (!databaseUpdated) outcome = const OperationOutcome.failed();
       }
     } catch (error, stackTrace) {
       _logger.severe(
           'Selecting an external database location failed', error, stackTrace);
+      outcome = OperationOutcome.failed(error);
     }
 
     // Cleanup
@@ -218,9 +224,10 @@ class AppDatabase {
             'Syncing images after the database location changed failed',
             error,
             stackTrace);
+        outcome = OperationOutcome.failed(error);
       }
     }
-    return databaseUpdated;
+    return outcome;
   }
 
   void resetExternalLocation() async {

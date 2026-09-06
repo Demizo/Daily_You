@@ -1,6 +1,7 @@
 import 'package:daily_you/utils/backup_restore_utils.dart';
 import 'package:daily_you/utils/imports/import_registry.dart';
 import 'package:daily_you/utils/export_utils.dart';
+import 'package:daily_you/widgets/failure_dialog.dart';
 import 'package:daily_you/widgets/settings_icon_action.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
@@ -52,12 +53,19 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
 
     BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
 
-    await ImportRegistry.instance.optionFor(format).run(context, (status) {
+    final outcome =
+        await ImportRegistry.instance.optionFor(format).run(context, (status) {
       statusNotifier.value = status;
     });
 
     if (!mounted) return;
     Navigator.of(context).pop();
+
+    if (outcome.failed) {
+      await showFailureDialog(context,
+          description: AppLocalizations.of(context)!.importErrorDescription,
+          error: outcome.error);
+    }
   }
 
   Future<void> _showExportSelectionPopup() async {
@@ -86,20 +94,24 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
       },
     );
 
-    if (chosenFormat != ExportFormat.none) {
-      if (!mounted) return;
-      ValueNotifier<String> statusNotifier = ValueNotifier<String>("");
+    if (chosenFormat == ExportFormat.none) return;
+    if (!mounted) return;
 
-      BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
+    ValueNotifier<String> statusNotifier = ValueNotifier<String>("");
 
-      if (chosenFormat == ExportFormat.markdown) {
-        await ExportUtils.exportToMarkdown(context, (status) {
-          statusNotifier.value = status;
-        });
-      }
+    BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
 
-      if (!mounted) return;
-      Navigator.of(context).pop();
+    final outcome = await ExportUtils.exportToMarkdown(context, (status) {
+      statusNotifier.value = status;
+    });
+
+    if (!mounted) return;
+    Navigator.of(context).pop();
+
+    if (outcome.failed) {
+      await showFailureDialog(context,
+          description: AppLocalizations.of(context)!.exportErrorDescription,
+          error: outcome.error);
     }
   }
 
@@ -108,31 +120,17 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
 
     BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
 
-    bool success = await BackupRestoreUtils.backupToZip(context, (status) {
+    final outcome = await BackupRestoreUtils.backupToZip(context, (status) {
       statusNotifier.value = status;
     });
 
     if (!context.mounted) return;
     Navigator.of(context).pop();
 
-    if (!success) {
-      await showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-                title: Text(AppLocalizations.of(context)!.errorTitle),
-                actions: [
-                  TextButton(
-                    child:
-                        Text(MaterialLocalizations.of(context).okButtonLabel),
-                    onPressed: () async {
-                      Navigator.pop(context);
-                    },
-                  ),
-                ],
-                content:
-                    Text(AppLocalizations.of(context)!.backupErrorDescription));
-          });
+    if (outcome.failed) {
+      await showFailureDialog(context,
+          description: AppLocalizations.of(context)!.backupErrorDescription,
+          error: outcome.error);
     }
   }
 
@@ -141,31 +139,17 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
 
     BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
 
-    bool success = await BackupRestoreUtils.restoreFromZip(context, (status) {
+    final outcome = await BackupRestoreUtils.restoreFromZip(context, (status) {
       statusNotifier.value = status;
     });
 
     if (!context.mounted) return;
     Navigator.of(context).pop();
 
-    if (!success) {
-      await showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-                title: Text(AppLocalizations.of(context)!.errorTitle),
-                actions: [
-                  TextButton(
-                    child:
-                        Text(MaterialLocalizations.of(context).okButtonLabel),
-                    onPressed: () async {
-                      Navigator.pop(context);
-                    },
-                  ),
-                ],
-                content: Text(
-                    AppLocalizations.of(context)!.restoreErrorDescription));
-          });
+    if (outcome.failed) {
+      await showFailureDialog(context,
+          description: AppLocalizations.of(context)!.restoreErrorDescription,
+          error: outcome.error);
     }
   }
 

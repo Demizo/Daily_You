@@ -10,21 +10,22 @@ import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/storage/local_file_store.dart';
 import 'package:daily_you/storage/storage_picker.dart';
 import 'package:daily_you/utils/imports/import_helpers.dart';
+import 'package:daily_you/utils/operation_outcome.dart';
 import 'package:daily_you/utils/zip_utils.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
-Future<bool> importFromDaybook(
+Future<OperationOutcome> importFromDaybook(
     BuildContext context, Function(String) updateStatus) async {
   final localizations = AppLocalizations.of(context)!;
   updateStatus("0%");
 
   final selectedFile = await StoragePicker.pickFile();
-  if (selectedFile == null) return false;
+  if (selectedFile == null) return const OperationOutcome.cancelled();
 
-  bool success = true;
+  var outcome = const OperationOutcome.succeeded();
 
   final tempDir = await getTemporaryDirectory();
   const tempZip = "temp_daybook.zip";
@@ -136,10 +137,8 @@ Future<bool> importFromDaybook(
       processedEntries++;
       updateStatus("${((processedEntries / totalEntries) * 100).round()}%");
     }
-  } catch (e) {
-    updateStatus("$e");
-    await Future.delayed(const Duration(seconds: 5));
-    success = false;
+  } catch (error) {
+    outcome = OperationOutcome.failed(error);
   }
 
   updateStatus(localizations.cleanUpStatus);
@@ -154,5 +153,5 @@ Future<bool> importFromDaybook(
     await tempZipFolder.delete(recursive: true);
   }
 
-  return success;
+  return outcome;
 }
