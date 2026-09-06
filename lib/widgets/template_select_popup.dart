@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 
 Future<void> showTemplateSelectPopup(
     BuildContext context, TextEditingController controller,
-    {required FocusNode focusNode,
+    {required bool hasFocus,
     void Function(Template template)? onTemplateSelected}) {
   return showDialog(
     context: context,
@@ -15,8 +15,7 @@ Future<void> showTemplateSelectPopup(
         onTemplatesSelected: (Template template) {
           final templateText =
               TemplateRenderer.populate(context, template.text ?? "");
-          insertTemplateText(controller, templateText,
-              hasFocus: focusNode.hasFocus);
+          insertTemplateText(controller, templateText, hasFocus: hasFocus);
           onTemplateSelected?.call(template);
         },
       );

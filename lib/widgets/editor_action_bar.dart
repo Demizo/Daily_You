@@ -132,15 +132,25 @@ class _EditorActionBarState extends State<EditorActionBar> {
   }
 
   ToolbarEntry _templateEntry(DockMetrics metrics) {
-    return _iconEntry(
-      metrics,
-      Icons.note_add_rounded,
-      () => showTemplateSelectPopup(context, widget.controller,
-          focusNode: widget.focusNode, onTemplateSelected: (template) {
-        widget.onTemplateInserted?.call(template);
-        widget.focusNode.requestFocus();
-      }),
-      claimsFocus: false,
+    return ToolbarEntry(
+      width: metrics.buttonSize,
+      build: (context, dismissOverflow) => ToolbarIconButton(
+        size: metrics.buttonSize,
+        icon: Icons.note_add_rounded,
+        onPressed: () {
+          dismissOverflow?.call();
+          // Capture before the popup or focus restorer can shift focus away
+          final hasFocus = widget.focusNode.hasFocus;
+          _focusRestorer.run(
+            () => showTemplateSelectPopup(context, widget.controller,
+                hasFocus: hasFocus, onTemplateSelected: (template) {
+              widget.onTemplateInserted?.call(template);
+              widget.focusNode.requestFocus();
+            }),
+            claimsFocus: false,
+          );
+        },
+      ),
     );
   }
 
