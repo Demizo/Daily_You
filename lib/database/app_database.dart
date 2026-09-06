@@ -148,7 +148,9 @@ class AppDatabase {
       await db.close();
 
       return result.first.values.first == "ok";
-    } catch (_) {
+    } catch (error, stackTrace) {
+      _logger.warning(
+          'Database integrity check failed for $path', error, stackTrace);
       return false;
     }
   }
@@ -191,8 +193,9 @@ class AppDatabase {
         // Sync with external folder
         databaseUpdated = await _syncWithExternalDatabase(forceOverwrite: true);
       }
-    } catch (_) {
-      // Do nothing
+    } catch (error, stackTrace) {
+      _logger.severe(
+          'Selecting an external database location failed', error, stackTrace);
     }
 
     // Cleanup
@@ -210,8 +213,11 @@ class AppDatabase {
           await ImageStorage.instance
               .syncImageFolder(true, updateStatus: updateStatus);
         }
-      } catch (_) {
-        // Do nothing
+      } catch (error, stackTrace) {
+        _logger.severe(
+            'Syncing images after the database location changed failed',
+            error,
+            stackTrace);
       }
     }
     return databaseUpdated;

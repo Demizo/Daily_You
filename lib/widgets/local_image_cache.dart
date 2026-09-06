@@ -8,6 +8,7 @@ import 'package:daily_you/storage/local_file_store.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:logging/logging.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pool/pool.dart';
@@ -23,12 +24,15 @@ class ResizeRequest {
 
 class ResizeResponse {
   final String key;
+  final String? error;
 
-  ResizeResponse(this.key);
+  ResizeResponse(this.key, {this.error});
 }
 
 class LocalImageCache {
   static final LocalImageCache instance = LocalImageCache._internal();
+
+  final Logger _logger = Logger('LocalImageCache');
 
   final CacheManager _diskCache;
   String? tempImgFolderPath;
@@ -72,6 +76,9 @@ class LocalImageCache {
       _resizeSendPort = message;
     } else if (message is ResizeResponse) {
       final key = message.key;
+      if (message.error != null) {
+        _logger.warning('Resizing $key failed', message.error);
+      }
       final resizedName = "$key.jpg";
       final bytes = await _temporaryImageStore?.read(resizedName);
 
@@ -166,8 +173,8 @@ void imageResizerIsolate(Map<String, dynamic> args) async {
         }
 
         mainSendPort.send(ResizeResponse(key));
-      } catch (_) {
-        mainSendPort.send(ResizeResponse(key));
+      } catch (error) {
+        mainSendPort.send(ResizeResponse(key, error: "$error"));
       }
     }
   }

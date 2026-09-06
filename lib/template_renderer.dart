@@ -1,8 +1,11 @@
 import 'package:daily_you/time_manager.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
+import 'package:logging/logging.dart';
 
 class TemplateRenderer {
+  static final Logger _logger = Logger('TemplateRenderer');
+
   static final RegExp _variablePattern = RegExp(r"\{\{(\w+)(?::([^}]+))?\}\}");
 
   /// Populates template variables: {{date}}, {{time}}
@@ -33,8 +36,9 @@ class TemplateRenderer {
       if (format != null && format.isNotEmpty) {
         return DateFormat(format, locale.toString()).format(dt);
       }
-    } catch (_) {
-      // Do nothing
+    } catch (error) {
+      _logger.warning(
+          'Template date format "$format" could not be applied', error);
     }
 
     return DateFormat.yMd(locale.toString()).format(dt);
@@ -45,8 +49,9 @@ class TemplateRenderer {
       if (format != null && format.isNotEmpty) {
         return DateFormat(format, locale.toString()).format(dt);
       }
-    } catch (_) {
-      // Do nothing
+    } catch (error) {
+      _logger.warning(
+          'Template time format "$format" could not be applied', error);
     }
 
     return TimeManager.localizedTimeFormat(locale.toString()).format(dt);

@@ -7,6 +7,7 @@ import 'package:daily_you/models/image.dart';
 import 'package:daily_you/widgets/zoomable_image_page_view.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:logging/logging.dart';
 import 'package:share_plus/share_plus.dart';
 
 class ImageViewPage extends StatefulWidget {
@@ -24,6 +25,8 @@ class ImageViewPage extends StatefulWidget {
 }
 
 class _ImageViewPageState extends State<ImageViewPage> {
+  final Logger _logger = Logger('ImageViewPage');
+
   late PageController _pageController;
   late ValueNotifier<int> _currentPageNotifier;
 
@@ -169,7 +172,9 @@ class _ImageViewPageState extends State<ImageViewPage> {
                   PickedDirectory? saveDirectory;
                   try {
                     saveDirectory = await StoragePicker.pickDirectory();
-                  } catch (_) {
+                  } catch (error, stackTrace) {
+                    _logger.warning(
+                        'Choosing a download folder failed', error, stackTrace);
                     return;
                   }
                   if (saveDirectory == null) return;
