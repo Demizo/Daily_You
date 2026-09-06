@@ -4,47 +4,54 @@ import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/storage/storage_picker.dart';
 import 'package:daily_you/utils/imports/import_helpers.dart';
+import 'package:daily_you/utils/operation_outcome.dart';
 import 'package:intl/intl.dart';
 
-Future<bool> importFromPixels(Function(String) updateStatus) async {
+Future<OperationOutcome> importFromPixels(Function(String) updateStatus) async {
   updateStatus("0%");
 
-  var selectedFile = await StoragePicker.pickFile(
-      allowedExtensions: ['json'], mimeTypes: ['application/json']);
-  if (selectedFile == null) return false;
+  var outcome = const OperationOutcome.succeeded();
 
-  var bytes = await selectedFile.readBytes();
-  if (bytes == null) return false;
-  final jsonData = json.decode(utf8.decode(bytes.toList()));
+  try {
+    final selectedFile = await StoragePicker.pickFile(
+        allowedExtensions: ['json'], mimeTypes: ['application/json']);
+    if (selectedFile == null) return const OperationOutcome.cancelled();
 
-  final totalEntries = jsonData.length;
-  var processedEntries = 0;
+    final bytes = await selectedFile.readBytes();
+    if (bytes == null) return const OperationOutcome.failed();
+    final jsonData = json.decode(utf8.decode(bytes.toList()));
 
-  for (var entry in jsonData) {
-    if (entry['type'] == 'Mood') {
-      DateTime timeCreated = DateFormat("yyyy-MM-dd").parse(entry['date']);
-      DateTime timeModified = DateTime.now();
+    final totalEntries = jsonData.length;
+    var processedEntries = 0;
 
-      if (!EntriesProvider.instance.hasEntryAtTimestamp(timeCreated)) {
-        // Average multiple scores within a single Pixels entry
-        int avgMood =
-            (entry['scores'] as List<dynamic>).reduce((a, b) => a + b) ~/
-                entry['scores'].length;
-        int mappedMood = avgMood - 3;
+    for (var entry in jsonData) {
+      if (entry['type'] == 'Mood') {
+        DateTime timeCreated = DateFormat("yyyy-MM-dd").parse(entry['date']);
+        DateTime timeModified = DateTime.now();
 
-        await EntriesProvider.instance.add(
-            Entry(
-                text: entry['notes'] ?? '',
-                mood: mappedMood,
-                timeCreate: timeCreated,
-                timeModified: timeModified),
-            skipUpdate: true);
+        if (!EntriesProvider.instance.hasEntryAtTimestamp(timeCreated)) {
+          // Average multiple scores within a single Pixels entry
+          int avgMood =
+              (entry['scores'] as List<dynamic>).reduce((a, b) => a + b) ~/
+                  entry['scores'].length;
+          int mappedMood = avgMood - 3;
+
+          await EntriesProvider.instance.add(
+              Entry(
+                  text: entry['notes'] ?? '',
+                  mood: mappedMood,
+                  timeCreate: timeCreated,
+                  timeModified: timeModified),
+              skipUpdate: true);
+        }
       }
+      processedEntries += 1;
+      updateStatus("${((processedEntries / totalEntries) * 100).round()}%");
     }
-    processedEntries += 1;
-    updateStatus("${((processedEntries / totalEntries) * 100).round()}%");
+  } catch (error) {
+    outcome = OperationOutcome.failed(error);
   }
 
   await finishImport(updateStatus, syncImages: true);
-  return true;
+  return outcome;
 }

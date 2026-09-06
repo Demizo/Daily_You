@@ -15,6 +15,7 @@ import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/storage/storage_picker.dart';
+import 'package:daily_you/utils/operation_outcome.dart';
 import 'package:daily_you/utils/tag_name_sanitizer.dart';
 import 'package:daily_you/utils/zip_utils.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
@@ -23,15 +24,15 @@ import 'package:html2md/html2md.dart' as html2md;
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
-Future<bool> importFromDaylio(
+Future<OperationOutcome> importFromDaylio(
     BuildContext context, Function(String) updateStatus) async {
   final localizations = AppLocalizations.of(context)!;
   updateStatus("0%");
 
   final selectedFile = await StoragePicker.pickFile();
-  if (selectedFile == null) return false;
+  if (selectedFile == null) return const OperationOutcome.cancelled();
 
-  bool success = true;
+  var outcome = const OperationOutcome.succeeded();
 
   var tempDir = await getTemporaryDirectory();
   const tempDaylioZip = "temp_daylio.zip";
@@ -163,10 +164,8 @@ Future<bool> importFromDaylio(
       processedEntries++;
       updateStatus("${((processedEntries / totalEntries) * 100).round()}%");
     }
-  } catch (e) {
-    updateStatus("$e");
-    await Future.delayed(const Duration(seconds: 5));
-    success = false;
+  } catch (error) {
+    outcome = OperationOutcome.failed(error);
   }
 
   updateStatus(localizations.cleanUpStatus);
@@ -183,7 +182,7 @@ Future<bool> importFromDaylio(
     await tempDaylioFolder.delete(recursive: true);
   }
 
-  return success;
+  return outcome;
 }
 
 Future<Map<int, int>> _importTags(

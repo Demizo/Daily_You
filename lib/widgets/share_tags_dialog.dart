@@ -4,6 +4,7 @@ import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/utils/backup_restore_utils.dart';
 import 'package:daily_you/utils/tag_category_visuals.dart';
 import 'package:daily_you/utils/templates_tags_transfer.dart';
+import 'package:daily_you/widgets/failure_dialog.dart';
 import 'package:daily_you/widgets/tag_icon_glyph.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
@@ -24,25 +25,6 @@ class _ShareTagsDialogState extends State<ShareTagsDialog> {
     return "daily_you_tags_$timestamp.json";
   }
 
-  Future<void> _showErrorDialog(String description) async {
-    if (!mounted) return;
-    await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-              title: Text(AppLocalizations.of(context)!.errorTitle),
-              actions: [
-                TextButton(
-                  child: Text(MaterialLocalizations.of(context).okButtonLabel),
-                  onPressed: () async {
-                    Navigator.pop(context);
-                  },
-                ),
-              ],
-              content: Text(description));
-        });
-  }
-
   Future<void> _save() async {
     final bytes = TemplatesTagsTransfer.exportTags(_selectedTagIds);
     final fileName = _fileName();
@@ -50,7 +32,7 @@ class _ShareTagsDialogState extends State<ShareTagsDialog> {
     ValueNotifier<String> statusNotifier = ValueNotifier<String>("");
     BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
 
-    final success =
+    final outcome =
         await TemplatesTagsTransfer.saveBytesToFile(bytes, fileName, (status) {
       statusNotifier.value = status;
     });
@@ -58,9 +40,10 @@ class _ShareTagsDialogState extends State<ShareTagsDialog> {
     if (!mounted) return;
     Navigator.of(context).pop();
 
-    if (!success) {
-      await _showErrorDialog(
-          AppLocalizations.of(context)!.exportErrorDescription);
+    if (outcome.failed) {
+      await showFailureDialog(context,
+          description: AppLocalizations.of(context)!.exportErrorDescription,
+          error: outcome.error);
     }
   }
 

@@ -7,6 +7,7 @@ import 'package:daily_you/storage/external_sync_health.dart';
 import 'package:daily_you/storage/file_store.dart';
 import 'package:daily_you/storage/local_file_store.dart';
 import 'package:daily_you/storage/storage_picker.dart';
+import 'package:daily_you/utils/operation_outcome.dart';
 import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 import 'package:daily_you/database/entry_store.dart';
@@ -162,34 +163,34 @@ class ImageStorage {
     return await externalStore?.isAvailable() ?? false;
   }
 
-  Future<bool> selectExternalLocation(Function(String) updateStatus) async {
+  Future<OperationOutcome> selectExternalLocation(
+      Function(String) updateStatus) async {
     try {
       var selectedDirectory = await StoragePicker.pickDirectory();
-      if (selectedDirectory == null) return false;
+      if (selectedDirectory == null) return const OperationOutcome.cancelled();
 
       // Save Old Settings
-      var oldExternalImgUri =
+      var oldExternalImageUri =
           ConfigProvider.instance.get(Settings.externalImgUri);
-      var oldUseExternalImg = usingExternalLocation();
+      var oldUseExternalImage = usingExternalLocation();
 
       await ConfigProvider.instance
           .set(Settings.externalImgUri, selectedDirectory.uri);
       await ConfigProvider.instance.set(Settings.useExternalImg, true);
-      var synced = await syncImageFolder(true, updateStatus: updateStatus);
-      if (synced) {
-        return true;
-      } else {
-        // Restore Settings
-        await ConfigProvider.instance
-            .set(Settings.externalImgUri, oldExternalImgUri);
-        await ConfigProvider.instance
-            .set(Settings.useExternalImg, oldUseExternalImg);
-        return false;
+      if (await syncImageFolder(true, updateStatus: updateStatus)) {
+        return const OperationOutcome.succeeded();
       }
+
+      // Restore Settings
+      await ConfigProvider.instance
+          .set(Settings.externalImgUri, oldExternalImageUri);
+      await ConfigProvider.instance
+          .set(Settings.useExternalImg, oldUseExternalImage);
+      return const OperationOutcome.failed();
     } catch (error, stackTrace) {
       _logger.severe(
           'Selecting an external image location failed', error, stackTrace);
-      return false;
+      return OperationOutcome.failed(error);
     }
   }
 

@@ -7,6 +7,7 @@ import 'package:daily_you/utils/templates_tags_transfer.dart';
 import 'package:daily_you/widgets/edit_category.dart';
 import 'package:daily_you/widgets/edit_tag.dart';
 import 'package:daily_you/widgets/expressive_fab_menu.dart';
+import 'package:daily_you/widgets/failure_dialog.dart';
 import 'package:daily_you/widgets/share_tags_dialog.dart';
 import 'package:daily_you/widgets/tag_chip.dart';
 import 'package:daily_you/widgets/tag_icon_glyph.dart';
@@ -65,31 +66,17 @@ class _TagsSettingsState extends State<TagsSettings> {
 
     BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
 
-    bool success = await TemplatesTagsTransfer.importTransferFile((status) {
+    final outcome = await TemplatesTagsTransfer.importTransferFile((status) {
       statusNotifier.value = status;
     });
 
     if (!context.mounted) return;
     Navigator.of(context).pop();
 
-    if (!success) {
-      await showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-                title: Text(AppLocalizations.of(context)!.errorTitle),
-                actions: [
-                  TextButton(
-                    child:
-                        Text(MaterialLocalizations.of(context).okButtonLabel),
-                    onPressed: () async {
-                      Navigator.pop(context);
-                    },
-                  ),
-                ],
-                content:
-                    Text(AppLocalizations.of(context)!.importErrorDescription));
-          });
+    if (outcome.failed) {
+      await showFailureDialog(context,
+          description: AppLocalizations.of(context)!.importErrorDescription,
+          error: outcome.error);
     }
   }
 

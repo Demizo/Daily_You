@@ -11,6 +11,7 @@ import 'package:daily_you/models/image.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:daily_you/utils/operation_outcome.dart';
 import 'package:daily_you/utils/zip_utils.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +26,7 @@ enum ExportFormat {
 }
 
 class ExportUtils {
-  static Future<bool> exportToMarkdown(
+  static Future<OperationOutcome> exportToMarkdown(
       BuildContext context, Function(String) updateStatus) async {
     final localizations = AppLocalizations.of(context)!;
     final locale = TimeManager.currentLocale(context);
@@ -34,14 +35,12 @@ class ExportUtils {
     PickedDirectory? exportFolder;
     try {
       exportFolder = await StoragePicker.pickDirectory();
-    } catch (e) {
-      updateStatus("$e");
-      await Future.delayed(Duration(seconds: 5));
-      return false;
+    } catch (error) {
+      return OperationOutcome.failed(error);
     }
-    if (exportFolder == null) return false;
+    if (exportFolder == null) return const OperationOutcome.cancelled();
 
-    bool success = true;
+    var outcome = const OperationOutcome.succeeded();
 
     var tempDir = await getTemporaryDirectory();
     final tempExportFolder = Directory(join(tempDir.path, "logs"));
@@ -90,10 +89,8 @@ class ExportUtils {
           mimeType: "application/zip", onProgress: (percent) {
         updateStatus(localizations.tranferStatus("${percent.round()}"));
       });
-    } catch (e) {
-      updateStatus("$e");
-      await Future.delayed(Duration(seconds: 5));
-      success = false;
+    } catch (error) {
+      outcome = OperationOutcome.failed(error);
     }
 
     // Delete temp files
@@ -103,7 +100,7 @@ class ExportUtils {
       await tempExportFolder.delete(recursive: true);
     }
 
-    return success;
+    return outcome;
   }
 }
 

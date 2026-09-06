@@ -5,6 +5,7 @@ import 'package:daily_you/database/image_storage.dart';
 import 'package:daily_you/storage/file_store.dart';
 import 'package:daily_you/storage/local_file_store.dart';
 import 'package:daily_you/storage/storage_picker.dart';
+import 'package:daily_you/utils/operation_outcome.dart';
 import 'package:daily_you/utils/zip_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
@@ -12,10 +13,10 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
 class BackupRestoreUtils {
-  static Future<bool> backupToZip(
+  static Future<OperationOutcome> backupToZip(
       BuildContext context, void Function(String) updateStatus) async {
     final localizations = AppLocalizations.of(context)!;
-    bool exportSuccessful = true;
+    var outcome = const OperationOutcome.succeeded();
     var tempDir = await getTemporaryDirectory();
     final exportedZipName =
         "daily_you_backup_${DateTime.now().toIso8601String().replaceAll(':', '-')}.zip";
@@ -23,7 +24,7 @@ class BackupRestoreUtils {
 
     try {
       final saveDirectory = await StoragePicker.pickDirectory();
-      if (saveDirectory == null) return false;
+      if (saveDirectory == null) return const OperationOutcome.cancelled();
 
       // Create archive
       updateStatus(localizations.creatingBackupStatus("0"));
@@ -41,10 +42,8 @@ class BackupRestoreUtils {
           mimeType: "application/zip", onProgress: (percent) {
         updateStatus(localizations.tranferStatus("${percent.round()}"));
       });
-    } catch (e) {
-      updateStatus("$e");
-      await Future.delayed(Duration(seconds: 5));
-      exportSuccessful = false;
+    } catch (error) {
+      outcome = OperationOutcome.failed(error);
     }
 
     // Delete temp files
@@ -53,13 +52,13 @@ class BackupRestoreUtils {
       await tempExportZipFile.delete();
     }
 
-    return exportSuccessful;
+    return outcome;
   }
 
-  static Future<bool> restoreFromZip(
+  static Future<OperationOutcome> restoreFromZip(
       BuildContext context, void Function(String) updateStatus) async {
     final localizations = AppLocalizations.of(context)!;
-    var importSuccessful = true;
+    var outcome = const OperationOutcome.succeeded();
     var tempDir = await getTemporaryDirectory();
     final tempZipName = "temp_backup.zip";
     final tempZipFile = File(join(tempDir.path, tempZipName));
@@ -69,7 +68,7 @@ class BackupRestoreUtils {
       final archive = await StoragePicker.pickFile(
           allowedExtensions: ['zip'], mimeTypes: ['application/zip']);
 
-      if (archive == null) return false;
+      if (archive == null) return const OperationOutcome.cancelled();
 
       // Import archive
       updateStatus(localizations.tranferStatus("0"));
@@ -110,12 +109,10 @@ class BackupRestoreUtils {
           }
         }
       } else {
-        importSuccessful = false;
+        outcome = const OperationOutcome.failed();
       }
-    } catch (e) {
-      updateStatus("$e");
-      await Future.delayed(Duration(seconds: 5));
-      importSuccessful = false;
+    } catch (error) {
+      outcome = OperationOutcome.failed(error);
     }
 
     // Delete temp files
@@ -127,7 +124,7 @@ class BackupRestoreUtils {
       await restoreFolder.delete(recursive: true);
     }
 
-    return importSuccessful;
+    return outcome;
   }
 
   static Future<void> restoreImages(

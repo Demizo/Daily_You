@@ -8,6 +8,7 @@ import 'package:daily_you/models/template.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/providers/templates_provider.dart';
 import 'package:daily_you/storage/storage_picker.dart';
+import 'package:daily_you/utils/operation_outcome.dart';
 import 'package:share_plus/share_plus.dart';
 
 const String _tagsFileType = "daily_you_tags";
@@ -140,24 +141,24 @@ class TemplatesTagsTransfer {
     return _encode(data);
   }
 
-  static Future<bool> saveBytesToFile(
+  static Future<OperationOutcome> saveBytesToFile(
       Uint8List bytes, String fileName, Function(String) updateStatus) async {
     updateStatus("0%");
 
     try {
       final saveDirectory = await StoragePicker.pickDirectory();
-      if (saveDirectory == null) return false;
+      if (saveDirectory == null) return const OperationOutcome.cancelled();
 
       updateStatus("50%");
 
       final saved = await saveDirectory.store.write(fileName, bytes);
 
       updateStatus("100%");
-      return saved;
-    } catch (e) {
-      updateStatus("$e");
-      await Future.delayed(Duration(seconds: 5));
-      return false;
+      return saved
+          ? const OperationOutcome.succeeded()
+          : const OperationOutcome.failed();
+    } catch (error) {
+      return OperationOutcome.failed(error);
     }
   }
 
@@ -168,21 +169,22 @@ class TemplatesTagsTransfer {
     ));
   }
 
-  static Future<bool> importTransferFile(Function(String) updateStatus) async {
+  static Future<OperationOutcome> importTransferFile(
+      Function(String) updateStatus) async {
     updateStatus("0%");
 
     try {
       final selectedFile = await StoragePicker.pickFile(
           allowedExtensions: ['json'], mimeTypes: ['application/json']);
-      if (selectedFile == null) return false;
+      if (selectedFile == null) return const OperationOutcome.cancelled();
 
       final bytes = await selectedFile.readBytes();
-      if (bytes == null) return false;
+      if (bytes == null) return const OperationOutcome.failed();
 
       final jsonData = json.decode(utf8.decode(bytes)) as Map<String, dynamic>;
       if (jsonData['type'] != _tagsFileType &&
           jsonData['type'] != _templatesFileType) {
-        return false;
+        return const OperationOutcome.failed();
       }
 
       updateStatus("25%");
@@ -278,11 +280,9 @@ class TemplatesTagsTransfer {
       }
 
       updateStatus("100%");
-      return true;
-    } catch (e) {
-      updateStatus("$e");
-      await Future.delayed(Duration(seconds: 5));
-      return false;
+      return const OperationOutcome.succeeded();
+    } catch (error) {
+      return OperationOutcome.failed(error);
     }
   }
 }

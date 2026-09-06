@@ -8,6 +8,7 @@ import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/storage/storage_picker.dart';
 import 'package:daily_you/utils/imports/import_helpers.dart';
+import 'package:daily_you/utils/operation_outcome.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:html2md/html2md.dart' as html2md;
@@ -15,7 +16,7 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
-Future<bool> importFromDiarium(
+Future<OperationOutcome> importFromDiarium(
     BuildContext context, Function(String) updateStatus) async {
   final localizations = AppLocalizations.of(context)!;
   updateStatus("0%");
@@ -23,11 +24,11 @@ Future<bool> importFromDiarium(
   var tempDir = await getTemporaryDirectory();
   const tempDbName = "temp_diarium.db";
   Database? db;
-  bool success = true;
+  var outcome = const OperationOutcome.succeeded();
 
   try {
     final selectedFile = await StoragePicker.pickFile();
-    if (selectedFile == null) return false;
+    if (selectedFile == null) return const OperationOutcome.cancelled();
 
     updateStatus(localizations.tranferStatus("0"));
     await selectedFile.copyInto(tempDir.path, tempDbName,
@@ -114,10 +115,8 @@ Future<bool> importFromDiarium(
       processedEntries++;
       updateStatus("${((processedEntries / totalEntries) * 100).round()}%");
     }
-  } catch (e) {
-    updateStatus("$e");
-    await Future.delayed(const Duration(seconds: 5));
-    success = false;
+  } catch (error) {
+    outcome = OperationOutcome.failed(error);
   }
 
   updateStatus(localizations.cleanUpStatus);
@@ -133,5 +132,5 @@ Future<bool> importFromDiarium(
     await File(join(tempDir.path, tempDbName)).delete();
   }
 
-  return success;
+  return outcome;
 }

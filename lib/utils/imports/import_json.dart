@@ -5,21 +5,28 @@ import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/storage/storage_picker.dart';
 import 'package:daily_you/utils/imports/import_helpers.dart';
+import 'package:daily_you/utils/operation_outcome.dart';
 
-Future<bool> importFromJson(Function(String) updateStatus) async {
+Future<OperationOutcome> importFromJson(Function(String) updateStatus) async {
   updateStatus("0%");
 
-  var selectedFile = await StoragePicker.pickFile(
-      allowedExtensions: ['json'], mimeTypes: ['application/json']);
-  if (selectedFile == null) return false;
+  var outcome = const OperationOutcome.succeeded();
 
-  var bytes = await selectedFile.readBytes();
-  if (bytes == null) return false;
+  try {
+    final selectedFile = await StoragePicker.pickFile(
+        allowedExtensions: ['json'], mimeTypes: ['application/json']);
+    if (selectedFile == null) return const OperationOutcome.cancelled();
 
-  await addImportedEntries(decodeJsonEntries(bytes), updateStatus);
+    final bytes = await selectedFile.readBytes();
+    if (bytes == null) return const OperationOutcome.failed();
+
+    await addImportedEntries(decodeJsonEntries(bytes), updateStatus);
+  } catch (error) {
+    outcome = OperationOutcome.failed(error);
+  }
 
   await finishImport(updateStatus, syncImages: true);
-  return true;
+  return outcome;
 }
 
 List<ImportedEntry> decodeJsonEntries(Uint8List bytes) {
