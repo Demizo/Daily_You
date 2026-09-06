@@ -38,7 +38,9 @@ class LocalFileStore implements FileStore {
 
   @override
   Future<bool> write(String name, Uint8List bytes) async {
-    await _fileFor(name).writeAsBytes(bytes, flush: true);
+    final file = _fileFor(name);
+    await file.parent.create(recursive: true);
+    await file.writeAsBytes(bytes, flush: true);
     return true;
   }
 

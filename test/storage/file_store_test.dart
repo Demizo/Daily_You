@@ -33,6 +33,14 @@ void main() {
       expect(await LocalFileStore(join(directory.path, 'gone')).isAvailable(),
           isFalse);
     });
+
+    test('write recreates a directory that disappeared', () async {
+      await store.write('note.txt', bytesOf('hello'));
+      await directory.delete(recursive: true);
+
+      expect(await store.write('note.txt', bytesOf('again')), isTrue);
+      expect(await store.read('note.txt'), equals(bytesOf('again')));
+    });
   });
 }
 
