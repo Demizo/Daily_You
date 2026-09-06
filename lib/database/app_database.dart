@@ -46,6 +46,9 @@ class AppDatabase {
   static Database? _database;
   Database? get database => _database;
 
+  @visibleForTesting
+  set database(Database? database) => _database = database;
+
   String? _internalPath;
 
   FileStore get internalStore => LocalFileStore(dirname(_internalPath!));
@@ -298,6 +301,13 @@ class AppDatabase {
 
   Future _createDatabase(Database db, int version) async {
     _database = db;
+    await createSchema(db);
+    await TemplatesProvider.instance.createDefaultTemplates();
+    await TagsProvider.instance.createDefaultTags();
+    await _createWelcomeEntry();
+  }
+
+  Future<void> createSchema(Database db) async {
     await db.execute('''
 CREATE TABLE $entriesTable (
   ${EntryFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -316,9 +326,6 @@ CREATE TABLE $templatesTable (
   ${TemplatesFields.timeModified} DATETIME NOT NULL DEFAULT (DATETIME('now'))
 )
 ''');
-
-    await TemplatesProvider.instance.createDefaultTemplates();
-
     await db.execute('''
 CREATE TABLE $imagesTable (
     ${EntryImageFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -332,9 +339,6 @@ CREATE TABLE $imagesTable (
 
     await _createTagTables(db);
     await _createTemplateTagTable(db);
-    await TagsProvider.instance.createDefaultTags();
-
-    await _createWelcomeEntry();
   }
 
   Future<void> _createWelcomeEntry() async {
