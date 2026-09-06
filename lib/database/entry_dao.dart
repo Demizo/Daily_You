@@ -1,5 +1,6 @@
 import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/models/entry.dart';
+import 'package:sqflite/sqflite.dart';
 
 class EntryDao {
   static Future<List<Entry>> getAll() async {
@@ -24,15 +25,15 @@ class EntryDao {
     }
   }
 
-  static Future<Entry> add(Entry entry) async {
-    final id = await AppDatabase.instance.database!
-        .insert(entriesTable, entry.toJson());
+  static Future<Entry> add(Entry entry, {DatabaseExecutor? executor}) async {
+    final id =
+        await executorOrDatabase(executor).insert(entriesTable, entry.toJson());
 
     return entry.copy(id: id);
   }
 
-  static Future<void> update(Entry entry) async {
-    await AppDatabase.instance.database!.update(
+  static Future<void> update(Entry entry, {DatabaseExecutor? executor}) async {
+    await executorOrDatabase(executor).update(
       entriesTable,
       entry.toJson(),
       where: '${EntryFields.id} = ?',
@@ -40,8 +41,8 @@ class EntryDao {
     );
   }
 
-  static Future<void> remove(int id) async {
-    await AppDatabase.instance.database!.delete(
+  static Future<void> remove(int id, {DatabaseExecutor? executor}) async {
+    await executorOrDatabase(executor).delete(
       entriesTable,
       where: '${EntryFields.id} = ?',
       whereArgs: [id],

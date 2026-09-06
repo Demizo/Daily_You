@@ -1,5 +1,6 @@
 import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/models/image.dart';
+import 'package:sqflite/sqflite.dart';
 
 class EntryImageDao {
   static Future<List<EntryImage>> getAll() async {
@@ -24,23 +25,26 @@ class EntryImageDao {
     return entryImages;
   }
 
-  static Future<EntryImage> add(EntryImage entryImage) async {
-    final id = await AppDatabase.instance.database!
+  static Future<EntryImage> add(EntryImage entryImage,
+      {DatabaseExecutor? executor}) async {
+    final id = await executorOrDatabase(executor)
         .insert(imagesTable, entryImage.toJson());
 
     return entryImage.copy(id: id);
   }
 
-  static Future<void> remove(EntryImage entryImage) async {
-    await AppDatabase.instance.database!.delete(
+  static Future<void> remove(EntryImage entryImage,
+      {DatabaseExecutor? executor}) async {
+    await executorOrDatabase(executor).delete(
       imagesTable,
       where: '${EntryImageFields.id} = ?',
       whereArgs: [entryImage.id],
     );
   }
 
-  static Future<void> update(EntryImage image) async {
-    await AppDatabase.instance.database!.update(
+  static Future<void> update(EntryImage image,
+      {DatabaseExecutor? executor}) async {
+    await executorOrDatabase(executor).update(
       imagesTable,
       image.toJson(),
       where: '${EntryImageFields.id} = ?',
