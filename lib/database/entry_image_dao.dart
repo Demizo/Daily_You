@@ -27,7 +27,7 @@ class EntryImageDao {
 
   static Future<EntryImage> add(EntryImage entryImage,
       {DatabaseExecutor? executor}) async {
-    final id = await executorOrDatabase(executor)
+    final id = await AppDatabase.executorOr(executor)
         .insert(imagesTable, entryImage.toJson());
 
     return entryImage.copy(id: id);
@@ -35,7 +35,7 @@ class EntryImageDao {
 
   static Future<void> remove(EntryImage entryImage,
       {DatabaseExecutor? executor}) async {
-    await executorOrDatabase(executor).delete(
+    await AppDatabase.executorOr(executor).delete(
       imagesTable,
       where: '${EntryImageFields.id} = ?',
       whereArgs: [entryImage.id],
@@ -44,7 +44,7 @@ class EntryImageDao {
 
   static Future<void> update(EntryImage image,
       {DatabaseExecutor? executor}) async {
-    await executorOrDatabase(executor).update(
+    await AppDatabase.executorOr(executor).update(
       imagesTable,
       image.toJson(),
       where: '${EntryImageFields.id} = ?',

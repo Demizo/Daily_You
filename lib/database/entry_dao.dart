@@ -26,14 +26,14 @@ class EntryDao {
   }
 
   static Future<Entry> add(Entry entry, {DatabaseExecutor? executor}) async {
-    final id =
-        await executorOrDatabase(executor).insert(entriesTable, entry.toJson());
+    final id = await AppDatabase.executorOr(executor)
+        .insert(entriesTable, entry.toJson());
 
     return entry.copy(id: id);
   }
 
   static Future<void> update(Entry entry, {DatabaseExecutor? executor}) async {
-    await executorOrDatabase(executor).update(
+    await AppDatabase.executorOr(executor).update(
       entriesTable,
       entry.toJson(),
       where: '${EntryFields.id} = ?',
@@ -42,7 +42,7 @@ class EntryDao {
   }
 
   static Future<void> remove(int id, {DatabaseExecutor? executor}) async {
-    await executorOrDatabase(executor).delete(
+    await AppDatabase.executorOr(executor).delete(
       entriesTable,
       where: '${EntryFields.id} = ?',
       whereArgs: [id],

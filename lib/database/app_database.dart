@@ -25,12 +25,12 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
-DatabaseExecutor executorOrDatabase(DatabaseExecutor? executor) =>
-    executor ?? AppDatabase.instance.database!;
-
 class AppDatabase {
   static final AppDatabase instance = AppDatabase._init();
   AppDatabase._init();
+
+  static DatabaseExecutor executorOr(DatabaseExecutor? executor) =>
+      executor ?? instance.database!;
 
   static const String databaseFileName = 'daily_you.db';
 
