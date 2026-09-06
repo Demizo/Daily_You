@@ -3,7 +3,10 @@ import 'dart:io';
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/database/image_storage.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
-import 'package:daily_you/utils/file_layer.dart';
+import 'package:daily_you/storage/external_sync_health.dart';
+import 'package:daily_you/storage/file_store.dart';
+import 'package:daily_you/storage/local_file_store.dart';
+import 'package:daily_you/storage/storage_picker.dart';
 import 'package:daily_you/utils/generated/tag_icon_registry.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/image.dart';
@@ -26,7 +29,12 @@ class AppDatabase {
   static final AppDatabase instance = AppDatabase._init();
   AppDatabase._init();
 
+  static const String databaseFileName = 'daily_you.db';
+
   final Logger _logger = Logger('AppDatabase');
+
+  final ExternalSyncHealth externalSyncHealth =
+      ExternalSyncHealth('AppDatabase');
 
   /// True when a migration from external storage was attempted on the last
   /// [init] but failed.
@@ -36,6 +44,11 @@ class AppDatabase {
   Database? get database => _database;
 
   String? _internalPath;
+
+  FileStore get internalStore => LocalFileStore(dirname(_internalPath!));
+
+  FileStore? get externalStore =>
+      usingExternalLocation() ? FileStore.external(getExternalPath()) : null;
 
   Future<bool> init(
       {bool forceWithoutSync = false, bool allowMigration = true}) async {
@@ -79,7 +92,7 @@ class AppDatabase {
 
     final oldDir = await getExternalStorageDirectory();
     if (oldDir == null) return true;
-    final oldPath = join(oldDir.path, 'daily_you.db');
+    final oldPath = join(oldDir.path, databaseFileName);
     if (!await File(oldPath).exists()) return true;
 
     _logger.info('Database migration started: $oldPath -> $_internalPath');
@@ -141,7 +154,7 @@ class AppDatabase {
   Future<String> getInternalPath() async {
     final basePath = await getApplicationSupportDirectory();
     if (!basePath.existsSync()) basePath.createSync(recursive: true);
-    return join(basePath.path, 'daily_you.db');
+    return join(basePath.path, databaseFileName);
   }
 
   String getExternalPath() {
@@ -150,7 +163,7 @@ class AppDatabase {
 
   /// Return whether the app has permission to access the external location
   Future<bool> hasExternalLocationPermission() async {
-    return FileLayer.hasPermission(getExternalPath());
+    return await externalStore?.isAvailable() ?? false;
   }
 
   /// Select an external database location. Returns whether a new location was set successfully.
@@ -163,10 +176,10 @@ class AppDatabase {
     await _database!.close();
 
     try {
-      var selectedDirectory = await FileLayer.pickDirectory();
+      var selectedDirectory = await StoragePicker.pickDirectory();
       if (selectedDirectory != null) {
         await ConfigProvider.instance
-            .set(ConfigKey.externalDbUri, selectedDirectory);
+            .set(ConfigKey.externalDbUri, selectedDirectory.uri);
         await ConfigProvider.instance.set(ConfigKey.useExternalDb, true);
 
         // Sync with external folder
@@ -205,91 +218,73 @@ class AppDatabase {
   /// Overwrite the external database with local changes
   /// If an external database is not in use, no action is taken
   Future<void> updateExternalDatabase() async {
-    if (usingExternalLocation()) {
-      EasyDebounce.debounce("update-remote-database", Duration(seconds: 1),
-          () async {
-        // Create temporary export copy
-        final tmpExport =
-            "${_internalPath!}.export_${DateTime.now().millisecondsSinceEpoch}";
-        database!.execute("VACUUM INTO '$tmpExport'");
+    if (!usingExternalLocation()) return;
 
-        // Ensure export copy is valid
-        if (!await _validateSqliteDatabase(tmpExport)) {
-          await File(tmpExport).delete();
-          return;
-        }
+    EasyDebounce.debounce("update-remote-database", Duration(seconds: 1),
+        () async {
+      final externalLocation = externalStore;
+      if (externalLocation == null) return;
 
-        // Write to external location
-        var bytes =
-            await FileLayer.getFileBytes(tmpExport, useExternalPath: false);
+      final exportName =
+          "$databaseFileName.export_${DateTime.now().millisecondsSinceEpoch}";
+      final exportPath = join(dirname(_internalPath!), exportName);
+      try {
+        await database!.execute("VACUUM INTO '$exportPath'");
+
+        if (!await _validateSqliteDatabase(exportPath)) return;
+
+        final bytes = await internalStore.read(exportName);
         if (bytes == null) return;
-        await FileLayer.writeFileBytes(getExternalPath(), bytes,
-            name: "daily_you.db");
 
-        await FileLayer.deleteFile(tmpExport, useExternalPath: false);
-      });
-    }
+        await externalSyncHealth.record("external database write",
+            () => externalLocation.write(databaseFileName, bytes));
+      } finally {
+        await internalStore.delete(exportName);
+      }
+    });
   }
 
   /// Pull in remote changes if the external database is newer or if forceOverwrite is set
   Future<bool> _syncWithExternalDatabase({bool forceOverwrite = false}) async {
-    // Check if external database exists
-    var externalExists =
-        await FileLayer.exists(getExternalPath(), name: "daily_you.db");
+    final externalLocation = externalStore;
+    if (externalLocation == null) return false;
 
-    if (!externalExists) {
-      var bytes =
-          await FileLayer.getFileBytes(_internalPath!, useExternalPath: false);
+    if (!await externalLocation.exists(databaseFileName)) {
+      final bytes = await internalStore.read(databaseFileName);
       if (bytes == null) return false;
 
-      // Export internal DB
-      var externalDbPath =
-          await FileLayer.createFile(getExternalPath(), "daily_you.db", bytes);
-      return externalDbPath != null;
-    } else if (forceOverwrite || await _isExternalDatabaseNewer()) {
+      return externalSyncHealth.record("external database write",
+          () => externalLocation.write(databaseFileName, bytes));
+    }
+
+    if (forceOverwrite || await _isExternalDatabaseNewer(externalLocation)) {
       // Overwrite internal DB
-      var externalBytes =
-          await FileLayer.getFileBytes(getExternalPath(), name: "daily_you.db");
+      final externalBytes = await externalLocation.read(databaseFileName);
       if (externalBytes == null) return false;
 
-      // Create temporary internal DB
-      final temporaryInternalPath =
-          "${_internalPath!}.${DateTime.now().millisecondsSinceEpoch}.tmp";
-      final internalDirectory = dirname(temporaryInternalPath);
-      final temporaryFileName = basename(temporaryInternalPath);
-      await FileLayer.createFile(
-          internalDirectory, temporaryFileName, externalBytes,
-          useExternalPath: false);
+      final temporaryName =
+          "$databaseFileName.${DateTime.now().millisecondsSinceEpoch}.tmp";
+      await internalStore.write(temporaryName, externalBytes);
 
-      // Check that the new database is valid
-      if (await FileLayer.exists(internalDirectory,
-              name: temporaryFileName, useExternalPath: false) &&
-          await _validateSqliteDatabase(temporaryInternalPath)) {
-        // Replace internal database
-        await FileLayer.renameFile(temporaryInternalPath, _internalPath!,
-            useExternalPath: false);
-      } else {
-        // Delete temporary database
-        await FileLayer.deleteFile(temporaryInternalPath,
-            useExternalPath: false);
-        return false;
+      final temporaryPath = join(dirname(_internalPath!), temporaryName);
+      if (await _validateSqliteDatabase(temporaryPath)) {
+        return internalStore.rename(temporaryName, databaseFileName);
       }
+
+      await internalStore.delete(temporaryName);
+      return false;
     }
     return true;
   }
 
   /// Return whether the external database is newer
-  Future<bool> _isExternalDatabaseNewer() async {
-    // Get internal time
-    var internalModifiedTime = await FileLayer.getFileModifiedTime(
-            _internalPath!,
-            useExternalPath: false) ??
-        DateTime.now();
+  Future<bool> _isExternalDatabaseNewer(FileStore externalLocation) async {
+    final internalModifiedTime =
+        await internalStore.modifiedTime(databaseFileName) ?? DateTime.now();
 
-    var externalModifiedTime = await FileLayer.getFileModifiedTime(
-            getExternalPath(),
-            name: "daily_you.db") ??
-        internalModifiedTime;
+    final externalModifiedTime =
+        await externalLocation.modifiedTime(databaseFileName) ??
+            internalModifiedTime;
 
     return externalModifiedTime.isAfter(internalModifiedTime);
   }
