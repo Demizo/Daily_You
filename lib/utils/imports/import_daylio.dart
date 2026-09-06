@@ -14,7 +14,7 @@ import 'package:daily_you/models/tag_category.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
-import 'package:daily_you/utils/file_layer.dart';
+import 'package:daily_you/storage/storage_picker.dart';
 import 'package:daily_you/utils/tag_name_sanitizer.dart';
 import 'package:daily_you/utils/zip_utils.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
@@ -28,7 +28,7 @@ Future<bool> importFromDaylio(
   final localizations = AppLocalizations.of(context)!;
   updateStatus("0%");
 
-  final selectedFile = await FileLayer.pickFile();
+  final selectedFile = await StoragePicker.pickFile();
   if (selectedFile == null) return false;
 
   bool success = true;
@@ -40,8 +40,8 @@ Future<bool> importFromDaylio(
 
   try {
     updateStatus(localizations.tranferStatus("0"));
-    await FileLayer.copyFromExternalLocation(
-        selectedFile, tempDir.path, tempDaylioZip, onProgress: (percent) {
+    await selectedFile.copyInto(tempDir.path, tempDaylioZip,
+        onProgress: (percent) {
       updateStatus(localizations.tranferStatus("${percent.round()}"));
     });
 

@@ -7,7 +7,8 @@ import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
-import 'package:daily_you/utils/file_layer.dart';
+import 'package:daily_you/storage/local_file_store.dart';
+import 'package:daily_you/storage/storage_picker.dart';
 import 'package:daily_you/utils/imports/import_helpers.dart';
 import 'package:daily_you/utils/zip_utils.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
@@ -20,7 +21,7 @@ Future<bool> importFromDaybook(
   final localizations = AppLocalizations.of(context)!;
   updateStatus("0%");
 
-  final selectedFile = await FileLayer.pickFile();
+  final selectedFile = await StoragePicker.pickFile();
   if (selectedFile == null) return false;
 
   bool success = true;
@@ -32,8 +33,7 @@ Future<bool> importFromDaybook(
 
   try {
     updateStatus(localizations.tranferStatus("0"));
-    await FileLayer.copyFromExternalLocation(
-      selectedFile,
+    await selectedFile.copyInto(
       tempDir.path,
       tempZip,
       onProgress: (percent) {
@@ -46,15 +46,11 @@ Future<bool> importFromDaybook(
       tempZipFolder.path,
     );
 
-    final csvFile = await tempZipFolder.list().firstWhere(
-          (f) => basename(f.path) == 'entries.csv',
-          orElse: () => throw Exception('entries.csv not found'),
-        );
+    final extractedFiles = LocalFileStore(tempZipFolder.path);
+    final csvBytes = await extractedFiles.read('entries.csv');
+    if (csvBytes == null) throw Exception('entries.csv not found');
 
-    final csvString = utf8.decode(
-      await FileLayer.getFileBytes(csvFile.path, useExternalPath: false)
-          as List<int>,
-    );
+    final csvString = utf8.decode(csvBytes);
 
     final rows = const CsvDecoder(
       fieldDelimiter: ',',
@@ -119,10 +115,7 @@ Future<bool> importFromDaybook(
 
         int rank = 0;
         for (final filename in imageFilenames) {
-          final file = File(join(tempZipFolder.path, filename));
-          if (!await file.exists()) continue;
-          final bytes =
-              await FileLayer.getFileBytes(file.path, useExternalPath: false);
+          final bytes = await extractedFiles.read(filename);
           if (bytes == null) continue;
           final imagePath =
               await ImageStorage.instance.create(null, bytes, currTime: date);

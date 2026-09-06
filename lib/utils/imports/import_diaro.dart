@@ -6,7 +6,8 @@ import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
-import 'package:daily_you/utils/file_layer.dart';
+import 'package:daily_you/storage/local_file_store.dart';
+import 'package:daily_you/storage/storage_picker.dart';
 import 'package:daily_you/utils/imports/import_helpers.dart';
 import 'package:daily_you/utils/zip_utils.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
@@ -20,7 +21,7 @@ Future<bool> importFromDiaro(
   final localizations = AppLocalizations.of(context)!;
   updateStatus("0%");
 
-  final selectedFile = await FileLayer.pickFile();
+  final selectedFile = await StoragePicker.pickFile();
   if (selectedFile == null) return false;
 
   bool success = true;
@@ -32,8 +33,7 @@ Future<bool> importFromDiaro(
 
   try {
     updateStatus(localizations.tranferStatus("0"));
-    await FileLayer.copyFromExternalLocation(
-        selectedFile, tempDir.path, tempZip, onProgress: (percent) {
+    await selectedFile.copyInto(tempDir.path, tempZip, onProgress: (percent) {
       updateStatus(localizations.tranferStatus("${percent.round()}"));
     });
 
@@ -42,14 +42,14 @@ Future<bool> importFromDiaro(
       tempZipFolder.path,
     );
 
-    final xmlFile = await tempZipFolder.list().firstWhere(
-          (f) => basename(f.path).endsWith('DiaroBackup.xml'),
-          orElse: () => throw Exception('DiaroBackup.xml not found in archive'),
-        );
+    final extractedFiles = LocalFileStore(tempZipFolder.path);
+    final extractedPhotos =
+        LocalFileStore(join(tempZipFolder.path, 'media', 'photo'));
+    final xmlName = (await extractedFiles.list()).firstWhere(
+        (name) => name.endsWith('DiaroBackup.xml'),
+        orElse: () => throw Exception('DiaroBackup.xml not found in archive'));
 
-    final xmlString = utf8.decode(
-        await FileLayer.getFileBytes(xmlFile.path, useExternalPath: false)
-            as List<int>);
+    final xmlString = utf8.decode((await extractedFiles.read(xmlName))!);
     final xmlDoc = XmlDocument.parse(xmlString);
 
     final entriesTable = xmlDoc
@@ -143,10 +143,7 @@ Future<bool> importFromDiaro(
           int rank = 0;
           for (final att in atts) {
             final filename = att['filename'] as String;
-            final photoFile =
-                File(join(tempZipFolder.path, 'media', 'photo', filename));
-            final photoBytes = await FileLayer.getFileBytes(photoFile.path,
-                useExternalPath: false);
+            final photoBytes = await extractedPhotos.read(filename);
             if (photoBytes == null) continue;
             final imagePath = await ImageStorage.instance
                 .create(null, photoBytes, currTime: created);

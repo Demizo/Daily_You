@@ -6,7 +6,7 @@ import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
-import 'package:daily_you/utils/file_layer.dart';
+import 'package:daily_you/storage/storage_picker.dart';
 import 'package:daily_you/utils/imports/import_helpers.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -26,11 +26,11 @@ Future<bool> importFromDiarium(
   bool success = true;
 
   try {
-    final dbPath = await FileLayer.pickFile();
-    if (dbPath == null) return false;
+    final selectedFile = await StoragePicker.pickFile();
+    if (selectedFile == null) return false;
 
     updateStatus(localizations.tranferStatus("0"));
-    await FileLayer.copyFromExternalLocation(dbPath, tempDir.path, tempDbName,
+    await selectedFile.copyInto(tempDir.path, tempDbName,
         onProgress: (percent) {
       updateStatus(localizations.tranferStatus("${percent.round()}"));
     });

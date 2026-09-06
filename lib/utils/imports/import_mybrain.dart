@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/providers/entries_provider.dart';
-import 'package:daily_you/utils/file_layer.dart';
+import 'package:daily_you/storage/storage_picker.dart';
 import 'package:daily_you/utils/imports/import_helpers.dart';
 
 Future<bool> importFromMyBrain(Function(String) updateStatus) async {
@@ -11,11 +11,11 @@ Future<bool> importFromMyBrain(Function(String) updateStatus) async {
   bool success = true;
 
   try {
-    var selectedFile = await FileLayer.pickFile(
+    var selectedFile = await StoragePicker.pickFile(
         allowedExtensions: ['json'], mimeTypes: ['application/json']);
     if (selectedFile == null) return false;
 
-    var bytes = await FileLayer.getFileBytes(selectedFile);
+    var bytes = await selectedFile.readBytes();
     if (bytes == null) return false;
     final jsonData = json.decode(utf8.decode(bytes.toList()));
 
