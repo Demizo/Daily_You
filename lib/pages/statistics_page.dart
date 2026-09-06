@@ -42,6 +42,9 @@ class _StatsPageState extends State<StatsPage>
   double _headerHeight = 98.0;
   final GlobalKey _headerMeasureKey = GlobalKey();
 
+  List<Entry>? _countedEntries;
+  int _wordCount = 0;
+
   static const _rangeToString = {
     StatsRange.month: 'month',
     StatsRange.sixMonths: 'sixMonths',
@@ -89,6 +92,14 @@ class _StatsPageState extends State<StatsPage>
     }
   }
 
+  int _wordCountOf(List<Entry> entries) {
+    if (!identical(entries, _countedEntries)) {
+      _countedEntries = entries;
+      _wordCount = totalWordCount(entries);
+    }
+    return _wordCount;
+  }
+
   Widget buildPage(BuildContext context) {
     final entriesProvider = Provider.of<EntriesProvider>(context);
     final tagsProvider = Provider.of<TagsProvider>(context);
@@ -102,7 +113,7 @@ class _StatsPageState extends State<StatsPage>
 
     final logCount = entriesProvider.entries.length;
     final entryDayCount = entriesProvider.getEntryDayCount();
-    final wordCount = totalWordCount(entriesProvider.entries);
+    final wordCount = _wordCountOf(entriesProvider.entries);
 
     final primaryStreakItem = logCount > 0
         ? StatItem(
