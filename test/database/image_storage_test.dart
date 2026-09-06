@@ -5,6 +5,7 @@ import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/storage/file_store.dart';
 import 'package:daily_you/storage/in_memory_file_store.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -25,6 +26,11 @@ void main() {
 
   Uint8List bytesOf(String text) => Uint8List.fromList(text.codeUnits);
 
+  void useStores(FileStore internal, FileStore external) {
+    storage.overrideStores(internal, external);
+    addTearDown(storage.clearStoreOverrides);
+  }
+
   void useImages(List<String> imageNames) {
     final createdTime = DateTime(2026, 1, 1);
     EntriesProvider.instance.entries = [
@@ -44,7 +50,7 @@ void main() {
 
   test('exports images the external location is missing', () async {
     final externalStore = InMemoryFileStore();
-    storage.overrideStores(internalStore, externalStore);
+    useStores(internalStore, externalStore);
     useImages(['photo.jpg']);
     await internalStore.write('photo.jpg', bytesOf('photo'));
 
@@ -56,7 +62,7 @@ void main() {
 
   test('imports images the internal location is missing', () async {
     final externalStore = InMemoryFileStore();
-    storage.overrideStores(internalStore, externalStore);
+    useStores(internalStore, externalStore);
     useImages(['photo.jpg']);
     await externalStore.write('photo.jpg', bytesOf('photo'));
 
@@ -66,7 +72,7 @@ void main() {
   });
 
   test('records a rejected external write', () async {
-    storage.overrideStores(internalStore, RejectingFileStore());
+    useStores(internalStore, RejectingFileStore());
     useImages(['photo.jpg']);
     await internalStore.write('photo.jpg', bytesOf('photo'));
 
@@ -77,7 +83,7 @@ void main() {
   });
 
   test('records an external write that throws', () async {
-    storage.overrideStores(internalStore, UnreachableFileStore());
+    useStores(internalStore, UnreachableFileStore());
     useImages(['photo.jpg']);
     await internalStore.write('photo.jpg', bytesOf('photo'));
 
@@ -88,7 +94,7 @@ void main() {
   });
 
   test('refuses to garbage collect before the images load', () async {
-    storage.overrideStores(internalStore, InMemoryFileStore());
+    useStores(internalStore, InMemoryFileStore());
     await internalStore.write('photo.jpg', bytesOf('photo'));
 
     expect(EntryImagesProvider.instance.isLoaded, isFalse);
@@ -97,7 +103,7 @@ void main() {
   });
 
   test('deletes only unreferenced images', () async {
-    storage.overrideStores(internalStore, InMemoryFileStore());
+    useStores(internalStore, InMemoryFileStore());
     useImages(['kept.jpg']);
     EntryImagesProvider.instance.isLoaded = true;
     addTearDown(() => EntryImagesProvider.instance.isLoaded = false);

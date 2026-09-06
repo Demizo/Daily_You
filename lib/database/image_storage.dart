@@ -48,6 +48,12 @@ class ImageStorage {
     _externalStoreOverride = external;
   }
 
+  @visibleForTesting
+  void clearStoreOverrides() {
+    _internalStore = null;
+    _externalStoreOverride = null;
+  }
+
   bool usingExternalLocation() {
     return ConfigProvider.instance.get(ConfigKey.useExternalImg) ?? false;
   }
