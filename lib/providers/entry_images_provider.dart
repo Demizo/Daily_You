@@ -17,6 +17,9 @@ class EntryImagesProvider with ChangeNotifier {
 
   bool get isLoaded => _isLoaded;
 
+  @visibleForTesting
+  set isLoaded(bool value) => _isLoaded = value;
+
   void _rebuildCache() {
     final cache = <int, EntryImage?>{};
     for (final img in images) {

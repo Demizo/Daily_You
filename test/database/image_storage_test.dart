@@ -98,10 +98,13 @@ void main() {
 
   test('deletes only unreferenced images', () async {
     storage.overrideStores(internalStore, InMemoryFileStore());
+    useImages(['kept.jpg']);
+    EntryImagesProvider.instance.isLoaded = true;
+    addTearDown(() => EntryImagesProvider.instance.isLoaded = false);
     await internalStore.write('kept.jpg', bytesOf('kept'));
     await internalStore.write('orphan.jpg', bytesOf('orphan'));
 
-    await storage.deleteUnreferencedImages({'kept.jpg'});
+    expect(await storage.garbageCollectImages(), isTrue);
 
     expect(await internalStore.list(), equals(['kept.jpg']));
   });

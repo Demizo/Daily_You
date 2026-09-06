@@ -322,12 +322,11 @@ class ImageStorage {
           'Refused to garbage collect images before the image list was loaded');
     }
 
-    return deleteUnreferencedImages(
+    return _deleteUnreferencedImages(
         imagesProvider.images.map((entryImage) => entryImage.imgPath).toSet());
   }
 
-  @visibleForTesting
-  Future<bool> deleteUnreferencedImages(Set<String> referencedNames) async {
+  Future<bool> _deleteUnreferencedImages(Set<String> referencedNames) async {
     final internal = await internalStore();
     for (final name in await internal.list()) {
       if (!referencedNames.contains(name)) {
