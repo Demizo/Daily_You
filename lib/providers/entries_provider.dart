@@ -67,10 +67,6 @@ class EntriesProvider with ChangeNotifier {
   Future<Entry> add(Entry entry, {bool skipUpdate = false}) =>
       _store.add(entry, skipUpdate: skipUpdate);
 
-  Future<void> update(Entry entry) => _store.update(entry);
-
-  Future<void> remove(Entry entry) => _store.remove(entry);
-
   Future<void> deleteAll(Function(String) updateStatus) =>
       _store.deleteAll(updateStatus);
 

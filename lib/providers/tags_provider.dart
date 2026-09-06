@@ -185,6 +185,14 @@ class TagsProvider with ChangeNotifier {
     return _entryTagsByEntry[entryId] ?? const [];
   }
 
+  /// Replaces the cached tags for [entryId] with rows already written elsewhere.
+  void applyEntryTags(int entryId, List<EntryTag> written) {
+    final retained =
+        entryTags.where((entryTag) => entryTag.entryId != entryId).toList();
+    _setEntryTags([...retained, ...written]);
+    notifyListeners();
+  }
+
   /// Reconciles the tags stored for [entryId] with [desired], adding, removing,
   /// and updating rows so the database matches.
   Future<void> setEntryTags(int entryId, List<EntryTag> desired) async {
