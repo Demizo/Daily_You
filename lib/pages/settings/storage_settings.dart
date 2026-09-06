@@ -299,7 +299,7 @@ class _StorageSettingsState extends State<StorageSettings> {
                       await _showChangeLogFolderWarning();
                     },
                     onSecondaryPressed: () async {
-                      AppDatabase.instance.resetExternalLocation();
+                      await AppDatabase.instance.resetExternalLocation();
                     },
                   );
                 }
@@ -327,7 +327,7 @@ class _StorageSettingsState extends State<StorageSettings> {
                       await _attemptImageFolderChange();
                     },
                     onSecondaryPressed: () async {
-                      ImageStorage.instance.resetImageFolderLocation();
+                      await ImageStorage.instance.resetImageFolderLocation();
                     },
                   );
                 }

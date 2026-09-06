@@ -194,7 +194,7 @@ class ImageStorage {
     }
   }
 
-  void resetImageFolderLocation() async {
+  Future<void> resetImageFolderLocation() async {
     await ConfigProvider.instance.set(Settings.useExternalImg, false);
   }
 
