@@ -2,7 +2,6 @@ import 'dart:math' as math;
 
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/tag.dart';
-import 'package:intl/intl.dart';
 import 'package:word_count/word_count.dart';
 
 const List<String> _weekdayKeys = [
@@ -111,4 +110,4 @@ Set<int> entryIdsWithTag(List<EntryTag> entryTags, int tagId) {
 }
 
 String _weekdayKeyOf(Entry entry) =>
-    DateFormat('EEE', 'en').format(entry.timeCreate);
+    _weekdayKeys[entry.timeCreate.weekday - DateTime.monday];
