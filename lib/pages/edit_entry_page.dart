@@ -566,9 +566,13 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   }
 
   void _adoptSavedImages(Entry saved) {
-    _currentImages = [
+    final persistedIds = {
       for (final image in EntryImagesProvider.instance.getForEntry(saved))
-        image.copy()
+        image.imgPath: image.id
+    };
+    _currentImages = [
+      for (final image in _currentImages)
+        image.copy(id: persistedIds[image.imgPath], entryId: saved.id)
     ];
   }
 
