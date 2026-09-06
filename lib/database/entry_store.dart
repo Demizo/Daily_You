@@ -1,10 +1,42 @@
+import 'dart:async';
+
 import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/database/entry_dao.dart';
+import 'package:daily_you/database/entry_image_dao.dart';
+import 'package:daily_you/database/entry_tag_dao.dart';
+import 'package:daily_you/database/image_storage.dart';
 import 'package:daily_you/models/entry.dart';
+import 'package:daily_you/models/image.dart';
+import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:flutter/foundation.dart';
+import 'package:sqflite/sqflite.dart';
+
+class EntryDraft {
+  final Entry entry;
+  final List<EntryTag> tags;
+  final List<EntryImage> images;
+
+  const EntryDraft({
+    required this.entry,
+    this.tags = const [],
+    this.images = const [],
+  });
+}
+
+/// Builds the draft to write. [saved] is the result of the previous save in the
+/// same queue, so a caller editing a brand new entry can pick up its id.
+typedef EntryDraftBuilder = EntryDraft Function(Entry? saved);
+
+typedef _TagWrite = ({List<EntryTag> tags, bool changed});
+
+typedef _ImageWrite = ({
+  List<EntryImage> images,
+  List<String> removedFiles,
+  bool changed
+});
 
 class EntryStore with ChangeNotifier {
   static final EntryStore instance = EntryStore._init();
@@ -15,9 +47,46 @@ class EntryStore with ChangeNotifier {
 
   Map<DateTime, List<Entry>> _entriesByDay = {};
 
+  bool _saving = false;
+  EntryDraftBuilder? _queuedBuilder;
+  Completer<Entry>? _queuedWaiter;
+
   Future<void> load() async {
     entries = await EntryDao.getAll();
     _indexEntriesByDay();
+    notifyListeners();
+  }
+
+  /// Writes an entry with its tags and images. A save requested while another
+  /// is in flight runs as soon as that one finishes instead of being dropped.
+  Future<Entry> save(EntryDraftBuilder buildDraft) {
+    _queuedBuilder = buildDraft;
+    final waiter = _queuedWaiter ??= Completer<Entry>();
+    if (!_saving) {
+      _saving = true;
+      unawaited(_drainQueuedSaves());
+    }
+    return waiter.future;
+  }
+
+  Future<void> delete(Entry entry) async {
+    final images = EntryImagesProvider.instance.getForEntry(entry);
+
+    await AppDatabase.instance.database!.transaction((transaction) async {
+      for (final image in images) {
+        await EntryImageDao.remove(image, executor: transaction);
+      }
+      await EntryTagDao.removeAllForEntry(entry.id!, executor: transaction);
+      await EntryDao.remove(entry.id!, executor: transaction);
+    });
+
+    await _deleteImageFiles(images.map((image) => image.imgPath));
+
+    entries.removeWhere((existing) => existing.id == entry.id);
+    _indexEntriesByDay();
+    TagsProvider.instance.applyEntryTags(entry.id!, const []);
+    EntryImagesProvider.instance.applyForEntry(entry.id!, const []);
+    await AppDatabase.instance.updateExternalDatabase();
     notifyListeners();
   }
 
@@ -34,40 +103,15 @@ class EntryStore with ChangeNotifier {
     return entryWithId;
   }
 
-  Future<void> update(Entry entry) async {
-    await EntryDao.update(entry);
-    final index = getIndexOfEntry(entry.id!);
-    entries[index] = entry;
-    _sortEntries();
-    await AppDatabase.instance.updateExternalDatabase();
-
-    _indexEntriesByDay();
-    notifyListeners();
-  }
-
-  Future<void> remove(Entry entry) async {
-    await EntryDao.remove(entry.id!);
-    entries.removeWhere((existing) => existing.id == entry.id);
-    await AppDatabase.instance.updateExternalDatabase();
-
-    _indexEntriesByDay();
-    notifyListeners();
-  }
-
   Future<void> deleteAll(Function(String) updateStatus) async {
     updateStatus("0%");
+    final allEntries = entries.toList();
     var processedEntries = 0;
-    for (Entry entry in entries) {
-      var images = EntryImagesProvider.instance.getForEntry(entry);
-      for (final image in images) {
-        await EntryImagesProvider.instance.remove(image);
-      }
-      await TagsProvider.instance.removeAllEntryTagsForEntry(entry.id!);
+    for (final entry in allEntries) {
+      await delete(entry);
       processedEntries += 1;
-      // The store's remove function is not used to avoid editing the entries
-      // list while iterating over it.
-      await EntryDao.remove(entry.id!);
-      updateStatus("${((processedEntries / entries.length) * 100).round()}%");
+      updateStatus(
+          "${((processedEntries / allEntries.length) * 100).round()}%");
     }
 
     await load();
@@ -97,6 +141,161 @@ class EntryStore with ChangeNotifier {
 
   bool hasEntryAtTimestamp(DateTime timestamp) {
     return entries.any((entry) => entry.timeCreate == timestamp);
+  }
+
+  Future<void> _drainQueuedSaves() async {
+    Entry? saved;
+    while (_queuedBuilder != null) {
+      final buildDraft = _queuedBuilder!;
+      final waiter = _queuedWaiter!;
+      _queuedBuilder = null;
+      _queuedWaiter = null;
+      try {
+        saved = await _writeDraft(buildDraft(saved));
+        waiter.complete(saved);
+      } catch (error, stackTrace) {
+        waiter.completeError(error, stackTrace);
+      }
+    }
+    _saving = false;
+  }
+
+  Future<Entry> _writeDraft(EntryDraft draft) async {
+    late Entry saved;
+    late _TagWrite tagWrite;
+    late _ImageWrite imageWrite;
+    final entryChanged = _entryNeedsWrite(draft.entry);
+
+    await AppDatabase.instance.database!.transaction((transaction) async {
+      if (draft.entry.id == null) {
+        saved = await EntryDao.add(draft.entry, executor: transaction);
+      } else {
+        if (entryChanged) {
+          await EntryDao.update(draft.entry, executor: transaction);
+        }
+        saved = draft.entry;
+      }
+      tagWrite = await _writeEntryTags(transaction, saved.id!, draft.tags);
+      imageWrite = await _writeEntryImages(transaction, saved, draft.images);
+    });
+
+    if (!entryChanged && !tagWrite.changed && !imageWrite.changed) return saved;
+
+    await _deleteImageFiles(imageWrite.removedFiles);
+
+    final index = getIndexOfEntry(saved.id!);
+    if (index == -1) {
+      entries.add(saved);
+    } else {
+      entries[index] = saved;
+    }
+    _sortEntries();
+    _indexEntriesByDay();
+
+    TagsProvider.instance.applyEntryTags(saved.id!, tagWrite.tags);
+    EntryImagesProvider.instance.applyForEntry(saved.id!, imageWrite.images);
+
+    await AppDatabase.instance.updateExternalDatabase();
+    notifyListeners();
+    return saved;
+  }
+
+  bool _entryNeedsWrite(Entry entry) {
+    if (entry.id == null) return true;
+    final index = getIndexOfEntry(entry.id!);
+    if (index == -1) return true;
+    final stored = entries[index];
+    return stored.text != entry.text ||
+        stored.mood != entry.mood ||
+        stored.timeCreate != entry.timeCreate ||
+        stored.timeModified != entry.timeModified;
+  }
+
+  Future<_TagWrite> _writeEntryTags(
+      DatabaseExecutor executor, int entryId, List<EntryTag> desired) async {
+    final current = TagsProvider.instance.getEntryTagsForEntry(entryId);
+    final currentByTag = {
+      for (final entryTag in current) entryTag.tagId: entryTag
+    };
+    final desiredTagIds = desired.map((entryTag) => entryTag.tagId).toSet();
+    var changed = false;
+
+    for (final entryTag in current) {
+      if (desiredTagIds.contains(entryTag.tagId)) continue;
+      await EntryTagDao.remove(entryTag.id!, executor: executor);
+      changed = true;
+    }
+
+    final written = <EntryTag>[];
+    for (final wanted in desired) {
+      final existing = currentByTag[wanted.tagId];
+      if (existing == null) {
+        written.add(await EntryTagDao.add(
+          EntryTag(
+            entryId: entryId,
+            tagId: wanted.tagId,
+            value: wanted.value,
+            timeCreate: wanted.timeCreate,
+          ),
+          executor: executor,
+        ));
+        changed = true;
+      } else if (existing.value != wanted.value) {
+        final updated = EntryTag(
+          id: existing.id,
+          entryId: entryId,
+          tagId: wanted.tagId,
+          value: wanted.value,
+          timeCreate: existing.timeCreate,
+        );
+        await EntryTagDao.update(updated, executor: executor);
+        written.add(updated);
+        changed = true;
+      } else {
+        written.add(existing);
+      }
+    }
+    return (tags: written, changed: changed);
+  }
+
+  Future<_ImageWrite> _writeEntryImages(
+      DatabaseExecutor executor, Entry entry, List<EntryImage> desired) async {
+    final current = EntryImagesProvider.instance.getForEntry(entry);
+    final written = <EntryImage>[];
+    var changed = false;
+
+    for (final image in desired) {
+      final wanted = image.copy(entryId: entry.id);
+      final existing =
+          current.where((saved) => saved.id == wanted.id).firstOrNull;
+      if (existing == null) {
+        written.add(await EntryImageDao.add(wanted, executor: executor));
+        changed = true;
+      } else if (existing.imgRank != wanted.imgRank) {
+        await EntryImageDao.update(wanted, executor: executor);
+        written.add(wanted);
+        changed = true;
+      } else {
+        written.add(existing);
+      }
+    }
+
+    final desiredIds = desired.map((image) => image.id).nonNulls.toSet();
+    final removedFiles = <String>[];
+    for (final existing in current) {
+      if (desiredIds.contains(existing.id)) continue;
+      await EntryImageDao.remove(existing, executor: executor);
+      removedFiles.add(existing.imgPath);
+      changed = true;
+    }
+
+    return (images: written, removedFiles: removedFiles, changed: changed);
+  }
+
+  Future<void> _deleteImageFiles(Iterable<String> names) async {
+    for (final name in names) {
+      await ImageStorage.instance.delete(name);
+    }
   }
 
   void _sortEntries() {

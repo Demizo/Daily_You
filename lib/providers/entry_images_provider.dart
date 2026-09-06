@@ -70,6 +70,17 @@ class EntryImagesProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  /// Replaces the cached images for [entryId] with rows already written
+  /// elsewhere.
+  void applyForEntry(int entryId, List<EntryImage> written) {
+    images = [
+      ...images.where((image) => image.entryId != entryId),
+      ...written,
+    ];
+    _rebuildCache();
+    notifyListeners();
+  }
+
   EntryImage? getFirstImageForEntry(int entryId) =>
       _firstImageByEntryId[entryId];
 

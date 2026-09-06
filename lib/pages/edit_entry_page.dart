@@ -1,11 +1,10 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:daily_you/database/image_storage.dart';
+import 'package:daily_you/database/entry_store.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/models/tag.dart';
-import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:daily_you/providers/tags_provider.dart';
@@ -67,7 +66,6 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
       MarkdownPreviewController();
   final UndoHistoryController _undoController = UndoHistoryController();
   bool _deletingEntry = false;
-  bool _savingEntry = false;
   bool _newEntry = false;
   bool _creatingNewEntry = false;
   Timer? _debounceTimer;
@@ -209,7 +207,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                   // Pop view page
                   navigator.pop();
                 }
-                await _deleteEntry(entryToDelete);
+                await EntryStore.instance.delete(entryToDelete);
               },
             ),
             TextButton(
@@ -525,100 +523,55 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   }
 
   Future<void> _saveEntry() async {
-    // Saving is guarded since quickly entering and exiting the app could trigger
-    // multiple async saves.
-    if (_savingEntry == false) {
-      _savingEntry = true;
+    if (_newEntry && !_hasNewEntryChanges()) return;
 
-      final updatedEntry = _entry.copy(
-        text: text,
-        mood: mood,
-        timeCreate: entryDate,
-        timeModified: DateTime.now(),
-      );
+    if ((_newEntry || _hasEntryFieldChanges()) &&
+        Platform.isAndroid &&
+        TimeManager.isSameDay(DateTime.now(), entryDate!)) {
+      await NotificationManager.instance.dismissReminderNotification();
+    }
 
-      final hasTextChange = updatedEntry.text != _lastText;
-      final hasMoodChange = updatedEntry.mood != _lastMood;
-      final hasDateChange = updatedEntry.timeCreate != _lastEntryDate;
-
-      if (_newEntry) {
-        if (_hasNewEntryChanges()) {
-          if (Platform.isAndroid &&
-              TimeManager.isSameDay(DateTime.now(), updatedEntry.timeCreate)) {
-            await NotificationManager.instance.dismissReminderNotification();
-          }
-          _entry = await EntriesProvider.instance.add(updatedEntry);
-          id = _entry.id!;
-          _newEntry = false;
-          _lastText = _entry.text;
-          _lastMood = _entry.mood;
-          _lastEntryDate = _entry.timeCreate;
-          await TagsProvider.instance
-              .setEntryTags(id, _tagSource.toEntryTags(id));
-        }
-      } else {
-        if (hasTextChange || hasMoodChange || hasDateChange) {
-          if (Platform.isAndroid &&
-              TimeManager.isSameDay(DateTime.now(), updatedEntry.timeCreate)) {
-            await NotificationManager.instance.dismissReminderNotification();
-          }
-          _lastText = updatedEntry.text;
-          _lastMood = updatedEntry.mood;
-          _lastEntryDate = updatedEntry.timeCreate;
-          await EntriesProvider.instance.update(updatedEntry);
-        }
-        await TagsProvider.instance
-            .setEntryTags(id, _tagSource.toEntryTags(id));
-      }
-      // Images will update if they changed
-      await _saveOrUpdateImage(id);
-      _savingEntry = false;
-    }
-  }
-
-  Future _deleteEntry(Entry entry) async {
-    var entryImages = EntryImagesProvider.instance.getForEntry(entry);
-    for (EntryImage image in entryImages) {
-      await ImageStorage.instance.delete(image.imgPath);
-      await EntryImagesProvider.instance.remove(image);
-    }
-    await TagsProvider.instance.removeAllEntryTagsForEntry(entry.id!);
-    await EntriesProvider.instance.remove(entry);
-  }
-
-  Future _saveOrUpdateImage(int entryId) async {
-    if (entryId == -1 || _entry.id == null) return;
-    final savedImages = EntryImagesProvider.instance.getForEntry(_entry);
-    // Add images
-    for (EntryImage currentImage in _currentImages) {
-      currentImage.entryId = entryId;
-      if (currentImage.id == null ||
-          savedImages.where((image) => image.id == currentImage.id!).isEmpty) {
-        await EntryImagesProvider.instance.add(currentImage);
-      }
-    }
-    // Update images
-    for (EntryImage existingImage in savedImages) {
-      EntryImage? matchingImage = _currentImages
-          .where((image) => image.id == existingImage.id!)
-          .firstOrNull;
-      if (matchingImage == null) {
-        // Delete image
-        await ImageStorage.instance.delete(existingImage.imgPath);
-        await EntryImagesProvider.instance.remove(existingImage);
-      } else if (matchingImage.imgRank != existingImage.imgRank) {
-        await EntryImagesProvider.instance.update(matchingImage);
-      }
-    }
-    // Set current images to match saved state. Note: the entry images
-    // are copied to avoid editing the originals in the provider.
-    _currentImages.clear();
-    for (var image in EntryImagesProvider.instance.getForEntry(_entry)) {
-      _currentImages.add(image.copy());
-    }
+    _adoptSavedEntry(await EntryStore.instance.save(_buildDraft));
     if (mounted) {
       setState(() {});
     }
+  }
+
+  EntryDraft _buildDraft(Entry? saved) {
+    if (saved != null) _adoptSavedEntry(saved);
+    final entry = _hasEntryFieldChanges()
+        ? _entry.copy(
+            text: text,
+            mood: mood,
+            timeCreate: entryDate,
+            timeModified: DateTime.now(),
+          )
+        : _entry;
+    return EntryDraft(
+      entry: entry,
+      tags: _tagSource.toEntryTags(id),
+      images: _currentImages,
+    );
+  }
+
+  // Copied so the editor never mutates the provider's own image records.
+  void _adoptSavedEntry(Entry saved) {
+    _entry = saved;
+    id = saved.id!;
+    _newEntry = false;
+    _lastText = saved.text;
+    _lastMood = saved.mood;
+    _lastEntryDate = saved.timeCreate;
+    _currentImages = [
+      for (final image in EntryImagesProvider.instance.getForEntry(saved))
+        image.copy()
+    ];
+  }
+
+  bool _hasEntryFieldChanges() {
+    return text != _lastText ||
+        mood != _lastMood ||
+        entryDate != _lastEntryDate;
   }
 
   void _onTagsChanged() {
@@ -628,9 +581,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
 
   // Whether a not-yet-persisted entry has diverged from its default state
   bool _hasNewEntryChanges() {
-    return text != _lastText ||
-        mood != _lastMood ||
-        entryDate != _lastEntryDate ||
+    return _hasEntryFieldChanges() ||
         _tagsExceedSeed() ||
         _currentImages.isNotEmpty;
   }
