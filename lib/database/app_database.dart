@@ -228,19 +228,21 @@ class AppDatabase {
       final exportName =
           "$databaseFileName.export_${DateTime.now().millisecondsSinceEpoch}";
       final exportPath = join(dirname(_internalPath!), exportName);
-      try {
-        await database!.execute("VACUUM INTO '$exportPath'");
 
-        if (!await _validateSqliteDatabase(exportPath)) return;
+      await externalSyncHealth.record("external database write", () async {
+        try {
+          await database!.execute("VACUUM INTO '$exportPath'");
 
-        final bytes = await internalStore.read(exportName);
-        if (bytes == null) return;
+          if (!await _validateSqliteDatabase(exportPath)) return false;
 
-        await externalSyncHealth.record("external database write",
-            () => externalLocation.write(databaseFileName, bytes));
-      } finally {
-        await internalStore.delete(exportName);
-      }
+          final bytes = await internalStore.read(exportName);
+          if (bytes == null) return false;
+
+          return await externalLocation.write(databaseFileName, bytes);
+        } finally {
+          await internalStore.delete(exportName);
+        }
+      });
     });
   }
 
