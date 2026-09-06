@@ -2,7 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:daily_you/database/image_storage.dart';
-import 'package:daily_you/utils/file_layer.dart';
+import 'package:daily_you/storage/local_file_store.dart';
+import 'package:daily_you/storage/storage_picker.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/providers/entries_provider.dart';
@@ -28,9 +29,9 @@ class ExportUtils {
     final locale = TimeManager.currentLocale(context);
     updateStatus("(1/2) 0%");
 
-    String? exportFolder;
+    PickedDirectory? exportFolder;
     try {
-      exportFolder = await FileLayer.pickDirectory();
+      exportFolder = await StoragePicker.pickDirectory();
     } catch (e) {
       updateStatus("$e");
       await Future.delayed(Duration(seconds: 5));
@@ -48,6 +49,9 @@ class ExportUtils {
     await tempExportImageFolder.create(recursive: true);
     final exportedZipName =
         "daily_you_markdown_export_${DateTime.now().toIso8601String().replaceAll(':', '-')}.zip";
+
+    final exportStore = LocalFileStore(tempExportFolder.path);
+    final exportImageStore = LocalFileStore(tempExportImageFolder.path);
 
     try {
       final entries = EntriesProvider.instance.entries;
@@ -71,9 +75,7 @@ class ExportUtils {
           if (bytes != null) {
             noteBody.writeln('![](Images/$prettyName)');
 
-            await FileLayer.createFile(
-                tempExportImageFolder.path, prettyName, bytes,
-                useExternalPath: false);
+            await exportImageStore.write(prettyName, bytes);
           }
         }
 
@@ -84,9 +86,8 @@ class ExportUtils {
         noteBody.writeln(
             "$moodText${DateFormat.yMMMEd(locale).format(entry.timeCreate)}\n${entry.text}");
 
-        await FileLayer.createFile(tempExportFolder.path,
-            "log_$timestamp$indexSuffix.md", utf8.encode(noteBody.toString()),
-            useExternalPath: false);
+        await exportStore.write(
+            "log_$timestamp$indexSuffix.md", utf8.encode(noteBody.toString()));
 
         processedLogs++;
         updateStatus("(1/2) ${((processedLogs / totalLogs) * 100).round()}%");
@@ -101,9 +102,9 @@ class ExportUtils {
 
       // Save archive
       updateStatus(localizations.tranferStatus("0"));
-      await FileLayer.copyToExternalLocation(
-          join(tempDir.path, exportedZipName), exportFolder, exportedZipName,
-          onProgress: (percent) {
+      await exportFolder.copyFileInto(
+          join(tempDir.path, exportedZipName), exportedZipName,
+          mimeType: "application/zip", onProgress: (percent) {
         updateStatus(localizations.tranferStatus("${percent.round()}"));
       });
     } catch (e) {

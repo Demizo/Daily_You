@@ -7,7 +7,7 @@ import 'package:daily_you/models/tag_icon_type.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/providers/templates_provider.dart';
-import 'package:daily_you/utils/file_layer.dart';
+import 'package:daily_you/storage/storage_picker.dart';
 import 'package:share_plus/share_plus.dart';
 
 const String _tagsFileType = "daily_you_tags";
@@ -145,16 +145,15 @@ class TemplatesTagsTransfer {
     updateStatus("0%");
 
     try {
-      final saveDirectory = await FileLayer.pickDirectory();
+      final saveDirectory = await StoragePicker.pickDirectory();
       if (saveDirectory == null) return false;
 
       updateStatus("50%");
 
-      final createdFile =
-          await FileLayer.createFile(saveDirectory, fileName, bytes);
+      final saved = await saveDirectory.store.write(fileName, bytes);
 
       updateStatus("100%");
-      return createdFile != null;
+      return saved;
     } catch (e) {
       updateStatus("$e");
       await Future.delayed(Duration(seconds: 5));
@@ -173,11 +172,11 @@ class TemplatesTagsTransfer {
     updateStatus("0%");
 
     try {
-      final selectedFile = await FileLayer.pickFile(
+      final selectedFile = await StoragePicker.pickFile(
           allowedExtensions: ['json'], mimeTypes: ['application/json']);
       if (selectedFile == null) return false;
 
-      final bytes = await FileLayer.getFileBytes(selectedFile);
+      final bytes = await selectedFile.readBytes();
       if (bytes == null) return false;
 
       final jsonData = json.decode(utf8.decode(bytes)) as Map<String, dynamic>;

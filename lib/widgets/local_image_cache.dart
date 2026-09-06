@@ -3,7 +3,8 @@ import 'dart:isolate';
 
 import 'package:daily_you/database/image_storage.dart';
 import 'package:daily_you/file_bytes_cache.dart';
-import 'package:daily_you/utils/file_layer.dart';
+import 'package:daily_you/storage/file_store.dart';
+import 'package:daily_you/storage/local_file_store.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
@@ -31,6 +32,7 @@ class LocalImageCache {
 
   final CacheManager _diskCache;
   String? tempImgFolderPath;
+  FileStore? _temporaryImageStore;
   final _pending = <String>{};
   final FileBytesCache imageCache =
       FileBytesCache(maxCacheSize: 10 * 1024 * 1024);
@@ -52,6 +54,7 @@ class LocalImageCache {
   Future<void> _initResizeIsolate() async {
     final imgFolderPath = await ImageStorage.instance.getInternalFolder();
     tempImgFolderPath = (await getTemporaryDirectory()).path;
+    _temporaryImageStore = LocalFileStore(tempImgFolderPath!);
 
     final responsePort = ReceivePort();
     responsePort.listen(_listenForResults);
@@ -69,14 +72,13 @@ class LocalImageCache {
       _resizeSendPort = message;
     } else if (message is ResizeResponse) {
       final key = message.key;
-      final bytes = await FileLayer.getFileBytes(tempImgFolderPath!,
-          name: "$key.jpg", useExternalPath: false);
+      final resizedName = "$key.jpg";
+      final bytes = await _temporaryImageStore?.read(resizedName);
 
       if (bytes != null) {
         imageCache.put(key, bytes);
         await _diskCache.putFile(key, bytes, fileExtension: 'jpg');
-        await FileLayer.deleteFile(tempImgFolderPath!,
-            name: "$key.jpg", useExternalPath: false);
+        await _temporaryImageStore?.delete(resizedName);
       }
 
       _pending.remove(key);

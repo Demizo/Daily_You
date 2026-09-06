@@ -2,7 +2,8 @@ import 'dart:io';
 
 import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/database/image_storage.dart';
-import 'package:daily_you/utils/file_layer.dart';
+import 'package:daily_you/storage/local_file_store.dart';
+import 'package:daily_you/storage/storage_picker.dart';
 import 'package:daily_you/utils/zip_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
@@ -20,8 +21,8 @@ class BackupRestoreUtils {
     final tempExportZipFile = File(join(tempDir.path, exportedZipName));
 
     try {
-      final savePath = await FileLayer.pickDirectory();
-      if (savePath == null) return false;
+      final saveDirectory = await StoragePicker.pickDirectory();
+      if (saveDirectory == null) return false;
 
       // Create archive
       updateStatus(localizations.creatingBackupStatus("0"));
@@ -35,9 +36,8 @@ class BackupRestoreUtils {
 
       // Save archive
       updateStatus(localizations.tranferStatus("0"));
-      await FileLayer.copyToExternalLocation(
-          tempExportZipFile.path, savePath, exportedZipName,
-          onProgress: (percent) {
+      await saveDirectory.copyFileInto(tempExportZipFile.path, exportedZipName,
+          mimeType: "application/zip", onProgress: (percent) {
         updateStatus(localizations.tranferStatus("${percent.round()}"));
       });
     } catch (e) {
@@ -65,15 +65,14 @@ class BackupRestoreUtils {
     final restoreFolder = Directory(join(tempDir.path, "Restore"));
 
     try {
-      String? archive = await FileLayer.pickFile(
+      final archive = await StoragePicker.pickFile(
           allowedExtensions: ['zip'], mimeTypes: ['application/zip']);
 
       if (archive == null) return false;
 
       // Import archive
       updateStatus(localizations.tranferStatus("0"));
-      await FileLayer.copyFromExternalLocation(
-          archive, tempDir.path, tempZipName, onProgress: (percent) {
+      await archive.copyInto(tempDir.path, tempZipName, onProgress: (percent) {
         updateStatus(localizations.tranferStatus("${percent.round()}"));
       });
 
@@ -86,26 +85,28 @@ class BackupRestoreUtils {
         updateStatus(localizations.restoringBackupStatus("${percent.round()}"));
       });
 
-      final tempDb = File(join(restoreFolder.path, 'daily_you.db'));
-      if (await tempDb.exists()) {
+      final restoreStore = LocalFileStore(restoreFolder.path);
+      final databaseBytes =
+          await restoreStore.read(AppDatabase.databaseFileName);
+      if (databaseBytes != null) {
         // Import database
         await AppDatabase.instance.close();
-        await File(await AppDatabase.instance.getInternalPath())
-            .writeAsBytes(await tempDb.readAsBytes());
+        await AppDatabase.instance.internalStore
+            .write(AppDatabase.databaseFileName, databaseBytes);
         await AppDatabase.instance.open();
         await AppDatabase.instance.updateExternalDatabase();
 
         // Import images. These will be garbage collected after import
-        if (await Directory(join(restoreFolder.path, "Images")).exists()) {
+        final restoredImages =
+            LocalFileStore(join(restoreFolder.path, "Images"));
+        if (await restoredImages.isAvailable()) {
           // Also show cleanup status here since images may take awhile
           updateStatus(localizations.cleanUpStatus);
-          var files = Directory(join(restoreFolder.path, "Images")).list();
-          final internalImagePath =
-              await ImageStorage.instance.getInternalFolder();
-          await for (FileSystemEntity fileEntity in files) {
-            if (fileEntity is File) {
-              await File(join(internalImagePath, basename(fileEntity.path)))
-                  .writeAsBytes(await fileEntity.readAsBytes());
+          final imageStore = await ImageStorage.instance.internalStore();
+          for (final imageName in await restoredImages.list()) {
+            final imageBytes = await restoredImages.read(imageName);
+            if (imageBytes != null) {
+              await imageStore.write(imageName, imageBytes);
             }
           }
           if (ImageStorage.instance.usingExternalLocation()) {

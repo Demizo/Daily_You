@@ -2,12 +2,11 @@ import 'dart:io';
 
 import 'package:daily_you/database/image_storage.dart';
 import 'package:daily_you/time_manager.dart';
-import 'package:daily_you/utils/file_layer.dart';
+import 'package:daily_you/storage/storage_picker.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/widgets/zoomable_image_page_view.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:media_scanner/media_scanner.dart';
 import 'package:share_plus/share_plus.dart';
 
 class ImageViewPage extends StatefulWidget {
@@ -165,23 +164,17 @@ class _ImageViewPageState extends State<ImageViewPage> {
                   final currentImage = widget.images[currentIndex].imgPath;
                   var bytes =
                       await ImageStorage.instance.getBytes(currentImage);
-                  if (bytes != null) {
-                    String? saveDir;
-                    try {
-                      saveDir = await FileLayer.pickDirectory();
-                    } catch (_) {
-                      return;
-                    }
-                    if (saveDir == null) return;
-                    var newImageName = await FileLayer.createFile(
-                        saveDir, currentImage, bytes);
-                    if (newImageName != null) {
-                      if (Platform.isAndroid) {
-                        // Add image to media store
-                        MediaScanner.loadMedia(path: newImageName);
-                      }
-                    }
+                  if (bytes == null) return;
+
+                  PickedDirectory? saveDirectory;
+                  try {
+                    saveDirectory = await StoragePicker.pickDirectory();
+                  } catch (_) {
+                    return;
                   }
+                  if (saveDirectory == null) return;
+
+                  await saveDirectory.store.write(currentImage, bytes);
                 });
           });
     }
