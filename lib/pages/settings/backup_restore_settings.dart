@@ -1,6 +1,7 @@
 import 'package:daily_you/utils/backup_restore_utils.dart';
 import 'package:daily_you/utils/imports/import_registry.dart';
 import 'package:daily_you/utils/export_utils.dart';
+import 'package:daily_you/utils/operation_outcome.dart';
 import 'package:daily_you/widgets/failure_dialog.dart';
 import 'package:daily_you/widgets/settings_icon_action.dart';
 import 'package:flutter/material.dart';
@@ -101,9 +102,12 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
 
     BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
 
-    final outcome = await ExportUtils.exportToMarkdown(context, (status) {
-      statusNotifier.value = status;
-    });
+    var outcome = const OperationOutcome.cancelled();
+    if (chosenFormat == ExportFormat.markdown) {
+      outcome = await ExportUtils.exportToMarkdown(context, (status) {
+        statusNotifier.value = status;
+      });
+    }
 
     if (!mounted) return;
     Navigator.of(context).pop();
