@@ -1,6 +1,37 @@
 import 'package:daily_you/database/image_storage.dart';
+import 'package:daily_you/models/entry.dart';
+import 'package:daily_you/models/image.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
+
+/// An entry decoded from an import file, before it reaches the database. Its
+/// images carry no entry id until the entry is added.
+class ImportedEntry {
+  const ImportedEntry(this.entry, {this.images = const []});
+
+  final Entry entry;
+  final List<EntryImage> images;
+}
+
+Future<void> addImportedEntries(
+    List<ImportedEntry> importedEntries, Function(String) updateStatus) async {
+  final totalEntries = importedEntries.length;
+  var processedEntries = 0;
+
+  for (final imported in importedEntries) {
+    if (!EntriesProvider.instance
+        .hasEntryAtTimestamp(imported.entry.timeCreate)) {
+      final addedEntry =
+          await EntriesProvider.instance.add(imported.entry, skipUpdate: true);
+      for (final image in imported.images) {
+        await EntryImagesProvider.instance
+            .add(image.copy(entryId: addedEntry.id), skipUpdate: true);
+      }
+    }
+    processedEntries += 1;
+    updateStatus("${((processedEntries / totalEntries) * 100).round()}%");
+  }
+}
 
 Future<void> finishImport(Function(String) updateStatus,
     {bool syncImages = false}) async {

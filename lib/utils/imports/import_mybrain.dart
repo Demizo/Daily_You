@@ -1,7 +1,7 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:daily_you/models/entry.dart';
-import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/storage/storage_picker.dart';
 import 'package:daily_you/utils/imports/import_helpers.dart';
 
@@ -17,51 +17,8 @@ Future<bool> importFromMyBrain(Function(String) updateStatus) async {
 
     var bytes = await selectedFile.readBytes();
     if (bytes == null) return false;
-    final jsonData = json.decode(utf8.decode(bytes.toList()));
 
-    const moodMap = {
-      'TERRIBLE': -2,
-      'BAD': -1,
-      'OKAY': 0,
-      'GOOD': 1,
-      'AWESOME': 2,
-    };
-
-    final diary = jsonData['diary'] as List<dynamic>;
-    final totalEntries = diary.length;
-    var processedEntries = 0;
-
-    for (var entry in diary) {
-      final created =
-          DateTime.fromMillisecondsSinceEpoch(entry['createdDate'], isUtc: true)
-              .toLocal();
-      final updated =
-          DateTime.fromMillisecondsSinceEpoch(entry['updatedDate'], isUtc: true)
-              .toLocal();
-
-      int? mood;
-      if (entry['mood'] != null) {
-        mood = moodMap[entry['mood']];
-      }
-
-      final parts = <String>[];
-      if (entry['title'] != null) parts.add("# ${entry['title']}");
-      if (entry['content'] != null) parts.add(entry['content']);
-
-      if (!EntriesProvider.instance.hasEntryAtTimestamp(created)) {
-        await EntriesProvider.instance.add(
-            Entry(
-              text: parts.join("\n\n"),
-              mood: mood,
-              timeCreate: created,
-              timeModified: updated,
-            ),
-            skipUpdate: true);
-      }
-
-      processedEntries += 1;
-      updateStatus("${((processedEntries / totalEntries) * 100).round()}%");
-    }
+    await addImportedEntries(decodeMyBrainEntries(bytes), updateStatus);
   } catch (e) {
     updateStatus("$e");
     await Future.delayed(const Duration(seconds: 5));
@@ -70,4 +27,34 @@ Future<bool> importFromMyBrain(Function(String) updateStatus) async {
 
   await finishImport(updateStatus, syncImages: true);
   return success;
+}
+
+List<ImportedEntry> decodeMyBrainEntries(Uint8List bytes) {
+  const moodMap = {
+    'TERRIBLE': -2,
+    'BAD': -1,
+    'OKAY': 0,
+    'GOOD': 1,
+    'AWESOME': 2,
+  };
+
+  final jsonData = json.decode(utf8.decode(bytes.toList()));
+  final diary = jsonData['diary'] as List<dynamic>;
+
+  return [
+    for (var entry in diary)
+      ImportedEntry(Entry(
+        text: [
+          if (entry['title'] != null) "# ${entry['title']}",
+          if (entry['content'] != null) entry['content'] as String,
+        ].join("\n\n"),
+        mood: entry['mood'] != null ? moodMap[entry['mood']] : null,
+        timeCreate: DateTime.fromMillisecondsSinceEpoch(entry['createdDate'],
+                isUtc: true)
+            .toLocal(),
+        timeModified: DateTime.fromMillisecondsSinceEpoch(entry['updatedDate'],
+                isUtc: true)
+            .toLocal(),
+      )),
+  ];
 }
