@@ -44,6 +44,15 @@ class _AboutSettingsState extends State<AboutSettings> {
                     mode: LaunchMode.externalApplication);
               }),
           SettingsIconAction(
+              title: AppLocalizations.of(context)!.errorReport,
+              hint: "github.com/Demizo/Daily_You/issues",
+              icon: Icon(Icons.open_in_new_rounded),
+              onPressed: () async {
+                await launchUrl(
+                    Uri.https("github.com", "/Demizo/Daily_You/issues"),
+                    mode: LaunchMode.externalApplication);
+              }),
+          SettingsIconAction(
             title: AppLocalizations.of(context)!.settingsHelpTranslate,
             hint: "hosted.weblate.org/projects/daily-you",
             icon: Icon(Icons.open_in_new_rounded),
