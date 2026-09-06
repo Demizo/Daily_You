@@ -49,7 +49,11 @@ Future<bool> importFromDiaro(
         (name) => name.endsWith('DiaroBackup.xml'),
         orElse: () => throw Exception('DiaroBackup.xml not found in archive'));
 
-    final xmlString = utf8.decode((await extractedFiles.read(xmlName))!);
+    final xmlBytes = await extractedFiles.read(xmlName);
+    if (xmlBytes == null) {
+      throw Exception('DiaroBackup.xml not found in archive');
+    }
+    final xmlString = utf8.decode(xmlBytes);
     final xmlDoc = XmlDocument.parse(xmlString);
 
     final entriesTable = xmlDoc
