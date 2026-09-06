@@ -316,11 +316,17 @@ class ImageStorage {
   }
 
   Future<bool> garbageCollectImages() async {
-    return deleteUnreferencedImages(EntryImagesProvider.instance.images
-        .map((entryImage) => entryImage.imgPath)
-        .toSet());
+    final imagesProvider = EntryImagesProvider.instance;
+    if (!imagesProvider.isLoaded) {
+      throw StateError(
+          'Refused to garbage collect images before the image list was loaded');
+    }
+
+    return deleteUnreferencedImages(
+        imagesProvider.images.map((entryImage) => entryImage.imgPath).toSet());
   }
 
+  @visibleForTesting
   Future<bool> deleteUnreferencedImages(Set<String> referencedNames) async {
     final internal = await internalStore();
     for (final name in await internal.list()) {

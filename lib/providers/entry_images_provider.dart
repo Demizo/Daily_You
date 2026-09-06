@@ -13,6 +13,10 @@ class EntryImagesProvider with ChangeNotifier {
   List<EntryImage> images = List.empty(growable: true);
   Map<int, EntryImage?> _firstImageByEntryId = {};
 
+  bool _isLoaded = false;
+
+  bool get isLoaded => _isLoaded;
+
   void _rebuildCache() {
     final cache = <int, EntryImage?>{};
     for (final img in images) {
@@ -30,6 +34,7 @@ class EntryImagesProvider with ChangeNotifier {
   Future<void> load() async {
     images = await EntryImageDao.getAll();
     _rebuildCache();
+    _isLoaded = true;
     notifyListeners();
   }
 
