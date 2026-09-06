@@ -26,8 +26,8 @@ class EntryDraft {
   });
 }
 
-/// Builds the draft to write. [saved] is the result of the previous save in the
-/// same queue, so a caller editing a brand new entry can pick up its id.
+/// [saved] is this builder's own previous result, so a caller editing a brand
+/// new entry picks up the id it was just given.
 typedef EntryDraftBuilder = EntryDraft Function(Entry? saved);
 
 typedef _TagWrite = ({List<EntryTag> tags, bool changed});
@@ -48,8 +48,7 @@ class EntryStore with ChangeNotifier {
   Map<DateTime, List<Entry>> _entriesByDay = {};
 
   bool _saving = false;
-  EntryDraftBuilder? _queuedBuilder;
-  Completer<Entry>? _queuedWaiter;
+  final Map<EntryDraftBuilder, Completer<Entry>> _queued = {};
 
   Future<void> load() async {
     entries = await EntryDao.getAll();
@@ -57,11 +56,8 @@ class EntryStore with ChangeNotifier {
     notifyListeners();
   }
 
-  /// Writes an entry with its tags and images. A save requested while another
-  /// is in flight runs as soon as that one finishes instead of being dropped.
   Future<Entry> save(EntryDraftBuilder buildDraft) {
-    _queuedBuilder = buildDraft;
-    final waiter = _queuedWaiter ??= Completer<Entry>();
+    final waiter = _queued.putIfAbsent(buildDraft, Completer<Entry>.new);
     if (!_saving) {
       _saving = true;
       unawaited(_drainQueuedSaves());
@@ -144,14 +140,13 @@ class EntryStore with ChangeNotifier {
   }
 
   Future<void> _drainQueuedSaves() async {
-    Entry? saved;
-    while (_queuedBuilder != null) {
-      final buildDraft = _queuedBuilder!;
-      final waiter = _queuedWaiter!;
-      _queuedBuilder = null;
-      _queuedWaiter = null;
+    final savedByBuilder = <EntryDraftBuilder, Entry>{};
+    while (_queued.isNotEmpty) {
+      final buildDraft = _queued.keys.first;
+      final waiter = _queued.remove(buildDraft)!;
       try {
-        saved = await _writeDraft(buildDraft(saved));
+        final saved = await _writeDraft(buildDraft(savedByBuilder[buildDraft]));
+        savedByBuilder[buildDraft] = saved;
         waiter.complete(saved);
       } catch (error, stackTrace) {
         waiter.completeError(error, stackTrace);
