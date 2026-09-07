@@ -136,7 +136,7 @@ class _EditorActionBarState extends State<EditorActionBar> {
       width: metrics.buttonSize,
       build: (context, dismissOverflow) => ToolbarIconButton(
         size: metrics.buttonSize,
-        icon: Icons.note_add_rounded,
+        icon: const Icon(Icons.note_add_rounded),
         onPressed: () {
           dismissOverflow?.call();
           // Capture before the popup or focus restorer can shift focus away
@@ -156,7 +156,7 @@ class _EditorActionBarState extends State<EditorActionBar> {
 
   ToolbarEntry _iconEntry(
     DockMetrics metrics,
-    IconData icon,
+    Widget icon,
     FutureOr<void> Function() action, {
     bool claimsFocus = true,
     bool reconnectsKeyboard = false,
@@ -188,7 +188,7 @@ class _EditorActionBarState extends State<EditorActionBar> {
           final enabled = isUndo ? value.canUndo : value.canRedo;
           return ToolbarIconButton(
             size: metrics.buttonSize,
-            icon: isUndo ? Icons.undo_rounded : Icons.redo_rounded,
+            icon: Icon(isUndo ? Icons.undo_rounded : Icons.redo_rounded),
             onPressed: enabled
                 ? () {
                     dismissOverflow?.call();

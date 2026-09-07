@@ -118,15 +118,15 @@ class _EditTemplateState extends State<EditTemplate> {
   List<ToolbarAction> _buildMainActions() {
     return [
       ToolbarAction(
-        icon: Icons.today_rounded,
+        icon: const Icon(Icons.today_rounded),
         onPressed: () => insertAtCursor(_textEditingController, '{{date}}'),
       ),
       ToolbarAction(
-        icon: Icons.access_time_rounded,
+        icon: const Icon(Icons.access_time_rounded),
         onPressed: () => insertAtCursor(_textEditingController, '{{time}}'),
       ),
       ToolbarAction(
-        icon: Icons.local_offer_rounded,
+        icon: const Icon(Icons.local_offer_rounded),
         onPressed: _openTagPicker,
       ),
     ];

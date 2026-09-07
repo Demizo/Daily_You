@@ -429,7 +429,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   List<ToolbarAction> _buildMainActions(BuildContext context) {
     return [
       ToolbarAction(
-        icon: Icons.local_offer_rounded,
+        icon: const Icon(Icons.local_offer_rounded),
         onPressed: () => showDialog(
           context: context,
           builder: (_) =>
@@ -437,13 +437,13 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
         ),
       ),
       ToolbarAction(
-        icon: Icons.photo,
+        icon: const Icon(Icons.photo),
         mayLeaveApp: true,
         onPressed: () => EntryImageActions.pickFromGallery(_addImage),
       ),
       if (Platform.isAndroid)
         ToolbarAction(
-          icon: Icons.photo_camera_rounded,
+          icon: const Icon(Icons.photo_camera_rounded),
           mayLeaveApp: true,
           onPressed: () => EntryImageActions.takePhoto(_addImage),
         ),

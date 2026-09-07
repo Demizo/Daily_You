@@ -65,6 +65,7 @@ dependencies:
   shamsi_date:
   persian_datetime_picker: ^3.2.0
   markdown: ^7.3.1
+  flutter_svg: ^2.3.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -77,6 +78,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/daily_you_First_Steps.webp
+    - assets/icons/
 
 icons_launcher:
   image_path: "assets/logo.png"
