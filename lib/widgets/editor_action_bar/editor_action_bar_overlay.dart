@@ -35,24 +35,19 @@ class _EditorActionBarOverlayState extends State<EditorActionBarOverlay>
 
   late bool _docked;
 
-  late double _lastInset;
-
   @override
   void initState() {
     super.initState();
     _docked = widget.keyboardInset > 0;
-    _lastInset = widget.keyboardInset;
     _dockController =
         AnimationController(vsync: this, value: _docked ? 1.0 : 0.0);
     _session = EditorKeyboardSession(
         focusNode: widget.actionBar.focusNode,
         initialInset: widget.keyboardInset);
-    widget.actionBar.focusNode.addListener(_handleFocusChange);
+    _session.addListener(_syncDocked);
   }
 
-  void _handleFocusChange() {
-    if (!widget.actionBar.focusNode.hasFocus && _docked) _setDocked(false);
-  }
+  void _syncDocked() => _setDocked(_session.isUp);
 
   void _setDocked(bool docked) {
     if (docked == _docked) return;
@@ -66,29 +61,20 @@ class _EditorActionBarOverlayState extends State<EditorActionBarOverlay>
   void didUpdateWidget(covariant EditorActionBarOverlay oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.actionBar.focusNode != widget.actionBar.focusNode) {
-      oldWidget.actionBar.focusNode.removeListener(_handleFocusChange);
-      widget.actionBar.focusNode.addListener(_handleFocusChange);
+      _session.removeListener(_syncDocked);
       _session.dispose();
       _session = EditorKeyboardSession(
           focusNode: widget.actionBar.focusNode,
           initialInset: widget.keyboardInset);
+      _session.addListener(_syncDocked);
     }
-    // EditorKeyboardSession decides what's a real dismissal
-    // This only morphs the bar's shape based on direction
-    final inset = widget.keyboardInset;
-    _session.noteKeyboardInset(inset);
-    if (inset > _lastInset) {
-      _setDocked(true);
-    } else if (inset < _lastInset &&
-        _dockController.status != AnimationStatus.forward) {
-      _setDocked(false);
-    }
-    _lastInset = inset;
+    _session.noteKeyboardInset(widget.keyboardInset);
+    _syncDocked();
   }
 
   @override
   void dispose() {
-    widget.actionBar.focusNode.removeListener(_handleFocusChange);
+    _session.removeListener(_syncDocked);
     _session.dispose();
     _dockController.dispose();
     super.dispose();

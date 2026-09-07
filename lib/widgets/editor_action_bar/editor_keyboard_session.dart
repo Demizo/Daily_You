@@ -44,6 +44,9 @@ class EditorKeyboardSession extends ChangeNotifier {
   bool get isEditing =>
       state == EditorFocusState.docked || state == EditorFocusState.floating;
 
+  /// Debounced up signal
+  bool get isUp => _isUp;
+
   /// React to a new inset
   void noteKeyboardInset(double inset) {
     if (inset == _lastInset) return;
@@ -60,7 +63,7 @@ class EditorKeyboardSession extends ChangeNotifier {
       if (!alreadyDocked) notifyListeners();
       return;
     }
-    if (!_isUp || !focusNode.hasFocus) return;
+    if (!_isUp) return;
     _dismissDebounce ??= Timer(dismissDebounceDuration, () {
       _dismissDebounce = null;
       _isUp = false;
