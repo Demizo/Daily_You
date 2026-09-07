@@ -23,6 +23,10 @@ List<ToolbarAction> markdownActions(
     BuildContext context, TextEditingController controller) {
   return [
     ToolbarAction(
+      icon: const Icon(Icons.format_list_bulleted_rounded),
+      onPressed: () => insertLinePrefix(controller, '-'),
+    ),
+    ToolbarAction(
       icon: const Icon(Icons.text_fields_rounded),
       onPressed: () => _insertHeader(context, controller),
     ),
@@ -35,8 +39,12 @@ List<ToolbarAction> markdownActions(
       onPressed: () => wrapSelection(controller, '_'),
     ),
     ToolbarAction(
-      icon: const Icon(Icons.format_list_bulleted_rounded),
-      onPressed: () => insertLinePrefix(controller, '-'),
+      icon: const SvgIcon('assets/icons/format_ink_highlighter.svg'),
+      onPressed: () => wrapSelection(controller, '=='),
+    ),
+    ToolbarAction(
+      icon: const Icon(Icons.format_strikethrough_rounded),
+      onPressed: () => wrapSelection(controller, '~~'),
     ),
     ToolbarAction(
       icon: const Icon(Icons.format_quote_rounded),
@@ -45,14 +53,6 @@ List<ToolbarAction> markdownActions(
     ToolbarAction(
       icon: const Icon(Icons.link_rounded),
       onPressed: () => wrapSelection(controller, '[', ']()'),
-    ),
-    ToolbarAction(
-      icon: const SvgIcon('assets/icons/format_ink_highlighter.svg'),
-      onPressed: () => wrapSelection(controller, '=='),
-    ),
-    ToolbarAction(
-      icon: const Icon(Icons.format_strikethrough_rounded),
-      onPressed: () => wrapSelection(controller, '~~'),
     ),
   ];
 }
