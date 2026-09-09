@@ -57,12 +57,17 @@ class _ZoomableImagePageViewState extends State<ZoomableImagePageView>
 
   /// [FrictionSimulation]'s exponential-decay for panning
   static const double _panFrictionCoefficient = 0.0000135;
-  late final AnimationController _panFlingController =
-      AnimationController(vsync: this);
+  late final AnimationController _panFlingController;
   Animation<Offset>? _panFlingAnimation;
 
   ImageStream? _imageStream;
   ImageStreamListener? _imageStreamListener;
+
+  @override
+  void initState() {
+    super.initState();
+    _panFlingController = AnimationController(vsync: this);
+  }
 
   @override
   void didChangeDependencies() {
