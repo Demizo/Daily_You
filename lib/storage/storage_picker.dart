@@ -74,7 +74,7 @@ class StoragePicker {
     }
 
     final result = await FilePicker.pickFiles(
-      type: FileType.custom,
+      type: allowedExtensions != null ? FileType.custom : FileType.any,
       allowedExtensions: allowedExtensions,
     );
     final path = result?.files.first.path;
