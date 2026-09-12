@@ -66,7 +66,7 @@ void main() {
     await TagsProvider.instance.load();
     final image = await writeImageFile('photo.jpg');
 
-    final saved = await store.save((_) => EntryDraft(
+    final saved = await store.beginDraft().save((_) => EntryDraft(
           entry: draftEntry(text: 'a good day', mood: 1),
           tags: [
             EntryTag(entryId: 0, tagId: tag.id!, value: '2', timeCreate: time)
@@ -96,7 +96,8 @@ void main() {
     final keptImage = await writeImageFile('kept.jpg');
     final droppedImage = await writeImageFile('dropped.jpg');
 
-    final saved = await store.save((_) => EntryDraft(
+    final session = store.beginDraft();
+    final saved = await session.save((_) => EntryDraft(
           entry: draftEntry(),
           tags: [
             EntryTag(entryId: 0, tagId: kept.id!, timeCreate: time),
@@ -109,7 +110,7 @@ void main() {
         .getForEntry(store.entries.single)
         .firstWhere((image) => image.imgPath == 'kept.jpg');
 
-    await store.save((_) => EntryDraft(
+    await session.save((_) => EntryDraft(
           entry: saved.copy(text: 'trimmed'),
           tags: [
             EntryTag(
@@ -140,7 +141,7 @@ void main() {
     await database.execute('DROP TABLE $entryTagsTable');
 
     await expectLater(
-      store.save((_) => EntryDraft(
+      store.beginDraft().save((_) => EntryDraft(
             entry: draftEntry(),
             tags: [EntryTag(entryId: 0, tagId: tag.id!, timeCreate: time)],
           )),
@@ -150,12 +151,14 @@ void main() {
     expect(await database.query(entriesTable), isEmpty);
   });
 
-  test('replays a save requested while another is in flight', () async {
+  test('a session replays a save requested while another is in flight',
+      () async {
     var entry = draftEntry(text: 'draft');
     var text = 'first edit';
     int? mood;
     var editAgain = true;
     late Future<Entry> secondSave;
+    final session = store.beginDraft();
 
     EntryDraft buildDraft(Entry? saved) {
       if (saved != null) entry = saved;
@@ -165,12 +168,12 @@ void main() {
         editAgain = false;
         text = 'second edit';
         mood = 2;
-        secondSave = store.save(buildDraft);
+        secondSave = session.save(buildDraft);
       }
       return draft;
     }
 
-    expect((await store.save(buildDraft)).text, 'first edit');
+    expect((await session.save(buildDraft)).text, 'first edit');
     await secondSave;
 
     await reloadEverything();
@@ -180,36 +183,58 @@ void main() {
     expect(store.entries.single.mood, 2);
   });
 
-  test('gives each concurrent saver its own queue slot', () async {
-    var firstEntry = draftEntry(text: 'first');
-    var secondEntry = draftEntry(text: 'second');
-    var queueOthers = true;
-    late Future<Entry> firstReplay;
-    late Future<Entry> secondSave;
+  test(
+      'a session coalesces saves requested while a write is in flight, '
+      'keeping only the latest', () async {
+    var droppedBuildCount = 0;
+    late Future<Entry> droppedSave;
+    late Future<Entry> finalSave;
+    final session = store.beginDraft();
 
-    EntryDraft buildSecond(Entry? saved) {
-      if (saved != null) secondEntry = saved;
-      return EntryDraft(entry: secondEntry.copy(text: 'second'));
+    EntryDraft buildDropped(Entry? saved) {
+      droppedBuildCount += 1;
+      return EntryDraft(entry: saved!.copy(text: 'dropped edit'));
     }
+
+    EntryDraft buildFinal(Entry? saved) =>
+        EntryDraft(entry: saved!.copy(text: 'final edit'));
 
     EntryDraft buildFirst(Entry? saved) {
-      if (saved != null) firstEntry = saved;
-      if (queueOthers) {
-        queueOthers = false;
-        firstReplay = store.save(buildFirst);
-        secondSave = store.save(buildSecond);
+      if (saved == null) {
+        droppedSave = session.save(buildDropped);
+        finalSave = session.save(buildFinal);
       }
-      return EntryDraft(entry: firstEntry.copy(text: 'first'));
+      return EntryDraft(entry: draftEntry(text: 'first edit'));
     }
 
-    final first = await store.save(buildFirst);
-    final replayed = await firstReplay;
-    final second = await secondSave;
+    final first = await session.save(buildFirst);
+    final last = await finalSave;
+    final droppedResult = await droppedSave;
 
-    expect(replayed.id, first.id);
-    expect(replayed.text, 'first');
+    expect(first.text, 'first edit');
+    expect(last.text, 'final edit');
+    expect(droppedResult.text, 'final edit');
+    expect(droppedBuildCount, 0);
+
+    await reloadEverything();
+
+    expect(store.entries, hasLength(1));
+    expect(store.entries.single.text, 'final edit');
+  });
+
+  test('independent sessions save concurrently without interfering', () async {
+    final sessionA = store.beginDraft();
+    final sessionB = store.beginDraft();
+
+    final firstFuture =
+        sessionA.save((_) => EntryDraft(entry: draftEntry(text: 'first')));
+    final secondFuture =
+        sessionB.save((_) => EntryDraft(entry: draftEntry(text: 'second')));
+
+    final first = await firstFuture;
+    final second = await secondFuture;
+
     expect(second.id, isNot(first.id));
-    expect(second.text, 'second');
 
     await reloadEverything();
 
@@ -222,7 +247,7 @@ void main() {
     await TagsProvider.instance.load();
     final image = await writeImageFile('photo.jpg');
 
-    final saved = await store.save((_) => EntryDraft(
+    final saved = await store.beginDraft().save((_) => EntryDraft(
           entry: draftEntry(),
           tags: [EntryTag(entryId: 0, tagId: tag.id!, timeCreate: time)],
           images: [image],

@@ -9,6 +9,7 @@ import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/providers/templates_provider.dart';
+import 'package:daily_you/widgets/entry_draft_dirty_tracker.dart';
 import 'package:daily_you/widgets/tag_attachment_source.dart';
 import 'package:daily_you/widgets/tag_grouped_chip_list.dart';
 import 'package:daily_you/widgets/tag_picker_dialog.dart';
@@ -51,11 +52,8 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
 
   late Entry _entry;
   int id = -1;
-  String _lastText = "";
   String text = "";
-  int? _lastMood;
   int? mood;
-  DateTime? _lastEntryDate;
   DateTime? entryDate;
   late List<EntryImage> _currentImages;
   bool _loadingEntry = true;
@@ -68,10 +66,9 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   bool _deletingEntry = false;
   bool _newEntry = false;
   bool _creatingNewEntry = false;
-  Timer? _debounceTimer;
   late TagAttachmentSource _tagSource;
-  // Tag ids seeded from the default template, or already on the entry
-  late Set<int> _seededTagIds;
+  late EntryDraftDirtyTracker _dirtyTracker;
+  late final EntryDraftSession _draftSession = EntryStore.instance.beginDraft();
 
   Future<void> _initEntry() async {
     if (widget.entry == null) {
@@ -105,20 +102,19 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
       _tagSource = TagAttachmentSource.fromEntryTags(
           TagsProvider.instance.getEntryTagsForEntry(id));
     }
-    _seededTagIds = _tagSource.attachedTagIds.toSet();
+    _dirtyTracker = EntryDraftDirtyTracker(
+      text: _entry.text,
+      mood: _entry.mood,
+      date: _entry.timeCreate,
+      seededTagIds: _tagSource.attachedTagIds.toSet(),
+    );
     _tagSource.addListener(_onTagsChanged);
-    _lastMood = _entry.mood;
     mood = _entry.mood;
-    _lastEntryDate = _entry.timeCreate;
     entryDate = _entry.timeCreate;
-    _lastText = _entry.text;
     text = _entry.text;
     _textEditingController.addListener(() {
       text = _textEditingController.text;
-      _debounceTimer?.cancel();
-      _debounceTimer = Timer(const Duration(seconds: 5), () {
-        _saveEntry();
-      });
+      _scheduleSave();
     });
     setState(() {
       _loadingEntry = false;
@@ -148,7 +144,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     _focusNode.dispose();
     _textEditingController.dispose();
     _undoController.dispose();
-    _debounceTimer?.cancel();
+    EasyDebounce.cancel("save-entry");
     _tagSource.removeListener(_onTagsChanged);
     _tagSource.dispose();
     super.dispose();
@@ -191,7 +187,6 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                   Text(MaterialLocalizations.of(context).deleteButtonTooltip),
               onPressed: () async {
                 _deletingEntry = true;
-                _debounceTimer?.cancel();
                 EasyDebounce.cancel("save-entry");
                 final navigator = Navigator.of(context);
                 if (_newEntry) {
@@ -331,8 +326,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                 moodValue: mood,
                 onChangedMood: (mood) {
                   setLocalState(() => this.mood = mood);
-                  EasyDebounce.debounce(
-                      "save-entry", Duration(seconds: 5), () => _saveEntry());
+                  _scheduleSave();
                 }),
           ),
           _buildTagChips(),
@@ -522,6 +516,10 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     await _saveEntry();
   }
 
+  void _scheduleSave() {
+    EasyDebounce.debounce("save-entry", const Duration(seconds: 5), _saveEntry);
+  }
+
   Future<void> _saveEntry() async {
     if (_newEntry && !_hasNewEntryChanges()) return;
 
@@ -531,7 +529,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
       await NotificationManager.instance.dismissReminderNotification();
     }
 
-    final saved = await EntryStore.instance.save(_buildDraft);
+    final saved = await _draftSession.save(_buildDraft);
     _adoptSavedEntry(saved);
     _adoptSavedImages(saved);
     if (mounted) {
@@ -560,9 +558,11 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     _entry = saved;
     id = saved.id!;
     _newEntry = false;
-    _lastText = saved.text;
-    _lastMood = saved.mood;
-    _lastEntryDate = saved.timeCreate;
+    _dirtyTracker.markSaved(
+      text: saved.text,
+      mood: saved.mood,
+      date: saved.timeCreate,
+    );
   }
 
   void _adoptSavedImages(Entry saved) {
@@ -577,30 +577,22 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   }
 
   bool _hasEntryFieldChanges() {
-    return text != _lastText ||
-        mood != _lastMood ||
-        entryDate != _lastEntryDate;
+    return _dirtyTracker.hasFieldChanges(
+        text: text, mood: mood, date: entryDate!);
   }
 
   void _onTagsChanged() {
-    EasyDebounce.debounce(
-        "save-entry", const Duration(seconds: 5), () => _saveEntry());
+    _scheduleSave();
   }
 
-  // Whether a not-yet-persisted entry has diverged from its default state
   bool _hasNewEntryChanges() {
-    return _hasEntryFieldChanges() ||
-        _tagsExceedSeed() ||
-        _currentImages.isNotEmpty;
-  }
-
-  // Whether the working set holds anything beyond the seeded default tags
-  bool _tagsExceedSeed() {
-    for (final tagId in _tagSource.attachedTagIds) {
-      if (!_seededTagIds.contains(tagId)) return true;
-      if (_tagSource.valueFor(tagId) != null) return true;
-    }
-    return false;
+    return _dirtyTracker.hasUnsavedChanges(
+      text: text,
+      mood: mood,
+      date: entryDate!,
+      tagSource: _tagSource,
+      hasImages: _currentImages.isNotEmpty,
+    );
   }
 
   void _applyInsertedTemplateTags(Template template) {
