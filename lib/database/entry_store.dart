@@ -30,6 +30,44 @@ class EntryDraft {
 /// new entry picks up the id it was just given.
 typedef EntryDraftBuilder = EntryDraft Function(Entry? saved);
 
+class EntryDraftSession {
+  EntryDraftSession._(this._store);
+
+  final EntryStore _store;
+  Entry? _lastSaved;
+  EntryDraftBuilder? _pendingBuild;
+  Completer<Entry>? _pendingCompleter;
+  bool _writing = false;
+
+  Future<Entry> save(EntryDraftBuilder buildDraft) {
+    _pendingBuild = buildDraft;
+    _pendingCompleter ??= Completer<Entry>();
+    final future = _pendingCompleter!.future;
+    if (!_writing) {
+      _writing = true;
+      unawaited(_runPending());
+    }
+    return future;
+  }
+
+  Future<void> _runPending() async {
+    while (_pendingBuild != null) {
+      final buildDraft = _pendingBuild!;
+      final completer = _pendingCompleter!;
+      _pendingBuild = null;
+      _pendingCompleter = null;
+      try {
+        final saved = await _store._writeDraft(buildDraft(_lastSaved));
+        _lastSaved = saved;
+        completer.complete(saved);
+      } catch (error, stackTrace) {
+        completer.completeError(error, stackTrace);
+      }
+    }
+    _writing = false;
+  }
+}
+
 typedef _TagWrite = ({List<EntryTag> tags, bool changed});
 
 typedef _ImageWrite = ({
@@ -55,22 +93,12 @@ class EntryStore with ChangeNotifier {
 
   Map<DateTime, List<Entry>> _entriesByDay = {};
 
-  bool _saving = false;
-  final Map<EntryDraftBuilder, Completer<Entry>> _queued = {};
+  EntryDraftSession beginDraft() => EntryDraftSession._(this);
 
   Future<void> load() async {
     _entries = await EntryDao.getAll();
     _indexEntriesByDay();
     notifyListeners();
-  }
-
-  Future<Entry> save(EntryDraftBuilder buildDraft) {
-    final waiter = _queued.putIfAbsent(buildDraft, Completer<Entry>.new);
-    if (!_saving) {
-      _saving = true;
-      unawaited(_drainQueuedSaves());
-    }
-    return waiter.future;
   }
 
   Future<void> delete(Entry entry) async {
@@ -145,22 +173,6 @@ class EntryStore with ChangeNotifier {
 
   bool hasEntryAtTimestamp(DateTime timestamp) {
     return entries.any((entry) => entry.timeCreate == timestamp);
-  }
-
-  Future<void> _drainQueuedSaves() async {
-    final savedByBuilder = <EntryDraftBuilder, Entry>{};
-    while (_queued.isNotEmpty) {
-      final buildDraft = _queued.keys.first;
-      final waiter = _queued.remove(buildDraft)!;
-      try {
-        final saved = await _writeDraft(buildDraft(savedByBuilder[buildDraft]));
-        savedByBuilder[buildDraft] = saved;
-        waiter.complete(saved);
-      } catch (error, stackTrace) {
-        waiter.completeError(error, stackTrace);
-      }
-    }
-    _saving = false;
   }
 
   Future<Entry> _writeDraft(EntryDraft draft) async {
