@@ -58,6 +58,14 @@ class _EntryImageEditableListState extends State<EntryImageEditableList> {
   }
 
   @override
+  void didUpdateWidget(EntryImageEditableList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!identical(widget.images, oldWidget.images)) {
+      _images = widget.images;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     if (_images.length > 1) {
       return SizedBox(
