@@ -228,11 +228,16 @@ class EntryStore with ChangeNotifier {
 
   Future<_TagWrite> _writeEntryTags(
       DatabaseExecutor executor, int entryId, List<EntryTag> desired) async {
+    // Tags can be deleted while editing entries, drop dead tags
+    final liveTagIds = TagsProvider.instance.tags.map((tag) => tag.id).toSet();
     final current = TagsProvider.instance.getEntryTagsForEntry(entryId);
     final currentByTag = {
       for (final entryTag in current) entryTag.tagId: entryTag
     };
-    final desiredTagIds = desired.map((entryTag) => entryTag.tagId).toSet();
+    final desiredTagIds = desired
+        .map((entryTag) => entryTag.tagId)
+        .where(liveTagIds.contains)
+        .toSet();
     var changed = false;
 
     for (final entryTag in current) {
@@ -243,6 +248,7 @@ class EntryStore with ChangeNotifier {
 
     final written = <EntryTag>[];
     for (final wanted in desired) {
+      if (!liveTagIds.contains(wanted.tagId)) continue;
       final existing = currentByTag[wanted.tagId];
       if (existing == null) {
         written.add(await EntryTagDao.add(
