@@ -135,6 +135,32 @@ void main() {
     expect(await imageFiles.exists('kept.jpg'), isTrue);
   });
 
+  test('drops a desired tag that was deleted out from under the entry',
+      () async {
+    final tag = await addTag('walk');
+    await TagsProvider.instance.load();
+
+    final session = store.beginDraft();
+    final saved = await session.save((_) => EntryDraft(
+          entry: draftEntry(),
+          tags: [EntryTag(entryId: 0, tagId: tag.id!, timeCreate: time)],
+        ));
+
+    await TagsProvider.instance.remove(tag);
+
+    await session.save((_) => EntryDraft(
+          entry: saved.copy(text: 'edited after tag deletion'),
+          tags: [
+            EntryTag(entryId: saved.id!, tagId: tag.id!, timeCreate: time)
+          ],
+        ));
+
+    await reloadEverything();
+
+    expect(store.entries.single.text, 'edited after tag deletion');
+    expect(TagsProvider.instance.getEntryTagsForEntry(saved.id!), isEmpty);
+  });
+
   test('leaves no entry behind when the tag write fails', () async {
     final tag = await addTag('walk');
     await TagsProvider.instance.load();
