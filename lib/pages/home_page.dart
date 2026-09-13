@@ -143,7 +143,7 @@ class _HomePageState extends State<HomePage>
             .where((e) => TimeManager.isOnThisDayMatch(
                 e.timeCreate, referenceDate, isJalali))
             .toList(),
-        labelBuilder: (e) => AppLocalizations.of(context)!.flashbackYear(
+        labelBuilder: (_, e) => AppLocalizations.of(context)!.flashbackYear(
             refYear - TimeManager.calendarYearOf(e.timeCreate, isJalali)),
       ),
     ));
@@ -225,7 +225,6 @@ class _HomePageState extends State<HomePage>
                       final flashbackEntryIds =
                           flashback.entries.map((e) => e.id).toList();
                       final title = flashback.title;
-                      final locale = TimeManager.currentLocale(context);
                       if (!context.mounted) return;
                       await Navigator.of(context).push(MaterialPageRoute(
                         allowSnapshotting: false,
@@ -236,8 +235,9 @@ class _HomePageState extends State<HomePage>
                               .toList()
                               .reversed
                               .toList(),
-                          labelBuilder: (e) =>
-                              TimeManager.localizedTimeFormat(locale)
+                          labelBuilder: (context, e) =>
+                              TimeManager.localizedTimeFormat(context,
+                                      TimeManager.currentLocale(context))
                                   .format(e.timeCreate),
                         ),
                       ));

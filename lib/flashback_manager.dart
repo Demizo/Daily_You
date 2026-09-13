@@ -226,7 +226,7 @@ class FlashbackManager {
         entryLabels: entries.length == 1
             ? [label]
             : entries
-                .map((e) => TimeManager.localizedTimeFormat(locale)
+                .map((e) => TimeManager.localizedTimeFormat(context, locale)
                     .format(e.timeCreate))
                 .toList(),
       ));
