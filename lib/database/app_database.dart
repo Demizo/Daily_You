@@ -317,7 +317,7 @@ class AppDatabase {
     await createSchema(db);
     await TemplatesProvider.instance.createDefaultTemplates();
     await TagsProvider.instance.createDefaultTags();
-    await _createWelcomeEntry();
+    await createWelcomeEntry();
   }
 
   Future<void> createSchema(Database db) async {
@@ -354,7 +354,8 @@ CREATE TABLE $imagesTable (
     await _createTemplateTagTable(db);
   }
 
-  Future<void> _createWelcomeEntry() async {
+  @visibleForTesting
+  Future<void> createWelcomeEntry() async {
     final deviceLocale = WidgetsBinding.instance.platformDispatcher.locale;
     Locale locale;
     if (AppLocalizations.delegate.isSupported(deviceLocale)) {
