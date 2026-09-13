@@ -102,14 +102,19 @@ class FlashbackCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Flexible(
-                    child: Text(
-                      title,
-                      style: TextStyle(
-                        color: hasImages
-                            ? Colors.white
-                            : theme.colorScheme.onSurface,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        title,
+                        maxLines: 1,
+                        style: TextStyle(
+                          color: hasImages
+                              ? Colors.white
+                              : theme.colorScheme.onSurface,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
