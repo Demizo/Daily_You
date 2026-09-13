@@ -243,7 +243,7 @@ class EntryDayCell extends StatelessWidget {
               .toList()
               .reversed
               .toList(),
-          labelBuilder: (entry) =>
+          labelBuilder: (context, entry) =>
               TimeManager.formatYear(entry.timeCreate, context),
         ),
       ));

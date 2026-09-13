@@ -122,6 +122,7 @@ class _EntryViewPageState extends State<EntryViewPage> {
                                         ),
                                         Text(
                                           TimeManager.localizedTimeFormat(
+                                                  context,
                                                   TimeManager.currentLocale(
                                                       context))
                                               .format(entry.timeCreate),
@@ -162,7 +163,7 @@ class _EntryViewPageState extends State<EntryViewPage> {
                       padding: const EdgeInsets.only(
                           left: 8, top: 4, bottom: 18, right: 8),
                       child: Text(
-                        "${AppLocalizations.of(context)!.lastModified}: ${TimeManager.formatDateWithWeekday(entry.timeModified, context)} ${TimeManager.localizedTimeFormat(TimeManager.currentLocale(context)).format(entry.timeModified)}",
+                        "${AppLocalizations.of(context)!.lastModified}: ${TimeManager.formatDateWithWeekday(entry.timeModified, context)} ${TimeManager.localizedTimeFormat(context, TimeManager.currentLocale(context)).format(entry.timeModified)}",
                         style:
                             TextStyle(fontSize: 12, color: theme.disabledColor),
                       ),

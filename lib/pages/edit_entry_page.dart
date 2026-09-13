@@ -404,7 +404,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                   padding: EdgeInsets.all(6)),
               child: Text(
                 TimeManager.localizedTimeFormat(
-                        TimeManager.currentLocale(context))
+                        context, TimeManager.currentLocale(context))
                     .format(entryDate!),
                 style: TextStyle(
                   color: theme.colorScheme.primary,

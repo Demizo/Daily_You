@@ -78,12 +78,12 @@ class TimeManager {
   }
 
   static String timeOfDayString(BuildContext context, TimeOfDay timeOfDay) {
-    return localizedTimeFormat(TimeManager.currentLocale(context))
+    return localizedTimeFormat(context, TimeManager.currentLocale(context))
         .format(addTimeOfDay(startOfDay(DateTime.now()), timeOfDay));
   }
 
-  static DateFormat localizedTimeFormat(String locale) {
-    if (PlatformDispatcher.instance.alwaysUse24HourFormat) {
+  static DateFormat localizedTimeFormat(BuildContext context, String locale) {
+    if (MediaQuery.of(context).alwaysUse24HourFormat) {
       return DateFormat.Hm(locale);
     }
     return DateFormat.jm(locale);

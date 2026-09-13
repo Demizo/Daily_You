@@ -23,7 +23,7 @@ class TemplateRenderer {
           return _formatDate(now, locale, format);
 
         case "time":
-          return _formatTime(now, locale, format);
+          return _formatTime(context, now, locale, format);
 
         default:
           return match.group(0)!; // leave unknown variables unchanged
@@ -44,7 +44,8 @@ class TemplateRenderer {
     return DateFormat.yMd(locale.toString()).format(dt);
   }
 
-  static String _formatTime(DateTime dt, Locale locale, String? format) {
+  static String _formatTime(
+      BuildContext context, DateTime dt, Locale locale, String? format) {
     try {
       if (format != null && format.isNotEmpty) {
         return DateFormat(format, locale.toString()).format(dt);
@@ -54,6 +55,7 @@ class TemplateRenderer {
           'Template time format "$format" could not be applied', error);
     }
 
-    return TimeManager.localizedTimeFormat(locale.toString()).format(dt);
+    return TimeManager.localizedTimeFormat(context, locale.toString())
+        .format(dt);
   }
 }

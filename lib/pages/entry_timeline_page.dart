@@ -17,12 +17,11 @@ class EntryTimelinePage extends StatefulWidget {
 
   final String header;
   final List<Entry> Function() getEntries;
-  final String Function(Entry) labelBuilder;
+  final String Function(BuildContext, Entry) labelBuilder;
 
   /// Pushes a timeline listing every entry created on [date], ordered
   /// newest first, with each entry labeled by its time of day.
   static Future<void> pushForDay(BuildContext context, DateTime date) {
-    final locale = TimeManager.currentLocale(context);
     final title = TimeManager.formatDate(date, context);
     return Navigator.of(context).push(MaterialPageRoute(
       allowSnapshotting: false,
@@ -33,8 +32,9 @@ class EntryTimelinePage extends StatefulWidget {
             .toList()
             .reversed
             .toList(),
-        labelBuilder: (entry) =>
-            TimeManager.localizedTimeFormat(locale).format(entry.timeCreate),
+        labelBuilder: (context, entry) => TimeManager.localizedTimeFormat(
+                context, TimeManager.currentLocale(context))
+            .format(entry.timeCreate),
       ),
     ));
   }
@@ -65,7 +65,7 @@ class _EntryTimelinePageState extends State<EntryTimelinePage> {
         itemBuilder: (context, index) {
           final entry = entries[index];
           final entryImages = entryImagesProvider.getForEntry(entry);
-          final label = widget.labelBuilder(entry);
+          final label = widget.labelBuilder(context, entry);
           return AspectRatio(
             aspectRatio: 2.2,
             child: Row(
