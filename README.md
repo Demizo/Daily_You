@@ -9,10 +9,10 @@ Capture the moments that matter. **Daily You** helps you log your thoughts, trac
 Join a community that believes **your journal should be yours**, not a product.
 
 <p align="center">
-<img width="200" src="https://github.com/Demizo/Daily_You/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/Screenshot_0.png" alt="app screenshot">
-<img width="200" src="https://github.com/Demizo/Daily_You/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/Screenshot_1.png" alt="app screenshot">
-<img width="200" src="https://github.com/Demizo/Daily_You/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/Screenshot_2.png" alt="app screenshot">
-<img width="200" src="https://github.com/Demizo/Daily_You/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/Screenshot_3.png" alt="app screenshot">
+<img width="200" src="https://github.com/Demizo/Daily_You/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/1_home.png" alt="home page">
+<img width="200" src="https://github.com/Demizo/Daily_You/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/2_gallery.png" alt="gallery page">
+<img width="200" src="https://github.com/Demizo/Daily_You/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/3_stats.png" alt="stats page ">
+<img width="200" src="https://github.com/Demizo/Daily_You/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/4_entry_view.png" alt="journal entry">
 </p>
 
 ### Features
