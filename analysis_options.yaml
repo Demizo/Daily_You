@@ -3,3 +3,10 @@ analyzer:
   exclude:
     - submodules/**
     - /nix/store/**
+    - build/**
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**
