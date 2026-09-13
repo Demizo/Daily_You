@@ -68,9 +68,14 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  integration_test:
+    sdk: flutter
   flutter_lints: ^6.0.0
   mustache_template: ^2.0.5
   yaml: ^3.1.3
+  path_provider_platform_interface: ^2.1.2
+  plugin_platform_interface: ^2.1.8
+  golden_screenshot: ^11.0.1
 
 flutter:
   generate: true
