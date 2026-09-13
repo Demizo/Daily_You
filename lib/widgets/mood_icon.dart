@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:daily_you/config_provider.dart';
 import 'package:flutter/material.dart';
 
@@ -28,7 +30,10 @@ class _MoodIconState extends State<MoodIcon> {
   Widget build(BuildContext context) {
     return Text(
       MoodIcon.getMoodIcon(widget.moodValue),
-      style: TextStyle(fontSize: widget.size),
+      style: TextStyle(
+        fontSize: widget.size,
+        fontFamily: Platform.isLinux ? 'Noto Color Emoji' : null,
+      ),
       textScaler: widget.allowScaling ? null : TextScaler.noScaling,
     );
   }
