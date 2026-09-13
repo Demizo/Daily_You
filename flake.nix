@@ -67,7 +67,12 @@
             FLUTTER_ROOT = flutter;
             DART_ROOT = "${flutter}/bin/cache/dart-sdk";
             LD_LIBRARY_PATH = lib.makeLibraryPath [ sqlite ];
-            GSETTINGS_SCHEMA_DIR = lib.concatStringsSep ":" (map (pkg: "${pkg}/share/gsettings-schemas/${pkg.name}/glib-2.0/schemas") [ gsettings-desktop-schemas gtk3 ]);
+            GSETTINGS_SCHEMA_DIR = lib.concatStringsSep ":" (
+              map (pkg: "${pkg}/share/gsettings-schemas/${pkg.name}/glib-2.0/schemas") [
+                gsettings-desktop-schemas
+                gtk3
+              ]
+            );
             buildInputs = [
               flutter
               androidSdk # The customized SDK that we've made above
@@ -75,6 +80,9 @@
               sqlite
               gsettings-desktop-schemas
               gtk3
+              # X Server for screenshot generation
+              xvfb
+              xvfb-run
             ];
           };
       }
