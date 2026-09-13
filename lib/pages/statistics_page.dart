@@ -84,7 +84,7 @@ class _StatsPageState extends State<StatsPage>
     final renderBox =
         _headerMeasureKey.currentContext?.findRenderObject() as RenderBox?;
     if (renderBox == null || !renderBox.hasSize) return;
-    final measuredHeight = renderBox.size.height;
+    final measuredHeight = renderBox.size.height + 2.0;
     if ((measuredHeight - _headerHeight).abs() > 0.5) {
       setState(() => _headerHeight = measuredHeight);
     }
