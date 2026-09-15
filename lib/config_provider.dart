@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
 import 'package:daily_you/language_option.dart';
+import 'package:daily_you/storage/secret_store.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
@@ -14,11 +15,13 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Setting<T> {
-  const Setting(this.key, this.defaultValue, {this.secure = false});
+  const Setting(this.key, this.defaultValue,
+      {this.secure = false, this.secretStore = false});
 
   final String key;
   final T defaultValue;
   final bool secure;
+  final bool secretStore;
 }
 
 class Settings {
@@ -101,13 +104,14 @@ class Settings {
       Setting<bool>("requirePassword", false, secure: true);
   static const biometricUnlock =
       Setting<bool>("biometricUnlock", false, secure: true);
-  static const passwordHash = Setting<String>("passwordHash", "", secure: true);
+  static const passwordHash =
+      Setting<String>("passwordHash", "", secure: true, secretStore: true);
   static const passwordIsPin =
       Setting<bool>("passwordIsPin", false, secure: true);
   static const backupPasswordEnabled =
       Setting<bool>("backupPasswordEnabled", false, secure: true);
   static const backupPassword =
-      Setting<String>("backupPassword", "", secure: true);
+      Setting<String>("backupPassword", "", secure: true, secretStore: true);
   static const autoBackupEnabled = Setting<bool>("autoBackupEnabled", false);
   static const autoBackupLocationUri =
       Setting<String>("autoBackupLocationUri", "");
@@ -243,7 +247,9 @@ class ConfigProvider with ChangeNotifier {
     _config[setting.key] = value;
     notifyListeners();
 
-    if (setting.secure) {
+    if (setting.secretStore) {
+      await SecretStore.instance.write(setting.key, json.encode(value));
+    } else if (setting.secure) {
       final prefs = await SharedPreferences.getInstance();
       // Store as JSON for type safety
       await prefs.setString(setting.key, json.encode(value));
@@ -265,6 +271,8 @@ class ConfigProvider with ChangeNotifier {
 
     await readConfig();
     await loadSecureConfig();
+    await migrateSecretToSecretStore(Settings.passwordHash);
+    await loadSecretStoreConfig();
     await _pruneUnknownKeys();
   }
 
@@ -307,7 +315,8 @@ class ConfigProvider with ChangeNotifier {
 
   Future<void> loadSecureConfig() async {
     final prefs = await SharedPreferences.getInstance();
-    for (final setting in Settings.all.where((setting) => setting.secure)) {
+    for (final setting in Settings.all
+        .where((setting) => setting.secure && !setting.secretStore)) {
       final stored = prefs.getString(setting.key);
       if (stored == null) {
         _config[setting.key] = setting.defaultValue;
@@ -315,15 +324,62 @@ class ConfigProvider with ChangeNotifier {
         await prefs.setString(setting.key, json.encode(setting.defaultValue));
         continue;
       }
-      try {
-        _config[setting.key] = json.decode(stored);
-      } catch (error, stackTrace) {
-        _logger.warning(
-            'Secure setting ${setting.key} is not valid JSON, reading it raw',
-            error,
-            stackTrace);
-        _config[setting.key] = stored;
+      _decodeInto(setting, stored);
+    }
+  }
+
+  Future<void> loadSecretStoreConfig() async {
+    final prefs = await SharedPreferences.getInstance();
+    for (final setting
+        in Settings.all.where((setting) => setting.secretStore)) {
+      final stored =
+          await _readSecret(setting.key) ?? prefs.getString(setting.key);
+      if (stored == null) {
+        _config[setting.key] = setting.defaultValue;
+        continue;
       }
+      _decodeInto(setting, stored);
+    }
+  }
+
+  Future<String?> _readSecret(String key) async {
+    try {
+      return await SecretStore.instance.read(key);
+    } catch (error, stackTrace) {
+      _logger.warning(
+          'Could not read $key from secret storage', error, stackTrace);
+      return null;
+    }
+  }
+
+  void _decodeInto(Setting<Object?> setting, String stored) {
+    try {
+      _config[setting.key] = json.decode(stored);
+    } catch (error, stackTrace) {
+      _logger.warning('${setting.key} is not valid JSON, reading it raw', error,
+          stackTrace);
+      _config[setting.key] = stored;
+    }
+  }
+
+  Future<void> migrateSecretToSecretStore(Setting<Object?> setting) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (await _readSecret(setting.key) != null) return;
+
+    final legacyValue = prefs.getString(setting.key);
+    if (legacyValue == null) return;
+
+    try {
+      await SecretStore.instance.write(setting.key, legacyValue);
+      if (await SecretStore.instance.read(setting.key) == legacyValue) {
+        await prefs.remove(setting.key);
+      } else {
+        _logger
+            .severe('Secret migration verification failed for ${setting.key}');
+      }
+    } catch (error, stackTrace) {
+      _logger.severe(
+          'Secret migration failed for ${setting.key}', error, stackTrace);
     }
   }
 

@@ -6,7 +6,7 @@ class SettingsToggle extends StatelessWidget {
   final String title;
   final String? hint;
   final Setting<bool> setting;
-  final Function(bool) onChanged;
+  final Function(bool)? onChanged;
   final Icon? secondaryIcon;
   final Function()? onSecondaryPressed;
 

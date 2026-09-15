@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:daily_you/launch_intent.dart';
+import 'package:daily_you/storage/secret_store.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -13,6 +14,7 @@ class DeviceInfoService {
   String? model;
   PackageInfo? appInfo;
   bool? supportsBiometrics;
+  bool? supportsSecureStorage;
   LaunchIntent? launchIntent;
 
   Future<void> init() async {
@@ -26,5 +28,7 @@ class DeviceInfoService {
       model = androidInfo.model;
       supportsBiometrics = await auth.canCheckBiometrics;
     }
+
+    supportsSecureStorage = await SecretStore.instance.isAvailable();
   }
 }

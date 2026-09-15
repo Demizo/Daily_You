@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:daily_you/config_provider.dart';
+import 'package:daily_you/device_info_service.dart';
 import 'package:daily_you/main.dart';
 import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/time_manager.dart';
@@ -271,17 +272,21 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
                 : null,
             onSecondaryPressed: () async => _showBackupPasswordDialog(
                 AppLocalizations.of(context)!.settingsSecurityChangePassword),
-            onChanged: (value) async {
-              if (value) {
-                await _showBackupPasswordDialog(
-                    AppLocalizations.of(context)!.settingsSecuritySetPassword);
-                await configProvider.set(Settings.backupPasswordEnabled,
-                    BackupPasswordStore.password.isNotEmpty);
-              } else {
-                await configProvider.set(Settings.backupPassword, "");
-                await configProvider.set(Settings.backupPasswordEnabled, false);
-              }
-            },
+            onChanged: (DeviceInfoService().supportsSecureStorage ?? false)
+                ? (value) async {
+                    if (value) {
+                      await _showBackupPasswordDialog(AppLocalizations.of(
+                              context)!
+                          .settingsSecuritySetPassword);
+                      await configProvider.set(Settings.backupPasswordEnabled,
+                          BackupPasswordStore.password.isNotEmpty);
+                    } else {
+                      await configProvider.set(Settings.backupPassword, "");
+                      await configProvider.set(
+                          Settings.backupPasswordEnabled, false);
+                    }
+                  }
+                : null,
           ),
           if (Platform.isAndroid)
             SettingsToggle(

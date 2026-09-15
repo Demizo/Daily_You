@@ -38,41 +38,41 @@ class SecuritySettingsPageState extends State<SecuritySettings> {
               title:
                   AppLocalizations.of(context)!.settingsSecurityRequirePassword,
               setting: Settings.requirePassword,
-              onChanged: (value) async {
-                if (!configProvider.get(Settings.requirePassword)) {
-                  // Set a password
-                  bool setPassword = false;
-                  await showDialog(
-                      context: context,
-                      builder: (context) => AuthPopup(
-                            mode: AuthPopupMode.setPassword,
-                            title: AppLocalizations.of(context)!
-                                .settingsSecuritySetPassword,
-                            showBiometrics: false,
-                            dismissable: true,
-                            onSuccess: (_) {
-                              setPassword = true;
-                            },
-                          ));
-                  await configProvider.set(
-                      Settings.requirePassword, setPassword);
-                } else {
-                  // Disable password
-                  await showDialog(
-                      context: context,
-                      builder: (context) => AuthPopup(
-                            mode: AuthPopupMode.unlock,
-                            title: AppLocalizations.of(context)!
-                                .settingsSecurityEnterPassword,
-                            showBiometrics: false,
-                            dismissable: true,
-                            onSuccess: (_) {
-                              configProvider.set(
-                                  Settings.requirePassword, false);
-                            },
-                          ));
-                }
-              }),
+              onChanged: (DeviceInfoService().supportsSecureStorage ?? false)
+                  ? (value) async {
+                      if (!configProvider.get(Settings.requirePassword)) {
+                        bool setPassword = false;
+                        await showDialog(
+                            context: context,
+                            builder: (context) => AuthPopup(
+                                  mode: AuthPopupMode.setPassword,
+                                  title: AppLocalizations.of(context)!
+                                      .settingsSecuritySetPassword,
+                                  showBiometrics: false,
+                                  dismissable: true,
+                                  onSuccess: (_) {
+                                    setPassword = true;
+                                  },
+                                ));
+                        await configProvider.set(
+                            Settings.requirePassword, setPassword);
+                      } else {
+                        await showDialog(
+                            context: context,
+                            builder: (context) => AuthPopup(
+                                  mode: AuthPopupMode.unlock,
+                                  title: AppLocalizations.of(context)!
+                                      .settingsSecurityEnterPassword,
+                                  showBiometrics: false,
+                                  dismissable: true,
+                                  onSuccess: (_) {
+                                    configProvider.set(
+                                        Settings.requirePassword, false);
+                                  },
+                                ));
+                      }
+                    }
+                  : null),
           if (configProvider.get(Settings.requirePassword))
             SettingsIconAction(
                 title: AppLocalizations.of(context)!
