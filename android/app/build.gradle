@@ -108,6 +108,13 @@ android {
     }
 }
 
+// R8's ArtProfile rewriting is non-deterministic (https://issuetracker.google.com/issues/231837768)
+tasks.whenTaskAdded { task ->
+    if (task.name.contains("ArtProfile")) {
+        task.enabled = false
+    }
+}
+
 // See: https://developer.android.com/build/configure-apk-splits
 import com.android.build.OutputFile
 
