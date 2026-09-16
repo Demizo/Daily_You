@@ -66,7 +66,7 @@
             JAVA_HOME = jdk17.home;
             FLUTTER_ROOT = flutter;
             DART_ROOT = "${flutter}/bin/cache/dart-sdk";
-            LD_LIBRARY_PATH = lib.makeLibraryPath [ sqlite ];
+            LD_LIBRARY_PATH = lib.makeLibraryPath [ sqlite libsecret ];
             GSETTINGS_SCHEMA_DIR = lib.concatStringsSep ":" (
               map (pkg: "${pkg}/share/gsettings-schemas/${pkg.name}/glib-2.0/schemas") [
                 gsettings-desktop-schemas
@@ -80,6 +80,8 @@
               sqlite
               gsettings-desktop-schemas
               gtk3
+              pkg-config
+              libsecret
               # X Server for screenshot generation
               xvfb
               xvfb-run

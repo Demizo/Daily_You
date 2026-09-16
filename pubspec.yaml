@@ -65,6 +65,8 @@ dependencies:
   persian_datetime_picker: ^3.2.0
   markdown: ^7.3.1
   flutter_svg: ^2.3.0
+  flutter_secure_storage: ^10.3.4
+  pointycastle: ^4.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
