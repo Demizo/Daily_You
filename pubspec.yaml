@@ -31,6 +31,8 @@ dependencies:
     git:
       url: https://github.com/Demizo/shared-storage
       ref: release
+  saf_transfer:
+    path: packages/saf_transfer
   device_info_plus: ^12.4.0
   fl_chart: ^1.2.0
   markdown_widget: ^2.3.2+8
@@ -59,7 +61,6 @@ dependencies:
   quick_actions: ^1.1.0
   flutter_displaymode: ^0.7.0
   dynamic_color: ^1.8.1
-  uuid: ^4.5.3
   flutter_expandable_fab: ^2.3.0
   shamsi_date:
   persian_datetime_picker: ^3.2.0

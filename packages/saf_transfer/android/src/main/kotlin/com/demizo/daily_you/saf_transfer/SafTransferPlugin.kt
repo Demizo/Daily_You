@@ -1,3 +1,5 @@
+package com.demizo.daily_you.saf_transfer
+
 import android.content.Context
 import androidx.documentfile.provider.DocumentFile
 import io.flutter.embedding.engine.plugins.FlutterPlugin
@@ -37,14 +39,14 @@ class SafTransferPlugin : FlutterPlugin, MethodCallHandler {
                         // Get file size for progress calculation
                         val totalSize = DocumentFile.fromSingleUri(context, fileUriStr)?.length() ?: 0L
                         val inputStream = context.contentResolver.openInputStream(fileUriStr)
-                        
+
                         inputStream?.use { input ->
                             val file = File(dest)
                             file.outputStream().use { output ->
                                 copyStreamWithProgress(input, output, totalSize, transferId)
                             }
                         }
-                        
+
                         launch(Dispatchers.Main) { result.success(null) }
                     } catch (err: Exception) {
                         launch(Dispatchers.Main) { result.error("PluginError", err.message, null) }
@@ -95,9 +97,9 @@ class SafTransferPlugin : FlutterPlugin, MethodCallHandler {
     }
 
     private suspend fun copyStreamWithProgress(
-        input: InputStream, 
-        output: OutputStream, 
-        totalSize: Long, 
+        input: InputStream,
+        output: OutputStream,
+        totalSize: Long,
         transferId: String
     ) {
         val buffer = ByteArray(8 * 1024)
@@ -111,11 +113,11 @@ class SafTransferPlugin : FlutterPlugin, MethodCallHandler {
 
             if (totalSize > 0) {
                 val currentProgress = (totalRead.toDouble() / totalSize) * 100
-                
+
                 // Report progress every ~5% or when finished
                 if (currentProgress - lastReportedProgress >= 5.0 || currentProgress >= 100.0) {
                     lastReportedProgress = currentProgress
-                    
+
                     // Flutter MethodChannel requires UI Thread
                     withContext(Dispatchers.Main) {
                         channel.invokeMethod("transferProgress", mapOf(
