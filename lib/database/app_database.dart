@@ -156,6 +156,21 @@ class AppDatabase {
     }
   }
 
+  Future<bool> exportSnapshotTo(String path) async {
+    final db = _database;
+    if (db == null) return false;
+
+    try {
+      await db.execute("VACUUM INTO '$path'");
+      if (await _validateSqliteDatabase(path)) return true;
+    } catch (error, stackTrace) {
+      _logger.severe('Database snapshot to $path failed', error, stackTrace);
+    }
+
+    if (await File(path).exists()) await File(path).delete();
+    return false;
+  }
+
   bool usingExternalLocation() {
     return ConfigProvider.instance.get(Settings.useExternalDb);
   }
@@ -250,9 +265,7 @@ class AppDatabase {
 
       await externalSyncHealth.record("external database write", () async {
         try {
-          await database!.execute("VACUUM INTO '$exportPath'");
-
-          if (!await _validateSqliteDatabase(exportPath)) return false;
+          if (!await exportSnapshotTo(exportPath)) return false;
 
           final bytes = await internalStore.read(exportName);
           if (bytes == null) return false;

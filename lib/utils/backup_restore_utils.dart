@@ -39,12 +39,19 @@ class BackupRestoreUtils {
   }) async {
     final tempDir = await getTemporaryDirectory();
     final stagedArchive = File(join(tempDir.path, name));
+    final databaseSnapshot =
+        File(join(tempDir.path, AppDatabase.databaseFileName));
 
     try {
+      if (await databaseSnapshot.exists()) await databaseSnapshot.delete();
+      if (!await AppDatabase.instance.exportSnapshotTo(databaseSnapshot.path)) {
+        throw Exception('Failed to create a consistent database snapshot');
+      }
+
       onCompress(0);
       await ZipUtils.compress(
           stagedArchive.path,
-          [await AppDatabase.instance.getInternalPath()],
+          [databaseSnapshot.path],
           [await ImageStorage.instance.getInternalFolder()],
           password: _backupPassword(),
           onProgress: onCompress);
@@ -54,12 +61,19 @@ class BackupRestoreUtils {
       }
 
       onTransfer(0);
-      await destination.copyFileInto(stagedArchive.path, name,
+      final transferred = await destination.copyFileInto(
+          stagedArchive.path, name,
           mimeType: "application/zip", onProgress: onTransfer);
+      if (!transferred) {
+        throw Exception('Failed to transfer backup to $name');
+      }
     } finally {
       onCleanup();
       if (await stagedArchive.exists()) {
         await stagedArchive.delete();
+      }
+      if (await databaseSnapshot.exists()) {
+        await databaseSnapshot.delete();
       }
     }
   }
@@ -87,6 +101,14 @@ class BackupRestoreUtils {
       return false;
     }
 
+    final databaseAlreadyOpen = AppDatabase.instance.database != null;
+    if (!databaseAlreadyOpen &&
+        !await AppDatabase.instance
+            .init(forceWithoutSync: true, allowMigration: false)) {
+      _logger.severe('Automatic backup skipped: could not open database');
+      return false;
+    }
+
     try {
       await _writeBackup(
         destination: destination,
@@ -98,6 +120,8 @@ class BackupRestoreUtils {
     } catch (error, stackTrace) {
       _logger.severe('Automatic backup failed', error, stackTrace);
       return false;
+    } finally {
+      if (!databaseAlreadyOpen) await AppDatabase.instance.close();
     }
 
     await _recordBackup(automatic: true);
