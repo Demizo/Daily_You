@@ -268,6 +268,7 @@ class BackupRestoreUtils {
           if (ImageStorage.instance.usingExternalLocation()) {
             await ImageStorage.instance.syncImageFolder(true);
           }
+          ImageStorage.instance.invalidateCache();
         }
       } else {
         outcome = const OperationOutcome.failed();

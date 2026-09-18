@@ -1,3 +1,4 @@
+import 'package:daily_you/database/image_storage.dart';
 import 'package:daily_you/widgets/local_image_cache.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +20,7 @@ class LocalImageLoader extends StatefulWidget {
 class _LocalImageLoaderState extends State<LocalImageLoader> {
   Uint8List? _bytes;
   bool _imageNotFound = false;
+  int _cacheVersion = ImageStorage.instance.cacheVersion.value;
 
   @override
   void initState() {
@@ -30,11 +32,14 @@ class _LocalImageLoaderState extends State<LocalImageLoader> {
   void didUpdateWidget(covariant LocalImageLoader oldWidget) {
     super.didUpdateWidget(oldWidget);
 
+    final cacheVersion = ImageStorage.instance.cacheVersion.value;
     if (oldWidget.imagePath != widget.imagePath ||
-        oldWidget.cacheSize != widget.cacheSize) {
+        oldWidget.cacheSize != widget.cacheSize ||
+        cacheVersion != _cacheVersion) {
+      _cacheVersion = cacheVersion;
       _bytes = null;
       _imageNotFound = false;
-      _load(); // reload for the new path
+      _load();
     }
   }
 

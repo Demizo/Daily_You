@@ -28,6 +28,14 @@ class ImageStorage {
       FileBytesCache(maxCacheSize: 10 * 1024 * 1024);
   final Pool imgFetchPool = Pool(3);
 
+  // Bumped when new images are restored or synced. Forces UI to re-fetch images
+  final ValueNotifier<int> cacheVersion = ValueNotifier(0);
+
+  void invalidateCache() {
+    imageCache.clear();
+    cacheVersion.value++;
+  }
+
   final ExternalSyncHealth externalSyncHealth =
       ExternalSyncHealth('ImageStorage');
 
@@ -317,6 +325,8 @@ class ImageStorage {
         updateStatus?.call("$syncedEntries/${entries.length}");
       }
     }
+
+    invalidateCache();
 
     if (garbageCollect) {
       return await garbageCollectImages();

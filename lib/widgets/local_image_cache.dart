@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:isolate';
 
@@ -53,6 +54,12 @@ class LocalImageCache {
           ),
         ) {
     _initResizeIsolate();
+    ImageStorage.instance.cacheVersion.addListener(_onImagesInvalidated);
+  }
+
+  void _onImagesInvalidated() {
+    imageCache.clear();
+    unawaited(_diskCache.emptyCache());
   }
 
   Future<void> _initResizeIsolate() async {
