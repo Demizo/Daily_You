@@ -304,11 +304,12 @@ Future<void> setAutoBackupAlarm() async {
   if (!ConfigProvider.instance.get(Settings.autoBackupEnabled)) return;
 
   final nextRun = nextAutoBackupTimeFromConfig(ConfigProvider.instance);
+  final exact = await NotificationManager.instance.canScheduleExactAlarms();
 
   await AndroidAlarmManager.oneShotAt(
       nextRun, _autoBackupAlarmId, autoBackupCallbackDispatcher,
       allowWhileIdle: true,
-      exact: true,
+      exact: exact,
       rescheduleOnReboot: true,
       wakeup: true);
 }
