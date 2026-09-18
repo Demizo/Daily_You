@@ -738,9 +738,6 @@ class AppLocalizationsFa extends AppLocalizations {
   String get settingsAutoBackupKeepAll => 'All';
 
   @override
-  String get settingsAutoBackupLocationNotSet => 'Not configured';
-
-  @override
   String get autoBackupProgressTitle => 'Backing Up…';
 
   @override

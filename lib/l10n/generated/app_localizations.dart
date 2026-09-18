@@ -1378,12 +1378,6 @@ abstract class AppLocalizations {
   /// **'All'**
   String get settingsAutoBackupKeepAll;
 
-  /// No description provided for @settingsAutoBackupLocationNotSet.
-  ///
-  /// In en, this message translates to:
-  /// **'Not configured'**
-  String get settingsAutoBackupLocationNotSet;
-
   /// No description provided for @autoBackupProgressTitle.
   ///
   /// In en, this message translates to:

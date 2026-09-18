@@ -119,7 +119,7 @@ class Settings {
       Setting<String>("autoBackupInterval", "daily");
   static const autoBackupHour = Setting<int>("autoBackupHour", 2);
   static const autoBackupMinute = Setting<int>("autoBackupMinute", 0);
-  static const autoBackupMaxCount = Setting<int>("autoBackupMaxCount", 5);
+  static const autoBackupMaxCount = Setting<int>("autoBackupMaxCount", 3);
   static const lastBackup = Setting<String>("lastBackup", "", secure: true);
   static const lastAutoBackup =
       Setting<String>("lastAutoBackup", "", secure: true);

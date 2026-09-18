@@ -47,29 +47,9 @@ class AutoBackupSettingsDialog extends StatelessWidget {
           children: [
             SettingsIconAction(
               title: AppLocalizations.of(context)!.settingsAutoBackupLocation,
-              hint: locationUri.isEmpty
-                  ? AppLocalizations.of(context)!
-                      .settingsAutoBackupLocationNotSet
-                  : StoragePicker.displayName(locationUri),
+              hint: StoragePicker.displayName(locationUri),
               icon: Icon(Icons.folder_rounded),
               onPressed: _pickLocation,
-            ),
-            SettingsDropdown<int>(
-              title: AppLocalizations.of(context)!.settingsAutoBackupMaxCount,
-              value: configProvider.get(Settings.autoBackupMaxCount),
-              options: [
-                DropdownMenuItem(value: 3, child: Text("3")),
-                DropdownMenuItem(value: 5, child: Text("5")),
-                DropdownMenuItem(value: 10, child: Text("10")),
-                DropdownMenuItem(
-                    value: 0,
-                    child: Text(AppLocalizations.of(context)!
-                        .settingsAutoBackupKeepAll)),
-              ],
-              onChanged: (value) async {
-                if (value == null) return;
-                await configProvider.set(Settings.autoBackupMaxCount, value);
-              },
             ),
             SettingsIconAction(
               title: AppLocalizations.of(context)!.settingsAutoBackupTime,
@@ -94,6 +74,24 @@ class AutoBackupSettingsDialog extends StatelessWidget {
               onChanged: (value) async {
                 if (value == null) return;
                 await configProvider.set(Settings.autoBackupInterval, value);
+              },
+            ),
+            SettingsDropdown<int>(
+              title: AppLocalizations.of(context)!.settingsAutoBackupMaxCount,
+              value: configProvider.get(Settings.autoBackupMaxCount),
+              options: [
+                DropdownMenuItem(value: 1, child: Text("1")),
+                DropdownMenuItem(value: 3, child: Text("3")),
+                DropdownMenuItem(value: 5, child: Text("5")),
+                DropdownMenuItem(value: 10, child: Text("10")),
+                DropdownMenuItem(
+                    value: 0,
+                    child: Text(AppLocalizations.of(context)!
+                        .settingsAutoBackupKeepAll)),
+              ],
+              onChanged: (value) async {
+                if (value == null) return;
+                await configProvider.set(Settings.autoBackupMaxCount, value);
               },
             ),
           ],

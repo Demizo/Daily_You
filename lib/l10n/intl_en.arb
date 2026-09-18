@@ -405,8 +405,6 @@
   "@settingsAutoBackupNext": {},
   "settingsAutoBackupKeepAll": "All",
   "@settingsAutoBackupKeepAll": {},
-  "settingsAutoBackupLocationNotSet": "Not configured",
-  "@settingsAutoBackupLocationNotSet": {},
   "autoBackupProgressTitle": "Backing Up…",
   "@autoBackupProgressTitle": {},
   "autoBackupFailedTitle": "Backup Failed",
