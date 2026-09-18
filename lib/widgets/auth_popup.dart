@@ -112,6 +112,8 @@ class _AuthPopupState extends State<AuthPopup> {
       success = didAuthenticate;
     } on PlatformException {
       success = false;
+    } on LocalAuthException {
+      success = false;
     }
     return success;
   }
