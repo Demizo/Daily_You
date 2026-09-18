@@ -913,6 +913,9 @@ class AppLocalizationsOc extends AppLocalizations {
   String get settingsSourceCode => 'Còdi font';
 
   @override
+  String get settingsOpenSourceLicenses => 'Open Source Licenses';
+
+  @override
   String get settingsMadeWithLove => 'Made with ❤️';
 
   @override

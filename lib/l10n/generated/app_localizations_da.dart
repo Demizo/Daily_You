@@ -910,6 +910,9 @@ class AppLocalizationsDa extends AppLocalizations {
   String get settingsSourceCode => 'Kildekode';
 
   @override
+  String get settingsOpenSourceLicenses => 'Open Source Licenses';
+
+  @override
   String get settingsMadeWithLove => 'Lavet med ❤️';
 
   @override

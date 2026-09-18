@@ -901,6 +901,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsSourceCode => '源代码';
 
   @override
+  String get settingsOpenSourceLicenses => 'Open Source Licenses';
+
+  @override
   String get settingsMadeWithLove => '用❤️制作';
 
   @override

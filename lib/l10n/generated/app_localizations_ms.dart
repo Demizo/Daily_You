@@ -862,6 +862,9 @@ class AppLocalizationsMs extends AppLocalizations {
   String get settingsSourceCode => 'Kod Sumber';
 
   @override
+  String get settingsOpenSourceLicenses => 'Open Source Licenses';
+
+  @override
   String get settingsMadeWithLove => 'Dibuat dengan ❤️';
 
   @override

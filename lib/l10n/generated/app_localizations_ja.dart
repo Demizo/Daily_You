@@ -903,6 +903,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get settingsSourceCode => 'ソースコード';
 
   @override
+  String get settingsOpenSourceLicenses => 'Open Source Licenses';
+
+  @override
   String get settingsMadeWithLove => '❤️ をこめて作りました';
 
   @override

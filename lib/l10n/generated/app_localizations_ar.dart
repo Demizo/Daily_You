@@ -916,6 +916,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsSourceCode => 'الكود المصدري';
 
   @override
+  String get settingsOpenSourceLicenses => 'Open Source Licenses';
+
+  @override
   String get settingsMadeWithLove => 'مصنوع ب ❤️';
 
   @override

@@ -1696,6 +1696,12 @@ abstract class AppLocalizations {
   /// **'Source Code'**
   String get settingsSourceCode;
 
+  /// No description provided for @settingsOpenSourceLicenses.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Source Licenses'**
+  String get settingsOpenSourceLicenses;
+
   /// No description provided for @settingsMadeWithLove.
   ///
   /// In en, this message translates to:

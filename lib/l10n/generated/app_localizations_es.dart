@@ -917,6 +917,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsSourceCode => 'Código Fuente';
 
   @override
+  String get settingsOpenSourceLicenses => 'Open Source Licenses';
+
+  @override
   String get settingsMadeWithLove => 'Hecho con 💚';
 
   @override

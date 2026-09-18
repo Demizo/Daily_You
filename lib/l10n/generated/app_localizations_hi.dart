@@ -912,6 +912,9 @@ class AppLocalizationsHi extends AppLocalizations {
   String get settingsSourceCode => 'स्रोत कोड';
 
   @override
+  String get settingsOpenSourceLicenses => 'Open Source Licenses';
+
+  @override
   String get settingsMadeWithLove => 'Made with ❤️';
 
   @override

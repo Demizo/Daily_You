@@ -909,6 +909,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get settingsSourceCode => 'Zdrojový kód';
 
   @override
+  String get settingsOpenSourceLicenses => 'Open Source Licenses';
+
+  @override
   String get settingsMadeWithLove => 'Vyrobeno s ❤️';
 
   @override

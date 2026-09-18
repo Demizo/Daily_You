@@ -924,6 +924,9 @@ class AppLocalizationsTa extends AppLocalizations {
   String get settingsSourceCode => 'மூலக் குறியீடு';
 
   @override
+  String get settingsOpenSourceLicenses => 'Open Source Licenses';
+
+  @override
   String get settingsMadeWithLove => '❤️ கொண்டு உருவாக்கப்பட்டது';
 
   @override

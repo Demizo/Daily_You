@@ -920,6 +920,9 @@ class AppLocalizationsUk extends AppLocalizations {
   String get settingsSourceCode => 'Вихідний код';
 
   @override
+  String get settingsOpenSourceLicenses => 'Open Source Licenses';
+
+  @override
   String get settingsMadeWithLove => 'Зроблено з ❤️';
 
   @override

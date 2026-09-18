@@ -911,6 +911,9 @@ class AppLocalizationsFa extends AppLocalizations {
   String get settingsSourceCode => 'کد منبع';
 
   @override
+  String get settingsOpenSourceLicenses => 'Open Source Licenses';
+
+  @override
   String get settingsMadeWithLove => 'ساخته شده با ❤️';
 
   @override

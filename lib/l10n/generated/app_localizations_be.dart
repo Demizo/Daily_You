@@ -911,6 +911,9 @@ class AppLocalizationsBe extends AppLocalizations {
   String get settingsSourceCode => 'Source Code';
 
   @override
+  String get settingsOpenSourceLicenses => 'Open Source Licenses';
+
+  @override
   String get settingsMadeWithLove => 'Made with ❤️';
 
   @override

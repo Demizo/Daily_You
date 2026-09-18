@@ -917,6 +917,9 @@ class AppLocalizationsFi extends AppLocalizations {
   String get settingsSourceCode => 'Lähdekoodi';
 
   @override
+  String get settingsOpenSourceLicenses => 'Open Source Licenses';
+
+  @override
   String get settingsMadeWithLove => '❤️:lla tehty';
 
   @override

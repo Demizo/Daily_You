@@ -917,6 +917,9 @@ class AppLocalizationsPl extends AppLocalizations {
   String get settingsSourceCode => 'Kod źródłowy';
 
   @override
+  String get settingsOpenSourceLicenses => 'Open Source Licenses';
+
+  @override
   String get settingsMadeWithLove => 'Zrobione z ❤️';
 
   @override

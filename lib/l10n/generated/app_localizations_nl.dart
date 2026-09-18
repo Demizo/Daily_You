@@ -919,6 +919,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settingsSourceCode => 'Broncode';
 
   @override
+  String get settingsOpenSourceLicenses => 'Open Source Licenses';
+
+  @override
   String get settingsMadeWithLove => 'Gemaakt met ❤️';
 
   @override

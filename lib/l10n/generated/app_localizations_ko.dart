@@ -903,6 +903,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get settingsSourceCode => '소스 코드';
 
   @override
+  String get settingsOpenSourceLicenses => 'Open Source Licenses';
+
+  @override
   String get settingsMadeWithLove => '❤️을 담아 제작';
 
   @override

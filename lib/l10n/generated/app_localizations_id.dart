@@ -912,6 +912,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get settingsSourceCode => 'Sumber kode';
 
   @override
+  String get settingsOpenSourceLicenses => 'Open Source Licenses';
+
+  @override
   String get settingsMadeWithLove => 'Dibuat dengan ❤️';
 
   @override

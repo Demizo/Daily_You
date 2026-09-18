@@ -911,6 +911,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get settingsSourceCode => 'Kaynak Kodu';
 
   @override
+  String get settingsOpenSourceLicenses => 'Open Source Licenses';
+
+  @override
   String get settingsMadeWithLove => '❤️ ile yapılmıştır';
 
   @override

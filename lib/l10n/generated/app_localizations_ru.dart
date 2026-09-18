@@ -924,6 +924,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsSourceCode => 'Исходный код';
 
   @override
+  String get settingsOpenSourceLicenses => 'Open Source Licenses';
+
+  @override
   String get settingsMadeWithLove => 'Сделано с ❤️';
 
   @override

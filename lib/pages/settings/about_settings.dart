@@ -35,43 +35,6 @@ class _AboutSettingsState extends State<AboutSettings> {
       ),
       body: ListView(
         children: [
-          SettingsIconAction(
-              title: AppLocalizations.of(context)!.settingsSourceCode,
-              hint: "github.com/Demizo/Daily_You",
-              icon: Icon(Icons.open_in_new_rounded),
-              onPressed: () async {
-                await launchUrl(Uri.https("github.com", "/Demizo/Daily_You"),
-                    mode: LaunchMode.externalApplication);
-              }),
-          SettingsIconAction(
-              title: AppLocalizations.of(context)!.errorReport,
-              hint: "github.com/Demizo/Daily_You/issues",
-              icon: Icon(Icons.open_in_new_rounded),
-              onPressed: () async {
-                await launchUrl(
-                    Uri.https("github.com", "/Demizo/Daily_You/issues"),
-                    mode: LaunchMode.externalApplication);
-              }),
-          SettingsIconAction(
-            title: AppLocalizations.of(context)!.settingsHelpTranslate,
-            hint: "hosted.weblate.org/projects/daily-you",
-            icon: Icon(Icons.open_in_new_rounded),
-            onPressed: () async {
-              await launchUrl(
-                  Uri.https("hosted.weblate.org", "/projects/daily-you"),
-                  mode: LaunchMode.externalApplication);
-            },
-          ),
-          SettingsIconAction(
-              title: AppLocalizations.of(context)!.settingsLicense,
-              hint: AppLocalizations.of(context)!.licenseGPLv3,
-              icon: Icon(Icons.open_in_new_rounded),
-              onPressed: () async {
-                await launchUrl(
-                    Uri.https("github.com",
-                        "/Demizo/Daily_You/blob/master/LICENSE.txt"),
-                    mode: LaunchMode.externalApplication);
-              }),
           GestureDetector(
             child: SettingsIconAction(
                 title: AppLocalizations.of(context)!.settingsVersion,
@@ -106,6 +69,59 @@ class _AboutSettingsState extends State<AboutSettings> {
               }
             },
           ),
+          SettingsIconAction(
+              title: AppLocalizations.of(context)!.settingsSourceCode,
+              hint: "github.com/Demizo/Daily_You",
+              icon: Icon(Icons.open_in_new_rounded),
+              onPressed: () async {
+                await launchUrl(Uri.https("github.com", "/Demizo/Daily_You"),
+                    mode: LaunchMode.externalApplication);
+              }),
+          SettingsIconAction(
+              title: AppLocalizations.of(context)!.settingsLicense,
+              hint: AppLocalizations.of(context)!.licenseGPLv3,
+              icon: Icon(Icons.open_in_new_rounded),
+              onPressed: () async {
+                await launchUrl(
+                    Uri.https("github.com",
+                        "/Demizo/Daily_You/blob/master/LICENSE.txt"),
+                    mode: LaunchMode.externalApplication);
+              }),
+          SettingsIconAction(
+              title: AppLocalizations.of(context)!.settingsOpenSourceLicenses,
+              icon: Icon(Icons.chevron_right_rounded),
+              onPressed: () async {
+                await Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => LicensePage(
+                          applicationName:
+                              AppLocalizations.of(context)!.appTitle,
+                          applicationVersion:
+                              DeviceInfoService().appInfo?.version,
+                        )));
+              }),
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+            child: Divider(),
+          ),
+          SettingsIconAction(
+            title: AppLocalizations.of(context)!.settingsHelpTranslate,
+            hint: "hosted.weblate.org/projects/daily-you",
+            icon: Icon(Icons.open_in_new_rounded),
+            onPressed: () async {
+              await launchUrl(
+                  Uri.https("hosted.weblate.org", "/projects/daily-you"),
+                  mode: LaunchMode.externalApplication);
+            },
+          ),
+          SettingsIconAction(
+              title: AppLocalizations.of(context)!.errorReport,
+              hint: "github.com/Demizo/Daily_You/issues",
+              icon: Icon(Icons.open_in_new_rounded),
+              onPressed: () async {
+                await launchUrl(
+                    Uri.https("github.com", "/Demizo/Daily_You/issues"),
+                    mode: LaunchMode.externalApplication);
+              }),
         ],
       ),
     );
