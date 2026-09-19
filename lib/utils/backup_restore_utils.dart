@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/database/image_storage.dart';
+import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/storage/file_store.dart';
 import 'package:daily_you/storage/local_file_store.dart';
 import 'package:daily_you/storage/storage_picker.dart';
@@ -15,6 +16,7 @@ import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:logging/logging.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class _RestoreCancelled implements Exception {}
 
@@ -133,6 +135,44 @@ class BackupRestoreUtils {
       _logger.severe('Pruning old backups failed', error, stackTrace);
     }
     return true;
+  }
+
+  static Future<bool> runAutoBackupAndNotify() async {
+    final prefs = await SharedPreferences.getInstance();
+    final progressTitle =
+        prefs.getString('autoBackupProgressTitle') ?? 'Backing Up…';
+    final failedTitle =
+        prefs.getString('autoBackupFailedTitle') ?? 'Backup Failed';
+
+    try {
+      await NotificationManager.instance.showBackupProgress(0, progressTitle);
+    } catch (error, stackTrace) {
+      _logger.warning(
+          'Could not show backup progress notification', error, stackTrace);
+    }
+
+    var success = false;
+    try {
+      var shownPercent = 0;
+      success = await runAutoBackup(onProgress: (percent) {
+        if (percent - shownPercent < 5) return;
+        shownPercent = percent.round();
+        NotificationManager.instance
+            .showBackupProgress(shownPercent, progressTitle);
+      });
+    } finally {
+      try {
+        if (success) {
+          await NotificationManager.instance.stopBackupProgress();
+        } else {
+          await NotificationManager.instance.showBackupFailed(failedTitle);
+        }
+      } catch (error, stackTrace) {
+        _logger.warning(
+            'Could not update backup result notification', error, stackTrace);
+      }
+    }
+    return success;
   }
 
   static Future<void> _pruneAutoBackups(FileStore destination, int keep) async {

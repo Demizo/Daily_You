@@ -25,7 +25,6 @@ import 'package:daily_you/layouts/responsive_layout.dart';
 import 'package:daily_you/theme_mode_provider.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:logging/logging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:statsfl/statsfl.dart';
@@ -34,8 +33,6 @@ import 'package:provider/provider.dart';
 
 const int _autoBackupAlarmId = 2;
 
-final Logger _alarmCallbackLogger = Logger('AlarmCallbacks');
-
 @pragma('vm:entry-point')
 void autoBackupCallbackDispatcher() async {
   configureLogging();
@@ -43,41 +40,7 @@ void autoBackupCallbackDispatcher() async {
 
   if (ConfigProvider.instance.get(Settings.autoBackupEnabled)) {
     await NotificationManager.instance.init();
-
-    final prefs = await SharedPreferences.getInstance();
-    final progressTitle =
-        prefs.getString('autoBackupProgressTitle') ?? 'Backing Up…';
-    final failedTitle =
-        prefs.getString('autoBackupFailedTitle') ?? 'Backup Failed';
-
-    try {
-      await NotificationManager.instance.showBackupProgress(0, progressTitle);
-    } catch (error, stackTrace) {
-      _alarmCallbackLogger.warning(
-          'Could not show backup progress notification', error, stackTrace);
-    }
-
-    var success = false;
-    try {
-      var shownPercent = 0;
-      success = await BackupRestoreUtils.runAutoBackup(onProgress: (percent) {
-        if (percent - shownPercent < 5) return;
-        shownPercent = percent.round();
-        NotificationManager.instance
-            .showBackupProgress(shownPercent, progressTitle);
-      });
-    } finally {
-      try {
-        if (success) {
-          await NotificationManager.instance.stopBackupProgress();
-        } else {
-          await NotificationManager.instance.showBackupFailed(failedTitle);
-        }
-      } catch (error, stackTrace) {
-        _alarmCallbackLogger.warning(
-            'Could not update backup result notification', error, stackTrace);
-      }
-    }
+    await BackupRestoreUtils.runAutoBackupAndNotify();
   }
 
   await setAutoBackupAlarm();
