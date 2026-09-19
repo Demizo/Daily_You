@@ -61,6 +61,7 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
 	vectorDrawables.generatedDensities = []
+        resValue "string", "app_name", "Daily You"
     }
 
     signingConfigs {
@@ -81,6 +82,13 @@ android {
 	}
         fdroid {
             dimension "default"
+        }
+        dev {
+            dimension "default"
+            applicationIdSuffix ".dev"
+            versionNameSuffix "-dev"
+            resValue "string", "app_name", "Daily You Dev"
+            signingConfig signingConfigs.release
         }
     }
 
