@@ -101,4 +101,55 @@ void main() {
       expect(AutoBackupInterval.fromKey('yearly'), AutoBackupInterval.daily);
     });
   });
+
+  group('autoBackupIsOverdue', () {
+    bool overdue({
+      required DateTime now,
+      DateTime? lastRun,
+      AutoBackupInterval interval = AutoBackupInterval.daily,
+      TimeOfDay timeOfDay = backupAt,
+    }) =>
+        autoBackupIsOverdue(
+            now: now,
+            lastRun: lastRun,
+            interval: interval,
+            timeOfDay: timeOfDay);
+
+    test('is not overdue when it has never run', () {
+      expect(overdue(now: DateTime(2026, 5, 19, 9, 0)), isFalse);
+    });
+
+    test('is not overdue while the due slot is still ahead', () {
+      expect(
+          overdue(
+              now: DateTime(2026, 5, 17, 20, 0),
+              lastRun: DateTime(2026, 5, 17, 2, 0, 30)),
+          isFalse);
+    });
+
+    test('is not overdue within the grace period right after the slot', () {
+      expect(
+          overdue(
+              now: DateTime(2026, 5, 18, 2, 1),
+              lastRun: DateTime(2026, 5, 17, 2, 0, 30)),
+          isFalse);
+    });
+
+    test('is overdue once the due slot has clearly passed', () {
+      expect(
+          overdue(
+              now: DateTime(2026, 5, 18, 9, 0),
+              lastRun: DateTime(2026, 5, 17, 2, 0, 30)),
+          isTrue);
+    });
+
+    test('is overdue for a missed weekly backup', () {
+      expect(
+          overdue(
+              now: DateTime(2026, 5, 26, 9, 0),
+              lastRun: DateTime(2026, 5, 18, 2, 0),
+              interval: AutoBackupInterval.weekly),
+          isTrue);
+    });
+  });
 }

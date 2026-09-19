@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:daily_you/config_provider.dart';
@@ -5,6 +6,8 @@ import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/database/image_storage.dart';
 import 'package:daily_you/device_info_service.dart';
 import 'package:daily_you/launch_intent.dart';
+import 'package:daily_you/main.dart';
+import 'package:daily_you/utils/auto_backup_schedule.dart';
 import 'package:daily_you/utils/backup_restore_utils.dart';
 import 'package:daily_you/widgets/auth_popup.dart';
 import 'package:flutter/material.dart';
@@ -129,11 +132,13 @@ class _LaunchPageState extends State<LaunchPage> {
       await _migrateImagesFromExternalStorage();
       if (ImageStorage.instance.usingExternalLocation()) {
         if (await ImageStorage.instance.hasExternalLocationPermission()) {
+          unawaited(_catchUpMissedAutoBackup());
           await _nextPage();
           return;
         }
         _errorType = _LaunchErrorType.externalAccess;
       } else {
+        unawaited(_catchUpMissedAutoBackup());
         await _nextPage();
         return;
       }
@@ -147,6 +152,27 @@ class _LaunchPageState extends State<LaunchPage> {
     setState(() {
       isLoading = false;
     });
+  }
+
+  Future<void> _catchUpMissedAutoBackup() async {
+    if (!Platform.isAndroid) return;
+    final configProvider = ConfigProvider.instance;
+    if (!configProvider.get(Settings.autoBackupEnabled)) return;
+
+    final overdue = autoBackupIsOverdue(
+      now: DateTime.now(),
+      lastRun: DateTime.tryParse(configProvider.get(Settings.lastAutoBackup)),
+      interval: AutoBackupInterval.fromKey(
+          configProvider.get(Settings.autoBackupInterval)),
+      timeOfDay: TimeOfDay(
+        hour: configProvider.get(Settings.autoBackupHour),
+        minute: configProvider.get(Settings.autoBackupMinute),
+      ),
+    );
+    if (!overdue) return;
+
+    await BackupRestoreUtils.runAutoBackupAndNotify();
+    await setAutoBackupAlarm();
   }
 
   Future<void> _retryDatabaseConnection() async {

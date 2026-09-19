@@ -49,6 +49,22 @@ DateTime nextAutoBackupTime({
       from.year, from.month, from.day + 1, timeOfDay.hour, timeOfDay.minute);
 }
 
+/// Whether the schedule's due slot (one interval after [lastRun]) has
+/// already passed without a backup recording a newer [lastRun].
+bool autoBackupIsOverdue({
+  required DateTime now,
+  required DateTime? lastRun,
+  required AutoBackupInterval interval,
+  required TimeOfDay timeOfDay,
+}) {
+  if (lastRun == null) return false;
+  final due = interval.advance(lastRun);
+  final dueSlot =
+      DateTime(due.year, due.month, due.day, timeOfDay.hour, timeOfDay.minute);
+  const gracePeriod = Duration(minutes: 2);
+  return now.isAfter(dueSlot.add(gracePeriod));
+}
+
 DateTime nextAutoBackupTimeFromConfig(ConfigProvider configProvider) =>
     nextAutoBackupTime(
       now: DateTime.now(),
