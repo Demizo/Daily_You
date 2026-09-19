@@ -116,7 +116,7 @@ class Settings {
   static const autoBackupLocationUri =
       Setting<String>("autoBackupLocationUri", "");
   static const autoBackupInterval =
-      Setting<String>("autoBackupInterval", "daily");
+      Setting<String>("autoBackupInterval", "weekly");
   static const autoBackupHour = Setting<int>("autoBackupHour", 2);
   static const autoBackupMinute = Setting<int>("autoBackupMinute", 0);
   static const autoBackupMaxCount = Setting<int>("autoBackupMaxCount", 3);
