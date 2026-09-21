@@ -48,6 +48,7 @@ void autoBackupCallbackDispatcher() async {
 
 @pragma('vm:entry-point')
 void onThisDayCallbackDispatcher() async {
+  WidgetsFlutterBinding.ensureInitialized();
   configureLogging();
   await ConfigProvider.instance.init();
   // Skip syncing and migration for the alarm background task
@@ -103,6 +104,7 @@ void onThisDayCallbackDispatcher() async {
 
 @pragma('vm:entry-point')
 void callbackDispatcher() async {
+  WidgetsFlutterBinding.ensureInitialized();
   configureLogging();
   await ConfigProvider.instance.init();
   // Skip syncing and migration for the alarm background task
