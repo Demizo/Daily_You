@@ -102,6 +102,9 @@ class _LaunchPageState extends State<LaunchPage> {
     if (!mounted) return;
     await prefs.setString('autoBackupFailedTitle',
         AppLocalizations.of(context)!.autoBackupFailedTitle);
+    if (!mounted) return;
+    await prefs.setString('backupCancelActionLabel',
+        MaterialLocalizations.of(context).cancelButtonLabel);
   }
 
   Future _checkDatabaseConnection() async {

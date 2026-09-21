@@ -2,10 +2,23 @@ import 'dart:io';
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:daily_you/main.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 const int backupNotificationId = 2;
+const String backupCancelActionId = 'cancel_auto_backup';
+const String _backupCancelRequestedPrefsKey = 'autoBackupCancelRequested';
+
+/// Handles the cancel action on whichever isolate the tap lands on; may run
+/// on its own background isolate, separate from the one driving the backup.
+@pragma('vm:entry-point')
+void backupCancelBackgroundHandler(NotificationResponse response) async {
+  if (response.actionId != backupCancelActionId) return;
+  WidgetsFlutterBinding.ensureInitialized();
+  await NotificationManager.instance.requestBackupCancel();
+}
 
 class NotificationManager {
   static final NotificationManager instance = NotificationManager._init();
@@ -37,9 +50,24 @@ class NotificationManager {
     await _notifications!.initialize(
         settings: const InitializationSettings(
             android: AndroidInitializationSettings('@drawable/ic_notification'),
-            linux:
-                LinuxInitializationSettings(defaultActionName: 'Log Today')));
+            linux: LinuxInitializationSettings(defaultActionName: 'Log Today')),
+        onDidReceiveNotificationResponse: backupCancelBackgroundHandler,
+        onDidReceiveBackgroundNotificationResponse:
+            backupCancelBackgroundHandler);
   }
+
+  /// Marks the running automatic backup for cancellation; picked up by
+  /// whichever isolate is polling [isBackupCancelRequested].
+  Future<void> requestBackupCancel() async =>
+      (await _prefs).setBool(_backupCancelRequestedPrefsKey, true);
+
+  Future<bool> isBackupCancelRequested() async =>
+      (await _prefs).getBool(_backupCancelRequestedPrefsKey) ?? false;
+
+  Future<void> clearBackupCancelRequest() async =>
+      (await _prefs).remove(_backupCancelRequestedPrefsKey);
+
+  Future<SharedPreferences> get _prefs => SharedPreferences.getInstance();
 
   Future<bool> hasNotificationPermission() async {
     if (Platform.isAndroid) {
@@ -126,7 +154,8 @@ class NotificationManager {
       _notifications!.resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>()!;
 
-  Future<void> showBackupProgress(int percent, String title) async {
+  Future<void> showBackupProgress(int percent, String title,
+      {String? cancelLabel}) async {
     await _android.startForegroundService(
       id: backupNotificationId,
       title: title,
@@ -140,6 +169,15 @@ class NotificationManager {
         maxProgress: 100,
         progress: percent,
         onlyAlertOnce: true,
+        actions: cancelLabel == null
+            ? null
+            : [
+                AndroidNotificationAction(
+                  backupCancelActionId,
+                  cancelLabel,
+                  showsUserInterface: false,
+                ),
+              ],
       ),
       foregroundServiceTypes: const {
         AndroidServiceForegroundType.foregroundServiceTypeDataSync

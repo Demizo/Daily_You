@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:daily_you/config_provider.dart';
@@ -7,6 +8,7 @@ import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/storage/file_store.dart';
 import 'package:daily_you/storage/local_file_store.dart';
 import 'package:daily_you/storage/storage_picker.dart';
+import 'package:daily_you/utils/cancellation_token.dart';
 import 'package:daily_you/utils/operation_outcome.dart';
 import 'package:daily_you/utils/password_store.dart';
 import 'package:daily_you/utils/zip_utils.dart';
@@ -38,6 +40,7 @@ class BackupRestoreUtils {
     required void Function(double percent) onCompress,
     required void Function(double percent) onTransfer,
     required void Function() onCleanup,
+    CancellationToken? cancellationToken,
   }) async {
     final tempDir = await getTemporaryDirectory();
     final stagedArchive = File(join(tempDir.path, name));
@@ -51,13 +54,15 @@ class BackupRestoreUtils {
       }
 
       onCompress(0);
-      await ZipUtils.compress(
-          stagedArchive.path,
-          [databaseSnapshot.path],
+      await ZipUtils.compress(stagedArchive.path, [databaseSnapshot.path],
           [await ImageStorage.instance.getInternalFolder()],
           password: _backupPassword(),
-          onProgress: onCompress);
+          onProgress: onCompress,
+          cancellationToken: cancellationToken);
 
+      if (cancellationToken?.isCancelled ?? false) {
+        throw BackupCancelledException();
+      }
       if (await stagedArchive.length() == 0) {
         throw Exception('Created backup is empty');
       }
@@ -88,8 +93,10 @@ class BackupRestoreUtils {
     }
   }
 
+  /// Throws [BackupCancelledException] when cancelled
   static Future<bool> runAutoBackup(
-      {void Function(double percent)? onProgress}) async {
+      {void Function(double percent)? onProgress,
+      CancellationToken? cancellationToken}) async {
     final destinationUri =
         ConfigProvider.instance.get(Settings.autoBackupLocationUri);
     if (destinationUri.isEmpty) return false;
@@ -118,7 +125,10 @@ class BackupRestoreUtils {
         onCompress: (percent) => onProgress?.call(percent / 2),
         onTransfer: (percent) => onProgress?.call(50 + percent / 2),
         onCleanup: () {},
+        cancellationToken: cancellationToken,
       );
+    } on BackupCancelledException {
+      rethrow;
     } catch (error, stackTrace) {
       _logger.severe('Automatic backup failed', error, stackTrace);
       return false;
@@ -143,26 +153,47 @@ class BackupRestoreUtils {
         prefs.getString('autoBackupProgressTitle') ?? 'Backing Up…';
     final failedTitle =
         prefs.getString('autoBackupFailedTitle') ?? 'Backup Failed';
+    final cancelLabel = prefs.getString('backupCancelActionLabel');
+
+    await NotificationManager.instance.clearBackupCancelRequest();
+    final cancellationToken = CancellationToken();
+    final cancelPoll =
+        Timer.periodic(const Duration(milliseconds: 300), (_) async {
+      if (cancellationToken.isCancelled) return;
+      if (await NotificationManager.instance.isBackupCancelRequested()) {
+        cancellationToken.cancel();
+      }
+    });
 
     try {
-      await NotificationManager.instance.showBackupProgress(0, progressTitle);
+      await NotificationManager.instance
+          .showBackupProgress(0, progressTitle, cancelLabel: cancelLabel);
     } catch (error, stackTrace) {
       _logger.warning(
           'Could not show backup progress notification', error, stackTrace);
     }
 
     var success = false;
+    var cancelled = false;
     try {
       var shownPercent = 0;
-      success = await runAutoBackup(onProgress: (percent) {
-        if (percent - shownPercent < 5) return;
-        shownPercent = percent.round();
-        NotificationManager.instance
-            .showBackupProgress(shownPercent, progressTitle);
-      });
+      success = await runAutoBackup(
+        cancellationToken: cancellationToken,
+        onProgress: (percent) {
+          if (percent - shownPercent < 5) return;
+          shownPercent = percent.round();
+          NotificationManager.instance.showBackupProgress(
+              shownPercent, progressTitle,
+              cancelLabel: cancelLabel);
+        },
+      );
+    } on BackupCancelledException {
+      cancelled = true;
+      _logger.info('Automatic backup cancelled by the user');
     } finally {
+      cancelPoll.cancel();
       try {
-        if (success) {
+        if (cancelled || success) {
           await NotificationManager.instance.stopBackupProgress();
         } else {
           await NotificationManager.instance.showBackupFailed(failedTitle);
@@ -189,11 +220,8 @@ class BackupRestoreUtils {
     }
   }
 
-  static Future<void> _extractBackup(
-      File archive,
-      Directory destination,
-      String? password,
-      void Function(double percent) onProgress) async {
+  static Future<void> _extractBackup(File archive, Directory destination,
+      String? password, void Function(double percent) onProgress) async {
     if (await destination.exists()) {
       await destination.delete(recursive: true);
     }
