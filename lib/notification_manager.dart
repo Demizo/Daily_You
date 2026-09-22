@@ -56,17 +56,17 @@ class NotificationManager {
             backupCancelBackgroundHandler);
   }
 
-  // Picked up by whichever isolate is polling isBackupCancelRequested.
-  Future<void> requestBackupCancel() async =>
-      (await _prefs).setBool(_backupCancelRequestedPrefsKey, true);
+  // SharedPreferencesAsync, not SharedPreferences.getInstance() which caches the whole map
+  Future<void> requestBackupCancel() =>
+      _asyncPrefs.setBool(_backupCancelRequestedPrefsKey, true);
 
   Future<bool> isBackupCancelRequested() async =>
-      (await _prefs).getBool(_backupCancelRequestedPrefsKey) ?? false;
+      (await _asyncPrefs.getBool(_backupCancelRequestedPrefsKey)) ?? false;
 
-  Future<void> clearBackupCancelRequest() async =>
-      (await _prefs).remove(_backupCancelRequestedPrefsKey);
+  Future<void> clearBackupCancelRequest() =>
+      _asyncPrefs.remove(_backupCancelRequestedPrefsKey);
 
-  Future<SharedPreferences> get _prefs => SharedPreferences.getInstance();
+  final SharedPreferencesAsync _asyncPrefs = SharedPreferencesAsync();
 
   Future<bool> hasNotificationPermission() async {
     if (Platform.isAndroid) {
