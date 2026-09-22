@@ -353,13 +353,21 @@ Future<void> armAutoBackupWork() async {
 
 // Kept under its own unique name with ExistingWorkPolicy.keep, so reopening
 // the app while a catch-up is already queued doesn't register a duplicate.
+// Skips entirely if the periodic work is already running.
 Future<void> enqueueAutoBackupCatchup() async {
+  if (await isAutoBackupPeriodicRunning()) return;
+
   await Workmanager().registerOneOffTask(
     _autoBackupCatchupWorkName,
     _autoBackupCatchupTaskName,
     existingWorkPolicy: ExistingWorkPolicy.keep,
     foregroundServiceConfig: await _autoBackupForegroundServiceConfig(),
   );
+}
+
+Future<bool> isAutoBackupPeriodicRunning() async {
+  final workInfo = await Workmanager().getWorkInfo(_autoBackupPeriodicWorkName);
+  return workInfo?.state == WorkState.running;
 }
 
 Future<ForegroundServiceConfig> _autoBackupForegroundServiceConfig() async {

@@ -49,11 +49,14 @@ class BackupRestoreUtils {
   }) async {
     final tempDir = await getTemporaryDirectory();
     final stagedArchive = File(join(tempDir.path, name));
+    // Unique to prevent overlap if multiple backups manage to run concurrently
+    final snapshotDir = Directory(join(tempDir.path, '$name.snapshot'));
     final databaseSnapshot =
-        File(join(tempDir.path, AppDatabase.databaseFileName));
+        File(join(snapshotDir.path, AppDatabase.databaseFileName));
 
     try {
-      if (await databaseSnapshot.exists()) await databaseSnapshot.delete();
+      if (await snapshotDir.exists()) await snapshotDir.delete(recursive: true);
+      await snapshotDir.create(recursive: true);
       if (!await AppDatabase.instance.exportSnapshotTo(databaseSnapshot.path)) {
         throw Exception('Failed to create a consistent database snapshot');
       }
@@ -84,8 +87,8 @@ class BackupRestoreUtils {
       if (await stagedArchive.exists()) {
         await stagedArchive.delete();
       }
-      if (await databaseSnapshot.exists()) {
-        await databaseSnapshot.delete();
+      if (await snapshotDir.exists()) {
+        await snapshotDir.delete(recursive: true);
       }
     }
   }
