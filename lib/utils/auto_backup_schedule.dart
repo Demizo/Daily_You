@@ -3,13 +3,16 @@ import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 enum AutoBackupInterval {
-  daily('daily'),
-  weekly('weekly'),
-  monthly('monthly');
+  daily('daily', Duration(hours: 24)),
+  weekly('weekly', Duration(days: 7)),
+  monthly('monthly', Duration(days: 30));
 
-  const AutoBackupInterval(this.key);
+  const AutoBackupInterval(this.key, this.duration);
 
   final String key;
+
+  /// Intervals use a fixed duration, not calendar units
+  final Duration duration;
 
   static AutoBackupInterval fromKey(String? key) =>
       values.firstWhere((interval) => interval.key == key, orElse: () => daily);
@@ -23,30 +26,19 @@ enum AutoBackupInterval {
           AppLocalizations.of(context)!.settingsAutoBackupIntervalMonthly,
       };
 
-  DateTime advance(DateTime from) => switch (this) {
-        AutoBackupInterval.daily =>
-          DateTime(from.year, from.month, from.day + 1, from.hour, from.minute),
-        AutoBackupInterval.weekly =>
-          DateTime(from.year, from.month, from.day + 7, from.hour, from.minute),
-        AutoBackupInterval.monthly =>
-          DateTime(from.year, from.month + 1, from.day, from.hour, from.minute),
-      };
+  DateTime advance(DateTime from) => from.add(duration);
 }
 
+/// The next time a backup is due. Now if none has ever run, or one
+/// interval after the last run.
 DateTime nextAutoBackupTime({
   required DateTime now,
   required DateTime? lastRun,
   required AutoBackupInterval interval,
-  required TimeOfDay timeOfDay,
 }) {
-  final due = lastRun == null ? now : interval.advance(lastRun);
-  final from = due.isBefore(now) ? now : due;
-
-  final slot = DateTime(
-      from.year, from.month, from.day, timeOfDay.hour, timeOfDay.minute);
-  if (slot.isAfter(now)) return slot;
-  return DateTime(
-      from.year, from.month, from.day + 1, timeOfDay.hour, timeOfDay.minute);
+  if (lastRun == null) return now;
+  final due = interval.advance(lastRun);
+  return due.isBefore(now) ? now : due;
 }
 
 /// Whether the schedule's due slot (one interval after [lastRun]) has
@@ -55,14 +47,10 @@ bool autoBackupIsOverdue({
   required DateTime now,
   required DateTime? lastRun,
   required AutoBackupInterval interval,
-  required TimeOfDay timeOfDay,
 }) {
   if (lastRun == null) return false;
-  final due = interval.advance(lastRun);
-  final dueSlot =
-      DateTime(due.year, due.month, due.day, timeOfDay.hour, timeOfDay.minute);
   const gracePeriod = Duration(minutes: 2);
-  return now.isAfter(dueSlot.add(gracePeriod));
+  return now.isAfter(interval.advance(lastRun).add(gracePeriod));
 }
 
 DateTime nextAutoBackupTimeFromConfig(ConfigProvider configProvider) =>
@@ -71,8 +59,4 @@ DateTime nextAutoBackupTimeFromConfig(ConfigProvider configProvider) =>
       lastRun: DateTime.tryParse(configProvider.get(Settings.lastAutoBackup)),
       interval: AutoBackupInterval.fromKey(
           configProvider.get(Settings.autoBackupInterval)),
-      timeOfDay: TimeOfDay(
-        hour: configProvider.get(Settings.autoBackupHour),
-        minute: configProvider.get(Settings.autoBackupMinute),
-      ),
     );

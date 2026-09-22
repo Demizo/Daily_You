@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
@@ -30,20 +31,63 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:statsfl/statsfl.dart';
 import 'package:time_range_picker/time_range_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:workmanager/workmanager.dart';
 
-const int _autoBackupAlarmId = 2;
+const String _autoBackupPeriodicWorkName = 'auto_backup_periodic';
+const String _autoBackupCatchupWorkName = 'auto_backup_catchup';
+const String _autoBackupPeriodicTaskName = 'autoBackupPeriodic';
+const String _autoBackupCatchupTaskName = 'autoBackupCatchup';
+const String _autoBackupRetryAttemptPrefsKey = 'autoBackupRetryAttempt';
+
+// Max backup retry attempts
+const int _autoBackupMaxAttempts = 3;
+
+// Lets onTaskStopped wait for the running task's cleanup to actually finish
+Completer<void>? _autoBackupCleanupComplete;
 
 @pragma('vm:entry-point')
-void autoBackupCallbackDispatcher() async {
-  configureLogging();
-  await ConfigProvider.instance.init();
+void autoBackupCallbackDispatcher() {
+  Workmanager().executeTask((taskName, inputData) async {
+    WidgetsFlutterBinding.ensureInitialized();
+    configureLogging();
+    await ConfigProvider.instance.init();
 
-  if (ConfigProvider.instance.get(Settings.autoBackupEnabled)) {
-    await NotificationManager.instance.init();
-    await BackupRestoreUtils.runAutoBackupAndNotify();
+    _autoBackupCleanupComplete = Completer<void>();
+    try {
+      if (!ConfigProvider.instance.get(Settings.autoBackupEnabled)) {
+        return true;
+      }
+      await NotificationManager.instance.init();
+      return await _runAutoBackupWithBoundedRetry();
+    } finally {
+      if (!_autoBackupCleanupComplete!.isCompleted) {
+        _autoBackupCleanupComplete!.complete();
+      }
+    }
+  }, onTaskStopped: (taskName, stopReason) async {
+    // Any system-initiated stop, not just a notification tap.
+    await NotificationManager.instance.requestBackupCancel();
+    await _autoBackupCleanupComplete?.future
+        .timeout(const Duration(seconds: 10), onTimeout: () {});
+  });
+}
+
+Future<bool> _runAutoBackupWithBoundedRetry() async {
+  final prefs = await SharedPreferences.getInstance();
+  final outcome = await BackupRestoreUtils.runAutoBackupAndNotify();
+
+  if (outcome != AutoBackupOutcome.failed) {
+    await prefs.remove(_autoBackupRetryAttemptPrefsKey);
+    return true;
   }
 
-  await setAutoBackupAlarm();
+  final attempt = (prefs.getInt(_autoBackupRetryAttemptPrefsKey) ?? 0) + 1;
+  if (attempt >= _autoBackupMaxAttempts) {
+    await prefs.remove(_autoBackupRetryAttemptPrefsKey);
+    return true;
+  }
+  await prefs.setInt(_autoBackupRetryAttemptPrefsKey, attempt);
+  return false;
 }
 
 @pragma('vm:entry-point')
@@ -184,7 +228,8 @@ void main() async {
     await NotificationManager.instance.init();
 
     await AndroidAlarmManager.initialize();
-    await setAutoBackupAlarm();
+    await Workmanager().initialize(autoBackupCallbackDispatcher);
+    await armAutoBackupWork();
   }
 
   runApp(MultiProvider(providers: [
@@ -280,19 +325,52 @@ Future<void> setOnThisDayAlarm({bool firstSet = false}) async {
       allowWhileIdle: true, exact: exact, rescheduleOnReboot: true);
 }
 
-Future<void> setAutoBackupAlarm() async {
-  await AndroidAlarmManager.cancel(_autoBackupAlarmId);
-  if (!ConfigProvider.instance.get(Settings.autoBackupEnabled)) return;
+// Safe to call repeatedly: ExistingPeriodicWorkPolicy.update updates a
+// pending request in place rather than resetting it.
+Future<void> armAutoBackupWork() async {
+  if (!ConfigProvider.instance.get(Settings.autoBackupEnabled)) {
+    await Workmanager().cancelByUniqueName(_autoBackupPeriodicWorkName);
+    return;
+  }
 
-  final nextRun = nextAutoBackupTimeFromConfig(ConfigProvider.instance);
-  final exact = await NotificationManager.instance.canScheduleExactAlarms();
+  final interval = AutoBackupInterval.fromKey(
+      ConfigProvider.instance.get(Settings.autoBackupInterval));
+  final requireCharging =
+      ConfigProvider.instance.get(Settings.autoBackupRequireCharging);
 
-  await AndroidAlarmManager.oneShotAt(
-      nextRun, _autoBackupAlarmId, autoBackupCallbackDispatcher,
-      allowWhileIdle: true,
-      exact: exact,
-      rescheduleOnReboot: true,
-      wakeup: true);
+  await Workmanager().registerPeriodicTask(
+    _autoBackupPeriodicWorkName,
+    _autoBackupPeriodicTaskName,
+    frequency: interval.duration,
+    existingWorkPolicy: ExistingPeriodicWorkPolicy.update,
+    constraints: Constraints(
+      requiresDeviceIdle: true,
+      requiresCharging: requireCharging,
+    ),
+    foregroundServiceConfig: await _autoBackupForegroundServiceConfig(),
+  );
+}
+
+// Kept under its own unique name with ExistingWorkPolicy.keep, so reopening
+// the app while a catch-up is already queued doesn't register a duplicate.
+Future<void> enqueueAutoBackupCatchup() async {
+  await Workmanager().registerOneOffTask(
+    _autoBackupCatchupWorkName,
+    _autoBackupCatchupTaskName,
+    existingWorkPolicy: ExistingWorkPolicy.keep,
+    foregroundServiceConfig: await _autoBackupForegroundServiceConfig(),
+  );
+}
+
+Future<ForegroundServiceConfig> _autoBackupForegroundServiceConfig() async {
+  final prefs = await SharedPreferences.getInstance();
+  return ForegroundServiceConfig(
+    notificationId: backupNotificationId,
+    notificationChannelId: backupNotificationChannelId,
+    notificationChannelName: backupNotificationChannelId,
+    notificationTitle: prefs.getString('autoBackupProgressTitle'),
+    foregroundServiceType: ForegroundServiceType.dataSync,
+  );
 }
 
 class MainApp extends StatefulWidget {

@@ -702,9 +702,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get settingsAutoBackupLocation => 'Backup Location';
 
   @override
-  String get settingsAutoBackupTime => 'Backup Time';
-
-  @override
   String get settingsAutoBackupInterval => 'Backup Interval';
 
   @override
@@ -718,6 +715,9 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get settingsAutoBackupMaxCount => 'Backups To Keep';
+
+  @override
+  String get settingsAutoBackupRequireCharging => 'Only While Charging';
 
   @override
   String settingsBackupLast(Object time) {

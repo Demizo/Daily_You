@@ -8,11 +8,11 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const int backupNotificationId = 2;
+const String backupNotificationChannelId = 'daily_you_backup';
 const String backupCancelActionId = 'cancel_auto_backup';
 const String _backupCancelRequestedPrefsKey = 'autoBackupCancelRequested';
 
-/// Handles the cancel action on whichever isolate the tap lands on; may run
-/// on its own background isolate, separate from the one driving the backup.
+// May run on its own background isolate, separate from the backup's.
 @pragma('vm:entry-point')
 void backupCancelBackgroundHandler(NotificationResponse response) async {
   if (response.actionId != backupCancelActionId) return;
@@ -56,8 +56,7 @@ class NotificationManager {
             backupCancelBackgroundHandler);
   }
 
-  /// Marks the running automatic backup for cancellation; picked up by
-  /// whichever isolate is polling [isBackupCancelRequested].
+  // Picked up by whichever isolate is polling isBackupCancelRequested.
   Future<void> requestBackupCancel() async =>
       (await _prefs).setBool(_backupCancelRequestedPrefsKey, true);
 
@@ -160,7 +159,7 @@ class NotificationManager {
       id: backupNotificationId,
       title: title,
       notificationDetails: AndroidNotificationDetails(
-        'daily_you_backup',
+        backupNotificationChannelId,
         title,
         icon: '@drawable/ic_notification',
         importance: Importance.low,
@@ -195,7 +194,7 @@ class NotificationManager {
         body: null,
         notificationDetails: NotificationDetails(
             android: AndroidNotificationDetails(
-          'daily_you_backup',
+          backupNotificationChannelId,
           title,
           icon: '@drawable/ic_notification',
           importance: Importance.defaultImportance,

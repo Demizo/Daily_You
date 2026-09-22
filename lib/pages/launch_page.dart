@@ -167,15 +167,10 @@ class _LaunchPageState extends State<LaunchPage> {
       lastRun: DateTime.tryParse(configProvider.get(Settings.lastAutoBackup)),
       interval: AutoBackupInterval.fromKey(
           configProvider.get(Settings.autoBackupInterval)),
-      timeOfDay: TimeOfDay(
-        hour: configProvider.get(Settings.autoBackupHour),
-        minute: configProvider.get(Settings.autoBackupMinute),
-      ),
     );
     if (!overdue) return;
 
-    await BackupRestoreUtils.runAutoBackupAndNotify();
-    await setAutoBackupAlarm();
+    await enqueueAutoBackupCatchup();
   }
 
   Future<void> _retryDatabaseConnection() async {

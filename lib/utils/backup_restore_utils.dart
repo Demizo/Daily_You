@@ -22,8 +22,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class _RestoreCancelled implements Exception {}
 
+enum AutoBackupOutcome { succeeded, cancelled, failed, skipped }
+
 class BackupRestoreUtils {
   static final Logger _logger = Logger('BackupRestoreUtils');
+
+  // Prevent periodic and catch-up backups from colliding
+  static bool _autoBackupRunning = false;
 
   static const String manualBackupPrefix = 'daily_you_backup_';
   static const String autoBackupPrefix = 'daily_you_auto_backup_';
@@ -147,7 +152,17 @@ class BackupRestoreUtils {
     return true;
   }
 
-  static Future<bool> runAutoBackupAndNotify() async {
+  static Future<AutoBackupOutcome> runAutoBackupAndNotify() async {
+    if (_autoBackupRunning) return AutoBackupOutcome.skipped;
+    _autoBackupRunning = true;
+    try {
+      return await _runAutoBackupAndNotify();
+    } finally {
+      _autoBackupRunning = false;
+    }
+  }
+
+  static Future<AutoBackupOutcome> _runAutoBackupAndNotify() async {
     final prefs = await SharedPreferences.getInstance();
     final progressTitle =
         prefs.getString('autoBackupProgressTitle') ?? 'Backing Up…';
@@ -203,7 +218,8 @@ class BackupRestoreUtils {
             'Could not update backup result notification', error, stackTrace);
       }
     }
-    return success;
+    if (cancelled) return AutoBackupOutcome.cancelled;
+    return success ? AutoBackupOutcome.succeeded : AutoBackupOutcome.failed;
   }
 
   static Future<void> _pruneAutoBackups(FileStore destination, int keep) async {

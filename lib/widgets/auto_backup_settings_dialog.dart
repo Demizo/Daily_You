@@ -1,10 +1,10 @@
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/storage/storage_picker.dart';
-import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/utils/auto_backup_schedule.dart';
 import 'package:daily_you/widgets/settings_dropdown.dart';
 import 'package:daily_you/widgets/settings_icon_action.dart';
+import 'package:daily_you/widgets/settings_toggle.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -16,20 +16,6 @@ class AutoBackupSettingsDialog extends StatelessWidget {
     if (directory == null) return;
     await ConfigProvider.instance
         .set(Settings.autoBackupLocationUri, directory.uri);
-  }
-
-  Future<void> _pickTime(BuildContext context) async {
-    final configProvider = ConfigProvider.instance;
-    final picked = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay(
-        hour: configProvider.get(Settings.autoBackupHour),
-        minute: configProvider.get(Settings.autoBackupMinute),
-      ),
-    );
-    if (picked == null) return;
-    await configProvider.set(Settings.autoBackupHour, picked.hour);
-    await configProvider.set(Settings.autoBackupMinute, picked.minute);
   }
 
   @override
@@ -50,17 +36,6 @@ class AutoBackupSettingsDialog extends StatelessWidget {
               hint: StoragePicker.displayName(locationUri),
               icon: Icon(Icons.folder_rounded),
               onPressed: _pickLocation,
-            ),
-            SettingsIconAction(
-              title: AppLocalizations.of(context)!.settingsAutoBackupTime,
-              hint: TimeManager.timeOfDayString(
-                  context,
-                  TimeOfDay(
-                    hour: configProvider.get(Settings.autoBackupHour),
-                    minute: configProvider.get(Settings.autoBackupMinute),
-                  )),
-              icon: Icon(Icons.access_time_rounded),
-              onPressed: () async => _pickTime(context),
             ),
             SettingsDropdown<String>(
               title: AppLocalizations.of(context)!.settingsAutoBackupInterval,
@@ -92,6 +67,15 @@ class AutoBackupSettingsDialog extends StatelessWidget {
               onChanged: (value) async {
                 if (value == null) return;
                 await configProvider.set(Settings.autoBackupMaxCount, value);
+              },
+            ),
+            SettingsToggle(
+              title: AppLocalizations.of(context)!
+                  .settingsAutoBackupRequireCharging,
+              setting: Settings.autoBackupRequireCharging,
+              onChanged: (value) async {
+                await configProvider.set(
+                    Settings.autoBackupRequireCharging, value);
               },
             ),
           ],

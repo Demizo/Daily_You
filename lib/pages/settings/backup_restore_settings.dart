@@ -214,9 +214,10 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
   }
 
   String _nextAutoBackupText(ConfigProvider configProvider) {
+    // Date only since idle/charging-gated scheduling has no guaranteed time
     final next = nextAutoBackupTimeFromConfig(configProvider);
     return AppLocalizations.of(context)!
-        .settingsAutoBackupNext(_dateTimeText(next));
+        .settingsAutoBackupNext(TimeManager.formatDate(next, context));
   }
 
   String _dateTimeText(DateTime time) =>
@@ -238,7 +239,7 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
   Future<void> _showAutoBackupSettings() async {
     await showDialog(
         context: context, builder: (context) => AutoBackupSettingsDialog());
-    await setAutoBackupAlarm();
+    await armAutoBackupWork();
   }
 
   @override
@@ -294,7 +295,7 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
                   return;
                 }
                 await configProvider.set(Settings.autoBackupEnabled, false);
-                await setAutoBackupAlarm();
+                await armAutoBackupWork();
               },
             ),
           SettingsToggle(

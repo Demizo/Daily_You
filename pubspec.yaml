@@ -26,6 +26,7 @@ dependencies:
   icons_launcher: ^3.0.0
   flutter_local_notifications: ^21.0.0
   android_alarm_manager_plus: ^5.0.0
+  workmanager: ^0.10.10
   flutter_colorpicker: ^1.0.3
   shared_storage:
     git:

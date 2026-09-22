@@ -1318,12 +1318,6 @@ abstract class AppLocalizations {
   /// **'Backup Location'**
   String get settingsAutoBackupLocation;
 
-  /// No description provided for @settingsAutoBackupTime.
-  ///
-  /// In en, this message translates to:
-  /// **'Backup Time'**
-  String get settingsAutoBackupTime;
-
   /// No description provided for @settingsAutoBackupInterval.
   ///
   /// In en, this message translates to:
@@ -1353,6 +1347,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Backups To Keep'**
   String get settingsAutoBackupMaxCount;
+
+  /// No description provided for @settingsAutoBackupRequireCharging.
+  ///
+  /// In en, this message translates to:
+  /// **'Only While Charging'**
+  String get settingsAutoBackupRequireCharging;
 
   /// No description provided for @settingsBackupLast.
   ///
