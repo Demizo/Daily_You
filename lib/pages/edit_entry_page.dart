@@ -483,7 +483,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
       );
 
   Widget _saveButton() => IconButton(
-        icon: const Icon(Icons.check_rounded),
+        icon: const Icon(Icons.edit_off_rounded),
         onPressed: () => Navigator.of(context).pop(),
       );
 
