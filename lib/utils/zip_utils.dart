@@ -85,7 +85,8 @@ class ZipUtils {
       }
       for (var folder in args["inputFolders"]) {
         // TODO This is not accurate and only works for a single folder
-        await encoder.addDirectory(Directory(folder), onProgress: (progress) {
+        await encoder.addDirectory(Directory(folder), level: 0,
+            onProgress: (progress) {
           sendPort.send(progress * 100);
         });
       }
