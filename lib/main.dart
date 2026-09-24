@@ -376,7 +376,9 @@ Future<ForegroundServiceConfig> _autoBackupForegroundServiceConfig() async {
     notificationId: backupNotificationId,
     notificationChannelId: backupNotificationChannelId,
     notificationChannelName: backupNotificationChannelId,
-    notificationTitle: prefs.getString('autoBackupProgressTitle'),
+    notificationTitle: prefs
+        .getString('creatingBackupStatusTemplate')
+        ?.replaceFirst('{percent}', '0'),
     foregroundServiceType: ForegroundServiceType.dataSync,
   );
 }

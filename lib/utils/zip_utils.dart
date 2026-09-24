@@ -11,7 +11,6 @@ class ZipUtils {
   static Future<void> compress(
       String outputFile, List<String> inputFiles, List<String> inputFolders,
       {Function(double percent)? onProgress,
-      String? password,
       CancellationToken? cancellationToken}) async {
     if (cancellationToken?.isCancelled ?? false) {
       throw BackupCancelledException();
@@ -35,7 +34,6 @@ class ZipUtils {
       "inputFiles": inputFiles,
       "inputFolders": inputFolders,
       "port": rxPort.sendPort,
-      "password": password,
     });
 
     cancellationToken?.attachIsolate(isolate, () {
@@ -54,7 +52,7 @@ class ZipUtils {
   }
 
   static Future<void> extract(String inputFile, String outputFolder,
-      {Function(double percent)? onProgress, String? password}) async {
+      {Function(double percent)? onProgress}) async {
     var rxPort = ReceivePort();
 
     rxPort.listen((data) {
@@ -67,7 +65,6 @@ class ZipUtils {
       "inputFile": inputFile,
       "outputFolder": outputFolder,
       "port": rxPort.sendPort,
-      "password": password,
     });
 
     rxPort.close();
@@ -78,7 +75,7 @@ class ZipUtils {
   static Future<void> encodeArchive(Map<String, dynamic> args) async {
     SendPort sendPort = args["port"];
     try {
-      var encoder = ZipFileEncoder(password: args["password"]);
+      var encoder = ZipFileEncoder();
       encoder.createWithStream(OutputFileStream(args["outputFile"]));
       for (var file in args["inputFiles"]) {
         await encoder.addFile(File(file));
@@ -99,8 +96,7 @@ class ZipUtils {
 
   static Future<void> decodeArchive(Map<String, dynamic> args) async {
     SendPort sendPort = args["port"];
-    var decoder = ZipDecoder().decodeStream(InputFileStream(args["inputFile"]),
-        password: args["password"]);
+    var decoder = ZipDecoder().decodeStream(InputFileStream(args["inputFile"]));
 
     // Track number of files for progress indication
     var totalFileCount = decoder.numberOfFiles();

@@ -97,14 +97,20 @@ class _LaunchPageState extends State<LaunchPage> {
     await prefs.setString('onThisDayNotificationDescription',
         AppLocalizations.of(context)!.settingsOnThisDayDescription);
     if (!mounted) return;
-    await prefs.setString('autoBackupProgressTitle',
-        AppLocalizations.of(context)!.autoBackupProgressTitle);
-    if (!mounted) return;
     await prefs.setString('autoBackupFailedTitle',
         AppLocalizations.of(context)!.autoBackupFailedTitle);
     if (!mounted) return;
     await prefs.setString('backupCancelActionLabel',
         MaterialLocalizations.of(context).cancelButtonLabel);
+    if (!mounted) return;
+    await prefs.setString('creatingBackupStatusTemplate',
+        AppLocalizations.of(context)!.creatingBackupStatus('{percent}'));
+    if (!mounted) return;
+    await prefs.setString('encryptingBackupStatusTemplate',
+        AppLocalizations.of(context)!.encryptingBackupStatus('{percent}'));
+    if (!mounted) return;
+    await prefs.setString('tranferStatusTemplate',
+        AppLocalizations.of(context)!.tranferStatus('{percent}'));
   }
 
   Future _checkDatabaseConnection() async {

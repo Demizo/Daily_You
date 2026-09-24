@@ -731,9 +731,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsAutoBackupKeepAll => 'All';
 
   @override
-  String get autoBackupProgressTitle => 'Backing Up…';
-
-  @override
   String get autoBackupFailedTitle => 'Backup Failed';
 
   @override
@@ -749,6 +746,16 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String restoringBackupStatus(Object percent) {
     return '正在恢复备份…$percent%';
+  }
+
+  @override
+  String encryptingBackupStatus(Object percent) {
+    return 'Encrypting Backup… $percent%';
+  }
+
+  @override
+  String decryptingBackupStatus(Object percent) {
+    return 'Decrypting Backup… $percent%';
   }
 
   @override

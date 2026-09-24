@@ -1,10 +1,9 @@
 import 'dart:convert';
-import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:daily_you/config_provider.dart';
-import 'package:pointycastle/export.dart';
+import 'package:daily_you/utils/crypto_utils.dart';
 
 abstract class PasswordStore {
   const PasswordStore();
@@ -31,7 +30,7 @@ class AppPasswordStore extends PasswordStore {
     if (decoded != null) return decoded.verify(password);
 
     final legacyHash = sha256.convert(utf8.encode(password)).toString();
-    if (!_constantTimeEquals(utf8.encode(stored), utf8.encode(legacyHash))) {
+    if (!constantTimeEquals(utf8.encode(stored), utf8.encode(legacyHash))) {
       return false;
     }
     await save(password);
@@ -58,7 +57,7 @@ class BackupPasswordStore extends PasswordStore {
       password.isNotEmpty;
 
   @override
-  Future<bool> validate(String password) async => _constantTimeEquals(
+  Future<bool> validate(String password) async => constantTimeEquals(
       utf8.encode(BackupPasswordStore.password), utf8.encode(password));
 
   @override
@@ -66,20 +65,11 @@ class BackupPasswordStore extends PasswordStore {
       ConfigProvider.instance.set(Settings.backupPassword, password);
 }
 
-bool _constantTimeEquals(List<int> a, List<int> b) {
-  if (a.length != b.length) return false;
-  var difference = 0;
-  for (var i = 0; i < a.length; i++) {
-    difference |= a[i] ^ b[i];
-  }
-  return difference == 0;
-}
-
 class _Argon2Phc {
-  static const _memoryKiB = 19456;
-  static const _iterations = 2;
-  static const _parallelism = 1;
-  static const _hashLength = 32;
+  static const _memoryKiB = defaultArgon2MemoryKiB;
+  static const _iterations = defaultArgon2Iterations;
+  static const _parallelism = defaultArgon2Parallelism;
+  static const _hashLength = defaultArgon2KeyLength;
   static const _saltLength = 16;
   static const _version = 19;
 
@@ -101,8 +91,8 @@ class _Argon2Phc {
   });
 
   static String hashPassword(String password) {
-    final salt = _randomBytes(_saltLength);
-    final hash = _derive(
+    final salt = secureRandomBytes(_saltLength);
+    final hash = deriveArgon2idKey(
       password: password,
       salt: salt,
       memoryKiB: _memoryKiB,
@@ -131,7 +121,7 @@ class _Argon2Phc {
   }
 
   bool verify(String password) {
-    final actual = _derive(
+    final actual = deriveArgon2idKey(
       password: password,
       salt: salt,
       memoryKiB: memoryKiB,
@@ -139,36 +129,7 @@ class _Argon2Phc {
       parallelism: parallelism,
       keyLength: hash.length,
     );
-    return _constantTimeEquals(actual, hash);
-  }
-
-  static Uint8List _derive({
-    required String password,
-    required Uint8List salt,
-    required int memoryKiB,
-    required int iterations,
-    required int parallelism,
-    required int keyLength,
-  }) {
-    final generator = Argon2BytesGenerator()
-      ..init(Argon2Parameters(
-        Argon2Parameters.ARGON2_id,
-        salt,
-        desiredKeyLength: keyLength,
-        iterations: iterations,
-        memory: memoryKiB,
-        lanes: parallelism,
-      ));
-    final output = Uint8List(keyLength);
-    generator.deriveKey(
-        Uint8List.fromList(utf8.encode(password)), 0, output, 0);
-    return output;
-  }
-
-  static Uint8List _randomBytes(int length) {
-    final random = Random.secure();
-    return Uint8List.fromList(
-        List<int>.generate(length, (_) => random.nextInt(256)));
+    return constantTimeEquals(actual, hash);
   }
 
   static String _encodeUnpadded(Uint8List bytes) =>

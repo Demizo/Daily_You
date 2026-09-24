@@ -1378,12 +1378,6 @@ abstract class AppLocalizations {
   /// **'All'**
   String get settingsAutoBackupKeepAll;
 
-  /// No description provided for @autoBackupProgressTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Backing Up…'**
-  String get autoBackupProgressTitle;
-
   /// No description provided for @autoBackupFailedTitle.
   ///
   /// In en, this message translates to:
@@ -1407,6 +1401,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Restoring Backup… {percent}%'**
   String restoringBackupStatus(Object percent);
+
+  /// No description provided for @encryptingBackupStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Encrypting Backup… {percent}%'**
+  String encryptingBackupStatus(Object percent);
+
+  /// No description provided for @decryptingBackupStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Decrypting Backup… {percent}%'**
+  String decryptingBackupStatus(Object percent);
 
   /// No description provided for @cleanUpStatus.
   ///

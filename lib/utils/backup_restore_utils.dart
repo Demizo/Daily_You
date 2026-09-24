@@ -8,6 +8,7 @@ import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/storage/file_store.dart';
 import 'package:daily_you/storage/local_file_store.dart';
 import 'package:daily_you/storage/storage_picker.dart';
+import 'package:daily_you/utils/backup_encryption.dart';
 import 'package:daily_you/utils/cancellation_token.dart';
 import 'package:daily_you/utils/operation_outcome.dart';
 import 'package:daily_you/utils/password_store.dart';
@@ -43,16 +44,20 @@ class BackupRestoreUtils {
     required PickedDirectory destination,
     required String name,
     required void Function(double percent) onCompress,
+    required void Function(double percent) onEncrypt,
     required void Function(double percent) onTransfer,
     required void Function() onCleanup,
     CancellationToken? cancellationToken,
   }) async {
     final tempDir = await getTemporaryDirectory();
     final stagedArchive = File(join(tempDir.path, name));
+    final encryptedArchive = File('${stagedArchive.path}.enc');
     // Unique to prevent overlap if multiple backups manage to run concurrently
     final snapshotDir = Directory(join(tempDir.path, '$name.snapshot'));
     final databaseSnapshot =
         File(join(snapshotDir.path, AppDatabase.databaseFileName));
+    final password = _backupPassword();
+    final outputName = password != null ? '$name.enc' : name;
 
     try {
       if (await snapshotDir.exists()) await snapshotDir.delete(recursive: true);
@@ -64,9 +69,7 @@ class BackupRestoreUtils {
       onCompress(0);
       await ZipUtils.compress(stagedArchive.path, [databaseSnapshot.path],
           [await ImageStorage.instance.getInternalFolder()],
-          password: _backupPassword(),
-          onProgress: onCompress,
-          cancellationToken: cancellationToken);
+          onProgress: onCompress, cancellationToken: cancellationToken);
 
       if (cancellationToken?.isCancelled ?? false) {
         throw BackupCancelledException();
@@ -75,17 +78,34 @@ class BackupRestoreUtils {
         throw Exception('Created backup is empty');
       }
 
+      var backupFile = stagedArchive;
+      if (password != null) {
+        onEncrypt(0);
+        await BackupEncryption.encryptFile(
+            stagedArchive.path, encryptedArchive.path, password,
+            onProgress: onEncrypt, cancellationToken: cancellationToken);
+        if (cancellationToken?.isCancelled ?? false) {
+          throw BackupCancelledException();
+        }
+        backupFile = encryptedArchive;
+      }
+
       onTransfer(0);
       final transferred = await destination.copyFileInto(
-          stagedArchive.path, name,
-          mimeType: "application/zip", onProgress: onTransfer);
+          backupFile.path, outputName,
+          mimeType:
+              password != null ? "application/octet-stream" : "application/zip",
+          onProgress: onTransfer);
       if (!transferred) {
-        throw Exception('Failed to transfer backup to $name');
+        throw Exception('Failed to transfer backup to $outputName');
       }
     } finally {
       onCleanup();
       if (await stagedArchive.exists()) {
         await stagedArchive.delete();
+      }
+      if (await encryptedArchive.exists()) {
+        await encryptedArchive.delete();
       }
       if (await snapshotDir.exists()) {
         await snapshotDir.delete(recursive: true);
@@ -103,7 +123,9 @@ class BackupRestoreUtils {
 
   /// Throws [BackupCancelledException] when cancelled
   static Future<bool> runAutoBackup(
-      {void Function(double percent)? onProgress,
+      {void Function(double percent)? onCompress,
+      void Function(double percent)? onEncrypt,
+      void Function(double percent)? onTransfer,
       CancellationToken? cancellationToken}) async {
     final destinationUri =
         ConfigProvider.instance.get(Settings.autoBackupLocationUri);
@@ -130,8 +152,9 @@ class BackupRestoreUtils {
       await _writeBackup(
         destination: destination,
         name: _backupName(autoBackupPrefix),
-        onCompress: (percent) => onProgress?.call(percent / 2),
-        onTransfer: (percent) => onProgress?.call(50 + percent / 2),
+        onCompress: onCompress ?? (_) {},
+        onEncrypt: onEncrypt ?? (_) {},
+        onTransfer: onTransfer ?? (_) {},
         onCleanup: () {},
         cancellationToken: cancellationToken,
       );
@@ -167,11 +190,16 @@ class BackupRestoreUtils {
 
   static Future<AutoBackupOutcome> _runAutoBackupAndNotify() async {
     final prefs = await SharedPreferences.getInstance();
-    final progressTitle =
-        prefs.getString('autoBackupProgressTitle') ?? 'Backing Up…';
+    final creatingTemplate = prefs.getString('creatingBackupStatusTemplate');
+    final encryptingTemplate =
+        prefs.getString('encryptingBackupStatusTemplate');
+    final transferringTemplate = prefs.getString('tranferStatusTemplate');
     final failedTitle =
         prefs.getString('autoBackupFailedTitle') ?? 'Backup Failed';
     final cancelLabel = prefs.getString('backupCancelActionLabel');
+
+    String stageTitle(String? template, int percent) =>
+        template?.replaceFirst('{percent}', '$percent') ?? '';
 
     await NotificationManager.instance.clearBackupCancelRequest();
     final cancellationToken = CancellationToken();
@@ -184,8 +212,9 @@ class BackupRestoreUtils {
     });
 
     try {
-      await NotificationManager.instance
-          .showBackupProgress(0, progressTitle, cancelLabel: cancelLabel);
+      await NotificationManager.instance.showBackupProgress(
+          0, stageTitle(creatingTemplate, 0),
+          cancelLabel: cancelLabel);
     } catch (error, stackTrace) {
       _logger.warning(
           'Could not show backup progress notification', error, stackTrace);
@@ -194,16 +223,23 @@ class BackupRestoreUtils {
     var success = false;
     var cancelled = false;
     try {
+      String? shownTemplate = creatingTemplate;
       var shownPercent = 0;
+      void showStage(String? template, double percent) {
+        final rounded = percent.round();
+        if (template == shownTemplate && rounded - shownPercent < 5) return;
+        shownTemplate = template;
+        shownPercent = rounded;
+        NotificationManager.instance.showBackupProgress(
+            rounded, stageTitle(template, rounded),
+            cancelLabel: cancelLabel);
+      }
+
       success = await runAutoBackup(
         cancellationToken: cancellationToken,
-        onProgress: (percent) {
-          if (percent - shownPercent < 5) return;
-          shownPercent = percent.round();
-          NotificationManager.instance.showBackupProgress(
-              shownPercent, progressTitle,
-              cancelLabel: cancelLabel);
-        },
+        onCompress: (percent) => showStage(creatingTemplate, percent),
+        onEncrypt: (percent) => showStage(encryptingTemplate, percent),
+        onTransfer: (percent) => showStage(transferringTemplate, percent),
       );
     } on BackupCancelledException {
       cancelled = true;
@@ -229,7 +265,8 @@ class BackupRestoreUtils {
     if (keep <= 0) return;
     final backups = (await destination.list())
         .where((name) =>
-            name.startsWith(autoBackupPrefix) && name.endsWith('.zip'))
+            name.startsWith(autoBackupPrefix) &&
+            (name.endsWith('.zip') || name.endsWith('.zip.enc')))
         .toList()
       ..sort();
     if (backups.length <= keep) return;
@@ -240,13 +277,32 @@ class BackupRestoreUtils {
   }
 
   static Future<void> _extractBackup(File archive, Directory destination,
-      String? password, void Function(double percent) onProgress) async {
+      void Function(double percent) onProgress) async {
     if (await destination.exists()) {
       await destination.delete(recursive: true);
     }
     await destination.create(recursive: true);
     await ZipUtils.extract(archive.path, destination.path,
-        password: password, onProgress: onProgress);
+        onProgress: onProgress);
+  }
+
+  static Future<void> _decryptBackup(BuildContext context, File encrypted,
+      File destination, void Function(double percent) onProgress) async {
+    try {
+      final password =
+          BackupPasswordStore.isEnabled ? BackupPasswordStore.password : null;
+      if (password == null) throw BackupDecryptionFailedException();
+      await BackupEncryption.decryptFile(
+          encrypted.path, destination.path, password,
+          onProgress: onProgress);
+    } catch (_) {
+      if (!context.mounted) rethrow;
+      final password = await _promptForBackupPassword(context);
+      if (password == null) throw _RestoreCancelled();
+      await BackupEncryption.decryptFile(
+          encrypted.path, destination.path, password,
+          onProgress: onProgress);
+    }
   }
 
   static Future<String?> _promptForBackupPassword(BuildContext context) async {
@@ -279,6 +335,8 @@ class BackupRestoreUtils {
         name: _backupName(manualBackupPrefix),
         onCompress: (percent) => updateStatus(
             localizations.creatingBackupStatus("${percent.round()}")),
+        onEncrypt: (percent) => updateStatus(
+            localizations.encryptingBackupStatus("${percent.round()}")),
         onTransfer: (percent) =>
             updateStatus(localizations.tranferStatus("${percent.round()}")),
         onCleanup: () => updateStatus(localizations.cleanUpStatus),
@@ -296,21 +354,35 @@ class BackupRestoreUtils {
     final localizations = AppLocalizations.of(context)!;
     var outcome = const OperationOutcome.succeeded();
     var tempDir = await getTemporaryDirectory();
-    final tempZipName = "temp_backup.zip";
-    final tempZipFile = File(join(tempDir.path, tempZipName));
+    const tempImportName = "temp_backup_import";
+    final tempImportFile = File(join(tempDir.path, tempImportName));
+    final tempZipFile = File(join(tempDir.path, "temp_backup.zip"));
     final restoreFolder = Directory(join(tempDir.path, "Restore"));
 
     try {
       final archive = await StoragePicker.pickFile(
-          allowedExtensions: ['zip'], mimeTypes: ['application/zip']);
+          allowedExtensions: ['zip', 'enc'],
+          mimeTypes: ['application/zip', 'application/octet-stream']);
 
       if (archive == null) return const OperationOutcome.cancelled();
 
       // Import archive
       updateStatus(localizations.tranferStatus("0"));
-      await archive.copyInto(tempDir.path, tempZipName, onProgress: (percent) {
+      await archive.copyInto(tempDir.path, tempImportName,
+          onProgress: (percent) {
         updateStatus(localizations.tranferStatus("${percent.round()}"));
       });
+
+      if (await BackupEncryption.looksEncrypted(tempImportFile)) {
+        if (!context.mounted) throw _RestoreCancelled();
+        await _decryptBackup(context, tempImportFile, tempZipFile, (percent) {
+          updateStatus(
+              localizations.decryptingBackupStatus("${percent.round()}"));
+        });
+      } else {
+        if (await tempZipFile.exists()) await tempZipFile.delete();
+        await tempImportFile.copy(tempZipFile.path);
+      }
 
       // Restore archive
       updateStatus(localizations.restoringBackupStatus("0"));
@@ -319,19 +391,7 @@ class BackupRestoreUtils {
         updateStatus(localizations.restoringBackupStatus("${percent.round()}"));
       }
 
-      try {
-        await _extractBackup(
-            tempZipFile,
-            restoreFolder,
-            BackupPasswordStore.isEnabled ? BackupPasswordStore.password : null,
-            reportExtractProgress);
-      } catch (_) {
-        if (!context.mounted) rethrow;
-        final password = await _promptForBackupPassword(context);
-        if (password == null) throw _RestoreCancelled();
-        await _extractBackup(
-            tempZipFile, restoreFolder, password, reportExtractProgress);
-      }
+      await _extractBackup(tempZipFile, restoreFolder, reportExtractProgress);
 
       final restoreStore = LocalFileStore(restoreFolder.path);
       final databaseBytes =
@@ -368,6 +428,9 @@ class BackupRestoreUtils {
 
     // Delete temp files
     updateStatus(localizations.cleanUpStatus);
+    if (await tempImportFile.exists()) {
+      await tempImportFile.delete();
+    }
     if (await tempZipFile.exists()) {
       await tempZipFile.delete();
     }

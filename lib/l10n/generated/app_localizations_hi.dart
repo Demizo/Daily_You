@@ -738,9 +738,6 @@ class AppLocalizationsHi extends AppLocalizations {
   String get settingsAutoBackupKeepAll => 'All';
 
   @override
-  String get autoBackupProgressTitle => 'Backing Up…';
-
-  @override
   String get autoBackupFailedTitle => 'Backup Failed';
 
   @override
@@ -756,6 +753,16 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String restoringBackupStatus(Object percent) {
     return 'बैकअप रीस्टोर किया जा रहा है $percent%';
+  }
+
+  @override
+  String encryptingBackupStatus(Object percent) {
+    return 'Encrypting Backup… $percent%';
+  }
+
+  @override
+  String decryptingBackupStatus(Object percent) {
+    return 'Decrypting Backup… $percent%';
   }
 
   @override
