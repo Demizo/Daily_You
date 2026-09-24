@@ -244,7 +244,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                       }
                     },
                   ),
-                  actions: [_deleteButton(), _saveButton()]),
+                  actions: [_deleteButton(), _closeButton()]),
               body: EditorActionBarOverlay(
                 keyboardInset: keyboardInset,
                 body: LayoutBuilder(
@@ -482,8 +482,9 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
         onPressed: () => _showDeleteEntryPopup(),
       );
 
-  Widget _saveButton() => IconButton(
-        icon: const Icon(Icons.edit_off_rounded),
+  Widget _closeButton() => IconButton(
+        icon: Icon(
+            _creatingNewEntry ? Icons.check_rounded : Icons.edit_off_rounded),
         onPressed: () => Navigator.of(context).pop(),
       );
 
