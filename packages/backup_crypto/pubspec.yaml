@@ -1,0 +1,19 @@
+name: backup_crypto
+description: Native chunked AES-GCM backup encryption/decryption for Android
+version: 0.0.1
+publish_to: 'none'
+
+environment:
+  sdk: '>=3.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  uuid: ^4.5.3
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        package: com.demizo.daily_you.backup_crypto
+        pluginClass: BackupCryptoPlugin
