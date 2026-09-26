@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:daily_you/utils/backup_encryption.dart';
 import 'package:daily_you/utils/cancellation_token.dart';
@@ -76,6 +77,33 @@ void main() {
         equals(await File(largeFile).readAsBytes()));
   });
 
+  test('a file spanning multiple chunks and worker isolates round trips',
+      () async {
+    final largeFile = join(work.path, 'large_multi_chunk.zip');
+    final sink = File(largeFile).openWrite();
+    final chunk = Uint8List(1 << 20);
+    for (var i = 0; i < chunk.length; i++) {
+      chunk[i] = i % 256;
+    }
+    for (var i = 0; i < 90; i++) {
+      sink.add(chunk);
+    }
+    await sink.close();
+
+    final percents = <double>[];
+    await BackupEncryption.encryptFile(largeFile, encryptedFile, 'dolphin',
+        onProgress: percents.add);
+    final decrypted = join(work.path, 'decrypted_multi_chunk.zip');
+    await BackupEncryption.decryptFile(encryptedFile, decrypted, 'dolphin',
+        onProgress: percents.add);
+
+    expect(await File(decrypted).length(), await File(largeFile).length());
+    expect(await File(decrypted).readAsBytes(),
+        equals(await File(largeFile).readAsBytes()));
+    expect(percents, isNotEmpty);
+    expect(percents.last, 100);
+  });
+
   test('a pre-cancelled token stops encryption before it starts', () async {
     final token = CancellationToken()..cancel();
 
@@ -86,12 +114,12 @@ void main() {
     expect(await File(encryptedFile).exists(), isFalse);
   });
 
-  test('a corrupted canary is rejected', () async {
+  test('a corrupted ciphertext is rejected', () async {
     await BackupEncryption.encryptFile(plainFile, encryptedFile, 'dolphin');
 
-    // Canary sits right after magic + salt + iv (6 + 16 + 16).
+    // Flip a byte in the last chunk's tag, right at the end of the file.
     final bytes = await File(encryptedFile).readAsBytes();
-    bytes[40] ^= 0xff;
+    bytes[bytes.length - 1] ^= 0xff;
     await File(encryptedFile).writeAsBytes(bytes);
 
     final decrypted = join(work.path, 'decrypted.zip');

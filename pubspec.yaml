@@ -69,6 +69,8 @@ dependencies:
   flutter_svg: ^2.3.0
   flutter_secure_storage: ^10.3.4
   pointycastle: ^4.0.0
+  cryptography: ^2.9.0
+  cryptography_flutter: ^2.3.4
 dev_dependencies:
   flutter_test:
     sdk: flutter
