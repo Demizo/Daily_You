@@ -182,6 +182,9 @@ Future<void> _captureHomeAndGallery(WidgetTester tester,
   themeModeProvider.themeMode = ThemeMode.dark;
   await tester.tap(find.byIcon(Icons.home_rounded));
   await _settle(tester);
+  await tester
+      .runAsync(() => Future.delayed(const Duration(milliseconds: 500)));
+  await _settle(tester);
   await _precacheVisibleImages(tester);
   await tester.expectScreenshot(fastlanePhoneDevice, '1_home',
       langCode: fastlaneLocale);
