@@ -245,5 +245,6 @@
     "labelPresentLabel": "Present",
     "labelAbsentLabel": "Absent",
     "labelCoverageLabel": "Cobertura",
-    "chartDistributionTitle": "Distribució de {tag}"
+    "chartDistributionTitle": "Distribució de {tag}",
+    "settingsAutoBackupRequireCharging": "Només durant la càrrega"
 }
