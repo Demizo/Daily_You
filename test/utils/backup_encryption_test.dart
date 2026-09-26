@@ -85,4 +85,17 @@ void main() {
         throwsA(isA<BackupCancelledException>()));
     expect(await File(encryptedFile).exists(), isFalse);
   });
+
+  test('a corrupted canary is rejected', () async {
+    await BackupEncryption.encryptFile(plainFile, encryptedFile, 'dolphin');
+
+    // Canary sits right after magic + salt + iv (6 + 16 + 16).
+    final bytes = await File(encryptedFile).readAsBytes();
+    bytes[40] ^= 0xff;
+    await File(encryptedFile).writeAsBytes(bytes);
+
+    final decrypted = join(work.path, 'decrypted.zip');
+    expect(BackupEncryption.decryptFile(encryptedFile, decrypted, 'dolphin'),
+        throwsA(isA<BackupDecryptionFailedException>()));
+  });
 }
