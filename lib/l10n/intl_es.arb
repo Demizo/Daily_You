@@ -257,5 +257,6 @@
     "settingsAutoBackupNext": "Próximo respaldo {time}",
     "settingsAutoBackupKeepAll": "Todo",
     "autoBackupFailedTitle": "Respaldo fallido",
-    "settingsOpenSourceLicenses": "Licencias de código abierto"
+    "settingsOpenSourceLicenses": "Licencias de código abierto",
+    "settingsAutoBackupRequireCharging": "Solo durante la carga"
 }
