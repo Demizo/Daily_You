@@ -3,12 +3,14 @@ import 'dart:io';
 import 'dart:isolate';
 import 'dart:typed_data';
 
+import 'package:backup_crypto/backup_crypto.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:cryptography/dart.dart';
 import 'package:daily_you/utils/cancellation_token.dart';
 import 'package:daily_you/utils/crypto_utils.dart';
 import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
+import 'package:uuid/uuid.dart';
 
 class BackupDecryptionFailedException implements Exception {}
 
@@ -40,7 +42,7 @@ class BackupEncryption {
   static final bool _hasNativeAcceleration =
       Platform.isAndroid || Platform.isIOS;
 
-  static const _chunkPlainSize = 8 << 20;
+  static const _chunkPlainSize = 16 << 20;
 
   static const _maxDesktopWorkers = 4;
   static const _reservedDesktopCores = 2;
@@ -142,6 +144,38 @@ class BackupEncryption {
       throw BackupCancelledException();
     }
 
+    // On Android defer to native plugin for full file encryption
+    if (Platform.isAndroid) {
+      _logger
+          .info('$label (native): bodyLength=${keyMaterial.totalPlainLength}');
+      final requestId = const Uuid().v4();
+      cancellationToken
+          ?.attachNativeCancel(() => BackupCrypto.cancel(requestId));
+      try {
+        final run = direction == _Direction.encrypt
+            ? BackupCrypto.encryptBody
+            : BackupCrypto.decryptBody;
+        await run(
+          requestId: requestId,
+          inputPath: inputFile,
+          outputPath: outputFile,
+          key: keyMaterial.key,
+          baseNonce: keyMaterial.baseNonce,
+          chunkPlainSize: keyMaterial.chunkPlainSize,
+          totalPlainLength: keyMaterial.totalPlainLength,
+          headerLength: _headerLength,
+          onProgress: onProgress,
+        );
+      } on BackupCryptoCancelledException {
+        throw BackupCancelledException();
+      } on BackupCryptoDecryptionFailedException {
+        throw BackupDecryptionFailedException();
+      } finally {
+        cancellationToken?.detach();
+      }
+      return;
+    }
+
     final workerCount = _workerCountFor(totalChunks);
     final chunksPerWorker = (totalChunks + workerCount - 1) ~/ workerCount;
 
@@ -235,6 +269,7 @@ class BackupEncryption {
     final endChunk = args["endChunk"] as int;
     final key = args["key"] as Uint8List;
     final baseNonce = args["baseNonce"] as Uint8List;
+    final onDiskChunkSize = chunkPlainSize + _tagLength;
 
     final input = File(args["inputFile"]).openSync(mode: FileMode.read);
     final output =
@@ -247,7 +282,6 @@ class BackupEncryption {
         final plainLength = totalPlainLength - chunkStart < chunkPlainSize
             ? totalPlainLength - chunkStart
             : chunkPlainSize;
-        final onDiskChunkSize = chunkPlainSize + _tagLength;
         final nonce = _chunkNonce(baseNonce, chunkIndex);
 
         if (direction == _Direction.encrypt) {

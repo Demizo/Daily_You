@@ -7,6 +7,7 @@ class CancellationToken {
   bool _isCancelled = false;
   final Set<Isolate> _isolates = {};
   void Function()? _onCancelled;
+  void Function()? _onNativeCancel;
 
   bool get isCancelled => _isCancelled;
 
@@ -17,6 +18,7 @@ class CancellationToken {
       isolate.kill(priority: Isolate.immediate);
     }
     _onCancelled?.call();
+    _onNativeCancel?.call();
   }
 
   void attachIsolate(Isolate isolate, void Function() onCancelled) {
@@ -37,8 +39,18 @@ class CancellationToken {
     _onCancelled = onCancelled;
   }
 
+  /// Registers a hook invoked on [cancel] for work with no isolate to kill
+  void attachNativeCancel(void Function() onNativeCancel) {
+    if (_isCancelled) {
+      onNativeCancel();
+      return;
+    }
+    _onNativeCancel = onNativeCancel;
+  }
+
   void detach() {
     _isolates.clear();
     _onCancelled = null;
+    _onNativeCancel = null;
   }
 }
