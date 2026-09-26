@@ -1,0 +1,8 @@
+Daily You v3.5.0 has arrived! Protect your memories:
+
+• Added the option to encrypt backups
+• Added support for automatic backups
+• Improved app password security
+• Updated the about page with additional resources
+• Under the hood improvements and minor UI changes
+• Updated translations
