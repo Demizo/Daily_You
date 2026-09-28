@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:daily_you/database/entry_store.dart';
@@ -18,6 +19,43 @@ class UnreachableFileStore extends InMemoryFileStore {
   @override
   Future<bool> write(String name, Uint8List bytes) async =>
       throw Exception('permission revoked');
+}
+
+class FakeImageFolder extends InMemoryFileStore {
+  FakeImageFolder({super.reportsSizes, super.uniqueNamesOnCollision});
+
+  final List<String> lookups = [];
+  final List<String> writes = [];
+  final List<String> deletes = [];
+  final Map<String, Completer<void>> heldWrites = {};
+
+  Completer<void> holdWritesOf(String name) =>
+      heldWrites[name] = Completer<void>();
+
+  @override
+  Future<bool> exists(String name) {
+    lookups.add('exists $name');
+    return super.exists(name);
+  }
+
+  @override
+  Future<Uint8List?> read(String name) {
+    lookups.add('read $name');
+    return super.read(name);
+  }
+
+  @override
+  Future<bool> delete(String name) {
+    deletes.add(name);
+    return super.delete(name);
+  }
+
+  @override
+  Future<bool> write(String name, Uint8List bytes) async {
+    writes.add(name);
+    await heldWrites[name]?.future;
+    return super.write(name, bytes);
+  }
 }
 
 void main() {
@@ -91,6 +129,78 @@ void main() {
 
     expect(storage.externalSyncHealth.lastAttempt!.failureReason,
         contains('permission revoked'));
+  });
+
+  group('capture', () {
+    final captureTime = DateTime(2026, 1, 2, 3, 4, 5);
+    const capturedName = 'daily_you_2026-01-02T03-04-05.jpg';
+
+    test('uploads without looking anything up first', () async {
+      final externalStore = FakeImageFolder();
+      useStores(internalStore, externalStore);
+
+      final name =
+          await storage.create(null, bytesOf('photo'), currTime: captureTime);
+      await pumpEventQueue();
+
+      expect(name, capturedName);
+      expect(externalStore.lookups, isEmpty);
+      expect(await externalStore.list(), equals([capturedName]));
+      expect(await externalStore.read(capturedName), equals(bytesOf('photo')));
+    });
+
+    test('leaves an existing file with the same name untouched', () async {
+      final externalStore = InMemoryFileStore(uniqueNamesOnCollision: true);
+      useStores(internalStore, externalStore);
+      await externalStore.write(capturedName, bytesOf('other device'));
+
+      await storage.create(null, bytesOf('photo'), currTime: captureTime);
+      await pumpEventQueue();
+
+      expect(await externalStore.list(), equals([capturedName]));
+      expect(await externalStore.read(capturedName),
+          equals(bytesOf('other device')));
+    });
+
+    test('that is interrupted is reported', () async {
+      final externalStore = InMemoryFileStore()..writesStopAfter = 0;
+      useStores(internalStore, externalStore);
+
+      await storage.create(null, bytesOf('photo'), currTime: captureTime);
+      await pumpEventQueue();
+
+      expect(storage.externalSyncHealth.lastAttempt!.failureReason,
+          contains('stopped'));
+    });
+
+    test('that times out is reported and deletes nothing', () async {
+      final externalStore = FakeImageFolder();
+      useStores(internalStore, externalStore);
+      externalStore.holdWritesOf(capturedName);
+      storage.externalCreateTimeout = const Duration(milliseconds: 10);
+      addTearDown(
+          () => storage.externalCreateTimeout = const Duration(seconds: 60));
+
+      await storage.create(null, bytesOf('photo'), currTime: captureTime);
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+
+      expect(storage.externalSyncHealth.lastAttempt!.failureReason,
+          contains('TimeoutException'));
+      expect(externalStore.deletes, isEmpty);
+      expect(await internalStore.read(capturedName), equals(bytesOf('photo')));
+    });
+
+    test('with skipExternalUpload writes internally only', () async {
+      final externalStore = FakeImageFolder();
+      useStores(internalStore, externalStore);
+
+      await storage.create(null, bytesOf('photo'),
+          currTime: captureTime, skipExternalUpload: true);
+      await pumpEventQueue();
+
+      expect(await internalStore.read(capturedName), equals(bytesOf('photo')));
+      expect(externalStore.writes, isEmpty);
+    });
   });
 
   test('refuses to garbage collect before the images load', () async {
