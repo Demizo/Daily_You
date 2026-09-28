@@ -14,6 +14,16 @@ class SafFileStore implements FileStore {
 
   Uri get _tree => Uri.parse(treeUri);
 
+  /// Another app may rename files, so an entry is used only while it still
+  /// has the listed name.
+  Map<String, Uri> _listedDocuments = {};
+
+  Future<Uri?> _listedDocument(String name) async {
+    final listed = _listedDocuments[name];
+    if (listed == null) return null;
+    return (await saf.fromTreeUri(listed))?.name == name ? listed : null;
+  }
+
   Future<saf.DocumentFile?> _child(String name,
           {bool requiresWriteAccess = true}) =>
       saf.child(_tree, name, requiresWriteAccess: requiresWriteAccess);
@@ -41,17 +51,22 @@ class SafFileStore implements FileStore {
     ];
 
     final files = List<StoredFile>.empty(growable: true);
+    final documents = <String, Uri>{};
     await for (final document in saf.listFiles(_tree, columns: columns)) {
       final name = document.name;
       if (document.isFile == true && name != null) {
         files.add(StoredFile(name, document.size ?? 0));
+        documents[name] = document.uri;
       }
     }
+    _listedDocuments = documents;
     return files;
   }
 
   @override
   Future<Uint8List?> read(String name) async {
+    final listed = await _listedDocument(name);
+    if (listed != null) return saf.getDocumentContent(listed);
     final document = await _child(name);
     return document != null ? await document.getContent() : null;
   }
@@ -95,6 +110,9 @@ class SafFileStore implements FileStore {
 
   @override
   Future<bool> delete(String name) async {
+    final listed = await _listedDocument(name);
+    _listedDocuments.remove(name);
+    if (listed != null) return await saf.delete(listed) == true;
     final document = await _child(name, requiresWriteAccess: false);
     if (document == null) return true;
     return await document.delete() ?? false;
