@@ -30,6 +30,18 @@ class LocalFileStore implements FileStore {
   }
 
   @override
+  Future<List<StoredFile>> listFiles() async {
+    final files = List<StoredFile>.empty(growable: true);
+    await for (final entity in Directory(directoryPath).list()) {
+      if (entity is! File) continue;
+      final stat = await entity.stat();
+      if (stat.type == FileSystemEntityType.notFound) continue;
+      files.add(StoredFile(basename(entity.path), stat.size));
+    }
+    return files;
+  }
+
+  @override
   Future<Uint8List?> read(String name) async {
     final file = _fileFor(name);
     if (!await file.exists()) return null;

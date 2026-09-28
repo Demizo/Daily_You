@@ -4,6 +4,15 @@ import 'dart:typed_data';
 import 'package:daily_you/storage/local_file_store.dart';
 import 'package:daily_you/storage/saf_file_store.dart';
 
+class StoredFile {
+  const StoredFile(this.name, this.size);
+
+  final String name;
+
+  /// 0 when the file is empty or the store can't report its size.
+  final int size;
+}
+
 abstract interface class FileStore {
   factory FileStore.external(String location) =>
       Platform.isAndroid ? SafFileStore(location) : LocalFileStore(location);
@@ -13,6 +22,10 @@ abstract interface class FileStore {
   Future<bool> exists(String name);
 
   Future<List<String>> list();
+
+  /// Throws on a reported listing error. A listing can still miss files
+  /// silently.
+  Future<List<StoredFile>> listFiles();
 
   Future<Uint8List?> read(String name);
 

@@ -34,6 +34,12 @@ void main() {
           isFalse);
     });
 
+    test('listFiles throws when the directory is missing', () async {
+      await expectLater(
+          LocalFileStore(join(directory.path, 'gone')).listFiles(),
+          throwsA(isA<FileSystemException>()));
+    });
+
     test('write recreates a directory that disappeared', () async {
       await store.write('note.txt', bytesOf('hello'));
       await directory.delete(recursive: true);
@@ -87,6 +93,21 @@ void fileStoreContract(FileStore Function() storeOf) {
     await store.write('two.txt', bytesOf('2'));
 
     expect(await store.list(), unorderedEquals(['one.txt', 'two.txt']));
+  });
+
+  test('listFiles reports every file with its size', () async {
+    final store = storeOf();
+    await store.write('one.txt', bytesOf('1'));
+    await store.write('two.txt', bytesOf('22'));
+
+    final files = await store.listFiles();
+
+    expect({for (final file in files) file.name: file.size},
+        equals({'one.txt': 1, 'two.txt': 2}));
+  });
+
+  test('listFiles of an empty store is empty', () async {
+    expect(await storeOf().listFiles(), isEmpty);
   });
 
   test('rename moves the bytes to the new name', () async {

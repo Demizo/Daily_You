@@ -3,6 +3,11 @@ import 'dart:typed_data';
 import 'package:daily_you/storage/file_store.dart';
 
 class InMemoryFileStore implements FileStore {
+  InMemoryFileStore({this.reportsSizes = true});
+
+  /// Some Android providers list every size as 0.
+  final bool reportsSizes;
+
   final Map<String, Uint8List> _bytesByName = {};
   final Map<String, DateTime> _modifiedTimeByName = {};
 
@@ -14,6 +19,12 @@ class InMemoryFileStore implements FileStore {
 
   @override
   Future<List<String>> list() async => _bytesByName.keys.toList();
+
+  @override
+  Future<List<StoredFile>> listFiles() async => [
+        for (final MapEntry(key: name, value: bytes) in _bytesByName.entries)
+          StoredFile(name, reportsSizes ? bytes.length : 0)
+      ];
 
   @override
   Future<Uint8List?> read(String name) async => _bytesByName[name];
