@@ -141,6 +141,11 @@ class _LaunchPageState extends State<LaunchPage> {
       await _migrateImagesFromExternalStorage();
       if (ImageStorage.instance.usingExternalLocation()) {
         if (await ImageStorage.instance.hasExternalLocationPermission()) {
+          unawaited(ImageStorage.instance.syncImageFolder(false).then((_) {},
+              onError: (Object error, StackTrace stackTrace) {
+            _logger.severe(
+                'Syncing the image folder failed', error, stackTrace);
+          }));
           unawaited(_catchUpMissedAutoBackup());
           await _nextPage();
           return;
