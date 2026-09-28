@@ -25,19 +25,26 @@ class SafFileStore implements FileStore {
       await (await _child(name, requiresWriteAccess: false))?.exists() ?? false;
 
   @override
-  Future<List<String>> list() async {
+  Future<List<String>> list() async =>
+      [for (final file in await listFiles()) file.name];
+
+  @override
+  Future<List<StoredFile>> listFiles() async {
     const columns = <saf.DocumentFileColumn>[
       saf.DocumentFileColumn.displayName,
       saf.DocumentFileColumn.mimeType,
+      saf.DocumentFileColumn.size,
+      saf.DocumentFileColumn.id,
     ];
 
-    final names = List<String>.empty(growable: true);
+    final files = List<StoredFile>.empty(growable: true);
     await for (final document in saf.listFiles(_tree, columns: columns)) {
-      if (document.isFile == true && document.name != null) {
-        names.add(document.name!);
+      final name = document.name;
+      if (document.isFile == true && name != null) {
+        files.add(StoredFile(name, document.size ?? 0));
       }
     }
-    return names;
+    return files;
   }
 
   @override
