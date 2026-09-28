@@ -25,8 +25,7 @@ Future<OperationOutcome> importFromJson(Function(String) updateStatus) async {
     outcome = OperationOutcome.failed(error);
   }
 
-  await finishImport(updateStatus, syncImages: true);
-  return outcome;
+  return finishImport(updateStatus, outcome);
 }
 
 List<ImportedEntry> decodeJsonEntries(Uint8List bytes) {

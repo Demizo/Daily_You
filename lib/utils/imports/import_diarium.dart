@@ -96,6 +96,7 @@ Future<OperationOutcome> importFromDiarium(
               null,
               data,
               currTime: timestamp,
+              skipExternalUpload: true,
             );
             if (newImage != null) {
               await EntryImagesProvider.instance.add(
@@ -121,8 +122,7 @@ Future<OperationOutcome> importFromDiarium(
 
   updateStatus(localizations.cleanUpStatus);
 
-  await EntriesProvider.instance.load();
-  await EntryImagesProvider.instance.load();
+  outcome = await finishImport(updateStatus, outcome);
 
   if (db != null && db.isOpen) {
     await db.close();
