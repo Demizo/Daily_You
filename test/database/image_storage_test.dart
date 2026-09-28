@@ -131,6 +131,40 @@ void main() {
         contains('permission revoked'));
   });
 
+  group('getBytes', () {
+    test('caches an external copy without writing it internally', () async {
+      final externalStore = InMemoryFileStore();
+      useStores(internalStore, externalStore);
+      await externalStore.write('photo.jpg', bytesOf('photo'));
+
+      expect(await storage.getBytes('photo.jpg'), equals(bytesOf('photo')));
+
+      expect(await internalStore.exists('photo.jpg'), isFalse);
+      expect(storage.imageCache.get('photo.jpg'), equals(bytesOf('photo')));
+    });
+
+    test('falls back to the external copy when the internal one is empty',
+        () async {
+      final externalStore = InMemoryFileStore();
+      useStores(internalStore, externalStore);
+      await internalStore.write('photo.jpg', Uint8List(0));
+      await externalStore.write('photo.jpg', bytesOf('photo'));
+
+      expect(await storage.getBytes('photo.jpg'), equals(bytesOf('photo')));
+      expect(await internalStore.read('photo.jpg'), isEmpty);
+    });
+
+    test('never returns or caches empty bytes', () async {
+      final externalStore = InMemoryFileStore();
+      useStores(internalStore, externalStore);
+      await internalStore.write('photo.jpg', Uint8List(0));
+      await externalStore.write('photo.jpg', Uint8List(0));
+
+      expect(await storage.getBytes('photo.jpg'), isNull);
+      expect(storage.imageCache.get('photo.jpg'), isNull);
+    });
+  });
+
   group('capture', () {
     final captureTime = DateTime(2026, 1, 2, 3, 4, 5);
     const capturedName = 'daily_you_2026-01-02T03-04-05.jpg';

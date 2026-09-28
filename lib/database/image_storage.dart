@@ -219,22 +219,21 @@ class ImageStorage {
     }
     // Fetch local copy if present
     final internal = await internalStore();
-    bytes = await imgFetchPool.withResource(() => internal.read(imageName));
+    bytes = _nonEmpty(
+        await imgFetchPool.withResource(() => internal.read(imageName)));
 
-    // Attempt to fetch file externally
     final external = externalStore;
     if (bytes == null && external != null) {
-      // Get and cache external image
-      bytes = await external.read(imageName);
-      if (bytes != null) {
-        await internal.write(imageName, bytes);
-      }
+      bytes = _nonEmpty(await external.read(imageName));
     }
     if (bytes != null) {
       imageCache.put(imageName, bytes);
     }
     return bytes;
   }
+
+  Uint8List? _nonEmpty(Uint8List? bytes) =>
+      bytes == null || bytes.isEmpty ? null : bytes;
 
   Future<String?> create(String? imageName, Uint8List bytes,
       {DateTime? currTime, bool skipExternalUpload = false}) async {
