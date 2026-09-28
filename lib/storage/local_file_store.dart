@@ -65,6 +65,26 @@ class LocalFileStore implements FileStore {
   }
 
   @override
+  Future<CreateResult> createNew(String name, Uint8List bytes) async {
+    final file = _fileFor(name);
+    await file.parent.create(recursive: true);
+    try {
+      await file.create(exclusive: true);
+    } on FileSystemException {
+      if (await file.exists()) return CreateResult.alreadyExists;
+      rethrow;
+    }
+
+    try {
+      await file.writeAsBytes(bytes, flush: true);
+      return CreateResult.created;
+    } catch (_) {
+      if (await file.exists()) await file.delete();
+      rethrow;
+    }
+  }
+
+  @override
   Future<bool> delete(String name) async {
     final file = _fileFor(name);
     if (await file.exists()) await file.delete();
