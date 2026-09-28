@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:daily_you/storage/file_store.dart';
+import 'package:logging/logging.dart';
 import 'package:saf_util/saf_util.dart';
 import 'package:shared_storage/shared_storage.dart' as saf;
 
@@ -8,6 +9,8 @@ class SafFileStore implements FileStore {
   SafFileStore(this.treeUri);
 
   final String treeUri;
+
+  final Logger _logger = Logger('SafFileStore');
 
   Uri get _tree => Uri.parse(treeUri);
 
@@ -71,6 +74,23 @@ class SafFileStore implements FileStore {
     final renamed =
         await SafUtil().rename(document.uri.toString(), false, newName);
     return renamed.name == newName;
+  }
+
+  @override
+  Future<CreateResult> createNew(String name, Uint8List bytes) async {
+    final created = await saf.createFileAsBytes(_tree,
+        mimeType: "*/*", displayName: name, bytes: bytes);
+    if (created == null) return CreateResult.failed;
+    final createdName = created.name;
+    if (createdName == name) return CreateResult.created;
+    // Without a name the outcome is unknown, so nothing is deleted
+    if (createdName == null || createdName.isEmpty) return CreateResult.failed;
+
+    // A different name means a collision occurred
+    if (await saf.delete(created.uri) != true) {
+      _logger.warning('could not delete $createdName after $name collided');
+    }
+    return CreateResult.alreadyExists;
   }
 
   @override

@@ -4,6 +4,8 @@ import 'dart:typed_data';
 import 'package:daily_you/storage/local_file_store.dart';
 import 'package:daily_you/storage/saf_file_store.dart';
 
+enum CreateResult { created, alreadyExists, failed }
+
 class StoredFile {
   const StoredFile(this.name, this.size);
 
@@ -32,6 +34,9 @@ abstract interface class FileStore {
   Future<bool> write(String name, Uint8List bytes);
 
   Future<bool> rename(String name, String newName);
+
+  /// Never replaces an existing [name].
+  Future<CreateResult> createNew(String name, Uint8List bytes);
 
   Future<bool> delete(String name);
 
