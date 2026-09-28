@@ -10,8 +10,6 @@ import 'package:daily_you/storage/storage_picker.dart';
 import 'package:daily_you/utils/operation_outcome.dart';
 import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
-import 'package:daily_you/database/entry_store.dart';
-import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -40,12 +38,14 @@ class ImageStorage {
       ExternalSyncHealth('ImageStorage');
 
   @visibleForTesting
-  Duration externalCreateTimeout = const Duration(seconds: 60);
+  Duration externalTimeout = const Duration(seconds: 60);
 
   final Set<String> _uploadingNames = {};
 
   FileStore? _internalStore;
   FileStore? _externalStoreOverride;
+  int _imageFolderRequests = 0;
+  Future<void> _imageFolderWork = Future.value();
 
   Future<FileStore> internalStore() async =>
       _internalStore ??= LocalFileStore(await getInternalFolder());
@@ -272,23 +272,22 @@ class ImageStorage {
   Future<CreateResult> _createExternal(
       FileStore external, String name, Uint8List bytes) async {
     _uploadingNames.add(name);
-    try {
-      var result = CreateResult.failed;
-      await externalSyncHealth.record("external image create of $name",
-          () async {
-        result = await external
-            .createNew(name, bytes)
-            .timeout(externalCreateTimeout);
-        return result != CreateResult.failed;
-      });
-      if (result == CreateResult.alreadyExists) {
-        _logger.warning(
-            'external image create of $name collided with an existing file');
-      }
-      return result;
-    } finally {
-      _uploadingNames.remove(name);
+    final create = external.createNew(name, bytes);
+    // Even after timeout, create could keep writing. To be safe, consider it to be uploading unless it completes gracefully
+    unawaited(create
+        .then((_) {}, onError: (Object _) {})
+        .whenComplete(() => _uploadingNames.remove(name)));
+
+    var result = CreateResult.failed;
+    await externalSyncHealth.record("external image create of $name", () async {
+      result = await create.timeout(externalTimeout);
+      return result != CreateResult.failed;
+    });
+    if (result == CreateResult.alreadyExists) {
+      _logger.warning(
+          'external image create of $name collided with an existing file');
     }
+    return result;
   }
 
   Future<bool> delete(String imageName) async {
@@ -307,62 +306,58 @@ class ImageStorage {
 
   Future<bool> syncImageFolder(bool garbageCollect,
       {Function(String)? updateStatus}) async {
-    final external = externalStore;
-    if (external == null) return false;
-    final internal = await internalStore();
+    final summary = await reconcileImageFolder(updateStatus: updateStatus);
+    if (summary == null) return false;
 
-    List<Entry> entries = EntryStore.instance.entries;
-    updateStatus?.call("0/${entries.length}");
-
-    List<String> externalImages = await external.list();
-    List<String> internalImages = await internal.list();
-
-    int syncedEntries = 0;
-    for (Entry entry in entries) {
-      var images = EntryImagesProvider.instance.getForEntry(entry);
-      for (final image in images) {
-        var entryImage = image.imgPath;
-
-        // Export
-        if (internalImages.contains(entryImage) &&
-            !externalImages.contains(entryImage)) {
-          var bytes = await internal.read(entryImage);
-          if (bytes != null) {
-            await externalSyncHealth.record("external image write",
-                () => external.write(entryImage, bytes));
-          }
-        }
-
-        // Import
-        if (externalImages.contains(entryImage) &&
-            !internalImages.contains(entryImage)) {
-          var bytes = await external.read(entryImage);
-          if (bytes != null) {
-            await internal.write(entryImage, bytes);
-          }
-        }
-        syncedEntries += 1;
-        updateStatus?.call("$syncedEntries/${entries.length}");
-      }
-    }
-
-    invalidateCache();
-
-    if (garbageCollect) {
-      return await garbageCollectImages();
-    }
+    if (garbageCollect) return await garbageCollectImages();
     return true;
   }
 
-  Future<bool> garbageCollectImages() async {
+  /// Stops any sync pass, then runs [action] before any later request.
+  Future<T> whileNotSyncing<T>(Future<T> Function() action) =>
+      _queueImageFolderWork((_) => action());
+
+  /// A pass covers every image, so a newer request stops a running or queued
+  /// one. Throws when a listing fails.
+  @visibleForTesting
+  Future<ImageSyncSummary?> reconcileImageFolder(
+          {Function(String)? updateStatus}) =>
+      _queueImageFolderWork((superseded) async {
+        final internal = await internalStore();
+        final external = externalStore;
+        if (external == null) return null;
+
+        final summary = await _ImageFolderReconcile(
+                this,
+                internal,
+                external,
+                _referencedImageNames('reconcile').toList(),
+                superseded,
+                updateStatus ?? (_) {})
+            .run();
+        if (summary.downloaded > 0 || summary.repaired > 0) invalidateCache();
+        return summary;
+      });
+
+  Future<T> _queueImageFolderWork<T>(
+      Future<T> Function(bool Function() superseded) work) {
+    final request = ++_imageFolderRequests;
+    final result = _imageFolderWork
+        .then((_) => work(() => request != _imageFolderRequests));
+    _imageFolderWork = result.then((_) {}, onError: (_) {});
+    return result;
+  }
+
+  Future<bool> garbageCollectImages() async =>
+      _deleteUnreferencedImages(_referencedImageNames('garbage collect'));
+
+  Set<String> _referencedImageNames(String action) {
     final imagesProvider = EntryImagesProvider.instance;
     if (!imagesProvider.isLoaded) {
       throw StateError(
-          'Refused to garbage collect images before the image list was loaded');
+          'Refused to $action images before the image list was loaded');
     }
-
-    return _deleteUnreferencedImages(
-        imagesProvider.images.map((entryImage) => entryImage.imgPath).toSet());
+    return {for (final entryImage in imagesProvider.images) entryImage.imgPath};
   }
 
   Future<bool> _deleteUnreferencedImages(Set<String> referencedNames) async {
@@ -373,5 +368,311 @@ class ImageStorage {
       }
     }
     return true;
+  }
+}
+
+class ImageSyncSummary {
+  int uploaded = 0;
+  int downloaded = 0;
+  int repaired = 0;
+  int conflicts = 0;
+  int unavailable = 0;
+  int skippedSizeUnknown = 0;
+  int collisions = 0;
+  int failures = 0;
+
+  @override
+  String toString() => [
+        'uploaded $uploaded',
+        'downloaded $downloaded',
+        'repaired $repaired',
+        'conflicts $conflicts',
+        'unavailable $unavailable',
+        'skipped as size unknown $skippedSizeUnknown',
+        'collisions $collisions',
+        'failures $failures',
+      ].join(', ');
+}
+
+class _ImageFolderReconcile {
+  _ImageFolderReconcile(this._storage, this._internal, this._external,
+      this._referencedNames, this._superseded, this._updateStatus);
+
+  static const _stopAfterConsecutive = 3;
+
+  final ImageStorage _storage;
+  final FileStore _internal;
+  final FileStore _external;
+  final List<String> _referencedNames;
+  final bool Function() _superseded;
+  final Function(String) _updateStatus;
+
+  final ImageSyncSummary _summary = ImageSyncSummary();
+  Map<String, int> _internalSizes = {};
+  Map<String, int> _externalSizes = {};
+  Set<String> _internalLowerCaseNames = {};
+  Set<String> _externalLowerCaseNames = {};
+  bool _sizesReported = true;
+
+  int _consecutiveFailedWrites = 0;
+  String? _stopReason;
+
+  Logger get _logger => _storage._logger;
+
+  bool _shouldStop() {
+    if (_superseded()) _stopReason ??= 'a newer request';
+    return _stopReason != null;
+  }
+
+  /// Later image folder work waits for the pass. Time out SAF providers in case they don't respond
+  Future<T> _timed<T>(Future<T> operation) =>
+      operation.timeout(_storage.externalTimeout);
+
+  Future<ImageSyncSummary> run() async {
+    if (_shouldStop()) return _finished();
+
+    try {
+      _internalSizes = _sizesByName(await _internal.listFiles());
+      _externalSizes = _sizesByName(await _timed(_external.listFiles()));
+    } catch (error) {
+      _logger.severe('reconcile: aborted, could not list images', error);
+      rethrow;
+    }
+
+    _internalLowerCaseNames = _lowerCased(_internalSizes.keys);
+    _externalLowerCaseNames = _lowerCased(_externalSizes.keys);
+    _sizesReported =
+        _externalSizes.isEmpty || _externalSizes.values.any((size) => size > 0);
+
+    final total = _referencedNames.length;
+    _updateStatus("0/$total");
+    for (final (index, name) in _referencedNames.indexed) {
+      if (_shouldStop()) break;
+      try {
+        await _reconcileImage(name);
+      } catch (error) {
+        _logger.severe('reconcile: $name failed', error);
+        _failed();
+      }
+      _updateStatus("${index + 1}/$total");
+
+      if (_consecutiveFailedWrites >= _stopAfterConsecutive) {
+        _stopReason = 'the circuit breaker after $_stopAfterConsecutive '
+            'consecutive failed or colliding writes';
+      }
+    }
+
+    return _finished();
+  }
+
+  ImageSyncSummary _finished() {
+    final outcome =
+        _stopReason == null ? 'finished' : 'stopped by $_stopReason';
+    final sizes = _sizesReported ? '' : ', Image Folder does not report sizes';
+    _logger.info('reconcile: $outcome: $_summary$sizes');
+    return _summary;
+  }
+
+  Map<String, int> _sizesByName(Iterable<StoredFile> files) =>
+      {for (final file in files) file.name: file.size};
+
+  Set<String> _lowerCased(Iterable<String> names) =>
+      {for (final name in names) name.toLowerCase()};
+
+  Future<void> _reconcileImage(String name) async {
+    if (_storage._uploadingNames.contains(name)) return;
+
+    final internalSize = _internalSizes[name];
+    final externalSize = _externalSizes[name];
+    if (_matchesOnlyByCase(name, internalSize, externalSize)) return;
+
+    if (internalSize != null && externalSize != null) {
+      if (internalSize == 0 ||
+          (_sizesReported && internalSize != externalSize)) {
+        await _compareCopies(name, externalSize);
+      } else if (!_sizesReported) {
+        _summary.skippedSizeUnknown++;
+      }
+    } else if (internalSize != null && internalSize > 0) {
+      if (await _upload(name)) _summary.uploaded++;
+    } else if (internalSize == null && externalSize != null) {
+      await _downloadMissing(name, externalSize);
+    } else {
+      _unavailable(
+          name, 'no usable copy on this device or in the Image Folder');
+    }
+  }
+
+  bool _matchesOnlyByCase(String name, int? internalSize, int? externalSize) {
+    final lowerCaseName = name.toLowerCase();
+    final internalByCase =
+        internalSize == null && _internalLowerCaseNames.contains(lowerCaseName);
+    final externalByCase =
+        externalSize == null && _externalLowerCaseNames.contains(lowerCaseName);
+    if (!internalByCase && !externalByCase) return false;
+
+    _logger.info(
+        'reconcile: $name matches a file only by case, counting it as present');
+    return true;
+  }
+
+  /// A listed 0 may mean unknown, so only a positive size is checked.
+  int? _listedSize(int externalSize) =>
+      _sizesReported && externalSize > 0 ? externalSize : null;
+
+  Future<void> _downloadMissing(String name, int externalSize) async {
+    final bytes = await _readExternal(name);
+    final listedSize = _listedSize(externalSize);
+    if (bytes == null) {
+      _failed();
+    } else if (bytes.isEmpty) {
+      _unavailable(name, 'the Image Folder copy is empty');
+    } else if (listedSize != null && bytes.length != listedSize) {
+      _logger.severe('reconcile: download of $name refused, '
+          'read ${bytes.length} of $listedSize bytes');
+      _failed();
+    } else if (await _download(name, bytes)) {
+      _summary.downloaded++;
+    }
+  }
+
+  /// A shorter copy whose bytes start the longer one is a cut-off write of
+  /// the same image, repair it
+  Future<void> _compareCopies(String name, int externalSize) async {
+    final internalBytes = await _internal.read(name);
+    final externalBytes = await _readExternal(name);
+    final listedSize = _listedSize(externalSize);
+    if (internalBytes != null &&
+        externalBytes != null &&
+        (listedSize == null || externalBytes.length == listedSize)) {
+      if (_isPrefix(internalBytes, externalBytes) &&
+          internalBytes.length == externalBytes.length) {
+        if (internalBytes.isEmpty) {
+          _unavailable(name, 'both copies are empty');
+        }
+        return;
+      }
+      if (_isPrefix(externalBytes, internalBytes)) {
+        if (await _replaceExternal(name, internalBytes)) {
+          _summary.repaired++;
+          _logger
+              .info('reconcile: replaced shorter Image Folder copy of $name');
+        }
+        return;
+      }
+      if (_isPrefix(internalBytes, externalBytes)) {
+        if (await _replaceInternal(name, externalBytes)) {
+          _summary.repaired++;
+          _logger.info('reconcile: replaced shorter internal copy of $name');
+        }
+        return;
+      }
+    }
+    _summary.conflicts++;
+    _logger.warning('reconcile: conflict on $name, internal copy is '
+        '${_internalSizes[name]} bytes and Image Folder copy is listed as '
+        '$externalSize bytes; leaving both');
+  }
+
+  bool _isPrefix(Uint8List shorter, Uint8List longer) {
+    if (shorter.length > longer.length) return false;
+    for (var i = 0; i < shorter.length; i++) {
+      if (shorter[i] != longer[i]) return false;
+    }
+    return true;
+  }
+
+  Future<bool> _upload(String name, [Uint8List? bytes]) async {
+    bytes ??= await _internal.read(name);
+    if (bytes == null || bytes.isEmpty) {
+      _logger.severe('reconcile: upload of $name failed, could not read it');
+      _failed();
+      return false;
+    }
+    return _tally(await _storage._createExternal(_external, name, bytes));
+  }
+
+  Future<bool> _replaceExternal(String name, Uint8List bytes) async {
+    final deleted = await _storage.externalSyncHealth.record(
+        "reconcile: delete of shorter $name",
+        () => _timed(_external.delete(name)));
+    if (!deleted) {
+      _failedWrite();
+      return false;
+    }
+    return _upload(name, bytes);
+  }
+
+  Future<bool> _replaceInternal(String name, Uint8List bytes) async {
+    if (!await _internal.delete(name)) {
+      _logger.severe('reconcile: delete of internal $name failed');
+      _failedWrite();
+      return false;
+    }
+    return _download(name, bytes);
+  }
+
+  Future<bool> _download(String name, Uint8List bytes) async {
+    final CreateResult result;
+    try {
+      result = await _internal.createNew(name, bytes);
+    } catch (error) {
+      _logger.severe('reconcile: download of $name failed', error);
+      _failedWrite();
+      return false;
+    }
+    switch (result) {
+      case CreateResult.created:
+        break;
+      case CreateResult.alreadyExists:
+        _logger.warning(
+            'reconcile: download of $name collided with an existing file');
+      case CreateResult.failed:
+        _logger.severe('reconcile: download of $name failed');
+    }
+    return _tally(result);
+  }
+
+  Future<Uint8List?> _readExternal(String name) async {
+    try {
+      final bytes = await _timed(_external.read(name));
+      if (bytes == null) {
+        _logger
+            .warning('reconcile: could not read $name from the Image Folder');
+      }
+      return bytes;
+    } catch (error) {
+      _logger.warning(
+          'reconcile: read of $name from the Image Folder failed', error);
+      return null;
+    }
+  }
+
+  void _unavailable(String name, String reason) {
+    _summary.unavailable++;
+    _logger.info('reconcile: $name is unavailable on this device, $reason');
+  }
+
+  /// Only writes count towards the circuit breaker. A file that can't be read
+  /// fails every launch
+  bool _tally(CreateResult result) {
+    switch (result) {
+      case CreateResult.created:
+        _consecutiveFailedWrites = 0;
+        return true;
+      case CreateResult.alreadyExists:
+        _summary.collisions++;
+        _consecutiveFailedWrites++;
+      case CreateResult.failed:
+        _failedWrite();
+    }
+    return false;
+  }
+
+  void _failed() => _summary.failures++;
+
+  void _failedWrite() {
+    _failed();
+    _consecutiveFailedWrites++;
   }
 }
