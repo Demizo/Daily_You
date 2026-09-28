@@ -410,8 +410,8 @@ class BackupRestoreUtils {
         if (await restoredImages.isAvailable()) {
           // Also show cleanup status here since images may take awhile
           updateStatus(localizations.cleanUpStatus);
-          await restoreImages(
-              restoredImages, await ImageStorage.instance.internalStore());
+          await ImageStorage.instance.whileNotSyncing(() async => restoreImages(
+              restoredImages, await ImageStorage.instance.internalStore()));
           if (ImageStorage.instance.usingExternalLocation()) {
             await ImageStorage.instance.syncImageFolder(true);
           }
