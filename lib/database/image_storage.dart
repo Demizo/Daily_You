@@ -39,6 +39,11 @@ class ImageStorage {
   final ExternalSyncHealth externalSyncHealth =
       ExternalSyncHealth('ImageStorage');
 
+  @visibleForTesting
+  Duration externalCreateTimeout = const Duration(seconds: 60);
+
+  final Set<String> _uploadingNames = {};
+
   FileStore? _internalStore;
   FileStore? _externalStoreOverride;
 
@@ -232,7 +237,7 @@ class ImageStorage {
   }
 
   Future<String?> create(String? imageName, Uint8List bytes,
-      {DateTime? currTime}) async {
+      {DateTime? currTime, bool skipExternalUpload = false}) async {
     currTime ??= DateTime.now();
 
     final internal = await internalStore();
@@ -256,19 +261,35 @@ class ImageStorage {
       index += 1;
     }
 
-    // Do not await operation
-    unawaited(_createExternal(newImageName, bytes));
-
     if (!await internal.write(newImageName, bytes)) return null;
+
+    final external = externalStore;
+    if (external != null && !skipExternalUpload) {
+      unawaited(_createExternal(external, newImageName, bytes));
+    }
     return newImageName;
   }
 
-  Future<void> _createExternal(String name, Uint8List bytes) async {
-    final external = externalStore;
-    if (external == null || await external.exists(name)) return;
-
-    await externalSyncHealth.record(
-        "external image write", () => external.write(name, bytes));
+  Future<CreateResult> _createExternal(
+      FileStore external, String name, Uint8List bytes) async {
+    _uploadingNames.add(name);
+    try {
+      var result = CreateResult.failed;
+      await externalSyncHealth.record("external image create of $name",
+          () async {
+        result = await external
+            .createNew(name, bytes)
+            .timeout(externalCreateTimeout);
+        return result != CreateResult.failed;
+      });
+      if (result == CreateResult.alreadyExists) {
+        _logger.warning(
+            'external image create of $name collided with an existing file');
+      }
+      return result;
+    } finally {
+      _uploadingNames.remove(name);
+    }
   }
 
   Future<bool> delete(String imageName) async {
