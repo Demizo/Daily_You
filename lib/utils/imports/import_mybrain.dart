@@ -25,8 +25,7 @@ Future<OperationOutcome> importFromMyBrain(
     outcome = OperationOutcome.failed(error);
   }
 
-  await finishImport(updateStatus, syncImages: true);
-  return outcome;
+  return finishImport(updateStatus, outcome);
 }
 
 List<ImportedEntry> decodeMyBrainEntries(Uint8List bytes) {

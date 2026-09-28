@@ -65,6 +65,5 @@ Future<OperationOutcome> importFromOneShot(
     outcome = OperationOutcome.failed(error);
   }
 
-  await finishImport(updateStatus, syncImages: true);
-  return outcome;
+  return finishImport(updateStatus, outcome);
 }

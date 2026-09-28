@@ -52,6 +52,5 @@ Future<OperationOutcome> importFromPixels(Function(String) updateStatus) async {
     outcome = OperationOutcome.failed(error);
   }
 
-  await finishImport(updateStatus, syncImages: true);
-  return outcome;
+  return finishImport(updateStatus, outcome);
 }

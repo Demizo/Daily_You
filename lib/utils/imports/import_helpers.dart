@@ -3,6 +3,7 @@ import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/utils/operation_outcome.dart';
 
 /// An entry decoded from an import file, before it reaches the database. Its
 /// images carry no entry id until the entry is added.
@@ -33,14 +34,19 @@ Future<void> addImportedEntries(
   }
 }
 
-Future<void> finishImport(Function(String) updateStatus,
-    {bool syncImages = false}) async {
+Future<OperationOutcome> finishImport(
+    Function(String) updateStatus, OperationOutcome outcome) async {
   await EntriesProvider.instance.load();
   await EntryImagesProvider.instance.load();
-  if (syncImages && ImageStorage.instance.usingExternalLocation()) {
-    await ImageStorage.instance
-        .syncImageFolder(true, updateStatus: updateStatus);
+  if (ImageStorage.instance.usingExternalLocation()) {
+    try {
+      await ImageStorage.instance
+          .syncImageFolder(true, updateStatus: updateStatus);
+    } catch (error) {
+      return outcome.failed ? outcome : OperationOutcome.failed(error);
+    }
   }
+  return outcome;
 }
 
 DateTime diariumIdToDateTime(int ticks) {

@@ -150,8 +150,9 @@ Future<OperationOutcome> importFromDiaro(
             final filename = att['filename'] as String;
             final photoBytes = await extractedPhotos.read(filename);
             if (photoBytes == null) continue;
-            final imagePath = await ImageStorage.instance
-                .create(null, photoBytes, currTime: created);
+            final imagePath = await ImageStorage.instance.create(
+                null, photoBytes,
+                currTime: created, skipExternalUpload: true);
             if (imagePath != null) {
               await EntryImagesProvider.instance.add(
                   EntryImage(
@@ -175,8 +176,7 @@ Future<OperationOutcome> importFromDiaro(
 
   updateStatus(localizations.cleanUpStatus);
 
-  await EntriesProvider.instance.load();
-  await EntryImagesProvider.instance.load();
+  outcome = await finishImport(updateStatus, outcome);
 
   if (await File(join(tempDir.path, tempZip)).exists()) {
     await File(join(tempDir.path, tempZip)).delete();

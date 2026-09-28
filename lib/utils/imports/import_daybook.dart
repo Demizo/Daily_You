@@ -118,8 +118,8 @@ Future<OperationOutcome> importFromDaybook(
         for (final filename in imageFilenames) {
           final bytes = await extractedFiles.read(filename);
           if (bytes == null) continue;
-          final imagePath =
-              await ImageStorage.instance.create(null, bytes, currTime: date);
+          final imagePath = await ImageStorage.instance
+              .create(null, bytes, currTime: date, skipExternalUpload: true);
           if (imagePath != null) {
             await EntryImagesProvider.instance.add(
               EntryImage(
@@ -143,8 +143,7 @@ Future<OperationOutcome> importFromDaybook(
 
   updateStatus(localizations.cleanUpStatus);
 
-  await EntriesProvider.instance.load();
-  await EntryImagesProvider.instance.load();
+  outcome = await finishImport(updateStatus, outcome);
 
   if (await File(join(tempDir.path, tempZip)).exists()) {
     await File(join(tempDir.path, tempZip)).delete();

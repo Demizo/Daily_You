@@ -15,6 +15,7 @@ import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/storage/storage_picker.dart';
+import 'package:daily_you/utils/imports/import_helpers.dart';
 import 'package:daily_you/utils/operation_outcome.dart';
 import 'package:daily_you/utils/tag_name_sanitizer.dart';
 import 'package:daily_you/utils/zip_utils.dart';
@@ -134,7 +135,7 @@ Future<OperationOutcome> importFromDaylio(
 
           final imagePath = await ImageStorage.instance.create(
               null, Uint8List.fromList(await File(file).readAsBytes()),
-              currTime: datetime);
+              currTime: datetime, skipExternalUpload: true);
           if (imagePath != null) {
             await EntryImagesProvider.instance.add(
                 EntryImage(
@@ -170,8 +171,7 @@ Future<OperationOutcome> importFromDaylio(
 
   updateStatus(localizations.cleanUpStatus);
 
-  await EntriesProvider.instance.load();
-  await EntryImagesProvider.instance.load();
+  outcome = await finishImport(updateStatus, outcome);
   await TagsProvider.instance.load();
   await AppDatabase.instance.updateExternalDatabase();
 
