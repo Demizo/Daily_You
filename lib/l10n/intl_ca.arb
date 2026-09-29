@@ -246,5 +246,7 @@
     "labelAbsentLabel": "Absent",
     "labelCoverageLabel": "Cobertura",
     "chartDistributionTitle": "Distribució de {tag}",
-    "settingsAutoBackupRequireCharging": "Només durant la càrrega"
+    "settingsAutoBackupRequireCharging": "Només durant la càrrega",
+    "encryptingBackupStatus": "S'està xifrant la còpia de seguretat… {percent}%",
+    "decryptingBackupStatus": "S'està desxifrant la còpia de seguretat… {percent}%"
 }
