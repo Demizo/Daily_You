@@ -9,6 +9,7 @@ class ScaledMarkdown extends StatelessWidget {
   final int? maxCharacters;
   final double scaleFactor;
   final bool compact;
+  final bool selectable;
 
   const ScaledMarkdown({
     super.key,
@@ -16,6 +17,7 @@ class ScaledMarkdown extends StatelessWidget {
     this.maxCharacters,
     this.scaleFactor = 1,
     this.compact = false,
+    this.selectable = true,
   });
 
   @override
@@ -33,6 +35,7 @@ class ScaledMarkdown extends StatelessWidget {
     final customScaler = TextScaler.linear(deviceScaler.scale(scaleFactor));
 
     return MarkdownBlock(
+      selectable: selectable,
       config: theme.brightness == Brightness.light
           ? MarkdownConfig.defaultConfig
           : MarkdownConfig.darkConfig,
