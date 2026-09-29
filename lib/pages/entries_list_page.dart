@@ -39,25 +39,28 @@ class _EntriesListPageState extends State<EntriesListPage> {
     Provider.of<EntriesProvider>(context);
     final entries = widget.getEntries();
 
-    return PageView.builder(
-        hitTestBehavior: HitTestBehavior.translucent,
-        controller: _pageController,
-        physics: FastPageViewScrollPhysics(),
-        reverse: true,
-        itemCount: entries.length,
-        onPageChanged: null,
-        itemBuilder: (context, index) {
-          return EntryViewPage(
-            entryId: entries[index].id!,
-            onEntryEdited: (editedEntryId) {
-              final updatedEntries = widget.getEntries();
-              final newIndex =
-                  updatedEntries.indexWhere((e) => e.id == editedEntryId);
-              if (newIndex != -1 && mounted) {
-                _pageController.jumpToPage(newIndex);
-              }
-            },
-          );
-        });
+    // SelectionArea for entry text sits above the page so it loses to swipe gestures.
+    return SelectionArea(
+      child: PageView.builder(
+          hitTestBehavior: HitTestBehavior.translucent,
+          controller: _pageController,
+          physics: FastPageViewScrollPhysics(),
+          reverse: true,
+          itemCount: entries.length,
+          onPageChanged: null,
+          itemBuilder: (context, index) {
+            return EntryViewPage(
+              entryId: entries[index].id!,
+              onEntryEdited: (editedEntryId) {
+                final updatedEntries = widget.getEntries();
+                final newIndex =
+                    updatedEntries.indexWhere((e) => e.id == editedEntryId);
+                if (newIndex != -1 && mounted) {
+                  _pageController.jumpToPage(newIndex);
+                }
+              },
+            );
+          }),
+    );
   }
 }
