@@ -162,5 +162,6 @@
     "chartGroupingDay": "Dia",
     "chartGroupingWeek": "Semana",
     "chartGroupingMonth": "Mês",
-    "chartGroupingYear": "Ano"
+    "chartGroupingYear": "Ano",
+    "pageCalendarTitle": "Calendário"
 }
