@@ -3,72 +3,70 @@ import 'package:flutter/material.dart';
 import 'local_image_loader.dart';
 
 class ImageGrid extends StatelessWidget {
-  const ImageGrid({super.key, required this.images});
+  ImageGrid({super.key, required List<EntryImage> images})
+      : imagePaths = [for (final image in images) image.imgPath],
+        imageBuilder = _buildStoredImage;
 
-  final List<EntryImage> images;
+  const ImageGrid.fromPaths({
+    super.key,
+    required this.imagePaths,
+    required this.imageBuilder,
+  });
+
+  final List<String> imagePaths;
+  final Widget Function(String imagePath) imageBuilder;
+
+  static Widget _buildStoredImage(String imagePath) =>
+      LocalImageLoader(imagePath: imagePath);
 
   @override
   Widget build(BuildContext context) {
-    final imgs = images.take(4).toList();
+    final paths = imagePaths.take(4).toList();
+    Widget tile(int index) => Expanded(child: imageBuilder(paths[index]));
+    const horizontalGap = SizedBox(width: 2);
+    const verticalGap = SizedBox(height: 2);
 
-    if (imgs.length == 1) {
-      return LocalImageLoader(imagePath: imgs[0].imgPath);
+    if (paths.length == 1) {
+      return imageBuilder(paths[0]);
     }
 
-    if (imgs.length == 2) {
+    if (paths.length == 2) {
       return Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Expanded(child: LocalImageLoader(imagePath: imgs[0].imgPath)),
-          const SizedBox(width: 2),
-          Expanded(child: LocalImageLoader(imagePath: imgs[1].imgPath)),
-        ],
+        children: [tile(0), horizontalGap, tile(1)],
       );
     }
 
-    if (imgs.length == 3) {
+    if (paths.length == 3) {
       return Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Expanded(child: LocalImageLoader(imagePath: imgs[0].imgPath)),
-          const SizedBox(width: 2),
+          tile(0),
+          horizontalGap,
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(child: LocalImageLoader(imagePath: imgs[1].imgPath)),
-                const SizedBox(height: 2),
-                Expanded(child: LocalImageLoader(imagePath: imgs[2].imgPath)),
-              ],
+              children: [tile(1), verticalGap, tile(2)],
             ),
           ),
         ],
       );
     }
 
-    // 4+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Expanded(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(child: LocalImageLoader(imagePath: imgs[0].imgPath)),
-              const SizedBox(width: 2),
-              Expanded(child: LocalImageLoader(imagePath: imgs[1].imgPath)),
-            ],
+            children: [tile(0), horizontalGap, tile(1)],
           ),
         ),
-        const SizedBox(height: 2),
+        verticalGap,
         Expanded(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(child: LocalImageLoader(imagePath: imgs[2].imgPath)),
-              const SizedBox(width: 2),
-              Expanded(child: LocalImageLoader(imagePath: imgs[3].imgPath)),
-            ],
+            children: [tile(2), horizontalGap, tile(3)],
           ),
         ),
       ],

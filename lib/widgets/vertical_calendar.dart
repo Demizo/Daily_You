@@ -33,8 +33,13 @@ final class _WeekRowItem extends _CalendarItem {
 
 class VerticalCalendar extends StatefulWidget {
   final ScrollController scrollController;
+  final void Function(BuildContext context, DateTime date)? onDaySelected;
 
-  const VerticalCalendar({super.key, required this.scrollController});
+  const VerticalCalendar({
+    super.key,
+    required this.scrollController,
+    this.onDaySelected,
+  });
 
   @override
   State<VerticalCalendar> createState() => _VerticalCalendarState();
@@ -461,7 +466,7 @@ class _VerticalCalendarState extends State<VerticalCalendar>
                   ),
                 ],
               ),
-              _buildCalendarControls(context),
+              if (widget.onDaySelected == null) _buildCalendarControls(context),
               _buildJumpToTodayButton(context),
             ]);
       },
@@ -726,6 +731,7 @@ class _VerticalCalendarState extends State<VerticalCalendar>
         isJalali: _isJalali,
         calendarTagOverride: calendarTagOverride,
         calendarTagEntryMap: calendarTagEntryMap,
+        onSelectDay: widget.onDaySelected,
       ),
     );
   }
@@ -743,6 +749,7 @@ class _WeekRow extends StatelessWidget {
   final bool isJalali;
   final Tag? calendarTagOverride;
   final Map<int, EntryTag> calendarTagEntryMap;
+  final void Function(BuildContext context, DateTime date)? onSelectDay;
 
   const _WeekRow({
     required this.days,
@@ -756,6 +763,7 @@ class _WeekRow extends StatelessWidget {
     this.isJalali = false,
     this.calendarTagOverride,
     this.calendarTagEntryMap = const {},
+    this.onSelectDay,
   });
 
   @override
@@ -829,6 +837,7 @@ class _WeekRow extends StatelessWidget {
               isJalali: isJalali,
               calendarTagOverride: calendarTagOverride,
               calendarTagEntryMap: calendarTagEntryMap,
+              onSelectDay: onSelectDay,
             ),
           );
         }).toList(),
