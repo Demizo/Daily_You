@@ -45,6 +45,26 @@ class EntryImage {
         timeCreate: timeCreate ?? this.timeCreate,
       );
 
+  static List<EntryImage> appendRanked(
+    List<EntryImage> images,
+    List<String> newImagePaths, {
+    required int entryId,
+  }) {
+    final result = [for (final image in images) image.copy()];
+    for (final path in newImagePaths) {
+      for (final image in result) {
+        image.imgRank += 1;
+      }
+      result.add(EntryImage(
+        entryId: entryId,
+        imgPath: path,
+        imgRank: 0,
+        timeCreate: DateTime.now(),
+      ));
+    }
+    return result;
+  }
+
   static EntryImage fromJson(Map<String, Object?> json) => EntryImage(
         id: json[EntryImageFields.id] as int?,
         entryId: json[EntryImageFields.entryId] as int?,

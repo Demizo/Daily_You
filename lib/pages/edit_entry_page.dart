@@ -34,6 +34,7 @@ class AddEditEntryPage extends StatefulWidget {
   final DateTime? overrideCreateDate;
   final bool openCamera;
   final List<EntryImage> images;
+  final String? sharedText;
 
   const AddEditEntryPage({
     super.key,
@@ -41,7 +42,14 @@ class AddEditEntryPage extends StatefulWidget {
     this.overrideCreateDate,
     this.openCamera = false,
     this.images = const <EntryImage>[],
+    this.sharedText,
   });
+
+  static String mergeSharedText(String baseText, String? sharedText) {
+    if (sharedText == null) return baseText;
+    return baseText.isEmpty ? sharedText : '$baseText\n\n$sharedText';
+  }
+
   @override
   State<AddEditEntryPage> createState() => _AddEditEntryPageState();
 }
@@ -71,24 +79,26 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   late final EntryDraftSession _draftSession = EntryStore.instance.beginDraft();
 
   Future<void> _initEntry() async {
+    String dirtyTrackerBaselineText;
     if (widget.entry == null) {
       var createTime =
           (TimeManager.isToday(widget.overrideCreateDate ?? DateTime.now()))
               ? DateTime.now()
               : (widget.overrideCreateDate ?? DateTime.now());
-      var text = "";
+      var templateText = "";
       final defaultTemplate = TemplatesProvider.instance.getDefaultTemplate();
       final defaultTagIds = <int>[];
       if (defaultTemplate != null) {
-        text = defaultTemplate.text ?? "";
+        templateText = defaultTemplate.text ?? "";
         defaultTagIds.addAll(TagsProvider.instance
             .getTemplateTagsForTemplate(defaultTemplate.id!)
             .map((templateTag) => templateTag.tagId));
       }
+      dirtyTrackerBaselineText = templateText;
       _tagSource = TagAttachmentSource(
           supportsValues: true, initialTagIds: defaultTagIds);
       _entry = Entry(
-        text: text,
+        text: AddEditEntryPage.mergeSharedText(templateText, widget.sharedText),
         mood: null,
         timeCreate: createTime,
         timeModified: DateTime.now(),
@@ -101,9 +111,16 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
       id = _entry.id ?? -1;
       _tagSource = TagAttachmentSource.fromEntryTags(
           TagsProvider.instance.getEntryTagsForEntry(id));
+      dirtyTrackerBaselineText = _entry.text;
+      if (widget.sharedText != null) {
+        _entry = _entry.copy(
+          text:
+              AddEditEntryPage.mergeSharedText(_entry.text, widget.sharedText),
+        );
+      }
     }
     _dirtyTracker = EntryDraftDirtyTracker(
-      text: _entry.text,
+      text: dirtyTrackerBaselineText,
       mood: _entry.mood,
       date: _entry.timeCreate,
       seededTagIds: _tagSource.attachedTagIds.toSet(),
@@ -119,6 +136,14 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     setState(() {
       _loadingEntry = false;
     });
+
+    if (widget.sharedText != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _textEditingController.selection =
+            TextSelection.collapsed(offset: _textEditingController.text.length);
+      });
+    }
 
     if (widget.openCamera && !_openedCamera) {
       _openedCamera = true;
@@ -607,17 +632,8 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   }
 
   Future<void> _addImage(List<String> imgPaths) async {
-    for (var imgPath in imgPaths) {
-      // Add image to the end by giving it the lowest rank
-      for (var image in _currentImages) {
-        image.imgRank += 1;
-      }
-      _currentImages.add(EntryImage(
-          entryId: id,
-          imgPath: imgPath,
-          imgRank: 0,
-          timeCreate: DateTime.now()));
-    }
+    _currentImages =
+        EntryImage.appendRanked(_currentImages, imgPaths, entryId: id);
     await _saveEntry();
   }
 }

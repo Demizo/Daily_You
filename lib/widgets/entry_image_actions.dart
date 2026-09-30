@@ -17,8 +17,7 @@ class EntryImageActions {
     final pickedFile = await picker.pickImage(source: ImageSource.camera);
 
     if (pickedFile != null) {
-      final imageName = await ImageStorage.instance
-          .create(pickedFile.name, await _compressImage(pickedFile, quality));
+      final imageName = await _storeCompressed(pickedFile, quality);
       if (imageName == null) return;
       onChangedImage([imageName]);
       if (Platform.isAndroid) {
@@ -35,8 +34,7 @@ class EntryImageActions {
 
     final newImages = <String>[];
     for (final file in pickedFiles) {
-      final imageName = await ImageStorage.instance
-          .create(file.name, await _compressImage(file, quality));
+      final imageName = await _storeCompressed(file, quality);
       if (imageName != null) {
         newImages.add(imageName);
       }
@@ -45,6 +43,24 @@ class EntryImageActions {
       }
     }
     onChangedImage(newImages);
+  }
+
+  static Future<List<String>> importSharedImages(List<String> paths) async {
+    final quality = ConfigProvider.instance.get(Settings.imageQualityLevel);
+
+    final newImages = <String>[];
+    for (final path in paths) {
+      final imageName = await _storeCompressed(XFile(path), quality);
+      if (imageName != null) {
+        newImages.add(imageName);
+      }
+    }
+    return newImages;
+  }
+
+  static Future<String?> _storeCompressed(XFile file, String quality) async {
+    return await ImageStorage.instance
+        .create(file.name, await _compressImage(file, quality));
   }
 
   static Future<Uint8List> _compressImage(
