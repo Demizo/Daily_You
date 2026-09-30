@@ -9,6 +9,7 @@ import 'package:daily_you/pages/entry_timeline_page.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/utils/tag_visuals.dart';
+import 'package:daily_you/widgets/day_menu.dart';
 import 'package:daily_you/widgets/local_image_loader.dart';
 import 'package:daily_you/widgets/tag_icon_glyph.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +30,7 @@ class EntryDayCell extends StatelessWidget {
   final bool isJalali;
   final Tag? calendarTagOverride;
   final Map<int, EntryTag> calendarTagEntryMap;
+  final void Function(BuildContext context, DateTime date)? onSelectDay;
 
   const EntryDayCell({
     super.key,
@@ -43,6 +45,7 @@ class EntryDayCell extends StatelessWidget {
     this.isJalali = false,
     this.calendarTagOverride,
     this.calendarTagEntryMap = const {},
+    this.onSelectDay,
   });
 
   Widget _buildTagIconGlyph(
@@ -185,26 +188,8 @@ class EntryDayCell extends StatelessWidget {
 
     if (!context.mounted) return;
 
-    final RenderBox button = context.findRenderObject() as RenderBox;
-    final RenderBox overlay =
-        Overlay.of(context).context.findRenderObject() as RenderBox;
-
-    // Calculate the position representing the bottom edge of the cell
-    final RelativeRect position = RelativeRect.fromRect(
-      Rect.fromPoints(
-        button.localToGlobal(button.size.bottomLeft(Offset.zero),
-            ancestor: overlay),
-        button.localToGlobal(button.size.bottomRight(Offset.zero),
-            ancestor: overlay),
-      ),
-      Offset.zero & overlay.size,
-    );
-
-    final result = await showMenu<String>(
-      context: context,
-      position: position,
-      menuPadding: EdgeInsets.all(0),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+    final result = await showDayMenu<String>(
+      context,
       items: [
         if (hasOnThisDay)
           PopupMenuItem<String>(
@@ -261,6 +246,8 @@ class EntryDayCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final firstEntry = entries.firstOrNull;
+    final selectDay =
+        onSelectDay == null ? null : () => onSelectDay!(context, date);
     final entriesProvider = context.read<EntriesProvider>();
     final isMulti = entries.length > 1;
     final colorScheme = Theme.of(context).colorScheme;
@@ -277,19 +264,21 @@ class EntryDayCell extends StatelessWidget {
       final showImageBg = showImages && firstImage != null;
       return MergeSemantics(
           child: GestureDetector(
-        onTap: () async {
-          if (isMulti) {
-            await EntryTimelinePage.pushForDay(context, date);
-          } else {
-            await Navigator.of(context).push(MaterialPageRoute(
-              allowSnapshotting: false,
-              builder: (context) => EntriesListPage(
-                  index: entriesProvider.getIndexOfEntry(firstEntry!.id!),
-                  getEntries: () => entriesProvider.entries),
-            ));
-          }
-        },
-        onLongPress: () => _showPopupMenu(context, entriesProvider),
+        onTap: selectDay ??
+            () async {
+              if (isMulti) {
+                await EntryTimelinePage.pushForDay(context, date);
+              } else {
+                await Navigator.of(context).push(MaterialPageRoute(
+                  allowSnapshotting: false,
+                  builder: (context) => EntriesListPage(
+                      index: entriesProvider.getIndexOfEntry(firstEntry!.id!),
+                      getEntries: () => entriesProvider.entries),
+                ));
+              }
+            },
+        onLongPress:
+            selectDay ?? () => _showPopupMenu(context, entriesProvider),
         child: SizedBox(
           width: cellSize,
           height: cellSize,
@@ -387,17 +376,19 @@ class EntryDayCell extends StatelessWidget {
       return MergeSemantics(
           child: GestureDetector(
               behavior: HitTestBehavior.translucent,
-              onTap: () async {
-                await Navigator.of(context).push(MaterialPageRoute(
-                  allowSnapshotting: false,
-                  builder: (context) => AddEditEntryPage(
-                    overrideCreateDate:
-                        TimeManager.currentTimeOnDifferentDate(date)
-                            .copyWith(isUtc: false),
-                  ),
-                ));
-              },
-              onLongPress: () => _showPopupMenu(context, entriesProvider),
+              onTap: selectDay ??
+                  () async {
+                    await Navigator.of(context).push(MaterialPageRoute(
+                      allowSnapshotting: false,
+                      builder: (context) => AddEditEntryPage(
+                        overrideCreateDate:
+                            TimeManager.currentTimeOnDifferentDate(date)
+                                .copyWith(isUtc: false),
+                      ),
+                    ));
+                  },
+              onLongPress:
+                  selectDay ?? () => _showPopupMenu(context, entriesProvider),
               child: SizedBox(
                 width: cellSize,
                 height: cellSize,
