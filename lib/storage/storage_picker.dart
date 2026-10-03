@@ -88,7 +88,7 @@ class StoragePicker {
       type: allowedExtensions != null ? FileType.custom : FileType.any,
       allowedExtensions: allowedExtensions,
     );
-    final path = result?.files.first.path;
+    final path = result.isEmpty ? null : result.first.path;
     return path != null ? PickedFile(path) : null;
   }
 }
