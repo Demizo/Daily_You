@@ -90,7 +90,7 @@ android {
 
     buildTypes {
         release {
-	  // Use the signed flavor for a signed release
+            vcsInfo.include false
         }
         profile {
             signingConfig signingConfigs.release
