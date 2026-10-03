@@ -1,7 +1,7 @@
 {
   description = "Flutter";
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
   };
   outputs =
@@ -21,7 +21,7 @@
           };
         };
         buildToolsVersion = "35.0.1";
-        platformToolsVersion = "35.0.2";
+        platformToolsVersion = "37.0.1";
         ndkVersion = "28.2.13676358";
         androidEnv = pkgs.androidenv.override { licenseAccepted = true; };
         androidComposition = androidEnv.composeAndroidPackages {
