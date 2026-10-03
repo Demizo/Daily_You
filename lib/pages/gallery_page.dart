@@ -432,6 +432,8 @@ class _GalleryPageState extends State<GalleryPage>
     final entryAttachmentsProvider =
         Provider.of<EntryAttachmentsProvider>(context);
     final configProvider = Provider.of<ConfigProvider>(context);
+    final searchText = EntriesProvider.instance.searchText;
+    final largeCards = listView || searchText.isNotEmpty;
     return entries.isEmpty
         ? Center(
             child: Text(
@@ -446,10 +448,10 @@ class _GalleryPageState extends State<GalleryPage>
             physics: const ScrollPhysics(),
             shrinkWrap: true,
             gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: listView ? 500 : 300,
+                maxCrossAxisExtent: largeCards ? 500 : 300,
                 crossAxisSpacing: 1.0,
                 mainAxisSpacing: 1.0,
-                childAspectRatio: listView ? 2.0 : 1.0),
+                childAspectRatio: largeCards ? 2.0 : 1.0),
             itemCount: entries.length,
             itemBuilder: (context, index) {
               final entry = entries[index];
@@ -465,13 +467,14 @@ class _GalleryPageState extends State<GalleryPage>
                             ),
                           )));
                 },
-                child: listView
+                child: largeCards
                     ? LargeEntryCardWidget(
                         entry: entry,
                         attachments: _visualAttachmentsOf(
                             entryAttachmentsProvider, entry),
                         hideImage:
                             configProvider.get(Settings.hideImagesInGallery),
+                        searchQuery: searchText,
                       )
                     : EntryCardWidget(
                         entry: entry,
