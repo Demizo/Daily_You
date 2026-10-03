@@ -32,6 +32,8 @@ dependencies:
     git:
       url: https://github.com/Demizo/shared-storage
       ref: release
+  share_receiver:
+    path: packages/share_receiver
   saf_transfer:
     path: packages/saf_transfer
   backup_crypto:
