@@ -4,6 +4,7 @@
 
 import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:daily_you/utils/search_text_window.dart';
 import 'package:daily_you/widgets/entry_card_header_row.dart';
 import 'package:daily_you/widgets/attachment_grid.dart';
 import 'package:daily_you/widgets/scaled_markdown.dart';
@@ -77,13 +78,15 @@ class LargeCard extends StatelessWidget {
     );
   }
 
-  static Widget markdownBody(String text) => OverflowBox(
+  static Widget markdownBody(String text, {String highlightQuery = ''}) =>
+      OverflowBox(
         alignment: AlignmentDirectional.topStart,
         maxHeight: double.infinity,
         child: ScaledMarkdown(
           data: text,
           maxCharacters: 500,
           scaleFactor: 0.95,
+          highlightQuery: highlightQuery,
         ),
       );
 }
@@ -95,12 +98,14 @@ class LargeEntryCardWidget extends StatelessWidget {
     required this.entry,
     required this.attachments,
     this.hideImage = false,
+    this.searchQuery = '',
   });
 
   final Entry entry;
   final List<EntryAttachment> attachments;
   final String? title;
   final bool hideImage;
+  final String searchQuery;
 
   @override
   Widget build(BuildContext context) {
@@ -120,7 +125,10 @@ class LargeEntryCardWidget extends StatelessWidget {
         ),
       ),
       body: entry.text.isNotEmpty
-          ? LargeCard.markdownBody(entry.text)
+          ? LargeCard.markdownBody(
+              searchTextWindow(entry.text, searchQuery),
+              highlightQuery: searchQuery,
+            )
           : Text(
               AppLocalizations.of(context)!.writeSomethingHint,
               style: TextStyle(color: theme.disabledColor, fontSize: 16),
