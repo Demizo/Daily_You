@@ -147,13 +147,13 @@ class AppLocalizationsEs extends AppLocalizations {
   String get statisticsNotEnoughData => 'No hay suficientes datos…';
 
   @override
-  String get statisticsRangeOneMonth => '1 Mes';
+  String get statisticsRangeOneMonth => '1 mes';
 
   @override
-  String get statisticsRangeSixMonths => '6 Meses';
+  String get statisticsRangeSixMonths => '6 meses';
 
   @override
-  String get statisticsRangeOneYear => '1 Año';
+  String get statisticsRangeOneYear => '1 año';
 
   @override
   String get statisticsRangeAllTime => 'Todo el tiempo';
@@ -165,7 +165,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String chartByDayTitle(Object tag) {
-    return '$tag Por Día';
+    return '$tag por día';
   }
 
   @override
@@ -233,7 +233,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get errorExternalStorageAccessTitle =>
-      'No Se Puede Acceder al Almacenamiento Externo';
+      'No se puede acceder al almacenamiento externo';
 
   @override
   String get errorExternalStorageAccessDescription =>
@@ -278,7 +278,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get deletePhotoDescription => '¿Quieres eliminar esta foto?';
 
   @override
-  String get pageSettingsTitle => 'Ajustes';
+  String get pageSettingsTitle => 'Configuración';
 
   @override
   String get settingsAppearanceTitle => 'Apariencia';
@@ -680,7 +680,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get restoreErrorDescription => '¡Error en restaurar respaldo!';
 
   @override
-  String get settingsBackupRestoreTitle => 'Respaldo y Restauración';
+  String get settingsBackupRestoreTitle => 'Respaldo y restauración';
 
   @override
   String get settingsBackup => 'Respaldo';
@@ -722,10 +722,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsAutoBackupIntervalMonthly => 'Mensual';
 
   @override
-  String get settingsAutoBackupMaxCount => 'Nº de respaldos a mantener';
+  String get settingsAutoBackupMaxCount => 'Respaldos que conservar';
 
   @override
-  String get settingsAutoBackupRequireCharging => 'Only While Charging';
+  String get settingsAutoBackupRequireCharging => 'Solo durante la carga';
 
   @override
   String settingsBackupLast(Object time) {
@@ -748,46 +748,46 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String tranferStatus(Object percent) {
-    return 'Transfiriendo... $percent%';
+    return 'Transfiriendo… $percent %';
   }
 
   @override
   String creatingBackupStatus(Object percent) {
-    return 'Creando Respaldo... $percent%';
+    return 'Creando respaldo... $percent %';
   }
 
   @override
   String restoringBackupStatus(Object percent) {
-    return 'Restaurando Respaldo… $percent%';
+    return 'Restaurando respaldo… $percent %';
   }
 
   @override
   String encryptingBackupStatus(Object percent) {
-    return 'Encrypting Backup… $percent%';
+    return 'Cifrando respaldo… $percent %';
   }
 
   @override
   String decryptingBackupStatus(Object percent) {
-    return 'Decrypting Backup… $percent%';
+    return 'Descifrando respaldo… $percent %';
   }
 
   @override
-  String get cleanUpStatus => 'Restableciendo…';
+  String get cleanUpStatus => 'Limpiando…';
 
   @override
   String migratingImagesStatus(Object current, Object total) {
-    return 'Transfiriendo fotos… $current/$total';
+    return 'Migrando fotos… $current/$total';
   }
 
   @override
   String get settingsExport => 'Exportar';
 
   @override
-  String get settingsExportToAnotherFormat => 'Exportar A Otro Formato';
+  String get settingsExportToAnotherFormat => 'Exportar a otro formato';
 
   @override
   String get settingsExportFormatDescription =>
-      '¡Esto no deberia ser usado como un\nrespaldo!';
+      'Esto no debe usarse como respaldo.';
 
   @override
   String get exportLogs => 'Exportar Registros';

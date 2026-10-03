@@ -732,7 +732,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settingsAutoBackupMaxCount => 'Sauvegardes à conserver';
 
   @override
-  String get settingsAutoBackupRequireCharging => 'Only While Charging';
+  String get settingsAutoBackupRequireCharging => 'Seulement en charge';
 
   @override
   String settingsBackupLast(Object time) {
@@ -770,12 +770,12 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String encryptingBackupStatus(Object percent) {
-    return 'Encrypting Backup… $percent%';
+    return 'Chiffrement de la sauvegarde… $percent%';
   }
 
   @override
   String decryptingBackupStatus(Object percent) {
-    return 'Decrypting Backup… $percent%';
+    return 'Déchiffrement de la sauvegarde… $percent%';
   }
 
   @override

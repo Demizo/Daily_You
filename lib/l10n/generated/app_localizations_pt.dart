@@ -1253,6 +1253,9 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get settingsHideImages => 'Ocultar Imagens';
 
   @override
+  String get pageCalendarTitle => 'Calendário';
+
+  @override
   String get viewLayoutList => 'Lista';
 
   @override

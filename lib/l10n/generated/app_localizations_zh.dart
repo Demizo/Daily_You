@@ -682,56 +682,56 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsRestorePromptDescription => '恢复备份将覆盖您现有的数据！';
 
   @override
-  String get settingsBackupPasswordProtect => 'Password Protect Backups';
+  String get settingsBackupPasswordProtect => '使用密码保护备份';
 
   @override
-  String get backupEncryptedTitle => 'Encrypted Backup';
+  String get backupEncryptedTitle => '加密备份';
 
   @override
-  String get backupEncryptedContent => 'This backup is password protected.';
+  String get backupEncryptedContent => '此备份受密码保护。';
 
   @override
-  String get settingsAutoBackup => 'Automatic Backups';
+  String get settingsAutoBackup => '自动备份';
 
   @override
-  String get settingsAutoBackupLocation => 'Backup Location';
+  String get settingsAutoBackupLocation => '备份位置';
 
   @override
-  String get settingsAutoBackupInterval => 'Backup Interval';
+  String get settingsAutoBackupInterval => '备份间隔';
 
   @override
-  String get settingsAutoBackupIntervalDaily => 'Daily';
+  String get settingsAutoBackupIntervalDaily => '每日';
 
   @override
-  String get settingsAutoBackupIntervalWeekly => 'Weekly';
+  String get settingsAutoBackupIntervalWeekly => '每周';
 
   @override
-  String get settingsAutoBackupIntervalMonthly => 'Monthly';
+  String get settingsAutoBackupIntervalMonthly => '每月';
 
   @override
-  String get settingsAutoBackupMaxCount => 'Backups To Keep';
+  String get settingsAutoBackupMaxCount => '保留的备份数量';
 
   @override
-  String get settingsAutoBackupRequireCharging => 'Only While Charging';
+  String get settingsAutoBackupRequireCharging => '仅在充电时';
 
   @override
   String settingsBackupLast(Object time) {
-    return 'Last backup $time';
+    return '上次备份：$time';
   }
 
   @override
-  String get settingsBackupNever => 'Never backed up';
+  String get settingsBackupNever => '从未备份过';
 
   @override
   String settingsAutoBackupNext(Object time) {
-    return 'Next backup $time';
+    return '下次备份：$time';
   }
 
   @override
-  String get settingsAutoBackupKeepAll => 'All';
+  String get settingsAutoBackupKeepAll => '全部';
 
   @override
-  String get autoBackupFailedTitle => 'Backup Failed';
+  String get autoBackupFailedTitle => '备份失败';
 
   @override
   String tranferStatus(Object percent) {
@@ -750,12 +750,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String encryptingBackupStatus(Object percent) {
-    return 'Encrypting Backup… $percent%';
+    return '正在加密备份… $percent%';
   }
 
   @override
   String decryptingBackupStatus(Object percent) {
-    return 'Decrypting Backup… $percent%';
+    return '正在解密备份… $percent%';
   }
 
   @override
@@ -908,7 +908,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsSourceCode => '源代码';
 
   @override
-  String get settingsOpenSourceLicenses => 'Open Source Licenses';
+  String get settingsOpenSourceLicenses => '开源许可';
 
   @override
   String get settingsMadeWithLove => '用❤️制作';
@@ -1655,6 +1655,9 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get settingsAutoBackupMaxCount => '要保留的備份';
 
   @override
+  String get settingsAutoBackupRequireCharging => '僅在充電時';
+
+  @override
   String settingsBackupLast(Object time) {
     return '上次備份 $time';
   }
@@ -1686,6 +1689,16 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   @override
   String restoringBackupStatus(Object percent) {
     return '正在還原備份… $percent%';
+  }
+
+  @override
+  String encryptingBackupStatus(Object percent) {
+    return '正在加密備份… $percent%';
+  }
+
+  @override
+  String decryptingBackupStatus(Object percent) {
+    return '正在解密備份… $percent%';
   }
 
   @override

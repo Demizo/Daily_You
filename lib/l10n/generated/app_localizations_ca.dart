@@ -729,7 +729,7 @@ class AppLocalizationsCa extends AppLocalizations {
   String get settingsAutoBackupMaxCount => 'Còpies de seguretat a conservar';
 
   @override
-  String get settingsAutoBackupRequireCharging => 'Only While Charging';
+  String get settingsAutoBackupRequireCharging => 'Només durant la càrrega';
 
   @override
   String settingsBackupLast(Object time) {
@@ -767,12 +767,12 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String encryptingBackupStatus(Object percent) {
-    return 'Encrypting Backup… $percent%';
+    return 'S\'està xifrant la còpia de seguretat… $percent%';
   }
 
   @override
   String decryptingBackupStatus(Object percent) {
-    return 'Decrypting Backup… $percent%';
+    return 'S\'està desxifrant la còpia de seguretat… $percent%';
   }
 
   @override
