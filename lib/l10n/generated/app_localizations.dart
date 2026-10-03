@@ -1769,6 +1769,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{tag} Distribution'**
   String chartDistributionTitle(Object tag);
+
+  /// No description provided for @shareAddToLogPickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a log'**
+  String get shareAddToLogPickerTitle;
 }
 
 class _AppLocalizationsDelegate

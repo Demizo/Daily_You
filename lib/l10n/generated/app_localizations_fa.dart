@@ -951,4 +951,7 @@ class AppLocalizationsFa extends AppLocalizations {
   String chartDistributionTitle(Object tag) {
     return '$tag توزیع';
   }
+
+  @override
+  String get shareAddToLogPickerTitle => 'Choose a log';
 }

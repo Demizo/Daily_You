@@ -941,6 +941,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String chartDistributionTitle(Object tag) {
     return '$tag 分布';
   }
+
+  @override
+  String get shareAddToLogPickerTitle => 'Choose a log';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).

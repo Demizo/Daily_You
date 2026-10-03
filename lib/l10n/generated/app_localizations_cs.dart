@@ -949,4 +949,7 @@ class AppLocalizationsCs extends AppLocalizations {
   String chartDistributionTitle(Object tag) {
     return 'Distribuce $tag';
   }
+
+  @override
+  String get shareAddToLogPickerTitle => 'Choose a log';
 }
