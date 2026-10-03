@@ -30,25 +30,21 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace = "com.demizo.daily_you"
-    compileSdkVersion flutter.compileSdkVersion
+    compileSdkVersion 37
     ndkVersion flutter.ndkVersion
 
     compileOptions {
         coreLibraryDesugaringEnabled true
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-
-    kotlinOptions {
-        jvmTarget = '1.8'
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     aaptOptions {
         cruncherEnabled = false
     }
 
-    sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
+    buildFeatures {
+        resValues = true
     }
 
     defaultConfig {

@@ -30,12 +30,14 @@
           cmakeVersions = [ "3.22.1" ];
           includeNDK = true;
           buildToolsVersions = [
+            "36.0.0"
             buildToolsVersion
             "35.0.0"
             "34.0.0"
             "33.0.1"
           ];
           platformVersions = [
+            "37"
             "36"
             "35"
             "34"
