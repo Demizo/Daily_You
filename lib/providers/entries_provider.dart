@@ -4,6 +4,7 @@
 
 import 'package:daily_you/database/entry_store.dart';
 import 'package:daily_you/models/entry.dart';
+import 'package:daily_you/utils/search_matcher.dart';
 import 'package:material_ui/material_ui.dart';
 
 enum OrderBy { date, mood, tracker }
@@ -94,8 +95,7 @@ class EntriesProvider with ChangeNotifier {
     List<Entry> filteredEntries;
     if (_searchText.isNotEmpty) {
       filteredEntries = entries
-          .where((entry) =>
-              entry.text.toLowerCase().contains(_searchText.toLowerCase()))
+          .where((entry) => textMatchesQuery(entry.text, _searchText))
           .toList();
     } else {
       filteredEntries = entries.toList();
