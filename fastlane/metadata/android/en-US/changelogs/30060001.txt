@@ -1,0 +1,6 @@
+Daily You v3.6.0 has arrived! Sync & Share:
+
+• Added the ability to share text and images to the app
+• Improved external folder syncing
+• Under the hood improvements and minor UI changes
+• Updated translations
