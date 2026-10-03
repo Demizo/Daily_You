@@ -256,5 +256,8 @@
     "settingsAutoBackupNext": "Prochaine sauvegarde {time}",
     "settingsAutoBackupKeepAll": "Toutes",
     "autoBackupFailedTitle": "Échec de la sauvegarde",
-    "settingsOpenSourceLicenses": "Licences Open Source"
+    "settingsOpenSourceLicenses": "Licences Open Source",
+    "settingsAutoBackupRequireCharging": "Seulement en charge",
+    "encryptingBackupStatus": "Chiffrement de la sauvegarde… {percent}%",
+    "decryptingBackupStatus": "Déchiffrement de la sauvegarde… {percent}%"
 }
