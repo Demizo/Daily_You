@@ -534,5 +534,7 @@
   "labelCoverageLabel": "Coverage",
   "@labelCoverageLabel": {},
   "chartDistributionTitle": "{tag} Distribution",
-  "@chartDistributionTitle": {}
+  "@chartDistributionTitle": {},
+  "shareAddToLogPickerTitle": "Choose a log",
+  "@shareAddToLogPickerTitle": {}
 }

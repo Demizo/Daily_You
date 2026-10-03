@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:daily_you/config_provider.dart';
@@ -9,6 +10,8 @@ import 'package:daily_you/models/image.dart';
 import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/pages/share_page.dart';
+import 'package:share_receiver/share_receiver.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/expressive_fab_menu.dart';
 import 'package:daily_you/widgets/flashback_card.dart';
@@ -35,6 +38,7 @@ class _HomePageState extends State<HomePage>
   bool firstLoad = true;
   final ScrollController _scrollController = ScrollController();
   final _fabKey = GlobalKey<ExpandableFabState>();
+  StreamSubscription<SharePayload>? _shareSubscription;
 
   @override
   bool get wantKeepAlive => true;
@@ -44,10 +48,12 @@ class _HomePageState extends State<HomePage>
     super.initState();
     _checkForLaunchIntent();
     _checkForNotificationLaunch();
+    _listenForShares();
   }
 
   @override
   void dispose() {
+    _shareSubscription?.cancel();
     _scrollController.dispose();
     super.dispose();
   }
@@ -125,6 +131,20 @@ class _HomePageState extends State<HomePage>
         await _addNewEntryForToday();
       }
     }
+  }
+
+  void _listenForShares() {
+    if (!Platform.isAndroid) return;
+    _shareSubscription = ShareReceiver.instance.shares.listen(_handleShare);
+  }
+
+  Future<void> _handleShare(SharePayload payload) async {
+    if (!mounted) return;
+    Navigator.of(context).popUntil((route) => route.isFirst);
+    await Navigator.of(context).push(MaterialPageRoute(
+      allowSnapshotting: false,
+      builder: (context) => SharePage(payload: payload),
+    ));
   }
 
   Future<void> _openOnThisDayTimeline(DateTime referenceDate) async {

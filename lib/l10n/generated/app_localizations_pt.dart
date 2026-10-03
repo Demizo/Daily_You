@@ -955,6 +955,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String chartDistributionTitle(Object tag) {
     return '$tag Distribution';
   }
+
+  @override
+  String get shareAddToLogPickerTitle => 'Choose a log';
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).
