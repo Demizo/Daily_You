@@ -27,7 +27,7 @@ class MarkdownPreviewStyles {
       quote: colors.onSurfaceVariant,
       misspelling: colors.error,
       codeBackground: colors.surfaceContainerHighest,
-      highlightBackground: Colors.yellow.shade700,
+      highlightBackground: highlightBackgroundColor,
     );
   }
 
