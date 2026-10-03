@@ -20,7 +20,7 @@ import 'package:daily_you/utils/operation_outcome.dart';
 import 'package:daily_you/utils/tag_name_sanitizer.dart';
 import 'package:daily_you/utils/zip_utils.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:html2md/html2md.dart' as html2md;
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';

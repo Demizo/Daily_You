@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:daily_you/models/image.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 
 import 'local_image_loader.dart';

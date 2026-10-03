@@ -12,7 +12,7 @@ import 'package:daily_you/utils/tag_visuals.dart';
 import 'package:daily_you/widgets/day_menu.dart';
 import 'package:daily_you/widgets/local_image_loader.dart';
 import 'package:daily_you/widgets/tag_icon_glyph.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
 import 'package:provider/provider.dart';
 import 'package:daily_you/pages/entries_list_page.dart';

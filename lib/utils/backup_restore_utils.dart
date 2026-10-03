@@ -14,7 +14,7 @@ import 'package:daily_you/utils/operation_outcome.dart';
 import 'package:daily_you/utils/password_store.dart';
 import 'package:daily_you/utils/zip_utils.dart';
 import 'package:daily_you/widgets/auth_popup.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:logging/logging.dart';
 import 'package:path/path.dart';

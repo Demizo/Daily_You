@@ -1,5 +1,5 @@
 import 'package:daily_you/models/tag.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 extension TagVisuals on Tag {
   /// Fallback icon shown when the tag has no icon of its own set.

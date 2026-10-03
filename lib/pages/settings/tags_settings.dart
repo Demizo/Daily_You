@@ -11,7 +11,7 @@ import 'package:daily_you/widgets/failure_dialog.dart';
 import 'package:daily_you/widgets/share_tags_dialog.dart';
 import 'package:daily_you/widgets/tag_chip.dart';
 import 'package:daily_you/widgets/tag_icon_glyph.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:provider/provider.dart';
 

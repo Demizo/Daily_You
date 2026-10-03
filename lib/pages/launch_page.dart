@@ -10,7 +10,7 @@ import 'package:daily_you/main.dart';
 import 'package:daily_you/utils/auto_backup_schedule.dart';
 import 'package:daily_you/utils/backup_restore_utils.dart';
 import 'package:daily_you/widgets/auth_popup.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:logging/logging.dart';
 import 'package:quick_actions/quick_actions.dart';

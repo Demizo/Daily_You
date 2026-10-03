@@ -1,7 +1,7 @@
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/utils/tag_visuals.dart';
 import 'package:daily_you/widgets/tag_icon_glyph.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class TagChip extends StatelessWidget {
   final Tag tag;

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 
 /// Delete confirmation prompt. Returns true when a delete is confirmed, false otherwise.

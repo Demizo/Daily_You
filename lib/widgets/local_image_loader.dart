@@ -1,7 +1,7 @@
 import 'package:daily_you/database/image_storage.dart';
 import 'package:daily_you/widgets/local_image_cache.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class LocalImageLoader extends StatefulWidget {
   final String imagePath;

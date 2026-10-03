@@ -4,7 +4,8 @@ import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/settings_icon_action.dart';
 import 'package:daily_you/widgets/settings_toggle.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' as sdk_material show TimeOfDay;
+import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -61,14 +62,16 @@ class NotificationSettings extends StatefulWidget {
 
   static Future<void> _selectTimeRange(BuildContext context) async {
     ThemeData theme = Theme.of(context);
-    TimeRange currentRange = TimeManager.getReminderTimeRange();
+    final currentRange = TimeManager.getReminderTimeRange();
     TimeRange? range = await showTimeRangePicker(
         context: context,
         toText: "",
         fromText: "",
         use24HourFormat: ConfigProvider.instance.is24HourFormat(),
-        start: currentRange.startTime,
-        end: currentRange.endTime,
+        start: sdk_material.TimeOfDay(
+            hour: currentRange.start.hour, minute: currentRange.start.minute),
+        end: sdk_material.TimeOfDay(
+            hour: currentRange.end.hour, minute: currentRange.end.minute),
         ticks: 24,
         handlerColor: theme.colorScheme.primary,
         strokeColor: theme.colorScheme.primary,
@@ -79,33 +82,20 @@ class NotificationSettings extends StatefulWidget {
         ticksWidth: 2,
         autoAdjustLabels: false,
         labels: [
-          ClockLabel.fromTime(
-              time: TimeOfDay(hour: 0, minute: 0),
-              text: DateFormat.j(TimeManager.currentLocale(context)).format(
-                  TimeManager.addTimeOfDay(
-                      TimeManager.startOfDay(DateTime.now()),
-                      TimeOfDay(hour: 0, minute: 0)))),
-          ClockLabel.fromTime(
-              time: TimeOfDay(hour: 6, minute: 0),
-              text: DateFormat.j(TimeManager.currentLocale(context)).format(
-                  TimeManager.addTimeOfDay(
-                      TimeManager.startOfDay(DateTime.now()),
-                      TimeOfDay(hour: 6, minute: 0)))),
-          ClockLabel.fromTime(
-              time: TimeOfDay(hour: 12, minute: 0),
-              text: DateFormat.j(TimeManager.currentLocale(context)).format(
-                  TimeManager.addTimeOfDay(
-                      TimeManager.startOfDay(DateTime.now()),
-                      TimeOfDay(hour: 12, minute: 0)))),
-          ClockLabel.fromTime(
-              time: TimeOfDay(hour: 18, minute: 0),
-              text: DateFormat.j(TimeManager.currentLocale(context)).format(
-                  TimeManager.addTimeOfDay(
-                      TimeManager.startOfDay(DateTime.now()),
-                      TimeOfDay(hour: 18, minute: 0)))),
+          for (final hour in [0, 6, 12, 18])
+            ClockLabel.fromTime(
+                time: sdk_material.TimeOfDay(hour: hour, minute: 0),
+                text: DateFormat.j(TimeManager.currentLocale(context)).format(
+                    TimeManager.addTimeOfDay(
+                        TimeManager.startOfDay(DateTime.now()),
+                        TimeOfDay(hour: hour, minute: 0)))),
         ]);
     if (range != null) {
-      await TimeManager.setReminderTimeRange(range);
+      await TimeManager.setReminderTimeRange((
+        start: TimeOfDay(
+            hour: range.startTime.hour, minute: range.startTime.minute),
+        end: TimeOfDay(hour: range.endTime.hour, minute: range.endTime.minute),
+      ));
       if (ConfigProvider.instance.get(Settings.dailyReminders)) {
         await NotificationManager.instance.stopDailyReminders();
         await NotificationManager.instance.startScheduledDailyReminders();

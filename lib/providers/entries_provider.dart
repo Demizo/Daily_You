@@ -1,6 +1,6 @@
 import 'package:daily_you/database/entry_store.dart';
 import 'package:daily_you/models/entry.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 enum OrderBy { date, mood, tracker }
 

@@ -1,5 +1,5 @@
 import 'dart:math';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 //Note: See https://github.com/flutter/flutter/issues/55103#issuecomment-747059541
 class FastPageViewScrollPhysics extends ScrollPhysics {

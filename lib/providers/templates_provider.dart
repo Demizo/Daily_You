@@ -5,7 +5,7 @@ import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/database/template_dao.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:daily_you/providers/tags_provider.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class TemplatesProvider with ChangeNotifier {
   static final TemplatesProvider instance = TemplatesProvider._init();

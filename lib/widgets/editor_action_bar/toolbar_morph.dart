@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 const Duration toolbarMorphDuration = Duration(milliseconds: 260);
 const Curve toolbarMorphCurve = Curves.easeOutCubic;

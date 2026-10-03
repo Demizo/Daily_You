@@ -5,7 +5,7 @@ import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/storage/storage_picker.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/widgets/zoomable_image_page_view.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:share_plus/share_plus.dart';

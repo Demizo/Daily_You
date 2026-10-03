@@ -1,72 +1,34 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:cupertino_ui/cupertino_ui.dart';
+import 'package:flutter_localizations/flutter_localizations.dart' as sdk;
+import 'package:material_ui/material_ui.dart';
 
-class CustomMaterialLocalizationsDelegate
-    extends LocalizationsDelegate<MaterialLocalizations> {
-  const CustomMaterialLocalizationsDelegate();
+class OccitanFrenchFallbackDelegate<T> extends LocalizationsDelegate<T> {
+  const OccitanFrenchFallbackDelegate(this.delegate);
 
-  @override
-  bool isSupported(Locale locale) {
-    // Pretend to support everything
-    return true;
-  }
+  final LocalizationsDelegate<T> delegate;
 
   @override
-  Future<MaterialLocalizations> load(Locale locale) {
-    if (locale.languageCode == 'oc') {
-      // Load French localization for Occitan
-      return GlobalMaterialLocalizations.delegate.load(const Locale('fr'));
-    }
-    return GlobalMaterialLocalizations.delegate.load(locale);
-  }
+  Type get type => delegate.type;
+
+  @override
+  bool isSupported(Locale locale) => true;
+
+  @override
+  Future<T> load(Locale locale) =>
+      delegate.load(locale.languageCode == 'oc' ? const Locale('fr') : locale);
 
   @override
   bool shouldReload(covariant LocalizationsDelegate old) => false;
 }
 
-class CustomCupertinoLocalizationsDelegate
-    extends LocalizationsDelegate<CupertinoLocalizations> {
-  const CustomCupertinoLocalizationsDelegate();
+const appLocalizationsDelegates = <LocalizationsDelegate<dynamic>>[
+  OccitanFrenchFallbackDelegate(GlobalMaterialLocalizations.delegate),
+  OccitanFrenchFallbackDelegate(GlobalCupertinoLocalizations.delegate),
+  OccitanFrenchFallbackDelegate(sdk.GlobalWidgetsLocalizations.delegate),
+];
 
-  @override
-  bool isSupported(Locale locale) {
-    // Pretend to support everything
-    return true;
-  }
-
-  @override
-  Future<CupertinoLocalizations> load(Locale locale) {
-    if (locale.languageCode == 'oc') {
-      // Load French localization for Occitan
-      return GlobalCupertinoLocalizations.delegate.load(const Locale('fr'));
-    }
-    return GlobalCupertinoLocalizations.delegate.load(locale);
-  }
-
-  @override
-  bool shouldReload(covariant LocalizationsDelegate old) => false;
-}
-
-class CustomWidgetsLocalizationsDelegate
-    extends LocalizationsDelegate<WidgetsLocalizations> {
-  const CustomWidgetsLocalizationsDelegate();
-
-  @override
-  bool isSupported(Locale locale) {
-    // Pretend to support everything
-    return true;
-  }
-
-  @override
-  Future<WidgetsLocalizations> load(Locale locale) {
-    if (locale.languageCode == 'oc') {
-      // Load French localization for Occitan
-      return GlobalWidgetsLocalizations.delegate.load(const Locale('fr'));
-    }
-    return GlobalWidgetsLocalizations.delegate.load(locale);
-  }
-
-  @override
-  bool shouldReload(covariant LocalizationsDelegate old) => false;
-}
+const sdkLocalizationsDelegates = <LocalizationsDelegate<dynamic>>[
+  OccitanFrenchFallbackDelegate(sdk.GlobalMaterialLocalizations.delegate),
+  OccitanFrenchFallbackDelegate(sdk.GlobalCupertinoLocalizations.delegate),
+  OccitanFrenchFallbackDelegate(sdk.GlobalWidgetsLocalizations.delegate),
+];

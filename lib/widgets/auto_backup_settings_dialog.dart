@@ -5,7 +5,7 @@ import 'package:daily_you/utils/auto_backup_schedule.dart';
 import 'package:daily_you/widgets/settings_dropdown.dart';
 import 'package:daily_you/widgets/settings_icon_action.dart';
 import 'package:daily_you/widgets/settings_toggle.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
 class AutoBackupSettingsDialog extends StatelessWidget {

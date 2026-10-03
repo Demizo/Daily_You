@@ -1,5 +1,5 @@
 import 'package:daily_you/widgets/markdown_highlight_syntax.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:markdown_widget/markdown_widget.dart';
 
 // Fixes duplicate scaling issues with markdown_widget

@@ -1,6 +1,6 @@
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 enum AutoBackupInterval {
   daily('daily', Duration(hours: 24)),

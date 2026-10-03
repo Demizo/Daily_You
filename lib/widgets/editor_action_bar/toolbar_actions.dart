@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:daily_you/utils/text_editing.dart';
 import 'package:daily_you/widgets/icons/svg_icon.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 @immutable
 class ToolbarAction {

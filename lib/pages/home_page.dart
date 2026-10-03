@@ -17,7 +17,7 @@ import 'package:daily_you/widgets/expressive_fab_menu.dart';
 import 'package:daily_you/widgets/flashback_card.dart';
 import 'package:daily_you/widgets/support_banner.dart';
 import 'package:daily_you/widgets/vertical_calendar.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/pages/entries_list_page.dart';

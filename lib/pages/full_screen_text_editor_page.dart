@@ -1,7 +1,7 @@
 import 'package:daily_you/widgets/editor_action_bar.dart';
 import 'package:daily_you/widgets/entry_text_field.dart';
 import 'package:daily_you/widgets/markdown_preview_controller.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:word_count/word_count.dart';
 

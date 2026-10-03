@@ -3,7 +3,7 @@ import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/entry_card_header_row.dart';
 import 'package:daily_you/widgets/image_grid.dart';
 import 'package:daily_you/widgets/scaled_markdown.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/models/entry.dart';
 

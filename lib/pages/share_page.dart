@@ -12,7 +12,7 @@ import 'package:daily_you/widgets/entry_image_actions.dart';
 import 'package:daily_you/widgets/image_grid.dart';
 import 'package:daily_you/widgets/large_entry_card_widget.dart';
 import 'package:daily_you/widgets/vertical_calendar.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:share_receiver/share_receiver.dart';
 
 class SharePage extends StatefulWidget {

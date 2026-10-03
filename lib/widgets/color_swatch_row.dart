@@ -1,5 +1,5 @@
 import 'package:daily_you/utils/color_utils.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class ColorSwatchRow extends StatelessWidget {
   final String label;

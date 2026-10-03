@@ -2,7 +2,7 @@ import 'package:daily_you/models/template.dart';
 import 'package:daily_you/template_renderer.dart';
 import 'package:daily_you/utils/text_editing.dart';
 import 'package:daily_you/widgets/template_select.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 Future<void> showTemplateSelectPopup(
     BuildContext context, TextEditingController controller,

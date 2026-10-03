@@ -7,7 +7,7 @@ import 'package:daily_you/widgets/delete_confirm_dialog.dart';
 import 'package:daily_you/widgets/icon_picker_dialog.dart';
 import 'package:daily_you/widgets/tag_icon_glyph.dart';
 import 'package:daily_you/utils/tag_name_sanitizer.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 
 class EditCategory extends StatefulWidget {

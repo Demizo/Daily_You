@@ -1,6 +1,6 @@
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/utils/password_store.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
 

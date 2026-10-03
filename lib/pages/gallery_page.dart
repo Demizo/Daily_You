@@ -7,7 +7,7 @@ import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/widgets/tag_picker_dialog.dart';
 import 'package:daily_you/widgets/hiding_widget.dart';
 import 'package:daily_you/widgets/large_entry_card_widget.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/widgets/entry_card_widget.dart';
 import 'package:daily_you/pages/entries_list_page.dart';

@@ -66,8 +66,8 @@ dependencies:
   csv: ^8.0.0
   quick_actions: ^1.1.0
   flutter_displaymode: ^0.7.0
-  dynamic_color: ^1.9.0
-  flutter_expandable_fab: ^2.5.2
+  dynamic_color: ^2.1.0
+  flutter_expandable_fab: ^3.0.0
   shamsi_date:
   persian_datetime_picker: ^3.2.0
   markdown: ^7.3.1
@@ -76,6 +76,8 @@ dependencies:
   pointycastle: ^4.0.0
   cryptography: ^2.9.0
   cryptography_flutter: ^2.3.4
+  material_ui: ^1.5.0
+  cupertino_ui: ^1.1.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -4,7 +4,7 @@ import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/utils/bucket_combiner.dart';
 import 'package:daily_you/utils/chart_y_range.dart';
 import 'package:daily_you/widgets/connected_button_group.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';

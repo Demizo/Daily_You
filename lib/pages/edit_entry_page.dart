@@ -21,7 +21,7 @@ import 'package:daily_you/widgets/editor_action_bar.dart';
 import 'package:daily_you/widgets/editor_action_bar/editor_keyboard_session.dart';
 import 'package:daily_you/widgets/entry_image_editable_list.dart';
 import 'package:easy_debounce/easy_debounce.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/widgets/entry_image_actions.dart';

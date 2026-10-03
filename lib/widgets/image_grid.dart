@@ -1,5 +1,5 @@
 import 'package:daily_you/models/image.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'local_image_loader.dart';
 
 class ImageGrid extends StatelessWidget {
