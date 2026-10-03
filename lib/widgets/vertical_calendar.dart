@@ -13,7 +13,7 @@ import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/calendar_view_options_dialog.dart';
 import 'package:daily_you/widgets/entry_day_cell.dart';
 import 'package:daily_you/widgets/year_month_picker.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 

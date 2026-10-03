@@ -1,5 +1,5 @@
 import 'package:daily_you/utils/color_utils.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:markdown_widget/markdown_widget.dart';
 

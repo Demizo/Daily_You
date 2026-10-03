@@ -153,7 +153,7 @@ packages:
     source: hosted
     version: "8.0.0"
   cupertino_ui:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: cupertino_ui
       sha256: c23816577a1280cff409e989541767887011f8f1d8c1863a794ed308af46f2a9
@@ -188,10 +188,10 @@ packages:
     dependency: "direct main"
     description:
       name: dynamic_color
-      sha256: "4aeb76de323e8eb660bab5557d826ad7ebbf1434a598f0c6aa8a11a9696a6757"
+      sha256: "869b3bce0100eb519768ecd71c0111f0b5ea679f5f62e1f59c49d80067e730c5"
       url: "https://pub.dev"
     source: hosted
-    version: "1.9.0"
+    version: "2.1.0"
   easy_debounce:
     dependency: "direct main"
     description:
@@ -361,10 +361,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_expandable_fab
-      sha256: "2a488600924fd2a041679ad889807ee5670414a7a518cf11d4854b9898b3504f"
+      sha256: fdcab005a453fa452fa68e24031cedfeb811d5bd13513fa3caa6bb3b2097353b
       url: "https://pub.dev"
     source: hosted
-    version: "2.5.2"
+    version: "3.0.0"
   flutter_highlight:
     dependency: transitive
     description:
@@ -837,7 +837,7 @@ packages:
     source: hosted
     version: "0.13.0"
   material_ui:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: material_ui
       sha256: "32d98f11cf5942a095a8c3e01b03e4de3b17941437713dcf36b1088fb62e23d2"

@@ -1,5 +1,5 @@
 import 'package:daily_you/models/tag_category.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 extension TagCategoryVisuals on TagCategory {
   /// Resolves the category's color against the theme; a null [TagCategory.color]

@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:daily_you/config_provider.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class MoodIcon extends StatefulWidget {
   final int? moodValue;

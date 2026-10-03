@@ -21,7 +21,7 @@ import 'package:daily_you/utils/chart_y_range.dart';
 import 'package:daily_you/utils/tag_visuals.dart';
 import 'package:daily_you/widgets/value_by_day_chart.dart';
 import 'package:daily_you/widgets/value_over_time_chart.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:provider/provider.dart';

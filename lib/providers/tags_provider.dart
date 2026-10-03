@@ -10,7 +10,7 @@ import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/models/tag_category.dart';
 import 'package:daily_you/models/tag_icon_type.dart';
 import 'package:daily_you/utils/generated/tag_icon_registry.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class TagSection {
   final TagCategory? category;

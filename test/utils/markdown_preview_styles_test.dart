@@ -1,6 +1,6 @@
 import 'package:daily_you/utils/markdown_preview_scanner.dart';
 import 'package:daily_you/utils/markdown_preview_styles.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

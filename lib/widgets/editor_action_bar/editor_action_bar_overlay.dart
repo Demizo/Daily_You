@@ -1,7 +1,7 @@
 import 'package:daily_you/widgets/editor_action_bar.dart';
 import 'package:daily_you/widgets/editor_action_bar/dock_metrics.dart';
 import 'package:daily_you/widgets/editor_action_bar/editor_keyboard_session.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class EditorActionBarOverlay extends StatefulWidget {
   final Widget body;

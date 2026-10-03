@@ -3,7 +3,7 @@ import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/database/entry_image_dao.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/image.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class EntryImagesProvider with ChangeNotifier {
   static final EntryImagesProvider instance = EntryImagesProvider._init();

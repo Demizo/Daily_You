@@ -6,7 +6,7 @@ import 'package:daily_you/language_option.dart';
 import 'package:daily_you/storage/secret_store.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:easy_debounce/easy_debounce.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';

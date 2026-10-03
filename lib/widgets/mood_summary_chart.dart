@@ -1,7 +1,7 @@
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/widgets/material_shapes.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:provider/provider.dart';
 

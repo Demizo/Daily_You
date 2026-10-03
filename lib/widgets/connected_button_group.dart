@@ -1,5 +1,5 @@
 import 'dart:ui' show lerpDouble;
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 const double _kFullRadius = 50.0;
 const double _kInnerRadius = 8.0;

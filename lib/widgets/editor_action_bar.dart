@@ -12,7 +12,7 @@ import 'package:daily_you/widgets/editor_action_bar/toolbar_focus_restorer.dart'
 import 'package:daily_you/widgets/editor_action_bar/toolbar_morph.dart';
 import 'package:daily_you/widgets/editor_action_bar/toolbar_overflow_popup.dart';
 import 'package:daily_you/widgets/template_select_popup.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 export 'package:daily_you/widgets/editor_action_bar/editor_action_bar_overlay.dart';
 export 'package:daily_you/widgets/editor_action_bar/toolbar_actions.dart'

@@ -5,7 +5,7 @@ import 'package:daily_you/utils/markdown_preview_styles.dart';
 import 'package:daily_you/widgets/editor_action_bar/editor_keyboard_session.dart';
 import 'package:daily_you/widgets/markdown_preview_controller.dart';
 import 'package:daily_you/widgets/markdown_preview_decorations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class EntryTextField extends StatefulWidget {
   final MarkdownPreviewController controller;

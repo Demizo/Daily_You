@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:daily_you/utils/color_utils.dart';
 import 'package:daily_you/utils/markdown_preview_scanner.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Maps style onto the Markdown constructs
 class MarkdownPreviewStyles {

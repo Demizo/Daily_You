@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 import 'dart:ui' show lerpDouble;
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class PillClipper extends CustomClipper<Path> {
   static Path buildPath(Size size) {

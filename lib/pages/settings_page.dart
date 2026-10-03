@@ -12,7 +12,7 @@ import 'package:daily_you/pages/settings/templates_page.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/widgets/settings_category.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';

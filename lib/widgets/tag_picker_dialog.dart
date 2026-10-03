@@ -7,7 +7,7 @@ import 'package:daily_you/widgets/tag_attachment_source.dart';
 import 'package:daily_you/widgets/tag_chip.dart';
 import 'package:daily_you/widgets/tag_grouped_chip_list.dart';
 import 'package:daily_you/utils/tag_name_sanitizer.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:provider/provider.dart';
 

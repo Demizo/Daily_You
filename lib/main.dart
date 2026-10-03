@@ -19,7 +19,7 @@ import 'package:daily_you/utils/auto_backup_schedule.dart';
 import 'package:daily_you/utils/backup_restore_utils.dart';
 import 'package:daily_you/utils/logging.dart';
 import 'package:dynamic_color/dynamic_color.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/layouts/mobile_scaffold.dart';
 import 'package:daily_you/layouts/responsive_layout.dart';
@@ -29,7 +29,6 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:statsfl/statsfl.dart';
-import 'package:time_range_picker/time_range_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:workmanager/workmanager.dart';
 
@@ -268,14 +267,13 @@ Future<void> setAlarm({bool firstSet = false}) async {
     }
   } else {
     final random = Random();
-    TimeRange timeRange = TimeManager.getReminderTimeRange();
+    final timeRange = TimeManager.getReminderTimeRange();
 
     Duration startTime =
-        TimeManager.addTimeOfDay(referenceTime, timeRange.startTime)
+        TimeManager.addTimeOfDay(referenceTime, timeRange.start)
             .difference(referenceTime);
-    Duration endTime =
-        TimeManager.addTimeOfDay(referenceTime, timeRange.endTime)
-            .difference(referenceTime);
+    Duration endTime = TimeManager.addTimeOfDay(referenceTime, timeRange.end)
+        .difference(referenceTime);
 
     if (endTime < startTime) {
       // Extend end time to next day
@@ -492,9 +490,7 @@ class _MainAppState extends State<MainApp> {
                 debugShowCheckedModeBanner: false,
                 localizationsDelegates: <LocalizationsDelegate<dynamic>>[
                   AppLocalizations.delegate,
-                  CustomMaterialLocalizationsDelegate(),
-                  CustomCupertinoLocalizationsDelegate(),
-                  CustomWidgetsLocalizationsDelegate(),
+                  ...appLocalizationsDelegates,
                 ],
                 locale: configProvider.getOverrideLanguage(),
                 supportedLocales: [
@@ -518,6 +514,9 @@ class _MainAppState extends State<MainApp> {
                 },
                 theme: lightTheme,
                 darkTheme: darkTheme,
+                // ignore: deprecated_member_use
+                builder: (context, child) => MaterialUiCompatibilityBridge(
+                    delegates: sdkLocalizationsDelegates, child: child!),
                 home: LaunchPage(
                     nextPage: ResponsiveLayout(
                   mobileScaffold: MobileScaffold(),

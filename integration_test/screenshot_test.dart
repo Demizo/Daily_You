@@ -16,7 +16,7 @@ import 'package:daily_you/providers/templates_provider.dart';
 import 'package:daily_you/theme_mode_provider.dart';
 import 'package:daily_you/widgets/stats_overview_card.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:golden_screenshot/golden_screenshot.dart';
