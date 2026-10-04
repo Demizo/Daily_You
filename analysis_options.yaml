@@ -10,3 +10,4 @@ analyzer:
     - windows/**
     - macos/**
     - linux/**
+    - integration_test/**
