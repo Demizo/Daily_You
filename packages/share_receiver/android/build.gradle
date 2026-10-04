@@ -1,5 +1,5 @@
-group 'com.demizo.daily_you.share_receiver'
-version '1.0'
+group = 'com.demizo.daily_you.share_receiver'
+version = '1.0'
 
 apply plugin: 'com.android.library'
 
@@ -8,7 +8,7 @@ if (project.findProperty("android.builtInKotlin")?.toString() != "true") {
 }
 
 android {
-    namespace 'com.demizo.daily_you.share_receiver'
+    namespace = 'com.demizo.daily_you.share_receiver'
     compileSdkVersion 36
 
     compileOptions {
