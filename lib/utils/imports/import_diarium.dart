@@ -1,14 +1,20 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:daily_you/database/app_database.dart';
+import 'package:daily_you/database/entry_tag_dao.dart';
 import 'package:daily_you/database/image_storage.dart';
+import 'package:daily_you/database/tag_dao.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/image.dart';
+import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/storage/storage_picker.dart';
 import 'package:daily_you/utils/imports/import_helpers.dart';
 import 'package:daily_you/utils/operation_outcome.dart';
+import 'package:daily_you/utils/tag_name_sanitizer.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:html2md/html2md.dart' as html2md;
@@ -39,6 +45,13 @@ Future<OperationOutcome> importFromDiarium(
     db = await openDatabase(join(tempDir.path, tempDbName), readOnly: true);
     final entries = await db.rawQuery('SELECT * FROM Entries');
     final media = await db.rawQuery('SELECT * FROM Media WHERE Type = 0');
+    final tagsByDiariumId =
+        await importDiariumTags(await db.rawQuery('SELECT * FROM Tags'));
+    final entryTagsByEntryId = <int, List<Map<String, Object?>>>{};
+    for (final row in await db.rawQuery('SELECT * FROM EntryTags')) {
+      final entryId = row['DiaryEntryId'] as int;
+      entryTagsByEntryId.putIfAbsent(entryId, () => []).add(row);
+    }
 
     final Map<int, DateTime> idToTimestamp = {};
     for (final entry in entries) {
@@ -111,6 +124,9 @@ Future<OperationOutcome> importFromDiarium(
             }
           }
         }
+
+        await addDiariumEntryTags(addedEntry.id!, timestamp,
+            entryTagsByEntryId[id] ?? const [], tagsByDiariumId);
       }
 
       processedEntries++;
@@ -123,6 +139,8 @@ Future<OperationOutcome> importFromDiarium(
   updateStatus(localizations.cleanUpStatus);
 
   outcome = await finishImport(updateStatus, outcome);
+  await TagsProvider.instance.load();
+  await AppDatabase.instance.updateExternalDatabase();
 
   if (db != null && db.isOpen) {
     await db.close();
@@ -133,4 +151,80 @@ Future<OperationOutcome> importFromDiarium(
   }
 
   return outcome;
+}
+
+const int _diariumLabelTagType = 0;
+const int _diariumNumericTrackerType = 2;
+
+int? parseDiariumColor(String? hex) {
+  if (hex == null || !RegExp(r'^#[0-9a-fA-F]{8}$').hasMatch(hex)) return null;
+  return int.parse(hex.substring(1), radix: 16);
+}
+
+Future<Map<int, Tag>> importDiariumTags(
+    List<Map<String, Object?>> diariumTags) async {
+  String tagLookupKey(TagType tagType, String name) =>
+      '${tagType.name}:${name.toLowerCase()}';
+
+  final tagByLookupKey = <String, Tag>{};
+  var nextSortOrder = 0;
+  for (final tag in TagsProvider.instance.tags) {
+    tagByLookupKey.putIfAbsent(tagLookupKey(tag.tagType, tag.name), () => tag);
+    if (tag.categoryId == null && tag.sortOrder >= nextSortOrder) {
+      nextSortOrder = tag.sortOrder + 1;
+    }
+  }
+
+  final tagsByDiariumId = <int, Tag>{};
+  for (final diariumTag in diariumTags) {
+    final tagType = switch (diariumTag['Type']) {
+      _diariumLabelTagType => TagType.label,
+      _diariumNumericTrackerType => TagType.tracker,
+      _ => null,
+    };
+    final name = sanitizeTagName((diariumTag['Value'] as String?) ?? '');
+    if (tagType == null || name.isEmpty) continue;
+
+    var tag = tagByLookupKey[tagLookupKey(tagType, name)];
+    if (tag == null) {
+      final now = DateTime.now();
+      tag = await TagDao.add(Tag(
+        name: name,
+        tagType: tagType,
+        color: parseDiariumColor(diariumTag['Color'] as String?),
+        sortOrder: nextSortOrder++,
+        timeCreate: now,
+        timeModified: now,
+      ));
+      tagByLookupKey[tagLookupKey(tagType, name)] = tag;
+    }
+    tagsByDiariumId[diariumTag['DiaryTagId'] as int] = tag;
+  }
+  return tagsByDiariumId;
+}
+
+Future<void> addDiariumEntryTags(
+    int entryId,
+    DateTime timestamp,
+    List<Map<String, Object?>> diariumEntryTags,
+    Map<int, Tag> tagsByDiariumId) async {
+  final addedTagIds = <int>{};
+  for (final diariumEntryTag in diariumEntryTags) {
+    final tag = tagsByDiariumId[diariumEntryTag['DiaryTagId']];
+    if (tag == null) continue;
+
+    String? value;
+    if (tag.tagType == TagType.tracker) {
+      value = (diariumEntryTag['TrackingValue'] as String?)?.trim();
+      if (!(double.tryParse(value ?? '')?.isFinite ?? false)) continue;
+    }
+    if (!addedTagIds.add(tag.id!)) continue;
+
+    await EntryTagDao.add(EntryTag(
+      entryId: entryId,
+      tagId: tag.id!,
+      value: value,
+      timeCreate: timestamp,
+    ));
+  }
 }
