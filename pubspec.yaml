@@ -104,7 +104,7 @@ icons_launcher:
       notification_image: "assets/logo_notification.png"
       adaptive_background_image: "assets/logo_background.png"
       adaptive_foreground_image: "assets/logo_foreground.png"
-      adaptive_round_image: "assets/logo.png"
+      adaptive_round_image: "assets/logo_round.png"
       adaptive_monochrome_image: "assets/logo_monochrome.png"
     ios:
       enable: false
