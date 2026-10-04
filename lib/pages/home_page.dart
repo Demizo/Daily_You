@@ -23,7 +23,6 @@ import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/pages/entries_list_page.dart';
 import 'package:daily_you/pages/entry_timeline_page.dart';
 import 'package:daily_you/pages/edit_entry_page.dart';
-import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -37,7 +36,6 @@ class _HomePageState extends State<HomePage>
     with AutomaticKeepAliveClientMixin {
   bool firstLoad = true;
   final ScrollController _scrollController = ScrollController();
-  final _fabKey = GlobalKey<ExpandableFabState>();
   StreamSubscription<SharePayload>? _shareSubscription;
 
   @override
@@ -58,15 +56,7 @@ class _HomePageState extends State<HomePage>
     super.dispose();
   }
 
-  void _closeFab() {
-    final fabState = _fabKey.currentState;
-    if (fabState != null && fabState.isOpen) {
-      fabState.toggle();
-    }
-  }
-
   Future<void> _openWithCamera(Entry? entry, List<EntryImage> images) async {
-    _closeFab();
     await Navigator.of(context).push(MaterialPageRoute(
       allowSnapshotting: false,
       builder: (context) =>
@@ -75,7 +65,6 @@ class _HomePageState extends State<HomePage>
   }
 
   Future<void> _addNewEntryForToday() async {
-    _closeFab();
     await Navigator.of(context).push(MaterialPageRoute(
       allowSnapshotting: false,
       builder: (context) =>
@@ -84,7 +73,6 @@ class _HomePageState extends State<HomePage>
   }
 
   Future<void> _editEntry(Entry entry, List<EntryImage> images) async {
-    _closeFab();
     await Navigator.of(context).push(MaterialPageRoute(
       allowSnapshotting: false,
       builder: (context) =>
@@ -93,7 +81,6 @@ class _HomePageState extends State<HomePage>
   }
 
   Future<void> _addEntryForPickedDay() async {
-    _closeFab();
     final picked = await TimeManager.pickDate(
       context,
       initialDate: DateTime.now(),
