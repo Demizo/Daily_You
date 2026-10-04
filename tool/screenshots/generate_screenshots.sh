@@ -30,6 +30,9 @@ case "$reply" in
     ;;
 esac
 
+pubspec_backup_dir="$(mktemp -d)"
+cp pubspec.yaml pubspec.lock "$pubspec_backup_dir"
+
 moved=false
 if [[ -e "$real_data_dir" ]]; then
   mv "$real_data_dir" "$backup_dir"
@@ -39,6 +42,9 @@ fi
 restore_real_data() {
   local status=$?
   trap - EXIT INT TERM
+  cp "$pubspec_backup_dir/pubspec.yaml" "$pubspec_backup_dir/pubspec.lock" .
+  rm -rf "$pubspec_backup_dir"
+  flutter pub get > /dev/null
   rm -rf "$real_data_dir"
   if [[ "$moved" == true ]]; then
     mv "$backup_dir" "$real_data_dir"
@@ -47,6 +53,8 @@ restore_real_data() {
   exit "$status"
 }
 trap restore_real_data EXIT INT TERM
+
+flutter pub add --dev integration_test --sdk=flutter
 
 xvfb-run -a flutter test integration_test/screenshot_test.dart -d linux --update-goldens
 
