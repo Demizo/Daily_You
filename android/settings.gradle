@@ -23,4 +23,3 @@ plugins {
 }
 
 include ":app"
-

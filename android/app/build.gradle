@@ -31,10 +31,10 @@ if (keystorePropertiesFile.exists()) {
 android {
     namespace = "com.demizo.daily_you"
     compileSdkVersion 37
-    ndkVersion flutter.ndkVersion
+    ndkVersion = flutter.ndkVersion
 
     compileOptions {
-        coreLibraryDesugaringEnabled true
+        coreLibraryDesugaringEnabled = true
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
@@ -52,7 +52,7 @@ android {
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdkVersion flutter.minSdkVersion
-        multiDexEnabled true
+        multiDexEnabled = true
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
@@ -74,7 +74,7 @@ android {
     productFlavors {
 	independent {
             dimension "default"
-            signingConfig signingConfigs.release
+            signingConfig = signingConfigs.release
 	}
         fdroid {
             dimension "default"
@@ -84,16 +84,16 @@ android {
             applicationIdSuffix ".dev"
             versionNameSuffix "-dev"
             resValue "string", "app_name", "Daily You Dev"
-            signingConfig signingConfigs.release
+            signingConfig = signingConfigs.release
         }
     }
 
     buildTypes {
         release {
-            vcsInfo.include false
+            vcsInfo.include = false
         }
         profile {
-            signingConfig signingConfigs.release
+            signingConfig = signingConfigs.release
         }
     }
 
@@ -107,7 +107,7 @@ android {
     // TODO: Temporary fix to address: https://github.com/flutter/flutter/issues/169496
     packaging {
        jniLibs {
-            useLegacyPackaging true
+            useLegacyPackaging = true
        }
     }
 }
@@ -148,7 +148,7 @@ android.applicationVariants.all { variant ->
 }
 
 flutter {
-    source '../..'
+    source = '../..'
 }
 
 dependencies {
