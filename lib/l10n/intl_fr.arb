@@ -80,7 +80,7 @@
     "settingsTemplatesTitle": "Modèles",
     "manageTemplates": "Gérer les modèles",
     "exportLogs": "Exporter les enregistrements",
-    "logFolderWarningDescription": "Si le dossier sélectionné contient déjà un fichier 'daily_you.db', celui-ci sera utilisé pour écraser vos journaux existants !",
+    "logFolderWarningDescription": "Si le dossier sélectionné contient déjà un fichier 'daily_you.db', celui-ci sera utilisé pour écraser vos enregistrements existants !",
     "settingsExport": "Exporter",
     "exportImages": "Exporter les images",
     "importLogs": "Importer les enregistrements",
@@ -105,7 +105,7 @@
     "logFormatDescription": "Le format d’un autre application peut ne pas prendre en charge toutes les fonctionnalités. Merci de signaler tout problème étant donné que les formats tiers peuvent changer avec le temps. Cela n’affectera pas les journaux existants !",
     "settingsDeleteAllLogsPrompt": "Écrivez '{prompt}' pour confirmer. Cette action est irréversible !",
     "settingsAlwaysSendReminderTitle": "Toujours envoyer un rappel",
-    "settingsAlwaysSendReminderDescription": "Envoyer un rappel même une entrée est déjà commencée",
+    "settingsAlwaysSendReminderDescription": "Envoyer un rappel même si une entrée est déjà commencée",
     "settingsImportFromAnotherApp": "Import d’une autre application",
     "settingsLanguageTitle": "Langue",
     "settingsCustomizeNotificationTitle": "Personnaliser les notifications",
@@ -259,5 +259,6 @@
     "settingsOpenSourceLicenses": "Licences Open Source",
     "settingsAutoBackupRequireCharging": "Seulement en charge",
     "encryptingBackupStatus": "Chiffrement de la sauvegarde… {percent}%",
-    "decryptingBackupStatus": "Déchiffrement de la sauvegarde… {percent}%"
+    "decryptingBackupStatus": "Déchiffrement de la sauvegarde… {percent}%",
+    "shareAddToLogPickerTitle": "Choisir un enregistrement"
 }
