@@ -4,7 +4,6 @@
 
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:daily_you/database/attachment_storage.dart';
 import 'package:daily_you/storage/file_store.dart';
@@ -17,6 +16,7 @@ import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/utils/operation_outcome.dart';
 import 'package:daily_you/utils/zip_utils.dart';
+import 'package:daily_you/widgets/attachment_type_presentation.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
@@ -34,6 +34,10 @@ class ExportUtils {
       BuildContext context, Function(String) updateStatus) async {
     final localizations = AppLocalizations.of(context)!;
     final locale = TimeManager.currentLocale(context);
+
+    final includedTypes = await _pickIncludedTypes(context);
+    if (includedTypes == null) return const OperationOutcome.cancelled();
+
     updateStatus("(1/2) 0%");
 
     PickedDirectory? exportFolder;
@@ -49,41 +53,42 @@ class ExportUtils {
     var tempDir = await getTemporaryDirectory();
     final tempExportFolder = Directory(join(tempDir.path, "logs"));
     await tempExportFolder.create(recursive: true);
-    final tempExportImageFolder =
-        Directory(join(tempExportFolder.path, "Images"));
-    await tempExportImageFolder.create(recursive: true);
     final exportedZipName =
         "daily_you_markdown_export_${DateTime.now().toIso8601String().replaceAll(':', '-')}.zip";
 
     final exportStore = LocalFileStore(tempExportFolder.path);
-    final exportImageStore = LocalFileStore(tempExportImageFolder.path);
 
     try {
       final entries = EntriesProvider.instance.entries;
       final totalLogs = entries.length;
       int processedLogs = 0;
-      final writer = MarkdownExportWriter(
-          noteStore: exportStore, imageStore: exportImageStore, locale: locale);
+      final writer =
+          MarkdownExportWriter(noteStore: exportStore, locale: locale);
 
       for (Entry entry in entries) {
-        final images = <(EntryAttachment, Uint8List)>[];
-        for (EntryAttachment image
-            in EntryAttachmentsProvider.instance.getForEntry(entry)) {
-          final bytes = await AttachmentStorage.instance
-              .getBytes(image.filePath, AttachmentType.image);
-          if (bytes != null) images.add((image, bytes));
+        final attachments = <(EntryAttachment, String)>[];
+        for (EntryAttachment attachment in EntryAttachmentsProvider.instance
+            .getForEntry(entry)
+            .where((attachment) => includedTypes.contains(attachment.type))) {
+          final path = await AttachmentStorage.instance
+              .getLocalPath(attachment.filePath, attachment.type);
+          if (path != null) attachments.add((attachment, path));
         }
 
-        await writer.write(entry, images);
+        await writer.write(entry, attachments);
 
         processedLogs++;
         updateStatus("(1/2) ${((processedLogs / totalLogs) * 100).round()}%");
       }
 
-      // Zip export folder
-      await ZipUtils.compress(
-          join(tempDir.path, exportedZipName), [], [tempExportFolder.path],
-          onProgress: (percent) {
+      final exportFolderName = basename(tempExportFolder.path);
+      await ZipUtils.compress(join(tempDir.path, exportedZipName), [], [
+        tempExportFolder.path
+      ], filesByArchivePath: {
+        for (final MapEntry(key: relativePath, value: sourcePath)
+            in writer.attachmentSources.entries)
+          '$exportFolderName/$relativePath': sourcePath
+      }, onProgress: (percent) {
         updateStatus("(2/2) ${percent.round()}%");
       });
 
@@ -107,33 +112,79 @@ class ExportUtils {
 
     return outcome;
   }
+
+  static Future<Set<AttachmentType>?> _pickIncludedTypes(
+      BuildContext context) async {
+    final included = {...AttachmentType.values};
+    return showDialog<Set<AttachmentType>>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (dialogContext, setLocalState) => AlertDialog(
+          title: Text(AppLocalizations.of(dialogContext)!.exportIncludeTitle),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (final type in AttachmentType.values)
+                CheckboxListTile(
+                  contentPadding: EdgeInsets.zero,
+                  value: included.contains(type),
+                  title: Text(type.label(AppLocalizations.of(dialogContext)!)),
+                  onChanged: (value) => setLocalState(() {
+                    if (value ?? false) {
+                      included.add(type);
+                    } else {
+                      included.remove(type);
+                    }
+                  }),
+                ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(
+                  MaterialLocalizations.of(dialogContext).cancelButtonLabel),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, included),
+              child: Text(AppLocalizations.of(dialogContext)!.settingsExport),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class MarkdownExportWriter {
-  MarkdownExportWriter(
-      {required this.noteStore,
-      required this.imageStore,
-      required this.locale});
+  MarkdownExportWriter({required this.noteStore, required this.locale});
 
   final FileStore noteStore;
-  final FileStore imageStore;
   final String locale;
+
+  final Map<String, String> attachmentSources = {};
 
   final Map<String, int> _timestampCount = {};
 
   Future<void> write(
-      Entry entry, List<(EntryAttachment, Uint8List)> images) async {
+      Entry entry, List<(EntryAttachment, String)> attachments) async {
     final timestamp = DateFormat("yyyy-MM-dd", locale).format(entry.timeCreate);
     _timestampCount[timestamp] = (_timestampCount[timestamp] ?? 0) + 1;
     final index = _timestampCount[timestamp]!;
     final indexSuffix = index > 1 ? "_$index" : "";
 
     final noteBody = StringBuffer();
-    for (final (image, bytes) in images) {
+    for (final (attachment, sourcePath) in attachments) {
+      final folderName = attachment.type.folderName;
+      final prefix = attachment.type.name;
       final prettyName =
-          "image_$timestamp${indexSuffix}_${image.rank}${extension(image.filePath)}";
-      noteBody.writeln('![](Images/$prettyName)');
-      await imageStore.write(prettyName, bytes);
+          "${prefix}_$timestamp${indexSuffix}_${attachment.rank}${extension(attachment.filePath)}";
+
+      noteBody.writeln(attachment.type == AttachmentType.image
+          ? '![]($folderName/$prettyName)'
+          : '[$prettyName]($folderName/$prettyName)');
+
+      attachmentSources['$folderName/$prettyName'] = sourcePath;
     }
 
     final moodText =

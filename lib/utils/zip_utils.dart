@@ -14,7 +14,8 @@ import 'package:path/path.dart';
 class ZipUtils {
   static Future<void> compress(
       String outputFile, List<String> inputFiles, List<String> inputFolders,
-      {Function(double percent)? onProgress,
+      {Map<String, String> filesByArchivePath = const {},
+      Function(double percent)? onProgress,
       CancellationToken? cancellationToken}) async {
     if (cancellationToken?.isCancelled ?? false) {
       throw BackupCancelledException();
@@ -37,6 +38,7 @@ class ZipUtils {
       "outputFile": outputFile,
       "inputFiles": inputFiles,
       "inputFolders": inputFolders,
+      "filesByArchivePath": filesByArchivePath,
       "port": rxPort.sendPort,
     });
 
@@ -81,15 +83,36 @@ class ZipUtils {
     try {
       var encoder = ZipFileEncoder();
       encoder.createWithStream(OutputFileStream(args["outputFile"]));
-      for (var file in args["inputFiles"]) {
-        await encoder.addFile(File(file));
+      for (final String file in args["inputFiles"]) {
+        await _addStored(encoder, File(file), basename(file));
       }
-      for (var folder in args["inputFolders"]) {
-        // TODO This is not accurate and only works for a single folder
-        await encoder.addDirectory(Directory(folder), level: 0,
-            onProgress: (progress) {
-          sendPort.send(progress * 100);
-        });
+
+      final List<String> folders = args["inputFolders"];
+      final Map<String, String> filesByArchivePath = args["filesByArchivePath"];
+      final folderFiles = [for (final folder in folders) _filesIn(folder)];
+      final folderBytes = [for (final files in folderFiles) _sizeOf(files)];
+      final fileBytes = [
+        for (final path in filesByArchivePath.values) File(path).lengthSync()
+      ];
+      final totalBytes =
+          [...folderBytes, ...fileBytes].fold(0, (a, b) => a + b);
+      var finishedBytes = 0;
+      void report(double fraction, int bytes) {
+        if (totalBytes > 0) {
+          sendPort.send((finishedBytes + fraction * bytes) / totalBytes * 100);
+        }
+      }
+
+      for (final (index, folder) in folders.indexed) {
+        await _addFolder(encoder, folder, folderFiles[index],
+            (fraction) => report(fraction, folderBytes[index]));
+        finishedBytes += folderBytes[index];
+        report(0, 0);
+      }
+      for (final (index, entry) in filesByArchivePath.entries.indexed) {
+        await _addStored(encoder, File(entry.value), entry.key);
+        finishedBytes += fileBytes[index];
+        report(0, 0);
       }
       await encoder.close();
       sendPort.send(_encodeArchiveDone);
@@ -97,6 +120,37 @@ class ZipUtils {
       sendPort.send(error.toString());
     }
   }
+
+  static Future<void> _addFolder(ZipFileEncoder encoder, String folder,
+      List<File> files, void Function(double fraction) onProgress) async {
+    for (final (index, file) in files.indexed) {
+      final relativeParts = split(relative(file.path, from: folder));
+      await _addStored(
+          encoder, file, posix.joinAll([basename(folder), ...relativeParts]));
+      onProgress((index + 1) / files.length);
+    }
+  }
+
+  // ZipFileEncoder.addFile deflates into memory even at level 0.
+  static Future<void> _addStored(
+      ZipFileEncoder encoder, File file, String archivePath) async {
+    final stat = await file.stat();
+    final stream = InputFileStream(file.path);
+    try {
+      encoder.addArchiveFile(ArchiveFile.stream(archivePath, stream)
+        ..compression = CompressionType.none
+        ..lastModTime = stat.modified.millisecondsSinceEpoch ~/ 1000
+        ..mode = stat.mode);
+    } finally {
+      await stream.close();
+    }
+  }
+
+  static List<File> _filesIn(String folder) =>
+      Directory(folder).listSync(recursive: true).whereType<File>().toList();
+
+  static int _sizeOf(List<File> files) =>
+      files.fold(0, (bytes, file) => bytes + file.lengthSync());
 
   static String _pathInside(String outputFolder, String entryName) {
     // Fix for Zip encodings that place / at the start of files paths.

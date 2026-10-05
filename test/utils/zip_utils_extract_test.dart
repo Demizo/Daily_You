@@ -38,6 +38,19 @@ void main() {
         File(join(output, 'backup', 'note.txt')).readAsStringSync(), 'hello');
   });
 
+  test('extracts an older deflated archive', () async {
+    final photo = Uint8List.fromList(List.generate(50000, (i) => i % 7));
+    final path = join(work.path, 'deflated.zip');
+    await File(path).writeAsBytes(ZipEncoder()
+        .encodeBytes(Archive()..add(ArchiveFile.bytes('Images/a.jpg', photo))));
+
+    await ZipUtils.extract(path, join(work.path, 'restored'));
+
+    expect(
+        File(join(work.path, 'restored', 'Images', 'a.jpg')).readAsBytesSync(),
+        photo);
+  });
+
   Future<String> archiveOf(List<ArchiveFile> files) async {
     final archive = Archive();
     for (final file in files) {
