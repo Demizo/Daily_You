@@ -70,7 +70,8 @@ void main() {
       expect(ConfigProvider.instance.get(Settings.passwordHash), legacyHash);
     });
 
-    test('a PHC hash written with different params than this app uses still '
+    test(
+        'a PHC hash written with different params than this app uses still '
         'validates', () async {
       const memoryKiB = 8192;
       const iterations = 3;
