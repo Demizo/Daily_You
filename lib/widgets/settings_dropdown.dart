@@ -11,6 +11,7 @@ class SettingsDropdown<T> extends StatelessWidget {
   final Function(T?) onChanged;
   final DropdownButtonBuilder? selectedItemBuilder;
   final IconData? leadingIcon;
+  final bool expanded;
 
   const SettingsDropdown({
     super.key,
@@ -20,6 +21,7 @@ class SettingsDropdown<T> extends StatelessWidget {
     required this.onChanged,
     this.selectedItemBuilder,
     this.leadingIcon,
+    this.expanded = false,
   });
 
   @override
@@ -28,7 +30,7 @@ class SettingsDropdown<T> extends StatelessWidget {
         underline: Container(),
         elevation: 1,
         isDense: true,
-        isExpanded: false,
+        isExpanded: expanded,
         alignment: AlignmentDirectional.centerEnd,
         borderRadius: BorderRadius.circular(20),
         value: value,
@@ -59,7 +61,7 @@ class SettingsDropdown<T> extends StatelessWidget {
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
           ),
-          dropdown,
+          expanded ? Flexible(flex: 3, child: dropdown) : dropdown,
         ],
       ),
     );
