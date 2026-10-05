@@ -208,6 +208,7 @@ class ScreenshotSeeder {
       await EntryAttachmentsProvider.instance.add(
         EntryAttachment(
           entryId: entry.id,
+          type: AttachmentType.image,
           filePath: imageName,
           rank: rank,
           timeCreate: timestamp,

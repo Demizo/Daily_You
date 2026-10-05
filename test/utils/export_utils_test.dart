@@ -57,6 +57,7 @@ void main() {
       (
         EntryAttachment(
             entryId: 1,
+            type: AttachmentType.image,
             filePath: 'daily_you_a.png',
             rank: 1,
             timeCreate: timeCreate),
@@ -65,6 +66,7 @@ void main() {
       (
         EntryAttachment(
             entryId: 1,
+            type: AttachmentType.image,
             filePath: 'daily_you_b.jpg',
             rank: 0,
             timeCreate: timeCreate),
@@ -86,6 +88,7 @@ void main() {
     final timeCreate = DateTime(2026, 3, 4);
     final image = EntryAttachment(
         entryId: 1,
+        type: AttachmentType.image,
         filePath: 'daily_you_a.png',
         rank: 0,
         timeCreate: timeCreate);

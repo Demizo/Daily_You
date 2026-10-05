@@ -8,6 +8,7 @@ import 'dart:isolate';
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/database/attachment_storage.dart';
 import 'package:daily_you/utils/exif_orientation.dart';
+import 'package:daily_you/models/attachment.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
@@ -16,15 +17,15 @@ import 'package:path/path.dart' show extension;
 
 class EntryAttachmentActions {
   static Future<void> takePhoto(
-      ValueChanged<List<String>> onChangedImage) async {
+      ValueChanged<List<NewAttachment>> onChangedImage) async {
     final picker = ImagePicker();
     final quality = ConfigProvider.instance.get(Settings.imageQualityLevel);
     final pickedFile = await picker.pickImage(source: ImageSource.camera);
 
     if (pickedFile != null) {
-      final imageName = await _storeCompressed(pickedFile, quality);
-      if (imageName == null) return;
-      onChangedImage([imageName]);
+      final attachment = await _storeImage(pickedFile, quality);
+      if (attachment == null) return;
+      onChangedImage([attachment]);
       if (Platform.isAndroid) {
         await File(pickedFile.path).delete();
       }
@@ -32,40 +33,44 @@ class EntryAttachmentActions {
   }
 
   static Future<void> pickFromGallery(
-      ValueChanged<List<String>> onChangedImage) async {
+      ValueChanged<List<NewAttachment>> onChangedImage) async {
     final picker = ImagePicker();
     final quality = ConfigProvider.instance.get(Settings.imageQualityLevel);
     final pickedFiles = await picker.pickMultiImage();
 
-    final newImages = <String>[];
+    final newAttachments = <NewAttachment>[];
     for (final file in pickedFiles) {
-      final imageName = await _storeCompressed(file, quality);
-      if (imageName != null) {
-        newImages.add(imageName);
+      final attachment = await _storeImage(file, quality);
+      if (attachment != null) {
+        newAttachments.add(attachment);
       }
       if (Platform.isAndroid) {
         await File(file.path).delete();
       }
     }
-    onChangedImage(newImages);
+    onChangedImage(newAttachments);
   }
 
-  static Future<List<String>> importSharedImages(List<String> paths) async {
+  static Future<List<NewAttachment>> importSharedImages(
+      List<String> paths) async {
     final quality = ConfigProvider.instance.get(Settings.imageQualityLevel);
 
-    final newImages = <String>[];
+    final newAttachments = <NewAttachment>[];
     for (final path in paths) {
-      final imageName = await _storeCompressed(XFile(path), quality);
-      if (imageName != null) {
-        newImages.add(imageName);
+      final attachment = await _storeImage(XFile(path), quality);
+      if (attachment != null) {
+        newAttachments.add(attachment);
       }
     }
-    return newImages;
+    return newAttachments;
   }
 
-  static Future<String?> _storeCompressed(XFile file, String quality) async {
-    return await AttachmentStorage.instance
+  static Future<NewAttachment?> _storeImage(XFile file, String quality) async {
+    final fileName = await AttachmentStorage.instance
         .create(file.name, await _compressImage(file, quality));
+    return fileName != null
+        ? NewAttachment(type: AttachmentType.image, filePath: fileName)
+        : null;
   }
 
   static Future<Uint8List> _compressImage(

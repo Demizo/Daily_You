@@ -144,6 +144,7 @@ Future<OperationOutcome> importFromDaylio(
             await EntryAttachmentsProvider.instance.add(
                 EntryAttachment(
                   entryId: addedEntry.id!,
+                  type: AttachmentType.image,
                   filePath: imagePath,
                   rank: 0,
                   timeCreate: datetime,
