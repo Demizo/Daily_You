@@ -16,11 +16,11 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart' hide PickedFile;
 import 'package:image/image.dart' as img;
 import 'package:logging/logging.dart';
-import 'package:path/path.dart' show basename, extension, join;
+import 'package:path/path.dart' show basename, extension, join, setExtension;
 import 'package:path_provider/path_provider.dart';
 import 'package:v_video_compressor/v_video_compressor.dart';
 
-typedef _Store = Future<NewAttachment?> Function(String path);
+typedef _Store = Future<NewAttachment?> Function(String path, String? fileName);
 
 class PendingAttachment {
   const PendingAttachment({
@@ -49,18 +49,24 @@ class EntryAttachmentActions {
     if (pickedFile == null) return const [];
     return _pendingFromPaths(
         [pickedFile.path], AttachmentType.image, _storeImagePath,
-        deleteAfterwards: _pickerReturnsCopies);
+        keepNames: false, deleteAfterwards: _pickerReturnsCopies);
   }
 
   static Future<List<PendingAttachment>> pickFromGallery() async {
     final pickedFiles = await ImagePicker().pickMultiImage();
     return _pendingFromPaths([for (final file in pickedFiles) file.path],
         AttachmentType.image, _storeImagePath,
-        deleteAfterwards: _pickerReturnsCopies);
+        keepNames: true, deleteAfterwards: _pickerReturnsCopies);
   }
 
   static Future<List<NewAttachment>> importSharedImages(List<String> paths) =>
       _storeEach(paths, AttachmentType.image, _storeImagePath);
+
+  static Future<List<NewAttachment>> importSharedVideos(List<String> paths) =>
+      _storeEach(paths, AttachmentType.video, _storeVideo);
+
+  static Future<List<NewAttachment>> importSharedAudio(List<String> paths) =>
+      _storeEach(paths, AttachmentType.audio, _storeAudio);
 
   static Future<void> deleteStoredAttachments(
       List<NewAttachment> attachments) async {
@@ -101,8 +107,8 @@ class EntryAttachmentActions {
 
   static Future<List<NewAttachment>> _storeEach(
           List<String> paths, AttachmentType type, _Store store) async =>
-      storeAll(
-          await _pendingFromPaths(paths, type, store, deleteAfterwards: false));
+      storeAll(await _pendingFromPaths(paths, type, store,
+          keepNames: true, deleteAfterwards: false));
 
   static Future<List<PendingAttachment>> takeVideo() async {
     final pickedFile =
@@ -110,14 +116,14 @@ class EntryAttachmentActions {
     if (pickedFile == null) return const [];
     return _pendingFromPaths(
         [pickedFile.path], AttachmentType.video, _storeVideo,
-        deleteAfterwards: _pickerReturnsCopies);
+        keepNames: false, deleteAfterwards: _pickerReturnsCopies);
   }
 
   static Future<List<PendingAttachment>> pickVideosFromGallery() async {
     final pickedFiles = await ImagePicker().pickMultiVideo();
     return _pendingFromPaths([for (final file in pickedFiles) file.path],
         AttachmentType.video, _storeVideo,
-        deleteAfterwards: _pickerReturnsCopies);
+        keepNames: true, deleteAfterwards: _pickerReturnsCopies);
   }
 
   static Future<List<PendingAttachment>> pickAudioFile() =>
@@ -129,6 +135,7 @@ class EntryAttachmentActions {
     List<String> paths,
     AttachmentType type,
     _Store store, {
+    required bool keepNames,
     required bool deleteAfterwards,
   }) async =>
       [
@@ -137,8 +144,10 @@ class EntryAttachmentActions {
             type: type,
             name: basename(path),
             sizeBytes: await File(path).length(),
-            store: () =>
-                _storeThenDelete(path, () => store(path), deleteAfterwards),
+            store: () => _storeThenDelete(
+                path,
+                () => store(path, keepNames ? basename(path) : null),
+                deleteAfterwards),
             discard: deleteAfterwards ? () => _deleteQuietly(path) : null,
           )
       ];
@@ -158,7 +167,7 @@ class EntryAttachmentActions {
           final temporaryPath = await _copyToTemporaryFile(picked, type);
           if (temporaryPath == null) return null;
           return _storeThenDelete(
-              temporaryPath, () => store(temporaryPath), true);
+              temporaryPath, () => store(temporaryPath, picked.name), true);
         },
       )
     ];
@@ -173,15 +182,20 @@ class EntryAttachmentActions {
     }
   }
 
-  static Future<NewAttachment?> _storeAudio(String sourcePath) async {
-    final fileName = await AttachmentStorage.instance.createFromFile(
-        basename(sourcePath), File(sourcePath), AttachmentType.audio);
-    return fileName != null
-        ? NewAttachment(type: AttachmentType.audio, filePath: fileName)
+  static Future<NewAttachment?> _storeAudio(
+      String sourcePath, String? fileName) async {
+    final storedName = await AttachmentStorage.instance.createFromFile(
+        fileName ?? basename(sourcePath),
+        File(sourcePath),
+        AttachmentType.audio,
+        keepFileName: fileName != null);
+    return storedName != null
+        ? NewAttachment(type: AttachmentType.audio, filePath: storedName)
         : null;
   }
 
-  static Future<NewAttachment?> _storeVideo(String sourcePath) async {
+  static Future<NewAttachment?> _storeVideo(
+      String sourcePath, String? fileName) async {
     String? compressedPath;
     try {
       if (Platform.isAndroid) {
@@ -200,10 +214,16 @@ class EntryAttachmentActions {
       }
 
       final storedPath = compressedPath ?? sourcePath;
-      final fileName = await AttachmentStorage.instance.createFromFile(
-          basename(storedPath), File(storedPath), AttachmentType.video);
-      return fileName != null
-          ? NewAttachment(type: AttachmentType.video, filePath: fileName)
+      final keptName = fileName == null
+          ? null
+          : setExtension(fileName, extension(storedPath));
+      final storedName = await AttachmentStorage.instance.createFromFile(
+          keptName ?? basename(storedPath),
+          File(storedPath),
+          AttachmentType.video,
+          keepFileName: keptName != null);
+      return storedName != null
+          ? NewAttachment(type: AttachmentType.video, filePath: storedName)
           : null;
     } finally {
       if (compressedPath != null && compressedPath != sourcePath) {
@@ -244,16 +264,20 @@ class EntryAttachmentActions {
     return temporaryPath;
   }
 
-  static Future<NewAttachment?> _storeImagePath(String path) {
+  static Future<NewAttachment?> _storeImagePath(String path, String? fileName) {
     final quality = ConfigProvider.instance.get(Settings.imageQualityLevel);
-    return _storeImage(XFile(path), quality);
+    return _storeImage(XFile(path), quality, fileName);
   }
 
-  static Future<NewAttachment?> _storeImage(XFile file, String quality) async {
-    final fileName = await AttachmentStorage.instance.create(
-        file.name, await _compressImage(file, quality), AttachmentType.image);
-    return fileName != null
-        ? NewAttachment(type: AttachmentType.image, filePath: fileName)
+  static Future<NewAttachment?> _storeImage(
+      XFile file, String quality, String? fileName) async {
+    final storedName = await AttachmentStorage.instance.create(
+        fileName ?? file.name,
+        await _compressImage(file, quality),
+        AttachmentType.image,
+        keepFileName: fileName != null);
+    return storedName != null
+        ? NewAttachment(type: AttachmentType.image, filePath: storedName)
         : null;
   }
 

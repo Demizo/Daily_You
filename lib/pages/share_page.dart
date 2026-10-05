@@ -13,7 +13,9 @@ import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/day_menu.dart';
 import 'package:daily_you/widgets/entry_attachment_actions.dart';
+import 'package:daily_you/widgets/attachment_tile_background.dart';
 import 'package:daily_you/widgets/attachment_grid.dart';
+import 'package:daily_you/widgets/video_thumbnail_cache.dart';
 import 'package:daily_you/widgets/large_entry_card_widget.dart';
 import 'package:daily_you/widgets/vertical_calendar.dart';
 import 'package:material_ui/material_ui.dart';
@@ -34,7 +36,7 @@ class _SharePageState extends State<SharePage> {
 
   @override
   void dispose() {
-    widget.payload.deleteImages();
+    widget.payload.deleteMedia();
     _scrollController.dispose();
     super.dispose();
   }
@@ -86,15 +88,25 @@ class _SharePageState extends State<SharePage> {
 
   Future<void> _openEditor(DateTime day, Entry? entry) async {
     setState(() => _opening = true);
-    final List<NewAttachment> newAttachments;
+    final newAttachments = <NewAttachment>[];
     try {
-      newAttachments = await EntryAttachmentActions.importSharedImages(
-          widget.payload.imagePaths);
+      final payload = widget.payload;
+      newAttachments
+        ..addAll(
+            await EntryAttachmentActions.importSharedImages(payload.imagePaths))
+        ..addAll(
+            await EntryAttachmentActions.importSharedVideos(payload.videoPaths))
+        ..addAll(
+            await EntryAttachmentActions.importSharedAudio(payload.audioPaths));
     } catch (_) {
+      await EntryAttachmentActions.deleteStoredAttachments(newAttachments);
       if (mounted) setState(() => _opening = false);
       rethrow;
     }
-    if (!mounted) return;
+    if (!mounted) {
+      await EntryAttachmentActions.deleteStoredAttachments(newAttachments);
+      return;
+    }
 
     final page = entry == null
         ? AddEditEntryPage(
@@ -118,23 +130,41 @@ class _SharePageState extends State<SharePage> {
     ));
   }
 
+  Widget _previewTile(String path) {
+    final payload = widget.payload;
+    if (payload.videoPaths.contains(path)) {
+      final cache = VideoThumbnailCache.instance;
+      return VideoTileBackground(
+        id: path,
+        peek: () => cache.peekForPath(path),
+        load: () => cache.getThumbnailForPath(path),
+      );
+    }
+    if (payload.audioPaths.contains(path)) {
+      return AudioTileBackground(seed: path.hashCode);
+    }
+    return Image.file(File(path), fit: BoxFit.cover, cacheWidth: 500);
+  }
+
   Widget _buildPreview() {
-    final text = widget.payload.text;
+    final payload = widget.payload;
+    final text = payload.text;
     final hasText = text != null && text.isNotEmpty;
+    final mediaPaths = [
+      ...payload.imagePaths,
+      ...payload.videoPaths,
+      ...payload.audioPaths,
+    ];
     final card = LargeCard(
-      media: widget.payload.imagePaths.isEmpty
+      media: mediaPaths.isEmpty
           ? null
           : AttachmentGrid.fromPaths(
-              attachmentPaths: widget.payload.imagePaths,
-              pathTileBuilder: (path) => Image.file(
-                File(path),
-                fit: BoxFit.cover,
-                cacheWidth: 500,
-              ),
+              attachmentPaths: mediaPaths,
+              pathTileBuilder: _previewTile,
             ),
       body: hasText ? LargeCard.markdownBody(text) : null,
     );
-    if (widget.payload.imagePaths.isEmpty || hasText) return card;
+    if (mediaPaths.isEmpty || hasText) return card;
     return Center(child: AspectRatio(aspectRatio: 1, child: card));
   }
 
