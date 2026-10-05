@@ -13,9 +13,34 @@ void main() {
       expect(SharePayload.fromMap(null), isNull);
     });
 
-    test('returns null for a share with neither text nor images', () {
+    test('returns null for a share with neither text nor media', () {
       expect(SharePayload.fromMap({'text': null, 'imagePaths': <Object?>[]}),
           isNull);
+    });
+
+    test('returns null when no shared file was a supported kind', () {
+      expect(
+          SharePayload.fromMap({
+            'text': null,
+            'imagePaths': <Object?>[],
+            'videoPaths': <Object?>[],
+            'audioPaths': <Object?>[],
+          }),
+          isNull);
+    });
+
+    test('keeps the supported kinds of a mixed share', () {
+      final result = SharePayload.fromMap({
+        'text': null,
+        'imagePaths': ['a.jpg'],
+        'videoPaths': <Object?>[],
+        'audioPaths': ['a.m4a'],
+      });
+
+      expect(result!.hasMedia, isTrue);
+      expect(result.imagePaths, ['a.jpg']);
+      expect(result.videoPaths, isEmpty);
+      expect(result.audioPaths, ['a.m4a']);
     });
 
     test('builds a payload for an image-only share', () {
@@ -38,6 +63,18 @@ void main() {
       expect(result.imagePaths, ['a.jpg', 'b.jpg']);
     });
 
+    test('keeps shared video and audio separate from images', () {
+      final result = SharePayload.fromMap({
+        'imagePaths': ['a.jpg'],
+        'videoPaths': ['a.mp4'],
+        'audioPaths': ['a.m4a'],
+      });
+
+      expect(result!.imagePaths, ['a.jpg']);
+      expect(result.videoPaths, ['a.mp4']);
+      expect(result.audioPaths, ['a.m4a']);
+    });
+
     test('uses text alone when there is no image', () {
       final result = SharePayload.fromMap({'text': 'hello'});
 
@@ -46,7 +83,7 @@ void main() {
     });
   });
 
-  test('deleteImages removes the cached files and their directory', () {
+  test('deleteMedia removes the cached files and their directory', () {
     final root = Directory.systemTemp.createTempSync('share_test');
     addTearDown(() => root.deleteSync(recursive: true));
     final directory = Directory('${root.path}/share')..createSync();
@@ -54,7 +91,7 @@ void main() {
     final payload = SharePayload(
         imagePaths: [existing.path, '${directory.path}/missing.jpg']);
 
-    payload.deleteImages();
+    payload.deleteMedia();
 
     expect(existing.existsSync(), isFalse);
     expect(directory.existsSync(), isFalse);
