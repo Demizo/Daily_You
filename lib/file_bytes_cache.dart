@@ -26,6 +26,15 @@ class FileBytesCache {
   void put(String key, Uint8List value) {
     final valueSize = value.lengthInBytes;
 
+    if (valueSize > maxCacheSize) {
+      final stale = _cache.remove(key);
+      if (stale != null) {
+        _currentSize -= stale.lengthInBytes;
+        _usageOrder.remove(key);
+      }
+      return;
+    }
+
     // If the key already exists, update the value
     if (_cache.containsKey(key)) {
       _currentSize -= _cache[key]!.lengthInBytes; // Subtract old size

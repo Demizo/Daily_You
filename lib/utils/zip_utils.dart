@@ -98,6 +98,19 @@ class ZipUtils {
     }
   }
 
+  static String _pathInside(String outputFolder, String entryName) {
+    // Fix for Zip encodings that place / at the start of files paths.
+    // All Zip paths should be relative
+    final relativeName =
+        entryName.startsWith('/') ? entryName.substring(1) : entryName;
+    final resolved = join(outputFolder, relativeName);
+    if (!isWithin(outputFolder, resolved)) {
+      throw FormatException(
+          'Archive entry escapes the output folder', entryName);
+    }
+    return resolved;
+  }
+
   static Future<void> decodeArchive(Map<String, dynamic> args) async {
     SendPort sendPort = args["port"];
     var decoder = ZipDecoder().decodeStream(InputFileStream(args["inputFile"]));
@@ -108,23 +121,20 @@ class ZipUtils {
 
     for (final entry in decoder) {
       if (entry.isFile) {
-        final bytes = entry.readBytes();
-        if (bytes == null) continue;
-        // Fix for Zip encodings that place / at the start of files paths.
-        // All Zip paths should be relative
-        String fileName = entry.name;
-        if (fileName.startsWith('/')) {
-          fileName = fileName.substring(1);
-        }
-        final file = File(join(args["outputFolder"], fileName));
+        final file = File(_pathInside(args["outputFolder"], entry.name));
         await file.create(recursive: true);
-        await file.writeAsBytes(bytes);
+        final output = OutputFileStream(file.path);
+        try {
+          entry.writeContent(output);
+        } finally {
+          await output.close();
+        }
 
         // Updates status
         processedFileCount += 1;
         sendPort.send((processedFileCount / totalFileCount) * 100);
       } else {
-        await Directory(join(args["outputFolder"], entry.name))
+        await Directory(_pathInside(args["outputFolder"], entry.name))
             .create(recursive: true);
       }
     }

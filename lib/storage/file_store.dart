@@ -42,6 +42,12 @@ abstract interface class FileStore {
   /// Never replaces an existing [name].
   Future<CreateResult> createNew(String name, Uint8List bytes);
 
+  Future<CreateResult> createNewFromFile(String name, File source);
+
+  Future<bool> copyToFile(String name, File destination);
+
+  Future<int?> size(String name);
+
   Future<bool> delete(String name);
 
   Future<DateTime?> modifiedTime(String name);
