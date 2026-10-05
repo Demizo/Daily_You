@@ -6,6 +6,16 @@ import 'package:daily_you/models/attachment.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  test('only audio has no visual preview', () {
+    expect({
+      for (final type in AttachmentType.values) type: type.isVisual
+    }, {
+      AttachmentType.image: true,
+      AttachmentType.video: true,
+      AttachmentType.audio: false,
+    });
+  });
+
   group('EntryAttachment.appendRanked', () {
     test('assigns descending ranks so newest share sorts first', () {
       final result = EntryAttachment.appendRanked(

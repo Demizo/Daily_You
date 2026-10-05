@@ -125,8 +125,8 @@ class _SharePageState extends State<SharePage> {
       media: widget.payload.imagePaths.isEmpty
           ? null
           : AttachmentGrid.fromPaths(
-              imagePaths: widget.payload.imagePaths,
-              imageBuilder: (path) => Image.file(
+              attachmentPaths: widget.payload.imagePaths,
+              pathTileBuilder: (path) => Image.file(
                 File(path),
                 fit: BoxFit.cover,
                 cacheWidth: 500,

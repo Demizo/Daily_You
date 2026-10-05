@@ -32,7 +32,10 @@ class FlashbackCard extends StatelessWidget {
     final coverImages = hideImages
         ? <EntryAttachment>[]
         : entries
-            .map((e) => attachmentsProvider.getForEntry(e).firstOrNull)
+            .map((e) => attachmentsProvider
+                .getForEntry(e)
+                .where((attachment) => attachment.type.isVisual)
+                .firstOrNull)
             .whereType<EntryAttachment>()
             .take(4)
             .toList();

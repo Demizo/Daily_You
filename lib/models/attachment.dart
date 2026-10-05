@@ -27,6 +27,8 @@ enum AttachmentType {
         audio => '.m4a',
         video => '.mp4',
       };
+
+  bool get isVisual => this != audio;
 }
 
 class EntryAttachmentFields {
