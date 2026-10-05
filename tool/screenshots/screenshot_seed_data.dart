@@ -202,6 +202,7 @@ class ScreenshotSeeder {
       final imageName = await AttachmentStorage.instance.create(
         sourceFile.uri.pathSegments.last,
         bytes,
+        AttachmentType.image,
         currTime: timestamp,
       );
       if (imageName == null) continue;

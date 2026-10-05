@@ -14,7 +14,7 @@ class LocalImageLoader extends StatefulWidget {
   const LocalImageLoader({
     super.key,
     required this.imagePath,
-    this.cacheSize = 500,
+    this.cacheSize = LocalImageCache.previewWidth,
   });
 
   @override

@@ -6,10 +6,9 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:daily_you/database/attachment_storage.dart';
-import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/attachment.dart';
+import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/providers/entries_provider.dart';
-import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/storage/local_file_store.dart';
 import 'package:daily_you/storage/storage_picker.dart';
 import 'package:daily_you/utils/imports/import_helpers.dart';
@@ -123,6 +122,8 @@ Future<OperationOutcome> importFromDiaro(
       });
     }
 
+    final takenNames = await AttachmentStorage.instance
+        .takenLowerCaseNames(AttachmentType.image);
     final totalEntries = entries.length;
     int processedEntries = 0;
 
@@ -154,20 +155,8 @@ Future<OperationOutcome> importFromDiaro(
             final filename = att['filename'] as String;
             final photoBytes = await extractedPhotos.read(filename);
             if (photoBytes == null) continue;
-            final imagePath = await AttachmentStorage.instance.create(
-                null, photoBytes,
-                currTime: created, skipExternalUpload: true);
-            if (imagePath != null) {
-              await EntryAttachmentsProvider.instance.add(
-                  EntryAttachment(
-                    entryId: addedEntry.id!,
-                    type: AttachmentType.image,
-                    filePath: imagePath,
-                    rank: rank++,
-                    timeCreate: created,
-                  ),
-                  skipUpdate: true);
-            }
+            await addImportedImage(
+                addedEntry.id!, photoBytes, rank++, created, takenNames);
           }
         }
       }

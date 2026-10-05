@@ -5,15 +5,14 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/database/attachment_storage.dart';
+import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/database/entry_tag_dao.dart';
 import 'package:daily_you/database/tag_dao.dart';
-import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/models/entry.dart';
+import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/providers/entries_provider.dart';
-import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/storage/storage_picker.dart';
 import 'package:daily_you/utils/imports/import_helpers.dart';
@@ -74,6 +73,8 @@ Future<OperationOutcome> importFromDiarium(
       ..sort((a, b) =>
           (a['DiaryEntryId'] as int).compareTo(b['DiaryEntryId'] as int));
 
+    final takenNames = await AttachmentStorage.instance
+        .takenLowerCaseNames(AttachmentType.image);
     final totalEntries = sortedEntries.length;
     int processedEntries = 0;
 
@@ -109,24 +110,8 @@ Future<OperationOutcome> importFromDiarium(
           final data = img['Data'] as Uint8List?;
           final rank = entryMedia.length - 1 - (img['Index'] as int? ?? 0);
           if (data != null) {
-            final newImage = await AttachmentStorage.instance.create(
-              null,
-              data,
-              currTime: timestamp,
-              skipExternalUpload: true,
-            );
-            if (newImage != null) {
-              await EntryAttachmentsProvider.instance.add(
-                  EntryAttachment(
-                    id: null,
-                    entryId: addedEntry.id!,
-                    type: AttachmentType.image,
-                    filePath: newImage,
-                    rank: rank,
-                    timeCreate: timestamp,
-                  ),
-                  skipUpdate: true);
-            }
+            await addImportedImage(
+                addedEntry.id!, data, rank, timestamp, takenNames);
           }
         }
 

@@ -155,4 +155,15 @@ class SafFileStore implements FileStore {
   @override
   Future<DateTime?> modifiedTime(String name) async =>
       (await _child(name))?.lastModified;
+
+  @override
+  Future<FileStore> subfolder(String name) async {
+    final existing = await _child(name, requiresWriteAccess: false);
+    final childUri =
+        existing?.uri ?? (await saf.createDirectory(_tree, name))?.uri;
+    if (childUri == null) {
+      throw FileSystemException('could not create folder $name', treeUri);
+    }
+    return SafFileStore(childUri.toString());
+  }
 }

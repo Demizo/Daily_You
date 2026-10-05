@@ -223,7 +223,7 @@ class _EntryViewPageState extends State<EntryViewPage> {
 
             if (images.isNotEmpty) {
               var bytes = await AttachmentStorage.instance
-                  .getBytes(images.first.filePath);
+                  .getBytes(images.first.filePath, AttachmentType.image);
               if (bytes != null) {
                 await SharePlus.instance.share(ShareParams(
                     files: [XFile.fromData(bytes, mimeType: "images/*")],

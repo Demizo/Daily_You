@@ -156,6 +156,14 @@ void main() {
       expect(await store.list(), equals(['photo.jpg']));
     });
 
+    test('a subfolder exists and lists empty before anything is written',
+        () async {
+      final subfolder = await store.subfolder('Audio');
+
+      expect(await subfolder.isAvailable(), isTrue);
+      expect(await subfolder.listFiles(), isEmpty);
+    });
+
     test('write recreates a directory that disappeared', () async {
       await store.write('note.txt', bytesOf('hello'));
       await directory.delete(recursive: true);
