@@ -21,6 +21,21 @@ class AppLocalizationsPt extends AppLocalizations {
   String get actionTakePhoto => 'Tire uma foto';
 
   @override
+  String get actionTakeVideo => 'Take video';
+
+  @override
+  String get actionRecordAudio => 'Record audio';
+
+  @override
+  String get actionAddImage => 'Add image';
+
+  @override
+  String get actionAddVideo => 'Add video';
+
+  @override
+  String get actionAddAudio => 'Add audio';
+
+  @override
   String get actionToday => 'Hoje';
 
   @override
@@ -276,6 +291,23 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get deletePhotoDescription => 'Quer apagar esta foto?';
+
+  @override
+  String get deleteAttachmentTitle => 'Delete Attachment';
+
+  @override
+  String get deleteAttachmentDescription =>
+      'Do you want to delete this attachment?';
+
+  @override
+  String get largeAttachmentWarningTitle => 'Large attachment';
+
+  @override
+  String get largeAttachmentWarningDescription =>
+      'This attachment is large and will increase your backup size.';
+
+  @override
+  String get dontShowAgain => 'Don\'t show again';
 
   @override
   String get pageSettingsTitle => 'Configurações';
@@ -637,6 +669,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settingsImageQuality => 'Qualidade da Imagem';
 
   @override
+  String get settingsMediaQualityTitle => 'Media Quality';
+
+  @override
   String get imageQualityHigh => 'Alta';
 
   @override
@@ -647,6 +682,9 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get imageQualityNoCompression => 'Sem Compressão';
+
+  @override
+  String get settingsStorageUsage => 'Storage Usage';
 
   @override
   String get settingsLogFolder => 'Pasta de Registos';
@@ -793,6 +831,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get exportImages => 'Export Images';
 
   @override
+  String get exportIncludeTitle => 'Include';
+
+  @override
   String get settingsImport => 'Import';
 
   @override
@@ -934,6 +975,12 @@ class AppLocalizationsPt extends AppLocalizations {
   String get imagesTitle => 'Images';
 
   @override
+  String get audioTitle => 'Audio';
+
+  @override
+  String get videoTitle => 'Video';
+
+  @override
   String get tagMoodTitle => 'Humor';
 
   @override
@@ -958,6 +1005,31 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get shareAddToLogPickerTitle => 'Choose a log';
+
+  @override
+  String get attachmentAddErrorDescription => 'Failed to add attachment!';
+
+  @override
+  String get attachmentLoadFailed => 'Could not open this attachment';
+
+  @override
+  String get attachmentNoAppToOpen => 'No app can open this attachment';
+
+  @override
+  String get recorderDiscardTitle => 'Discard recording?';
+
+  @override
+  String get recorderDiscardDescription => 'This recording will be deleted.';
+
+  @override
+  String get recorderDiscardAction => 'Discard';
+
+  @override
+  String get recorderPermissionDenied =>
+      'Microphone permission is required to record audio';
+
+  @override
+  String get recorderErrorDescription => 'Failed to record audio!';
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).
