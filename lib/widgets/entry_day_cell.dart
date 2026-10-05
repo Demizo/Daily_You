@@ -13,8 +13,8 @@ import 'package:daily_you/pages/entry_timeline_page.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/utils/tag_visuals.dart';
+import 'package:daily_you/widgets/attachment_cover_thumbnail.dart';
 import 'package:daily_you/widgets/day_menu.dart';
-import 'package:daily_you/widgets/local_image_loader.dart';
 import 'package:daily_you/widgets/tag_icon_glyph.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
@@ -27,7 +27,7 @@ class EntryDayCell extends StatelessWidget {
   final ui.Image? dayNumber;
   final double cellSize;
   final List<Entry> entries;
-  final EntryAttachment? firstImage;
+  final List<EntryAttachment> coverCandidates;
 
   final bool showImages;
   final bool showMood;
@@ -43,7 +43,7 @@ class EntryDayCell extends StatelessWidget {
     required this.dayNumber,
     required this.cellSize,
     required this.entries,
-    required this.firstImage,
+    required this.coverCandidates,
     this.showImages = true,
     this.showMood = true,
     this.isJalali = false,
@@ -265,7 +265,7 @@ class EntryDayCell extends StatelessWidget {
         hasOverrideTag && (!tagGoesCenter || isTrackerOverride);
 
     if (entries.isNotEmpty) {
-      final showImageBg = showImages && firstImage != null;
+      final showImageBg = showImages && coverCandidates.isNotEmpty;
       return MergeSemantics(
           child: GestureDetector(
         onTap: selectDay ??
@@ -298,10 +298,7 @@ class EntryDayCell extends StatelessWidget {
                 ),
                 clipBehavior: showImageBg ? Clip.hardEdge : Clip.none,
                 child: showImageBg
-                    ? LocalImageLoader(
-                        imagePath: firstImage!.filePath,
-                        cacheSize: 100,
-                      )
+                    ? AttachmentCoverThumbnail(candidates: coverCandidates)
                     : Center(
                         child: tagGoesCenter
                             ? _buildTagCutoutCenter(

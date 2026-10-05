@@ -2,48 +2,47 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
+import 'dart:math';
+
 import 'package:daily_you/models/attachment.dart';
+import 'package:daily_you/widgets/attachment_tile_background.dart';
 import 'package:material_ui/material_ui.dart';
-import 'local_image_loader.dart';
 
 class AttachmentGrid extends StatelessWidget {
   AttachmentGrid({super.key, required List<EntryAttachment> attachments})
-      : imagePaths = [
-          for (final attachment in attachments) attachment.filePath
-        ],
-        imageBuilder = _buildStoredImage;
+      : tileCount = attachments.length,
+        tileBuilder = ((index) =>
+            AttachmentTileBackground(attachment: attachments[index]));
 
-  const AttachmentGrid.fromPaths({
+  AttachmentGrid.fromPaths({
     super.key,
-    required this.imagePaths,
-    required this.imageBuilder,
-  });
+    required List<String> attachmentPaths,
+    required Widget Function(String attachmentPath) pathTileBuilder,
+  })  : tileCount = attachmentPaths.length,
+        tileBuilder = ((index) => pathTileBuilder(attachmentPaths[index]));
 
-  final List<String> imagePaths;
-  final Widget Function(String imagePath) imageBuilder;
-
-  static Widget _buildStoredImage(String imagePath) =>
-      LocalImageLoader(imagePath: imagePath);
+  final int tileCount;
+  final Widget Function(int index) tileBuilder;
 
   @override
   Widget build(BuildContext context) {
-    final paths = imagePaths.take(4).toList();
-    Widget tile(int index) => Expanded(child: imageBuilder(paths[index]));
+    final count = min(tileCount, 4);
+    Widget tile(int index) => Expanded(child: tileBuilder(index));
     const horizontalGap = SizedBox(width: 2);
     const verticalGap = SizedBox(height: 2);
 
-    if (paths.length == 1) {
-      return imageBuilder(paths[0]);
+    if (count == 1) {
+      return tileBuilder(0);
     }
 
-    if (paths.length == 2) {
+    if (count == 2) {
       return Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [tile(0), horizontalGap, tile(1)],
       );
     }
 
-    if (paths.length == 3) {
+    if (count == 3) {
       return Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

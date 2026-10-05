@@ -69,7 +69,10 @@ class _EntryTimelinePageState extends State<EntryTimelinePage> {
         itemCount: entries.length,
         itemBuilder: (context, index) {
           final entry = entries[index];
-          final entryAttachments = entryAttachmentsProvider.getForEntry(entry);
+          final entryAttachments = entryAttachmentsProvider
+              .getForEntry(entry)
+              .where((attachment) => attachment.type.isVisual)
+              .toList();
           final label = widget.labelBuilder(context, entry);
           return AspectRatio(
             aspectRatio: 2.2,

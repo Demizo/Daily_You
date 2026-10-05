@@ -3,6 +3,7 @@
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
 import 'package:daily_you/config_provider.dart';
+import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/providers/entries_provider.dart';
@@ -417,6 +418,14 @@ class _GalleryPageState extends State<GalleryPage>
     );
   }
 
+  List<EntryAttachment> _visualAttachmentsOf(
+      EntryAttachmentsProvider provider, Entry entry) {
+    return provider
+        .getForEntry(entry)
+        .where((attachment) => attachment.type.isVisual)
+        .toList();
+  }
+
   Widget buildEntries(BuildContext context, bool listView, List<Entry> entries,
       TagsProvider tagsProvider) {
     final entryAttachmentsProvider =
@@ -458,15 +467,15 @@ class _GalleryPageState extends State<GalleryPage>
                 child: listView
                     ? LargeEntryCardWidget(
                         entry: entry,
-                        attachments:
-                            entryAttachmentsProvider.getForEntry(entry),
+                        attachments: _visualAttachmentsOf(
+                            entryAttachmentsProvider, entry),
                         hideImage:
                             configProvider.get(Settings.hideImagesInGallery),
                       )
                     : EntryCardWidget(
                         entry: entry,
-                        attachments:
-                            entryAttachmentsProvider.getForEntry(entry),
+                        attachments: _visualAttachmentsOf(
+                            entryAttachmentsProvider, entry),
                         hideImage:
                             configProvider.get(Settings.hideImagesInGallery),
                       ),

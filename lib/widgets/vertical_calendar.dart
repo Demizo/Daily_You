@@ -11,6 +11,7 @@ import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/pages/entries_list_page.dart';
 import 'package:daily_you/pages/entry_timeline_page.dart';
 import 'package:daily_you/providers/entries_provider.dart';
+import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/time_manager.dart';
@@ -816,12 +817,13 @@ class _WeekRow extends StatelessWidget {
           }
 
           final entries = entriesProvider.getEntriesForDate(day);
-          final firstImage = !showImages
-              ? null
+          final coverCandidates = !showImages
+              ? const <EntryAttachment>[]
               : entries
                   .map((entry) =>
-                      attachmentsProvider.getFirstImageForEntry(entry.id!))
-                  .firstWhere((image) => image != null, orElse: () => null);
+                      attachmentsProvider.getCoverCandidatesForEntry(entry.id!))
+                  .firstWhere((candidates) => candidates.isNotEmpty,
+                      orElse: () => const []);
 
           final displayDayNum =
               isJalali ? TimeManager.jalaliDayNumber(day) : day.day;
@@ -833,7 +835,7 @@ class _WeekRow extends StatelessWidget {
               date: day,
               today: today,
               entries: entries,
-              firstImage: firstImage,
+              coverCandidates: coverCandidates,
               cellSize: cellSize,
               dayNumber: dayNumberCache[displayDayNum],
               showImages: showImages,

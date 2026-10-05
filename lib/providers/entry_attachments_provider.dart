@@ -3,6 +3,7 @@
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
 import 'dart:async';
+
 import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/database/entry_attachment_dao.dart';
 import 'package:daily_you/models/entry.dart';
@@ -16,7 +17,7 @@ class EntryAttachmentsProvider with ChangeNotifier {
   EntryAttachmentsProvider._init();
 
   List<EntryAttachment> attachments = List.empty(growable: true);
-  Map<int, EntryAttachment?> _firstImageByEntryId = {};
+  Map<int, List<EntryAttachment>> _coverCandidatesByEntryId = {};
 
   bool _isLoaded = false;
 
@@ -25,20 +26,32 @@ class EntryAttachmentsProvider with ChangeNotifier {
   @visibleForTesting
   set isLoaded(bool value) => _isLoaded = value;
 
+  static bool _isCoverCandidate(EntryAttachment attachment) =>
+      attachment.type.isVisual;
+
   void _rebuildCache() {
-    final cache = <int, EntryAttachment?>{};
+    final cache = <int, List<EntryAttachment>>{};
     for (final attachment in attachments) {
+      if (!_isCoverCandidate(attachment)) continue;
       final id = attachment.entryId;
       if (id == null) continue;
-      final existing = cache[id];
-      if (existing == null || attachment.rank > existing.rank) {
-        cache[id] = attachment;
-      }
+      cache.putIfAbsent(id, () => []).add(attachment);
     }
-    _firstImageByEntryId = cache;
+    for (final candidates in cache.values) {
+      candidates.sort((a, b) => b.rank.compareTo(a.rank));
+    }
+    _coverCandidatesByEntryId = cache;
   }
 
-  /// Load the provider's data from the app database
+  void _addToCache(EntryAttachment attachment) {
+    final id = attachment.entryId;
+    if (id == null || !_isCoverCandidate(attachment)) return;
+    _coverCandidatesByEntryId[id] = [
+      ...?_coverCandidatesByEntryId[id],
+      attachment,
+    ]..sort((a, b) => b.rank.compareTo(a.rank));
+  }
+
   Future<void> load() async {
     attachments = await EntryAttachmentDao.getAll();
     _rebuildCache();
@@ -46,12 +59,10 @@ class EntryAttachmentsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // CRUD operations
-
   Future<void> add(EntryAttachment attachment, {skipUpdate = false}) async {
     final attachmentWithId = await EntryAttachmentDao.add(attachment);
     attachments.add(attachmentWithId);
-    _rebuildCache();
+    _addToCache(attachmentWithId);
     await AppDatabase.instance.updateExternalDatabase();
     if (!skipUpdate) {
       notifyListeners();
@@ -84,8 +95,8 @@ class EntryAttachmentsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  EntryAttachment? getFirstImageForEntry(int entryId) =>
-      _firstImageByEntryId[entryId];
+  List<EntryAttachment> getCoverCandidatesForEntry(int entryId) =>
+      _coverCandidatesByEntryId[entryId] ?? const [];
 
   List<EntryAttachment> getForEntry(Entry entry) {
     final attachmentsForEntry = attachments
