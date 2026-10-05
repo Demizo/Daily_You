@@ -76,8 +76,8 @@ class BackupRestoreUtils {
           stagedArchive.path,
           [databaseSnapshot.path],
           [
-            await AttachmentStorage.instance
-                .getInternalFolder(AttachmentType.image)
+            for (final type in AttachmentType.values)
+              await AttachmentStorage.instance.getInternalFolder(type)
           ],
           onProgress: onCompress,
           cancellationToken: cancellationToken);
@@ -392,48 +392,11 @@ class BackupRestoreUtils {
         });
       } else {
         if (await tempZipFile.exists()) await tempZipFile.delete();
-        await tempImportFile.copy(tempZipFile.path);
+        await tempImportFile.rename(tempZipFile.path);
       }
 
-      // Restore archive
-      updateStatus(localizations.restoringBackupStatus("0"));
-
-      void reportExtractProgress(double percent) {
-        updateStatus(localizations.restoringBackupStatus("${percent.round()}"));
-      }
-
-      await _extractBackup(tempZipFile, restoreFolder, reportExtractProgress);
-
-      final restoreStore = LocalFileStore(restoreFolder.path);
-      final databaseBytes =
-          await restoreStore.read(AppDatabase.databaseFileName);
-      if (databaseBytes != null) {
-        // Import database
-        await AppDatabase.instance.close();
-        await AppDatabase.instance.internalStore
-            .write(AppDatabase.databaseFileName, databaseBytes);
-        await AppDatabase.instance.open();
-        await AppDatabase.instance.updateExternalDatabase();
-
-        // Import images. These will be garbage collected after import
-        final restoredImages =
-            LocalFileStore(join(restoreFolder.path, "Images"));
-        if (await restoredImages.isAvailable()) {
-          // Also show cleanup status here since images may take awhile
-          updateStatus(localizations.cleanUpStatus);
-          await AttachmentStorage.instance.whileNotSyncing(() async =>
-              restoreImages(
-                  restoredImages,
-                  await AttachmentStorage.instance
-                      .internalStore(AttachmentType.image)));
-          if (AttachmentStorage.instance.usingExternalLocation()) {
-            await AttachmentStorage.instance.syncAttachmentFolders(true);
-          }
-          AttachmentStorage.instance.invalidateCache();
-        }
-      } else {
-        outcome = const OperationOutcome.failed();
-      }
+      outcome = await restoreFromArchive(
+          tempZipFile, restoreFolder, localizations, updateStatus);
     } on _RestoreCancelled {
       outcome = const OperationOutcome.cancelled();
     } catch (error) {
@@ -455,12 +418,68 @@ class BackupRestoreUtils {
     return outcome;
   }
 
-  static Future<void> restoreImages(
-      FileStore backup, FileStore destination) async {
-    for (final imageName in await backup.list()) {
-      final bytes = await backup.read(imageName);
-      if (bytes != null) await destination.write(imageName, bytes);
+  @visibleForTesting
+  static Future<OperationOutcome> restoreFromArchive(
+      File archive,
+      Directory restoreFolder,
+      AppLocalizations localizations,
+      void Function(String) updateStatus) async {
+    updateStatus(localizations.restoringBackupStatus("0"));
+
+    await _extractBackup(archive, restoreFolder, (percent) {
+      updateStatus(localizations.restoringBackupStatus("${percent.round()}"));
+    });
+
+    final restoredDatabase =
+        File(join(restoreFolder.path, AppDatabase.databaseFileName));
+    if (!await restoredDatabase.exists()) {
+      return const OperationOutcome.failed();
     }
+
+    await AppDatabase.instance.replaceDatabase(restoredDatabase);
+    await AppDatabase.instance.updateExternalDatabase();
+
+    final failedFiles = <String>[];
+    for (final type in AttachmentType.values) {
+      final restoredFiles =
+          LocalFileStore(join(restoreFolder.path, type.folderName));
+      if (!await restoredFiles.isAvailable()) continue;
+
+      updateStatus(localizations.cleanUpStatus);
+      failedFiles.addAll(await AttachmentStorage.instance.whileNotSyncing(
+          () async => restoreAttachmentFiles(
+              restoredFiles,
+              LocalFileStore(
+                  await AttachmentStorage.instance.getInternalFolder(type)))));
+    }
+    if (AttachmentStorage.instance.usingExternalLocation()) {
+      await AttachmentStorage.instance
+          .syncAttachmentFolders(failedFiles.isEmpty);
+    } else if (failedFiles.isEmpty) {
+      await AttachmentStorage.instance.garbageCollectAttachments();
+    }
+    AttachmentStorage.instance.invalidateCache();
+    if (failedFiles.isEmpty) return const OperationOutcome.succeeded();
+    return OperationOutcome.failed(FileSystemException(
+        'Could not restore ${failedFiles.length} attachment file(s)',
+        failedFiles.join(', ')));
+  }
+
+  static Future<List<String>> restoreAttachmentFiles(
+      LocalFileStore backup, LocalFileStore destination) async {
+    final failedFiles = <String>[];
+    for (final fileName in await backup.list()) {
+      try {
+        await destination.writeAtomically(fileName, (temporary) async {
+          await File(join(backup.directoryPath, fileName)).copy(temporary.path);
+          return true;
+        });
+      } catch (error, stackTrace) {
+        _logger.warning('Restoring $fileName failed', error, stackTrace);
+        failedFiles.add(fileName);
+      }
+    }
+    return failedFiles;
   }
 
   static void showLoadingStatus(

@@ -150,6 +150,28 @@ class AppDatabase {
     db.close();
   }
 
+  Future<void> replaceDatabase(File replacement) async {
+    const previousName = '$databaseFileName.previous';
+    final store = LocalFileStore(dirname(_internalPath!));
+    await close();
+    var movedAside = false;
+    try {
+      await store.delete(previousName);
+      movedAside = await store.rename(databaseFileName, previousName);
+      await store.writeAtomically(databaseFileName, (temporary) async {
+        await replacement.copy(temporary.path);
+        return true;
+      });
+      await open();
+    } catch (_) {
+      if (_database != null) await close();
+      if (movedAside) await store.rename(previousName, databaseFileName);
+      await open();
+      rethrow;
+    }
+    await store.delete(previousName);
+  }
+
   Future<bool> _validateSqliteDatabase(String path) async {
     try {
       final db = await openDatabase(path, readOnly: true);

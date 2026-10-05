@@ -3,28 +3,40 @@
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
 import 'dart:convert';
-import 'dart:typed_data';
+import 'dart:io';
 
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/storage/in_memory_file_store.dart';
+import 'package:daily_you/storage/local_file_store.dart';
 import 'package:daily_you/utils/export_utils.dart';
+import 'package:daily_you/utils/zip_utils.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:path/path.dart' show join;
 
 void main() {
   late InMemoryFileStore noteStore;
-  late InMemoryFileStore imageStore;
   late MarkdownExportWriter writer;
+  late Directory sources;
 
   setUpAll(() => initializeDateFormatting('en'));
 
   setUp(() {
+    sources = Directory.systemTemp.createTempSync('export_sources');
     noteStore = InMemoryFileStore();
-    imageStore = InMemoryFileStore();
-    writer = MarkdownExportWriter(
-        noteStore: noteStore, imageStore: imageStore, locale: 'en');
+    writer = MarkdownExportWriter(noteStore: noteStore, locale: 'en');
   });
+
+  tearDown(() => sources.deleteSync(recursive: true));
+
+  var sourceCount = 0;
+
+  String sourceFile(List<int> bytes) {
+    final file = File('${sources.path}/source_${sourceCount++}');
+    file.writeAsBytesSync(bytes);
+    return file.path;
+  }
 
   Entry entryOn(DateTime timeCreate, {String text = ''}) =>
       Entry(text: text, timeCreate: timeCreate, timeModified: timeCreate);
@@ -51,8 +63,10 @@ void main() {
             ['log_2026-03-04.md', 'log_2026-03-04_2.md', 'log_2026-03-05.md']));
   });
 
-  test('writes images beside the note and links them by rank', () async {
+  test('links images by rank and points each at its source file', () async {
     final timeCreate = DateTime(2026, 3, 4);
+    final first = sourceFile([1, 2]);
+    final second = sourceFile([3, 4]);
     await writer.write(entryOn(timeCreate, text: 'body'), [
       (
         EntryAttachment(
@@ -61,7 +75,7 @@ void main() {
             filePath: 'daily_you_a.png',
             rank: 1,
             timeCreate: timeCreate),
-        Uint8List.fromList([1, 2])
+        first,
       ),
       (
         EntryAttachment(
@@ -70,14 +84,14 @@ void main() {
             filePath: 'daily_you_b.jpg',
             rank: 0,
             timeCreate: timeCreate),
-        Uint8List.fromList([3, 4])
+        second,
       ),
     ]);
 
-    expect(await imageStore.list(),
-        equals(['image_2026-03-04_1.png', 'image_2026-03-04_0.jpg']));
-    expect(await imageStore.read('image_2026-03-04_1.png'),
-        equals(Uint8List.fromList([1, 2])));
+    expect(writer.attachmentSources, {
+      'Images/image_2026-03-04_1.png': first,
+      'Images/image_2026-03-04_0.jpg': second,
+    });
     expect(
         await noteNamed('log_2026-03-04.md'),
         startsWith('![](Images/image_2026-03-04_1.png)\n'
@@ -92,12 +106,88 @@ void main() {
         filePath: 'daily_you_a.png',
         rank: 0,
         timeCreate: timeCreate);
-    final bytes = Uint8List.fromList([1]);
+    final source = sourceFile([1]);
 
-    await writer.write(entryOn(timeCreate), [(image, bytes)]);
-    await writer.write(entryOn(timeCreate), [(image, bytes)]);
+    await writer.write(entryOn(timeCreate), [(image, source)]);
+    await writer.write(entryOn(timeCreate), [(image, source)]);
 
-    expect(await imageStore.list(),
-        equals(['image_2026-03-04_0.png', 'image_2026-03-04_2_0.png']));
+    expect(
+        writer.attachmentSources.keys,
+        equals([
+          'Images/image_2026-03-04_0.png',
+          'Images/image_2026-03-04_2_0.png'
+        ]));
+  });
+
+  test('links a video into its own folder as a plain link, not an image',
+      () async {
+    final timeCreate = DateTime(2026, 3, 4);
+    await writer.write(entryOn(timeCreate, text: 'body'), [
+      (
+        EntryAttachment(
+            entryId: 1,
+            type: AttachmentType.video,
+            filePath: 'daily_you_a.mp4',
+            rank: 0,
+            timeCreate: timeCreate),
+        sourceFile([1, 2]),
+      ),
+    ]);
+
+    expect(writer.attachmentSources.keys,
+        equals(['Video/video_2026-03-04_0.mp4']));
+    expect(await noteNamed('log_2026-03-04.md'),
+        startsWith('[video_2026-03-04_0.mp4](Video/video_2026-03-04_0.mp4)\n'));
+  });
+
+  test('copies no attachment bytes into the note folder', () async {
+    final timeCreate = DateTime(2026, 3, 4);
+    await writer.write(entryOn(timeCreate), [
+      (
+        EntryAttachment(
+            entryId: 1,
+            type: AttachmentType.audio,
+            filePath: 'daily_you_a.m4a',
+            rank: 0,
+            timeCreate: timeCreate),
+        sourceFile([1, 2]),
+      ),
+    ]);
+
+    expect(await noteStore.list(), equals(['log_2026-03-04.md']));
+  });
+
+  test('zipped, the notes and attachments sit where the links point', () async {
+    final timeCreate = DateTime(2026, 3, 4);
+    final noteFolder = Directory(join(sources.path, 'logs'))..createSync();
+    final diskWriter = MarkdownExportWriter(
+        noteStore: LocalFileStore(noteFolder.path), locale: 'en');
+    await diskWriter.write(entryOn(timeCreate, text: 'body'), [
+      (
+        EntryAttachment(
+            entryId: 1,
+            type: AttachmentType.video,
+            filePath: 'daily_you_a.mp4',
+            rank: 0,
+            timeCreate: timeCreate),
+        sourceFile([9, 8, 7]),
+      ),
+    ]);
+    final archive = join(sources.path, 'export.zip');
+
+    await ZipUtils.compress(archive, [], [
+      noteFolder.path
+    ], filesByArchivePath: {
+      for (final entry in diskWriter.attachmentSources.entries)
+        'logs/${entry.key}': entry.value
+    });
+    await ZipUtils.extract(archive, join(sources.path, 'extracted'));
+
+    final extracted = join(sources.path, 'extracted', 'logs');
+    expect(File(join(extracted, 'log_2026-03-04.md')).existsSync(), isTrue);
+    expect(
+        File(join(extracted, 'Video', 'video_2026-03-04_0.mp4'))
+            .readAsBytesSync(),
+        equals([9, 8, 7]));
   });
 }
