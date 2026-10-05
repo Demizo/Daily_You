@@ -21,6 +21,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get actionTakePhoto => '拍张照';
 
   @override
+  String get actionTakeVideo => 'Take video';
+
+  @override
+  String get actionRecordAudio => 'Record audio';
+
+  @override
+  String get actionAddImage => 'Add image';
+
+  @override
+  String get actionAddVideo => 'Add video';
+
+  @override
+  String get actionAddAudio => 'Add audio';
+
+  @override
   String get actionToday => '今天';
 
   @override
@@ -274,6 +289,23 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get deletePhotoDescription => '您确定要删除这张图片吗？';
+
+  @override
+  String get deleteAttachmentTitle => 'Delete Attachment';
+
+  @override
+  String get deleteAttachmentDescription =>
+      'Do you want to delete this attachment?';
+
+  @override
+  String get largeAttachmentWarningTitle => 'Large attachment';
+
+  @override
+  String get largeAttachmentWarningDescription =>
+      'This attachment is large and will increase your backup size.';
+
+  @override
+  String get dontShowAgain => 'Don\'t show again';
 
   @override
   String get pageSettingsTitle => '设置';
@@ -630,6 +662,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsImageQuality => '图像质量';
 
   @override
+  String get settingsMediaQualityTitle => 'Media Quality';
+
+  @override
   String get imageQualityHigh => '高';
 
   @override
@@ -640,6 +675,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get imageQualityNoCompression => '无损';
+
+  @override
+  String get settingsStorageUsage => 'Storage Usage';
 
   @override
   String get settingsLogFolder => '日迹存储目录';
@@ -782,6 +820,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get exportImages => '导出图片';
 
   @override
+  String get exportIncludeTitle => 'Include';
+
+  @override
   String get settingsImport => '导入数据';
 
   @override
@@ -920,6 +961,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get imagesTitle => '图像';
 
   @override
+  String get audioTitle => 'Audio';
+
+  @override
+  String get videoTitle => 'Video';
+
+  @override
   String get tagMoodTitle => '心情';
 
   @override
@@ -944,6 +991,31 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get shareAddToLogPickerTitle => '选择日志';
+
+  @override
+  String get attachmentAddErrorDescription => 'Failed to add attachment!';
+
+  @override
+  String get attachmentLoadFailed => 'Could not open this attachment';
+
+  @override
+  String get attachmentNoAppToOpen => 'No app can open this attachment';
+
+  @override
+  String get recorderDiscardTitle => 'Discard recording?';
+
+  @override
+  String get recorderDiscardDescription => 'This recording will be deleted.';
+
+  @override
+  String get recorderDiscardAction => 'Discard';
+
+  @override
+  String get recorderPermissionDenied =>
+      'Microphone permission is required to record audio';
+
+  @override
+  String get recorderErrorDescription => 'Failed to record audio!';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).

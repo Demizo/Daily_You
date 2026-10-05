@@ -21,6 +21,21 @@ class AppLocalizationsId extends AppLocalizations {
   String get actionTakePhoto => 'Ambil foto';
 
   @override
+  String get actionTakeVideo => 'Take video';
+
+  @override
+  String get actionRecordAudio => 'Record audio';
+
+  @override
+  String get actionAddImage => 'Add image';
+
+  @override
+  String get actionAddVideo => 'Add video';
+
+  @override
+  String get actionAddAudio => 'Add audio';
+
+  @override
   String get actionToday => 'Hari ini';
 
   @override
@@ -276,6 +291,23 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get deletePhotoDescription => 'Apakah Anda ingin menghapus foto ini?';
+
+  @override
+  String get deleteAttachmentTitle => 'Delete Attachment';
+
+  @override
+  String get deleteAttachmentDescription =>
+      'Do you want to delete this attachment?';
+
+  @override
+  String get largeAttachmentWarningTitle => 'Large attachment';
+
+  @override
+  String get largeAttachmentWarningDescription =>
+      'This attachment is large and will increase your backup size.';
+
+  @override
+  String get dontShowAgain => 'Don\'t show again';
 
   @override
   String get pageSettingsTitle => 'Pengaturan';
@@ -637,6 +669,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get settingsImageQuality => 'Kualitas Gambar';
 
   @override
+  String get settingsMediaQualityTitle => 'Media Quality';
+
+  @override
   String get imageQualityHigh => 'Tinggi';
 
   @override
@@ -647,6 +682,9 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get imageQualityNoCompression => 'Tidak dikompres';
+
+  @override
+  String get settingsStorageUsage => 'Storage Usage';
 
   @override
   String get settingsLogFolder => 'Folder Log';
@@ -791,6 +829,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get exportImages => 'Ekspor Gambar';
 
   @override
+  String get exportIncludeTitle => 'Include';
+
+  @override
   String get settingsImport => 'Impor';
 
   @override
@@ -931,6 +972,12 @@ class AppLocalizationsId extends AppLocalizations {
   String get imagesTitle => 'Gambar';
 
   @override
+  String get audioTitle => 'Audio';
+
+  @override
+  String get videoTitle => 'Video';
+
+  @override
   String get tagMoodTitle => 'Perasaan';
 
   @override
@@ -955,4 +1002,29 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get shareAddToLogPickerTitle => 'Choose a log';
+
+  @override
+  String get attachmentAddErrorDescription => 'Failed to add attachment!';
+
+  @override
+  String get attachmentLoadFailed => 'Could not open this attachment';
+
+  @override
+  String get attachmentNoAppToOpen => 'No app can open this attachment';
+
+  @override
+  String get recorderDiscardTitle => 'Discard recording?';
+
+  @override
+  String get recorderDiscardDescription => 'This recording will be deleted.';
+
+  @override
+  String get recorderDiscardAction => 'Discard';
+
+  @override
+  String get recorderPermissionDenied =>
+      'Microphone permission is required to record audio';
+
+  @override
+  String get recorderErrorDescription => 'Failed to record audio!';
 }

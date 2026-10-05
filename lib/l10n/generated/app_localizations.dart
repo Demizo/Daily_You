@@ -186,6 +186,36 @@ abstract class AppLocalizations {
   /// **'Take photo'**
   String get actionTakePhoto;
 
+  /// No description provided for @actionTakeVideo.
+  ///
+  /// In en, this message translates to:
+  /// **'Take video'**
+  String get actionTakeVideo;
+
+  /// No description provided for @actionRecordAudio.
+  ///
+  /// In en, this message translates to:
+  /// **'Record audio'**
+  String get actionRecordAudio;
+
+  /// No description provided for @actionAddImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Add image'**
+  String get actionAddImage;
+
+  /// No description provided for @actionAddVideo.
+  ///
+  /// In en, this message translates to:
+  /// **'Add video'**
+  String get actionAddVideo;
+
+  /// No description provided for @actionAddAudio.
+  ///
+  /// In en, this message translates to:
+  /// **'Add audio'**
+  String get actionAddAudio;
+
   /// No description provided for @actionToday.
   ///
   /// In en, this message translates to:
@@ -527,6 +557,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Do you want to delete this photo?'**
   String get deletePhotoDescription;
+
+  /// No description provided for @deleteAttachmentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Attachment'**
+  String get deleteAttachmentTitle;
+
+  /// No description provided for @deleteAttachmentDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Do you want to delete this attachment?'**
+  String get deleteAttachmentDescription;
+
+  /// No description provided for @largeAttachmentWarningTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Large attachment'**
+  String get largeAttachmentWarningTitle;
+
+  /// No description provided for @largeAttachmentWarningDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'This attachment is large and will increase your backup size.'**
+  String get largeAttachmentWarningDescription;
+
+  /// No description provided for @dontShowAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t show again'**
+  String get dontShowAgain;
 
   /// No description provided for @pageSettingsTitle.
   ///
@@ -1188,6 +1248,12 @@ abstract class AppLocalizations {
   /// **'Image Quality'**
   String get settingsImageQuality;
 
+  /// No description provided for @settingsMediaQualityTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Media Quality'**
+  String get settingsMediaQualityTitle;
+
   /// No description provided for @imageQualityHigh.
   ///
   /// In en, this message translates to:
@@ -1211,6 +1277,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No Compression'**
   String get imageQualityNoCompression;
+
+  /// No description provided for @settingsStorageUsage.
+  ///
+  /// In en, this message translates to:
+  /// **'Storage Usage'**
+  String get settingsStorageUsage;
 
   /// No description provided for @settingsLogFolder.
   ///
@@ -1457,6 +1529,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Export Images'**
   String get exportImages;
+
+  /// No description provided for @exportIncludeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Include'**
+  String get exportIncludeTitle;
 
   /// No description provided for @settingsImport.
   ///
@@ -1728,6 +1806,18 @@ abstract class AppLocalizations {
   /// **'Images'**
   String get imagesTitle;
 
+  /// No description provided for @audioTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Audio'**
+  String get audioTitle;
+
+  /// No description provided for @videoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Video'**
+  String get videoTitle;
+
   /// No description provided for @tagMoodTitle.
   ///
   /// In en, this message translates to:
@@ -1775,6 +1865,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Choose a log'**
   String get shareAddToLogPickerTitle;
+
+  /// No description provided for @attachmentAddErrorDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to add attachment!'**
+  String get attachmentAddErrorDescription;
+
+  /// No description provided for @attachmentLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open this attachment'**
+  String get attachmentLoadFailed;
+
+  /// No description provided for @attachmentNoAppToOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'No app can open this attachment'**
+  String get attachmentNoAppToOpen;
+
+  /// No description provided for @recorderDiscardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard recording?'**
+  String get recorderDiscardTitle;
+
+  /// No description provided for @recorderDiscardDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'This recording will be deleted.'**
+  String get recorderDiscardDescription;
+
+  /// No description provided for @recorderDiscardAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard'**
+  String get recorderDiscardAction;
+
+  /// No description provided for @recorderPermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Microphone permission is required to record audio'**
+  String get recorderPermissionDenied;
+
+  /// No description provided for @recorderErrorDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to record audio!'**
+  String get recorderErrorDescription;
 }
 
 class _AppLocalizationsDelegate
