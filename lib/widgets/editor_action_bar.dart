@@ -4,6 +4,7 @@
 
 import 'dart:async';
 
+import 'package:daily_you/layouts/wide_screen.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:daily_you/utils/text_editing.dart';
 import 'package:daily_you/widgets/editor_action_bar/action_bar_pill.dart';
@@ -44,9 +45,6 @@ class EditorActionBar extends StatefulWidget {
   /// Space host pages reserve so content doesn't sit behind the bar
   static double reservedHeight(BuildContext context) =>
       DockMetrics.reservedHeight(context);
-
-  /// Threshold for wide screen layout
-  static const double wideBreakpoint = 600.0;
 
   static const double _dividerWidth = 8.0;
 
@@ -269,8 +267,7 @@ class _EditorActionBarState extends State<EditorActionBar> {
     final showToggle = widget.mainActions != null && _isEditing;
     final showingMainActions = widget.mainActions != null &&
         (!_isEditing || _showMainActionsWhileFocused);
-    final isWide =
-        MediaQuery.sizeOf(context).width >= EditorActionBar.wideBreakpoint;
+    final isWide = isWideScreen(context);
 
     return Padding(
       padding: EdgeInsets.fromLTRB(
