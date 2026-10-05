@@ -26,6 +26,8 @@
 	<string>$(PRODUCT_COPYRIGHT)</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Daily You uses the microphone to record audio attachments for your entries.</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 </dict>
