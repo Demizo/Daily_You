@@ -86,14 +86,9 @@ class _EntryViewPageState extends State<EntryViewPage> {
                           ),
                         ),
                         onTap: () async {
-                          await Navigator.of(context).push(MaterialPageRoute(
-                            allowSnapshotting: false,
-                            fullscreenDialog: true,
-                            builder: (context) => AttachmentViewPage(
-                              attachments: attachments,
-                              index: 0,
-                            ),
-                          ));
+                          await Navigator.of(context).push(
+                              AttachmentViewPage.route(
+                                  attachments: attachments, index: 0));
                         },
                       ),
                     Card.filled(
@@ -268,15 +263,11 @@ class _EntryViewPageState extends State<EntryViewPage> {
                           ),
                         ),
                         onTap: () async {
-                          await Navigator.of(context).push(MaterialPageRoute(
-                            allowSnapshotting: false,
-                            fullscreenDialog: true,
-                            builder: (context) => AttachmentViewPage(
-                              attachments: attachments,
-                              index: attachments
-                                  .indexWhere((x) => x.id == attachment.id),
-                            ),
-                          ));
+                          await Navigator.of(context).push(
+                              AttachmentViewPage.route(
+                                  attachments: attachments,
+                                  index: attachments.indexWhere(
+                                      (x) => x.id == attachment.id)));
                         },
                       ),
                     ),
@@ -304,14 +295,8 @@ class _EntryViewPageState extends State<EntryViewPage> {
                     ),
                   ),
                   onTap: () async {
-                    await Navigator.of(context).push(MaterialPageRoute(
-                      allowSnapshotting: false,
-                      fullscreenDialog: true,
-                      builder: (context) => AttachmentViewPage(
-                        attachments: attachments,
-                        index: index,
-                      ),
-                    ));
+                    await Navigator.of(context).push(AttachmentViewPage.route(
+                        attachments: attachments, index: index));
                   },
                 );
               }),

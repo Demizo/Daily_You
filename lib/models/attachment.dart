@@ -28,6 +28,12 @@ enum AttachmentType {
         video => '.mp4',
       };
 
+  String get mimePattern => switch (this) {
+        image => 'image/*',
+        audio => 'audio/*',
+        video => 'video/*',
+      };
+
   bool get isVisual => this != audio;
 }
 
