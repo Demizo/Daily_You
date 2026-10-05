@@ -4,29 +4,40 @@
 
 import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/models/attachment.dart';
+import 'package:logging/logging.dart';
 import 'package:sqflite/sqflite.dart';
 
 class EntryAttachmentDao {
+  static final Logger _logger = Logger('EntryAttachmentDao');
+
+  static List<EntryAttachment> _parse(List<Map<String, Object?>> rows) {
+    final attachments = <EntryAttachment>[];
+    for (final row in rows) {
+      final attachment = EntryAttachment.tryFromJson(row);
+      if (attachment == null) {
+        _logger.warning(
+            'Skipping attachment ${row[EntryAttachmentFields.id]} of unknown type ${row[EntryAttachmentFields.type]}');
+      } else {
+        attachments.add(attachment);
+      }
+    }
+    return attachments;
+  }
+
   static Future<List<EntryAttachment>> getAll() async {
     final result = await AppDatabase.instance.database!
         .query(attachmentsTable, orderBy: '${EntryAttachmentFields.rank} DESC');
 
-    return result.map((json) => EntryAttachment.fromJson(json)).toList();
+    return _parse(result);
   }
 
   static Future<List<EntryAttachment>> getForEntry(int entryId) async {
-    List<EntryAttachment> attachments = List.empty(growable: true);
-
     final maps = await AppDatabase.instance.database!.query(attachmentsTable,
         where: '${EntryAttachmentFields.entryId} = ?',
         whereArgs: [entryId],
         orderBy: '${EntryAttachmentFields.rank} DESC');
 
-    for (final map in maps) {
-      attachments.add(EntryAttachment.fromJson(map));
-    }
-
-    return attachments;
+    return _parse(maps);
   }
 
   static Future<EntryAttachment> add(EntryAttachment attachment,

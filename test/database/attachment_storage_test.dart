@@ -109,7 +109,11 @@ void main() {
     EntryAttachmentsProvider.instance.attachments = [
       for (final (rank, name) in imageNames.indexed)
         EntryAttachment(
-            entryId: 1, filePath: name, rank: rank, timeCreate: createdTime)
+            entryId: 1,
+            type: AttachmentType.image,
+            filePath: name,
+            rank: rank,
+            timeCreate: createdTime)
     ];
   }
 

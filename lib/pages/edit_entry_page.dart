@@ -151,7 +151,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
 
     if (widget.openCamera && !_openedCamera) {
       _openedCamera = true;
-      EntryAttachmentActions.takePhoto(_addImage);
+      EntryAttachmentActions.takePhoto(_addAttachments);
     }
   }
 
@@ -460,13 +460,14 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
       ToolbarAction(
         icon: const Icon(Icons.photo),
         mayLeaveApp: true,
-        onPressed: () => EntryAttachmentActions.pickFromGallery(_addImage),
+        onPressed: () =>
+            EntryAttachmentActions.pickFromGallery(_addAttachments),
       ),
       if (Platform.isAndroid)
         ToolbarAction(
           icon: const Icon(Icons.photo_camera_rounded),
           mayLeaveApp: true,
-          onPressed: () => EntryAttachmentActions.takePhoto(_addImage),
+          onPressed: () => EntryAttachmentActions.takePhoto(_addAttachments),
         ),
     ];
   }
@@ -639,9 +640,9 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     }
   }
 
-  Future<void> _addImage(List<String> imgPaths) async {
+  Future<void> _addAttachments(List<NewAttachment> newAttachments) async {
     _currentAttachments = EntryAttachment.appendRanked(
-        _currentAttachments, imgPaths,
+        _currentAttachments, newAttachments,
         entryId: id);
     await _saveEntry();
   }

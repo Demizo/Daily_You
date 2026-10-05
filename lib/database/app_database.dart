@@ -130,9 +130,13 @@ class AppDatabase {
     }
   }
 
+  static const schemaVersion = 6;
+
   Future<void> open() async {
     _database = await openDatabase(_internalPath!,
-        version: 5, onCreate: _createDatabase, onUpgrade: _onUpgrade);
+        version: schemaVersion,
+        onCreate: _createDatabase,
+        onUpgrade: onUpgrade);
 
     await EntriesProvider.instance.load();
     await EntryAttachmentsProvider.instance.load();
@@ -360,6 +364,7 @@ CREATE TABLE $templatesTable (
 CREATE TABLE $attachmentsTable (
     ${EntryAttachmentFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     ${EntryAttachmentFields.entryId} INTEGER NOT NULL,
+    ${EntryAttachmentFields.type} TEXT NOT NULL,
     ${EntryAttachmentFields.filePath} TEXT NOT NULL,
     ${EntryAttachmentFields.rank} INTEGER NOT NULL,
     ${EntryAttachmentFields.timeCreate} DATETIME NOT NULL DEFAULT (DATETIME('now')),
@@ -407,6 +412,7 @@ CREATE TABLE $attachmentsTable (
       await EntryAttachmentsProvider.instance.add(
         EntryAttachment(
           entryId: welcomeEntry.id,
+          type: AttachmentType.image,
           filePath: imageName,
           rank: 0,
           timeCreate: now,
@@ -495,7 +501,8 @@ CREATE TABLE $templateTagsTable (
 ''');
   }
 
-  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+  @visibleForTesting
+  Future<void> onUpgrade(Database db, int oldVersion, int newVersion) async {
     _database = db;
     // In this case, oldVersion is 1, newVersion is 2
     if (oldVersion == 1) {
@@ -513,19 +520,19 @@ CREATE TABLE $templatesTable (
     }
     if (oldVersion <= 2) {
       await db.execute('''
-CREATE TABLE $attachmentsTable (
-    ${EntryAttachmentFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    ${EntryAttachmentFields.entryId} INTEGER NOT NULL,
-    ${EntryAttachmentFields.filePath} TEXT NOT NULL,
-    ${EntryAttachmentFields.rank} INTEGER NOT NULL,
-    ${EntryAttachmentFields.timeCreate} DATETIME NOT NULL DEFAULT (DATETIME('now')),
-    FOREIGN KEY (${EntryAttachmentFields.entryId}) REFERENCES $entriesTable (id)
+CREATE TABLE entry_images (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    entry_id INTEGER NOT NULL,
+    img_path TEXT NOT NULL,
+    img_rank INTEGER NOT NULL,
+    time_create DATETIME NOT NULL DEFAULT (DATETIME('now')),
+    FOREIGN KEY (entry_id) REFERENCES $entriesTable (id)
 )
 ''');
       await db.transaction((txn) async {
         await txn.execute('''
--- Step 1: Insert the non-null imgPath entries into the imagesTable
-INSERT INTO $attachmentsTable (${EntryAttachmentFields.entryId}, ${EntryAttachmentFields.filePath}, ${EntryAttachmentFields.rank}, ${EntryAttachmentFields.timeCreate})
+-- Step 1: Insert the non-null imgPath entries into entry_images
+INSERT INTO entry_images (entry_id, img_path, img_rank, time_create)
 SELECT ${EntryFields.id}, $deprecatedImgPath, 0, ${EntryFields.timeCreate}
 FROM $entriesTable
 WHERE $deprecatedImgPath IS NOT NULL;
@@ -567,5 +574,43 @@ DROP TABLE old_entries;
     if (oldVersion <= 4) {
       await _createTemplateTagTable(db);
     }
+    // An older app that pulled a version 6 database relabels it as version 5
+    if (oldVersion <= 5 && !await _tableExists(db, attachmentsTable)) {
+      await db.execute('''
+CREATE TABLE $attachmentsTable (
+    ${EntryAttachmentFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    ${EntryAttachmentFields.entryId} INTEGER NOT NULL,
+    ${EntryAttachmentFields.type} TEXT NOT NULL,
+    ${EntryAttachmentFields.filePath} TEXT NOT NULL,
+    ${EntryAttachmentFields.rank} INTEGER NOT NULL,
+    ${EntryAttachmentFields.timeCreate} DATETIME NOT NULL DEFAULT (DATETIME('now')),
+    FOREIGN KEY (${EntryAttachmentFields.entryId}) REFERENCES $entriesTable (id)
+)
+''');
+      await db.transaction((txn) async {
+        await txn.execute('''
+INSERT INTO $attachmentsTable (${EntryAttachmentFields.id}, ${EntryAttachmentFields.entryId}, ${EntryAttachmentFields.type}, ${EntryAttachmentFields.filePath}, ${EntryAttachmentFields.rank}, ${EntryAttachmentFields.timeCreate})
+SELECT id, entry_id, 'image', img_path, img_rank, time_create
+FROM entry_images
+WHERE img_path IS NOT NULL AND img_path != ''
+ORDER BY id;
+    ''');
+        await txn.execute(
+            "DELETE FROM sqlite_sequence WHERE name = '$attachmentsTable';");
+        await txn.execute('''
+INSERT INTO sqlite_sequence (name, seq)
+SELECT '$attachmentsTable', seq FROM sqlite_sequence WHERE name = 'entry_images';
+    ''');
+        await txn.execute('DROP TABLE entry_images;');
+      });
+    }
+  }
+
+  Future<bool> _tableExists(Database db, String name) async {
+    final rows = await db.query('sqlite_master',
+        columns: ['name'],
+        where: "type = 'table' AND name = ?",
+        whereArgs: [name]);
+    return rows.isNotEmpty;
   }
 }

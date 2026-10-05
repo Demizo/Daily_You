@@ -120,6 +120,7 @@ Future<OperationOutcome> importFromDiarium(
                   EntryAttachment(
                     id: null,
                     entryId: addedEntry.id!,
+                    type: AttachmentType.image,
                     filePath: newImage,
                     rank: rank,
                     timeCreate: timestamp,

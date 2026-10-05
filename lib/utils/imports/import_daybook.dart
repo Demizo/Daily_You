@@ -128,6 +128,7 @@ Future<OperationOutcome> importFromDaybook(
             await EntryAttachmentsProvider.instance.add(
               EntryAttachment(
                 entryId: addedEntry.id!,
+                type: AttachmentType.image,
                 filePath: imagePath,
                 rank: rank++,
                 timeCreate: date,

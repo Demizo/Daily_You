@@ -48,6 +48,7 @@ List<ImportedEntry> decodeJsonEntries(Uint8List bytes) {
           if (entry['imgPath'] != null)
             EntryAttachment(
                 entryId: null,
+                type: AttachmentType.image,
                 filePath: entry['imgPath'],
                 rank: 0,
                 timeCreate: DateTime.now()),
@@ -55,6 +56,7 @@ List<ImportedEntry> decodeJsonEntries(Uint8List bytes) {
             for (var image in entry['images'])
               EntryAttachment(
                   entryId: null,
+                  type: AttachmentType.image,
                   filePath: image['imgPath'],
                   rank: image['imgRank'] as int,
                   timeCreate: DateTime.parse(image['timeCreated'])),

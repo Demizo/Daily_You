@@ -56,6 +56,7 @@ Future<OperationOutcome> importFromOneShot(
           await EntryAttachmentsProvider.instance.add(
               EntryAttachment(
                   entryId: addedEntry.id,
+                  type: AttachmentType.image,
                   filePath: entry['relativePath'],
                   rank: 0,
                   timeCreate: DateTime.now()),

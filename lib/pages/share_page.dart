@@ -86,9 +86,9 @@ class _SharePageState extends State<SharePage> {
 
   Future<void> _openEditor(DateTime day, Entry? entry) async {
     setState(() => _opening = true);
-    final List<String> imageNames;
+    final List<NewAttachment> newAttachments;
     try {
-      imageNames = await EntryAttachmentActions.importSharedImages(
+      newAttachments = await EntryAttachmentActions.importSharedImages(
           widget.payload.imagePaths);
     } catch (_) {
       if (mounted) setState(() => _opening = false);
@@ -100,15 +100,15 @@ class _SharePageState extends State<SharePage> {
         ? AddEditEntryPage(
             overrideCreateDate: TimeManager.currentTimeOnDifferentDate(day)
                 .copyWith(isUtc: false),
-            attachments:
-                EntryAttachment.appendRanked(const [], imageNames, entryId: -1),
+            attachments: EntryAttachment.appendRanked(const [], newAttachments,
+                entryId: -1),
             sharedText: widget.payload.text,
           )
         : AddEditEntryPage(
             entry: entry,
             attachments: EntryAttachment.appendRanked(
                 EntryAttachmentsProvider.instance.getForEntry(entry),
-                imageNames,
+                newAttachments,
                 entryId: entry.id!),
             sharedText: widget.payload.text,
           );

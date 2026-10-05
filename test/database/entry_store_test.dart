@@ -42,7 +42,11 @@ void main() {
   Future<EntryAttachment> writeImageFile(String name) async {
     await imageFiles.write(name, Uint8List.fromList(name.codeUnits));
     return EntryAttachment(
-        entryId: null, filePath: name, rank: 0, timeCreate: time);
+        entryId: null,
+        type: AttachmentType.image,
+        filePath: name,
+        rank: 0,
+        timeCreate: time);
   }
 
   setUpAll(sqfliteFfiInit);
@@ -290,5 +294,26 @@ void main() {
     expect(TagsProvider.instance.entryTags, isEmpty);
     expect(EntryAttachmentsProvider.instance.attachments, isEmpty);
     expect(await imageFiles.exists('photo.jpg'), isFalse);
+  });
+
+  test('loads the attachments it knows and skips a row of an unknown type',
+      () async {
+    final image = await writeImageFile('photo.jpg');
+    final saved = await store.beginDraft().save((_) => EntryDraft(
+          entry: draftEntry(),
+          attachments: [image],
+        ));
+    await database.insert('entry_attachments', {
+      'entry_id': saved.id,
+      'type': 'hologram',
+      'file_path': 'future.holo',
+      'rank': 5,
+      'time_create': time.toIso8601String(),
+    });
+
+    await EntryAttachmentsProvider.instance.load();
+
+    expect(EntryAttachmentsProvider.instance.attachments.map((a) => a.filePath),
+        equals(['photo.jpg']));
   });
 }
