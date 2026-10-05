@@ -7,6 +7,7 @@ import 'package:daily_you/utils/backup_restore_utils.dart';
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/database/attachment_storage.dart';
+import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/storage/storage_picker.dart';
 import 'package:daily_you/widgets/failure_dialog.dart';
@@ -292,7 +293,8 @@ class _StorageSettingsState extends State<StorageSettings> {
                 return const SizedBox();
               }),
           FutureBuilder(
-              future: AttachmentStorage.instance.getInternalFolder(),
+              future: AttachmentStorage.instance
+                  .getInternalFolder(AttachmentType.image),
               builder: (context, snapshot) {
                 if (snapshot.hasData && snapshot.data != null) {
                   var folderText = snapshot.data!;

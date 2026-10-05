@@ -7,10 +7,13 @@ import 'dart:io';
 
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/file_bytes_cache.dart';
+import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/storage/external_sync_health.dart';
 import 'package:daily_you/storage/file_store.dart';
+import 'package:daily_you/storage/in_memory_file_store.dart';
 import 'package:daily_you/storage/local_file_store.dart';
 import 'package:daily_you/storage/storage_picker.dart';
+import 'package:daily_you/utils/attachment_file_name.dart';
 import 'package:daily_you/utils/operation_outcome.dart';
 import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
@@ -37,6 +40,12 @@ class AttachmentStorage {
     cacheVersion.value++;
   }
 
+  final StreamController<({AttachmentType type, String fileName})>
+      _deletedController = StreamController.broadcast();
+
+  Stream<({AttachmentType type, String fileName})> get deletions =>
+      _deletedController.stream;
+
   final ExternalSyncHealth externalSyncHealth =
       ExternalSyncHealth('AttachmentStorage');
 
@@ -45,41 +54,66 @@ class AttachmentStorage {
 
   final Set<String> _uploadingNames = {};
 
-  FileStore? _internalStore;
-  FileStore? _externalStoreOverride;
+  final Map<AttachmentType, FileStore> _internalStores = {};
+  final Map<AttachmentType, FileStore> _externalStoreOverrides = {};
+  final Map<AttachmentType, FileStore> _externalSubfolders = {};
   int _folderRequests = 0;
   Future<void> _folderWork = Future.value();
 
-  Future<FileStore> internalStore() async =>
-      _internalStore ??= LocalFileStore(await getInternalFolder());
+  Future<FileStore> internalStore(AttachmentType type) async =>
+      _internalStores[type] ??= LocalFileStore(await getInternalFolder(type));
 
-  FileStore? get externalStore =>
-      _externalStoreOverride ??
-      (usingExternalLocation()
-          ? FileStore.external(_getExternalFolder())
-          : null);
+  Future<FileStore?> externalStore(AttachmentType type) async {
+    final override = _externalStoreOverrides[type];
+    if (override != null) return override;
+    if (!usingExternalLocation()) return null;
+
+    final base = FileStore.external(_getExternalFolder());
+    if (type == AttachmentType.image) return base;
+    try {
+      return _externalSubfolders[type] ??=
+          await base.subfolder(type.folderName);
+    } catch (error, stackTrace) {
+      _logger.warning('External ${type.folderName} folder is unavailable',
+          error, stackTrace);
+      return null;
+    }
+  }
 
   @visibleForTesting
   void overrideStores(FileStore internal, FileStore external) {
-    _internalStore = internal;
-    _externalStoreOverride = external;
+    for (final type in AttachmentType.values) {
+      final isImage = type == AttachmentType.image;
+      _internalStores[type] = isImage ? internal : InMemoryFileStore();
+      _externalStoreOverrides[type] = isImage ? external : InMemoryFileStore();
+    }
   }
 
   @visibleForTesting
   void clearStoreOverrides() {
-    _internalStore = null;
-    _externalStoreOverride = null;
+    _internalStores.clear();
+    _externalStoreOverrides.clear();
+    _externalSubfolders.clear();
   }
 
   bool usingExternalLocation() {
     return ConfigProvider.instance.get(Settings.useExternalImg);
   }
 
-  Future<String> getInternalFolder() async {
+  Future<int> internalSizeBytes(AttachmentType type) async {
+    final folder = Directory(await getInternalFolder(type));
+    var total = 0;
+    await for (final entity in folder.list()) {
+      if (entity is File) total += await entity.length();
+    }
+    return total;
+  }
+
+  Future<String> getInternalFolder(AttachmentType type) async {
     final basePath = await getApplicationSupportDirectory();
-    final imagesDir = Directory('${basePath.path}/Images');
-    if (!imagesDir.existsSync()) imagesDir.createSync(recursive: true);
-    return imagesDir.path;
+    final directory = Directory('${basePath.path}/${type.folderName}');
+    if (!directory.existsSync()) directory.createSync(recursive: true);
+    return directory.path;
   }
 
   Future<Directory?> _oldExternalImagesDirectory() async {
@@ -102,7 +136,8 @@ class AttachmentStorage {
     final oldImagesDir = await _oldExternalImagesDirectory();
     if (oldImagesDir == null) return;
 
-    final newImagesDir = Directory(await getInternalFolder());
+    final newImagesDir =
+        Directory(await getInternalFolder(AttachmentType.image));
 
     final imageFiles =
         await oldImagesDir.list().where((entity) => entity is File).toList();
@@ -176,7 +211,8 @@ class AttachmentStorage {
 
   /// Return whether the app has permission to access the external location
   Future<bool> hasExternalLocationPermission() async {
-    return await externalStore?.isAvailable() ?? false;
+    return await (await externalStore(AttachmentType.image))?.isAvailable() ??
+        false;
   }
 
   Future<OperationOutcome> selectExternalLocation(
@@ -193,6 +229,7 @@ class AttachmentStorage {
       await ConfigProvider.instance
           .set(Settings.externalImgUri, selectedDirectory.uri);
       await ConfigProvider.instance.set(Settings.useExternalImg, true);
+      _externalSubfolders.clear();
       if (await syncAttachmentFolders(true, updateStatus: updateStatus)) {
         return const OperationOutcome.succeeded();
       }
@@ -202,6 +239,7 @@ class AttachmentStorage {
           .set(Settings.externalImgUri, oldExternalImageUri);
       await ConfigProvider.instance
           .set(Settings.useExternalImg, oldUseExternalImage);
+      _externalSubfolders.clear();
       return const OperationOutcome.failed();
     } catch (error, stackTrace) {
       _logger.severe(
@@ -212,22 +250,21 @@ class AttachmentStorage {
 
   Future<void> resetImageFolderLocation() async {
     await ConfigProvider.instance.set(Settings.useExternalImg, false);
+    _externalSubfolders.clear();
   }
 
-  Future<Uint8List?> getBytes(String fileName) async {
-    // Fetch cache copy if present
+  Future<Uint8List?> getBytes(String fileName, AttachmentType type) async {
     var bytes = bytesCache.get(fileName);
     if (bytes != null) {
       return bytes;
     }
-    // Fetch local copy if present
-    final internal = await internalStore();
+    final internal = await internalStore(type);
     bytes =
         _nonEmpty(await fetchPool.withResource(() => internal.read(fileName)));
 
-    final external = externalStore;
-    if (bytes == null && external != null) {
-      bytes = _nonEmpty(await external.read(fileName));
+    if (bytes == null) {
+      final external = await externalStore(type);
+      if (external != null) bytes = _nonEmpty(await external.read(fileName));
     }
     if (bytes != null) {
       bytesCache.put(fileName, bytes);
@@ -238,44 +275,137 @@ class AttachmentStorage {
   Uint8List? _nonEmpty(Uint8List? bytes) =>
       bytes == null || bytes.isEmpty ? null : bytes;
 
-  Future<String?> create(String? fileName, Uint8List bytes,
-      {DateTime? currTime, bool skipExternalUpload = false}) async {
-    currTime ??= DateTime.now();
-
-    final internal = await internalStore();
-
-    // Don't make a copy of files already in the folder
-    if (fileName != null && await internal.exists(fileName)) {
-      return fileName;
+  Future<String?> getLocalPath(String fileName, AttachmentType type) async {
+    final folder = await getInternalFolder(type);
+    if (await (await internalStore(type)).exists(fileName)) {
+      return join(folder, fileName);
     }
 
-    var fileExtension = fileName != null ? extension(fileName) : ".jpg";
+    final external = await externalStore(type);
+    if (external == null) return null;
+
+    try {
+      final fetched = await LocalFileStore(folder).writeAtomically(
+          fileName,
+          (temporary) async =>
+              await external.copyToFile(fileName, temporary) &&
+              await temporary.length() > 0);
+      return fetched ? join(folder, fileName) : null;
+    } catch (error, stackTrace) {
+      _logger.warning('Fetching $fileName from the external location failed',
+          error, stackTrace);
+      return null;
+    }
+  }
+
+  Future<String?> create(String? fileName, Uint8List bytes, AttachmentType type,
+          {DateTime? currTime,
+          bool skipExternalUpload = false,
+          bool keepFileName = false,
+          Set<String>? takenNames}) =>
+      _createNew(
+          fileName,
+          type,
+          currTime,
+          skipExternalUpload,
+          keepFileName,
+          takenNames,
+          (store, name) => store.createNew(name, bytes),
+          (external, _, name) => external.createNew(name, bytes));
+
+  Future<String?> createFromFile(
+          String? fileName, File source, AttachmentType type,
+          {DateTime? currTime,
+          bool skipExternalUpload = false,
+          bool keepFileName = false,
+          Set<String>? takenNames}) =>
+      _createNew(
+          fileName,
+          type,
+          currTime,
+          skipExternalUpload,
+          keepFileName,
+          takenNames,
+          (store, name) => store.createNewFromFile(name, source),
+          _uploadFromInternal);
+
+  Future<String?> _createNew(
+    String? fileName,
+    AttachmentType type,
+    DateTime? currTime,
+    bool skipExternalUpload,
+    bool keepFileName,
+    Set<String>? takenNames,
+    Future<CreateResult> Function(FileStore internal, String name)
+        createInternal,
+    Future<CreateResult> Function(
+            FileStore external, FileStore internal, String name)
+        upload,
+  ) async {
+    currTime ??= DateTime.now();
+
+    final internal = await internalStore(type);
+
+    final fileExtension = sanitizedExtension(fileName, type.defaultExtension);
 
     final timestamp =
         currTime.toIso8601String().split('.').first.replaceAll(':', '-');
 
-    var newFileName = "daily_you_$timestamp$fileExtension";
-
-    // Ensure unique name
-    int index = 1;
-    while (await internal.exists(newFileName)) {
-      newFileName = "daily_you_${timestamp}_$index$fileExtension";
+    final stem = (keepFileName ? sanitizedStem(fileName) : null) ??
+        "daily_you_$timestamp";
+    final taken = takenNames ?? await takenLowerCaseNames(type);
+    var newFileName = "$stem$fileExtension";
+    var index = 0;
+    while (true) {
+      if (!taken.contains(newFileName.toLowerCase())) {
+        final result = await createInternal(internal, newFileName);
+        if (result == CreateResult.created) break;
+        if (result == CreateResult.failed) return null;
+      }
       index += 1;
+      newFileName = "${stem}_$index$fileExtension";
     }
 
-    if (!await internal.write(newFileName, bytes)) return null;
+    taken.add(newFileName.toLowerCase());
 
-    final external = externalStore;
-    if (external != null && !skipExternalUpload) {
-      unawaited(_createExternal(external, newFileName, bytes));
+    final external = skipExternalUpload ? null : await externalStore(type);
+    if (external != null) {
+      final name = newFileName;
+      unawaited(_createExternal(
+          external, name, () => upload(external, internal, name)));
     }
     return newFileName;
   }
 
-  Future<CreateResult> _createExternal(
-      FileStore external, String name, Uint8List bytes) async {
+  Future<Set<String>> takenLowerCaseNames(AttachmentType type) async => {
+        for (final name in await (await internalStore(type)).list())
+          name.toLowerCase(),
+        for (final attachment in EntryAttachmentsProvider.instance.attachments)
+          if (attachment.type == type) attachment.filePath.toLowerCase(),
+      };
+
+  Future<CreateResult> _uploadFromInternal(
+      FileStore external, FileStore internal, String name) async {
+    if (internal is LocalFileStore) {
+      return external.createNewFromFile(
+          name, File(join(internal.directoryPath, name)));
+    }
+    final bytes = await internal.read(name);
+    if (bytes == null || bytes.isEmpty) return CreateResult.failed;
+    return external.createNew(name, bytes);
+  }
+
+  Future<int?> sizeBytes(String fileName, AttachmentType type) async {
+    final internal = await internalStore(type);
+    final size = await internal.size(fileName);
+    if (size != null) return size;
+    return (await externalStore(type))?.size(fileName);
+  }
+
+  Future<CreateResult> _createExternal(FileStore external, String name,
+      Future<CreateResult> Function() start) async {
     _uploadingNames.add(name);
-    final create = external.createNew(name, bytes);
+    final create = start();
     // Even after timeout, create could keep writing. To be safe, consider it to be uploading unless it completes gracefully
     unawaited(create
         .then((_) {}, onError: (Object _) {})
@@ -294,18 +424,26 @@ class AttachmentStorage {
     return result;
   }
 
-  Future<bool> delete(String fileName) async {
-    final internal = await internalStore();
-    await internal.delete(fileName);
+  Future<bool> delete(String fileName, AttachmentType type) async {
+    var deleted = true;
+    try {
+      await (await internalStore(type)).delete(fileName);
+      bytesCache.remove(fileName);
+      _deletedController.add((type: type, fileName: fileName));
+    } catch (error, stackTrace) {
+      _logger.warning(
+          'Deleting $fileName from internal storage failed', error, stackTrace);
+      deleted = false;
+    }
 
-    final external = externalStore;
+    final external = await externalStore(type);
     if (external != null) {
       // Do not await operation
       unawaited(externalSyncHealth.record(
           "external attachment delete", () => external.delete(fileName)));
     }
 
-    return true;
+    return deleted;
   }
 
   Future<bool> syncAttachmentFolders(bool garbageCollect,
@@ -326,18 +464,24 @@ class AttachmentStorage {
   Future<AttachmentSyncSummary?> reconcileAttachmentFolders(
           {Function(String)? updateStatus}) =>
       _queueFolderWork((superseded) async {
-        final internal = await internalStore();
-        final external = externalStore;
-        if (external == null) return null;
+        if (await externalStore(AttachmentType.image) == null) return null;
 
-        final summary = await _AttachmentFolderReconcile(
-                this,
-                internal,
-                external,
-                _referencedFileNames('reconcile').toList(),
-                superseded,
-                updateStatus ?? (_) {})
-            .run();
+        final referenced = _referencedFileNames('reconcile');
+        final summary = AttachmentSyncSummary();
+        for (final type in AttachmentType.values) {
+          final external = await externalStore(type);
+          if (external == null) continue;
+
+          summary.add(await _AttachmentFolderReconcile(
+                  this,
+                  type,
+                  await internalStore(type),
+                  external,
+                  referenced[type]!.toList(),
+                  superseded,
+                  updateStatus ?? (_) {})
+              .run());
+        }
         if (summary.downloaded > 0 || summary.repaired > 0) invalidateCache();
         return summary;
       });
@@ -351,29 +495,37 @@ class AttachmentStorage {
     return result;
   }
 
-  Future<bool> garbageCollectAttachments() async =>
-      _deleteUnreferenced(_referencedFileNames('garbage collect'));
+  Future<bool> garbageCollectAttachments() async {
+    final referenced = _referencedFileNames('garbage collect');
+    for (final type in AttachmentType.values) {
+      await _deleteUnreferenced(type, referenced[type]!);
+    }
+    return true;
+  }
 
-  Set<String> _referencedFileNames(String action) {
+  Map<AttachmentType, Set<String>> _referencedFileNames(String action) {
     final attachmentsProvider = EntryAttachmentsProvider.instance;
     if (!attachmentsProvider.isLoaded) {
       throw StateError(
           'Refused to $action attachments before the attachment list was loaded');
     }
     return {
-      for (final attachment in attachmentsProvider.attachments)
-        attachment.filePath
+      for (final type in AttachmentType.values)
+        type: {
+          for (final attachment in attachmentsProvider.attachments)
+            if (attachment.type == type) attachment.filePath
+        },
     };
   }
 
-  Future<bool> _deleteUnreferenced(Set<String> referencedNames) async {
-    final internal = await internalStore();
+  Future<void> _deleteUnreferenced(
+      AttachmentType type, Set<String> referencedNames) async {
+    final internal = await internalStore(type);
     for (final name in await internal.list()) {
       if (!referencedNames.contains(name)) {
         await internal.delete(name);
       }
     }
-    return true;
   }
 }
 
@@ -386,6 +538,17 @@ class AttachmentSyncSummary {
   int skippedSizeUnknown = 0;
   int collisions = 0;
   int failures = 0;
+
+  void add(AttachmentSyncSummary other) {
+    uploaded += other.uploaded;
+    downloaded += other.downloaded;
+    repaired += other.repaired;
+    conflicts += other.conflicts;
+    unavailable += other.unavailable;
+    skippedSizeUnknown += other.skippedSizeUnknown;
+    collisions += other.collisions;
+    failures += other.failures;
+  }
 
   @override
   String toString() => [
@@ -401,12 +564,19 @@ class AttachmentSyncSummary {
 }
 
 class _AttachmentFolderReconcile {
-  _AttachmentFolderReconcile(this._storage, this._internal, this._external,
-      this._referencedNames, this._superseded, this._updateStatus);
+  _AttachmentFolderReconcile(
+      this._storage,
+      this._type,
+      this._internal,
+      this._external,
+      this._referencedNames,
+      this._superseded,
+      this._updateStatus);
 
   static const _stopAfterConsecutive = 3;
 
   final AttachmentStorage _storage;
+  final AttachmentType _type;
   final FileStore _internal;
   final FileStore _external;
   final List<String> _referencedNames;
@@ -474,7 +644,7 @@ class _AttachmentFolderReconcile {
     final outcome =
         _stopReason == null ? 'finished' : 'stopped by $_stopReason';
     final sizes = _sizesReported ? '' : ', Image Folder does not report sizes';
-    _logger.info('reconcile: $outcome: $_summary$sizes');
+    _logger.info('reconcile ${_type.name}: $outcome: $_summary$sizes');
     return _summary;
   }
 
@@ -526,23 +696,50 @@ class _AttachmentFolderReconcile {
       _sizesReported && externalSize > 0 ? externalSize : null;
 
   Future<void> _downloadMissing(String name, int externalSize) async {
+    final internal = _internal;
+    if (internal is LocalFileStore) {
+      return _downloadMissingToDisk(internal, name, externalSize);
+    }
+
     final bytes = await _readExternal(name);
-    final listedSize = _listedSize(externalSize);
-    if (bytes == null) {
-      _failed();
-    } else if (bytes.isEmpty) {
-      _unavailable(name, 'the Image Folder copy is empty');
-    } else if (listedSize != null && bytes.length != listedSize) {
-      _logger.severe('reconcile: download of $name refused, '
-          'read ${bytes.length} of $listedSize bytes');
-      _failed();
-    } else if (await _download(name, bytes)) {
+    if (_acceptDownload(name, bytes?.length, externalSize) &&
+        await _download(name, () => internal.createNew(name, bytes!))) {
       _summary.downloaded++;
     }
   }
 
+  Future<void> _downloadMissingToDisk(
+      LocalFileStore internal, String name, int externalSize) async {
+    final downloaded = await _download(name, () async {
+      final published = await internal.writeAtomically(name, (temporary) async {
+        final copied = await _copyExternal(name, temporary);
+        return _acceptDownload(
+            name, copied ? await temporary.length() : null, externalSize);
+      });
+      return published ? CreateResult.created : null;
+    });
+    if (downloaded) _summary.downloaded++;
+  }
+
+  /// [size] is null when the copy couldn't be read.
+  bool _acceptDownload(String name, int? size, int externalSize) {
+    final listedSize = _listedSize(externalSize);
+    if (size == null) {
+      _failed();
+    } else if (size == 0) {
+      _unavailable(name, 'the external folder copy is empty');
+    } else if (listedSize != null && size != listedSize) {
+      _logger.severe('reconcile: download of $name refused, '
+          'read $size of $listedSize bytes');
+      _failed();
+    } else {
+      return true;
+    }
+    return false;
+  }
+
   /// A shorter copy whose bytes start the longer one is a cut-off write of
-  /// the same image, repair it
+  /// the same file, repair it
   Future<void> _compareCopies(String name, int externalSize) async {
     final internalBytes = await _internal.read(name);
     final externalBytes = await _readExternal(name);
@@ -588,13 +785,18 @@ class _AttachmentFolderReconcile {
   }
 
   Future<bool> _upload(String name, [Uint8List? bytes]) async {
-    bytes ??= await _internal.read(name);
-    if (bytes == null || bytes.isEmpty) {
+    final length = bytes?.length ?? await _internal.size(name);
+    if (length == null || length == 0) {
       _logger.severe('reconcile: upload of $name failed, could not read it');
       _failed();
       return false;
     }
-    return _tally(await _storage._createExternal(_external, name, bytes));
+    return _tally(await _storage._createExternal(
+        _external,
+        name,
+        () => bytes != null
+            ? _external.createNew(name, bytes)
+            : _storage._uploadFromInternal(_external, _internal, name)));
   }
 
   Future<bool> _replaceExternal(String name, Uint8List bytes) async {
@@ -614,18 +816,21 @@ class _AttachmentFolderReconcile {
       _failedWrite();
       return false;
     }
-    return _download(name, bytes);
+    return _download(name, () => _internal.createNew(name, bytes));
   }
 
-  Future<bool> _download(String name, Uint8List bytes) async {
-    final CreateResult result;
+  /// [create] returns null when it already counted why nothing was written.
+  Future<bool> _download(
+      String name, Future<CreateResult?> Function() create) async {
+    final CreateResult? result;
     try {
-      result = await _internal.createNew(name, bytes);
+      result = await create();
     } catch (error) {
       _logger.severe('reconcile: download of $name failed', error);
       _failedWrite();
       return false;
     }
+    if (result == null) return false;
     switch (result) {
       case CreateResult.created:
         break;
@@ -650,6 +855,21 @@ class _AttachmentFolderReconcile {
       _logger.warning(
           'reconcile: read of $name from the Image Folder failed', error);
       return null;
+    }
+  }
+
+  Future<bool> _copyExternal(String name, File destination) async {
+    try {
+      final copied = await _timed(_external.copyToFile(name, destination));
+      if (!copied) {
+        _logger
+            .warning('reconcile: could not read $name from the Image Folder');
+      }
+      return copied;
+    } catch (error) {
+      _logger.warning(
+          'reconcile: read of $name from the Image Folder failed', error);
+      return false;
     }
   }
 

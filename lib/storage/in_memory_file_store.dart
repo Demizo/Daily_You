@@ -22,6 +22,7 @@ class InMemoryFileStore implements FileStore {
 
   final Map<String, Uint8List> _bytesByName = {};
   final Map<String, DateTime> _modifiedTimeByName = {};
+  final Map<String, InMemoryFileStore> _subfolders = {};
 
   @override
   Future<bool> isAvailable() async => true;
@@ -108,4 +109,8 @@ class InMemoryFileStore implements FileStore {
   @override
   Future<DateTime?> modifiedTime(String name) async =>
       _modifiedTimeByName[name];
+
+  @override
+  Future<FileStore> subfolder(String name) async =>
+      _subfolders.putIfAbsent(name, InMemoryFileStore.new);
 }

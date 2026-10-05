@@ -6,6 +6,7 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:daily_you/database/attachment_storage.dart';
+import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/layouts/fast_page_view_scroll_physics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -486,7 +487,8 @@ class EntryImageProvider extends ImageProvider<EntryImageProvider> {
 
   Future<ui.Codec> _loadAsync(
       EntryImageProvider key, ImageDecoderCallback decode) async {
-    final bytes = await AttachmentStorage.instance.getBytes(key.imagePath);
+    final bytes = await AttachmentStorage.instance
+        .getBytes(key.imagePath, AttachmentType.image);
     if (bytes == null) {
       throw StateError('Image not found: ${key.imagePath}');
     }

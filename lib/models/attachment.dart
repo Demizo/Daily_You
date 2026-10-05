@@ -15,6 +15,18 @@ enum AttachmentType {
   static AttachmentType fromValue(String value) =>
       tryFromValue(value) ??
       (throw FormatException('Unknown attachment type', value));
+
+  String get folderName => switch (this) {
+        image => 'Images',
+        audio => 'Audio',
+        video => 'Video',
+      };
+
+  String get defaultExtension => switch (this) {
+        image => '.jpg',
+        audio => '.m4a',
+        video => '.mp4',
+      };
 }
 
 class EntryAttachmentFields {

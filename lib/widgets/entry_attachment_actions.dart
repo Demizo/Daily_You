@@ -66,8 +66,8 @@ class EntryAttachmentActions {
   }
 
   static Future<NewAttachment?> _storeImage(XFile file, String quality) async {
-    final fileName = await AttachmentStorage.instance
-        .create(file.name, await _compressImage(file, quality));
+    final fileName = await AttachmentStorage.instance.create(
+        file.name, await _compressImage(file, quality), AttachmentType.image);
     return fileName != null
         ? NewAttachment(type: AttachmentType.image, filePath: fileName)
         : null;

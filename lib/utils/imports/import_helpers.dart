@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
+import 'dart:typed_data';
+
 import 'package:daily_you/database/attachment_storage.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/attachment.dart';
@@ -34,6 +36,23 @@ Future<void> addImportedEntries(
     processedEntries += 1;
     updateStatus("${((processedEntries / totalEntries) * 100).round()}%");
   }
+}
+
+Future<void> addImportedImage(int entryId, Uint8List bytes, int rank,
+    DateTime timeCreate, Set<String> takenNames) async {
+  final filePath = await AttachmentStorage.instance.create(
+      null, bytes, AttachmentType.image,
+      currTime: timeCreate, skipExternalUpload: true, takenNames: takenNames);
+  if (filePath == null) return;
+  await EntryAttachmentsProvider.instance.add(
+      EntryAttachment(
+        entryId: entryId,
+        type: AttachmentType.image,
+        filePath: filePath,
+        rank: rank,
+        timeCreate: timeCreate,
+      ),
+      skipUpdate: true);
 }
 
 Future<OperationOutcome> finishImport(

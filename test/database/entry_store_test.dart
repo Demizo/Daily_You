@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:daily_you/database/app_database.dart';
@@ -296,6 +297,56 @@ void main() {
     expect(await imageFiles.exists('photo.jpg'), isFalse);
   });
 
+  test('removes the audio and video files of a deleted entry', () async {
+    final audioFiles =
+        await AttachmentStorage.instance.internalStore(AttachmentType.audio);
+    final videoFiles =
+        await AttachmentStorage.instance.internalStore(AttachmentType.video);
+    await audioFiles.write('voice.m4a', Uint8List.fromList([1]));
+    await videoFiles.write('clip.mp4', Uint8List.fromList([2]));
+    await videoFiles.write('other.mp4', Uint8List.fromList([3]));
+    EntryAttachment attachment(AttachmentType type, String name, int rank) =>
+        EntryAttachment(
+            entryId: null,
+            type: type,
+            filePath: name,
+            rank: rank,
+            timeCreate: time);
+
+    final saved = await store.beginDraft().save((_) => EntryDraft(
+          entry: draftEntry(),
+          attachments: [
+            attachment(AttachmentType.audio, 'voice.m4a', 1),
+            attachment(AttachmentType.video, 'clip.mp4', 0),
+          ],
+        ));
+
+    await store.delete(saved);
+    await reloadEverything();
+
+    expect(EntryAttachmentsProvider.instance.attachments, isEmpty);
+    expect(await audioFiles.list(), isEmpty);
+    expect(await videoFiles.list(), equals(['other.mp4']));
+  });
+
+  test('a file that cannot be deleted does not stop the entry delete',
+      () async {
+    final stuckFiles = StuckFileStore();
+    AttachmentStorage.instance.overrideStores(stuckFiles, InMemoryFileStore());
+    final image = await writeImageFile('photo.jpg');
+    final saved = await store.beginDraft().save((_) => EntryDraft(
+          entry: draftEntry(),
+          attachments: [image],
+        ));
+
+    await store.delete(saved);
+
+    expect(store.entries, isEmpty);
+    expect(EntryAttachmentsProvider.instance.attachments, isEmpty);
+    await reloadEverything();
+    expect(store.entries, isEmpty);
+  });
+
   test('loads the attachments it knows and skips a row of an unknown type',
       () async {
     final image = await writeImageFile('photo.jpg');
@@ -316,4 +367,10 @@ void main() {
     expect(EntryAttachmentsProvider.instance.attachments.map((a) => a.filePath),
         equals(['photo.jpg']));
   });
+}
+
+class StuckFileStore extends InMemoryFileStore {
+  @override
+  Future<bool> delete(String name) async =>
+      throw const FileSystemException('read-only');
 }

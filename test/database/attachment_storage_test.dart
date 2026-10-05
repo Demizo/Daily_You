@@ -3,14 +3,29 @@
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
 import 'dart:async';
-import 'dart:typed_data';
+import 'dart:convert';
+import 'dart:io';
 
 import 'package:daily_you/database/attachment_storage.dart';
 import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/storage/file_store.dart';
 import 'package:daily_you/storage/in_memory_file_store.dart';
+import 'package:daily_you/storage/local_file_store.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:path/path.dart' show basename, join;
+import '../support/source_file.dart';
+
+class ListingCountingStore extends InMemoryFileStore {
+  int listings = 0;
+
+  @override
+  Future<List<String>> list() {
+    listings += 1;
+    return super.list();
+  }
+}
 
 class FakeImageFolder extends InMemoryFileStore {
   FakeImageFolder({super.reportsSizes, super.uniqueNamesOnCollision});
@@ -91,6 +106,23 @@ class FakeImageFolder extends InMemoryFileStore {
   }
 }
 
+class UploadSignalingStore extends InMemoryFileStore {
+  final uploaded = Completer<void>();
+
+  @override
+  Future<CreateResult> createNewFromFile(String name, File source) async {
+    final result = await super.createNewFromFile(name, source);
+    uploaded.complete();
+    return result;
+  }
+}
+
+class StuckStore extends InMemoryFileStore {
+  @override
+  Future<bool> delete(String name) async =>
+      throw const FileSystemException('read-only');
+}
+
 void main() {
   final storage = AttachmentStorage.instance;
   late InMemoryFileStore internalStore;
@@ -117,6 +149,21 @@ void main() {
     ];
   }
 
+  void useAttachments(List<(AttachmentType, String)> attachments) {
+    EntryAttachmentsProvider.instance.isLoaded = true;
+    addTearDown(() => EntryAttachmentsProvider.instance.isLoaded = false);
+    final createdTime = DateTime(2026, 1, 1);
+    EntryAttachmentsProvider.instance.attachments = [
+      for (final (rank, (type, name)) in attachments.indexed)
+        EntryAttachment(
+            entryId: 1,
+            type: type,
+            filePath: name,
+            rank: rank,
+            timeCreate: createdTime)
+    ];
+  }
+
   setUp(() {
     internalStore = InMemoryFileStore();
     storage.bytesCache.clear();
@@ -128,7 +175,8 @@ void main() {
       useStores(internalStore, externalStore);
       await externalStore.write('photo.jpg', bytesOf('photo'));
 
-      expect(await storage.getBytes('photo.jpg'), equals(bytesOf('photo')));
+      expect(await storage.getBytes('photo.jpg', AttachmentType.image),
+          equals(bytesOf('photo')));
 
       expect(await internalStore.exists('photo.jpg'), isFalse);
       expect(storage.bytesCache.get('photo.jpg'), equals(bytesOf('photo')));
@@ -141,7 +189,8 @@ void main() {
       await internalStore.write('photo.jpg', Uint8List(0));
       await externalStore.write('photo.jpg', bytesOf('photo'));
 
-      expect(await storage.getBytes('photo.jpg'), equals(bytesOf('photo')));
+      expect(await storage.getBytes('photo.jpg', AttachmentType.image),
+          equals(bytesOf('photo')));
       expect(await internalStore.read('photo.jpg'), isEmpty);
     });
 
@@ -151,8 +200,121 @@ void main() {
       await internalStore.write('photo.jpg', Uint8List(0));
       await externalStore.write('photo.jpg', Uint8List(0));
 
-      expect(await storage.getBytes('photo.jpg'), isNull);
+      expect(await storage.getBytes('photo.jpg', AttachmentType.image), isNull);
       expect(storage.bytesCache.get('photo.jpg'), isNull);
+    });
+  });
+
+  group('delete', () {
+    test('forgets the cached bytes so a reused name shows new content',
+        () async {
+      useStores(internalStore, InMemoryFileStore());
+      final first = await storage.create(
+          'photo.jpg', bytesOf('first'), AttachmentType.image,
+          keepFileName: true);
+      expect(await storage.getBytes(first!, AttachmentType.image),
+          equals(bytesOf('first')));
+
+      await storage.delete(first, AttachmentType.image);
+      final second = await storage.create(
+          'photo.jpg', bytesOf('second'), AttachmentType.image,
+          keepFileName: true);
+
+      expect(second, first);
+      expect(await storage.getBytes(second!, AttachmentType.image),
+          equals(bytesOf('second')));
+    });
+
+    test('announces the deleted file', () async {
+      useStores(internalStore, InMemoryFileStore());
+      final name =
+          await storage.create('clip.mp4', bytesOf('a'), AttachmentType.video);
+      final announced = storage.deletions.first;
+
+      await storage.delete(name!, AttachmentType.video);
+
+      expect(await announced, (type: AttachmentType.video, fileName: name));
+    });
+  });
+
+  group('getLocalPath', () {
+    late Directory support;
+    late Directory imageFolder;
+    late FakeImageFolder externalStore;
+
+    setUpAll(TestWidgetsFlutterBinding.ensureInitialized);
+
+    setUp(() async {
+      support = await Directory.systemTemp.createTemp('local_path');
+      imageFolder = await Directory(join(support.path, 'Images')).create();
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+              const MethodChannel('plugins.flutter.io/path_provider'),
+              (call) async => support.path);
+      externalStore = FakeImageFolder();
+      useStores(LocalFileStore(imageFolder.path), externalStore);
+    });
+
+    tearDown(() async {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+              const MethodChannel('plugins.flutter.io/path_provider'), null);
+      await support.delete(recursive: true);
+    });
+
+    test('returns the internal file without asking the external location',
+        () async {
+      await File(join(imageFolder.path, 'photo.jpg')).writeAsString('photo');
+
+      final path =
+          await storage.getLocalPath('photo.jpg', AttachmentType.image);
+
+      expect(path, join(imageFolder.path, 'photo.jpg'));
+      expect(externalStore.lookups, isEmpty);
+    });
+
+    test('copies a file only the external location has into the folder',
+        () async {
+      await externalStore.write('photo.jpg', bytesOf('photo'));
+
+      final path =
+          await storage.getLocalPath('photo.jpg', AttachmentType.image);
+
+      expect(File(path!).readAsStringSync(), 'photo');
+      expect(imageFolder.listSync().map((entity) => basename(entity.path)),
+          equals(['photo.jpg']));
+    });
+
+    test('fetches without caching the bytes in memory', () async {
+      await externalStore.write('photo.jpg', bytesOf('photo'));
+
+      await storage.getLocalPath('photo.jpg', AttachmentType.image);
+
+      expect(storage.bytesCache.get('photo.jpg'), isNull);
+    });
+
+    test('is null and leaves nothing behind when no copy exists', () async {
+      expect(await storage.getLocalPath('photo.jpg', AttachmentType.image),
+          isNull);
+      expect(imageFolder.listSync(), isEmpty);
+    });
+
+    test('is null and leaves nothing behind for an empty external copy',
+        () async {
+      await externalStore.write('photo.jpg', Uint8List(0));
+
+      expect(await storage.getLocalPath('photo.jpg', AttachmentType.image),
+          isNull);
+      expect(imageFolder.listSync(), isEmpty);
+    });
+
+    test('is null when the external copy cannot be read', () async {
+      await externalStore.write('photo.jpg', bytesOf('photo'));
+      externalStore.unreadableNames.add('photo.jpg');
+
+      expect(await storage.getLocalPath('photo.jpg', AttachmentType.image),
+          isNull);
+      expect(imageFolder.listSync(), isEmpty);
     });
   });
 
@@ -164,8 +326,9 @@ void main() {
       final externalStore = FakeImageFolder();
       useStores(internalStore, externalStore);
 
-      final name =
-          await storage.create(null, bytesOf('photo'), currTime: captureTime);
+      final name = await storage.create(
+          null, bytesOf('photo'), AttachmentType.image,
+          currTime: captureTime);
       await pumpEventQueue();
 
       expect(name, capturedName);
@@ -179,7 +342,8 @@ void main() {
       useStores(internalStore, externalStore);
       await externalStore.write(capturedName, bytesOf('other device'));
 
-      await storage.create(null, bytesOf('photo'), currTime: captureTime);
+      await storage.create(null, bytesOf('photo'), AttachmentType.image,
+          currTime: captureTime);
       await pumpEventQueue();
 
       expect(await externalStore.list(), equals([capturedName]));
@@ -191,7 +355,8 @@ void main() {
       final externalStore = InMemoryFileStore()..writesStopAfter = 0;
       useStores(internalStore, externalStore);
 
-      await storage.create(null, bytesOf('photo'), currTime: captureTime);
+      await storage.create(null, bytesOf('photo'), AttachmentType.image,
+          currTime: captureTime);
       await pumpEventQueue();
 
       expect(storage.externalSyncHealth.lastAttempt!.failureReason,
@@ -205,13 +370,393 @@ void main() {
       storage.externalTimeout = const Duration(milliseconds: 10);
       addTearDown(() => storage.externalTimeout = const Duration(seconds: 60));
 
-      await storage.create(null, bytesOf('photo'), currTime: captureTime);
+      await storage.create(null, bytesOf('photo'), AttachmentType.image,
+          currTime: captureTime);
       await Future<void>.delayed(const Duration(milliseconds: 50));
 
       expect(storage.externalSyncHealth.lastAttempt!.failureReason,
           contains('TimeoutException'));
       expect(externalStore.deletes, isEmpty);
       expect(await internalStore.read(capturedName), equals(bytesOf('photo')));
+    });
+  });
+
+  group('attachment types', () {
+    final captureTime = DateTime(2026, 1, 2, 3, 4, 5);
+    const stamp = 'daily_you_2026-01-02T03-04-05';
+
+    Future<FileStore> internalOf(AttachmentType type) =>
+        storage.internalStore(type);
+    Future<FileStore> externalOf(AttachmentType type) async =>
+        (await storage.externalStore(type))!;
+
+    setUp(() => useStores(internalStore, InMemoryFileStore()));
+
+    test('routes each type to its own folder', () async {
+      for (final type in AttachmentType.values) {
+        await storage.create('x.bin', bytesOf(type.name), type,
+            currTime: captureTime);
+      }
+      await pumpEventQueue();
+
+      for (final type in AttachmentType.values) {
+        final names = await (await internalOf(type)).list();
+        expect(names, hasLength(1), reason: type.name);
+        expect(await (await internalOf(type)).read(names.single),
+            equals(bytesOf(type.name)));
+        final external = await (await externalOf(type)).list();
+        expect(external, equals(names), reason: type.name);
+      }
+    });
+
+    test('names a new file with the extension of the one given', () async {
+      final name = await storage.create(
+          'song.flac', bytesOf('a'), AttachmentType.audio,
+          currTime: captureTime);
+
+      expect(name, '$stamp.flac');
+    });
+
+    test('falls back to the default extension of the type', () async {
+      for (final (type, extension) in [
+        (AttachmentType.image, '.jpg'),
+        (AttachmentType.audio, '.m4a'),
+        (AttachmentType.video, '.mp4'),
+      ]) {
+        expect(
+            await storage.create(null, bytesOf('a'), type,
+                currTime: captureTime),
+            '$stamp$extension');
+        expect(
+            await storage.create('content-name', bytesOf('a'), type,
+                currTime: captureTime),
+            '${stamp}_1$extension');
+      }
+    });
+
+    test('never reuses a file already in the folder', () async {
+      await internalStore.write('photo.jpg', bytesOf('first'));
+
+      final name = await storage.create(
+          'photo.jpg', bytesOf('second'), AttachmentType.image,
+          currTime: captureTime);
+
+      expect(name, '$stamp.jpg');
+      expect(await internalStore.read('photo.jpg'), equals(bytesOf('first')));
+      expect(await internalStore.read(name!), equals(bytesOf('second')));
+    });
+
+    test('keeps the given name when asked', () async {
+      final name = await storage.create(
+          'Holiday photo.JPG', bytesOf('a'), AttachmentType.image,
+          keepFileName: true, currTime: captureTime);
+
+      expect(name, 'Holiday photo.JPG');
+      expect(await internalStore.read(name!), equals(bytesOf('a')));
+    });
+
+    test('numbers a kept name that is already taken', () async {
+      final names = [
+        for (final content in ['a', 'b', 'c'])
+          await storage.create(
+              'photo.jpg', bytesOf(content), AttachmentType.image,
+              keepFileName: true, currTime: captureTime)
+      ];
+
+      expect(names, ['photo.jpg', 'photo_1.jpg', 'photo_2.jpg']);
+      expect(await internalStore.read('photo.jpg'), equals(bytesOf('a')));
+      expect(await internalStore.read('photo_2.jpg'), equals(bytesOf('c')));
+    });
+
+    test('keeps only the file name of a given path and limits its length',
+        () async {
+      final nested = await storage.create(
+          'albums/2026/trip.mp3', bytesOf('a'), AttachmentType.audio,
+          keepFileName: true, currTime: captureTime);
+      final long = await storage.create(
+          '${'x' * 300}.mp3', bytesOf('b'), AttachmentType.audio,
+          keepFileName: true, currTime: captureTime);
+
+      expect(nested, 'trip.mp3');
+      expect(long, '${'x' * 100}.mp3');
+    });
+
+    test('treats names that differ only by case as taken', () async {
+      final names = [
+        for (final name in ['Photo.JPG', 'photo.jpg', 'PHOTO.jpg'])
+          await storage.create(name, bytesOf(name), AttachmentType.image,
+              keepFileName: true, currTime: captureTime)
+      ];
+
+      expect(names, ['Photo.JPG', 'photo_1.jpg', 'PHOTO_2.jpg']);
+    });
+
+    group('with a shared set of taken names', () {
+      test('keeps names from one import apart, ignoring case', () async {
+        final takenNames =
+            await storage.takenLowerCaseNames(AttachmentType.image);
+
+        final names = [
+          for (final name in [
+            'Photo.JPG',
+            'photo.jpg',
+            'PHOTO.jpg',
+            'photo_1.jpg'
+          ])
+            await storage.create(name, bytesOf(name), AttachmentType.image,
+                keepFileName: true,
+                currTime: captureTime,
+                takenNames: takenNames)
+        ];
+
+        expect(names,
+            ['Photo.JPG', 'photo_1.jpg', 'PHOTO_2.jpg', 'photo_1_1.jpg']);
+        expect(takenNames,
+            {'photo.jpg', 'photo_1.jpg', 'photo_2.jpg', 'photo_1_1.jpg'});
+      });
+
+      test('lists the folder once per import', () async {
+        final countingStore = ListingCountingStore();
+        useStores(countingStore, InMemoryFileStore());
+        useAttachments([(AttachmentType.image, 'Synced.jpg')]);
+        final takenNames =
+            await storage.takenLowerCaseNames(AttachmentType.image);
+
+        final names = [
+          for (var count = 0; count < 3; count++)
+            await storage.create(null, bytesOf('$count'), AttachmentType.image,
+                currTime: captureTime,
+                skipExternalUpload: true,
+                takenNames: takenNames),
+          await storage.create('synced.jpg', bytesOf('a'), AttachmentType.image,
+              keepFileName: true, takenNames: takenNames),
+        ];
+
+        expect(names, [
+          '$stamp.jpg',
+          '${stamp}_1.jpg',
+          '${stamp}_2.jpg',
+          'synced_1.jpg',
+        ]);
+        expect(countingStore.listings, 1);
+      });
+
+      test('lists the folder for every file without it', () async {
+        final countingStore = ListingCountingStore();
+        useStores(countingStore, InMemoryFileStore());
+
+        for (var count = 0; count < 3; count++) {
+          await storage.create(null, bytesOf('$count'), AttachmentType.image,
+              currTime: captureTime, skipExternalUpload: true);
+        }
+
+        expect(countingStore.listings, 3);
+      });
+    });
+
+    test('does not reuse a name an entry already references', () async {
+      useAttachments([(AttachmentType.image, 'Synced.jpg')]);
+
+      final name = await storage.create(
+          'synced.jpg', bytesOf('a'), AttachmentType.image,
+          keepFileName: true, currTime: captureTime);
+
+      expect(name, 'synced_1.jpg');
+    });
+
+    test('a referenced name only blocks its own type', () async {
+      useAttachments([(AttachmentType.audio, 'clip.mp4')]);
+
+      final name = await storage.create(
+          'clip.mp4', bytesOf('a'), AttachmentType.video,
+          keepFileName: true, currTime: captureTime);
+
+      expect(name, 'clip.mp4');
+    });
+
+    test('stores a name with rejected characters under a safe one', () async {
+      final name = await storage.create(
+          'what?:*.m<p>4', bytesOf('a'), AttachmentType.video,
+          keepFileName: true, currTime: captureTime);
+
+      expect(name, 'what___.m_p_4');
+      expect(await (await internalOf(AttachmentType.video)).list(), [name]);
+    });
+
+    test('keeps a long multibyte name within the file name limit', () async {
+      final name = await storage.create(
+          '${'音' * 200}.m4a', bytesOf('a'), AttachmentType.audio,
+          keepFileName: true, currTime: captureTime);
+
+      expect(utf8.encode(name!).length, lessThanOrEqualTo(255));
+      expect(name, endsWith('.m4a'));
+    });
+
+    test('createFromFile keeps the given name when asked', () async {
+      final name = await storage.createFromFile(
+          'clip.mov', sourceFile('clip bytes'), AttachmentType.video,
+          keepFileName: true, currTime: captureTime);
+
+      expect(name, 'clip.mov');
+      final folder = await internalOf(AttachmentType.video);
+      expect(await folder.read(name!), equals(bytesOf('clip bytes')));
+    });
+
+    test('gives two captures in the same second different files', () async {
+      final first = await storage.create(
+          null, bytesOf('one'), AttachmentType.video,
+          currTime: captureTime);
+      final second = await storage.create(
+          null, bytesOf('two'), AttachmentType.video,
+          currTime: captureTime);
+
+      expect(second, isNot(first));
+      final folder = await internalOf(AttachmentType.video);
+      expect(await folder.read(first!), equals(bytesOf('one')));
+      expect(await folder.read(second!), equals(bytesOf('two')));
+    });
+
+    test('createFromFile copies a file that may then be deleted', () async {
+      final source = sourceFile('clip bytes');
+
+      final name = await storage.createFromFile(
+          'clip.mov', source, AttachmentType.video,
+          currTime: captureTime);
+      source.deleteSync();
+      await pumpEventQueue();
+
+      expect(name, '$stamp.mov');
+      expect(await (await internalOf(AttachmentType.video)).read(name!),
+          equals(bytesOf('clip bytes')));
+      expect(await (await externalOf(AttachmentType.video)).read(name),
+          equals(bytesOf('clip bytes')));
+    });
+
+    test('createFromFile uploads from the internal copy of a real folder',
+        () async {
+      final folder = Directory.systemTemp.createTempSync('internal_videos');
+      addTearDown(() => folder.deleteSync(recursive: true));
+      final external = UploadSignalingStore();
+      useStores(LocalFileStore(folder.path), external);
+      final source = sourceFile('real bytes');
+
+      final name = await storage.createFromFile(
+          null, source, AttachmentType.image,
+          currTime: captureTime);
+      source.deleteSync();
+      await external.uploaded.future;
+
+      expect(File(join(folder.path, name!)).readAsStringSync(), 'real bytes');
+      expect(await external.read(name), equals(bytesOf('real bytes')));
+    });
+
+    test('createFromFile skips the upload when asked', () async {
+      final name = await storage.createFromFile(
+          null, sourceFile('a'), AttachmentType.audio,
+          currTime: captureTime, skipExternalUpload: true);
+      await pumpEventQueue();
+
+      expect(await (await externalOf(AttachmentType.audio)).list(), isEmpty);
+      expect(
+          await (await internalOf(AttachmentType.audio)).exists(name!), isTrue);
+    });
+
+    test('sizeBytes reads the local copy, then the external one', () async {
+      await (await internalOf(AttachmentType.video))
+          .write('local.mp4', bytesOf('12345'));
+      await (await externalOf(AttachmentType.video))
+          .write('remote.mp4', bytesOf('123'));
+
+      expect(await storage.sizeBytes('local.mp4', AttachmentType.video), 5);
+      expect(await storage.sizeBytes('remote.mp4', AttachmentType.video), 3);
+      expect(await storage.sizeBytes('gone.mp4', AttachmentType.video), isNull);
+    });
+
+    test('delete removes the file from both folders of its type only',
+        () async {
+      for (final type in [AttachmentType.audio, AttachmentType.video]) {
+        await (await internalOf(type)).write('same.bin', bytesOf('a'));
+        await (await externalOf(type)).write('same.bin', bytesOf('a'));
+      }
+
+      await storage.delete('same.bin', AttachmentType.audio);
+      await pumpEventQueue();
+
+      expect(await (await internalOf(AttachmentType.audio)).list(), isEmpty);
+      expect(await (await externalOf(AttachmentType.audio)).list(), isEmpty);
+      expect((await internalOf(AttachmentType.video)).list(),
+          completion(['same.bin']));
+      expect((await externalOf(AttachmentType.video)).list(),
+          completion(['same.bin']));
+    });
+
+    test('delete reports a failure instead of throwing', () async {
+      final stuck = StuckStore();
+      useStores(stuck, InMemoryFileStore());
+
+      expect(await storage.delete('a.jpg', AttachmentType.image), isFalse);
+    });
+
+    group('reconcile', () {
+      test('uploads and downloads audio and video through their own folders',
+          () async {
+        useAttachments([
+          (AttachmentType.audio, 'voice.m4a'),
+          (AttachmentType.video, 'clip.mp4'),
+        ]);
+        await (await internalOf(AttachmentType.audio))
+            .write('voice.m4a', bytesOf('voice'));
+        await (await externalOf(AttachmentType.video))
+            .write('clip.mp4', bytesOf('clip'));
+
+        final summary = (await storage.reconcileAttachmentFolders())!;
+
+        expect(summary.uploaded, 1);
+        expect(summary.downloaded, 1);
+        expect(await (await externalOf(AttachmentType.audio)).read('voice.m4a'),
+            equals(bytesOf('voice')));
+        expect(await (await internalOf(AttachmentType.video)).read('clip.mp4'),
+            equals(bytesOf('clip')));
+        expect(await internalStore.list(), isEmpty);
+      });
+
+      test('a name referenced as audio does not cover the same video name',
+          () async {
+        useAttachments([(AttachmentType.audio, 'same.bin')]);
+        await (await internalOf(AttachmentType.video))
+            .write('same.bin', bytesOf('video'));
+
+        await storage.garbageCollectAttachments();
+
+        expect(await (await internalOf(AttachmentType.video)).list(), isEmpty);
+      });
+    });
+
+    test('garbage collection keeps referenced files of every type', () async {
+      useAttachments([
+        (AttachmentType.image, 'kept.jpg'),
+        (AttachmentType.audio, 'kept.m4a'),
+        (AttachmentType.video, 'kept.mp4'),
+      ]);
+      for (final (type, name) in [
+        (AttachmentType.image, 'kept.jpg'),
+        (AttachmentType.image, 'orphan.jpg'),
+        (AttachmentType.audio, 'kept.m4a'),
+        (AttachmentType.audio, 'orphan.m4a'),
+        (AttachmentType.video, 'kept.mp4'),
+        (AttachmentType.video, 'orphan.mp4'),
+      ]) {
+        await (await internalOf(type)).write(name, bytesOf(name));
+      }
+
+      await storage.garbageCollectAttachments();
+
+      expect(await (await internalOf(AttachmentType.image)).list(),
+          equals(['kept.jpg']));
+      expect(await (await internalOf(AttachmentType.audio)).list(),
+          equals(['kept.m4a']));
+      expect(await (await internalOf(AttachmentType.video)).list(),
+          equals(['kept.mp4']));
     });
   });
 
@@ -317,6 +862,61 @@ void main() {
       });
     });
 
+    group('with one copy missing and a folder on disk', () {
+      late Directory disk;
+
+      setUp(() async {
+        disk = await Directory.systemTemp.createTemp('reconcile_disk');
+        addTearDown(() => disk.delete(recursive: true));
+        useFolder(FakeImageFolder(), ['a.jpg']);
+        storage.overrideStores(LocalFileStore(disk.path), folder);
+      });
+
+      List<String> onDisk() =>
+          disk.listSync().map((entity) => basename(entity.path)).toList();
+
+      test('downloads through a staged file beside the folder', () async {
+        await folder.write('a.jpg', bytesOf('a'));
+
+        expect((await reconcile()).downloaded, 1);
+
+        expect(File(join(disk.path, 'a.jpg')).readAsStringSync(), 'a');
+        expect(onDisk(), equals(['a.jpg']));
+      });
+
+      test('refuses a copy shorter than the listed size and keeps nothing',
+          () async {
+        await folder.write('a.jpg', bytesOf('photo'));
+        folder.shortReads.add('a.jpg');
+
+        final summary = await reconcile();
+
+        expect(summary.failures, 1);
+        expect(summary.downloaded, 0);
+        expect(onDisk(), isEmpty);
+      });
+
+      test('never copies an empty Image Folder file in', () async {
+        await folder.write('a.jpg', Uint8List(0));
+
+        final summary = await reconcile();
+
+        expect(summary.unavailable, 1);
+        expect(summary.downloaded, 0);
+        expect(onDisk(), isEmpty);
+      });
+
+      test('counts an unreadable Image Folder file as a failure', () async {
+        await folder.write('a.jpg', bytesOf('a'));
+        folder.unreadableNames.add('a.jpg');
+
+        final summary = await reconcile();
+
+        expect(summary.failures, 1);
+        expect(onDisk(), isEmpty);
+      });
+    });
+
     group('with both copies', () {
       test('does nothing when both copies have the same size', () async {
         useFolder(FakeImageFolder(), ['a.jpg']);
@@ -325,7 +925,6 @@ void main() {
 
         expectNothingDone(await reconcile());
         expect(folder.writes, isEmpty);
-        expect(folder.reads, isEmpty);
       });
 
       test('does nothing when a copy listed as 0 bytes matches', () async {
@@ -759,7 +1358,8 @@ void main() {
       final run = reconcile();
       await pumpEventQueue();
 
-      await storage.create(null, bytesOf('photo'), currTime: captureTime);
+      await storage.create(null, bytesOf('photo'), AttachmentType.image,
+          currTime: captureTime);
       await pumpEventQueue();
       expect(await folder.read(capturedName), equals(bytesOf('photo')));
 
@@ -769,12 +1369,13 @@ void main() {
 
     test('a capture and a run uploading the same image leave one file',
         () async {
-      useFolder(FakeImageFolder(uniqueNamesOnCollision: true),
-          ['a.jpg', capturedName]);
+      useFolder(FakeImageFolder(uniqueNamesOnCollision: true), ['a.jpg']);
       await internalStore.write('a.jpg', bytesOf('a'));
       final capture = folder.holdUploadOf(capturedName);
       folder.hiddenFromListing.add(capturedName);
-      await storage.create(null, bytesOf('photo'), currTime: captureTime);
+      await storage.create(null, bytesOf('photo'), AttachmentType.image,
+          currTime: captureTime);
+      useImages(['a.jpg', capturedName]);
       await pumpEventQueue();
       final slowUpload = folder.holdUploadOf('a.jpg');
       final run = reconcile();
@@ -792,9 +1393,10 @@ void main() {
 
     test('an image created without an upload is uploaded by the next run',
         () async {
-      useFolder(FakeImageFolder(), [capturedName]);
-      await storage.create(null, bytesOf('photo'),
+      useFolder(FakeImageFolder(), []);
+      await storage.create(null, bytesOf('photo'), AttachmentType.image,
           currTime: captureTime, skipExternalUpload: true);
+      useImages([capturedName]);
       await pumpEventQueue();
       expect(folder.writes, isEmpty);
       expect(await internalStore.read(capturedName), equals(bytesOf('photo')));
@@ -817,7 +1419,6 @@ void main() {
 
       expectNothingDone(await reconcile());
       expect(folder.writes, isEmpty);
-      expect(folder.reads, isEmpty);
     });
 
     test('repairs a library with scattered missing and empty files', () async {

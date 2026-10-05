@@ -16,6 +16,7 @@ import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:flutter/foundation.dart';
+import 'package:logging/logging.dart';
 import 'package:sqflite/sqflite.dart';
 
 class EntryDraft {
@@ -76,11 +77,13 @@ typedef _TagWrite = ({List<EntryTag> tags, bool changed});
 
 typedef _AttachmentWrite = ({
   List<EntryAttachment> attachments,
-  List<String> removedFiles,
+  List<EntryAttachment> removed,
   bool changed
 });
 
 class EntryStore with ChangeNotifier {
+  static final Logger _logger = Logger('EntryStore');
+
   static final EntryStore instance = EntryStore._init();
 
   EntryStore._init();
@@ -116,8 +119,7 @@ class EntryStore with ChangeNotifier {
       await EntryDao.remove(entry.id!, executor: transaction);
     });
 
-    await _deleteAttachmentFiles(
-        attachments.map((attachment) => attachment.filePath));
+    await _deleteAttachmentFiles(attachments);
 
     _entries = _entries.where((existing) => existing.id != entry.id).toList();
     _indexEntriesByDay();
@@ -204,7 +206,7 @@ class EntryStore with ChangeNotifier {
       return saved;
     }
 
-    await _deleteAttachmentFiles(attachmentWrite.removedFiles);
+    await _deleteAttachmentFiles(attachmentWrite.removed);
 
     final index = getIndexOfEntry(saved.id!);
     if (index == -1) {
@@ -312,20 +314,29 @@ class EntryStore with ChangeNotifier {
 
     final desiredIds =
         desired.map((attachment) => attachment.id).nonNulls.toSet();
-    final removedFiles = <String>[];
+    final removed = <EntryAttachment>[];
     for (final existing in current) {
       if (desiredIds.contains(existing.id)) continue;
       await EntryAttachmentDao.remove(existing, executor: executor);
-      removedFiles.add(existing.filePath);
+      removed.add(existing);
       changed = true;
     }
 
-    return (attachments: written, removedFiles: removedFiles, changed: changed);
+    return (attachments: written, removed: removed, changed: changed);
   }
 
-  Future<void> _deleteAttachmentFiles(Iterable<String> names) async {
-    for (final name in names) {
-      await AttachmentStorage.instance.delete(name);
+  Future<void> _deleteAttachmentFiles(
+      Iterable<EntryAttachment> attachments) async {
+    for (final attachment in attachments) {
+      try {
+        await AttachmentStorage.instance
+            .delete(attachment.filePath, attachment.type);
+      } catch (error, stackTrace) {
+        _logger.warning(
+            'Deleting attachment file ${attachment.filePath} failed',
+            error,
+            stackTrace);
+      }
     }
   }
 

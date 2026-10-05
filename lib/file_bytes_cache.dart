@@ -60,6 +60,13 @@ class FileBytesCache {
     _currentSize += valueSize;
   }
 
+  void remove(String key) {
+    final removed = _cache.remove(key);
+    if (removed == null) return;
+    _currentSize -= removed.lengthInBytes;
+    _usageOrder.remove(key);
+  }
+
   void clear() {
     _cache.clear();
     _usageOrder.clear();

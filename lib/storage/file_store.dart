@@ -51,4 +51,6 @@ abstract interface class FileStore {
   Future<bool> delete(String name);
 
   Future<DateTime?> modifiedTime(String name);
+
+  Future<FileStore> subfolder(String name);
 }

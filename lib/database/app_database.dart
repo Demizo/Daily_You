@@ -406,6 +406,7 @@ CREATE TABLE $attachmentsTable (
     final imageName = await AttachmentStorage.instance.create(
       'daily_you_First_Steps.webp',
       imageBytes.buffer.asUint8List(),
+      AttachmentType.image,
       currTime: now,
     );
     if (imageName != null) {

@@ -141,4 +141,11 @@ class LocalFileStore implements FileStore {
     if (!await file.exists()) return null;
     return file.lastModified();
   }
+
+  @override
+  Future<FileStore> subfolder(String name) async {
+    final directory = Directory(join(directoryPath, name));
+    await directory.create(recursive: true);
+    return LocalFileStore(directory.path);
+  }
 }

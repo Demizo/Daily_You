@@ -77,8 +77,8 @@ class _AttachmentViewPageState extends State<AttachmentViewPage> {
           icon: const Icon(Icons.info_outline_rounded),
           onPressed: () async {
             final imageEntry = widget.attachments[currentIndex];
-            final bytes =
-                await AttachmentStorage.instance.getBytes(imageEntry.filePath);
+            final bytes = await AttachmentStorage.instance
+                .getBytes(imageEntry.filePath, AttachmentType.image);
 
             if (bytes == null || !context.mounted) return;
 
@@ -146,8 +146,8 @@ class _AttachmentViewPageState extends State<AttachmentViewPage> {
               icon: const Icon(Icons.share_rounded),
               onPressed: () async {
                 final currentImage = widget.attachments[currentIndex].filePath;
-                var bytes =
-                    await AttachmentStorage.instance.getBytes(currentImage);
+                var bytes = await AttachmentStorage.instance
+                    .getBytes(currentImage, AttachmentType.image);
                 if (bytes != null) {
                   await SharePlus.instance.share(ShareParams(
                       files: [XFile.fromData(bytes, mimeType: "images/*")],
@@ -171,8 +171,8 @@ class _AttachmentViewPageState extends State<AttachmentViewPage> {
                 onPressed: () async {
                   final currentImage =
                       widget.attachments[currentIndex].filePath;
-                  var bytes =
-                      await AttachmentStorage.instance.getBytes(currentImage);
+                  var bytes = await AttachmentStorage.instance
+                      .getBytes(currentImage, AttachmentType.image);
                   if (bytes == null) return;
 
                   PickedDirectory? saveDirectory;

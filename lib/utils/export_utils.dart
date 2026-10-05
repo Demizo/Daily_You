@@ -69,8 +69,8 @@ class ExportUtils {
         final images = <(EntryAttachment, Uint8List)>[];
         for (EntryAttachment image
             in EntryAttachmentsProvider.instance.getForEntry(entry)) {
-          final bytes =
-              await AttachmentStorage.instance.getBytes(image.filePath);
+          final bytes = await AttachmentStorage.instance
+              .getBytes(image.filePath, AttachmentType.image);
           if (bytes != null) images.add((image, bytes));
         }
 
