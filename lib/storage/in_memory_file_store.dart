@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:daily_you/storage/file_store.dart';
@@ -72,6 +73,21 @@ class InMemoryFileStore implements FileStore {
     await delete(createdName);
     return CreateResult.alreadyExists;
   }
+
+  @override
+  Future<CreateResult> createNewFromFile(String name, File source) async =>
+      createNew(name, await source.readAsBytes());
+
+  @override
+  Future<bool> copyToFile(String name, File destination) async {
+    final bytes = await read(name);
+    if (bytes == null) return false;
+    await destination.writeAsBytes(bytes);
+    return true;
+  }
+
+  @override
+  Future<int?> size(String name) async => _bytesByName[name]?.length;
 
   String _freeName(String name) {
     if (!uniqueNamesOnCollision) return name;

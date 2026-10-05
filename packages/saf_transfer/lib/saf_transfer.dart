@@ -59,6 +59,26 @@ class SafTransfer {
     }
   }
 
+  static Future<String?> createInExternalLocation(String localFilePath,
+      String treeUri, String fileName, String mimeType) async {
+    _initListener();
+    try {
+      final result =
+          await _channel.invokeMethod<Map<Object?, Object?>>('copyToExternal', {
+        'treeUri': treeUri,
+        'fileName': fileName,
+        'mime': mimeType,
+        'localSrc': localFilePath,
+        'overwrite': false,
+        'append': false,
+        'transferId': const Uuid().v4(),
+      });
+      return result?['fileName'] as String? ?? '';
+    } catch (e) {
+      return null;
+    }
+  }
+
   /// Copy a file from local storage to external storage (SAF)
   static Future<bool> copyToExternalLocation(
       String localFilePath, String treeUri, String fileName, String mimeType,

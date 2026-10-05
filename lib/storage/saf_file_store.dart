@@ -2,10 +2,12 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:daily_you/storage/file_store.dart';
 import 'package:logging/logging.dart';
+import 'package:saf_transfer/saf_transfer.dart';
 import 'package:saf_util/saf_util.dart';
 import 'package:shared_storage/shared_storage.dart' as saf;
 
@@ -111,6 +113,34 @@ class SafFileStore implements FileStore {
     }
     return CreateResult.alreadyExists;
   }
+
+  @override
+  Future<CreateResult> createNewFromFile(String name, File source) async {
+    final createdName = await SafTransfer.createInExternalLocation(
+        source.path, treeUri, name, "*/*");
+    if (createdName == null) return CreateResult.failed;
+    if (createdName == name) return CreateResult.created;
+    if (createdName.isEmpty) return CreateResult.failed;
+
+    if (!await delete(createdName)) {
+      _logger.warning('could not delete $createdName after $name collided');
+    }
+    return CreateResult.alreadyExists;
+  }
+
+  @override
+  Future<bool> copyToFile(String name, File destination) async {
+    final uri = await _listedDocument(name) ??
+        (await _child(name, requiresWriteAccess: false))?.uri;
+    if (uri == null) return false;
+    return await SafTransfer.copyFromExternalLocation(
+            uri.toString(), destination.path) &&
+        await destination.exists();
+  }
+
+  @override
+  Future<int?> size(String name) async =>
+      (await _child(name, requiresWriteAccess: false))?.size;
 
   @override
   Future<bool> delete(String name) async {

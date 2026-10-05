@@ -10,6 +10,7 @@ import 'package:daily_you/storage/in_memory_file_store.dart';
 import 'package:daily_you/storage/local_file_store.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' show join;
+import '../support/source_file.dart';
 
 void main() {
   group('InMemoryFileStore', () {
@@ -64,6 +65,95 @@ void main() {
       await expectLater(
           LocalFileStore(join(directory.path, 'gone')).listFiles(),
           throwsA(isA<FileSystemException>()));
+    });
+
+    test('createNew leaves no partial file beside the created one', () async {
+      await store.createNew('photo.jpg', bytesOf('photo'));
+      await store.createNewFromFile('clip.mp4', sourceFile('clip'));
+
+      expect(await store.list(), unorderedEquals(['photo.jpg', 'clip.mp4']));
+    });
+
+    test('a failed copy leaves nothing under the name or beside it', () async {
+      final missing = File(join(directory.path, 'missing.bin'));
+
+      await expectLater(store.createNewFromFile('clip.mp4', missing),
+          throwsA(isA<FileSystemException>()));
+
+      expect(await store.list(), isEmpty);
+    });
+
+    test('a partial file left by an interrupted create does not block one',
+        () async {
+      await File(join(directory.path, 'clip.mp4.partial'))
+          .writeAsString('cut off and longer than the real content');
+
+      expect(await store.createNewFromFile('clip.mp4', sourceFile('clip')),
+          CreateResult.created);
+
+      expect(await store.read('clip.mp4'), equals(bytesOf('clip')));
+    });
+
+    group('writeAtomically', () {
+      late LocalFileStore local;
+
+      setUp(() => local = store as LocalFileStore);
+
+      test('replaces the file and leaves no temporary file', () async {
+        await store.write('clip.mp4', bytesOf('old'));
+
+        final published =
+            await local.writeAtomically('clip.mp4', (temporary) async {
+          await temporary.writeAsString('new');
+          return true;
+        });
+
+        expect(published, isTrue);
+        expect(await store.read('clip.mp4'), equals(bytesOf('new')));
+        expect(await store.list(), equals(['clip.mp4']));
+      });
+
+      test('giving up keeps the current file and removes the temporary one',
+          () async {
+        await store.write('clip.mp4', bytesOf('old'));
+
+        final published =
+            await local.writeAtomically('clip.mp4', (temporary) async {
+          await temporary.writeAsString('half');
+          return false;
+        });
+
+        expect(published, isFalse);
+        expect(await store.read('clip.mp4'), equals(bytesOf('old')));
+        expect(await store.list(), equals(['clip.mp4']));
+      });
+
+      test(
+          'a failing fill keeps the current file and removes the temporary one',
+          () async {
+        await store.write('clip.mp4', bytesOf('old'));
+
+        await expectLater(
+            local.writeAtomically('clip.mp4', (temporary) async {
+              await temporary.writeAsString('half');
+              throw const FileSystemException('disk full');
+            }),
+            throwsA(isA<FileSystemException>()));
+
+        expect(await store.read('clip.mp4'), equals(bytesOf('old')));
+        expect(await store.list(), equals(['clip.mp4']));
+      });
+    });
+
+    test('two creates of one name leave exactly one winner', () async {
+      final results = await Future.wait([
+        store.createNew('photo.jpg', bytesOf('first')),
+        store.createNew('photo.jpg', bytesOf('second')),
+      ]);
+
+      expect(results,
+          unorderedEquals([CreateResult.created, CreateResult.alreadyExists]));
+      expect(await store.list(), equals(['photo.jpg']));
     });
 
     test('write recreates a directory that disappeared', () async {
@@ -170,6 +260,53 @@ void fileStoreContract(FileStore Function() storeOf,
         await orOnFailure(store.createNew('photo.jpg', bytesOf('photo')),
             CreateResult.failed),
         CreateResult.failed);
+  });
+
+  test('createNewFromFile copies the file under its final name', () async {
+    final store = storeOf();
+    final source = sourceFile('photo');
+
+    expect(await store.createNewFromFile('photo.jpg', source),
+        CreateResult.created);
+
+    expect(await store.read('photo.jpg'), equals(bytesOf('photo')));
+    expect(source.readAsStringSync(), 'photo');
+  });
+
+  test('createNewFromFile never replaces an existing file', () async {
+    final store = storeOf();
+    await store.write('photo.jpg', bytesOf('original'));
+
+    expect(await store.createNewFromFile('photo.jpg', sourceFile('other')),
+        CreateResult.alreadyExists);
+
+    expect(await store.read('photo.jpg'), equals(bytesOf('original')));
+  });
+
+  test('copyToFile copies the bytes over the destination', () async {
+    final store = storeOf();
+    await store.write('photo.jpg', bytesOf('photo'));
+    final destination = sourceFile('stale and longer than the photo');
+
+    expect(await store.copyToFile('photo.jpg', destination), isTrue);
+
+    expect(destination.readAsStringSync(), 'photo');
+  });
+
+  test('copyToFile of a missing name copies nothing', () async {
+    final destination = sourceFile('untouched');
+
+    expect(await storeOf().copyToFile('missing.jpg', destination), isFalse);
+
+    expect(destination.readAsStringSync(), 'untouched');
+  });
+
+  test('size reports a written file and nothing for a missing one', () async {
+    final store = storeOf();
+    await store.write('note.txt', bytesOf('hello'));
+
+    expect(await store.size('note.txt'), 5);
+    expect(await store.size('missing.txt'), isNull);
   });
 
   test('rename moves the bytes to the new name', () async {
