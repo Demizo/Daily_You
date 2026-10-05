@@ -13,8 +13,6 @@ import 'package:flutter/gestures.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/physics.dart';
 
-/// A [PageView] of zoomable images.
-///
 /// Uses [_ArenaAwarePanRecognizer] to proactively claim single-finger drags
 /// once an image is zoomed in, rather than racing the page view's own drag
 /// recognizer for them.
@@ -23,6 +21,7 @@ class ZoomableAttachmentPageView extends StatefulWidget {
     super.key,
     required this.imageProviders,
     required this.controller,
+    this.customPageBuilder,
     this.onPageChanged,
     this.errorBuilder,
     this.minScale = 1.0,
@@ -30,8 +29,9 @@ class ZoomableAttachmentPageView extends StatefulWidget {
     this.doubleTapScale = 2.0,
   });
 
-  final List<ImageProvider> imageProviders;
+  final List<ImageProvider?> imageProviders;
   final PageController controller;
+  final Widget Function(BuildContext context, int index)? customPageBuilder;
   final ValueChanged<int>? onPageChanged;
   final Widget Function(BuildContext context, Object error)? errorBuilder;
   final double minScale;
@@ -93,6 +93,15 @@ class _ZoomableAttachmentPageViewState extends State<ZoomableAttachmentPageView>
 
   void _resolveImageSize(int index) {
     final provider = widget.imageProviders[index];
+    if (provider == null) {
+      if (_imageStream != null && _imageStreamListener != null) {
+        _imageStream!.removeListener(_imageStreamListener!);
+      }
+      _imageStream = null;
+      _imageStreamListener = null;
+      if (_imageSize != null) setState(() => _imageSize = null);
+      return;
+    }
     final newStream = provider.resolve(createLocalImageConfiguration(context));
     if (newStream.key == _imageStream?.key) return;
     if (_imageStream != null && _imageStreamListener != null) {
@@ -192,6 +201,7 @@ class _ZoomableAttachmentPageViewState extends State<ZoomableAttachmentPageView>
   /// Applies [newScale] while keeping the content point under [focalLocal]
   void _applyFocalScale(
       Offset focalLocal, Offset? focalLocalDelta, double newScale) {
+    if (_fittedImageSize() == null) return;
     final viewportCenter = _viewportSize.center(Offset.zero);
     final oldFocalLocal = focalLocal - (focalLocalDelta ?? Offset.zero);
     final anchor = (oldFocalLocal - viewportCenter - _offset) / _scale;
@@ -375,8 +385,14 @@ class _ZoomableAttachmentPageViewState extends State<ZoomableAttachmentPageView>
   }
 
   Widget _buildPage(BuildContext context, int index) {
+    final provider = widget.imageProviders[index];
+    if (provider == null) {
+      return widget.customPageBuilder?.call(context, index) ??
+          const SizedBox.shrink();
+    }
+
     final image = Image(
-      image: widget.imageProviders[index],
+      image: provider,
       fit: BoxFit.contain,
       gaplessPlayback: true,
       errorBuilder: (context, error, stackTrace) {
