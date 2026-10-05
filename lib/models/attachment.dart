@@ -35,6 +35,17 @@ enum AttachmentType {
       };
 
   bool get isVisual => this != audio;
+
+  int? get largeFileWarningBytes => switch (this) {
+        image => null,
+        audio => 5 * 1024 * 1024,
+        video => 20 * 1024 * 1024,
+      };
+
+  bool isLarge(int sizeBytes) {
+    final threshold = largeFileWarningBytes;
+    return threshold != null && sizeBytes > threshold;
+  }
 }
 
 class EntryAttachmentFields {

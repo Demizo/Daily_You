@@ -68,6 +68,10 @@ class Settings {
   static const defaultTemplate = Setting<int>("defaultTemplate", -1);
   static const imageQualityLevel =
       Setting<String>("imageQualityLevel", ImageQuality.medium);
+  static const videoQualityLevel =
+      Setting<String>("videoQualityLevel", VideoQuality.medium);
+  static const suppressLargeAttachmentWarning =
+      Setting<bool>("suppressLargeAttachmentWarning", false);
   static const overrideLanguage =
       Setting<Map<String, dynamic>?>("overrideLanguage", null);
   static const showFlashbacks = Setting<bool>("showFlashbacks", true);
@@ -159,6 +163,8 @@ class Settings {
     dismissedNotificationOnboarding,
     defaultTemplate,
     imageQualityLevel,
+    videoQualityLevel,
+    suppressLargeAttachmentWarning,
     overrideLanguage,
     showFlashbacks,
     excludeBadDaysFromFlashbacks,
@@ -206,6 +212,12 @@ class Settings {
 
 class ImageQuality {
   static const String noCompression = "noCompression";
+  static const String high = "high";
+  static const String medium = "medium";
+  static const String low = "low";
+}
+
+class VideoQuality {
   static const String high = "high";
   static const String medium = "medium";
   static const String low = "low";

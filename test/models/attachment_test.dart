@@ -16,6 +16,16 @@ void main() {
     });
   });
 
+  test('only audio and video can be large, above their own threshold', () {
+    const megabyte = 1024 * 1024;
+
+    expect(AttachmentType.image.isLarge(500 * megabyte), isFalse);
+    expect(AttachmentType.audio.isLarge(5 * megabyte), isFalse);
+    expect(AttachmentType.audio.isLarge(5 * megabyte + 1), isTrue);
+    expect(AttachmentType.video.isLarge(20 * megabyte), isFalse);
+    expect(AttachmentType.video.isLarge(20 * megabyte + 1), isTrue);
+  });
+
   group('EntryAttachment.appendRanked', () {
     test('assigns descending ranks so newest share sorts first', () {
       final result = EntryAttachment.appendRanked(
