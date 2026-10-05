@@ -13,9 +13,14 @@ import 'package:saf_util/saf_util.dart';
 import 'package:shared_storage/shared_storage.dart' as saf;
 
 class PickedFile {
-  const PickedFile(this.uri);
+  const PickedFile(this.uri, {String? displayName, this.sizeBytes})
+      : _displayName = displayName;
 
   final String uri;
+  final String? _displayName;
+  final int? sizeBytes;
+
+  String get name => _displayName ?? basename(uri);
 
   Future<Uint8List?> readBytes() async {
     if (Platform.isAndroid) {
@@ -82,18 +87,28 @@ class StoragePicker {
   }
 
   static Future<PickedFile?> pickFile(
-      {List<String>? mimeTypes, List<String>? allowedExtensions}) async {
+      {List<String>? mimeTypes,
+      List<String>? allowedExtensions,
+      FileType? type}) async {
     if (Platform.isAndroid) {
       final pickedFile = await SafUtil().pickFile(mimeTypes: mimeTypes);
-      return pickedFile != null ? PickedFile(pickedFile.uri) : null;
+      return pickedFile != null
+          ? PickedFile(pickedFile.uri,
+              displayName: pickedFile.name, sizeBytes: pickedFile.length)
+          : null;
     }
 
+    final pickerType =
+        type ?? (allowedExtensions != null ? FileType.custom : FileType.any);
     final result = await FilePicker.pickFiles(
-      type: allowedExtensions != null ? FileType.custom : FileType.any,
-      allowedExtensions: allowedExtensions,
+      type: pickerType,
+      allowedExtensions:
+          pickerType == FileType.custom ? allowedExtensions : null,
     );
     final path = result.isEmpty ? null : result.first.path;
-    return path != null ? PickedFile(path) : null;
+    return path != null
+        ? PickedFile(path, sizeBytes: await File(path).length())
+        : null;
   }
 }
 

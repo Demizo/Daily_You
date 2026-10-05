@@ -5,6 +5,8 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:daily_you/config_provider.dart';
+import 'package:daily_you/database/attachment_storage.dart';
 import 'package:daily_you/database/entry_store.dart';
 import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/notification_manager.dart';
@@ -13,7 +15,11 @@ import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/providers/templates_provider.dart';
+import 'package:daily_you/utils/file_size_format.dart';
+import 'package:daily_you/widgets/attachment_type_presentation.dart';
 import 'package:daily_you/widgets/entry_draft_dirty_tracker.dart';
+import 'package:daily_you/widgets/failure_dialog.dart';
+import 'package:daily_you/widgets/file_size_row.dart';
 import 'package:daily_you/widgets/tag_attachment_source.dart';
 import 'package:daily_you/widgets/tag_grouped_chip_list.dart';
 import 'package:daily_you/widgets/tag_picker_dialog.dart';
@@ -23,7 +29,9 @@ import 'package:provider/provider.dart';
 import 'package:daily_you/pages/full_screen_text_editor_page.dart';
 import 'package:daily_you/widgets/editor_action_bar.dart';
 import 'package:daily_you/widgets/editor_action_bar/editor_keyboard_session.dart';
+import 'package:daily_you/widgets/editor_action_bar/toolbar_menu_action.dart';
 import 'package:daily_you/widgets/entry_attachment_editable_list.dart';
+import 'package:daily_you/widgets/icons/svg_icon.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
@@ -68,6 +76,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   int? mood;
   DateTime? entryDate;
   late List<EntryAttachment> _currentAttachments;
+  int _pendingAttachmentCount = 0;
   bool _loadingEntry = true;
   bool _openedCamera = false;
   final ScrollController _scrollController = ScrollController();
@@ -151,7 +160,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
 
     if (widget.openCamera && !_openedCamera) {
       _openedCamera = true;
-      EntryAttachmentActions.takePhoto(_addAttachments);
+      _importAttachments(EntryAttachmentActions.takePhoto());
     }
   }
 
@@ -231,6 +240,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                   navigator.pop();
                 }
                 await EntryStore.instance.delete(entryToDelete);
+                await _deleteUnsavedFiles(_currentAttachments);
               },
             ),
             TextButton(
@@ -293,13 +303,18 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
-                                  if (_currentAttachments.isNotEmpty)
+                                  if (_currentAttachments.isNotEmpty ||
+                                      _pendingAttachmentCount > 0)
                                     EntryAttachmentEditableList(
                                         attachments: _currentAttachments,
+                                        pendingCount: _pendingAttachmentCount,
                                         onAttachmentsChanged:
                                             (attachments) async {
+                                          final removed =
+                                              _unsavedRemovedBy(attachments);
                                           _currentAttachments = attachments;
                                           await _saveEntry();
+                                          await _deleteUnsavedFiles(removed);
                                         }),
                                   StatefulBuilder(
                                     builder: (context, setLocalState) =>
@@ -448,6 +463,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   }
 
   List<ToolbarAction> _buildMainActions(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return [
       ToolbarAction(
         icon: const Icon(Icons.local_offer_rounded),
@@ -458,16 +474,45 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
         ),
       ),
       ToolbarAction(
-        icon: const Icon(Icons.photo),
-        mayLeaveApp: true,
-        onPressed: () =>
-            EntryAttachmentActions.pickFromGallery(_addAttachments),
+        icon: const SvgIcon('assets/icons/attach_file.svg'),
+        menu: [
+          ToolbarMenuAction(
+            icon: Icons.mic_rounded,
+            label: l10n.actionAddAudio,
+            onSelected: () =>
+                _importAttachments(EntryAttachmentActions.pickAudioFile()),
+          ),
+          ToolbarMenuAction(
+            icon: Icons.videocam_rounded,
+            label: l10n.actionAddVideo,
+            onSelected: () => _importAttachments(
+                EntryAttachmentActions.pickVideosFromGallery()),
+          ),
+          ToolbarMenuAction(
+            icon: Icons.photo_rounded,
+            label: l10n.actionAddImage,
+            onSelected: () =>
+                _importAttachments(EntryAttachmentActions.pickFromGallery()),
+          ),
+        ],
       ),
       if (Platform.isAndroid)
         ToolbarAction(
           icon: const Icon(Icons.photo_camera_rounded),
-          mayLeaveApp: true,
-          onPressed: () => EntryAttachmentActions.takePhoto(_addAttachments),
+          menu: [
+            ToolbarMenuAction(
+              icon: Icons.videocam_rounded,
+              label: l10n.actionTakeVideo,
+              onSelected: () =>
+                  _importAttachments(EntryAttachmentActions.takeVideo()),
+            ),
+            ToolbarMenuAction(
+              icon: Icons.photo_camera_rounded,
+              label: l10n.actionTakePhoto,
+              onSelected: () =>
+                  _importAttachments(EntryAttachmentActions.takePhoto()),
+            ),
+          ],
         ),
     ];
   }
@@ -640,10 +685,133 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     }
   }
 
+  List<EntryAttachment> _unsavedRemovedBy(List<EntryAttachment> remaining) => [
+        for (final attachment in _currentAttachments)
+          if (attachment.id == null &&
+              !remaining.any((kept) =>
+                  kept.type == attachment.type &&
+                  kept.filePath == attachment.filePath))
+            attachment
+      ];
+
+  Future<void> _deleteUnsavedFiles(List<EntryAttachment> attachments) async {
+    for (final attachment in attachments) {
+      if (attachment.id != null) continue;
+      final inUse = EntryAttachmentsProvider.instance.attachments.any((saved) =>
+          saved.type == attachment.type &&
+          saved.filePath == attachment.filePath);
+      if (inUse) continue;
+      await AttachmentStorage.instance
+          .delete(attachment.filePath, attachment.type);
+    }
+  }
+
   Future<void> _addAttachments(List<NewAttachment> newAttachments) async {
     _currentAttachments = EntryAttachment.appendRanked(
         _currentAttachments, newAttachments,
         entryId: id);
     await _saveEntry();
+  }
+
+  Future<void> _importAttachments(
+      Future<List<PendingAttachment>> picking) async {
+    final List<PendingAttachment> pending;
+    try {
+      pending = await picking;
+    } catch (error) {
+      await _showAttachmentFailure(error);
+      return;
+    }
+    if (pending.isEmpty) return;
+    if (!mounted) {
+      await EntryAttachmentActions.discardAll(pending);
+      return;
+    }
+
+    setState(() => _pendingAttachmentCount += pending.length);
+    final large = pending.where((attachment) => attachment.isLarge).firstOrNull;
+    if (large != null) {
+      unawaited(_warnAboutSize(large.type, large.name, large.sizeBytes!));
+    }
+
+    Object? failure;
+    var stored = const <NewAttachment>[];
+    try {
+      stored = await EntryAttachmentActions.storeAll(pending,
+          isCancelled: () => !mounted);
+    } catch (error) {
+      failure = error;
+    } finally {
+      _pendingAttachmentCount -= pending.length;
+      if (stored.isEmpty && mounted) setState(() {});
+    }
+    if (stored.isNotEmpty) await _addAttachments(stored);
+    if (failure != null || (mounted && stored.length < pending.length)) {
+      await _showAttachmentFailure(failure);
+    }
+  }
+
+  Future<void> _showAttachmentFailure(Object? error) async {
+    if (!mounted) return;
+    await showFailureDialog(context,
+        description:
+            AppLocalizations.of(context)!.attachmentAddErrorDescription,
+        error: error);
+  }
+
+  Future<void> _warnAboutSize(
+      AttachmentType type, String name, int sizeBytes) async {
+    if (ConfigProvider.instance.get(Settings.suppressLargeAttachmentWarning) ||
+        !mounted) {
+      return;
+    }
+
+    var suppress = false;
+    await showDialog(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (dialogContext, setLocalState) => AlertDialog(
+          title: Text(
+              AppLocalizations.of(dialogContext)!.largeAttachmentWarningTitle),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(AppLocalizations.of(dialogContext)!
+                  .largeAttachmentWarningDescription),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: FileSizeRow(
+                  icon: type.icon,
+                  label: name,
+                  sizeText: formatFileSize(sizeBytes,
+                      AppLocalizations.of(dialogContext)!.localeName),
+                ),
+              ),
+              CheckboxListTile(
+                contentPadding: EdgeInsets.zero,
+                value: suppress,
+                onChanged: (value) =>
+                    setLocalState(() => suppress = value ?? false),
+                title: Text(AppLocalizations.of(dialogContext)!.dontShowAgain),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                if (suppress) {
+                  await ConfigProvider.instance
+                      .set(Settings.suppressLargeAttachmentWarning, true);
+                }
+                if (dialogContext.mounted) Navigator.pop(dialogContext);
+              },
+              child:
+                  Text(MaterialLocalizations.of(dialogContext).okButtonLabel),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

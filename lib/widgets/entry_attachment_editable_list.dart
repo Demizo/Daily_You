@@ -5,19 +5,22 @@
 import 'dart:ui';
 
 import 'package:daily_you/models/attachment.dart';
+import 'package:daily_you/pages/attachment_view_page.dart';
+import 'package:daily_you/widgets/attachment_tile_background.dart';
+import 'package:daily_you/widgets/expressive_loading_indicator.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
-
-import 'local_image_loader.dart';
 
 class EntryAttachmentEditableList extends StatefulWidget {
   final List<EntryAttachment> attachments;
   final ValueChanged<List<EntryAttachment>> onAttachmentsChanged;
+  final int pendingCount;
 
   const EntryAttachmentEditableList({
     super.key,
     required this.attachments,
     required this.onAttachmentsChanged,
+    this.pendingCount = 0,
   });
 
   @override
@@ -28,13 +31,14 @@ class EntryAttachmentEditableList extends StatefulWidget {
 class _EntryAttachmentEditableListState
     extends State<EntryAttachmentEditableList> {
   late List<EntryAttachment> _attachments;
+  final ScrollController _scrollController = ScrollController();
 
   void _showDeleteAttachmentPopup(int index) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(AppLocalizations.of(context)!.deletePhotoTitle),
+          title: Text(AppLocalizations.of(context)!.deleteAttachmentTitle),
           actions: [
             TextButton(
               child:
@@ -51,7 +55,8 @@ class _EntryAttachmentEditableListState
               },
             )
           ],
-          content: Text(AppLocalizations.of(context)!.deletePhotoDescription),
+          content:
+              Text(AppLocalizations.of(context)!.deleteAttachmentDescription),
         );
       },
     );
@@ -60,28 +65,61 @@ class _EntryAttachmentEditableListState
   @override
   void initState() {
     super.initState();
-    _attachments = widget.attachments;
+    _attachments = List.of(widget.attachments);
   }
 
   @override
   void didUpdateWidget(EntryAttachmentEditableList oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (!identical(widget.attachments, oldWidget.attachments)) {
-      _attachments = widget.attachments;
+      _attachments = List.of(widget.attachments);
+    }
+    if (_totalCount(widget) > _totalCount(oldWidget)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToEnd());
     }
   }
 
   @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollToEnd() {
+    if (!_scrollController.hasClients) return;
+    _scrollController.animateTo(
+      _scrollController.position.maxScrollExtent,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  static int _totalCount(EntryAttachmentEditableList list) =>
+      list.attachments.length + list.pendingCount;
+
+  @override
   Widget build(BuildContext context) {
-    if (_attachments.length > 1) {
+    final pendingCount = widget.pendingCount;
+    final totalCount = _attachments.length + pendingCount;
+    if (totalCount == 0) return const SizedBox.shrink();
+    if (totalCount > 1) {
       return SizedBox(
         height: 160,
         child: ReorderableListView.builder(
+            scrollController: _scrollController,
             scrollDirection: Axis.horizontal,
             proxyDecorator: _proxyDecorator,
+            footer: pendingCount == 0
+                ? null
+                : Row(children: [
+                    for (var i = 0; i < pendingCount; i++)
+                      const SizedBox(
+                          width: 160, height: 160, child: _PendingTile()),
+                  ]),
             itemBuilder: (context, index) {
               return SizedBox(
-                key: ValueKey(index),
+                key: ValueKey(
+                    (_attachments[index].type, _attachments[index].filePath)),
                 width: 160,
                 height: 160,
                 child: editableWidget(
@@ -96,7 +134,7 @@ class _EntryAttachmentEditableListState
               _attachments.insert(newIndex, attachment);
               _updateAttachmentRanks();
               setState(() {});
-              widget.onAttachmentsChanged(_attachments);
+              widget.onAttachmentsChanged(List.of(_attachments));
             }),
       );
     } else {
@@ -104,8 +142,15 @@ class _EntryAttachmentEditableListState
           child: SizedBox(
               width: 220,
               height: 220,
-              child: editableWidget(0, showDragHandle: false)));
+              child: pendingCount > 0
+                  ? const _PendingTile()
+                  : editableWidget(0, showDragHandle: false)));
     }
+  }
+
+  void _openViewer(int index) {
+    Navigator.of(context).push(
+        AttachmentViewPage.route(attachments: _attachments, index: index));
   }
 
   Card editableWidget(int index, {bool showDragHandle = true}) {
@@ -113,7 +158,10 @@ class _EntryAttachmentEditableListState
       clipBehavior: Clip.antiAlias,
       child:
           Stack(alignment: Alignment.center, fit: StackFit.expand, children: [
-        LocalImageLoader(imagePath: _attachments[index].filePath),
+        GestureDetector(
+          onTap: () => _openViewer(index),
+          child: AttachmentTileBackground(attachment: _attachments[index]),
+        ),
         Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -176,12 +224,25 @@ class _EntryAttachmentEditableListState
     _attachments.removeAt(index);
     _updateAttachmentRanks();
     setState(() {});
-    widget.onAttachmentsChanged(_attachments);
+    widget.onAttachmentsChanged(List.of(_attachments));
   }
 
   void _updateAttachmentRanks() {
     for (int i = 0; i < _attachments.length; i++) {
       _attachments[i].rank = _attachments.length - 1 - i;
     }
+  }
+}
+
+class _PendingTile extends StatelessWidget {
+  const _PendingTile();
+
+  @override
+  Widget build(BuildContext context) {
+    return Card.filled(
+      child: Center(
+        child: ExpressiveLoadingIndicator(),
+      ),
+    );
   }
 }
