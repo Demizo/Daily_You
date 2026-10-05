@@ -26,6 +26,7 @@ import 'package:daily_you/widgets/tag_picker_dialog.dart';
 import 'package:daily_you/widgets/tag_chip.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:provider/provider.dart';
+import 'package:daily_you/pages/audio_recorder_page.dart';
 import 'package:daily_you/pages/full_screen_text_editor_page.dart';
 import 'package:daily_you/widgets/editor_action_bar.dart';
 import 'package:daily_you/widgets/editor_action_bar/editor_keyboard_session.dart';
@@ -496,10 +497,15 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
           ),
         ],
       ),
-      if (Platform.isAndroid)
-        ToolbarAction(
-          icon: const Icon(Icons.photo_camera_rounded),
-          menu: [
+      ToolbarAction(
+        icon: const Icon(Icons.photo_camera_rounded),
+        menu: [
+          ToolbarMenuAction(
+            icon: Icons.mic_rounded,
+            label: l10n.actionRecordAudio,
+            onSelected: _recordAudio,
+          ),
+          if (Platform.isAndroid) ...[
             ToolbarMenuAction(
               icon: Icons.videocam_rounded,
               label: l10n.actionTakeVideo,
@@ -513,7 +519,8 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                   _importAttachments(EntryAttachmentActions.takePhoto()),
             ),
           ],
-        ),
+        ],
+      ),
     ];
   }
 
@@ -757,6 +764,23 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
         description:
             AppLocalizations.of(context)!.attachmentAddErrorDescription,
         error: error);
+  }
+
+  Future<void> _recordAudio() async {
+    final attachment = await Navigator.of(context).push<NewAttachment>(
+      MaterialPageRoute(
+        allowSnapshotting: false,
+        fullscreenDialog: true,
+        builder: (context) => const AudioRecorderPage(),
+      ),
+    );
+    if (attachment == null) return;
+    await _addAttachments([attachment]);
+    final sizeBytes = await AttachmentStorage.instance
+        .sizeBytes(attachment.filePath, attachment.type);
+    if (sizeBytes != null && attachment.type.isLarge(sizeBytes)) {
+      await _warnAboutSize(attachment.type, attachment.filePath, sizeBytes);
+    }
   }
 
   Future<void> _warnAboutSize(

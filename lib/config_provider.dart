@@ -68,6 +68,8 @@ class Settings {
   static const defaultTemplate = Setting<int>("defaultTemplate", -1);
   static const imageQualityLevel =
       Setting<String>("imageQualityLevel", ImageQuality.medium);
+  static const audioQualityLevel =
+      Setting<String>("audioQualityLevel", AudioQuality.medium);
   static const videoQualityLevel =
       Setting<String>("videoQualityLevel", VideoQuality.medium);
   static const suppressLargeAttachmentWarning =
@@ -163,6 +165,7 @@ class Settings {
     dismissedNotificationOnboarding,
     defaultTemplate,
     imageQualityLevel,
+    audioQualityLevel,
     videoQualityLevel,
     suppressLargeAttachmentWarning,
     overrideLanguage,
@@ -217,6 +220,12 @@ class ImageQuality {
   static const String low = "low";
 }
 
+class AudioQuality {
+  static const String high = "high";
+  static const String medium = "medium";
+  static const String low = "low";
+}
+
 class VideoQuality {
   static const String high = "high";
   static const String medium = "medium";
@@ -251,6 +260,20 @@ class ConfigProvider with ChangeNotifier {
     ImageQuality.high: 2100.0,
     ImageQuality.medium: 1600.0,
     ImageQuality.low: 1024.0,
+  };
+
+  static final audioQualityBitRateMapping = {
+    AudioQuality.low: 32000,
+    AudioQuality.medium: 64000,
+    AudioQuality.high: 128000,
+  };
+
+  static const audioSampleRate = 44100;
+
+  static final audioQualityChannelsMapping = {
+    AudioQuality.low: 1,
+    AudioQuality.medium: 1,
+    AudioQuality.high: 2,
   };
 
   T get<T>(Setting<T> setting) {
