@@ -5,7 +5,7 @@
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/pages/entries_list_page.dart';
 import 'package:daily_you/providers/entries_provider.dart';
-import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/large_entry_card_widget.dart';
 import 'package:material_ui/material_ui.dart';
@@ -51,7 +51,8 @@ class _EntryTimelinePageState extends State<EntryTimelinePage> {
   @override
   Widget build(BuildContext context) {
     Provider.of<EntriesProvider>(context);
-    final entryImagesProvider = Provider.of<EntryImagesProvider>(context);
+    final entryAttachmentsProvider =
+        Provider.of<EntryAttachmentsProvider>(context);
 
     final entries = widget.getEntries();
 
@@ -68,7 +69,7 @@ class _EntryTimelinePageState extends State<EntryTimelinePage> {
         itemCount: entries.length,
         itemBuilder: (context, index) {
           final entry = entries[index];
-          final entryImages = entryImagesProvider.getForEntry(entry);
+          final entryAttachments = entryAttachmentsProvider.getForEntry(entry);
           final label = widget.labelBuilder(context, entry);
           return AspectRatio(
             aspectRatio: 2.2,
@@ -123,7 +124,7 @@ class _EntryTimelinePageState extends State<EntryTimelinePage> {
                       child: LargeEntryCardWidget(
                         title: label,
                         entry: entry,
-                        images: entryImages,
+                        attachments: entryAttachments,
                       ),
                     ),
                   ),

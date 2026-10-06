@@ -46,11 +46,11 @@ class EntryDraftDirtyTracker {
     required int? mood,
     required DateTime date,
     required TagAttachmentSource tagSource,
-    required bool hasImages,
+    required bool hasAttachments,
   }) {
     return hasFieldChanges(text: text, mood: mood, date: date) ||
         _tagsExceedSeed(tagSource) ||
-        hasImages;
+        hasAttachments;
   }
 
   bool _tagsExceedSeed(TagAttachmentSource tagSource) {

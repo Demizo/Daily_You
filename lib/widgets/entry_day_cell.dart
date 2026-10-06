@@ -6,7 +6,7 @@ import 'dart:ui' as ui;
 
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/models/entry.dart';
-import 'package:daily_you/models/image.dart';
+import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/pages/edit_entry_page.dart';
 import 'package:daily_you/pages/entry_timeline_page.dart';
@@ -27,7 +27,7 @@ class EntryDayCell extends StatelessWidget {
   final ui.Image? dayNumber;
   final double cellSize;
   final List<Entry> entries;
-  final EntryImage? firstImage;
+  final EntryAttachment? firstImage;
 
   final bool showImages;
   final bool showMood;
@@ -299,7 +299,7 @@ class EntryDayCell extends StatelessWidget {
                 clipBehavior: showImageBg ? Clip.hardEdge : Clip.none,
                 child: showImageBg
                     ? LocalImageLoader(
-                        imagePath: firstImage!.imgPath,
+                        imagePath: firstImage!.filePath,
                         cacheSize: 100,
                       )
                     : Center(

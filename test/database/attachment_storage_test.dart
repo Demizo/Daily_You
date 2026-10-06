@@ -5,9 +5,9 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:daily_you/database/image_storage.dart';
-import 'package:daily_you/models/image.dart';
-import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/database/attachment_storage.dart';
+import 'package:daily_you/models/attachment.dart';
+import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/storage/file_store.dart';
 import 'package:daily_you/storage/in_memory_file_store.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -92,7 +92,7 @@ class FakeImageFolder extends InMemoryFileStore {
 }
 
 void main() {
-  final storage = ImageStorage.instance;
+  final storage = AttachmentStorage.instance;
   late InMemoryFileStore internalStore;
 
   Uint8List bytesOf(String text) => Uint8List.fromList(text.codeUnits);
@@ -103,19 +103,19 @@ void main() {
   }
 
   void useImages(List<String> imageNames) {
-    EntryImagesProvider.instance.isLoaded = true;
-    addTearDown(() => EntryImagesProvider.instance.isLoaded = false);
+    EntryAttachmentsProvider.instance.isLoaded = true;
+    addTearDown(() => EntryAttachmentsProvider.instance.isLoaded = false);
     final createdTime = DateTime(2026, 1, 1);
-    EntryImagesProvider.instance.images = [
+    EntryAttachmentsProvider.instance.attachments = [
       for (final (rank, name) in imageNames.indexed)
-        EntryImage(
-            entryId: 1, imgPath: name, imgRank: rank, timeCreate: createdTime)
+        EntryAttachment(
+            entryId: 1, filePath: name, rank: rank, timeCreate: createdTime)
     ];
   }
 
   setUp(() {
     internalStore = InMemoryFileStore();
-    storage.imageCache.clear();
+    storage.bytesCache.clear();
   });
 
   group('getBytes', () {
@@ -127,7 +127,7 @@ void main() {
       expect(await storage.getBytes('photo.jpg'), equals(bytesOf('photo')));
 
       expect(await internalStore.exists('photo.jpg'), isFalse);
-      expect(storage.imageCache.get('photo.jpg'), equals(bytesOf('photo')));
+      expect(storage.bytesCache.get('photo.jpg'), equals(bytesOf('photo')));
     });
 
     test('falls back to the external copy when the internal one is empty',
@@ -148,7 +148,7 @@ void main() {
       await externalStore.write('photo.jpg', Uint8List(0));
 
       expect(await storage.getBytes('photo.jpg'), isNull);
-      expect(storage.imageCache.get('photo.jpg'), isNull);
+      expect(storage.bytesCache.get('photo.jpg'), isNull);
     });
   });
 
@@ -216,8 +216,8 @@ void main() {
     final captureTime = DateTime(2026, 1, 2, 3, 4, 5);
     const capturedName = 'daily_you_2026-01-02T03-04-05.jpg';
 
-    Future<ImageSyncSummary> reconcile() async =>
-        (await storage.reconcileImageFolder())!;
+    Future<AttachmentSyncSummary> reconcile() async =>
+        (await storage.reconcileAttachmentFolders())!;
 
     void useFolder(FakeImageFolder imageFolder, List<String> images) {
       folder = imageFolder;
@@ -231,7 +231,7 @@ void main() {
       await folder.write(name, bytesOf(external));
     }
 
-    void expectNothingDone(ImageSyncSummary summary) {
+    void expectNothingDone(AttachmentSyncSummary summary) {
       expect([
         summary.uploaded,
         summary.downloaded,
@@ -249,7 +249,7 @@ void main() {
           await internalStore.write(name, bytesOf(name));
         }
 
-        expect(await storage.syncImageFolder(false), isTrue);
+        expect(await storage.syncAttachmentFolders(false), isTrue);
 
         for (final name in names) {
           expect(await folder.read(name), equals(bytesOf(name)));
@@ -261,7 +261,7 @@ void main() {
         useFolder(FakeImageFolder(), ['a.jpg']);
         await folder.write('a.jpg', bytesOf('a'));
 
-        expect(await storage.syncImageFolder(false), isTrue);
+        expect(await storage.syncAttachmentFolders(false), isTrue);
 
         expect(await internalStore.read('a.jpg'), equals(bytesOf('a')));
       });
@@ -540,7 +540,7 @@ void main() {
       folder.writes.clear();
 
       await expectLater(reconcile(), throwsException);
-      await expectLater(storage.syncImageFolder(false), throwsException);
+      await expectLater(storage.syncAttachmentFolders(false), throwsException);
       expect(folder.writes, isEmpty);
       expect(await internalStore.exists('b.jpg'), isFalse);
     });
@@ -648,7 +648,7 @@ void main() {
           FakeImageFolder()..failingUploads.add('photo.jpg'), ['photo.jpg']);
       await internalStore.write('photo.jpg', bytesOf('photo'));
 
-      await storage.syncImageFolder(false);
+      await storage.syncAttachmentFolders(false);
 
       expect(storage.externalSyncHealth.lastAttempt!.failureReason,
           contains('provider refused'));
@@ -839,8 +839,8 @@ void main() {
     useStores(internalStore, InMemoryFileStore());
     await internalStore.write('photo.jpg', bytesOf('photo'));
 
-    expect(EntryImagesProvider.instance.isLoaded, isFalse);
-    await expectLater(storage.garbageCollectImages(), throwsStateError);
+    expect(EntryAttachmentsProvider.instance.isLoaded, isFalse);
+    await expectLater(storage.garbageCollectAttachments(), throwsStateError);
     expect(await internalStore.exists('photo.jpg'), isTrue);
   });
 
@@ -850,7 +850,7 @@ void main() {
     await internalStore.write('kept.jpg', bytesOf('kept'));
     await internalStore.write('orphan.jpg', bytesOf('orphan'));
 
-    expect(await storage.garbageCollectImages(), isTrue);
+    expect(await storage.garbageCollectAttachments(), isTrue);
 
     expect(await internalStore.list(), equals(['kept.jpg']));
   });

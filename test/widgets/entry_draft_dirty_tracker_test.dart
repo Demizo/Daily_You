@@ -53,7 +53,7 @@ void main() {
           mood: null,
           date: date,
           tagSource: tagSource,
-          hasImages: false,
+          hasAttachments: false,
         ),
         isFalse);
   });
@@ -69,7 +69,7 @@ void main() {
           mood: null,
           date: date,
           tagSource: tagSource,
-          hasImages: false,
+          hasAttachments: false,
         ),
         isTrue);
   });
@@ -88,7 +88,7 @@ void main() {
           mood: null,
           date: date,
           tagSource: tagSource,
-          hasImages: false,
+          hasAttachments: false,
         ),
         isTrue);
   });
@@ -104,7 +104,7 @@ void main() {
           mood: null,
           date: date,
           tagSource: tagSource,
-          hasImages: true,
+          hasAttachments: true,
         ),
         isTrue);
   });

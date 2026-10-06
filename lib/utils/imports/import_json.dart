@@ -6,7 +6,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:daily_you/models/entry.dart';
-import 'package:daily_you/models/image.dart';
+import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/storage/storage_picker.dart';
 import 'package:daily_you/utils/imports/import_helpers.dart';
 import 'package:daily_you/utils/operation_outcome.dart';
@@ -43,20 +43,20 @@ List<ImportedEntry> decodeJsonEntries(Uint8List bytes) {
             mood: entry['mood'] as int?,
             timeCreate: DateTime.parse(entry['timeCreated']),
             timeModified: DateTime.parse(entry['timeModified'])),
-        images: [
+        attachments: [
           // Support old imgPath field
           if (entry['imgPath'] != null)
-            EntryImage(
+            EntryAttachment(
                 entryId: null,
-                imgPath: entry['imgPath'],
-                imgRank: 0,
+                filePath: entry['imgPath'],
+                rank: 0,
                 timeCreate: DateTime.now()),
           if (entry['images'] != null)
             for (var image in entry['images'])
-              EntryImage(
+              EntryAttachment(
                   entryId: null,
-                  imgPath: image['imgPath'],
-                  imgRank: image['imgRank'] as int,
+                  filePath: image['imgPath'],
+                  rank: image['imgRank'] as int,
                   timeCreate: DateTime.parse(image['timeCreated'])),
         ],
       ),

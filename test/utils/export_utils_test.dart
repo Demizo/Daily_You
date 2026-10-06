@@ -6,7 +6,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:daily_you/models/entry.dart';
-import 'package:daily_you/models/image.dart';
+import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/storage/in_memory_file_store.dart';
 import 'package:daily_you/utils/export_utils.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -55,18 +55,18 @@ void main() {
     final timeCreate = DateTime(2026, 3, 4);
     await writer.write(entryOn(timeCreate, text: 'body'), [
       (
-        EntryImage(
+        EntryAttachment(
             entryId: 1,
-            imgPath: 'daily_you_a.png',
-            imgRank: 1,
+            filePath: 'daily_you_a.png',
+            rank: 1,
             timeCreate: timeCreate),
         Uint8List.fromList([1, 2])
       ),
       (
-        EntryImage(
+        EntryAttachment(
             entryId: 1,
-            imgPath: 'daily_you_b.jpg',
-            imgRank: 0,
+            filePath: 'daily_you_b.jpg',
+            rank: 0,
             timeCreate: timeCreate),
         Uint8List.fromList([3, 4])
       ),
@@ -84,10 +84,10 @@ void main() {
 
   test('carries the note suffix into its image names', () async {
     final timeCreate = DateTime(2026, 3, 4);
-    final image = EntryImage(
+    final image = EntryAttachment(
         entryId: 1,
-        imgPath: 'daily_you_a.png',
-        imgRank: 0,
+        filePath: 'daily_you_a.png',
+        rank: 0,
         timeCreate: timeCreate);
     final bytes = Uint8List.fromList([1]);
 

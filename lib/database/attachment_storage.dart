@@ -14,32 +14,31 @@ import 'package:daily_you/storage/storage_picker.dart';
 import 'package:daily_you/utils/operation_outcome.dart';
 import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
-import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pool/pool.dart';
 
-class ImageStorage {
-  static final ImageStorage instance = ImageStorage._init();
+class AttachmentStorage {
+  static final AttachmentStorage instance = AttachmentStorage._init();
 
-  ImageStorage._init();
+  AttachmentStorage._init();
 
-  final Logger _logger = Logger('ImageStorage');
+  final Logger _logger = Logger('AttachmentStorage');
 
-  final FileBytesCache imageCache =
+  final FileBytesCache bytesCache =
       FileBytesCache(maxCacheSize: 10 * 1024 * 1024);
-  final Pool imgFetchPool = Pool(3);
+  final Pool fetchPool = Pool(3);
 
-  // Bumped when new images are restored or synced. Forces UI to re-fetch images
   final ValueNotifier<int> cacheVersion = ValueNotifier(0);
 
   void invalidateCache() {
-    imageCache.clear();
+    bytesCache.clear();
     cacheVersion.value++;
   }
 
   final ExternalSyncHealth externalSyncHealth =
-      ExternalSyncHealth('ImageStorage');
+      ExternalSyncHealth('AttachmentStorage');
 
   @visibleForTesting
   Duration externalTimeout = const Duration(seconds: 60);
@@ -48,8 +47,8 @@ class ImageStorage {
 
   FileStore? _internalStore;
   FileStore? _externalStoreOverride;
-  int _imageFolderRequests = 0;
-  Future<void> _imageFolderWork = Future.value();
+  int _folderRequests = 0;
+  Future<void> _folderWork = Future.value();
 
   Future<FileStore> internalStore() async =>
       _internalStore ??= LocalFileStore(await getInternalFolder());
@@ -194,7 +193,7 @@ class ImageStorage {
       await ConfigProvider.instance
           .set(Settings.externalImgUri, selectedDirectory.uri);
       await ConfigProvider.instance.set(Settings.useExternalImg, true);
-      if (await syncImageFolder(true, updateStatus: updateStatus)) {
+      if (await syncAttachmentFolders(true, updateStatus: updateStatus)) {
         return const OperationOutcome.succeeded();
       }
 
@@ -215,23 +214,23 @@ class ImageStorage {
     await ConfigProvider.instance.set(Settings.useExternalImg, false);
   }
 
-  Future<Uint8List?> getBytes(String imageName) async {
+  Future<Uint8List?> getBytes(String fileName) async {
     // Fetch cache copy if present
-    var bytes = imageCache.get(imageName);
+    var bytes = bytesCache.get(fileName);
     if (bytes != null) {
       return bytes;
     }
     // Fetch local copy if present
     final internal = await internalStore();
-    bytes = _nonEmpty(
-        await imgFetchPool.withResource(() => internal.read(imageName)));
+    bytes =
+        _nonEmpty(await fetchPool.withResource(() => internal.read(fileName)));
 
     final external = externalStore;
     if (bytes == null && external != null) {
-      bytes = _nonEmpty(await external.read(imageName));
+      bytes = _nonEmpty(await external.read(fileName));
     }
     if (bytes != null) {
-      imageCache.put(imageName, bytes);
+      bytesCache.put(fileName, bytes);
     }
     return bytes;
   }
@@ -239,38 +238,38 @@ class ImageStorage {
   Uint8List? _nonEmpty(Uint8List? bytes) =>
       bytes == null || bytes.isEmpty ? null : bytes;
 
-  Future<String?> create(String? imageName, Uint8List bytes,
+  Future<String?> create(String? fileName, Uint8List bytes,
       {DateTime? currTime, bool skipExternalUpload = false}) async {
     currTime ??= DateTime.now();
 
     final internal = await internalStore();
 
     // Don't make a copy of files already in the folder
-    if (imageName != null && await internal.exists(imageName)) {
-      return imageName;
+    if (fileName != null && await internal.exists(fileName)) {
+      return fileName;
     }
 
-    var fileExtension = imageName != null ? extension(imageName) : ".jpg";
+    var fileExtension = fileName != null ? extension(fileName) : ".jpg";
 
     final timestamp =
         currTime.toIso8601String().split('.').first.replaceAll(':', '-');
 
-    var newImageName = "daily_you_$timestamp$fileExtension";
+    var newFileName = "daily_you_$timestamp$fileExtension";
 
     // Ensure unique name
     int index = 1;
-    while (await internal.exists(newImageName)) {
-      newImageName = "daily_you_${timestamp}_$index$fileExtension";
+    while (await internal.exists(newFileName)) {
+      newFileName = "daily_you_${timestamp}_$index$fileExtension";
       index += 1;
     }
 
-    if (!await internal.write(newImageName, bytes)) return null;
+    if (!await internal.write(newFileName, bytes)) return null;
 
     final external = externalStore;
     if (external != null && !skipExternalUpload) {
-      unawaited(_createExternal(external, newImageName, bytes));
+      unawaited(_createExternal(external, newFileName, bytes));
     }
-    return newImageName;
+    return newFileName;
   }
 
   Future<CreateResult> _createExternal(
@@ -283,59 +282,59 @@ class ImageStorage {
         .whenComplete(() => _uploadingNames.remove(name)));
 
     var result = CreateResult.failed;
-    await externalSyncHealth.record("external image create of $name", () async {
+    await externalSyncHealth.record("external attachment create of $name",
+        () async {
       result = await create.timeout(externalTimeout);
       return result != CreateResult.failed;
     });
     if (result == CreateResult.alreadyExists) {
       _logger.warning(
-          'external image create of $name collided with an existing file');
+          'external attachment create of $name collided with an existing file');
     }
     return result;
   }
 
-  Future<bool> delete(String imageName) async {
+  Future<bool> delete(String fileName) async {
     final internal = await internalStore();
-    await internal.delete(imageName);
+    await internal.delete(fileName);
 
     final external = externalStore;
     if (external != null) {
       // Do not await operation
       unawaited(externalSyncHealth.record(
-          "external image delete", () => external.delete(imageName)));
+          "external attachment delete", () => external.delete(fileName)));
     }
 
     return true;
   }
 
-  Future<bool> syncImageFolder(bool garbageCollect,
+  Future<bool> syncAttachmentFolders(bool garbageCollect,
       {Function(String)? updateStatus}) async {
-    final summary = await reconcileImageFolder(updateStatus: updateStatus);
+    final summary =
+        await reconcileAttachmentFolders(updateStatus: updateStatus);
     if (summary == null) return false;
 
-    if (garbageCollect) return await garbageCollectImages();
+    if (garbageCollect) return await garbageCollectAttachments();
     return true;
   }
 
   /// Stops any sync pass, then runs [action] before any later request.
   Future<T> whileNotSyncing<T>(Future<T> Function() action) =>
-      _queueImageFolderWork((_) => action());
+      _queueFolderWork((_) => action());
 
-  /// A pass covers every image, so a newer request stops a running or queued
-  /// one. Throws when a listing fails.
   @visibleForTesting
-  Future<ImageSyncSummary?> reconcileImageFolder(
+  Future<AttachmentSyncSummary?> reconcileAttachmentFolders(
           {Function(String)? updateStatus}) =>
-      _queueImageFolderWork((superseded) async {
+      _queueFolderWork((superseded) async {
         final internal = await internalStore();
         final external = externalStore;
         if (external == null) return null;
 
-        final summary = await _ImageFolderReconcile(
+        final summary = await _AttachmentFolderReconcile(
                 this,
                 internal,
                 external,
-                _referencedImageNames('reconcile').toList(),
+                _referencedFileNames('reconcile').toList(),
                 superseded,
                 updateStatus ?? (_) {})
             .run();
@@ -343,28 +342,31 @@ class ImageStorage {
         return summary;
       });
 
-  Future<T> _queueImageFolderWork<T>(
+  Future<T> _queueFolderWork<T>(
       Future<T> Function(bool Function() superseded) work) {
-    final request = ++_imageFolderRequests;
-    final result = _imageFolderWork
-        .then((_) => work(() => request != _imageFolderRequests));
-    _imageFolderWork = result.then((_) {}, onError: (_) {});
+    final request = ++_folderRequests;
+    final result =
+        _folderWork.then((_) => work(() => request != _folderRequests));
+    _folderWork = result.then((_) {}, onError: (_) {});
     return result;
   }
 
-  Future<bool> garbageCollectImages() async =>
-      _deleteUnreferencedImages(_referencedImageNames('garbage collect'));
+  Future<bool> garbageCollectAttachments() async =>
+      _deleteUnreferenced(_referencedFileNames('garbage collect'));
 
-  Set<String> _referencedImageNames(String action) {
-    final imagesProvider = EntryImagesProvider.instance;
-    if (!imagesProvider.isLoaded) {
+  Set<String> _referencedFileNames(String action) {
+    final attachmentsProvider = EntryAttachmentsProvider.instance;
+    if (!attachmentsProvider.isLoaded) {
       throw StateError(
-          'Refused to $action images before the image list was loaded');
+          'Refused to $action attachments before the attachment list was loaded');
     }
-    return {for (final entryImage in imagesProvider.images) entryImage.imgPath};
+    return {
+      for (final attachment in attachmentsProvider.attachments)
+        attachment.filePath
+    };
   }
 
-  Future<bool> _deleteUnreferencedImages(Set<String> referencedNames) async {
+  Future<bool> _deleteUnreferenced(Set<String> referencedNames) async {
     final internal = await internalStore();
     for (final name in await internal.list()) {
       if (!referencedNames.contains(name)) {
@@ -375,7 +377,7 @@ class ImageStorage {
   }
 }
 
-class ImageSyncSummary {
+class AttachmentSyncSummary {
   int uploaded = 0;
   int downloaded = 0;
   int repaired = 0;
@@ -398,20 +400,20 @@ class ImageSyncSummary {
       ].join(', ');
 }
 
-class _ImageFolderReconcile {
-  _ImageFolderReconcile(this._storage, this._internal, this._external,
+class _AttachmentFolderReconcile {
+  _AttachmentFolderReconcile(this._storage, this._internal, this._external,
       this._referencedNames, this._superseded, this._updateStatus);
 
   static const _stopAfterConsecutive = 3;
 
-  final ImageStorage _storage;
+  final AttachmentStorage _storage;
   final FileStore _internal;
   final FileStore _external;
   final List<String> _referencedNames;
   final bool Function() _superseded;
   final Function(String) _updateStatus;
 
-  final ImageSyncSummary _summary = ImageSyncSummary();
+  final AttachmentSyncSummary _summary = AttachmentSyncSummary();
   Map<String, int> _internalSizes = {};
   Map<String, int> _externalSizes = {};
   Set<String> _internalLowerCaseNames = {};
@@ -428,18 +430,17 @@ class _ImageFolderReconcile {
     return _stopReason != null;
   }
 
-  /// Later image folder work waits for the pass. Time out SAF providers in case they don't respond
   Future<T> _timed<T>(Future<T> operation) =>
       operation.timeout(_storage.externalTimeout);
 
-  Future<ImageSyncSummary> run() async {
+  Future<AttachmentSyncSummary> run() async {
     if (_shouldStop()) return _finished();
 
     try {
       _internalSizes = _sizesByName(await _internal.listFiles());
       _externalSizes = _sizesByName(await _timed(_external.listFiles()));
     } catch (error) {
-      _logger.severe('reconcile: aborted, could not list images', error);
+      _logger.severe('reconcile: aborted, could not list attachments', error);
       rethrow;
     }
 
@@ -453,7 +454,7 @@ class _ImageFolderReconcile {
     for (final (index, name) in _referencedNames.indexed) {
       if (_shouldStop()) break;
       try {
-        await _reconcileImage(name);
+        await _reconcileAttachment(name);
       } catch (error) {
         _logger.severe('reconcile: $name failed', error);
         _failed();
@@ -469,7 +470,7 @@ class _ImageFolderReconcile {
     return _finished();
   }
 
-  ImageSyncSummary _finished() {
+  AttachmentSyncSummary _finished() {
     final outcome =
         _stopReason == null ? 'finished' : 'stopped by $_stopReason';
     final sizes = _sizesReported ? '' : ', Image Folder does not report sizes';
@@ -483,7 +484,7 @@ class _ImageFolderReconcile {
   Set<String> _lowerCased(Iterable<String> names) =>
       {for (final name in names) name.toLowerCase()};
 
-  Future<void> _reconcileImage(String name) async {
+  Future<void> _reconcileAttachment(String name) async {
     if (_storage._uploadingNames.contains(name)) return;
 
     final internalSize = _internalSizes[name];

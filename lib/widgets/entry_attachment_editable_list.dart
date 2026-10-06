@@ -4,30 +4,32 @@
 
 import 'dart:ui';
 
-import 'package:daily_you/models/image.dart';
+import 'package:daily_you/models/attachment.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 
 import 'local_image_loader.dart';
 
-class EntryImageEditableList extends StatefulWidget {
-  final List<EntryImage> images;
-  final ValueChanged<List<EntryImage>> onImagesChanged;
+class EntryAttachmentEditableList extends StatefulWidget {
+  final List<EntryAttachment> attachments;
+  final ValueChanged<List<EntryAttachment>> onAttachmentsChanged;
 
-  const EntryImageEditableList({
+  const EntryAttachmentEditableList({
     super.key,
-    required this.images,
-    required this.onImagesChanged,
+    required this.attachments,
+    required this.onAttachmentsChanged,
   });
 
   @override
-  State<EntryImageEditableList> createState() => _EntryImageEditableListState();
+  State<EntryAttachmentEditableList> createState() =>
+      _EntryAttachmentEditableListState();
 }
 
-class _EntryImageEditableListState extends State<EntryImageEditableList> {
-  late List<EntryImage> _images;
+class _EntryAttachmentEditableListState
+    extends State<EntryAttachmentEditableList> {
+  late List<EntryAttachment> _attachments;
 
-  void _showDeleteImagePopup(int index) {
+  void _showDeleteAttachmentPopup(int index) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -38,7 +40,7 @@ class _EntryImageEditableListState extends State<EntryImageEditableList> {
               child:
                   Text(MaterialLocalizations.of(context).deleteButtonTooltip),
               onPressed: () {
-                _deleteImage(index);
+                _deleteAttachment(index);
                 Navigator.pop(context);
               },
             ),
@@ -58,20 +60,20 @@ class _EntryImageEditableListState extends State<EntryImageEditableList> {
   @override
   void initState() {
     super.initState();
-    _images = widget.images;
+    _attachments = widget.attachments;
   }
 
   @override
-  void didUpdateWidget(EntryImageEditableList oldWidget) {
+  void didUpdateWidget(EntryAttachmentEditableList oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (!identical(widget.images, oldWidget.images)) {
-      _images = widget.images;
+    if (!identical(widget.attachments, oldWidget.attachments)) {
+      _attachments = widget.attachments;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_images.length > 1) {
+    if (_attachments.length > 1) {
       return SizedBox(
         height: 160,
         child: ReorderableListView.builder(
@@ -87,13 +89,14 @@ class _EntryImageEditableListState extends State<EntryImageEditableList> {
                 ),
               );
             },
-            itemCount: _images.length,
+            itemCount: _attachments.length,
             onReorderItem: (int oldIndex, int newIndex) {
-              final EntryImage image = _images.removeAt(oldIndex);
-              _images.insert(newIndex, image);
-              _updateImageRanks();
+              final EntryAttachment attachment =
+                  _attachments.removeAt(oldIndex);
+              _attachments.insert(newIndex, attachment);
+              _updateAttachmentRanks();
               setState(() {});
-              widget.onImagesChanged(_images);
+              widget.onAttachmentsChanged(_attachments);
             }),
       );
     } else {
@@ -110,7 +113,7 @@ class _EntryImageEditableListState extends State<EntryImageEditableList> {
       clipBehavior: Clip.antiAlias,
       child:
           Stack(alignment: Alignment.center, fit: StackFit.expand, children: [
-        LocalImageLoader(imagePath: _images[index].imgPath),
+        LocalImageLoader(imagePath: _attachments[index].filePath),
         Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -121,7 +124,7 @@ class _EntryImageEditableListState extends State<EntryImageEditableList> {
                 IconButton(
                     visualDensity: VisualDensity.compact,
                     padding: EdgeInsets.zero,
-                    onPressed: () => _showDeleteImagePopup(index),
+                    onPressed: () => _showDeleteAttachmentPopup(index),
                     icon: Icon(
                       Icons.close_rounded,
                       color: Colors.white,
@@ -169,17 +172,16 @@ class _EntryImageEditableListState extends State<EntryImageEditableList> {
     );
   }
 
-  void _deleteImage(int index) {
-    _images.removeAt(index);
-    _updateImageRanks();
+  void _deleteAttachment(int index) {
+    _attachments.removeAt(index);
+    _updateAttachmentRanks();
     setState(() {});
-    widget.onImagesChanged(_images);
+    widget.onAttachmentsChanged(_attachments);
   }
 
-  /// Sets the image ranks assuming that the list is in the correct order
-  void _updateImageRanks() {
-    for (int i = 0; i < _images.length; i++) {
-      _images[i].imgRank = _images.length - 1 - i;
+  void _updateAttachmentRanks() {
+    for (int i = 0; i < _attachments.length; i++) {
+      _attachments[i].rank = _attachments.length - 1 - i;
     }
   }
 }

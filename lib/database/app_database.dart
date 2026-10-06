@@ -5,7 +5,7 @@
 import 'dart:io';
 
 import 'package:daily_you/config_provider.dart';
-import 'package:daily_you/database/image_storage.dart';
+import 'package:daily_you/database/attachment_storage.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/storage/external_sync_health.dart';
 import 'package:daily_you/storage/file_store.dart';
@@ -14,12 +14,12 @@ import 'package:daily_you/storage/storage_picker.dart';
 import 'package:daily_you/utils/operation_outcome.dart';
 import 'package:daily_you/utils/generated/tag_icon_registry.dart';
 import 'package:daily_you/models/entry.dart';
-import 'package:daily_you/models/image.dart';
+import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/models/tag_category.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:daily_you/providers/entries_provider.dart';
-import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/providers/templates_provider.dart';
 import 'package:easy_debounce/easy_debounce.dart';
@@ -135,7 +135,7 @@ class AppDatabase {
         version: 5, onCreate: _createDatabase, onUpgrade: _onUpgrade);
 
     await EntriesProvider.instance.load();
-    await EntryImagesProvider.instance.load();
+    await EntryAttachmentsProvider.instance.load();
     await TemplatesProvider.instance.load();
     await TagsProvider.instance.load();
   }
@@ -233,10 +233,10 @@ class AppDatabase {
           .set(Settings.useExternalDb, oldUseExternalPath);
     } else {
       try {
-        if (ImageStorage.instance.usingExternalLocation() &&
-            await ImageStorage.instance.hasExternalLocationPermission()) {
-          await ImageStorage.instance
-              .syncImageFolder(true, updateStatus: updateStatus);
+        if (AttachmentStorage.instance.usingExternalLocation() &&
+            await AttachmentStorage.instance.hasExternalLocationPermission()) {
+          await AttachmentStorage.instance
+              .syncAttachmentFolders(true, updateStatus: updateStatus);
         }
       } catch (error, stackTrace) {
         _logger.severe(
@@ -357,13 +357,13 @@ CREATE TABLE $templatesTable (
 )
 ''');
     await db.execute('''
-CREATE TABLE $imagesTable (
-    ${EntryImageFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    ${EntryImageFields.entryId} INTEGER NOT NULL,
-    ${EntryImageFields.imgPath} TEXT NOT NULL,
-    ${EntryImageFields.imgRank} INTEGER NOT NULL,
-    ${EntryImageFields.timeCreate} DATETIME NOT NULL DEFAULT (DATETIME('now')),
-    FOREIGN KEY (${EntryImageFields.entryId}) REFERENCES $entriesTable (id)
+CREATE TABLE $attachmentsTable (
+    ${EntryAttachmentFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    ${EntryAttachmentFields.entryId} INTEGER NOT NULL,
+    ${EntryAttachmentFields.filePath} TEXT NOT NULL,
+    ${EntryAttachmentFields.rank} INTEGER NOT NULL,
+    ${EntryAttachmentFields.timeCreate} DATETIME NOT NULL DEFAULT (DATETIME('now')),
+    FOREIGN KEY (${EntryAttachmentFields.entryId}) REFERENCES $entriesTable (id)
 )
 ''');
 
@@ -398,17 +398,17 @@ CREATE TABLE $imagesTable (
 
     final imageBytes =
         await rootBundle.load('assets/daily_you_First_Steps.webp');
-    final imageName = await ImageStorage.instance.create(
+    final imageName = await AttachmentStorage.instance.create(
       'daily_you_First_Steps.webp',
       imageBytes.buffer.asUint8List(),
       currTime: now,
     );
     if (imageName != null) {
-      await EntryImagesProvider.instance.add(
-        EntryImage(
+      await EntryAttachmentsProvider.instance.add(
+        EntryAttachment(
           entryId: welcomeEntry.id,
-          imgPath: imageName,
-          imgRank: 0,
+          filePath: imageName,
+          rank: 0,
           timeCreate: now,
         ),
         skipUpdate: true,
@@ -513,19 +513,19 @@ CREATE TABLE $templatesTable (
     }
     if (oldVersion <= 2) {
       await db.execute('''
-CREATE TABLE $imagesTable (
-    ${EntryImageFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    ${EntryImageFields.entryId} INTEGER NOT NULL,
-    ${EntryImageFields.imgPath} TEXT NOT NULL,
-    ${EntryImageFields.imgRank} INTEGER NOT NULL,
-    ${EntryImageFields.timeCreate} DATETIME NOT NULL DEFAULT (DATETIME('now')),
-    FOREIGN KEY (${EntryImageFields.entryId}) REFERENCES $entriesTable (id)
+CREATE TABLE $attachmentsTable (
+    ${EntryAttachmentFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    ${EntryAttachmentFields.entryId} INTEGER NOT NULL,
+    ${EntryAttachmentFields.filePath} TEXT NOT NULL,
+    ${EntryAttachmentFields.rank} INTEGER NOT NULL,
+    ${EntryAttachmentFields.timeCreate} DATETIME NOT NULL DEFAULT (DATETIME('now')),
+    FOREIGN KEY (${EntryAttachmentFields.entryId}) REFERENCES $entriesTable (id)
 )
 ''');
       await db.transaction((txn) async {
         await txn.execute('''
 -- Step 1: Insert the non-null imgPath entries into the imagesTable
-INSERT INTO $imagesTable (${EntryImageFields.entryId}, ${EntryImageFields.imgPath}, ${EntryImageFields.imgRank}, ${EntryImageFields.timeCreate})
+INSERT INTO $attachmentsTable (${EntryAttachmentFields.entryId}, ${EntryAttachmentFields.filePath}, ${EntryAttachmentFields.rank}, ${EntryAttachmentFields.timeCreate})
 SELECT ${EntryFields.id}, $deprecatedImgPath, 0, ${EntryFields.timeCreate}
 FROM $entriesTable
 WHERE $deprecatedImgPath IS NOT NULL;

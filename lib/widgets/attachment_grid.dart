@@ -2,16 +2,18 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
-import 'package:daily_you/models/image.dart';
+import 'package:daily_you/models/attachment.dart';
 import 'package:material_ui/material_ui.dart';
 import 'local_image_loader.dart';
 
-class ImageGrid extends StatelessWidget {
-  ImageGrid({super.key, required List<EntryImage> images})
-      : imagePaths = [for (final image in images) image.imgPath],
+class AttachmentGrid extends StatelessWidget {
+  AttachmentGrid({super.key, required List<EntryAttachment> attachments})
+      : imagePaths = [
+          for (final attachment in attachments) attachment.filePath
+        ],
         imageBuilder = _buildStoredImage;
 
-  const ImageGrid.fromPaths({
+  const AttachmentGrid.fromPaths({
     super.key,
     required this.imagePaths,
     required this.imageBuilder,

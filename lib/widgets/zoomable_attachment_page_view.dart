@@ -5,7 +5,7 @@
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
-import 'package:daily_you/database/image_storage.dart';
+import 'package:daily_you/database/attachment_storage.dart';
 import 'package:daily_you/layouts/fast_page_view_scroll_physics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -17,8 +17,8 @@ import 'package:flutter/physics.dart';
 /// Uses [_ArenaAwarePanRecognizer] to proactively claim single-finger drags
 /// once an image is zoomed in, rather than racing the page view's own drag
 /// recognizer for them.
-class ZoomableImagePageView extends StatefulWidget {
-  const ZoomableImagePageView({
+class ZoomableAttachmentPageView extends StatefulWidget {
+  const ZoomableAttachmentPageView({
     super.key,
     required this.imageProviders,
     required this.controller,
@@ -38,12 +38,13 @@ class ZoomableImagePageView extends StatefulWidget {
   final double doubleTapScale;
 
   @override
-  State<ZoomableImagePageView> createState() => _ZoomableImagePageViewState();
+  State<ZoomableAttachmentPageView> createState() =>
+      _ZoomableAttachmentPageViewState();
 }
 
 enum _PanVerdict { release, compete, claim }
 
-class _ZoomableImagePageViewState extends State<ZoomableImagePageView>
+class _ZoomableAttachmentPageViewState extends State<ZoomableAttachmentPageView>
     with SingleTickerProviderStateMixin {
   late int _currentIndex = widget.controller.initialPage;
   double _scale = 1.0;
@@ -463,7 +464,6 @@ class _ArenaAwarePanRecognizer extends ScaleGestureRecognizer {
   }
 }
 
-/// Lazily loads image bytes for [Image] via [ImageStorage]
 class EntryImageProvider extends ImageProvider<EntryImageProvider> {
   const EntryImageProvider(this.imagePath);
 
@@ -486,7 +486,7 @@ class EntryImageProvider extends ImageProvider<EntryImageProvider> {
 
   Future<ui.Codec> _loadAsync(
       EntryImageProvider key, ImageDecoderCallback decode) async {
-    final bytes = await ImageStorage.instance.getBytes(key.imagePath);
+    final bytes = await AttachmentStorage.instance.getBytes(key.imagePath);
     if (bytes == null) {
       throw StateError('Image not found: ${key.imagePath}');
     }

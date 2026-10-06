@@ -7,7 +7,7 @@ import 'dart:io';
 
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/database/app_database.dart';
-import 'package:daily_you/database/image_storage.dart';
+import 'package:daily_you/database/attachment_storage.dart';
 import 'package:daily_you/device_info_service.dart';
 import 'package:daily_you/launch_intent.dart';
 import 'package:daily_you/main.dart';
@@ -143,12 +143,13 @@ class _LaunchPageState extends State<LaunchPage> {
 
     if (initialized) {
       await _migrateImagesFromExternalStorage();
-      if (ImageStorage.instance.usingExternalLocation()) {
-        if (await ImageStorage.instance.hasExternalLocationPermission()) {
-          unawaited(ImageStorage.instance.syncImageFolder(false).then((_) {},
-              onError: (Object error, StackTrace stackTrace) {
+      if (AttachmentStorage.instance.usingExternalLocation()) {
+        if (await AttachmentStorage.instance.hasExternalLocationPermission()) {
+          unawaited(AttachmentStorage.instance
+              .syncAttachmentFolders(false)
+              .then((_) {}, onError: (Object error, StackTrace stackTrace) {
             _logger.severe(
-                'Syncing the image folder failed', error, stackTrace);
+                'Syncing the attachment folders failed', error, stackTrace);
           }));
           unawaited(_catchUpMissedAutoBackup());
           await _nextPage();
@@ -201,14 +202,14 @@ class _LaunchPageState extends State<LaunchPage> {
   }
 
   Future<void> _migrateImagesFromExternalStorage() async {
-    if (!await ImageStorage.instance.needsImageMigration()) return;
+    if (!await AttachmentStorage.instance.needsImageMigration()) return;
     if (!mounted) return;
 
     final statusNotifier = ValueNotifier<String>("");
     BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
 
     try {
-      await ImageStorage.instance.migrateImagesFromExternalStorage(
+      await AttachmentStorage.instance.migrateImagesFromExternalStorage(
         updateStatus: (migrated, total) {
           if (!mounted) return;
           statusNotifier.value = AppLocalizations.of(context)!
