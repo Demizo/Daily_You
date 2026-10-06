@@ -18,6 +18,7 @@ import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/utils/auto_backup_schedule.dart';
 import 'package:daily_you/utils/backup_restore_utils.dart';
 import 'package:daily_you/utils/logging.dart';
+import 'package:daily_you/widgets/legacy_material_bridge.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
@@ -514,9 +515,7 @@ class _MainAppState extends State<MainApp> {
                 },
                 theme: lightTheme,
                 darkTheme: darkTheme,
-                // ignore: deprecated_member_use
-                builder: (context, child) => MaterialUiCompatibilityBridge(
-                    delegates: sdkLocalizationsDelegates, child: child!),
+                builder: (context, child) => LegacyMaterialBridge(child: child!),
                 home: LaunchPage(
                     nextPage: ResponsiveLayout(
                   mobileScaffold: MobileScaffold(),
