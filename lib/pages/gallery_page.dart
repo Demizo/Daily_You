@@ -6,7 +6,7 @@ import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/providers/entries_provider.dart';
-import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/widgets/tag_picker_dialog.dart';
 import 'package:daily_you/widgets/hiding_widget.dart';
@@ -419,7 +419,8 @@ class _GalleryPageState extends State<GalleryPage>
 
   Widget buildEntries(BuildContext context, bool listView, List<Entry> entries,
       TagsProvider tagsProvider) {
-    final entryImagesProvider = Provider.of<EntryImagesProvider>(context);
+    final entryAttachmentsProvider =
+        Provider.of<EntryAttachmentsProvider>(context);
     final configProvider = Provider.of<ConfigProvider>(context);
     return entries.isEmpty
         ? Center(
@@ -457,13 +458,15 @@ class _GalleryPageState extends State<GalleryPage>
                 child: listView
                     ? LargeEntryCardWidget(
                         entry: entry,
-                        images: entryImagesProvider.getForEntry(entry),
+                        attachments:
+                            entryAttachmentsProvider.getForEntry(entry),
                         hideImage:
                             configProvider.get(Settings.hideImagesInGallery),
                       )
                     : EntryCardWidget(
                         entry: entry,
-                        images: entryImagesProvider.getForEntry(entry),
+                        attachments:
+                            entryAttachmentsProvider.getForEntry(entry),
                         hideImage:
                             configProvider.get(Settings.hideImagesInGallery),
                       ),

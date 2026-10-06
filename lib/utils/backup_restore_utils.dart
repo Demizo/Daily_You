@@ -7,7 +7,7 @@ import 'dart:io';
 
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/database/app_database.dart';
-import 'package:daily_you/database/image_storage.dart';
+import 'package:daily_you/database/attachment_storage.dart';
 import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/storage/file_store.dart';
 import 'package:daily_you/storage/local_file_store.dart';
@@ -72,7 +72,7 @@ class BackupRestoreUtils {
 
       onCompress(0);
       await ZipUtils.compress(stagedArchive.path, [databaseSnapshot.path],
-          [await ImageStorage.instance.getInternalFolder()],
+          [await AttachmentStorage.instance.getInternalFolder()],
           onProgress: onCompress, cancellationToken: cancellationToken);
 
       if (cancellationToken?.isCancelled ?? false) {
@@ -414,12 +414,13 @@ class BackupRestoreUtils {
         if (await restoredImages.isAvailable()) {
           // Also show cleanup status here since images may take awhile
           updateStatus(localizations.cleanUpStatus);
-          await ImageStorage.instance.whileNotSyncing(() async => restoreImages(
-              restoredImages, await ImageStorage.instance.internalStore()));
-          if (ImageStorage.instance.usingExternalLocation()) {
-            await ImageStorage.instance.syncImageFolder(true);
+          await AttachmentStorage.instance.whileNotSyncing(() async =>
+              restoreImages(restoredImages,
+                  await AttachmentStorage.instance.internalStore()));
+          if (AttachmentStorage.instance.usingExternalLocation()) {
+            await AttachmentStorage.instance.syncAttachmentFolders(true);
           }
-          ImageStorage.instance.invalidateCache();
+          AttachmentStorage.instance.invalidateCache();
         }
       } else {
         outcome = const OperationOutcome.failed();

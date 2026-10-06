@@ -6,10 +6,10 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:daily_you/database/entry_store.dart';
-import 'package:daily_you/models/image.dart';
+import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/models/tag.dart';
-import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/providers/templates_provider.dart';
@@ -23,12 +23,12 @@ import 'package:provider/provider.dart';
 import 'package:daily_you/pages/full_screen_text_editor_page.dart';
 import 'package:daily_you/widgets/editor_action_bar.dart';
 import 'package:daily_you/widgets/editor_action_bar/editor_keyboard_session.dart';
-import 'package:daily_you/widgets/entry_image_editable_list.dart';
+import 'package:daily_you/widgets/entry_attachment_editable_list.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/models/entry.dart';
-import 'package:daily_you/widgets/entry_image_actions.dart';
+import 'package:daily_you/widgets/entry_attachment_actions.dart';
 import 'package:daily_you/widgets/entry_mood_picker.dart';
 import 'package:daily_you/widgets/entry_text_edit.dart';
 import 'package:daily_you/widgets/markdown_preview_controller.dart';
@@ -37,7 +37,7 @@ class AddEditEntryPage extends StatefulWidget {
   final Entry? entry;
   final DateTime? overrideCreateDate;
   final bool openCamera;
-  final List<EntryImage> images;
+  final List<EntryAttachment> attachments;
   final String? sharedText;
 
   const AddEditEntryPage({
@@ -45,7 +45,7 @@ class AddEditEntryPage extends StatefulWidget {
     this.entry,
     this.overrideCreateDate,
     this.openCamera = false,
-    this.images = const <EntryImage>[],
+    this.attachments = const <EntryAttachment>[],
     this.sharedText,
   });
 
@@ -67,7 +67,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   String text = "";
   int? mood;
   DateTime? entryDate;
-  late List<EntryImage> _currentImages;
+  late List<EntryAttachment> _currentAttachments;
   bool _loadingEntry = true;
   bool _openedCamera = false;
   final ScrollController _scrollController = ScrollController();
@@ -151,7 +151,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
 
     if (widget.openCamera && !_openedCamera) {
       _openedCamera = true;
-      EntryImageActions.takePhoto(_addImage);
+      EntryAttachmentActions.takePhoto(_addImage);
     }
   }
 
@@ -159,9 +159,9 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _currentImages = List.empty(growable: true);
-    for (var image in widget.images) {
-      _currentImages.add(image.copy());
+    _currentAttachments = List.empty(growable: true);
+    for (var attachment in widget.attachments) {
+      _currentAttachments.add(attachment.copy());
     }
     _initEntry();
   }
@@ -219,7 +219,6 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                 EasyDebounce.cancel("save-entry");
                 final navigator = Navigator.of(context);
                 if (_newEntry) {
-                  // Persist so there is a saved entry (and any images) to delete
                   await _saveEntry();
                 }
                 final entryToDelete = _entry;
@@ -294,11 +293,12 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
-                                  if (_currentImages.isNotEmpty)
-                                    EntryImageEditableList(
-                                        images: _currentImages,
-                                        onImagesChanged: (images) async {
-                                          _currentImages = images;
+                                  if (_currentAttachments.isNotEmpty)
+                                    EntryAttachmentEditableList(
+                                        attachments: _currentAttachments,
+                                        onAttachmentsChanged:
+                                            (attachments) async {
+                                          _currentAttachments = attachments;
                                           await _saveEntry();
                                         }),
                                   StatefulBuilder(
@@ -460,13 +460,13 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
       ToolbarAction(
         icon: const Icon(Icons.photo),
         mayLeaveApp: true,
-        onPressed: () => EntryImageActions.pickFromGallery(_addImage),
+        onPressed: () => EntryAttachmentActions.pickFromGallery(_addImage),
       ),
       if (Platform.isAndroid)
         ToolbarAction(
           icon: const Icon(Icons.photo_camera_rounded),
           mayLeaveApp: true,
-          onPressed: () => EntryImageActions.takePhoto(_addImage),
+          onPressed: () => EntryAttachmentActions.takePhoto(_addImage),
         ),
     ];
   }
@@ -561,7 +561,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
 
     final saved = await _draftSession.save(_buildDraft);
     _adoptSavedEntry(saved);
-    _adoptSavedImages(saved);
+    _adoptSavedAttachments(saved);
     if (mounted) {
       setState(() {});
     }
@@ -580,7 +580,9 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     return EntryDraft(
       entry: entry,
       tags: _tagSource.toEntryTags(id),
-      images: [for (final image in _currentImages) image.copy()],
+      attachments: [
+        for (final attachment in _currentAttachments) attachment.copy()
+      ],
     );
   }
 
@@ -595,14 +597,16 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     );
   }
 
-  void _adoptSavedImages(Entry saved) {
+  void _adoptSavedAttachments(Entry saved) {
     final persistedIds = {
-      for (final image in EntryImagesProvider.instance.getForEntry(saved))
-        image.imgPath: image.id
+      for (final attachment
+          in EntryAttachmentsProvider.instance.getForEntry(saved))
+        attachment.filePath: attachment.id
     };
-    _currentImages = [
-      for (final image in _currentImages)
-        image.copy(id: persistedIds[image.imgPath], entryId: saved.id)
+    _currentAttachments = [
+      for (final attachment in _currentAttachments)
+        attachment.copy(
+            id: persistedIds[attachment.filePath], entryId: saved.id)
     ];
   }
 
@@ -621,7 +625,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
       mood: mood,
       date: entryDate!,
       tagSource: _tagSource,
-      hasImages: _currentImages.isNotEmpty,
+      hasAttachments: _currentAttachments.isNotEmpty,
     );
   }
 
@@ -636,8 +640,9 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   }
 
   Future<void> _addImage(List<String> imgPaths) async {
-    _currentImages =
-        EntryImage.appendRanked(_currentImages, imgPaths, entryId: id);
+    _currentAttachments = EntryAttachment.appendRanked(
+        _currentAttachments, imgPaths,
+        entryId: id);
     await _saveEntry();
   }
 }

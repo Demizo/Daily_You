@@ -6,7 +6,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:isolate';
 
-import 'package:daily_you/database/image_storage.dart';
+import 'package:daily_you/database/attachment_storage.dart';
 import 'package:daily_you/file_bytes_cache.dart';
 import 'package:daily_you/storage/file_store.dart';
 import 'package:daily_you/storage/local_file_store.dart';
@@ -59,7 +59,7 @@ class LocalImageCache {
           ),
         ) {
     _initResizeIsolate();
-    ImageStorage.instance.cacheVersion.addListener(_onImagesInvalidated);
+    AttachmentStorage.instance.cacheVersion.addListener(_onImagesInvalidated);
   }
 
   void _onImagesInvalidated() {
@@ -68,7 +68,7 @@ class LocalImageCache {
   }
 
   Future<void> _initResizeIsolate() async {
-    final imgFolderPath = await ImageStorage.instance.getInternalFolder();
+    final imgFolderPath = await AttachmentStorage.instance.getInternalFolder();
     tempImgFolderPath = (await getTemporaryDirectory()).path;
     _temporaryImageStore = LocalFileStore(tempImgFolderPath!);
 
@@ -122,7 +122,7 @@ class LocalImageCache {
       String originalPath, int width) async {
     // Skip GIFs
     if (extension(originalPath).toLowerCase() == ".gif") {
-      return await ImageStorage.instance.getBytes(originalPath);
+      return await AttachmentStorage.instance.getBytes(originalPath);
     }
 
     final key = '${originalPath}_w$width';
@@ -145,7 +145,8 @@ class LocalImageCache {
     // Prime cache in the background
     primeCache(originalPath, width);
 
-    final originalBytes = await ImageStorage.instance.getBytes(originalPath);
+    final originalBytes =
+        await AttachmentStorage.instance.getBytes(originalPath);
     if (originalBytes == null) return null;
 
     return originalBytes;

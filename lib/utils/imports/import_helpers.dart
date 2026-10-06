@@ -2,20 +2,18 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
-import 'package:daily_you/database/image_storage.dart';
+import 'package:daily_you/database/attachment_storage.dart';
 import 'package:daily_you/models/entry.dart';
-import 'package:daily_you/models/image.dart';
+import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/providers/entries_provider.dart';
-import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/utils/operation_outcome.dart';
 
-/// An entry decoded from an import file, before it reaches the database. Its
-/// images carry no entry id until the entry is added.
 class ImportedEntry {
-  const ImportedEntry(this.entry, {this.images = const []});
+  const ImportedEntry(this.entry, {this.attachments = const []});
 
   final Entry entry;
-  final List<EntryImage> images;
+  final List<EntryAttachment> attachments;
 }
 
 Future<void> addImportedEntries(
@@ -28,9 +26,9 @@ Future<void> addImportedEntries(
         .hasEntryAtTimestamp(imported.entry.timeCreate)) {
       final addedEntry =
           await EntriesProvider.instance.add(imported.entry, skipUpdate: true);
-      for (final image in imported.images) {
-        await EntryImagesProvider.instance
-            .add(image.copy(entryId: addedEntry.id), skipUpdate: true);
+      for (final attachment in imported.attachments) {
+        await EntryAttachmentsProvider.instance
+            .add(attachment.copy(entryId: addedEntry.id), skipUpdate: true);
       }
     }
     processedEntries += 1;
@@ -41,11 +39,11 @@ Future<void> addImportedEntries(
 Future<OperationOutcome> finishImport(
     Function(String) updateStatus, OperationOutcome outcome) async {
   await EntriesProvider.instance.load();
-  await EntryImagesProvider.instance.load();
-  if (ImageStorage.instance.usingExternalLocation()) {
+  await EntryAttachmentsProvider.instance.load();
+  if (AttachmentStorage.instance.usingExternalLocation()) {
     try {
-      await ImageStorage.instance
-          .syncImageFolder(true, updateStatus: updateStatus);
+      await AttachmentStorage.instance
+          .syncAttachmentFolders(true, updateStatus: updateStatus);
     } catch (error) {
       return outcome.failed ? outcome : OperationOutcome.failed(error);
     }

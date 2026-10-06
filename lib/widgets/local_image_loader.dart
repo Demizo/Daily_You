@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
-import 'package:daily_you/database/image_storage.dart';
+import 'package:daily_you/database/attachment_storage.dart';
 import 'package:daily_you/widgets/local_image_cache.dart';
 import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
@@ -24,7 +24,7 @@ class LocalImageLoader extends StatefulWidget {
 class _LocalImageLoaderState extends State<LocalImageLoader> {
   Uint8List? _bytes;
   bool _imageNotFound = false;
-  int _cacheVersion = ImageStorage.instance.cacheVersion.value;
+  int _cacheVersion = AttachmentStorage.instance.cacheVersion.value;
 
   @override
   void initState() {
@@ -36,7 +36,7 @@ class _LocalImageLoaderState extends State<LocalImageLoader> {
   void didUpdateWidget(covariant LocalImageLoader oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    final cacheVersion = ImageStorage.instance.cacheVersion.value;
+    final cacheVersion = AttachmentStorage.instance.cacheVersion.value;
     if (oldWidget.imagePath != widget.imagePath ||
         oldWidget.cacheSize != widget.cacheSize ||
         cacheVersion != _cacheVersion) {

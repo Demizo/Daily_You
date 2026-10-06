@@ -6,11 +6,11 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:csv/csv.dart';
-import 'package:daily_you/database/image_storage.dart';
+import 'package:daily_you/database/attachment_storage.dart';
 import 'package:daily_you/models/entry.dart';
-import 'package:daily_you/models/image.dart';
+import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/providers/entries_provider.dart';
-import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/storage/local_file_store.dart';
 import 'package:daily_you/storage/storage_picker.dart';
 import 'package:daily_you/utils/imports/import_helpers.dart';
@@ -122,14 +122,14 @@ Future<OperationOutcome> importFromDaybook(
         for (final filename in imageFilenames) {
           final bytes = await extractedFiles.read(filename);
           if (bytes == null) continue;
-          final imagePath = await ImageStorage.instance
+          final imagePath = await AttachmentStorage.instance
               .create(null, bytes, currTime: date, skipExternalUpload: true);
           if (imagePath != null) {
-            await EntryImagesProvider.instance.add(
-              EntryImage(
+            await EntryAttachmentsProvider.instance.add(
+              EntryAttachment(
                 entryId: addedEntry.id!,
-                imgPath: imagePath,
-                imgRank: rank++,
+                filePath: imagePath,
+                rank: rank++,
                 timeCreate: date,
               ),
               skipUpdate: true,

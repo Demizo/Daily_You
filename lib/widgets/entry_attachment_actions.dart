@@ -6,7 +6,7 @@ import 'dart:io';
 import 'dart:isolate';
 
 import 'package:daily_you/config_provider.dart';
-import 'package:daily_you/database/image_storage.dart';
+import 'package:daily_you/database/attachment_storage.dart';
 import 'package:daily_you/utils/exif_orientation.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
@@ -14,7 +14,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as img;
 import 'package:path/path.dart' show extension;
 
-class EntryImageActions {
+class EntryAttachmentActions {
   static Future<void> takePhoto(
       ValueChanged<List<String>> onChangedImage) async {
     final picker = ImagePicker();
@@ -64,7 +64,7 @@ class EntryImageActions {
   }
 
   static Future<String?> _storeCompressed(XFile file, String quality) async {
-    return await ImageStorage.instance
+    return await AttachmentStorage.instance
         .create(file.name, await _compressImage(file, quality));
   }
 

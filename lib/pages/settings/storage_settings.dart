@@ -6,7 +6,7 @@ import 'dart:io';
 import 'package:daily_you/utils/backup_restore_utils.dart';
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/database/app_database.dart';
-import 'package:daily_you/database/image_storage.dart';
+import 'package:daily_you/database/attachment_storage.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/storage/storage_picker.dart';
 import 'package:daily_you/widgets/failure_dialog.dart';
@@ -123,7 +123,7 @@ class _StorageSettingsState extends State<StorageSettings> {
 
     BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
     final outcome =
-        await ImageStorage.instance.selectExternalLocation((status) {
+        await AttachmentStorage.instance.selectExternalLocation((status) {
       statusNotifier.value = status;
     });
 
@@ -221,7 +221,7 @@ class _StorageSettingsState extends State<StorageSettings> {
         statusNotifier.value = status;
       });
 
-      await ImageStorage.instance.garbageCollectImages();
+      await AttachmentStorage.instance.garbageCollectAttachments();
     } finally {
       if (context.mounted) Navigator.of(context).pop();
     }
@@ -292,11 +292,11 @@ class _StorageSettingsState extends State<StorageSettings> {
                 return const SizedBox();
               }),
           FutureBuilder(
-              future: ImageStorage.instance.getInternalFolder(),
+              future: AttachmentStorage.instance.getInternalFolder(),
               builder: (context, snapshot) {
                 if (snapshot.hasData && snapshot.data != null) {
                   var folderText = snapshot.data!;
-                  if (ImageStorage.instance.usingExternalLocation()) {
+                  if (AttachmentStorage.instance.usingExternalLocation()) {
                     folderText = StoragePicker.displayName(
                         configProvider.get(Settings.externalImgUri));
                   }
@@ -313,7 +313,8 @@ class _StorageSettingsState extends State<StorageSettings> {
                       await _attemptImageFolderChange();
                     },
                     onSecondaryPressed: () async {
-                      await ImageStorage.instance.resetImageFolderLocation();
+                      await AttachmentStorage.instance
+                          .resetImageFolderLocation();
                     },
                   );
                 }

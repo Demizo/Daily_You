@@ -6,14 +6,14 @@ import 'dart:io';
 
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/models/entry.dart';
-import 'package:daily_you/models/image.dart';
+import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/pages/edit_entry_page.dart';
 import 'package:daily_you/providers/entries_provider.dart';
-import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/day_menu.dart';
-import 'package:daily_you/widgets/entry_image_actions.dart';
-import 'package:daily_you/widgets/image_grid.dart';
+import 'package:daily_you/widgets/entry_attachment_actions.dart';
+import 'package:daily_you/widgets/attachment_grid.dart';
 import 'package:daily_you/widgets/large_entry_card_widget.dart';
 import 'package:daily_you/widgets/vertical_calendar.dart';
 import 'package:material_ui/material_ui.dart';
@@ -88,8 +88,8 @@ class _SharePageState extends State<SharePage> {
     setState(() => _opening = true);
     final List<String> imageNames;
     try {
-      imageNames =
-          await EntryImageActions.importSharedImages(widget.payload.imagePaths);
+      imageNames = await EntryAttachmentActions.importSharedImages(
+          widget.payload.imagePaths);
     } catch (_) {
       if (mounted) setState(() => _opening = false);
       rethrow;
@@ -100,13 +100,15 @@ class _SharePageState extends State<SharePage> {
         ? AddEditEntryPage(
             overrideCreateDate: TimeManager.currentTimeOnDifferentDate(day)
                 .copyWith(isUtc: false),
-            images: EntryImage.appendRanked(const [], imageNames, entryId: -1),
+            attachments:
+                EntryAttachment.appendRanked(const [], imageNames, entryId: -1),
             sharedText: widget.payload.text,
           )
         : AddEditEntryPage(
             entry: entry,
-            images: EntryImage.appendRanked(
-                EntryImagesProvider.instance.getForEntry(entry), imageNames,
+            attachments: EntryAttachment.appendRanked(
+                EntryAttachmentsProvider.instance.getForEntry(entry),
+                imageNames,
                 entryId: entry.id!),
             sharedText: widget.payload.text,
           );
@@ -122,7 +124,7 @@ class _SharePageState extends State<SharePage> {
     final card = LargeCard(
       media: widget.payload.imagePaths.isEmpty
           ? null
-          : ImageGrid.fromPaths(
+          : AttachmentGrid.fromPaths(
               imagePaths: widget.payload.imagePaths,
               imageBuilder: (path) => Image.file(
                 File(path),

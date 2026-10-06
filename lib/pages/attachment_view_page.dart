@@ -4,32 +4,32 @@
 
 import 'dart:io';
 
-import 'package:daily_you/database/image_storage.dart';
+import 'package:daily_you/database/attachment_storage.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/storage/storage_picker.dart';
-import 'package:daily_you/models/image.dart';
-import 'package:daily_you/widgets/zoomable_image_page_view.dart';
+import 'package:daily_you/models/attachment.dart';
+import 'package:daily_you/widgets/zoomable_attachment_page_view.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:share_plus/share_plus.dart';
 
-class ImageViewPage extends StatefulWidget {
-  final List<EntryImage> images;
+class AttachmentViewPage extends StatefulWidget {
+  final List<EntryAttachment> attachments;
   final int index;
 
-  const ImageViewPage({
+  const AttachmentViewPage({
     super.key,
-    required this.images,
+    required this.attachments,
     required this.index,
   });
 
   @override
-  State<ImageViewPage> createState() => _ImageViewPageState();
+  State<AttachmentViewPage> createState() => _AttachmentViewPageState();
 }
 
-class _ImageViewPageState extends State<ImageViewPage> {
-  final Logger _logger = Logger('ImageViewPage');
+class _AttachmentViewPageState extends State<AttachmentViewPage> {
+  final Logger _logger = Logger('AttachmentViewPage');
 
   late PageController _pageController;
   late ValueNotifier<int> _currentPageNotifier;
@@ -58,10 +58,10 @@ class _ImageViewPageState extends State<ImageViewPage> {
             downloadButton(context)
           ],
         ),
-        body: ZoomableImagePageView(
+        body: ZoomableAttachmentPageView(
           controller: _pageController,
-          imageProviders: widget.images
-              .map((image) => EntryImageProvider(image.imgPath))
+          imageProviders: widget.attachments
+              .map((attachment) => EntryImageProvider(attachment.filePath))
               .toList(),
           onPageChanged: (int newIndex) {
             _currentPageNotifier.value = newIndex;
@@ -76,9 +76,9 @@ class _ImageViewPageState extends State<ImageViewPage> {
         return IconButton(
           icon: const Icon(Icons.info_outline_rounded),
           onPressed: () async {
-            final imageEntry = widget.images[currentIndex];
+            final imageEntry = widget.attachments[currentIndex];
             final bytes =
-                await ImageStorage.instance.getBytes(imageEntry.imgPath);
+                await AttachmentStorage.instance.getBytes(imageEntry.filePath);
 
             if (bytes == null || !context.mounted) return;
 
@@ -99,7 +99,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _infoRow(Icons.label_rounded, imageEntry.imgPath),
+                    _infoRow(Icons.label_rounded, imageEntry.filePath),
                     const SizedBox(height: 8),
                     _infoRow(Icons.storage_rounded, sizeString),
                     const SizedBox(height: 8),
@@ -145,8 +145,9 @@ class _ImageViewPageState extends State<ImageViewPage> {
           return IconButton(
               icon: const Icon(Icons.share_rounded),
               onPressed: () async {
-                final currentImage = widget.images[currentIndex].imgPath;
-                var bytes = await ImageStorage.instance.getBytes(currentImage);
+                final currentImage = widget.attachments[currentIndex].filePath;
+                var bytes =
+                    await AttachmentStorage.instance.getBytes(currentImage);
                 if (bytes != null) {
                   await SharePlus.instance.share(ShareParams(
                       files: [XFile.fromData(bytes, mimeType: "images/*")],
@@ -168,9 +169,10 @@ class _ImageViewPageState extends State<ImageViewPage> {
             return IconButton(
                 icon: const Icon(Icons.download_rounded),
                 onPressed: () async {
-                  final currentImage = widget.images[currentIndex].imgPath;
+                  final currentImage =
+                      widget.attachments[currentIndex].filePath;
                   var bytes =
-                      await ImageStorage.instance.getBytes(currentImage);
+                      await AttachmentStorage.instance.getBytes(currentImage);
                   if (bytes == null) return;
 
                   PickedDirectory? saveDirectory;

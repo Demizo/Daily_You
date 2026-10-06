@@ -6,14 +6,14 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:daily_you/database/image_storage.dart';
+import 'package:daily_you/database/attachment_storage.dart';
 import 'package:daily_you/storage/file_store.dart';
 import 'package:daily_you/storage/local_file_store.dart';
 import 'package:daily_you/storage/storage_picker.dart';
 import 'package:daily_you/models/entry.dart';
-import 'package:daily_you/models/image.dart';
+import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/providers/entries_provider.dart';
-import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/utils/operation_outcome.dart';
 import 'package:daily_you/utils/zip_utils.dart';
@@ -66,10 +66,11 @@ class ExportUtils {
           noteStore: exportStore, imageStore: exportImageStore, locale: locale);
 
       for (Entry entry in entries) {
-        final images = <(EntryImage, Uint8List)>[];
-        for (EntryImage image
-            in EntryImagesProvider.instance.getForEntry(entry)) {
-          final bytes = await ImageStorage.instance.getBytes(image.imgPath);
+        final images = <(EntryAttachment, Uint8List)>[];
+        for (EntryAttachment image
+            in EntryAttachmentsProvider.instance.getForEntry(entry)) {
+          final bytes =
+              await AttachmentStorage.instance.getBytes(image.filePath);
           if (bytes != null) images.add((image, bytes));
         }
 
@@ -120,7 +121,8 @@ class MarkdownExportWriter {
 
   final Map<String, int> _timestampCount = {};
 
-  Future<void> write(Entry entry, List<(EntryImage, Uint8List)> images) async {
+  Future<void> write(
+      Entry entry, List<(EntryAttachment, Uint8List)> images) async {
     final timestamp = DateFormat("yyyy-MM-dd", locale).format(entry.timeCreate);
     _timestampCount[timestamp] = (_timestampCount[timestamp] ?? 0) + 1;
     final index = _timestampCount[timestamp]!;
@@ -129,7 +131,7 @@ class MarkdownExportWriter {
     final noteBody = StringBuffer();
     for (final (image, bytes) in images) {
       final prettyName =
-          "image_$timestamp${indexSuffix}_${image.imgRank}${extension(image.imgPath)}";
+          "image_$timestamp${indexSuffix}_${image.rank}${extension(image.filePath)}";
       noteBody.writeln('![](Images/$prettyName)');
       await imageStore.write(prettyName, bytes);
     }
