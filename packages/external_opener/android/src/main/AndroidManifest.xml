@@ -1,0 +1,14 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.demizo.daily_you.external_opener">
+    <application>
+        <provider
+            android:name="com.demizo.daily_you.external_opener.ExternalOpenerFileProvider"
+            android:authorities="${applicationId}.external_opener"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/external_opener_paths" />
+        </provider>
+    </application>
+</manifest>
