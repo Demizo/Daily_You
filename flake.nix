@@ -68,7 +68,8 @@
             JAVA_HOME = jdk17.home;
             FLUTTER_ROOT = flutter;
             DART_ROOT = "${flutter}/bin/cache/dart-sdk";
-            LD_LIBRARY_PATH = lib.makeLibraryPath [ sqlite libsecret ];
+            LD_LIBRARY_PATH = lib.makeLibraryPath [ sqlite libsecret mpv-unwrapped alsa-lib ];
+            CMAKE_PREFIX_PATH = lib.makeSearchPath "" [ libjpeg.dev libjpeg.out ];
             GSETTINGS_SCHEMA_DIR = lib.concatStringsSep ":" (
               map (pkg: "${pkg}/share/gsettings-schemas/${pkg.name}/glib-2.0/schemas") [
                 gsettings-desktop-schemas
@@ -87,6 +88,13 @@
               # X Server for screenshot generation
               xvfb
               xvfb-run
+              alsa-lib
+              pulseaudio
+              ffmpeg
+              libjpeg
+              mpv-unwrapped
+              libepoxy
+              libsysprof-capture
             ];
           };
       }
