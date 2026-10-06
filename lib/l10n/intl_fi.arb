@@ -135,5 +135,7 @@
     "wordCount": "{count, plural, one{{count} sana} other{{count} sanaa}}",
     "streakSinceBadDay": "{count, plural, other{Päiviä huonosta päivästä lähtien {count}}}",
     "streakCurrent": "{count, plural, other{Nykyinen putki {count}}}",
-    "streakLongest": "{count, plural, other{Pisin putki {count}}}"
+    "streakLongest": "{count, plural, other{Pisin putki {count}}}",
+    "actionTakePhoto": "Ota kuva",
+    "actionToday": "Tänään"
 }
