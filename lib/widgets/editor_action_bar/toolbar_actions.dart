@@ -5,22 +5,27 @@
 import 'dart:async';
 
 import 'package:daily_you/utils/text_editing.dart';
+import 'package:daily_you/widgets/editor_action_bar/toolbar_menu_action.dart';
 import 'package:daily_you/widgets/icons/svg_icon.dart';
 import 'package:material_ui/material_ui.dart';
 
 @immutable
 class ToolbarAction {
   final Widget icon;
-  final FutureOr<void> Function() onPressed;
+  final FutureOr<void> Function()? onPressed;
+
+  final List<ToolbarMenuAction>? menu;
 
   /// For actions that may launch an external activity. Focus must be manually restored
   final bool mayLeaveApp;
 
   const ToolbarAction({
     required this.icon,
-    required this.onPressed,
+    this.onPressed,
+    this.menu,
     this.mayLeaveApp = false,
-  });
+  }) : assert((onPressed == null) != (menu == null),
+            'Provide exactly one of onPressed or menu');
 }
 
 List<ToolbarAction> markdownActions(

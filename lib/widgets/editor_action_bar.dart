@@ -13,6 +13,7 @@ import 'package:daily_you/widgets/editor_action_bar/toolbar_actions.dart';
 import 'package:daily_you/widgets/editor_action_bar/action_bar_toggle_button.dart';
 import 'package:daily_you/widgets/editor_action_bar/toolbar_entry.dart';
 import 'package:daily_you/widgets/editor_action_bar/toolbar_focus_restorer.dart';
+import 'package:daily_you/widgets/editor_action_bar/toolbar_menu_action.dart';
 import 'package:daily_you/widgets/editor_action_bar/toolbar_morph.dart';
 import 'package:daily_you/widgets/editor_action_bar/toolbar_overflow_popup.dart';
 import 'package:daily_you/widgets/template_select_popup.dart';
@@ -110,8 +111,13 @@ class _EditorActionBarState extends State<EditorActionBar> {
     return _spaced([
       if (widget.showTemplateButton) _templateEntry(metrics),
       for (final action in widget.mainActions ?? const <ToolbarAction>[])
-        _iconEntry(metrics, action.icon, action.onPressed,
-            claimsFocus: false, reconnectsKeyboard: action.mayLeaveApp),
+        switch (action.menu) {
+          null => _iconEntry(metrics, action.icon, action.onPressed!,
+              claimsFocus: false, reconnectsKeyboard: action.mayLeaveApp),
+          [final only] => _iconEntry(metrics, Icon(only.icon), only.onSelected,
+              claimsFocus: false, reconnectsKeyboard: true),
+          _ => _menuIconEntry(metrics, action),
+        },
     ]);
   }
 
@@ -125,7 +131,7 @@ class _EditorActionBarState extends State<EditorActionBar> {
         _dividerEntry(),
       ],
       for (final action in markdownActions(context, widget.controller))
-        _iconEntry(metrics, action.icon, action.onPressed,
+        _iconEntry(metrics, action.icon, action.onPressed!,
             reconnectsKeyboard: action.mayLeaveApp),
       if (undoController != null) ...[
         _dividerEntry(),
@@ -175,6 +181,34 @@ class _EditorActionBarState extends State<EditorActionBar> {
           _focusRestorer.run(action,
               claimsFocus: claimsFocus, reconnectsKeyboard: reconnectsKeyboard);
         },
+      ),
+    );
+  }
+
+  ToolbarEntry _menuIconEntry(DockMetrics metrics, ToolbarAction action) {
+    return ToolbarEntry(
+      width: metrics.buttonSize,
+      build: (context, dismissOverflow) => Builder(
+        builder: (buttonContext) => ToolbarIconButton(
+          size: metrics.buttonSize,
+          icon: action.icon,
+          onPressed: () {
+            dismissOverflow?.call();
+            _overflowPopup.showMenu(
+              buttonContext,
+              [
+                for (final item in action.menu!)
+                  ToolbarMenuAction(
+                    icon: item.icon,
+                    label: item.label,
+                    onSelected: () => _focusRestorer.run(item.onSelected,
+                        claimsFocus: false, reconnectsKeyboard: true),
+                  ),
+              ],
+              barPadding: metrics.pillPadding,
+            );
+          },
+        ),
       ),
     );
   }

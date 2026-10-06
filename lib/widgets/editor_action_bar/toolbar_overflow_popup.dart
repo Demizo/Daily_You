@@ -4,6 +4,8 @@
 
 import 'package:daily_you/widgets/editor_action_bar/dock_metrics.dart';
 import 'package:daily_you/widgets/editor_action_bar/toolbar_entry.dart';
+import 'package:daily_you/widgets/editor_action_bar/toolbar_menu.dart';
+import 'package:daily_you/widgets/editor_action_bar/toolbar_menu_action.dart';
 import 'package:material_ui/material_ui.dart';
 
 class ToolbarOverflowPopup {
@@ -20,21 +22,66 @@ class ToolbarOverflowPopup {
   }
 
   void show(BuildContext buttonContext, List<ToolbarEntry> entries) {
+    final contentWidth =
+        entries.fold(_horizontalPadding * 2, (sum, entry) => sum + entry.width);
+    _showOverlay(
+      buttonContext,
+      width: contentWidth,
+      contentBuilder: (overlayContext) => SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (final entry in entries) entry.build(overlayContext, dismiss),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void showMenu(BuildContext buttonContext, List<ToolbarMenuAction> actions,
+      {double barPadding = 0}) {
     dismiss();
 
     final overlayState = Navigator.of(buttonContext).overlay!;
+    final button = _anchorBounds(overlayState, buttonContext);
+    final anchor = Rect.fromLTRB(
+        button.left, button.top - barPadding, button.right, button.bottom);
+
+    _overlayEntry = OverlayEntry(
+      builder: (_) => ToolbarMenu(
+        anchor: anchor,
+        actions: actions,
+        onClosed: dismiss,
+      ),
+    );
+
+    overlayState.insert(_overlayEntry!);
+  }
+
+  Rect _anchorBounds(OverlayState overlayState, BuildContext buttonContext) {
     final overlayBox = overlayState.context.findRenderObject()! as RenderBox;
     final button = buttonContext.findRenderObject()! as RenderBox;
-    final buttonPosition =
-        button.localToGlobal(Offset.zero, ancestor: overlayBox);
+    return button.localToGlobal(Offset.zero, ancestor: overlayBox) &
+        button.size;
+  }
+
+  void _showOverlay(
+    BuildContext buttonContext, {
+    required double width,
+    required WidgetBuilder contentBuilder,
+  }) {
+    dismiss();
+
+    final overlayState = Navigator.of(buttonContext).overlay!;
+    final buttonPosition = _anchorBounds(overlayState, buttonContext).topLeft;
 
     final screenSize = MediaQuery.sizeOf(buttonContext);
     const margin = DockMetrics.screenMargin;
-    final contentWidth =
-        entries.fold(_horizontalPadding * 2, (sum, entry) => sum + entry.width);
-    final width = contentWidth.clamp(0.0, screenSize.width - margin * 2);
-    final left =
-        buttonPosition.dx.clamp(margin, screenSize.width - width - margin);
+    final resolvedWidth = width.clamp(0.0, screenSize.width - margin * 2);
+    final left = buttonPosition.dx
+        .clamp(margin, screenSize.width - resolvedWidth - margin);
     final theme = Theme.of(buttonContext);
 
     _overlayEntry = OverlayEntry(
@@ -51,7 +98,7 @@ class ToolbarOverflowPopup {
           Positioned(
             left: left,
             bottom: screenSize.height - buttonPosition.dy,
-            width: width,
+            width: resolvedWidth,
             child: TextFieldTapRegion(
               child: Material(
                 color: Colors.transparent,
@@ -68,18 +115,7 @@ class ToolbarOverflowPopup {
                     child: IconTheme.merge(
                       data: const IconThemeData(opacity: 1.0),
                       child: IntrinsicHeight(
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              for (final entry in entries)
-                                entry.build(overlayContext, dismiss),
-                            ],
-                          ),
-                        ),
-                      ),
+                          child: contentBuilder(overlayContext)),
                     ),
                   ),
                 ),
