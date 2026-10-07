@@ -5,6 +5,7 @@
 import 'package:daily_you/models/tag_category.dart';
 import 'package:daily_you/models/tag_icon_type.dart';
 import 'package:daily_you/providers/tags_provider.dart';
+import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/color_picker_dialog.dart';
 import 'package:daily_you/widgets/color_swatch_row.dart';
 import 'package:daily_you/widgets/delete_confirm_dialog.dart';
@@ -98,7 +99,7 @@ class _EditCategoryState extends State<EditCategory> {
       _color != null ? Color(_color!) : Theme.of(context).colorScheme.onSurface;
 
   Future<void> _showIconPicker() async {
-    final result = await showDialog<IconPickerResult>(
+    final result = await showAppDialog<IconPickerResult>(
       context: context,
       builder: (context) => IconPickerDialog(
         previewColor: _effectiveColor(context),
@@ -113,7 +114,7 @@ class _EditCategoryState extends State<EditCategory> {
   }
 
   Future<void> _showColorPicker() async {
-    final result = await showDialog<ColorPickerResult>(
+    final result = await showAppDialog<ColorPickerResult>(
       context: context,
       builder: (context) => ColorPickerDialog(
         initialColor: _color != null ? Color(_color!) : null,

@@ -3,6 +3,7 @@
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
 import 'package:daily_you/time_manager.dart';
+import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
 import 'package:shamsi_date/shamsi_date.dart';
@@ -41,7 +42,7 @@ Future<DateTime?> _showGregorianPicker(
   final months = localizedMonths();
   final years = List.generate(now.year - 2000 + 1, (i) => 2000 + i);
 
-  return showDialog<DateTime>(
+  return showAppDialog<DateTime>(
     context: context,
     builder: (BuildContext context) {
       return StatefulBuilder(
@@ -160,7 +161,7 @@ Future<DateTime?> _showJalaliPicker(
   final months =
       List.generate(12, (i) => TimeManager.jalaliMonthName(i + 1, locale));
 
-  return showDialog<DateTime>(
+  return showAppDialog<DateTime>(
     context: context,
     builder: (BuildContext context) {
       return StatefulBuilder(

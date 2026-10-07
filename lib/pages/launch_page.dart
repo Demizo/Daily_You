@@ -13,6 +13,7 @@ import 'package:daily_you/launch_intent.dart';
 import 'package:daily_you/main.dart';
 import 'package:daily_you/utils/auto_backup_schedule.dart';
 import 'package:daily_you/utils/backup_restore_utils.dart';
+import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/auth_popup.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
@@ -121,7 +122,7 @@ class _LaunchPageState extends State<LaunchPage> {
     // Prompt unlock before initializing database
     if (ConfigProvider.instance.get(Settings.requirePassword)) {
       if (!mounted) return;
-      await showDialog(
+      await showAppDialog(
           context: context,
           builder: (context) => AuthPopup(
                 mode: AuthPopupMode.unlock,

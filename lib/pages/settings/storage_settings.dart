@@ -11,6 +11,7 @@ import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/storage/storage_picker.dart';
 import 'package:daily_you/utils/file_size_format.dart';
+import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/attachment_type_presentation.dart';
 import 'package:daily_you/widgets/failure_dialog.dart';
 import 'package:daily_you/widgets/file_size_row.dart';
@@ -88,7 +89,7 @@ class _StorageSettingsState extends State<StorageSettings> {
 
   Future<void> _showChangeLogFolderWarning() async {
     bool confirmed = false;
-    await showDialog(
+    await showAppDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -162,7 +163,7 @@ class _StorageSettingsState extends State<StorageSettings> {
     final TextEditingController controller = TextEditingController();
     final ValueNotifier<bool> isButtonEnabled = ValueNotifier(false);
 
-    showDialog(
+    showAppDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
@@ -345,7 +346,7 @@ class _StorageSettingsState extends State<StorageSettings> {
           SettingsIconAction(
             title: l10n.settingsMediaQualityTitle,
             icon: const Icon(Icons.chevron_right_rounded),
-            onPressed: () => showDialog(
+            onPressed: () => showAppDialog(
                 context: context, builder: (_) => const MediaQualityDialog()),
           ),
           const Padding(

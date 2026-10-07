@@ -15,6 +15,7 @@ import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/calendar_view_options_dialog.dart';
 import 'package:daily_you/widgets/entry_day_cell.dart';
 import 'package:daily_you/widgets/year_month_picker.dart';
@@ -565,7 +566,7 @@ class _VerticalCalendarState extends State<VerticalCalendar>
                   },
                 ),
                 IconButton(
-                  onPressed: () => showDialog(
+                  onPressed: () => showAppDialog(
                     context: context,
                     builder: (_) => const CalendarViewOptionsDialog(),
                   ),

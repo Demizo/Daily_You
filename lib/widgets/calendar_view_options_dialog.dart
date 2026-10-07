@@ -6,6 +6,7 @@ import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/providers/tags_provider.dart';
+import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/settings_dropdown.dart';
 import 'package:daily_you/widgets/tag_picker_dialog.dart';
 import 'package:material_ui/material_ui.dart';
@@ -107,7 +108,7 @@ class CalendarViewOptionsDialog extends StatelessWidget {
           return;
         }
         final filter = value == 'tracker' ? TagType.tracker : TagType.label;
-        final tag = await showDialog<Tag>(
+        final tag = await showAppDialog<Tag>(
           context: context,
           builder: (_) => TagPickerDialog(
             mode: TagPickerMode.selectSingle,

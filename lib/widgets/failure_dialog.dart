@@ -3,13 +3,14 @@
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
 import 'package:daily_you/l10n/generated/app_localizations.dart';
+import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 Future<void> showFailureDialog(BuildContext context,
     {required String description, Object? error}) {
-  return showDialog(
+  return showAppDialog(
     context: context,
     builder: (context) =>
         FailureDialog(description: description, details: error?.toString()),

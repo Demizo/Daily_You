@@ -15,6 +15,7 @@ import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/providers/templates_provider.dart';
+import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/utils/file_size_format.dart';
 import 'package:daily_you/widgets/attachment_type_presentation.dart';
 import 'package:daily_you/widgets/entry_draft_dirty_tracker.dart';
@@ -215,7 +216,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
       Navigator.of(context).pop();
       return;
     }
-    showDialog(
+    showAppDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -468,7 +469,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     return [
       ToolbarAction(
         icon: const Icon(Icons.local_offer_rounded),
-        onPressed: () => showDialog(
+        onPressed: () => showAppDialog(
           context: context,
           builder: (_) =>
               TagPickerDialog(mode: TagPickerMode.attach, source: _tagSource),
@@ -791,7 +792,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     }
 
     var suppress = false;
-    await showDialog(
+    await showAppDialog(
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (dialogContext, setLocalState) => AlertDialog(

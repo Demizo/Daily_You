@@ -7,6 +7,7 @@ import 'package:daily_you/models/template.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/providers/templates_provider.dart';
 import 'package:daily_you/utils/text_editing.dart';
+import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/delete_confirm_dialog.dart';
 import 'package:daily_you/widgets/editor_action_bar.dart';
 import 'package:daily_you/widgets/editor_action_bar/editor_keyboard_session.dart';
@@ -112,7 +113,7 @@ class _EditTemplateState extends State<EditTemplate> {
   }
 
   Future<void> _openTagPicker() async {
-    await showDialog(
+    await showAppDialog(
       context: context,
       builder: (_) =>
           TagPickerDialog(mode: TagPickerMode.attach, source: _tagSource),

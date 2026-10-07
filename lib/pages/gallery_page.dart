@@ -9,6 +9,7 @@ import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
+import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/tag_picker_dialog.dart';
 import 'package:daily_you/widgets/hiding_widget.dart';
 import 'package:daily_you/widgets/large_entry_card_widget.dart';
@@ -137,7 +138,7 @@ class _GalleryPageState extends State<GalleryPage>
   }
 
   void _showTagFilterDialog(BuildContext context) {
-    showDialog(
+    showAppDialog(
       context: context,
       builder: (_) => TagPickerDialog(
         mode: TagPickerMode.filter,
@@ -159,7 +160,7 @@ class _GalleryPageState extends State<GalleryPage>
     final entriesProvider =
         Provider.of<EntriesProvider>(context, listen: false);
     final tagsProvider = Provider.of<TagsProvider>(context, listen: false);
-    showDialog(
+    showAppDialog(
       context: context,
       builder: (context) {
         return StatefulBuilder(builder: (context, setDialogState) {
@@ -173,7 +174,7 @@ class _GalleryPageState extends State<GalleryPage>
             final previousOrderBy = entriesProvider.orderBy;
             setDialogState(() => entriesProvider.orderBy = OrderBy.tracker);
 
-            final tag = await showDialog<Tag>(
+            final tag = await showAppDialog<Tag>(
               context: context,
               builder: (_) => TagPickerDialog(
                 mode: TagPickerMode.selectSingle,

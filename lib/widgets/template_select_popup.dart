@@ -5,6 +5,7 @@
 import 'package:daily_you/models/template.dart';
 import 'package:daily_you/template_renderer.dart';
 import 'package:daily_you/utils/text_editing.dart';
+import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/template_select.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -12,7 +13,7 @@ Future<void> showTemplateSelectPopup(
     BuildContext context, TextEditingController controller,
     {required bool hasFocus,
     void Function(Template template)? onTemplateSelected}) {
-  return showDialog(
+  return showAppDialog(
     context: context,
     builder: (BuildContext context) {
       return TemplateSelect(

@@ -4,6 +4,7 @@
 
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/color_picker_dialog.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
 import 'package:daily_you/widgets/settings_dropdown.dart';
@@ -31,7 +32,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
   Future<void> _showAccentColorPopup(ThemeModeProvider themeProvider) async {
     final initialColor =
         Color(ConfigProvider.instance.get(Settings.accentColor));
-    final result = await showDialog<ColorPickerResult>(
+    final result = await showAppDialog<ColorPickerResult>(
       context: context,
       builder: (context) => ColorPickerDialog(initialColor: initialColor),
     );
@@ -43,7 +44,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
 
   void _showMoodEmojiPopup(int? value) {
     String newEmoji = '';
-    showDialog(
+    showAppDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -117,7 +118,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
 
   void _showHideImagesDialog(
       BuildContext context, ConfigProvider configProvider) {
-    showDialog(
+    showAppDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(

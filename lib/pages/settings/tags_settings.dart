@@ -8,6 +8,7 @@ import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/utils/backup_restore_utils.dart';
 import 'package:daily_you/utils/tag_category_visuals.dart';
 import 'package:daily_you/utils/templates_tags_transfer.dart';
+import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/edit_category.dart';
 import 'package:daily_you/widgets/edit_tag.dart';
 import 'package:daily_you/widgets/expressive_fab_menu.dart';
@@ -45,14 +46,14 @@ class _TagsSettingsState extends State<TagsSettings> {
   bool _isDraggingCategory = false;
 
   void _showEditTagDialog(BuildContext context, Tag? tag) {
-    showDialog(
+    showAppDialog(
       context: context,
       builder: (context) => EditTag(tag: tag),
     );
   }
 
   void _showCategoryDialog(BuildContext context, TagCategory? category) {
-    showDialog(
+    showAppDialog(
       context: context,
       builder: (_) => EditCategory(category: category),
     );
