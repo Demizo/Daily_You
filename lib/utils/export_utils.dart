@@ -16,6 +16,7 @@ import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/utils/operation_outcome.dart';
 import 'package:daily_you/utils/zip_utils.dart';
+import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/attachment_type_presentation.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
 import 'package:material_ui/material_ui.dart';
@@ -116,7 +117,7 @@ class ExportUtils {
   static Future<Set<AttachmentType>?> _pickIncludedTypes(
       BuildContext context) async {
     final included = {...AttachmentType.values};
-    return showDialog<Set<AttachmentType>>(
+    return showAppDialog<Set<AttachmentType>>(
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (dialogContext, setLocalState) => AlertDialog(

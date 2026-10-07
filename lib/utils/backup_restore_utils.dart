@@ -18,6 +18,7 @@ import 'package:daily_you/utils/cancellation_token.dart';
 import 'package:daily_you/utils/operation_outcome.dart';
 import 'package:daily_you/utils/password_store.dart';
 import 'package:daily_you/utils/zip_utils.dart';
+import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/auth_popup.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
@@ -318,7 +319,7 @@ class BackupRestoreUtils {
 
   static Future<String?> _promptForBackupPassword(BuildContext context) async {
     String? password;
-    await showDialog(
+    await showAppDialog(
         context: context,
         builder: (context) => AuthPopup(
               mode: AuthPopupMode.enterPassword,
@@ -484,7 +485,7 @@ class BackupRestoreUtils {
 
   static void showLoadingStatus(
       BuildContext context, ValueNotifier<String> statusNotifier) {
-    showDialog(
+    showAppDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) {

@@ -5,6 +5,7 @@
 import 'dart:async';
 
 import 'package:daily_you/utils/text_editing.dart';
+import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/editor_action_bar/toolbar_menu_action.dart';
 import 'package:daily_you/widgets/icons/svg_icon.dart';
 import 'package:material_ui/material_ui.dart';
@@ -68,7 +69,7 @@ List<ToolbarAction> markdownActions(
 
 Future<void> _insertHeader(
     BuildContext context, TextEditingController controller) async {
-  final level = await showDialog<int>(
+  final level = await showAppDialog<int>(
     context: context,
     builder: (context) => AlertDialog(
       content: Column(

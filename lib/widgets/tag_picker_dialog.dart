@@ -6,6 +6,7 @@ import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/pages/settings/tags_settings.dart';
 import 'package:daily_you/providers/tags_provider.dart';
+import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/edit_tag.dart';
 import 'package:daily_you/widgets/tag_attachment_source.dart';
 import 'package:daily_you/widgets/tag_chip.dart';
@@ -87,7 +88,7 @@ class _TagPickerDialogState extends State<TagPickerDialog> {
   Future<void> _createAndAddTagWithName(
       TagsProvider provider, String name) async {
     final tagsBefore = List<Tag>.from(provider.tags);
-    await showDialog(
+    await showAppDialog(
       context: context,
       builder: (_) => EditTag(tag: null, initialName: name),
     );

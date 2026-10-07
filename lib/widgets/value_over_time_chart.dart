@@ -7,6 +7,7 @@ import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/utils/bucket_combiner.dart';
 import 'package:daily_you/utils/chart_y_range.dart';
+import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/connected_button_group.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
@@ -397,7 +398,7 @@ class _ValueOverTimeChartState extends State<ValueOverTimeChart> {
   void _showGroupingDialog(BuildContext context, List<ChartGrouping> available,
       ChartGrouping effective) {
     var selected = effective;
-    showDialog(
+    showAppDialog(
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setDialogState) {

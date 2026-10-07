@@ -5,6 +5,7 @@
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/device_info_service.dart';
 import 'package:daily_you/theme_mode_provider.dart';
+import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/settings_icon_action.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
@@ -60,7 +61,7 @@ class _AboutSettingsState extends State<AboutSettings> {
                 themeProvider.updateAccentColor();
 
                 if (!context.mounted) return;
-                await showDialog(
+                await showAppDialog(
                   context: context,
                   builder: (BuildContext context) {
                     return AlertDialog(

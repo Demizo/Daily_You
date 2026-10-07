@@ -12,6 +12,7 @@ import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/stats/entry_stats.dart';
 import 'package:daily_you/stats/stats_range.dart';
 import 'package:daily_you/stats/streaks.dart';
+import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/distribution_chart.dart';
 import 'package:daily_you/widgets/label_summary_card.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
@@ -232,7 +233,7 @@ class _StatsPageState extends State<StatsPage>
       _applySubject(const MoodSubject());
       return;
     }
-    final tag = await showDialog<Tag>(
+    final tag = await showAppDialog<Tag>(
       context: context,
       builder: (_) => TagPickerDialog(
         mode: TagPickerMode.selectSingle,

@@ -12,6 +12,7 @@ import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/utils/attachment_mime.dart';
 import 'package:daily_you/utils/duration_format.dart';
 import 'package:daily_you/utils/file_size_format.dart';
+import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/failure_dialog.dart';
 import 'package:daily_you/widgets/media_attachment_page.dart';
 import 'package:daily_you/widgets/scale_fade_page_route.dart';
@@ -139,7 +140,7 @@ class _AttachmentViewPageState extends State<AttachmentViewPage> {
       final duration = info.duration;
 
       if (!mounted) return;
-      showDialog(
+      showAppDialog(
         context: context,
         builder: (context) => AlertDialog(
           content: Column(

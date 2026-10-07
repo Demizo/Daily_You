@@ -4,6 +4,7 @@
 
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/device_info_service.dart';
+import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/auth_popup.dart';
 import 'package:daily_you/widgets/settings_icon_action.dart';
 import 'package:daily_you/widgets/settings_toggle.dart';
@@ -46,7 +47,7 @@ class SecuritySettingsPageState extends State<SecuritySettings> {
                   ? (value) async {
                       if (!configProvider.get(Settings.requirePassword)) {
                         bool setPassword = false;
-                        await showDialog(
+                        await showAppDialog(
                             context: context,
                             builder: (context) => AuthPopup(
                                   mode: AuthPopupMode.setPassword,
@@ -61,7 +62,7 @@ class SecuritySettingsPageState extends State<SecuritySettings> {
                         await configProvider.set(
                             Settings.requirePassword, setPassword);
                       } else {
-                        await showDialog(
+                        await showAppDialog(
                             context: context,
                             builder: (context) => AuthPopup(
                                   mode: AuthPopupMode.unlock,
@@ -83,7 +84,7 @@ class SecuritySettingsPageState extends State<SecuritySettings> {
                     .settingsSecurityChangePassword,
                 icon: Icon(Icons.edit_rounded),
                 onPressed: () async {
-                  await showDialog(
+                  await showAppDialog(
                       context: context,
                       builder: (context) => AuthPopup(
                             mode: AuthPopupMode.changePassword,
@@ -101,7 +102,7 @@ class SecuritySettingsPageState extends State<SecuritySettings> {
                     .settingsSecurityBiometricUnlock,
                 setting: Settings.biometricUnlock,
                 onChanged: (value) async {
-                  await showDialog(
+                  await showAppDialog(
                       context: context,
                       builder: (context) => AuthPopup(
                             mode: AuthPopupMode.unlock,

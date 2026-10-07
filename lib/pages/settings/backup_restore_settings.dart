@@ -16,6 +16,7 @@ import 'package:daily_you/utils/imports/import_registry.dart';
 import 'package:daily_you/utils/export_utils.dart';
 import 'package:daily_you/utils/operation_outcome.dart';
 import 'package:daily_you/utils/password_store.dart';
+import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/auth_popup.dart';
 import 'package:daily_you/widgets/auto_backup_settings_dialog.dart';
 import 'package:daily_you/widgets/failure_dialog.dart';
@@ -40,7 +41,7 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
 
   Future<void> _showImportSelectionPopup() async {
     ImportFormat? chosenFormat;
-    await showDialog(
+    await showAppDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -89,7 +90,7 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
 
   Future<void> _showExportSelectionPopup() async {
     ExportFormat chosenFormat = ExportFormat.none;
-    await showDialog(
+    await showAppDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -177,7 +178,7 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
 
   Future<void> _showRestoreWarning() async {
     bool confirmed = false;
-    await showDialog(
+    await showAppDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -229,7 +230,7 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
       "${TimeManager.timeOfDayString(context, TimeOfDay.fromDateTime(time))}";
 
   Future<void> _showBackupPasswordDialog(String title) async {
-    await showDialog(
+    await showAppDialog(
         context: context,
         builder: (context) => AuthPopup(
               mode: AuthPopupMode.setPassword,
@@ -241,7 +242,7 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
   }
 
   Future<void> _showAutoBackupSettings() async {
-    await showDialog(
+    await showAppDialog(
         context: context, builder: (context) => AutoBackupSettingsDialog());
     await armAutoBackupWork();
   }

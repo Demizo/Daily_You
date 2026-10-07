@@ -6,6 +6,7 @@ import 'dart:ui';
 
 import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/pages/attachment_view_page.dart';
+import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/attachment_tile_background.dart';
 import 'package:daily_you/widgets/expressive_loading_indicator.dart';
 import 'package:material_ui/material_ui.dart';
@@ -34,7 +35,7 @@ class _EntryAttachmentEditableListState
   final ScrollController _scrollController = ScrollController();
 
   void _showDeleteAttachmentPopup(int index) {
-    showDialog(
+    showAppDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(

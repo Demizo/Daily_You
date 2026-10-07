@@ -11,6 +11,7 @@ import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/utils/duration_format.dart';
 import 'package:daily_you/utils/recording_temporary_files.dart';
+import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/audio_waveform_decoration.dart';
 import 'package:daily_you/widgets/expressive_icon_button.dart';
 import 'package:daily_you/widgets/failure_dialog.dart';
@@ -169,7 +170,7 @@ class _AudioRecorderPageState extends State<AudioRecorderPage>
 
   Future<void> _showPermissionDeniedDialog() async {
     final l10n = AppLocalizations.of(context)!;
-    final openSettings = await showDialog<bool>(
+    final openSettings = await showAppDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(l10n.warningTitle),
@@ -257,7 +258,7 @@ class _AudioRecorderPageState extends State<AudioRecorderPage>
 
     _confirmingDiscard = true;
     final l10n = AppLocalizations.of(context)!;
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showAppDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(l10n.recorderDiscardTitle),
