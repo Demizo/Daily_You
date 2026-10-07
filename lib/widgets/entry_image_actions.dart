@@ -3,6 +3,7 @@ import 'dart:isolate';
 
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/database/image_storage.dart';
+import 'package:daily_you/utils/exif_orientation.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
@@ -76,12 +77,19 @@ class EntryImageActions {
       return await image.readAsBytes();
     } else {
       if (Platform.isAndroid) {
-        return await FlutterImageCompress.compressWithFile(image.path,
-                quality: quality,
-                minWidth: width,
-                minHeight: width,
-                keepExif: true) ??
-            await image.readAsBytes();
+        final orientation = ExifOrientation.read(await image.readAsBytes());
+        final mirrored = ExifOrientation.isMirrored(orientation);
+        final compressed = await FlutterImageCompress.compressWithFile(
+            image.path,
+            quality: quality,
+            minWidth: width,
+            minHeight: width,
+            autoCorrectionAngle: !mirrored,
+            keepExif: true);
+        if (compressed == null) return await image.readAsBytes();
+        return mirrored
+            ? ExifOrientation.bake(compressed, orientation!, quality: quality)
+            : compressed;
       } else {
         return await Isolate.run(() async {
           final originalImage = await img.decodeImageFile(image.path);

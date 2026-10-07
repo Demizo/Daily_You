@@ -6,6 +6,7 @@ import 'package:daily_you/database/image_storage.dart';
 import 'package:daily_you/file_bytes_cache.dart';
 import 'package:daily_you/storage/file_store.dart';
 import 'package:daily_you/storage/local_file_store.dart';
+import 'package:daily_you/utils/exif_orientation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
@@ -165,12 +166,22 @@ void imageResizerIsolate(Map<String, dynamic> args) async {
         final width = message.width;
 
         if (Platform.isAndroid) {
-          await FlutterImageCompress.compressAndGetFile(
-              join(imgFolderPath, originalPath),
-              join(tempImgFolderPath, "$key.jpg"),
+          final sourcePath = join(imgFolderPath, originalPath);
+          final targetPath = join(tempImgFolderPath, "$key.jpg");
+          final orientation =
+              ExifOrientation.read(await File(sourcePath).readAsBytes());
+          final mirrored = ExifOrientation.isMirrored(orientation);
+          await FlutterImageCompress.compressAndGetFile(sourcePath, targetPath,
               quality: 85,
               minWidth: width,
-              minHeight: width);
+              minHeight: width,
+              autoCorrectionAngle: !mirrored);
+          if (mirrored) {
+            final target = File(targetPath);
+            await target.writeAsBytes(ExifOrientation.bake(
+                await target.readAsBytes(), orientation!,
+                quality: 85));
+          }
         } else {
           final cmd = img.Command()
             ..decodeJpgFile(join(imgFolderPath, originalPath))
