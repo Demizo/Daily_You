@@ -48,6 +48,8 @@ class AppDatabase {
   /// [init] but failed.
   bool migrationFailed = false;
 
+  bool databaseReplacedThisSession = false;
+
   static Database? _database;
   Database? get database => _database;
 
@@ -65,6 +67,7 @@ class AppDatabase {
       {bool forceWithoutSync = false, bool allowMigration = true}) async {
     _internalPath = await getInternalPath();
     migrationFailed = false;
+    databaseReplacedThisSession = false;
     bool success = true;
 
     if (Platform.isAndroid && allowMigration) {
@@ -332,7 +335,10 @@ class AppDatabase {
 
       final temporaryPath = join(dirname(_internalPath!), temporaryName);
       if (await _validateSqliteDatabase(temporaryPath)) {
-        return internalStore.rename(temporaryName, databaseFileName);
+        final replaced =
+            await internalStore.rename(temporaryName, databaseFileName);
+        if (replaced) databaseReplacedThisSession = true;
+        return replaced;
       }
 
       await internalStore.delete(temporaryName);
@@ -356,6 +362,7 @@ class AppDatabase {
   // SQLite Database Actions
 
   Future _createDatabase(Database db, int version) async {
+    databaseReplacedThisSession = true;
     _database = db;
     await createSchema(db);
     await TemplatesProvider.instance.createDefaultTemplates();
