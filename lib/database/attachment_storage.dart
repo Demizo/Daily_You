@@ -6,6 +6,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:daily_you/config_provider.dart';
+import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/file_bytes_cache.dart';
 import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/storage/external_sync_health.dart';
@@ -501,6 +502,39 @@ class AttachmentStorage {
       await _deleteUnreferenced(type, referenced[type]!);
     }
     return true;
+  }
+
+  Future<int> deleteOrphanedAttachments(
+      {Duration minAge = const Duration(days: 1), DateTime? now}) async {
+    final referenced = _referencedFileNames('delete orphaned');
+    if (AppDatabase.instance.databaseReplacedThisSession ||
+        referenced.values.every((names) => names.isEmpty)) {
+      _logger.info(
+          'Orphan sweep skipped: database replaced or nothing referenced');
+      return 0;
+    }
+    final cutoff = (now ?? DateTime.now()).subtract(minAge);
+    var deleted = 0;
+    for (final type in AttachmentType.values) {
+      final internal = await internalStore(type);
+      for (final name in await internal.list()) {
+        if (referenced[type]!.contains(name) ||
+            _uploadingNames.contains(name)) {
+          continue;
+        }
+        final modified = await internal.modifiedTime(name);
+        if (modified == null || modified.isAfter(cutoff)) continue;
+        try {
+          await internal.delete(name);
+          deleted++;
+        } catch (error, stackTrace) {
+          _logger.warning(
+              'Deleting orphaned attachment $name failed', error, stackTrace);
+        }
+      }
+    }
+    if (deleted > 0) _logger.info('Deleted $deleted orphaned attachments');
+    return deleted;
   }
 
   Map<AttachmentType, Set<String>> _referencedFileNames(String action) {

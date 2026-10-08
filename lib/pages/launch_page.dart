@@ -151,13 +151,14 @@ class _LaunchPageState extends State<LaunchPage> {
               .then((_) {}, onError: (Object error, StackTrace stackTrace) {
             _logger.severe(
                 'Syncing the attachment folders failed', error, stackTrace);
-          }));
+          }).whenComplete(_deleteOrphanedAttachments));
           unawaited(_catchUpMissedAutoBackup());
           await _nextPage();
           return;
         }
         _errorType = _LaunchErrorType.externalAccess;
       } else {
+        unawaited(_deleteOrphanedAttachments());
         unawaited(_catchUpMissedAutoBackup());
         await _nextPage();
         return;
@@ -172,6 +173,15 @@ class _LaunchPageState extends State<LaunchPage> {
     setState(() {
       isLoading = false;
     });
+  }
+
+  Future<void> _deleteOrphanedAttachments() async {
+    try {
+      await AttachmentStorage.instance.deleteOrphanedAttachments();
+    } catch (error, stackTrace) {
+      _logger.warning(
+          'Deleting orphaned attachments failed', error, stackTrace);
+    }
   }
 
   Future<void> _catchUpMissedAutoBackup() async {

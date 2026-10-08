@@ -6,6 +6,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/database/attachment_storage.dart';
 import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/providers/entry_attachments_provider.dart';
@@ -1458,5 +1459,124 @@ void main() {
     expect(await storage.garbageCollectAttachments(), isTrue);
 
     expect(await internalStore.list(), equals(['kept.jpg']));
+  });
+
+  test('garbage collection leaves the external folder alone', () async {
+    final externalStore = InMemoryFileStore();
+    useStores(internalStore, externalStore);
+    useImages(['kept.jpg']);
+    await internalStore.write('orphan.jpg', bytesOf('orphan'));
+    await externalStore.write('orphan.jpg', bytesOf('orphan'));
+    await externalStore.write('unknown.jpg', bytesOf('unknown'));
+
+    await storage.garbageCollectAttachments();
+
+    expect(await internalStore.exists('orphan.jpg'), isFalse);
+    expect(await externalStore.list(),
+        unorderedEquals(['orphan.jpg', 'unknown.jpg']));
+  });
+
+  group('deleteOrphanedAttachments', () {
+    final inTwoDays = DateTime.now().add(const Duration(days: 2));
+    late InMemoryFileStore externalStore;
+
+    Future<FileStore> internalOf(AttachmentType type) =>
+        storage.internalStore(type);
+
+    setUp(() {
+      externalStore = InMemoryFileStore();
+      useStores(internalStore, externalStore);
+    });
+
+    test('refuses to run before the attachments load', () async {
+      await internalStore.write('photo.jpg', bytesOf('photo'));
+
+      expect(EntryAttachmentsProvider.instance.isLoaded, isFalse);
+      await expectLater(
+          storage.deleteOrphanedAttachments(now: inTwoDays), throwsStateError);
+      expect(await internalStore.exists('photo.jpg'), isTrue);
+    });
+
+    test('deletes old unreferenced files of every type and keeps the rest',
+        () async {
+      useAttachments([
+        (AttachmentType.image, 'kept.jpg'),
+        (AttachmentType.audio, 'kept.m4a'),
+        (AttachmentType.video, 'kept.mp4'),
+      ]);
+      for (final (type, name) in [
+        (AttachmentType.image, 'kept.jpg'),
+        (AttachmentType.image, 'orphan.jpg'),
+        (AttachmentType.audio, 'kept.m4a'),
+        (AttachmentType.audio, 'orphan.m4a'),
+        (AttachmentType.video, 'kept.mp4'),
+        (AttachmentType.video, 'orphan.mp4'),
+      ]) {
+        await (await internalOf(type)).write(name, bytesOf(name));
+      }
+
+      expect(await storage.deleteOrphanedAttachments(now: inTwoDays), 3);
+
+      expect(
+          await (await internalOf(AttachmentType.image)).list(), ['kept.jpg']);
+      expect(
+          await (await internalOf(AttachmentType.audio)).list(), ['kept.m4a']);
+      expect(
+          await (await internalOf(AttachmentType.video)).list(), ['kept.mp4']);
+    });
+
+    test('keeps every file while no attachment is referenced', () async {
+      useAttachments([]);
+      await internalStore.write('photo.jpg', bytesOf('photo'));
+
+      expect(await storage.deleteOrphanedAttachments(now: inTwoDays), 0);
+
+      expect(await internalStore.exists('photo.jpg'), isTrue);
+    });
+
+    test('keeps every file when the database was replaced this session',
+        () async {
+      useAttachments([(AttachmentType.image, 'kept.jpg')]);
+      await internalStore.write('orphan.jpg', bytesOf('orphan'));
+      AppDatabase.instance.databaseReplacedThisSession = true;
+      addTearDown(
+          () => AppDatabase.instance.databaseReplacedThisSession = false);
+
+      expect(await storage.deleteOrphanedAttachments(now: inTwoDays), 0);
+
+      expect(await internalStore.exists('orphan.jpg'), isTrue);
+    });
+
+    test('keeps unreferenced files younger than the minimum age', () async {
+      useAttachments([]);
+      await internalStore.write('new.jpg', bytesOf('new'));
+
+      expect(await storage.deleteOrphanedAttachments(), 0);
+
+      expect(await internalStore.exists('new.jpg'), isTrue);
+    });
+
+    test('a name referenced as audio does not cover the same video name',
+        () async {
+      useAttachments([(AttachmentType.audio, 'same.bin')]);
+      await (await internalOf(AttachmentType.video))
+          .write('same.bin', bytesOf('video'));
+
+      await storage.deleteOrphanedAttachments(now: inTwoDays);
+
+      expect(await (await internalOf(AttachmentType.video)).list(), isEmpty);
+    });
+
+    test('leaves the external copy of a deleted orphan alone', () async {
+      useAttachments([(AttachmentType.image, 'kept.jpg')]);
+      await internalStore.write('orphan.jpg', bytesOf('orphan'));
+      await externalStore.write('orphan.jpg', bytesOf('orphan'));
+
+      await storage.deleteOrphanedAttachments(now: inTwoDays);
+      await pumpEventQueue();
+
+      expect(await internalStore.exists('orphan.jpg'), isFalse);
+      expect(await externalStore.exists('orphan.jpg'), isTrue);
+    });
   });
 }
