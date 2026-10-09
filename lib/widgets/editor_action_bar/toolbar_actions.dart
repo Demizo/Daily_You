@@ -27,6 +27,18 @@ List<ToolbarAction> markdownActions(
       onPressed: () => insertLinePrefix(controller, '-'),
     ),
     ToolbarAction(
+      icon: const Icon(Icons.checklist_rounded),
+      onPressed: () => toggleChecklist(controller),
+    ),
+    ToolbarAction(
+      icon: const Icon(Icons.format_indent_increase_rounded),
+      onPressed: () => indentLine(controller, outdent: false),
+    ),
+    ToolbarAction(
+      icon: const Icon(Icons.format_indent_decrease_rounded),
+      onPressed: () => indentLine(controller, outdent: true),
+    ),
+    ToolbarAction(
       icon: const Icon(Icons.text_fields_rounded),
       onPressed: () => _insertHeader(context, controller),
     ),

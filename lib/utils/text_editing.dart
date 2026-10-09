@@ -62,6 +62,87 @@ void insertLinePrefix(TextEditingController controller, String prefix) {
   );
 }
 
+// Behavior based on DenserMeerkat/June (GPL-3.0)
+void toggleChecklist(TextEditingController controller) {
+  final text = controller.text;
+  final selection = controller.selection;
+  final cursor = selection.isValid ? selection.start : text.length;
+
+  final lines = text.split('\n');
+  final prefixLength = text.substring(0, cursor).split('\n');
+  final lineIndex = prefixLength.length - 1;
+
+  final currentLine = lines[lineIndex];
+  String newLine;
+  int offsetDelta;
+
+  if (currentLine.trimLeft().startsWith('- [ ] ')) {
+    newLine = currentLine.replaceFirst('- [ ] ', '- [x] ');
+    offsetDelta = 0;
+  } else if (currentLine.trimLeft().startsWith('- [x] ') ||
+      currentLine.trimLeft().startsWith('- [X] ')) {
+    newLine = currentLine.replaceFirst(RegExp(r'- \[[xX]\] '), '');
+    offsetDelta = -6;
+  } else if (currentLine.trimLeft().startsWith('- ')) {
+    newLine = currentLine.replaceFirst('- ', '- [ ] ');
+    offsetDelta = 4;
+  } else {
+    newLine = '- [ ] $currentLine';
+    offsetDelta = 6;
+  }
+
+  lines[lineIndex] = newLine;
+  final newText = lines.join('\n');
+  final newOffset = (cursor + offsetDelta).clamp(0, newText.length);
+
+  controller.value = TextEditingValue(
+    text: newText,
+    selection: TextSelection.collapsed(offset: newOffset),
+  );
+}
+
+// Behavior based on DenserMeerkat/June (GPL-3.0)
+void indentLine(TextEditingController controller, {bool outdent = false}) {
+  final text = controller.text;
+  final selection = controller.selection;
+  final cursor = selection.isValid ? selection.start : text.length;
+
+  final lines = text.split('\n');
+  final prefixLines = text.substring(0, cursor).split('\n');
+  final lineIndex = prefixLines.length - 1;
+
+  final currentLine = lines[lineIndex];
+  String newLine;
+  int offsetDelta;
+
+  if (outdent) {
+    if (currentLine.startsWith('  ')) {
+      newLine = currentLine.substring(2);
+      offsetDelta = -2;
+    } else if (currentLine.startsWith(' ')) {
+      newLine = currentLine.substring(1);
+      offsetDelta = -1;
+    } else if (currentLine.startsWith('\t')) {
+      newLine = currentLine.substring(1);
+      offsetDelta = -1;
+    } else {
+      return;
+    }
+  } else {
+    newLine = '  $currentLine';
+    offsetDelta = 2;
+  }
+
+  lines[lineIndex] = newLine;
+  final newText = lines.join('\n');
+  final newOffset = (cursor + offsetDelta).clamp(0, newText.length);
+
+  controller.value = TextEditingValue(
+    text: newText,
+    selection: TextSelection.collapsed(offset: newOffset),
+  );
+}
+
 class BulletListContinuation {
   BulletListContinuation(this._controller) : _previousText = _controller.text {
     _controller.addListener(_handleTextChanged);
