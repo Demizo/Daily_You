@@ -1,5 +1,6 @@
 import 'package:daily_you/database/entry_store.dart';
 import 'package:daily_you/models/entry.dart';
+import 'package:daily_you/providers/tags_provider.dart';
 import 'package:material_ui/material_ui.dart';
 
 enum OrderBy { date, mood, tracker }
@@ -25,6 +26,47 @@ class EntriesProvider with ChangeNotifier {
   set searchText(String newSearchText) {
     if (_searchText == newSearchText) return;
     _searchText = newSearchText;
+    _calculateFilteredEntries();
+    notifyListeners();
+  }
+
+  DateTime? _startDate;
+  DateTime? get startDate => _startDate;
+  set startDate(DateTime? date) {
+    if (_startDate == date) return;
+    _startDate = date;
+    _calculateFilteredEntries();
+    notifyListeners();
+  }
+
+  DateTime? _endDate;
+  DateTime? get endDate => _endDate;
+  set endDate(DateTime? date) {
+    if (_endDate == date) return;
+    _endDate = date;
+    _calculateFilteredEntries();
+    notifyListeners();
+  }
+
+  Set<int> _filterTagIds = {};
+  Set<int> get filterTagIds => _filterTagIds;
+  set filterTagIds(Set<int> ids) {
+    _filterTagIds = ids;
+    _calculateFilteredEntries();
+    notifyListeners();
+  }
+
+  bool get hasActiveFilters =>
+      _searchText.isNotEmpty ||
+      _startDate != null ||
+      _endDate != null ||
+      _filterTagIds.isNotEmpty;
+
+  void clearFilters() {
+    _searchText = "";
+    _startDate = null;
+    _endDate = null;
+    _filterTagIds = {};
     _calculateFilteredEntries();
     notifyListeners();
   }
@@ -87,15 +129,27 @@ class EntriesProvider with ChangeNotifier {
   }
 
   void _calculateFilteredEntries() {
-    List<Entry> filteredEntries;
-    if (_searchText.isNotEmpty) {
-      filteredEntries = entries
-          .where((entry) =>
-              entry.text.toLowerCase().contains(_searchText.toLowerCase()))
-          .toList();
-    } else {
-      filteredEntries = entries.toList();
-    }
+    List<Entry> filteredEntries = entries.where((entry) {
+      if (_searchText.isNotEmpty &&
+          !entry.text.toLowerCase().contains(_searchText.toLowerCase())) {
+        return false;
+      }
+      if (_startDate != null && entry.timeCreate.isBefore(_startDate!)) {
+        return false;
+      }
+      if (_endDate != null && entry.timeCreate.isAfter(_endDate!)) {
+        return false;
+      }
+      if (_filterTagIds.isNotEmpty) {
+        final entryTags =
+            TagsProvider.instance.getEntryTagsForEntry(entry.id ?? -1);
+        final tagIds = entryTags.map((et) => et.tagId).toSet();
+        if (!tagIds.any((id) => _filterTagIds.contains(id))) {
+          return false;
+        }
+      }
+      return true;
+    }).toList();
 
     if (_orderBy == OrderBy.mood) {
       filteredEntries.sort((a, b) {
