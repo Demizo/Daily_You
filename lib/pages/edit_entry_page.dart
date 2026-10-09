@@ -345,6 +345,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                   undoController: _undoController,
                   focusNode: _focusNode,
                   onTemplateInserted: _applyInsertedTemplateTags,
+                  onTagSelected: (tag) => _tagSource.addTagId(tag.id!),
                   mainActions: _buildMainActions(context),
                 ),
               ),

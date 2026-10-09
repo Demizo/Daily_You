@@ -1,6 +1,9 @@
 import 'dart:async';
 
+import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/models/template.dart';
+import 'package:daily_you/providers/tags_provider.dart';
+import 'package:daily_you/utils/tag_autocomplete_helper.dart';
 import 'package:daily_you/utils/text_editing.dart';
 import 'package:daily_you/widgets/editor_action_bar/action_bar_pill.dart';
 import 'package:daily_you/widgets/editor_action_bar/dock_metrics.dart';
@@ -24,6 +27,7 @@ class EditorActionBar extends StatefulWidget {
   final UndoHistoryController? undoController;
   final bool showTemplateButton;
   final void Function(Template template)? onTemplateInserted;
+  final void Function(Tag tag)? onTagSelected;
   final List<ToolbarAction>? mainActions;
 
   const EditorActionBar({
@@ -33,6 +37,7 @@ class EditorActionBar extends StatefulWidget {
     this.undoController,
     this.showTemplateButton = true,
     this.onTemplateInserted,
+    this.onTagSelected,
     this.mainActions,
   });
 
@@ -57,6 +62,8 @@ class _EditorActionBarState extends State<EditorActionBar> {
   EditorKeyboardSession? _session;
   bool _isEditing = false;
   bool _showMainActionsWhileFocused = false;
+  TagTriggerMatch? _activeTrigger;
+  List<Tag> _suggestions = const [];
 
   @override
   void initState() {
@@ -67,7 +74,37 @@ class _EditorActionBarState extends State<EditorActionBar> {
         onReconnect: () => _session?.resume());
     _bulletContinuation = BulletListContinuation(widget.controller);
     widget.focusNode.addListener(_syncEditing);
+    widget.controller.addListener(_syncTagTrigger);
     _isEditing = _editingTarget;
+  }
+
+  void _syncTagTrigger() {
+    final selection = widget.controller.selection;
+    if (!selection.isValid || !selection.isCollapsed) {
+      if (_activeTrigger != null) {
+        setState(() {
+          _activeTrigger = null;
+          _suggestions = const [];
+        });
+      }
+      return;
+    }
+    final match = TagAutocompleteHelper.findTrigger(
+      widget.controller.text,
+      selection.baseOffset,
+    );
+    if (match != _activeTrigger) {
+      final tags = match != null
+          ? TagAutocompleteHelper.filterTags(
+              TagsProvider.instance.tags,
+              match.query,
+            )
+          : const <Tag>[];
+      setState(() {
+        _activeTrigger = match;
+        _suggestions = tags;
+      });
+    }
   }
 
   @override
@@ -83,6 +120,7 @@ class _EditorActionBarState extends State<EditorActionBar> {
     _focusRestorer.dispose();
     _bulletContinuation.dispose();
     widget.focusNode.removeListener(_syncEditing);
+    widget.controller.removeListener(_syncTagTrigger);
     _overflowPopup.dismiss();
     super.dispose();
   }
@@ -225,6 +263,37 @@ class _EditorActionBarState extends State<EditorActionBar> {
     ];
   }
 
+  List<ToolbarEntry> _tagSuggestionEntries(DockMetrics metrics) {
+    return [
+      for (final tag in _suggestions)
+        ToolbarEntry(
+          width: 80.0 + tag.name.length * 6.0,
+          build: (context, _) => Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 2.0),
+            child: ActionChip(
+              visualDensity: VisualDensity.compact,
+              label: Text('${_activeTrigger!.prefix}${tag.name}',
+                  style: const TextStyle(fontSize: 12)),
+              onPressed: () {
+                final result = TagAutocompleteHelper.completeTag(
+                  text: widget.controller.text,
+                  cursor: widget.controller.selection.baseOffset,
+                  trigger: _activeTrigger!,
+                  tagName: tag.name,
+                );
+                widget.controller.value = TextEditingValue(
+                  text: result.newText,
+                  selection: TextSelection.collapsed(offset: result.newCursor),
+                );
+                widget.onTagSelected?.call(tag);
+                widget.focusNode.requestFocus();
+              },
+            ),
+          ),
+        ),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     final metrics = DockMetrics.of(context);
@@ -259,10 +328,14 @@ class _EditorActionBarState extends State<EditorActionBar> {
                 ? AlignmentDirectional.centerStart
                 : AlignmentDirectional.center;
 
+            final entries = (_activeTrigger != null && _suggestions.isNotEmpty)
+                ? _tagSuggestionEntries(metrics)
+                : (showingMainActions
+                    ? _mainActionEntries(metrics)
+                    : _markdownEntries(context, metrics));
+
             final split = ToolbarEntrySplit.fit(
-              showingMainActions
-                  ? _mainActionEntries(metrics)
-                  : _markdownEntries(context, metrics),
+              entries,
               maxWidth: maxPillWidth,
               overflowButtonWidth: metrics.buttonSize,
               padding: metrics.pillPadding,
