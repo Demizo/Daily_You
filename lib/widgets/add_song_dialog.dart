@@ -1,5 +1,6 @@
 // Behavior based on DenserMeerkat/June (GPL-3.0)
 import 'package:daily_you/models/song.dart';
+import 'package:daily_you/utils/audio_import_helper.dart';
 import 'package:daily_you/utils/song_service.dart';
 import 'package:daily_you/utils/youtube_url_parser.dart';
 import 'package:material_ui/material_ui.dart';
@@ -104,6 +105,18 @@ class _AddSongDialogState extends State<AddSongDialog> {
                 ),
               ),
               onSubmitted: (val) => _resolveLink(val),
+            ),
+            const SizedBox(height: 12),
+            OutlinedButton.icon(
+              icon: const Icon(Icons.audio_file_rounded),
+              label: const Text('Import Local Audio File'),
+              onPressed: () async {
+                final navigator = Navigator.of(context);
+                final song = await AudioImportHelper.pickAndImportLocalAudio();
+                if (song != null && mounted) {
+                  navigator.pop(song);
+                }
+              },
             ),
             if (_isLoading) ...[
               const SizedBox(height: 16),

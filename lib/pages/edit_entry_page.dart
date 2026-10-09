@@ -431,6 +431,16 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
             SongCardWidget(
               song: song,
               compact: true,
+              onUpdate: (updated) async {
+                setLocalState(() {
+                  final idx = _currentSongs.indexOf(song);
+                  if (idx != -1) _currentSongs[idx] = updated;
+                });
+                if (updated.id != null) {
+                  await EntrySongDao.update(updated);
+                }
+                await _saveEntry();
+              },
               onDelete: () async {
                 setLocalState(() {
                   _currentSongs.remove(song);

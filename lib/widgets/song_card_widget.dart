@@ -7,18 +7,21 @@ import 'package:daily_you/database/song_storage.dart';
 import 'package:daily_you/models/song.dart';
 import 'package:daily_you/utils/network_gate.dart';
 import 'package:daily_you/utils/youtube_url_parser.dart';
+import 'package:daily_you/widgets/song_trim_dialog.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SongCardWidget extends StatefulWidget {
   final EntrySong song;
   final VoidCallback? onDelete;
+  final ValueChanged<EntrySong>? onUpdate;
   final bool compact;
 
   const SongCardWidget({
     super.key,
     required this.song,
     this.onDelete,
+    this.onUpdate,
     this.compact = false,
   });
 
@@ -168,9 +171,22 @@ class _SongCardWidgetState extends State<SongCardWidget> {
                 icon: Icon(_isPlaying
                     ? Icons.pause_rounded
                     : Icons.play_arrow_rounded),
-                tooltip: _isPlaying ? 'Pause preview' : 'Play 30s preview',
+                tooltip: _isPlaying ? 'Pause preview' : 'Play preview',
                 color: theme.colorScheme.primary,
                 onPressed: _togglePreview,
+              ),
+            if (widget.onUpdate != null && widget.song.previewUrl != null)
+              IconButton(
+                icon: const Icon(Icons.tune_rounded),
+                tooltip: 'Trim preview range',
+                color: theme.colorScheme.primary,
+                onPressed: () async {
+                  final trimmed =
+                      await SongTrimDialog.show(context, widget.song);
+                  if (trimmed != null) {
+                    widget.onUpdate!(trimmed);
+                  }
+                },
               ),
             // Open in YouTube Music
             IconButton(
