@@ -1841,6 +1841,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No logs recorded yet'**
   String get noLogsRecorded;
+
+  /// No description provided for @settingsScreenProtectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Screen protection'**
+  String get settingsScreenProtectionTitle;
+
+  /// No description provided for @settingsScreenProtectionDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Block screenshots and hide preview in recents'**
+  String get settingsScreenProtectionDescription;
 }
 
 class _AppLocalizationsDelegate

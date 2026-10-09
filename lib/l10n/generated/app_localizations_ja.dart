@@ -982,4 +982,11 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get noLogsRecorded => 'No logs recorded yet';
+
+  @override
+  String get settingsScreenProtectionTitle => 'Screen protection';
+
+  @override
+  String get settingsScreenProtectionDescription =>
+      'Block screenshots and hide preview in recents';
 }

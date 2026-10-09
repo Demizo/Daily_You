@@ -128,6 +128,7 @@ class Settings {
       Setting<bool>("developerModeEnabled", false);
   static const diagnosticLoggingEnabled =
       Setting<bool>("diagnosticLoggingEnabled", false);
+  static const screenProtection = Setting<bool>("screenProtection", false);
 
   static const List<Setting<Object?>> all = [
     configVersion,
@@ -197,6 +198,7 @@ class Settings {
     allowNetworkAccess,
     developerModeEnabled,
     diagnosticLoggingEnabled,
+    screenProtection,
   ];
 
   static const moodIcons = <int, Setting<String>>{

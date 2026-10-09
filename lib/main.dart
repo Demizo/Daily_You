@@ -14,6 +14,7 @@ import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/providers/entry_songs_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
+import 'package:daily_you/utils/screen_protection.dart';
 import 'package:daily_you/providers/templates_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/utils/auto_backup_schedule.dart';
@@ -231,6 +232,7 @@ void main() async {
     await AndroidAlarmManager.initialize();
     await Workmanager().initialize(autoBackupCallbackDispatcher);
     await armAutoBackupWork();
+    await ScreenProtection.updateFromConfig();
   }
 
   runApp(MultiProvider(providers: [

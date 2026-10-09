@@ -558,5 +558,9 @@
   "logsCopied": "Logs copied to clipboard",
   "@logsCopied": {},
   "noLogsRecorded": "No logs recorded yet",
-  "@noLogsRecorded": {}
+  "@noLogsRecorded": {},
+  "settingsScreenProtectionTitle": "Screen protection",
+  "@settingsScreenProtectionTitle": {},
+  "settingsScreenProtectionDescription": "Block screenshots and hide preview in recents",
+  "@settingsScreenProtectionDescription": {}
 }

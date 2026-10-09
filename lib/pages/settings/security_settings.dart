@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/device_info_service.dart';
 import 'package:daily_you/utils/network_gate.dart';
+import 'package:daily_you/utils/screen_protection.dart';
 import 'package:daily_you/widgets/auth_popup.dart';
 import 'package:daily_you/widgets/settings_icon_action.dart';
 import 'package:daily_you/widgets/settings_toggle.dart';
@@ -139,6 +142,18 @@ class SecuritySettingsPageState extends State<SecuritySettings> {
               setting: Settings.allowNetworkAccess,
               onChanged: (value) async {
                 await configProvider.set(Settings.allowNetworkAccess, value);
+              },
+            ),
+          if (Platform.isAndroid)
+            SettingsToggle(
+              title: AppLocalizations.of(context)!
+                  .settingsScreenProtectionTitle,
+              hint: AppLocalizations.of(context)!
+                  .settingsScreenProtectionDescription,
+              setting: Settings.screenProtection,
+              onChanged: (value) async {
+                await configProvider.set(Settings.screenProtection, value);
+                await ScreenProtection.updateFromConfig();
               },
             ),
         ],
