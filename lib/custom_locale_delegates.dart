@@ -30,9 +30,3 @@ const appLocalizationsDelegates = <LocalizationsDelegate<dynamic>>[
   OccitanFrenchFallbackDelegate(GlobalCupertinoLocalizations.delegate),
   OccitanFrenchFallbackDelegate(sdk.GlobalWidgetsLocalizations.delegate),
 ];
-
-const sdkLocalizationsDelegates = <LocalizationsDelegate<dynamic>>[
-  OccitanFrenchFallbackDelegate(sdk.GlobalMaterialLocalizations.delegate),
-  OccitanFrenchFallbackDelegate(sdk.GlobalCupertinoLocalizations.delegate),
-  OccitanFrenchFallbackDelegate(sdk.GlobalWidgetsLocalizations.delegate),
-];

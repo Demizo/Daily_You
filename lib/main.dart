@@ -22,7 +22,6 @@ import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/utils/auto_backup_schedule.dart';
 import 'package:daily_you/utils/backup_restore_utils.dart';
 import 'package:daily_you/utils/logging.dart';
-import 'package:daily_you/widgets/legacy_material_bridge.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
@@ -407,6 +406,17 @@ class MainApp extends StatefulWidget {
   State<MainApp> createState() => _MainAppState();
 }
 
+ThemeData _buildTheme(ColorScheme colorScheme,
+    {Color? scaffoldBackgroundColor}) {
+  return ThemeData(
+    useMaterial3: true,
+    materialTapTargetSize: MaterialTapTargetSize.padded,
+    colorScheme: colorScheme,
+    iconTheme: IconThemeData(color: colorScheme.onSurfaceVariant),
+    scaffoldBackgroundColor: scaffoldBackgroundColor,
+  );
+}
+
 class _MainAppState extends State<MainApp> {
   @override
   Widget build(BuildContext context) {
@@ -422,23 +432,17 @@ class _MainAppState extends State<MainApp> {
         // Use dynamic theme for seed color but do not inject chroma
         bool noChroma = (lightDynamic.primary.r == lightDynamic.primary.b) &&
             (lightDynamic.primary.b == lightDynamic.primary.g);
-        lightTheme = ThemeData(
-            useMaterial3: true,
-            materialTapTargetSize: MaterialTapTargetSize.padded,
-            colorScheme: ColorScheme.fromSeed(
-                seedColor: lightDynamic.primary,
-                primaryContainer: lightDynamic.primaryContainer,
-                dynamicSchemeVariant: noChroma
-                    ? DynamicSchemeVariant.fidelity
-                    : DynamicSchemeVariant.tonalSpot,
-                brightness: Brightness.light));
+        lightTheme = _buildTheme(ColorScheme.fromSeed(
+            seedColor: lightDynamic.primary,
+            primaryContainer: lightDynamic.primaryContainer,
+            dynamicSchemeVariant: noChroma
+                ? DynamicSchemeVariant.fidelity
+                : DynamicSchemeVariant.tonalSpot,
+            brightness: Brightness.light));
       } else {
-        lightTheme = ThemeData(
-            useMaterial3: true,
-            materialTapTargetSize: MaterialTapTargetSize.padded,
-            colorScheme: ColorScheme.fromSeed(
-                seedColor: themeModeProvider.accentColor,
-                brightness: Brightness.light));
+        lightTheme = _buildTheme(ColorScheme.fromSeed(
+            seedColor: themeModeProvider.accentColor,
+            brightness: Brightness.light));
       }
 
       if (themeModeProvider.usingSystemColor && darkDynamic != null) {
@@ -446,32 +450,23 @@ class _MainAppState extends State<MainApp> {
         // Use dynamic theme for seed color but do not inject chroma
         bool noChroma = (darkDynamic.primary.r == darkDynamic.primary.b) &&
             (darkDynamic.primary.b == darkDynamic.primary.g);
-        darkTheme = ThemeData(
-            useMaterial3: true,
-            materialTapTargetSize: MaterialTapTargetSize.padded,
-            colorScheme: ColorScheme.fromSeed(
-                seedColor: darkDynamic.primary,
-                primaryContainer: darkDynamic.primaryContainer,
-                dynamicSchemeVariant: noChroma
-                    ? DynamicSchemeVariant.fidelity
-                    : DynamicSchemeVariant.tonalSpot,
-                brightness: Brightness.dark));
+        darkTheme = _buildTheme(ColorScheme.fromSeed(
+            seedColor: darkDynamic.primary,
+            primaryContainer: darkDynamic.primaryContainer,
+            dynamicSchemeVariant: noChroma
+                ? DynamicSchemeVariant.fidelity
+                : DynamicSchemeVariant.tonalSpot,
+            brightness: Brightness.dark));
       } else {
-        darkTheme = ThemeData(
-          useMaterial3: true,
-          materialTapTargetSize: MaterialTapTargetSize.padded,
-          colorScheme: ColorScheme.fromSeed(
-              seedColor: themeModeProvider.accentColor,
-              brightness: Brightness.dark),
-        );
+        darkTheme = _buildTheme(ColorScheme.fromSeed(
+            seedColor: themeModeProvider.accentColor,
+            brightness: Brightness.dark));
       }
 
       // amoled override
       if (ConfigProvider.instance.get(Settings.theme) == 'amoled') {
-        darkTheme = ThemeData(
-            useMaterial3: true,
-            materialTapTargetSize: MaterialTapTargetSize.padded,
-            colorScheme: ColorScheme.fromSeed(
+        darkTheme = _buildTheme(
+            ColorScheme.fromSeed(
               seedColor: themeModeProvider.accentColor,
               brightness: Brightness.dark,
               surfaceContainerLowest: Colors.black,
@@ -533,7 +528,6 @@ class _MainAppState extends State<MainApp> {
                 },
                 theme: lightTheme,
                 darkTheme: darkTheme,
-                builder: (context, child) => LegacyMaterialBridge(child: child!),
                 home: LaunchPage(
                     nextPage: ResponsiveLayout(
                   mobileScaffold: MobileScaffold(),
