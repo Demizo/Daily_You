@@ -576,5 +576,19 @@
   "settingsCapitalizationTitle": "Auto-capitalization",
   "@settingsCapitalizationTitle": {},
   "settingsCapitalizationDescription": "Automatically capitalize sentences",
-  "@settingsCapitalizationDescription": {}
+  "@settingsCapitalizationDescription": {},
+  "securityQuestionTitle": "Security question",
+  "@securityQuestionTitle": {},
+  "securityQuestionDescription": "Recover your PIN using a security question",
+  "@securityQuestionDescription": {},
+  "securityQuestionPrompt": "Security question",
+  "@securityQuestionPrompt": {},
+  "securityAnswerPrompt": "Security answer",
+  "@securityAnswerPrompt": {},
+  "forgotPasswordButton": "Forgot PIN?",
+  "@forgotPasswordButton": {},
+  "securityQuestionWrongAnswer": "Incorrect answer",
+  "@securityQuestionWrongAnswer": {},
+  "securityQuestionResetPrompt": "PIN has been reset.",
+  "@securityQuestionResetPrompt": {}
 }

@@ -1895,6 +1895,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Automatically capitalize sentences'**
   String get settingsCapitalizationDescription;
+
+  /// No description provided for @securityQuestionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Security question'**
+  String get securityQuestionTitle;
+
+  /// No description provided for @securityQuestionDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Recover your PIN using a security question'**
+  String get securityQuestionDescription;
+
+  /// No description provided for @securityQuestionPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Security question'**
+  String get securityQuestionPrompt;
+
+  /// No description provided for @securityAnswerPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Security answer'**
+  String get securityAnswerPrompt;
+
+  /// No description provided for @forgotPasswordButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot PIN?'**
+  String get forgotPasswordButton;
+
+  /// No description provided for @securityQuestionWrongAnswer.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect answer'**
+  String get securityQuestionWrongAnswer;
+
+  /// No description provided for @securityQuestionResetPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'PIN has been reset.'**
+  String get securityQuestionResetPrompt;
 }
 
 class _AppLocalizationsDelegate

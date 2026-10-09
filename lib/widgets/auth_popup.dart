@@ -1,5 +1,6 @@
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/utils/password_store.dart';
+import 'package:daily_you/utils/security_question_helper.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
@@ -179,6 +180,70 @@ class _AuthPopupState extends State<AuthPopup> {
     }
   }
 
+  Future<void> _showSecurityQuestionRecovery() async {
+    final answerController = TextEditingController();
+    String? answerError;
+    final l10n = AppLocalizations.of(context)!;
+
+    final recovered = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (dialogContext, setDialogState) => AlertDialog(
+          title: Text(l10n.securityQuestionTitle),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                SecurityQuestionHelper.question,
+                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: answerController,
+                autofocus: true,
+                decoration: InputDecoration(
+                  labelText: l10n.securityAnswerPrompt,
+                  errorText: answerError,
+                  border: const OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text(MaterialLocalizations.of(dialogContext).cancelButtonLabel),
+            ),
+            FilledButton(
+              onPressed: () async {
+                final isValid = SecurityQuestionHelper.validateAnswer(answerController.text);
+                if (isValid) {
+                  await SecurityQuestionHelper.resetAppLock();
+                  if (dialogContext.mounted) {
+                    Navigator.of(dialogContext).pop(true);
+                  }
+                } else {
+                  setDialogState(() {
+                    answerError = l10n.securityQuestionWrongAnswer;
+                  });
+                }
+              },
+              child: Text(MaterialLocalizations.of(dialogContext).okButtonLabel),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (recovered == true && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.securityQuestionResetPrompt)),
+      );
+      _succeed('');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (widget.showBiometrics && !_biometricsPrompted) {
@@ -286,6 +351,12 @@ class _AuthPopupState extends State<AuthPopup> {
                   onPressed: _handleBiometric,
                   icon: const Icon(Icons.fingerprint),
                   iconSize: 32,
+                ),
+              if (widget.mode == AuthPopupMode.unlock &&
+                  SecurityQuestionHelper.hasSecurityQuestion)
+                TextButton(
+                  onPressed: _showSecurityQuestionRecovery,
+                  child: Text(AppLocalizations.of(context)!.forgotPasswordButton),
                 ),
               Padding(
                 padding: const EdgeInsets.only(top: 8.0, left: 8.0, right: 8.0),

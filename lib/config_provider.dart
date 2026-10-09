@@ -134,6 +134,11 @@ class Settings {
   static const keyboardCapitalization =
       Setting<bool>("keyboardCapitalization", true);
   static const markdownEnabled = Setting<bool>("markdownEnabled", true);
+  static const securityQuestion =
+      Setting<String>("securityQuestion", "");
+  static const securityAnswerHash = Setting<String>(
+      "securityAnswerHash", "",
+      secure: true, secretStore: true);
 
   static const List<Setting<Object?>> all = [
     configVersion,
@@ -207,6 +212,8 @@ class Settings {
     keyboardAutocorrect,
     keyboardCapitalization,
     markdownEnabled,
+    securityQuestion,
+    securityAnswerHash,
   ];
 
   static const moodIcons = <int, Setting<String>>{

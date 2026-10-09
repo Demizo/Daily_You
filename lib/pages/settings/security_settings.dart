@@ -4,6 +4,7 @@ import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/device_info_service.dart';
 import 'package:daily_you/utils/network_gate.dart';
 import 'package:daily_you/utils/screen_protection.dart';
+import 'package:daily_you/utils/security_question_helper.dart';
 import 'package:daily_you/widgets/auth_popup.dart';
 import 'package:daily_you/widgets/settings_icon_action.dart';
 import 'package:daily_you/widgets/settings_toggle.dart';
@@ -94,6 +95,15 @@ class SecuritySettingsPageState extends State<SecuritySettings> {
                             onSuccess: (_) {},
                           ));
                 }),
+          if (configProvider.get(Settings.requirePassword))
+            SettingsIconAction(
+                title: AppLocalizations.of(context)!.securityQuestionTitle,
+                hint: SecurityQuestionHelper.hasSecurityQuestion
+                    ? SecurityQuestionHelper.question
+                    : AppLocalizations.of(context)!
+                        .securityQuestionDescription,
+                icon: const Icon(Icons.help_outline_rounded),
+                onPressed: () => _promptSetupSecurityQuestion(context)),
           if (configProvider.get(Settings.requirePassword) &&
               (DeviceInfoService().supportsBiometrics ?? false))
             SettingsToggle(
@@ -156,6 +166,60 @@ class SecuritySettingsPageState extends State<SecuritySettings> {
                 await ScreenProtection.updateFromConfig();
               },
             ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _promptSetupSecurityQuestion(BuildContext context) async {
+    final qController =
+        TextEditingController(text: SecurityQuestionHelper.question);
+    final aController = TextEditingController();
+    final l10n = AppLocalizations.of(context)!;
+
+    await showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.securityQuestionTitle),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: qController,
+              decoration: InputDecoration(
+                labelText: l10n.securityQuestionPrompt,
+                hintText: 'e.g. What is your favorite book?',
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: aController,
+              decoration: InputDecoration(
+                labelText: l10n.securityAnswerPrompt,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child:
+                Text(MaterialLocalizations.of(dialogContext).cancelButtonLabel),
+          ),
+          FilledButton(
+            onPressed: () async {
+              if (qController.text.trim().isNotEmpty &&
+                  aController.text.trim().isNotEmpty) {
+                await SecurityQuestionHelper.setSecurityQuestion(
+                  qController.text,
+                  aController.text,
+                );
+                if (mounted) setState(() {});
+                if (dialogContext.mounted) Navigator.of(dialogContext).pop();
+              }
+            },
+            child: Text(MaterialLocalizations.of(dialogContext).okButtonLabel),
+          ),
         ],
       ),
     );

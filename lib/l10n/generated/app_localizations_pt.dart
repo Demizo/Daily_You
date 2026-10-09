@@ -1025,6 +1025,28 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get settingsCapitalizationDescription =>
       'Automatically capitalize sentences';
+
+  @override
+  String get securityQuestionTitle => 'Security question';
+
+  @override
+  String get securityQuestionDescription =>
+      'Recover your PIN using a security question';
+
+  @override
+  String get securityQuestionPrompt => 'Security question';
+
+  @override
+  String get securityAnswerPrompt => 'Security answer';
+
+  @override
+  String get forgotPasswordButton => 'Forgot PIN?';
+
+  @override
+  String get securityQuestionWrongAnswer => 'Incorrect answer';
+
+  @override
+  String get securityQuestionResetPrompt => 'PIN has been reset.';
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).
