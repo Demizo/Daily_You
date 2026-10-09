@@ -4,10 +4,12 @@ import 'dart:io';
 import 'package:daily_you/database/entry_song_dao.dart';
 import 'package:daily_you/database/entry_store.dart';
 import 'package:daily_you/models/image.dart';
+import 'package:daily_you/models/location.dart';
 import 'package:daily_you/models/song.dart';
 import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/providers/entry_locations_provider.dart';
 import 'package:daily_you/providers/entry_songs_provider.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:daily_you/providers/tags_provider.dart';
@@ -16,6 +18,7 @@ import 'package:daily_you/utils/song_service.dart';
 import 'package:daily_you/utils/youtube_url_parser.dart';
 import 'package:daily_you/widgets/add_song_dialog.dart';
 import 'package:daily_you/widgets/entry_draft_dirty_tracker.dart';
+import 'package:daily_you/widgets/location_picker_dialog.dart';
 import 'package:daily_you/widgets/song_card_widget.dart';
 import 'package:daily_you/widgets/tag_attachment_source.dart';
 import 'package:daily_you/widgets/tag_grouped_chip_list.dart';
@@ -72,6 +75,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   DateTime? entryDate;
   late List<EntryImage> _currentImages;
   late List<EntrySong> _currentSongs;
+  EntryLocation? _currentLocation;
   bool _loadingEntry = true;
   bool _openedCamera = false;
   final ScrollController _scrollController = ScrollController();
@@ -128,6 +132,8 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
       _currentSongs = [
         for (final s in EntrySongsProvider.instance.getForEntryId(id)) s.copy()
       ];
+      _currentLocation =
+          EntryLocationsProvider.instance.getForEntryId(id)?.copy();
       _tagSource = TagAttachmentSource.fromEntryTags(
           TagsProvider.instance.getEntryTagsForEntry(id));
       dirtyTrackerBaselineText = _entry.text;
@@ -381,8 +387,36 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                 }),
           ),
           _buildTagChips(),
+          _buildLocationChip(theme),
           _buildSongList(setLocalState),
         ],
+      ),
+    );
+  }
+
+  Widget _buildLocationChip(ThemeData theme) {
+    if (_currentLocation == null ||
+        (_currentLocation!.placeName == null &&
+            _currentLocation!.latitude == null)) {
+      return const SizedBox.shrink();
+    }
+    final label = _currentLocation!.placeName ??
+        '${_currentLocation!.latitude?.toStringAsFixed(4)}, ${_currentLocation!.longitude?.toStringAsFixed(4)}';
+    return Padding(
+      padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
+      child: Chip(
+        avatar: const Icon(Icons.location_on_rounded, size: 16),
+        label: Text(label),
+        deleteIcon: const Icon(Icons.close_rounded, size: 16),
+        onDeleted: () async {
+          setState(() {
+            _currentLocation = null;
+          });
+          if (id != -1) {
+            await EntryLocationsProvider.instance.removeForEntry(id);
+          }
+          await _saveEntry();
+        },
       ),
     );
   }
@@ -526,6 +560,10 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
         icon: const Icon(Icons.music_note_rounded),
         onPressed: _promptAddSong,
       ),
+      ToolbarAction(
+        icon: const Icon(Icons.location_on_rounded),
+        onPressed: _promptEditLocation,
+      ),
     ];
   }
 
@@ -621,8 +659,30 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     _adoptSavedEntry(saved);
     _adoptSavedImages(saved);
     await _persistSongs(saved.id!);
+    if (_currentLocation != null) {
+      if (_currentLocation!.placeName != null ||
+          _currentLocation!.latitude != null) {
+        _currentLocation!.entryId = saved.id!;
+        await EntryLocationsProvider.instance.setLocation(_currentLocation!);
+      } else {
+        await EntryLocationsProvider.instance.removeForEntry(saved.id!);
+      }
+    }
     if (mounted) {
       setState(() {});
+    }
+  }
+
+  Future<void> _promptEditLocation() async {
+    final updated = await LocationPickerDialog.show(
+      context,
+      initialLocation: _currentLocation,
+    );
+    if (updated != null && mounted) {
+      setState(() {
+        _currentLocation = updated;
+      });
+      await _saveEntry();
     }
   }
 

@@ -11,12 +11,14 @@ import 'package:daily_you/utils/operation_outcome.dart';
 import 'package:daily_you/utils/generated/tag_icon_registry.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/image.dart';
+import 'package:daily_you/models/location.dart';
 import 'package:daily_you/models/song.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/models/tag_category.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/providers/entry_locations_provider.dart';
 import 'package:daily_you/providers/entry_songs_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/providers/templates_provider.dart';
@@ -130,11 +132,12 @@ class AppDatabase {
 
   Future<void> open() async {
     _database = await openDatabase(_internalPath!,
-        version: 6, onCreate: _createDatabase, onUpgrade: _onUpgrade);
+        version: 7, onCreate: _createDatabase, onUpgrade: _onUpgrade);
 
     await EntriesProvider.instance.load();
     await EntryImagesProvider.instance.load();
     await EntrySongsProvider.instance.load();
+    await EntryLocationsProvider.instance.load();
     await TemplatesProvider.instance.load();
     await TagsProvider.instance.load();
   }
@@ -369,6 +372,7 @@ CREATE TABLE $imagesTable (
     await _createTagTables(db);
     await _createTemplateTagTable(db);
     await _createSongTables(db);
+    await _createLocationTable(db);
   }
 
   @visibleForTesting
@@ -570,6 +574,23 @@ DROP TABLE old_entries;
     if (oldVersion <= 5) {
       await _createSongTables(db);
     }
+    if (oldVersion <= 6) {
+      await _createLocationTable(db);
+    }
+  }
+
+  Future<void> _createLocationTable(Database db) async {
+    await db.execute('''
+CREATE TABLE $entryLocationsTable (
+    ${EntryLocationFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    ${EntryLocationFields.entryId} INTEGER NOT NULL,
+    ${EntryLocationFields.latitude} REAL,
+    ${EntryLocationFields.longitude} REAL,
+    ${EntryLocationFields.placeName} TEXT,
+    ${EntryLocationFields.timeCreate} DATETIME NOT NULL DEFAULT (DATETIME('now')),
+    FOREIGN KEY (${EntryLocationFields.entryId}) REFERENCES $entriesTable (id)
+)
+''');
   }
 
   Future<void> _createSongTables(Database db) async {

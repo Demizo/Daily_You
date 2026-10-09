@@ -8,6 +8,7 @@ import 'package:daily_you/pages/edit_entry_page.dart';
 import 'package:daily_you/pages/image_view_page.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/providers/entry_locations_provider.dart';
 import 'package:daily_you/providers/entry_songs_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/utils/markdown_io_helper.dart';
@@ -42,6 +43,8 @@ class _EntryViewPageState extends State<EntryViewPage> {
     final entriesProvider = Provider.of<EntriesProvider>(context);
     final entryImagesProvider = Provider.of<EntryImagesProvider>(context);
     final entrySongsProvider = Provider.of<EntrySongsProvider>(context);
+    final entryLocationsProvider =
+        Provider.of<EntryLocationsProvider>(context);
 
     final entry = entriesProvider.entries
         .where((e) => e.id == widget.entryId)
@@ -50,6 +53,7 @@ class _EntryViewPageState extends State<EntryViewPage> {
 
     final images = entryImagesProvider.getForEntry(entry);
     final songs = entrySongsProvider.getForEntry(entry);
+    final location = entryLocationsProvider.getForEntryId(entry.id!);
 
     return Scaffold(
       appBar: AppBar(
@@ -177,6 +181,33 @@ class _EntryViewPageState extends State<EntryViewPage> {
                               chipBuilder: (tag, entryTag) =>
                                   TagChip(tag: tag, value: entryTag.value),
                             ),
+                            if (location != null &&
+                                (location.placeName != null ||
+                                    location.latitude != null))
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(top: 4, bottom: 2),
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.location_on_rounded,
+                                        size: 16,
+                                        color: theme.colorScheme.primary),
+                                    const SizedBox(width: 4),
+                                    Expanded(
+                                      child: Text(
+                                        location.placeName ??
+                                            '${location.latitude?.toStringAsFixed(4)}, ${location.longitude?.toStringAsFixed(4)}',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                            fontSize: 13,
+                                            color: theme
+                                                .colorScheme.onSurfaceVariant),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                           ],
                         ),
                       ),

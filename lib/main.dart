@@ -12,6 +12,7 @@ import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/pages/launch_page.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/providers/entry_locations_provider.dart';
 import 'package:daily_you/providers/entry_songs_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/utils/screen_protection.dart';
@@ -258,6 +259,9 @@ void main() async {
     ),
     ChangeNotifierProvider<EntrySongsProvider>(
       create: (_) => EntrySongsProvider.instance,
+    ),
+    ChangeNotifierProvider<EntryLocationsProvider>(
+      create: (_) => EntryLocationsProvider.instance,
     ),
     ChangeNotifierProvider<TemplatesProvider>(
       create: (_) => TemplatesProvider.instance,

@@ -1,4 +1,5 @@
 import 'package:daily_you/models/entry.dart';
+import 'package:daily_you/providers/entry_locations_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/widgets/entry_tag_icon_preview.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
@@ -54,6 +55,13 @@ class EntryCardHeaderRow extends StatelessWidget {
                 ),
               ),
             ),
+            if (entry.id != null &&
+                context.watch<EntryLocationsProvider>().getForEntryId(entry.id!) != null)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                child: Icon(Icons.location_on_rounded,
+                    size: 14, color: Theme.of(context).colorScheme.primary),
+              ),
             Expanded(
               child: hasTags
                   ? Align(
