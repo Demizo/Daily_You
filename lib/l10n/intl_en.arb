@@ -562,5 +562,19 @@
   "settingsScreenProtectionTitle": "Screen protection",
   "@settingsScreenProtectionTitle": {},
   "settingsScreenProtectionDescription": "Block screenshots and hide preview in recents",
-  "@settingsScreenProtectionDescription": {}
+  "@settingsScreenProtectionDescription": {},
+  "settingsEditorTitle": "Editor",
+  "@settingsEditorTitle": {},
+  "settingsMarkdownTitle": "Markdown formatting",
+  "@settingsMarkdownTitle": {},
+  "settingsMarkdownDescription": "Render rich text and markdown formatting",
+  "@settingsMarkdownDescription": {},
+  "settingsAutocorrectTitle": "Autocorrect",
+  "@settingsAutocorrectTitle": {},
+  "settingsAutocorrectDescription": "Enable keyboard autocorrect and spell check",
+  "@settingsAutocorrectDescription": {},
+  "settingsCapitalizationTitle": "Auto-capitalization",
+  "@settingsCapitalizationTitle": {},
+  "settingsCapitalizationDescription": "Automatically capitalize sentences",
+  "@settingsCapitalizationDescription": {}
 }

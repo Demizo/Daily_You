@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/database/image_storage.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/models/image.dart';
@@ -160,10 +161,18 @@ class _EntryViewPageState extends State<EntryViewPage> {
                           child: Padding(
                               padding: const EdgeInsets.only(
                                   left: 8, top: 4, bottom: 4, right: 8),
-                              child: ScaledMarkdown(
-                                data: entry.text,
-                                selectable: false,
-                              ))),
+                              child: ConfigProvider.instance
+                                      .get(Settings.markdownEnabled)
+                                  ? ScaledMarkdown(
+                                      data: entry.text,
+                                      selectable: false,
+                                    )
+                                  : SelectableText(
+                                      entry.text,
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          color: theme.colorScheme.onSurface),
+                                    ))),
                     if (songs.isNotEmpty)
                       for (final song in songs)
                         SongCardWidget(song: song),

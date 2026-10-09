@@ -1853,6 +1853,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Block screenshots and hide preview in recents'**
   String get settingsScreenProtectionDescription;
+
+  /// No description provided for @settingsEditorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Editor'**
+  String get settingsEditorTitle;
+
+  /// No description provided for @settingsMarkdownTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Markdown formatting'**
+  String get settingsMarkdownTitle;
+
+  /// No description provided for @settingsMarkdownDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Render rich text and markdown formatting'**
+  String get settingsMarkdownDescription;
+
+  /// No description provided for @settingsAutocorrectTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Autocorrect'**
+  String get settingsAutocorrectTitle;
+
+  /// No description provided for @settingsAutocorrectDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable keyboard autocorrect and spell check'**
+  String get settingsAutocorrectDescription;
+
+  /// No description provided for @settingsCapitalizationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-capitalization'**
+  String get settingsCapitalizationTitle;
+
+  /// No description provided for @settingsCapitalizationDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatically capitalize sentences'**
+  String get settingsCapitalizationDescription;
 }
 
 class _AppLocalizationsDelegate

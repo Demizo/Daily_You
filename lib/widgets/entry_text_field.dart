@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/utils/markdown_preview_styles.dart';
 import 'package:daily_you/widgets/editor_action_bar/editor_keyboard_session.dart';
@@ -64,6 +65,11 @@ class _EntryTextFieldState extends State<EntryTextField> {
       scrollController: _scrollController,
       maxLines: null,
       expands: true,
+      autocorrect: ConfigProvider.instance.get(Settings.keyboardAutocorrect),
+      textCapitalization:
+          ConfigProvider.instance.get(Settings.keyboardCapitalization)
+              ? TextCapitalization.sentences
+              : TextCapitalization.none,
       selectionWidthStyle: BoxWidthStyle.tight,
       selectionHeightStyle: MarkdownPreviewDecorations.heightStyle,
       scrollPadding: widget.scrollPadding,
@@ -82,7 +88,6 @@ class _EntryTextFieldState extends State<EntryTextField> {
           buttonItems: suggestions,
         );
       },
-      textCapitalization: TextCapitalization.sentences,
       textAlignVertical: widget.textAlignVertical,
       style: baseStyle,
       decoration: InputDecoration(

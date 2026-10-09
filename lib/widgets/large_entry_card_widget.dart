@@ -1,3 +1,4 @@
+import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/entry_card_header_row.dart';
@@ -76,11 +77,16 @@ class LargeCard extends StatelessWidget {
   static Widget markdownBody(String text) => OverflowBox(
         alignment: AlignmentDirectional.topStart,
         maxHeight: double.infinity,
-        child: ScaledMarkdown(
-          data: text,
-          maxCharacters: 500,
-          scaleFactor: 0.95,
-        ),
+        child: ConfigProvider.instance.get(Settings.markdownEnabled)
+            ? ScaledMarkdown(
+                data: text,
+                maxCharacters: 500,
+                scaleFactor: 0.95,
+              )
+            : Text(
+                text,
+                style: const TextStyle(fontSize: 14),
+              ),
       );
 }
 

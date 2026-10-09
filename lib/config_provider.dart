@@ -129,6 +129,11 @@ class Settings {
   static const diagnosticLoggingEnabled =
       Setting<bool>("diagnosticLoggingEnabled", false);
   static const screenProtection = Setting<bool>("screenProtection", false);
+  static const keyboardAutocorrect =
+      Setting<bool>("keyboardAutocorrect", true);
+  static const keyboardCapitalization =
+      Setting<bool>("keyboardCapitalization", true);
+  static const markdownEnabled = Setting<bool>("markdownEnabled", true);
 
   static const List<Setting<Object?>> all = [
     configVersion,
@@ -199,6 +204,9 @@ class Settings {
     developerModeEnabled,
     diagnosticLoggingEnabled,
     screenProtection,
+    keyboardAutocorrect,
+    keyboardCapitalization,
+    markdownEnabled,
   ];
 
   static const moodIcons = <int, Setting<String>>{

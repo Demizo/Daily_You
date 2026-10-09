@@ -1004,4 +1004,28 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get settingsScreenProtectionDescription =>
       'Block screenshots and hide preview in recents';
+
+  @override
+  String get settingsEditorTitle => 'Editor';
+
+  @override
+  String get settingsMarkdownTitle => 'Markdown formatting';
+
+  @override
+  String get settingsMarkdownDescription =>
+      'Render rich text and markdown formatting';
+
+  @override
+  String get settingsAutocorrectTitle => 'Autocorrect';
+
+  @override
+  String get settingsAutocorrectDescription =>
+      'Enable keyboard autocorrect and spell check';
+
+  @override
+  String get settingsCapitalizationTitle => 'Auto-capitalization';
+
+  @override
+  String get settingsCapitalizationDescription =>
+      'Automatically capitalize sentences';
 }
