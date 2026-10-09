@@ -5,6 +5,7 @@ import 'package:daily_you/utils/imports/import_diarium.dart' as diarium;
 import 'package:daily_you/utils/imports/import_diaro.dart' as diaro;
 import 'package:daily_you/utils/imports/import_format.dart';
 import 'package:daily_you/utils/imports/import_json.dart' as json;
+import 'package:daily_you/utils/imports/import_markdown.dart' as markdown;
 import 'package:daily_you/utils/imports/import_mybrain.dart' as mybrain;
 import 'package:daily_you/utils/imports/import_oneshot.dart' as oneshot;
 import 'package:daily_you/utils/imports/import_pixels.dart' as pixels;
@@ -67,6 +68,11 @@ class ImportRegistry {
       ImportFormat.pixels,
       (localizations) => localizations.formatPixels,
       (context, updateStatus) => pixels.importFromPixels(updateStatus),
+    ),
+    ImportFormatOption(
+      ImportFormat.markdown,
+      (localizations) => 'Markdown (.md)',
+      (context, updateStatus) => markdown.importFromMarkdown(updateStatus),
     ),
   ]);
 

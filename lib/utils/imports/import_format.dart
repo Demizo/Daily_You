@@ -7,4 +7,5 @@ enum ImportFormat {
   myBrain,
   oneShot,
   pixels,
+  markdown,
 }

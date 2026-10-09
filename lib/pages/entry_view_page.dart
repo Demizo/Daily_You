@@ -10,6 +10,7 @@ import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/providers/entry_songs_provider.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:daily_you/utils/markdown_io_helper.dart';
 import 'package:daily_you/widgets/local_image_loader.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
 import 'package:daily_you/widgets/scaled_markdown.dart';
@@ -55,6 +56,31 @@ class _EntryViewPageState extends State<EntryViewPage> {
         actions: [
           _shareButton(context, entry, images),
           _editButton(context, entry, images),
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert_rounded),
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'export_md',
+                child: Row(
+                  children: [
+                    Icon(Icons.description_rounded),
+                    SizedBox(width: 8),
+                    Text('Export Markdown'),
+                  ],
+                ),
+              ),
+            ],
+            onSelected: (val) {
+              if (val == 'export_md') {
+                final md = MarkdownIoHelper.formatEntryAsMarkdown(entry);
+                SharePlus.instance.share(ShareParams(
+                  text: md,
+                  subject:
+                      'daily_you_${entry.timeCreate.toIso8601String().split('T').first}.md',
+                ));
+              }
+            },
+          ),
         ],
       ),
       body: ListView(
