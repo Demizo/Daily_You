@@ -390,7 +390,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get settingsAlwaysSendReminderDescription =>
-      'Envoyer un rappel même une entrée est déjà commencée';
+      'Envoyer un rappel même si une entrée est déjà commencée';
 
   @override
   String get settingsCustomizeNotificationTitle =>
@@ -665,7 +665,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get logFolderWarningDescription =>
-      'Si le dossier sélectionné contient déjà un fichier \'daily_you.db\', celui-ci sera utilisé pour écraser vos journaux existants !';
+      'Si le dossier sélectionné contient déjà un fichier \'daily_you.db\', celui-ci sera utilisé pour écraser vos enregistrements existants !';
 
   @override
   String get errorTitle => 'Erreur';
@@ -968,5 +968,5 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get shareAddToLogPickerTitle => 'Choose a log';
+  String get shareAddToLogPickerTitle => 'Choisir un enregistrement';
 }

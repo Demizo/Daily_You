@@ -943,7 +943,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get shareAddToLogPickerTitle => 'Choose a log';
+  String get shareAddToLogPickerTitle => '选择日志';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -1866,4 +1866,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String chartDistributionTitle(Object tag) {
     return '$tag 分佈';
   }
+
+  @override
+  String get shareAddToLogPickerTitle => '選擇一個紀錄';
 }

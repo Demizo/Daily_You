@@ -18,10 +18,10 @@ class AppLocalizationsFi extends AppLocalizations {
   String get dailyReminderDescription => 'Pidä päivittäinen päiväkirjasi…';
 
   @override
-  String get actionTakePhoto => 'Take photo';
+  String get actionTakePhoto => 'Ota kuva';
 
   @override
-  String get actionToday => 'Today';
+  String get actionToday => 'Tänään';
 
   @override
   String get actionOtherDay => 'Other day';
