@@ -8,51 +8,53 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('SpacesProvider tests', () {
-    test('Default spaces is at most 1-2', () {
+    test('Spaces are user-created and do not require default Personal space', () {
       final now = DateTime(2026, 10, 9);
       final provider = SpacesProvider.instance;
       provider.spaces.clear();
-      provider.spaces.add(Space(
+
+      expect(provider.spaces.isEmpty, isTrue);
+
+      final space = Space(
         id: 1,
-        name: 'Personal',
-        isDefault: true,
+        name: 'Work',
         timeCreate: now,
         timeModified: now,
-      ));
-
-      expect(provider.spaces.length, lessThanOrEqualTo(2));
-      expect(provider.defaultSpace.name, 'Personal');
+      );
+      provider.spaces.add(space);
+      expect(provider.spaces.length, 1);
+      expect(provider.spaces.first.name, 'Work');
     });
 
-    test('getEntriesForSpace does not duplicate normal journals under Personal space', () {
+    test('getEntriesForSpace does not duplicate normal journals under custom space', () {
       final now = DateTime(2026, 10, 9);
       final provider = SpacesProvider.instance;
       provider.spaces.clear();
       provider.spaces.addAll([
-        Space(id: 1, name: 'Personal', isDefault: true, timeCreate: now, timeModified: now),
-        Space(id: 2, name: 'Work', isDefault: false, timeCreate: now, timeModified: now),
+        Space(id: 1, name: 'Work', isDefault: false, timeCreate: now, timeModified: now),
+        Space(id: 2, name: 'Travel', isDefault: false, timeCreate: now, timeModified: now),
       ]);
 
-      final entry1 = Entry(id: 1, text: 'Personal diary note #personal', timeCreate: now, timeModified: now);
-      final entry2 = Entry(id: 2, text: 'Work meeting', timeCreate: now, timeModified: now);
+      final entry1 = Entry(id: 1, text: 'Work meeting #work', timeCreate: now, timeModified: now);
+      final entry2 = Entry(id: 2, text: 'Trip to Tokyo', timeCreate: now, timeModified: now);
       final entry3 = Entry(id: 3, text: 'Normal unassigned journal', timeCreate: now, timeModified: now);
 
       final allEntries = [entry1, entry2, entry3];
 
       provider.entrySpaces.clear();
-      provider.entrySpaces[2] = 2; // Entry 2 explicitly in Work
+      provider.entrySpaces[2] = 2; // Entry 2 explicitly in Travel
 
-      // Entry 2 is in Work
-      final workEntries = provider.getEntriesForSpace(2, allEntries);
+      // Entry 2 is in Travel
+      final travelEntries = provider.getEntriesForSpace(2, allEntries);
+      expect(travelEntries.length, 1);
+      expect(travelEntries.first.id, 2);
+
+      // Entry 1 has #work tag, so it matches Work space
+      // Entry 3 is a Normal Journal with no space assignment, so it does NOT appear under Work
+      final workEntries = provider.getEntriesForSpace(1, allEntries);
       expect(workEntries.length, 1);
-      expect(workEntries.first.id, 2);
-
-      // Entry 1 has #personal tag, so it matches Personal space
-      // Entry 3 is a Normal Journal with no space assignment, so it does NOT appear under Personal
-      final personalEntries = provider.getEntriesForSpace(1, allEntries);
-      expect(personalEntries.length, 1);
-      expect(personalEntries.first.id, 1);
-      expect(personalEntries.any((e) => e.id == 3), isFalse);
+      expect(workEntries.first.id, 1);
+      expect(workEntries.any((e) => e.id == 3), isFalse);
     });
   });
 

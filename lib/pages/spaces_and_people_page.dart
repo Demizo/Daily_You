@@ -92,12 +92,11 @@ class _SpacesAndPeoplePageState extends State<SpacesAndPeoplePage>
               title: const Text('Rename Space'),
               onTap: () => Navigator.of(ctx).pop('rename'),
             ),
-            if (!space.isDefault)
-              ListTile(
-                leading: const Icon(Icons.delete_outline_rounded, color: Colors.red),
-                title: const Text('Delete Space', style: TextStyle(color: Colors.red)),
-                onTap: () => Navigator.of(ctx).pop('delete'),
-              ),
+            ListTile(
+              leading: const Icon(Icons.delete_outline_rounded, color: Colors.red),
+              title: const Text('Delete Space', style: TextStyle(color: Colors.red)),
+              onTap: () => Navigator.of(ctx).pop('delete'),
+            ),
           ],
         ),
       ),
@@ -143,7 +142,7 @@ class _SpacesAndPeoplePageState extends State<SpacesAndPeoplePage>
         builder: (ctx) => AlertDialog(
           title: Text('Delete "${space.name}"?'),
           content: const Text(
-            'Entries in this space will be moved to the default Personal space.',
+            'Entries in this space will become unassigned normal journals.',
           ),
           actions: [
             TextButton(
@@ -160,7 +159,7 @@ class _SpacesAndPeoplePageState extends State<SpacesAndPeoplePage>
       if (confirm == true && mounted) {
         await SpacesProvider.instance.removeSpace(space);
         setState(() {
-          _selectedSpaceId = SpacesProvider.instance.defaultSpace.id;
+          _selectedSpaceId = null;
         });
       }
     }
@@ -280,7 +279,7 @@ class _SpacesAndPeoplePageState extends State<SpacesAndPeoplePage>
           entry: null,
           openCamera: false,
           images: const [],
-          initialSpaceId: _selectedSpaceId ?? SpacesProvider.instance.defaultSpace.id,
+          initialSpaceId: _selectedSpaceId,
         ),
       ));
     } else {
@@ -309,11 +308,12 @@ class _SpacesAndPeoplePageState extends State<SpacesAndPeoplePage>
     final people = peopleProvider.people;
 
     // Sync selected space
-    if (_selectedSpaceId == null || !spaces.any((s) => s.id == _selectedSpaceId)) {
-      _selectedSpaceId = spacesProvider.defaultSpace.id;
+    if (_selectedSpaceId != null && !spaces.any((s) => s.id == _selectedSpaceId)) {
+      _selectedSpaceId = spaces.isNotEmpty ? spaces.first.id : null;
+    } else if (_selectedSpaceId == null && spaces.isNotEmpty) {
+      _selectedSpaceId = spaces.first.id;
     }
-    final activeSpace = spaces.where((s) => s.id == _selectedSpaceId).firstOrNull ??
-        spacesProvider.defaultSpace;
+    final activeSpace = spaces.where((s) => s.id == _selectedSpaceId).firstOrNull;
 
     // Sync selected person
     if (_selectedPersonId != null && !people.any((p) => p.id == _selectedPersonId)) {
@@ -325,8 +325,8 @@ class _SpacesAndPeoplePageState extends State<SpacesAndPeoplePage>
 
     // Get matching entries
     final List<Entry> matchingEntries = _currentTab == SpacesPeopleTab.spaces
-        ? (activeSpace.id != null
-            ? spacesProvider.getEntriesForSpace(activeSpace.id!, allEntries)
+        ? (activeSpace?.id != null
+            ? spacesProvider.getEntriesForSpace(activeSpace!.id!, allEntries)
             : const [])
         : (activePerson?.id != null
             ? peopleProvider.getEntriesForPerson(activePerson!.id!, allEntries)
@@ -340,15 +340,19 @@ class _SpacesAndPeoplePageState extends State<SpacesAndPeoplePage>
       ),
       floatingActionButton: FloatingActionButton.extended(
         icon: Icon(_currentTab == SpacesPeopleTab.spaces
-            ? Icons.edit_note_rounded
-            : Icons.person_add_alt_1_rounded),
+            ? (activeSpace != null ? Icons.edit_note_rounded : Icons.create_new_folder_rounded)
+            : (activePerson != null ? Icons.edit_note_rounded : Icons.person_add_rounded)),
         label: Text(_currentTab == SpacesPeopleTab.spaces
-            ? 'New entry in ${activeSpace.name}'
+            ? (activeSpace != null
+                ? 'New entry in ${activeSpace.name}'
+                : 'Create Space')
             : (activePerson != null
                 ? 'New entry with @${activePerson.name}'
                 : 'Add Person')),
         onPressed: () {
-          if (_currentTab == SpacesPeopleTab.people && activePerson == null) {
+          if (_currentTab == SpacesPeopleTab.spaces && activeSpace == null) {
+            _promptAddSpace(context);
+          } else if (_currentTab == SpacesPeopleTab.people && activePerson == null) {
             _promptAddPerson(context);
           } else {
             _createNewEntry(context);
@@ -405,8 +409,8 @@ class _SpacesAndPeoplePageState extends State<SpacesAndPeoplePage>
                         child: FilterChip(
                           selected: space.id == _selectedSpaceId,
                           showCheckmark: false,
-                          avatar: Icon(
-                            space.isDefault ? Icons.star_rounded : Icons.folder_rounded,
+                          avatar: const Icon(
+                            Icons.folder_rounded,
                             size: 16,
                           ),
                           label: Text(
@@ -420,7 +424,7 @@ class _SpacesAndPeoplePageState extends State<SpacesAndPeoplePage>
                     ),
                   ActionChip(
                     avatar: const Icon(Icons.add_rounded, size: 16),
-                    label: const Text('Add Space'),
+                    label: const Text('Create Space'),
                     onPressed: () => _promptAddSpace(context),
                   ),
                 ],
@@ -462,9 +466,11 @@ class _SpacesAndPeoplePageState extends State<SpacesAndPeoplePage>
           // Main Body Content
           Expanded(
             child: _currentTab == SpacesPeopleTab.spaces
-                ? (matchingEntries.isEmpty
-                    ? _buildEmptySpaceState(context, activeSpace)
-                    : _buildEntriesList(matchingEntries, entriesProvider, imagesProvider))
+                ? (spaces.isEmpty
+                    ? _buildEmptySpacesListState(context)
+                    : (matchingEntries.isEmpty && activeSpace != null
+                        ? _buildEmptySpaceEntriesState(context, activeSpace)
+                        : _buildEntriesList(matchingEntries, entriesProvider, imagesProvider)))
                 : (people.isEmpty
                     ? _buildEmptyPeopleListState(context)
                     : (matchingEntries.isEmpty && activePerson != null
@@ -516,7 +522,43 @@ class _SpacesAndPeoplePageState extends State<SpacesAndPeoplePage>
     );
   }
 
-  Widget _buildEmptySpaceState(BuildContext context, Space space) {
+  Widget _buildEmptySpacesListState(BuildContext context) {
+    final theme = Theme.of(context);
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.dashboard_customize_outlined,
+                size: 64, color: theme.colorScheme.primary),
+            const SizedBox(height: 16),
+            Text(
+              'No Spaces created yet',
+              style: theme.textTheme.titleMedium
+                  ?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Create spaces to organize your journal by areas of life, projects, or contexts.',
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 20),
+            FilledButton.icon(
+              icon: const Icon(Icons.add_rounded),
+              label: const Text('Create Space'),
+              onPressed: () => _promptAddSpace(context),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptySpaceEntriesState(BuildContext context, Space space) {
     final theme = Theme.of(context);
     return Center(
       child: Padding(

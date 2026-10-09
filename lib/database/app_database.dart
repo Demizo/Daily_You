@@ -342,7 +342,6 @@ class AppDatabase {
     await createSchema(db);
     await TemplatesProvider.instance.createDefaultTemplates();
     await TagsProvider.instance.createDefaultTags();
-    await SpacesProvider.instance.createDefaultSpaces();
     await createWelcomeEntry();
   }
 
@@ -593,7 +592,6 @@ DROP TABLE old_entries;
     if (oldVersion <= 8) {
       await _createSpaceTables(db);
       await _createPeopleTables(db);
-      await SpacesProvider.instance.createDefaultSpaces();
     }
   }
 

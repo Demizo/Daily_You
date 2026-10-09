@@ -18,40 +18,17 @@ class SpacesProvider with ChangeNotifier {
 
   Future<void> load() async {
     _spaces = await SpacesDao.getAll();
-    if (_spaces.isEmpty) {
-      await createDefaultSpaces();
+    // Remove auto-generated default "Personal" space if present
+    final defaultPersonal = _spaces
+        .where((s) => s.isDefault && s.name.toLowerCase() == 'personal')
+        .firstOrNull;
+    if (defaultPersonal != null && defaultPersonal.id != null) {
+      await SpacesDao.remove(defaultPersonal.id!);
       _spaces = await SpacesDao.getAll();
     }
     final allEntrySpaces = await SpacesDao.getAllEntrySpaces();
     _entrySpaces = {for (final es in allEntrySpaces) es.entryId: es.spaceId};
     notifyListeners();
-  }
-
-  Future<void> createDefaultSpaces() async {
-    final now = DateTime.now();
-    final defaultSpace = Space(
-      name: 'Personal',
-      isDefault: true,
-      icon: 'person',
-      timeCreate: now,
-      timeModified: now,
-    );
-    await SpacesDao.add(defaultSpace);
-  }
-
-  Space get defaultSpace {
-    if (_spaces.isEmpty) {
-      final now = DateTime.now();
-      return Space(
-        id: 1,
-        name: 'Personal',
-        isDefault: true,
-        icon: 'person',
-        timeCreate: now,
-        timeModified: now,
-      );
-    }
-    return _spaces.firstWhere((s) => s.isDefault, orElse: () => _spaces.first);
   }
 
   Space? getSpaceForEntry(int entryId) {

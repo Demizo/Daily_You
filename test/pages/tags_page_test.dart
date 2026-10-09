@@ -28,8 +28,8 @@ void main() {
 
     final space1 = Space(
       id: 1,
-      name: 'Personal',
-      isDefault: true,
+      name: 'Projects',
+      isDefault: false,
       timeCreate: now,
       timeModified: now,
     );
@@ -63,7 +63,7 @@ void main() {
     EntryStore.instance.notifyListeners();
 
     SpacesProvider.instance.entrySpaces.clear();
-    SpacesProvider.instance.entrySpaces[1] = 1; // Assigned to Personal
+    SpacesProvider.instance.entrySpaces[1] = 1; // Assigned to Projects
     PeopleProvider.instance.entryPeople.clear();
     PeopleProvider.instance.entryPeople[1] = [1]; // Associated with Alice
 
@@ -91,12 +91,12 @@ void main() {
     expect(find.text('Spaces'), findsOneWidget);
     expect(find.text('People'), findsOneWidget);
 
-    // Initial tab is Spaces -> should see 'Personal' and 'Work'
+    // Initial tab is Spaces -> should see 'Projects' and 'Work'
     expect(
         find.byWidgetPredicate((w) =>
             w is FilterChip &&
             w.label is Text &&
-            (w.label as Text).data!.startsWith('Personal')),
+            (w.label as Text).data!.startsWith('Projects')),
         findsOneWidget);
     expect(
         find.byWidgetPredicate((w) =>
@@ -105,7 +105,7 @@ void main() {
             (w.label as Text).data!.startsWith('Work')),
         findsOneWidget);
 
-    // Personal space should show entry (fixing "No Entries" bug)
+    // Projects space should show entry (fixing "No Entries" bug)
     expect(find.byType(LargeEntryCardWidget), findsOneWidget);
 
     // Switch to People tab
