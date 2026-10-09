@@ -127,7 +127,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
       _newEntry = true;
       _creatingNewEntry = true;
       id = -1;
-      _currentSpaceId = widget.initialSpaceId ?? SpacesProvider.instance.defaultSpace.id;
+      _currentSpaceId = widget.initialSpaceId;
       _currentPersonIds = List.from(widget.initialPersonIds ?? const []);
       if (defaultTemplate?.id != null) {
         EntrySongDao.hasSongSlotForTemplate(defaultTemplate!.id!)
@@ -420,9 +420,8 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     final spacesProvider = SpacesProvider.instance;
     final peopleProvider = PeopleProvider.instance;
     final currentSpace = _currentSpaceId != null
-        ? spacesProvider.spaces.where((s) => s.id == _currentSpaceId).firstOrNull ??
-            spacesProvider.defaultSpace
-        : spacesProvider.defaultSpace;
+        ? spacesProvider.spaces.where((s) => s.id == _currentSpaceId).firstOrNull
+        : null;
 
     final taggedPeople = peopleProvider.people
         .where((p) => _currentPersonIds.contains(p.id))
@@ -435,13 +434,20 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
         runSpacing: 4,
         crossAxisAlignment: WrapCrossAlignment.center,
         children: [
-          FilterChip(
-            avatar: const Icon(Icons.dashboard_rounded, size: 16),
-            label: Text(currentSpace.name),
-            selected: true,
-            showCheckmark: false,
-            onSelected: (_) => _promptSelectSpace(setLocalState),
-          ),
+          if (currentSpace != null)
+            FilterChip(
+              avatar: const Icon(Icons.dashboard_rounded, size: 16),
+              label: Text(currentSpace.name),
+              selected: true,
+              showCheckmark: false,
+              onSelected: (_) => _promptSelectSpace(setLocalState),
+            )
+          else
+            ActionChip(
+              avatar: const Icon(Icons.dashboard_outlined, size: 16),
+              label: const Text('Add Space'),
+              onPressed: () => _promptSelectSpace(setLocalState),
+            ),
           for (final person in taggedPeople)
             InputChip(
               avatar: const Icon(Icons.person_rounded, size: 16),
@@ -477,6 +483,19 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
               child: Text('Select Space',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             ),
+            ListTile(
+              leading: Icon(
+                Icons.notes_rounded,
+                color: _currentSpaceId == null
+                    ? Theme.of(ctx).colorScheme.primary
+                    : null,
+              ),
+              title: const Text('None (Normal Journal)'),
+              trailing: _currentSpaceId == null
+                  ? const Icon(Icons.check_rounded, color: Colors.green)
+                  : null,
+              onTap: () => Navigator.of(ctx).pop(-1),
+            ),
             for (final space in spaces)
               ListTile(
                 leading: Icon(
@@ -503,7 +522,12 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
 
     if (!mounted || selected == null) return;
 
-    if (selected == -999) {
+    if (selected == -1) {
+      setLocalState(() {
+        _currentSpaceId = null;
+      });
+      _scheduleSave();
+    } else if (selected == -999) {
       final controller = TextEditingController();
       final name = await showDialog<String>(
         context: context,
@@ -914,6 +938,8 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     }
     if (_currentSpaceId != null) {
       await SpacesProvider.instance.assignEntryToSpace(saved.id!, _currentSpaceId!);
+    } else {
+      await SpacesProvider.instance.unassignEntryFromSpace(saved.id!);
     }
     await PeopleProvider.instance.setEntryPeople(saved.id!, _currentPersonIds);
     if (mounted) {

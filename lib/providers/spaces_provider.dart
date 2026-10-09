@@ -57,20 +57,19 @@ class SpacesProvider with ChangeNotifier {
   Space? getSpaceForEntry(int entryId) {
     final spaceId = _entrySpaces[entryId];
     if (spaceId == null) {
-      return defaultSpace;
+      return null;
     }
-    return _spaces.where((s) => s.id == spaceId).firstOrNull ?? defaultSpace;
+    return _spaces.where((s) => s.id == spaceId).firstOrNull;
   }
 
-  int getSpaceIdForEntry(int entryId) {
-    return _entrySpaces[entryId] ?? (defaultSpace.id ?? 1);
+  int? getSpaceIdForEntry(int entryId) {
+    return _entrySpaces[entryId];
   }
 
   List<Entry> getEntriesForSpace(int spaceId, List<Entry> allEntries) {
     final targetSpace = _spaces.where((s) => s.id == spaceId).firstOrNull;
     if (targetSpace == null) return const [];
 
-    final isDef = targetSpace.isDefault;
     final spaceNameLower = targetSpace.name.toLowerCase();
 
     final matches = allEntries.where((entry) {
@@ -81,13 +80,7 @@ class SpacesProvider with ChangeNotifier {
         return assignedId == spaceId;
       }
 
-      // If no explicit assignment:
-      // Default space takes all unassigned entries
-      if (isDef) {
-        return true;
-      }
-
-      // For non-default spaces, also check if entry text tags or mentions the space
+      // Check if entry text specifically tags or mentions this space
       if (entry.text.toLowerCase().contains('#$spaceNameLower') ||
           entry.text.toLowerCase().contains('[$spaceNameLower]')) {
         return true;
@@ -143,6 +136,13 @@ class SpacesProvider with ChangeNotifier {
   Future<void> assignEntryToSpace(int entryId, int spaceId) async {
     await SpacesDao.setSpaceForEntry(entryId, spaceId);
     _entrySpaces[entryId] = spaceId;
+    await AppDatabase.instance.updateExternalDatabase();
+    notifyListeners();
+  }
+
+  Future<void> unassignEntryFromSpace(int entryId) async {
+    await SpacesDao.removeForEntry(entryId);
+    _entrySpaces.remove(entryId);
     await AppDatabase.instance.updateExternalDatabase();
     notifyListeners();
   }

@@ -24,7 +24,7 @@ void main() {
       expect(provider.defaultSpace.name, 'Personal');
     });
 
-    test('getEntriesForSpace retrieves default and custom space entries properly', () {
+    test('getEntriesForSpace does not duplicate normal journals under Personal space', () {
       final now = DateTime(2026, 10, 9);
       final provider = SpacesProvider.instance;
       provider.spaces.clear();
@@ -33,9 +33,9 @@ void main() {
         Space(id: 2, name: 'Work', isDefault: false, timeCreate: now, timeModified: now),
       ]);
 
-      final entry1 = Entry(id: 1, text: 'Personal diary note', timeCreate: now, timeModified: now);
-      final entry2 = Entry(id: 2, text: 'Work meeting #work', timeCreate: now, timeModified: now);
-      final entry3 = Entry(id: 3, text: 'Another entry', timeCreate: now, timeModified: now);
+      final entry1 = Entry(id: 1, text: 'Personal diary note #personal', timeCreate: now, timeModified: now);
+      final entry2 = Entry(id: 2, text: 'Work meeting', timeCreate: now, timeModified: now);
+      final entry3 = Entry(id: 3, text: 'Normal unassigned journal', timeCreate: now, timeModified: now);
 
       final allEntries = [entry1, entry2, entry3];
 
@@ -47,10 +47,12 @@ void main() {
       expect(workEntries.length, 1);
       expect(workEntries.first.id, 2);
 
-      // Default space (Personal) gets unassigned entries (Entry 1 and Entry 3)
+      // Entry 1 has #personal tag, so it matches Personal space
+      // Entry 3 is a Normal Journal with no space assignment, so it does NOT appear under Personal
       final personalEntries = provider.getEntriesForSpace(1, allEntries);
-      expect(personalEntries.length, 2);
-      expect(personalEntries.map((e) => e.id).toSet(), {1, 3});
+      expect(personalEntries.length, 1);
+      expect(personalEntries.first.id, 1);
+      expect(personalEntries.any((e) => e.id == 3), isFalse);
     });
   });
 
