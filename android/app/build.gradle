@@ -66,41 +66,53 @@ android {
             keyPassword keystoreProperties['keyPassword']
             storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
             storePassword keystoreProperties['storePassword']
+            v1SigningEnabled true
+            v2SigningEnabled true
 	}
+        debug {
+            v1SigningEnabled true
+            v2SigningEnabled true
+        }
     }
+
+    def releaseSigning = (keystorePropertiesFile.exists() && keystoreProperties['storeFile'] != null)
+        ? signingConfigs.release
+        : signingConfigs.debug
 
     flavorDimensions "default"
 
     productFlavors {
 	independent {
             dimension "default"
-            signingConfig = signingConfigs.release
+            signingConfig releaseSigning
 	}
         fdroid {
             dimension "default"
+            signingConfig releaseSigning
         }
         dev {
             dimension "default"
             applicationIdSuffix ".dev"
             versionNameSuffix "-dev"
             resValue "string", "app_name", "Daily You Dev"
-            signingConfig = signingConfigs.release
+            signingConfig releaseSigning
         }
         full {
             dimension "default"
             applicationIdSuffix ".full"
             versionNameSuffix "-full"
             resValue "string", "app_name", "Daily You Full"
-            signingConfig = signingConfigs.release
+            signingConfig releaseSigning
         }
     }
 
     buildTypes {
         release {
             vcsInfo.include = false
+            signingConfig releaseSigning
         }
         profile {
-            signingConfig = signingConfigs.release
+            signingConfig releaseSigning
         }
     }
 
