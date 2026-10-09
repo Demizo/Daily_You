@@ -772,7 +772,8 @@ class _WeekRow extends StatelessWidget {
     return SizedBox(
       height: cellSize,
       child: Row(
-        children: days.map((day) {
+        children: List.generate(days.length, (i) {
+          final day = days[i];
           if (day == null) {
             return SizedBox(
               width: cellSize,
@@ -828,6 +829,20 @@ class _WeekRow extends StatelessWidget {
           final displayDayNum =
               isJalali ? TimeManager.jalaliDayNumber(day) : day.day;
 
+          final showStreaks =
+              ConfigProvider.instance.get(Settings.calendarStreaks);
+          final hasSelf = entries.isNotEmpty;
+          final connectLeft = showStreaks &&
+              hasSelf &&
+              i > 0 &&
+              days[i - 1] != null &&
+              entriesProvider.getEntriesForDate(days[i - 1]!).isNotEmpty;
+          final connectRight = showStreaks &&
+              hasSelf &&
+              i < days.length - 1 &&
+              days[i + 1] != null &&
+              entriesProvider.getEntriesForDate(days[i + 1]!).isNotEmpty;
+
           return SizedBox(
             width: cellSize,
             height: cellSize,
@@ -842,12 +857,14 @@ class _WeekRow extends StatelessWidget {
               showImages: showImages,
               showMood: showMood,
               isJalali: isJalali,
+              connectLeft: connectLeft,
+              connectRight: connectRight,
               calendarTagOverride: calendarTagOverride,
               calendarTagEntryMap: calendarTagEntryMap,
               onSelectDay: onSelectDay,
             ),
           );
-        }).toList(),
+        }),
       ),
     );
   }

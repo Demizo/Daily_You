@@ -1955,6 +1955,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Automatically open the editor when starting the app'**
   String get alwaysOpenNewLogDescription;
+
+  /// No description provided for @calendarStreaksTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Streaks & indicators'**
+  String get calendarStreaksTitle;
 }
 
 class _AppLocalizationsDelegate

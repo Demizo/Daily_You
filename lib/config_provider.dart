@@ -143,6 +143,7 @@ class Settings {
       Setting<String>("reminderDays", "1,2,3,4,5,6,7");
   static const alwaysOpenNewLog =
       Setting<bool>("alwaysOpenNewLog", false);
+  static const calendarStreaks = Setting<bool>("calendarStreaks", true);
 
   static const List<Setting<Object?>> all = [
     configVersion,
@@ -220,6 +221,7 @@ class Settings {
     securityAnswerHash,
     reminderDays,
     alwaysOpenNewLog,
+    calendarStreaks,
   ];
 
   static const moodIcons = <int, Setting<String>>{

@@ -1066,4 +1066,7 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get alwaysOpenNewLogDescription =>
       'Automatically open the editor when starting the app';
+
+  @override
+  String get calendarStreaksTitle => 'Streaks & indicators';
 }

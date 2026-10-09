@@ -596,5 +596,7 @@
   "alwaysOpenNewLogTitle": "Open new log on launch",
   "@alwaysOpenNewLogTitle": {},
   "alwaysOpenNewLogDescription": "Automatically open the editor when starting the app",
-  "@alwaysOpenNewLogDescription": {}
+  "@alwaysOpenNewLogDescription": {},
+  "calendarStreaksTitle": "Streaks & indicators",
+  "@calendarStreaksTitle": {}
 }

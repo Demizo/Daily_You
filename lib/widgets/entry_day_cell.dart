@@ -30,6 +30,8 @@ class EntryDayCell extends StatelessWidget {
   final bool showImages;
   final bool showMood;
   final bool isJalali;
+  final bool connectLeft;
+  final bool connectRight;
   final Tag? calendarTagOverride;
   final Map<int, EntryTag> calendarTagEntryMap;
   final void Function(BuildContext context, DateTime date)? onSelectDay;
@@ -46,6 +48,8 @@ class EntryDayCell extends StatelessWidget {
     this.showImages = true,
     this.showMood = true,
     this.isJalali = false,
+    this.connectLeft = false,
+    this.connectRight = false,
     this.calendarTagOverride,
     this.calendarTagEntryMap = const {},
     this.onSelectDay,
@@ -290,10 +294,18 @@ class EntryDayCell extends StatelessWidget {
             alignment: Alignment.center,
             children: [
               Container(
-                margin: const EdgeInsets.all(2),
+                margin: EdgeInsets.only(
+                  top: 2,
+                  bottom: 2,
+                  left: connectLeft ? 0 : 2,
+                  right: connectRight ? 0 : 2,
+                ),
                 decoration: BoxDecoration(
                   color: colorScheme.secondaryContainer,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.horizontal(
+                    left: Radius.circular(connectLeft ? 2 : 8),
+                    right: Radius.circular(connectRight ? 2 : 8),
+                  ),
                 ),
                 clipBehavior: showImageBg ? Clip.hardEdge : Clip.none,
                 child: showImageBg
@@ -356,6 +368,20 @@ class EntryDayCell extends StatelessWidget {
                         size: 12,
                         color: colorScheme.primary,
                       ),
+                    ),
+                  ),
+                ),
+              if (entries.isNotEmpty &&
+                  !isMulti &&
+                  (!showMood || firstEntry?.mood == null))
+                Positioned(
+                  bottom: 4,
+                  child: Container(
+                    width: 5,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: colorScheme.primary,
+                      shape: BoxShape.circle,
                     ),
                   ),
                 ),

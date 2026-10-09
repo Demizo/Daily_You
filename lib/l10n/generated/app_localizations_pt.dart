@@ -1057,6 +1057,9 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get alwaysOpenNewLogDescription =>
       'Automatically open the editor when starting the app';
+
+  @override
+  String get calendarStreaksTitle => 'Streaks & indicators';
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).

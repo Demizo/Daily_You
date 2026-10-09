@@ -43,6 +43,13 @@ class CalendarViewOptionsDialog extends StatelessWidget {
                 onChanged: (value) =>
                     config.set(Settings.calendarShowMood, value),
               ),
+              SwitchListTile(
+                secondary: const Icon(Icons.show_chart_rounded),
+                title: Text(l10n.calendarStreaksTitle),
+                value: config.get(Settings.calendarStreaks),
+                onChanged: (value) =>
+                    config.set(Settings.calendarStreaks, value),
+              ),
               _buildTagDisplayRow(context, l10n, config, overlayTag),
             ],
           ),
