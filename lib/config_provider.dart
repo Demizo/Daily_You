@@ -149,6 +149,14 @@ class Settings {
   static const paletteStyle =
       Setting<String>("paletteStyle", "tonalSpot");
   static const appFont = Setting<String>("appFont", "system");
+  static const mapStyleProvider =
+      Setting<String>("mapStyleProvider", "carto");
+  static const mapTilerKey =
+      Setting<String>("mapTilerKey", "", secure: true, secretStore: true);
+  static const stadiaKey =
+      Setting<String>("stadiaKey", "", secure: true, secretStore: true);
+  static const mapboxKey =
+      Setting<String>("mapboxKey", "", secure: true, secretStore: true);
 
   static const List<Setting<Object?>> all = [
     configVersion,
@@ -230,6 +238,10 @@ class Settings {
     recentEmojis,
     paletteStyle,
     appFont,
+    mapStyleProvider,
+    mapTilerKey,
+    stadiaKey,
+    mapboxKey,
   ];
 
   static const moodIcons = <int, Setting<String>>{
