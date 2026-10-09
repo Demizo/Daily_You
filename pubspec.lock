@@ -1567,14 +1567,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.12"
-  time_range_picker:
-    dependency: "direct main"
-    description:
-      name: time_range_picker
-      sha256: eeb904e963abec82f289308c320f54fd222a673ac326a4425ae55f2490b48bd9
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.3.1"
   timezone:
     dependency: transitive
     description:
