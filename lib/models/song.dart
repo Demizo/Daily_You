@@ -11,6 +11,7 @@ class EntrySongFields {
     url,
     title,
     artist,
+    album,
     coverPath,
     previewUrl,
     previewStartMs,
@@ -24,6 +25,7 @@ class EntrySongFields {
   static const String url = 'url';
   static const String title = 'title';
   static const String artist = 'artist';
+  static const String album = 'album';
   static const String coverPath = 'cover_path';
   static const String previewUrl = 'preview_url';
   static const String previewStartMs = 'preview_start_ms';
@@ -38,6 +40,7 @@ class EntrySong {
   final String url;
   final String title;
   final String artist;
+  final String? album;
   final String? coverPath;
   final String? previewUrl;
   final int previewStartMs;
@@ -51,6 +54,7 @@ class EntrySong {
     required this.url,
     required this.title,
     required this.artist,
+    this.album,
     this.coverPath,
     this.previewUrl,
     this.previewStartMs = 0,
@@ -65,6 +69,7 @@ class EntrySong {
     String? url,
     String? title,
     String? artist,
+    String? album,
     String? coverPath,
     String? previewUrl,
     int? previewStartMs,
@@ -78,6 +83,7 @@ class EntrySong {
         url: url ?? this.url,
         title: title ?? this.title,
         artist: artist ?? this.artist,
+        album: album ?? this.album,
         coverPath: coverPath ?? this.coverPath,
         previewUrl: previewUrl ?? this.previewUrl,
         previewStartMs: previewStartMs ?? this.previewStartMs,
@@ -90,8 +96,9 @@ class EntrySong {
         entryId: json[EntrySongFields.entryId] as int?,
         videoId: json[EntrySongFields.videoId] as String,
         url: json[EntrySongFields.url] as String,
-        title: json[EntrySongFields.title] as String,
-        artist: json[EntrySongFields.artist] as String,
+        title: (json[EntrySongFields.title] as String?) ?? '',
+        artist: (json[EntrySongFields.artist] as String?) ?? '',
+        album: json[EntrySongFields.album] as String?,
         coverPath: json[EntrySongFields.coverPath] as String?,
         previewUrl: json[EntrySongFields.previewUrl] as String?,
         previewStartMs: (json[EntrySongFields.previewStartMs] as int?) ?? 0,
@@ -106,6 +113,7 @@ class EntrySong {
         EntrySongFields.url: url,
         EntrySongFields.title: title,
         EntrySongFields.artist: artist,
+        EntrySongFields.album: album,
         EntrySongFields.coverPath: coverPath,
         EntrySongFields.previewUrl: previewUrl,
         EntrySongFields.previewStartMs: previewStartMs,

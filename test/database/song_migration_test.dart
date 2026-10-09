@@ -61,12 +61,12 @@ VALUES (10, 'Music Template', 'Today song: ', '$now', '$now')
 
     await dbV5.close();
 
-    // 2. Open with AppDatabase upgrade to version 6
+    // 2. Open with AppDatabase upgrade to version 8
     AppDatabase.instance.database = null;
     final upgradedDb = await dbFactory.openDatabase(
       dbPath,
       options: OpenDatabaseOptions(
-        version: 6,
+        version: 8,
         onUpgrade: (db, oldVersion, newVersion) async {
           if (oldVersion <= 5) {
             await db.execute('''
@@ -77,6 +77,7 @@ CREATE TABLE $entrySongsTable (
     ${EntrySongFields.url} TEXT NOT NULL,
     ${EntrySongFields.title} TEXT NOT NULL,
     ${EntrySongFields.artist} TEXT NOT NULL,
+    ${EntrySongFields.album} TEXT,
     ${EntrySongFields.coverPath} TEXT,
     ${EntrySongFields.previewUrl} TEXT,
     ${EntrySongFields.previewStartMs} INTEGER NOT NULL DEFAULT 0,
@@ -93,6 +94,12 @@ CREATE TABLE $templateSongSlotsTable (
     FOREIGN KEY (${TemplateSongSlotFields.templateId}) REFERENCES $templatesTable (id)
 );
 ''');
+          }
+          if (oldVersion <= 7) {
+            try {
+              await db.execute(
+                  'ALTER TABLE $entrySongsTable ADD COLUMN ${EntrySongFields.album} TEXT;');
+            } catch (_) {}
           }
         },
       ),

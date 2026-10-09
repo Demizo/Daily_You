@@ -11,7 +11,7 @@ class NetworkDisabledException implements Exception {
 
 class NetworkGate {
   static const bool isNetworkCompiledIn =
-      bool.fromEnvironment('ENABLE_NETWORK', defaultValue: false);
+      bool.fromEnvironment('ENABLE_NETWORK', defaultValue: true);
 
   static bool? debugOverrideCompiledIn;
 

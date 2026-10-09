@@ -19,6 +19,7 @@ class LargeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card.filled(
       color: Theme.of(context).colorScheme.surfaceContainer,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       clipBehavior: Clip.antiAlias,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -74,20 +75,17 @@ class LargeCard extends StatelessWidget {
     );
   }
 
-  static Widget markdownBody(String text) => OverflowBox(
-        alignment: AlignmentDirectional.topStart,
-        maxHeight: double.infinity,
-        child: ConfigProvider.instance.get(Settings.markdownEnabled)
-            ? ScaledMarkdown(
-                data: text,
-                maxCharacters: 500,
-                scaleFactor: 0.95,
-              )
-            : Text(
-                text,
-                style: const TextStyle(fontSize: 14),
-              ),
-      );
+  static Widget markdownBody(String text) =>
+      ConfigProvider.instance.get(Settings.markdownEnabled)
+          ? ScaledMarkdown(
+              data: text,
+              maxCharacters: 500,
+              scaleFactor: 0.95,
+            )
+          : Text(
+              text,
+              style: const TextStyle(fontSize: 14),
+            );
 }
 
 class LargeEntryCardWidget extends StatelessWidget {

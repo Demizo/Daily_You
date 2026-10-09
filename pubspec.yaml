@@ -1,18 +1,18 @@
 name: daily_you
 description: Every day is worth remembering...
-publish_to: 'none'
+publish_to: "none"
 version: 3.6.1+3006001
 
 environment:
-  sdk: '>=3.0.0'
+  sdk: ">=3.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  sqflite: 
-  path_provider: 
+  sqflite:
+  path_provider:
   sqflite_common_ffi:
   file_picker: ^13.1.0
   provider: ^6.0.5

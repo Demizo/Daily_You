@@ -30,7 +30,7 @@ void main() {
       NetworkGate.debugOverrideCompiledIn = null;
     });
 
-    test('returns offline fallback when network is disabled', () async {
+    test('returns offline fallback without fabricated info when network is disabled', () async {
       await ConfigProvider.instance.set(Settings.allowNetworkAccess, false);
 
       final result = await SongService.instance.resolveSong(
@@ -39,6 +39,9 @@ void main() {
 
       expect(result.isOfflineFallback, isTrue);
       expect(result.videoId, 'dQw4w9WgXcQ');
+      expect(result.title, isEmpty);
+      expect(result.artist, isEmpty);
+      expect(result.album, isNull);
       expect(result.coverPath, isNull);
       expect(result.previewUrl, isNull);
     });
@@ -66,6 +69,7 @@ void main() {
               {
                 'trackName': 'Never Gonna Give You Up',
                 'artistName': 'Rick Astley',
+                'collectionName': 'Whenever You Need Somebody',
                 'previewUrl': 'https://audio-ssl.itunes.apple.com/preview.m4a',
                 'artworkUrl100': 'https://is1-ssl.mzstatic.com/100x100bb.jpg',
               }
@@ -94,6 +98,7 @@ void main() {
       expect(result.videoId, 'dQw4w9WgXcQ');
       expect(result.title, 'Never Gonna Give You Up');
       expect(result.artist, 'Rick Astley');
+      expect(result.album, 'Whenever You Need Somebody');
       expect(
           result.previewUrl, 'https://audio-ssl.itunes.apple.com/preview.m4a');
       expect(result.coverPath, isNotNull);

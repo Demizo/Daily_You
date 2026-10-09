@@ -40,6 +40,7 @@ class FlashbackCard extends StatelessWidget {
       aspectRatio: 3.7 / 4,
       child: Card.filled(
         color: theme.colorScheme.surfaceContainer,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         clipBehavior: Clip.antiAlias,
         child: Stack(
           fit: StackFit.expand,

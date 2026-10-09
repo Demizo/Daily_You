@@ -1,6 +1,6 @@
-// Behavior based on DenserMeerkat/June (GPL-3.0)
 import 'package:daily_you/models/song.dart';
 import 'package:daily_you/utils/audio_import_helper.dart';
+import 'package:daily_you/utils/network_gate.dart';
 import 'package:daily_you/utils/song_service.dart';
 import 'package:daily_you/utils/youtube_url_parser.dart';
 import 'package:material_ui/material_ui.dart';
@@ -26,6 +26,7 @@ class _AddSongDialogState extends State<AddSongDialog> {
   final TextEditingController _urlController = TextEditingController();
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _artistController = TextEditingController();
+  final TextEditingController _albumController = TextEditingController();
 
   bool _isLoading = false;
   String? _errorMessage;
@@ -45,6 +46,7 @@ class _AddSongDialogState extends State<AddSongDialog> {
     _urlController.dispose();
     _titleController.dispose();
     _artistController.dispose();
+    _albumController.dispose();
     super.dispose();
   }
 
@@ -67,8 +69,9 @@ class _AddSongDialogState extends State<AddSongDialog> {
       if (mounted) {
         setState(() {
           _resolved = result;
-          _titleController.text = result.title;
-          _artistController.text = result.artist;
+          if (result.title.isNotEmpty) _titleController.text = result.title;
+          if (result.artist.isNotEmpty) _artistController.text = result.artist;
+          if (result.album != null) _albumController.text = result.album!;
           _isLoading = false;
         });
       }
@@ -84,13 +87,47 @@ class _AddSongDialogState extends State<AddSongDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final hasNetwork = NetworkGate.isNetworkAllowed;
+
     return AlertDialog(
-      title: const Text('Add Song'),
+      title: const Row(
+        children: [
+          Icon(Icons.music_note_rounded),
+          SizedBox(width: 8),
+          Text('Add Song'),
+        ],
+      ),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            if (!hasNetwork)
+              Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.wifi_off_rounded,
+                        size: 16,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Offline mode. Online search disabled in settings.',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             TextField(
               controller: _urlController,
               decoration: InputDecoration(
@@ -122,18 +159,30 @@ class _AddSongDialogState extends State<AddSongDialog> {
               const SizedBox(height: 16),
               const Center(child: CircularProgressIndicator()),
             ],
-            if (_resolved != null && !_isLoading) ...[
-              const SizedBox(height: 16),
-              TextField(
-                controller: _titleController,
-                decoration: const InputDecoration(labelText: 'Title'),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _titleController,
+              decoration: const InputDecoration(
+                labelText: 'Title',
+                hintText: 'Song Title',
               ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: _artistController,
-                decoration: const InputDecoration(labelText: 'Artist'),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: _artistController,
+              decoration: const InputDecoration(
+                labelText: 'Artist',
+                hintText: 'Artist Name',
               ),
-            ],
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: _albumController,
+              decoration: const InputDecoration(
+                labelText: 'Album (optional)',
+                hintText: 'Album Name',
+              ),
+            ),
           ],
         ),
       ),
@@ -143,21 +192,36 @@ class _AddSongDialogState extends State<AddSongDialog> {
           child: const Text('Cancel'),
         ),
         FilledButton(
-          onPressed: _resolved == null || _isLoading
+          onPressed: _isLoading
               ? null
               : () {
+                  final videoId =
+                      YouTubeUrlParser.extractVideoId(_urlController.text.trim()) ??
+                          (_resolved?.videoId ?? 'custom');
+                  final normalizedUrl =
+                      YouTubeUrlParser.normalizeUrl(videoId);
+
+                  final title = _titleController.text.trim();
+                  final artist = _artistController.text.trim();
+                  final album = _albumController.text.trim().isNotEmpty
+                      ? _albumController.text.trim()
+                      : _resolved?.album;
+
+                  if (title.isEmpty && _urlController.text.trim().isEmpty) {
+                    return;
+                  }
+
                   final song = EntrySong(
-                    entryId: -1, // Assigned by caller
-                    videoId: _resolved!.videoId,
-                    url: _resolved!.url,
-                    title: _titleController.text.trim().isNotEmpty
-                        ? _titleController.text.trim()
-                        : _resolved!.title,
-                    artist: _artistController.text.trim().isNotEmpty
-                        ? _artistController.text.trim()
-                        : _resolved!.artist,
-                    coverPath: _resolved!.coverPath,
-                    previewUrl: _resolved!.previewUrl,
+                    entryId: -1,
+                    videoId: videoId,
+                    url: _urlController.text.trim().isNotEmpty
+                        ? normalizedUrl
+                        : (_resolved?.url ?? ''),
+                    title: title.isNotEmpty ? title : 'Untitled Track',
+                    artist: artist.isNotEmpty ? artist : '',
+                    album: album,
+                    coverPath: _resolved?.coverPath,
+                    previewUrl: _resolved?.previewUrl,
                     timeCreate: DateTime.now(),
                   );
                   Navigator.of(context).pop(song);

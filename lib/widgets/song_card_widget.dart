@@ -57,8 +57,13 @@ class _SongCardWidgetState extends State<SongCardWidget> {
   }
 
   Future<void> _togglePreview() async {
-    if (widget.song.previewUrl == null) return;
-    if (!NetworkGate.isNetworkAllowed) {
+    final preview = widget.song.previewUrl;
+    if (preview == null || preview.isEmpty) return;
+
+    final isLocal = widget.song.url.startsWith('file://') ||
+        preview.startsWith('audio_');
+
+    if (!isLocal && !NetworkGate.isNetworkAllowed) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Network access is disabled in settings')),
       );
@@ -77,7 +82,14 @@ class _SongCardWidgetState extends State<SongCardWidget> {
     if (_isPlaying) {
       await _player!.pause();
     } else {
-      await _player!.play(UrlSource(widget.song.previewUrl!));
+      if (isLocal) {
+        final localBytes = await SongStorage.instance.getBytes(preview);
+        if (localBytes != null) {
+          await _player!.play(BytesSource(localBytes));
+        }
+      } else {
+        await _player!.play(UrlSource(preview));
+      }
     }
   }
 
@@ -106,20 +118,30 @@ class _SongCardWidgetState extends State<SongCardWidget> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final size = widget.compact ? 48.0 : 64.0;
+    final size = widget.compact ? 52.0 : 64.0;
+    final displayTitle = widget.song.title.trim().isNotEmpty
+        ? widget.song.title
+        : 'Untitled Track';
+
+    final artistPart = widget.song.artist.trim();
+    final albumPart = widget.song.album?.trim() ?? '';
+    final subtitleText = [
+      if (artistPart.isNotEmpty) artistPart,
+      if (albumPart.isNotEmpty) albumPart,
+    ].join(' • ');
 
     return Card(
       elevation: 0,
       color: theme.colorScheme.surfaceContainerHigh,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       margin: const EdgeInsets.symmetric(vertical: 4.0),
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
         child: Row(
           children: [
-            // Cover Artwork
+            // Cover Artwork with subtle shadow and rounded corners
             ClipRRect(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(12),
               child: SizedBox(
                 width: size,
                 height: size,
@@ -139,40 +161,43 @@ class _SongCardWidgetState extends State<SongCardWidget> {
               ),
             ),
             const SizedBox(width: 12),
-            // Song Title and Artist
+            // Song Title, Artist, and Album
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    widget.song.title,
+                    displayTitle,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.w600,
+                      fontSize: 15,
                     ),
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    widget.song.artist,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
+                  if (subtitleText.isNotEmpty) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitleText,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                        fontSize: 12,
+                      ),
                     ),
-                  ),
+                  ],
                 ],
               ),
             ),
-            // Play/Pause 30s preview
+            // Play/Pause preview
             if (widget.song.previewUrl != null && !widget.compact)
-              IconButton(
+              IconButton.filledTonal(
                 icon: Icon(_isPlaying
                     ? Icons.pause_rounded
                     : Icons.play_arrow_rounded),
                 tooltip: _isPlaying ? 'Pause preview' : 'Play preview',
-                color: theme.colorScheme.primary,
                 onPressed: _togglePreview,
               ),
             if (widget.onUpdate != null && widget.song.previewUrl != null)
@@ -189,12 +214,13 @@ class _SongCardWidgetState extends State<SongCardWidget> {
                 },
               ),
             // Open in YouTube Music
-            IconButton(
-              icon: const Icon(Icons.open_in_new_rounded),
-              tooltip: 'Open in YouTube Music',
-              color: theme.colorScheme.primary,
-              onPressed: _openYouTubeMusic,
-            ),
+            if (!widget.song.url.startsWith('file://'))
+              IconButton(
+                icon: const Icon(Icons.open_in_new_rounded),
+                tooltip: 'Open in YouTube Music',
+                color: theme.colorScheme.primary,
+                onPressed: _openYouTubeMusic,
+              ),
             // Optional Delete Button (in editor)
             if (widget.onDelete != null)
               IconButton(

@@ -132,7 +132,7 @@ class AppDatabase {
 
   Future<void> open() async {
     _database = await openDatabase(_internalPath!,
-        version: 7, onCreate: _createDatabase, onUpgrade: _onUpgrade);
+        version: 8, onCreate: _createDatabase, onUpgrade: _onUpgrade);
 
     await EntriesProvider.instance.load();
     await EntryImagesProvider.instance.load();
@@ -577,6 +577,10 @@ DROP TABLE old_entries;
     if (oldVersion <= 6) {
       await _createLocationTable(db);
     }
+    if (oldVersion <= 7) {
+      await db.execute(
+          'ALTER TABLE $entrySongsTable ADD COLUMN ${EntrySongFields.album} TEXT;');
+    }
   }
 
   Future<void> _createLocationTable(Database db) async {
@@ -602,6 +606,7 @@ CREATE TABLE $entrySongsTable (
     ${EntrySongFields.url} TEXT NOT NULL,
     ${EntrySongFields.title} TEXT NOT NULL,
     ${EntrySongFields.artist} TEXT NOT NULL,
+    ${EntrySongFields.album} TEXT,
     ${EntrySongFields.coverPath} TEXT,
     ${EntrySongFields.previewUrl} TEXT,
     ${EntrySongFields.previewStartMs} INTEGER NOT NULL DEFAULT 0,
