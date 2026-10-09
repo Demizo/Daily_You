@@ -27,9 +27,12 @@ import 'package:daily_you/widgets/tag_chip.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:provider/provider.dart';
 import 'package:daily_you/pages/full_screen_text_editor_page.dart';
+import 'package:daily_you/providers/people_provider.dart';
+import 'package:daily_you/providers/spaces_provider.dart';
 import 'package:daily_you/widgets/editor_action_bar.dart';
 import 'package:daily_you/widgets/editor_action_bar/editor_keyboard_session.dart';
 import 'package:daily_you/widgets/entry_image_editable_list.dart';
+import 'package:daily_you/widgets/location_map_preview_widget.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
@@ -45,6 +48,8 @@ class AddEditEntryPage extends StatefulWidget {
   final bool openCamera;
   final List<EntryImage> images;
   final String? sharedText;
+  final int? initialSpaceId;
+  final List<int>? initialPersonIds;
 
   const AddEditEntryPage({
     super.key,
@@ -53,6 +58,8 @@ class AddEditEntryPage extends StatefulWidget {
     this.openCamera = false,
     this.images = const <EntryImage>[],
     this.sharedText,
+    this.initialSpaceId,
+    this.initialPersonIds,
   });
 
   static String mergeSharedText(String baseText, String? sharedText) {
@@ -76,6 +83,8 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   late List<EntryImage> _currentImages;
   late List<EntrySong> _currentSongs;
   EntryLocation? _currentLocation;
+  int? _currentSpaceId;
+  List<int> _currentPersonIds = [];
   bool _loadingEntry = true;
   bool _openedCamera = false;
   final ScrollController _scrollController = ScrollController();
@@ -118,6 +127,8 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
       _newEntry = true;
       _creatingNewEntry = true;
       id = -1;
+      _currentSpaceId = widget.initialSpaceId ?? SpacesProvider.instance.defaultSpace.id;
+      _currentPersonIds = List.from(widget.initialPersonIds ?? const []);
       if (defaultTemplate?.id != null) {
         EntrySongDao.hasSongSlotForTemplate(defaultTemplate!.id!)
             .then((hasSlot) {
@@ -134,6 +145,8 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
       ];
       _currentLocation =
           EntryLocationsProvider.instance.getForEntryId(id)?.copy();
+      _currentSpaceId = SpacesProvider.instance.getSpaceIdForEntry(id);
+      _currentPersonIds = List.from(PeopleProvider.instance.getPersonIdsForEntry(id));
       _tagSource = TagAttachmentSource.fromEntryTags(
           TagsProvider.instance.getEntryTagsForEntry(id));
       dirtyTrackerBaselineText = _entry.text;
@@ -352,6 +365,14 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                   focusNode: _focusNode,
                   onTemplateInserted: _applyInsertedTemplateTags,
                   onTagSelected: (tag) => _tagSource.addTagId(tag.id!),
+                  onPersonSelected: (person) {
+                    if (person.id != null && !_currentPersonIds.contains(person.id!)) {
+                      setState(() {
+                        _currentPersonIds.add(person.id!);
+                      });
+                      _scheduleSave();
+                    }
+                  },
                   mainActions: _buildMainActions(context),
                 ),
               ),
@@ -386,6 +407,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                   _scheduleSave();
                 }),
           ),
+          _buildSpaceAndPeopleChips(theme, setLocalState),
           _buildTagChips(),
           _buildLocationChip(theme),
           _buildSongList(setLocalState),
@@ -394,66 +416,241 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     );
   }
 
+  Widget _buildSpaceAndPeopleChips(ThemeData theme, StateSetter setLocalState) {
+    final spacesProvider = SpacesProvider.instance;
+    final peopleProvider = PeopleProvider.instance;
+    final currentSpace = _currentSpaceId != null
+        ? spacesProvider.spaces.where((s) => s.id == _currentSpaceId).firstOrNull ??
+            spacesProvider.defaultSpace
+        : spacesProvider.defaultSpace;
+
+    final taggedPeople = peopleProvider.people
+        .where((p) => _currentPersonIds.contains(p.id))
+        .toList();
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+      child: Wrap(
+        spacing: 6,
+        runSpacing: 4,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          FilterChip(
+            avatar: const Icon(Icons.dashboard_rounded, size: 16),
+            label: Text(currentSpace.name),
+            selected: true,
+            showCheckmark: false,
+            onSelected: (_) => _promptSelectSpace(setLocalState),
+          ),
+          for (final person in taggedPeople)
+            InputChip(
+              avatar: const Icon(Icons.person_rounded, size: 16),
+              label: Text('@${person.name}'),
+              onDeleted: () {
+                setLocalState(() {
+                  _currentPersonIds.remove(person.id);
+                });
+                _scheduleSave();
+              },
+            ),
+          ActionChip(
+            avatar: const Icon(Icons.person_add_rounded, size: 16),
+            label: const Text('Add Person'),
+            onPressed: () => _promptAddPersonToEntry(setLocalState),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _promptSelectSpace(StateSetter setLocalState) async {
+    final spaces = SpacesProvider.instance.spaces;
+    final selected = await showModalBottomSheet<int>(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Text('Select Space',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            ),
+            for (final space in spaces)
+              ListTile(
+                leading: Icon(
+                  space.isDefault ? Icons.star_rounded : Icons.folder_rounded,
+                  color: space.id == _currentSpaceId
+                      ? Theme.of(ctx).colorScheme.primary
+                      : null,
+                ),
+                title: Text(space.name),
+                trailing: space.id == _currentSpaceId
+                    ? const Icon(Icons.check_rounded, color: Colors.green)
+                    : null,
+                onTap: () => Navigator.of(ctx).pop(space.id),
+              ),
+            ListTile(
+              leading: const Icon(Icons.add_rounded),
+              title: const Text('Create New Space'),
+              onTap: () => Navigator.of(ctx).pop(-999),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (!mounted || selected == null) return;
+
+    if (selected == -999) {
+      final controller = TextEditingController();
+      final name = await showDialog<String>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('New Space'),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            decoration: const InputDecoration(
+              labelText: 'Space name',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(ctx).pop(controller.text.trim()),
+              child: const Text('Create'),
+            ),
+          ],
+        ),
+      );
+      if (name != null && name.isNotEmpty && mounted) {
+        final created = await SpacesProvider.instance.addSpace(name);
+        setLocalState(() {
+          _currentSpaceId = created.id;
+        });
+        _scheduleSave();
+      }
+    } else {
+      setLocalState(() {
+        _currentSpaceId = selected;
+      });
+      _scheduleSave();
+    }
+  }
+
+  Future<void> _promptAddPersonToEntry(StateSetter setLocalState) async {
+    final people = PeopleProvider.instance.people;
+    final selected = await showModalBottomSheet<int>(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Text('Tag Person',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            ),
+            for (final person in people)
+              ListTile(
+                leading: const Icon(Icons.person_outline_rounded),
+                title: Text('@${person.name}'),
+                trailing: _currentPersonIds.contains(person.id)
+                    ? const Icon(Icons.check_rounded, color: Colors.green)
+                    : null,
+                onTap: () => Navigator.of(ctx).pop(person.id),
+              ),
+            ListTile(
+              leading: const Icon(Icons.person_add_rounded),
+              title: const Text('Add New Person'),
+              onTap: () => Navigator.of(ctx).pop(-999),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (!mounted || selected == null) return;
+
+    if (selected == -999) {
+      final controller = TextEditingController();
+      final name = await showDialog<String>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Add Person'),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            decoration: const InputDecoration(
+              labelText: 'Name',
+              prefixText: '@',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(ctx).pop(controller.text.trim()),
+              child: const Text('Add'),
+            ),
+          ],
+        ),
+      );
+      if (name != null && name.isNotEmpty && mounted) {
+        final newPerson = await PeopleProvider.instance.addPerson(name);
+        if (newPerson.id != null) {
+          setLocalState(() {
+            if (!_currentPersonIds.contains(newPerson.id!)) {
+              _currentPersonIds.add(newPerson.id!);
+            }
+          });
+          _scheduleSave();
+        }
+      }
+    } else {
+      setLocalState(() {
+        if (!_currentPersonIds.contains(selected)) {
+          _currentPersonIds.add(selected);
+        } else {
+          _currentPersonIds.remove(selected);
+        }
+      });
+      _scheduleSave();
+    }
+  }
+
   Widget _buildLocationChip(ThemeData theme) {
     if (_currentLocation == null ||
         (_currentLocation!.placeName == null &&
             _currentLocation!.latitude == null)) {
       return const SizedBox.shrink();
     }
-    final label = _currentLocation!.placeName ??
-        '${_currentLocation!.latitude?.toStringAsFixed(4)}°, ${_currentLocation!.longitude?.toStringAsFixed(4)}°';
     return Padding(
       padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
-      child: Card(
-        elevation: 0,
-        color: theme.colorScheme.surfaceContainerHighest,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        margin: EdgeInsets.zero,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(12),
-          onTap: _promptEditLocation,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            child: Row(
-              children: [
-                Icon(Icons.location_on_rounded, size: 18, color: theme.colorScheme.primary),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                      color: theme.colorScheme.onSurface,
-                    ),
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.edit_rounded, size: 16),
-                  tooltip: 'Edit location',
-                  visualDensity: VisualDensity.compact,
-                  onPressed: _promptEditLocation,
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close_rounded, size: 16),
-                  tooltip: 'Remove location',
-                  visualDensity: VisualDensity.compact,
-                  onPressed: () async {
-                    setState(() {
-                      _currentLocation = null;
-                    });
-                    if (id != -1) {
-                      await EntryLocationsProvider.instance.removeForEntry(id);
-                    }
-                    await _saveEntry();
-                  },
-                ),
-              ],
-            ),
-          ),
-        ),
+      child: LocationMapPreviewWidget(
+        location: _currentLocation!,
+        isEditable: true,
+        onTap: _promptEditLocation,
+        onEdit: _promptEditLocation,
+        onRemove: () async {
+          setState(() {
+            _currentLocation = null;
+          });
+          if (id != -1) {
+            await EntryLocationsProvider.instance.removeForEntry(id);
+          }
+          await _saveEntry();
+        },
       ),
     );
   }
@@ -715,6 +912,10 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
         await EntryLocationsProvider.instance.removeForEntry(saved.id!);
       }
     }
+    if (_currentSpaceId != null) {
+      await SpacesProvider.instance.assignEntryToSpace(saved.id!, _currentSpaceId!);
+    }
+    await PeopleProvider.instance.setEntryPeople(saved.id!, _currentPersonIds);
     if (mounted) {
       setState(() {});
     }

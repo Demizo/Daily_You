@@ -12,7 +12,9 @@ import 'package:daily_you/utils/generated/tag_icon_registry.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/models/location.dart';
+import 'package:daily_you/models/person.dart';
 import 'package:daily_you/models/song.dart';
+import 'package:daily_you/models/space.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/models/tag_category.dart';
 import 'package:daily_you/models/template.dart';
@@ -20,6 +22,8 @@ import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/providers/entry_locations_provider.dart';
 import 'package:daily_you/providers/entry_songs_provider.dart';
+import 'package:daily_you/providers/people_provider.dart';
+import 'package:daily_you/providers/spaces_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/providers/templates_provider.dart';
 import 'package:easy_debounce/easy_debounce.dart';
@@ -132,12 +136,14 @@ class AppDatabase {
 
   Future<void> open() async {
     _database = await openDatabase(_internalPath!,
-        version: 8, onCreate: _createDatabase, onUpgrade: _onUpgrade);
+        version: 9, onCreate: _createDatabase, onUpgrade: _onUpgrade);
 
     await EntriesProvider.instance.load();
     await EntryImagesProvider.instance.load();
     await EntrySongsProvider.instance.load();
     await EntryLocationsProvider.instance.load();
+    await SpacesProvider.instance.load();
+    await PeopleProvider.instance.load();
     await TemplatesProvider.instance.load();
     await TagsProvider.instance.load();
   }
@@ -336,6 +342,7 @@ class AppDatabase {
     await createSchema(db);
     await TemplatesProvider.instance.createDefaultTemplates();
     await TagsProvider.instance.createDefaultTags();
+    await SpacesProvider.instance.createDefaultSpaces();
     await createWelcomeEntry();
   }
 
@@ -373,6 +380,8 @@ CREATE TABLE $imagesTable (
     await _createTemplateTagTable(db);
     await _createSongTables(db);
     await _createLocationTable(db);
+    await _createSpaceTables(db);
+    await _createPeopleTables(db);
   }
 
   @visibleForTesting
@@ -581,6 +590,60 @@ DROP TABLE old_entries;
       await db.execute(
           'ALTER TABLE $entrySongsTable ADD COLUMN ${EntrySongFields.album} TEXT;');
     }
+    if (oldVersion <= 8) {
+      await _createSpaceTables(db);
+      await _createPeopleTables(db);
+      await SpacesProvider.instance.createDefaultSpaces();
+    }
+  }
+
+  Future<void> _createSpaceTables(Database db) async {
+    await db.execute('''
+CREATE TABLE $spacesTable (
+    ${SpaceFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    ${SpaceFields.name} TEXT NOT NULL UNIQUE,
+    ${SpaceFields.isDefault} INTEGER NOT NULL DEFAULT 0,
+    ${SpaceFields.icon} TEXT,
+    ${SpaceFields.color} INTEGER,
+    ${SpaceFields.timeCreate} DATETIME NOT NULL DEFAULT (DATETIME('now')),
+    ${SpaceFields.timeModified} DATETIME NOT NULL DEFAULT (DATETIME('now'))
+)
+''');
+
+    await db.execute('''
+CREATE TABLE $entrySpacesTable (
+    ${EntrySpaceFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    ${EntrySpaceFields.entryId} INTEGER NOT NULL,
+    ${EntrySpaceFields.spaceId} INTEGER NOT NULL,
+    FOREIGN KEY (${EntrySpaceFields.entryId}) REFERENCES $entriesTable (id),
+    FOREIGN KEY (${EntrySpaceFields.spaceId}) REFERENCES $spacesTable (id),
+    UNIQUE (${EntrySpaceFields.entryId}, ${EntrySpaceFields.spaceId})
+)
+''');
+  }
+
+  Future<void> _createPeopleTables(Database db) async {
+    await db.execute('''
+CREATE TABLE $peopleTable (
+    ${PersonFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    ${PersonFields.name} TEXT NOT NULL UNIQUE,
+    ${PersonFields.note} TEXT,
+    ${PersonFields.color} INTEGER,
+    ${PersonFields.timeCreate} DATETIME NOT NULL DEFAULT (DATETIME('now')),
+    ${PersonFields.timeModified} DATETIME NOT NULL DEFAULT (DATETIME('now'))
+)
+''');
+
+    await db.execute('''
+CREATE TABLE $entryPeopleTable (
+    ${EntryPersonFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    ${EntryPersonFields.entryId} INTEGER NOT NULL,
+    ${EntryPersonFields.personId} INTEGER NOT NULL,
+    FOREIGN KEY (${EntryPersonFields.entryId}) REFERENCES $entriesTable (id),
+    FOREIGN KEY (${EntryPersonFields.personId}) REFERENCES $peopleTable (id),
+    UNIQUE (${EntryPersonFields.entryId}, ${EntryPersonFields.personId})
+)
+''');
   }
 
   Future<void> _createLocationTable(Database db) async {

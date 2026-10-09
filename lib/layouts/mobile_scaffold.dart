@@ -8,8 +8,8 @@ import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/pages/gallery_page.dart';
 import 'package:daily_you/pages/home_page.dart';
+import 'package:daily_you/pages/spaces_and_people_page.dart';
 import 'package:daily_you/pages/statistics_page.dart';
-import 'package:daily_you/pages/tags_page.dart';
 import 'package:provider/provider.dart';
 
 import '../pages/settings_page.dart';
@@ -30,7 +30,7 @@ class _MobileScaffoldState extends State<MobileScaffold> {
 
   final List<Widget> pages = [
     const HomePage(),
-    const TagsPage(),
+    const SpacesAndPeoplePage(),
     const GalleryPage(),
     const StatsPage(),
   ];
@@ -287,8 +287,8 @@ class _MobileScaffoldState extends State<MobileScaffold> {
             context,
             theme,
             1,
-            Icons.local_offer_rounded,
-            'Tags & People',
+            Icons.dashboard_rounded,
+            'Spaces & People',
             onTap: closeDrawer
                 ? () {
                     Navigator.of(context).pop();
@@ -394,8 +394,8 @@ class _MobileScaffoldState extends State<MobileScaffold> {
               label: l10n.pageHomeTitle,
             ),
             const NavigationDestination(
-              icon: Icon(Icons.local_offer_rounded),
-              label: 'Tags & People',
+              icon: Icon(Icons.dashboard_rounded),
+              label: 'Spaces & People',
             ),
             NavigationDestination(
               icon: const Icon(Icons.photo_library_rounded),
@@ -503,7 +503,7 @@ class _MobileScaffoldState extends State<MobileScaffold> {
     final l10n = AppLocalizations.of(context)!;
     final List<String> pageTitles = [
       l10n.pageHomeTitle,
-      'Tags & People',
+      'Spaces & People',
       l10n.pageGalleryTitle,
       l10n.pageStatisticsTitle,
     ];

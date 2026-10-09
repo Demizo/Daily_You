@@ -1,7 +1,9 @@
 import 'dart:async';
 
+import 'package:daily_you/models/person.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/models/template.dart';
+import 'package:daily_you/providers/people_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/utils/tag_autocomplete_helper.dart';
 import 'package:daily_you/utils/text_editing.dart';
@@ -28,6 +30,7 @@ class EditorActionBar extends StatefulWidget {
   final bool showTemplateButton;
   final void Function(Template template)? onTemplateInserted;
   final void Function(Tag tag)? onTagSelected;
+  final void Function(Person person)? onPersonSelected;
   final List<ToolbarAction>? mainActions;
 
   const EditorActionBar({
@@ -38,6 +41,7 @@ class EditorActionBar extends StatefulWidget {
     this.showTemplateButton = true,
     this.onTemplateInserted,
     this.onTagSelected,
+    this.onPersonSelected,
     this.mainActions,
   });
 
@@ -64,6 +68,7 @@ class _EditorActionBarState extends State<EditorActionBar> {
   bool _showMainActionsWhileFocused = false;
   TagTriggerMatch? _activeTrigger;
   List<Tag> _suggestions = const [];
+  List<Person> _personSuggestions = const [];
 
   @override
   void initState() {
@@ -85,6 +90,7 @@ class _EditorActionBarState extends State<EditorActionBar> {
         setState(() {
           _activeTrigger = null;
           _suggestions = const [];
+          _personSuggestions = const [];
         });
       }
       return;
@@ -94,16 +100,32 @@ class _EditorActionBarState extends State<EditorActionBar> {
       selection.baseOffset,
     );
     if (match != _activeTrigger) {
-      final tags = match != null
-          ? TagAutocompleteHelper.filterTags(
-              TagsProvider.instance.tags,
-              match.query,
-            )
-          : const <Tag>[];
-      setState(() {
-        _activeTrigger = match;
-        _suggestions = tags;
-      });
+      if (match != null) {
+        if (match.prefix == '@') {
+          final people = PeopleProvider.instance.search(match.query).take(5).toList();
+          setState(() {
+            _activeTrigger = match;
+            _personSuggestions = people;
+            _suggestions = const [];
+          });
+        } else {
+          final tags = TagAutocompleteHelper.filterTags(
+            TagsProvider.instance.tags,
+            match.query,
+          );
+          setState(() {
+            _activeTrigger = match;
+            _suggestions = tags;
+            _personSuggestions = const [];
+          });
+        }
+      } else {
+        setState(() {
+          _activeTrigger = null;
+          _suggestions = const [];
+          _personSuggestions = const [];
+        });
+      }
     }
   }
 
@@ -264,6 +286,38 @@ class _EditorActionBarState extends State<EditorActionBar> {
   }
 
   List<ToolbarEntry> _tagSuggestionEntries(DockMetrics metrics) {
+    if (_activeTrigger?.prefix == '@') {
+      return [
+        for (final person in _personSuggestions)
+          ToolbarEntry(
+            width: 80.0 + person.name.length * 6.0,
+            build: (context, _) => Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 2.0),
+              child: ActionChip(
+                visualDensity: VisualDensity.compact,
+                avatar: const Icon(Icons.person_rounded, size: 14),
+                label: Text('@${person.name}',
+                    style: const TextStyle(fontSize: 12)),
+                onPressed: () {
+                  final result = TagAutocompleteHelper.completeTag(
+                    text: widget.controller.text,
+                    cursor: widget.controller.selection.baseOffset,
+                    trigger: _activeTrigger!,
+                    tagName: person.name,
+                  );
+                  widget.controller.value = TextEditingValue(
+                    text: result.newText,
+                    selection: TextSelection.collapsed(offset: result.newCursor),
+                  );
+                  widget.onPersonSelected?.call(person);
+                  widget.focusNode.requestFocus();
+                },
+              ),
+            ),
+          ),
+      ];
+    }
+
     return [
       for (final tag in _suggestions)
         ToolbarEntry(
@@ -328,7 +382,8 @@ class _EditorActionBarState extends State<EditorActionBar> {
                 ? AlignmentDirectional.centerStart
                 : AlignmentDirectional.center;
 
-            final entries = (_activeTrigger != null && _suggestions.isNotEmpty)
+            final entries = (_activeTrigger != null &&
+                    (_suggestions.isNotEmpty || _personSuggestions.isNotEmpty))
                 ? _tagSuggestionEntries(metrics)
                 : (showingMainActions
                     ? _mainActionEntries(metrics)

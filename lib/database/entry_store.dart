@@ -7,12 +7,16 @@ import 'package:daily_you/database/entry_location_dao.dart';
 import 'package:daily_you/database/entry_song_dao.dart';
 import 'package:daily_you/database/entry_tag_dao.dart';
 import 'package:daily_you/database/image_storage.dart';
+import 'package:daily_you/database/people_dao.dart';
+import 'package:daily_you/database/spaces_dao.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/providers/entry_locations_provider.dart';
 import 'package:daily_you/providers/entry_songs_provider.dart';
+import 'package:daily_you/providers/people_provider.dart';
+import 'package:daily_you/providers/spaces_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/utils/webdav_sync_engine.dart';
@@ -116,6 +120,8 @@ class EntryStore with ChangeNotifier {
       await EntryTagDao.removeAllForEntry(entry.id!, executor: transaction);
       await EntrySongDao.removeAllForEntry(entry.id!, executor: transaction);
       await EntryLocationDao.removeForEntry(entry.id!, executor: transaction);
+      await SpacesDao.removeForEntry(entry.id!, executor: transaction);
+      await PeopleDao.removeForEntry(entry.id!, executor: transaction);
       await EntryDao.remove(entry.id!, executor: transaction);
     });
 
@@ -127,6 +133,8 @@ class EntryStore with ChangeNotifier {
     EntryImagesProvider.instance.applyForEntry(entry.id!, const []);
     EntrySongsProvider.instance.removeAllForEntry(entry.id!);
     EntryLocationsProvider.instance.removeForEntry(entry.id!);
+    SpacesProvider.instance.removeForEntry(entry.id!);
+    PeopleProvider.instance.removeForEntry(entry.id!);
     await WebDavSyncEngine.recordTombstone(entry.id!);
     await AppDatabase.instance.updateExternalDatabase();
     notifyListeners();

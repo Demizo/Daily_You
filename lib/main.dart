@@ -14,6 +14,8 @@ import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/providers/entry_locations_provider.dart';
 import 'package:daily_you/providers/entry_songs_provider.dart';
+import 'package:daily_you/providers/people_provider.dart';
+import 'package:daily_you/providers/spaces_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/utils/screen_protection.dart';
 import 'package:daily_you/providers/templates_provider.dart';
@@ -262,6 +264,12 @@ void main() async {
     ),
     ChangeNotifierProvider<EntryLocationsProvider>(
       create: (_) => EntryLocationsProvider.instance,
+    ),
+    ChangeNotifierProvider<SpacesProvider>(
+      create: (_) => SpacesProvider.instance,
+    ),
+    ChangeNotifierProvider<PeopleProvider>(
+      create: (_) => PeopleProvider.instance,
     ),
     ChangeNotifierProvider<TemplatesProvider>(
       create: (_) => TemplatesProvider.instance,

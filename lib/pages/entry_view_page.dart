@@ -10,9 +10,12 @@ import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/providers/entry_locations_provider.dart';
 import 'package:daily_you/providers/entry_songs_provider.dart';
+import 'package:daily_you/providers/people_provider.dart';
+import 'package:daily_you/providers/spaces_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/utils/markdown_io_helper.dart';
 import 'package:daily_you/widgets/local_image_loader.dart';
+import 'package:daily_you/widgets/location_map_preview_widget.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
 import 'package:daily_you/widgets/scaled_markdown.dart';
 import 'package:daily_you/widgets/entry_tag_chips.dart';
@@ -21,7 +24,6 @@ import 'package:daily_you/widgets/tag_chip.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class EntryViewPage extends StatefulWidget {
   const EntryViewPage({
@@ -46,6 +48,8 @@ class _EntryViewPageState extends State<EntryViewPage> {
     final entrySongsProvider = Provider.of<EntrySongsProvider>(context);
     final entryLocationsProvider =
         Provider.of<EntryLocationsProvider>(context);
+    final spacesProvider = Provider.of<SpacesProvider>(context);
+    final peopleProvider = Provider.of<PeopleProvider>(context);
 
     final entry = entriesProvider.entries
         .where((e) => e.id == widget.entryId)
@@ -55,6 +59,8 @@ class _EntryViewPageState extends State<EntryViewPage> {
     final images = entryImagesProvider.getForEntry(entry);
     final songs = entrySongsProvider.getForEntry(entry);
     final location = entryLocationsProvider.getForEntryId(entry.id!);
+    final space = spacesProvider.getSpaceForEntry(entry.id!);
+    final taggedPeople = peopleProvider.getPeopleForEntry(entry.id!);
 
     return Scaffold(
       appBar: AppBar(
@@ -176,6 +182,30 @@ class _EntryViewPageState extends State<EntryViewPage> {
                                 ],
                               ),
                             ),
+                            if (space != null || taggedPeople.isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 4, bottom: 4),
+                                child: Wrap(
+                                  spacing: 6,
+                                  runSpacing: 4,
+                                  children: [
+                                    if (space != null)
+                                      Chip(
+                                        visualDensity: VisualDensity.compact,
+                                        avatar: const Icon(Icons.dashboard_rounded, size: 14),
+                                        label: Text(space.name,
+                                            style: const TextStyle(fontSize: 12)),
+                                      ),
+                                    for (final person in taggedPeople)
+                                      Chip(
+                                        visualDensity: VisualDensity.compact,
+                                        avatar: const Icon(Icons.person_rounded, size: 14),
+                                        label: Text('@${person.name}',
+                                            style: const TextStyle(fontSize: 12)),
+                                      ),
+                                  ],
+                                ),
+                              ),
                             EntryTagChips(
                               entryId: entry.id!,
                               padding: const EdgeInsets.only(top: 2, bottom: 2),
@@ -186,60 +216,10 @@ class _EntryViewPageState extends State<EntryViewPage> {
                                 (location.placeName != null ||
                                     location.latitude != null))
                               Padding(
-                                padding:
-                                    const EdgeInsets.only(top: 6, bottom: 2),
-                                child: InkWell(
-                                  borderRadius: BorderRadius.circular(8),
-                                  onTap: () async {
-                                    if (location.latitude != null &&
-                                        location.longitude != null) {
-                                      final uri = Uri.parse(
-                                          'https://www.openstreetmap.org/?mlat=${location.latitude}&mlon=${location.longitude}#map=16/${location.latitude}/${location.longitude}');
-                                      await launchUrl(uri,
-                                          mode: LaunchMode.externalApplication);
-                                    }
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8, vertical: 4),
-                                    decoration: BoxDecoration(
-                                      color: theme
-                                          .colorScheme.surfaceContainerHighest
-                                          .withAlpha(150),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Icon(Icons.location_on_rounded,
-                                            size: 16,
-                                            color: theme.colorScheme.primary),
-                                        const SizedBox(width: 6),
-                                        Expanded(
-                                          child: Text(
-                                            location.placeName != null &&
-                                                    location.placeName!.isNotEmpty
-                                                ? (location.latitude != null
-                                                    ? '${location.placeName} (${location.latitude?.toStringAsFixed(4)}°, ${location.longitude?.toStringAsFixed(4)}°)'
-                                                    : location.placeName!)
-                                                : '${location.latitude?.toStringAsFixed(4)}°, ${location.longitude?.toStringAsFixed(4)}°',
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(
-                                                fontSize: 13,
-                                                fontWeight: FontWeight.w500,
-                                                color: theme
-                                                    .colorScheme.onSurface),
-                                          ),
-                                        ),
-                                        if (location.latitude != null &&
-                                            location.longitude != null)
-                                          Icon(Icons.open_in_new_rounded,
-                                              size: 14,
-                                              color: theme
-                                                  .colorScheme.onSurfaceVariant),
-                                      ],
-                                    ),
-                                  ),
+                                padding: const EdgeInsets.only(top: 8, bottom: 4),
+                                child: LocationMapPreviewWidget(
+                                  location: location,
+                                  isEditable: false,
                                 ),
                               ),
                           ],

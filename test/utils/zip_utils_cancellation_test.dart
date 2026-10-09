@@ -20,7 +20,16 @@ void main() {
     }
   });
 
-  tearDown(() => work.delete(recursive: true));
+  tearDown(() async {
+    try {
+      await work.delete(recursive: true);
+    } catch (_) {
+      await Future<void>.delayed(const Duration(milliseconds: 150));
+      try {
+        await work.delete(recursive: true);
+      } catch (_) {}
+    }
+  });
 
   test('a pre-cancelled token stops compression before it starts', () async {
     final token = CancellationToken()..cancel();

@@ -3,8 +3,8 @@ import 'package:daily_you/models/location.dart';
 import 'package:daily_you/utils/location_service.dart';
 import 'package:daily_you/utils/map_tile_service.dart';
 import 'package:daily_you/utils/network_gate.dart';
+import 'package:daily_you/widgets/location_map_preview_widget.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class LocationPickerDialog extends StatefulWidget {
   final EntryLocation? initialLocation;
@@ -124,11 +124,6 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
     }
   }
 
-  Future<void> _openExternalMap(double lat, double lon) async {
-    final uri = Uri.parse('https://www.openstreetmap.org/?mlat=$lat&mlon=$lon#map=16/$lat/$lon');
-    await launchUrl(uri, mode: LaunchMode.externalApplication);
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -154,59 +149,16 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
           children: [
             // Live Preview Card
             if (hasValidCoords || place.isNotEmpty) ...[
-              Card(
-                elevation: 0,
-                color: theme.colorScheme.surfaceContainerHighest,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.primaryContainer,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.location_on_rounded,
-                          color: theme.colorScheme.onPrimaryContainer,
-                          size: 24,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              place.isNotEmpty ? place : 'Coordinates',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                            ),
-                            if (hasValidCoords) ...[
-                              const SizedBox(height: 2),
-                              Text(
-                                '${lat.toStringAsFixed(4)}°, ${lng.toStringAsFixed(4)}°',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: theme.colorScheme.onSurfaceVariant,
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-                      if (hasValidCoords)
-                        IconButton(
-                          icon: const Icon(Icons.open_in_new_rounded, size: 20),
-                          tooltip: 'Preview on Map',
-                          onPressed: () => _openExternalMap(lat, lng),
-                        ),
-                    ],
-                  ),
+              LocationMapPreviewWidget(
+                location: EntryLocation(
+                  id: null,
+                  entryId: -1,
+                  latitude: hasValidCoords ? lat : null,
+                  longitude: hasValidCoords ? lng : null,
+                  placeName: place.isNotEmpty ? place : null,
+                  timeCreate: DateTime.now(),
                 ),
+                isEditable: false,
               ),
               const SizedBox(height: 12),
             ],
