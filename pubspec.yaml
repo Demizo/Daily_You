@@ -66,7 +66,6 @@ dependencies:
   flutter_displaymode: ^0.7.0
   dynamic_color: ^2.1.0
   shamsi_date:
-  persian_datetime_picker: ^3.2.0
   markdown: ^7.3.1
   flutter_svg: ^2.3.0
   flutter_secure_storage: ^11.2.0

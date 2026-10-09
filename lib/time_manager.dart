@@ -5,9 +5,10 @@
 import 'dart:ui' show PlatformDispatcher;
 
 import 'package:daily_you/config_provider.dart';
+import 'package:daily_you/utils/jalali_calendar_delegate.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
-import 'package:persian_datetime_picker/persian_datetime_picker.dart';
+import 'package:shamsi_date/shamsi_date.dart';
 
 class TimeManager {
   static bool isToday(DateTime date) {
@@ -165,28 +166,21 @@ class TimeManager {
     required DateTime lastDate,
     bool Function(DateTime)? selectableDayPredicate,
   }) async {
-    if (isJalaliCalendar(context)) {
-      PersianSelectableDayPredicate? jalaliPredicate;
-      if (selectableDayPredicate != null) {
-        jalaliPredicate =
-            (Jalali day) => selectableDayPredicate(day.toDateTime());
-      }
-      final Jalali? picked = await showPersianDatePicker(
-        context: context,
-        initialDate: Jalali.fromDateTime(initialDate),
-        firstDate: Jalali.fromDateTime(firstDate),
-        lastDate: Jalali.fromDateTime(lastDate),
-        selectableDayPredicate: jalaliPredicate,
-      );
-      return picked?.toDateTime();
-    }
-    return showDatePicker(
+    final isJalali = isJalaliCalendar(context);
+    final picked = await showDatePicker(
       context: context,
       initialDate: initialDate,
       firstDate: firstDate,
       lastDate: lastDate,
-      selectableDayPredicate: selectableDayPredicate,
+      selectableDayPredicate: selectableDayPredicate == null
+          ? null
+          : (day) => selectableDayPredicate(JalaliDate.toGregorian(day)),
+      locale: isJalali ? const Locale('fa') : null,
+      calendarDelegate: isJalali
+          ? const JalaliCalendarDelegate()
+          : const GregorianCalendarDelegate(),
     );
+    return picked == null ? null : JalaliDate.toGregorian(picked);
   }
 
   // Returns true if entryDate falls on the same calendar day+month as referenceDate
