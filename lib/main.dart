@@ -158,8 +158,19 @@ void callbackDispatcher() async {
       .init(forceWithoutSync: true, allowMigration: false);
 
   if (ready) {
-    if (EntriesProvider.instance.getEntryForDate(DateTime.now()) == null ||
-        ConfigProvider.instance.get(Settings.alwaysRemind)) {
+    final allowedDays = ConfigProvider.instance
+        .get(Settings.reminderDays)
+        .split(',')
+        .map((s) => int.tryParse(s.trim()))
+        .whereType<int>()
+        .toSet();
+    final todayWeekday = DateTime.now().weekday;
+    final isAllowedDay =
+        allowedDays.isEmpty || allowedDays.contains(todayWeekday);
+
+    if (isAllowedDay &&
+        (EntriesProvider.instance.getEntryForDate(DateTime.now()) == null ||
+            ConfigProvider.instance.get(Settings.alwaysRemind))) {
       FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
           FlutterLocalNotificationsPlugin();
 

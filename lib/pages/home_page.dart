@@ -117,6 +117,8 @@ class _HomePageState extends State<HomePage>
       } else {
         await _addNewEntryForToday();
       }
+    } else if (ConfigProvider.instance.get(Settings.alwaysOpenNewLog)) {
+      await _addNewEntryForToday();
     }
   }
 

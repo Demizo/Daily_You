@@ -1937,6 +1937,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'PIN has been reset.'**
   String get securityQuestionResetPrompt;
+
+  /// No description provided for @reminderDaysTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder days'**
+  String get reminderDaysTitle;
+
+  /// No description provided for @alwaysOpenNewLogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Open new log on launch'**
+  String get alwaysOpenNewLogTitle;
+
+  /// No description provided for @alwaysOpenNewLogDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatically open the editor when starting the app'**
+  String get alwaysOpenNewLogDescription;
 }
 
 class _AppLocalizationsDelegate

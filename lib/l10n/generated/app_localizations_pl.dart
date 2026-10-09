@@ -1049,4 +1049,14 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get securityQuestionResetPrompt => 'PIN has been reset.';
+
+  @override
+  String get reminderDaysTitle => 'Reminder days';
+
+  @override
+  String get alwaysOpenNewLogTitle => 'Open new log on launch';
+
+  @override
+  String get alwaysOpenNewLogDescription =>
+      'Automatically open the editor when starting the app';
 }

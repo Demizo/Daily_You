@@ -590,5 +590,11 @@
   "securityQuestionWrongAnswer": "Incorrect answer",
   "@securityQuestionWrongAnswer": {},
   "securityQuestionResetPrompt": "PIN has been reset.",
-  "@securityQuestionResetPrompt": {}
+  "@securityQuestionResetPrompt": {},
+  "reminderDaysTitle": "Reminder days",
+  "@reminderDaysTitle": {},
+  "alwaysOpenNewLogTitle": "Open new log on launch",
+  "@alwaysOpenNewLogTitle": {},
+  "alwaysOpenNewLogDescription": "Automatically open the editor when starting the app",
+  "@alwaysOpenNewLogDescription": {}
 }

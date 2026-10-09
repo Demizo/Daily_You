@@ -139,6 +139,10 @@ class Settings {
   static const securityAnswerHash = Setting<String>(
       "securityAnswerHash", "",
       secure: true, secretStore: true);
+  static const reminderDays =
+      Setting<String>("reminderDays", "1,2,3,4,5,6,7");
+  static const alwaysOpenNewLog =
+      Setting<bool>("alwaysOpenNewLog", false);
 
   static const List<Setting<Object?>> all = [
     configVersion,
@@ -214,6 +218,8 @@ class Settings {
     markdownEnabled,
     securityQuestion,
     securityAnswerHash,
+    reminderDays,
+    alwaysOpenNewLog,
   ];
 
   static const moodIcons = <int, Setting<String>>{

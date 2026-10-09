@@ -151,7 +151,61 @@ class NotificationSettings extends StatefulWidget {
               await NotificationManager.instance.stopDailyReminders();
               await NotificationManager.instance.startScheduledDailyReminders();
             }),
+      if (configProvider.get(Settings.dailyReminders))
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                AppLocalizations.of(context)!.reminderDaysTitle,
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              ),
+              const SizedBox(height: 8),
+              _buildWeekdaySelector(context, configProvider),
+            ],
+          ),
+        ),
     ];
+  }
+
+  static Widget _buildWeekdaySelector(
+      BuildContext context, ConfigProvider configProvider) {
+    final daysStr = configProvider.get(Settings.reminderDays);
+    final selectedDays = daysStr
+        .split(',')
+        .map((s) => int.tryParse(s.trim()))
+        .whereType<int>()
+        .toSet();
+
+    const labels = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        for (var i = 1; i <= 7; i++)
+          FilterChip(
+            label: Text(labels[i - 1]),
+            selected: selectedDays.contains(i),
+            showCheckmark: false,
+            shape: const CircleBorder(),
+            padding: const EdgeInsets.all(4),
+            onSelected: (selected) async {
+              final newSet = Set<int>.from(selectedDays);
+              if (selected) {
+                newSet.add(i);
+              } else {
+                if (newSet.length > 1) {
+                  newSet.remove(i);
+                }
+              }
+              final joined = (newSet.toList()..sort()).join(',');
+              await configProvider.set(Settings.reminderDays, joined);
+            },
+          ),
+      ],
+    );
   }
 
   static List<Widget> buildOnThisDaySettings(BuildContext context) {
@@ -232,6 +286,18 @@ class _NotificationSettingsState extends State<NotificationSettings> {
                 icon: Icon(Icons.edit_notifications_rounded),
                 onPressed: () => AppSettings.openAppSettings(
                     type: AppSettingsType.notification)),
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+            child: Divider(),
+          ),
+          SettingsToggle(
+            title: AppLocalizations.of(context)!.alwaysOpenNewLogTitle,
+            hint: AppLocalizations.of(context)!.alwaysOpenNewLogDescription,
+            setting: Settings.alwaysOpenNewLog,
+            onChanged: (value) async {
+              await configProvider.set(Settings.alwaysOpenNewLog, value);
+            },
+          ),
         ],
       ),
     );
