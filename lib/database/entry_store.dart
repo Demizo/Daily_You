@@ -3,12 +3,14 @@ import 'dart:async';
 import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/database/entry_dao.dart';
 import 'package:daily_you/database/entry_image_dao.dart';
+import 'package:daily_you/database/entry_song_dao.dart';
 import 'package:daily_you/database/entry_tag_dao.dart';
 import 'package:daily_you/database/image_storage.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/image.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/providers/entry_songs_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:flutter/foundation.dart';
@@ -109,6 +111,7 @@ class EntryStore with ChangeNotifier {
         await EntryImageDao.remove(image, executor: transaction);
       }
       await EntryTagDao.removeAllForEntry(entry.id!, executor: transaction);
+      await EntrySongDao.removeAllForEntry(entry.id!, executor: transaction);
       await EntryDao.remove(entry.id!, executor: transaction);
     });
 
@@ -118,6 +121,7 @@ class EntryStore with ChangeNotifier {
     _indexEntriesByDay();
     TagsProvider.instance.applyEntryTags(entry.id!, const []);
     EntryImagesProvider.instance.applyForEntry(entry.id!, const []);
+    EntrySongsProvider.instance.removeAllForEntry(entry.id!);
     await AppDatabase.instance.updateExternalDatabase();
     notifyListeners();
   }

@@ -1,15 +1,22 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:daily_you/database/entry_song_dao.dart';
 import 'package:daily_you/database/entry_store.dart';
 import 'package:daily_you/models/image.dart';
+import 'package:daily_you/models/song.dart';
 import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/providers/entry_songs_provider.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/providers/templates_provider.dart';
+import 'package:daily_you/utils/song_service.dart';
+import 'package:daily_you/utils/youtube_url_parser.dart';
+import 'package:daily_you/widgets/add_song_dialog.dart';
 import 'package:daily_you/widgets/entry_draft_dirty_tracker.dart';
+import 'package:daily_you/widgets/song_card_widget.dart';
 import 'package:daily_you/widgets/tag_attachment_source.dart';
 import 'package:daily_you/widgets/tag_grouped_chip_list.dart';
 import 'package:daily_you/widgets/tag_picker_dialog.dart';
@@ -64,6 +71,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   int? mood;
   DateTime? entryDate;
   late List<EntryImage> _currentImages;
+  late List<EntrySong> _currentSongs;
   bool _loadingEntry = true;
   bool _openedCamera = false;
   final ScrollController _scrollController = ScrollController();
@@ -106,9 +114,20 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
       _newEntry = true;
       _creatingNewEntry = true;
       id = -1;
+      if (defaultTemplate?.id != null) {
+        EntrySongDao.hasSongSlotForTemplate(defaultTemplate!.id!)
+            .then((hasSlot) {
+          if (hasSlot && _currentSongs.isEmpty && mounted) {
+            _promptAddSong();
+          }
+        });
+      }
     } else {
       _entry = widget.entry!;
       id = _entry.id ?? -1;
+      _currentSongs = [
+        for (final s in EntrySongsProvider.instance.getForEntryId(id)) s.copy()
+      ];
       _tagSource = TagAttachmentSource.fromEntryTags(
           TagsProvider.instance.getEntryTagsForEntry(id));
       dirtyTrackerBaselineText = _entry.text;
@@ -138,6 +157,11 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     });
 
     if (widget.sharedText != null) {
+      final sharedVideoId =
+          YouTubeUrlParser.extractVideoId(widget.sharedText!);
+      if (sharedVideoId != null) {
+        unawaited(_autoAddSong(widget.sharedText!));
+      }
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
         _textEditingController.selection =
@@ -159,6 +183,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     for (var image in widget.images) {
       _currentImages.add(image.copy());
     }
+    _currentSongs = List.empty(growable: true);
     _initEntry();
   }
 
@@ -355,6 +380,32 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                 }),
           ),
           _buildTagChips(),
+          _buildSongList(setLocalState),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSongList(StateSetter setLocalState) {
+    if (_currentSongs.isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(left: 8, right: 8, bottom: 8),
+      child: Column(
+        children: [
+          for (final song in _currentSongs)
+            SongCardWidget(
+              song: song,
+              compact: true,
+              onDelete: () async {
+                setLocalState(() {
+                  _currentSongs.remove(song);
+                });
+                if (song.id != null) {
+                  await EntrySongsProvider.instance.remove(song);
+                }
+                await _saveEntry();
+              },
+            ),
         ],
       ),
     );
@@ -464,6 +515,10 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
           mayLeaveApp: true,
           onPressed: () => EntryImageActions.takePhoto(_addImage),
         ),
+      ToolbarAction(
+        icon: const Icon(Icons.music_note_rounded),
+        onPressed: _promptAddSong,
+      ),
     ];
   }
 
@@ -558,9 +613,43 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     final saved = await _draftSession.save(_buildDraft);
     _adoptSavedEntry(saved);
     _adoptSavedImages(saved);
+    await _persistSongs(saved.id!);
     if (mounted) {
       setState(() {});
     }
+  }
+
+  Future<void> _persistSongs(int entryId) async {
+    for (var i = 0; i < _currentSongs.length; i++) {
+      final song = _currentSongs[i];
+      if (song.id == null || song.entryId != entryId) {
+        song.entryId = entryId;
+        final savedSong = await EntrySongsProvider.instance.add(song);
+        _currentSongs[i] = savedSong;
+      }
+    }
+  }
+
+  Future<void> _promptAddSong({String? initialLink}) async {
+    final song = await AddSongDialog.show(context, initialLink: initialLink);
+    if (song != null && mounted) {
+      setState(() {
+        _currentSongs.add(song);
+      });
+      await _saveEntry();
+    }
+  }
+
+  Future<void> _autoAddSong(String url) async {
+    try {
+      final result = await SongService.instance.resolveSong(url);
+      if (mounted) {
+        setState(() {
+          _currentSongs.add(result.toEntrySong(entryId: id));
+        });
+        await _saveEntry();
+      }
+    } catch (_) {}
   }
 
   EntryDraft _buildDraft(Entry? saved) {
@@ -613,12 +702,13 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
 
   bool _hasNewEntryChanges() {
     return _dirtyTracker.hasUnsavedChanges(
-      text: text,
-      mood: mood,
-      date: entryDate!,
-      tagSource: _tagSource,
-      hasImages: _currentImages.isNotEmpty,
-    );
+          text: text,
+          mood: mood,
+          date: entryDate!,
+          tagSource: _tagSource,
+          hasImages: _currentImages.isNotEmpty,
+        ) ||
+        _currentSongs.isNotEmpty;
   }
 
   void _applyInsertedTemplateTags(Template template) {
@@ -629,6 +719,11 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     for (final tagId in templateTagIds) {
       _tagSource.addTagId(tagId);
     }
+    EntrySongDao.hasSongSlotForTemplate(template.id!).then((hasSlot) {
+      if (hasSlot && mounted) {
+        _promptAddSong();
+      }
+    });
   }
 
   Future<void> _addImage(List<String> imgPaths) async {

@@ -1,4 +1,5 @@
 import 'package:daily_you/config_provider.dart';
+import 'package:daily_you/database/entry_song_dao.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/providers/templates_provider.dart';
@@ -30,6 +31,7 @@ class _EditTemplateState extends State<EditTemplate> {
   late TextEditingController _nameController;
   late String templateText;
   late final TagAttachmentSource _tagSource;
+  bool _hasSongSlot = false;
   final FocusNode _focusNode = FocusNode();
   final MarkdownPreviewController _textEditingController =
       MarkdownPreviewController();
@@ -51,6 +53,11 @@ class _EditTemplateState extends State<EditTemplate> {
             .map((templateTag) => templateTag.tagId)
             .toList();
     _tagSource = TagAttachmentSource(initialTagIds: initialTagIds);
+    if (widget.template?.id != null) {
+      EntrySongDao.hasSongSlotForTemplate(widget.template!.id!).then((slot) {
+        if (mounted) setState(() => _hasSongSlot = slot);
+      });
+    }
     _textEditingController
         .addListener(() => templateText = _textEditingController.text);
   }
@@ -84,6 +91,7 @@ class _EditTemplateState extends State<EditTemplate> {
     }
     await TagsProvider.instance
         .setTemplateTags(templateId, _tagSource.attachedTagIds);
+    await EntrySongDao.setSongSlotForTemplate(templateId, _hasSongSlot);
     if (!mounted) return;
     Navigator.of(context).pop();
   }
@@ -230,7 +238,20 @@ class _EditTemplateState extends State<EditTemplate> {
                     width: double.infinity,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: _buildTagChips(),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _buildTagChips(),
+                          CheckboxListTile(
+                            value: _hasSongSlot,
+                            onChanged: (val) =>
+                                setState(() => _hasSongSlot = val ?? false),
+                            title: const Text('Include song slot'),
+                            secondary: const Icon(Icons.music_note_rounded),
+                            dense: true,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),

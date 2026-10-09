@@ -7,11 +7,13 @@ import 'package:daily_you/pages/edit_entry_page.dart';
 import 'package:daily_you/pages/image_view_page.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/providers/entry_songs_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/local_image_loader.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
 import 'package:daily_you/widgets/scaled_markdown.dart';
 import 'package:daily_you/widgets/entry_tag_chips.dart';
+import 'package:daily_you/widgets/song_card_widget.dart';
 import 'package:daily_you/widgets/tag_chip.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
@@ -37,6 +39,7 @@ class _EntryViewPageState extends State<EntryViewPage> {
     final theme = Theme.of(context);
     final entriesProvider = Provider.of<EntriesProvider>(context);
     final entryImagesProvider = Provider.of<EntryImagesProvider>(context);
+    final entrySongsProvider = Provider.of<EntrySongsProvider>(context);
 
     final entry = entriesProvider.entries
         .where((e) => e.id == widget.entryId)
@@ -44,6 +47,7 @@ class _EntryViewPageState extends State<EntryViewPage> {
     if (entry == null) return const Scaffold();
 
     final images = entryImagesProvider.getForEntry(entry);
+    final songs = entrySongsProvider.getForEntry(entry);
 
     return Scaffold(
       appBar: AppBar(
@@ -160,6 +164,9 @@ class _EntryViewPageState extends State<EntryViewPage> {
                                 data: entry.text,
                                 selectable: false,
                               ))),
+                    if (songs.isNotEmpty)
+                      for (final song in songs)
+                        SongCardWidget(song: song),
                     Padding(
                       padding: const EdgeInsets.only(
                           left: 8, top: 4, bottom: 18, right: 8),

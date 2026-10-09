@@ -74,6 +74,7 @@ dependencies:
   cryptography_flutter: ^2.3.4
   material_ui: ^1.5.0
   cupertino_ui: ^1.1.1
+  audioplayers: ^6.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/database/image_storage.dart';
+import 'package:daily_you/database/song_storage.dart';
 import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/storage/file_store.dart';
 import 'package:daily_you/storage/local_file_store.dart';
@@ -68,7 +69,10 @@ class BackupRestoreUtils {
 
       onCompress(0);
       await ZipUtils.compress(stagedArchive.path, [databaseSnapshot.path],
-          [await ImageStorage.instance.getInternalFolder()],
+          [
+            await ImageStorage.instance.getInternalFolder(),
+            await SongStorage.instance.getInternalFolder(),
+          ],
           onProgress: onCompress, cancellationToken: cancellationToken);
 
       if (cancellationToken?.isCancelled ?? false) {
@@ -416,6 +420,13 @@ class BackupRestoreUtils {
             await ImageStorage.instance.syncImageFolder(true);
           }
           ImageStorage.instance.invalidateCache();
+        }
+
+        final restoredSongs =
+            LocalFileStore(join(restoreFolder.path, "SongCovers"));
+        if (await restoredSongs.isAvailable()) {
+          await restoreImages(
+              restoredSongs, await SongStorage.instance.store());
         }
       } else {
         outcome = const OperationOutcome.failed();

@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/image.dart';
+import 'package:daily_you/models/song.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/pages/edit_entry_page.dart';
 import 'package:daily_you/pages/entry_timeline_page.dart';
@@ -24,6 +25,7 @@ class EntryDayCell extends StatelessWidget {
   final double cellSize;
   final List<Entry> entries;
   final EntryImage? firstImage;
+  final EntrySong? firstSong;
 
   final bool showImages;
   final bool showMood;
@@ -40,6 +42,7 @@ class EntryDayCell extends StatelessWidget {
     required this.cellSize,
     required this.entries,
     required this.firstImage,
+    this.firstSong,
     this.showImages = true,
     this.showMood = true,
     this.isJalali = false,
@@ -334,6 +337,26 @@ class EntryDayCell extends StatelessWidget {
                 ExcludeSemantics(
                   child: RawImage(
                     image: dayNumber,
+                  ),
+                ),
+              if (firstSong != null)
+                Positioned(
+                  top: 4,
+                  left: 4,
+                  child: Container(
+                    width: 18,
+                    height: 18,
+                    decoration: BoxDecoration(
+                      color: colorScheme.surface.withAlpha(220),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: Icon(
+                        Icons.music_note_rounded,
+                        size: 12,
+                        color: colorScheme.primary,
+                      ),
+                    ),
                   ),
                 ),
               Positioned(

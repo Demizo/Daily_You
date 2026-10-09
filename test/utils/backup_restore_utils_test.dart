@@ -45,4 +45,15 @@ void main() {
 
     expect(await destination.list(), isEmpty);
   });
+
+  test('restores song covers round-trip', () async {
+    final backup = InMemoryFileStore();
+    await backup.write('song_dQw4w9WgXcQ.jpg', bytesOf('cover_bytes'));
+
+    await BackupRestoreUtils.restoreImages(backup, destination);
+
+    expect(await destination.list(), contains('song_dQw4w9WgXcQ.jpg'));
+    expect(await destination.read('song_dQw4w9WgXcQ.jpg'),
+        equals(bytesOf('cover_bytes')));
+  });
 }

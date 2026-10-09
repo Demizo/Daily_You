@@ -11,11 +11,13 @@ import 'package:daily_you/utils/operation_outcome.dart';
 import 'package:daily_you/utils/generated/tag_icon_registry.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/image.dart';
+import 'package:daily_you/models/song.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/models/tag_category.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/providers/entry_songs_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/providers/templates_provider.dart';
 import 'package:easy_debounce/easy_debounce.dart';
@@ -128,10 +130,11 @@ class AppDatabase {
 
   Future<void> open() async {
     _database = await openDatabase(_internalPath!,
-        version: 5, onCreate: _createDatabase, onUpgrade: _onUpgrade);
+        version: 6, onCreate: _createDatabase, onUpgrade: _onUpgrade);
 
     await EntriesProvider.instance.load();
     await EntryImagesProvider.instance.load();
+    await EntrySongsProvider.instance.load();
     await TemplatesProvider.instance.load();
     await TagsProvider.instance.load();
   }
@@ -365,6 +368,7 @@ CREATE TABLE $imagesTable (
 
     await _createTagTables(db);
     await _createTemplateTagTable(db);
+    await _createSongTables(db);
   }
 
   @visibleForTesting
@@ -563,5 +567,36 @@ DROP TABLE old_entries;
     if (oldVersion <= 4) {
       await _createTemplateTagTable(db);
     }
+    if (oldVersion <= 5) {
+      await _createSongTables(db);
+    }
+  }
+
+  Future<void> _createSongTables(Database db) async {
+    await db.execute('''
+CREATE TABLE $entrySongsTable (
+    ${EntrySongFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    ${EntrySongFields.entryId} INTEGER NOT NULL,
+    ${EntrySongFields.videoId} TEXT NOT NULL,
+    ${EntrySongFields.url} TEXT NOT NULL,
+    ${EntrySongFields.title} TEXT NOT NULL,
+    ${EntrySongFields.artist} TEXT NOT NULL,
+    ${EntrySongFields.coverPath} TEXT,
+    ${EntrySongFields.previewUrl} TEXT,
+    ${EntrySongFields.previewStartMs} INTEGER NOT NULL DEFAULT 0,
+    ${EntrySongFields.previewEndMs} INTEGER,
+    ${EntrySongFields.timeCreate} DATETIME NOT NULL DEFAULT (DATETIME('now')),
+    FOREIGN KEY (${EntrySongFields.entryId}) REFERENCES $entriesTable (id)
+)
+''');
+
+    await db.execute('''
+CREATE TABLE $templateSongSlotsTable (
+    ${TemplateSongSlotFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    ${TemplateSongSlotFields.templateId} INTEGER NOT NULL,
+    ${TemplateSongSlotFields.timeCreate} DATETIME NOT NULL DEFAULT (DATETIME('now')),
+    FOREIGN KEY (${TemplateSongSlotFields.templateId}) REFERENCES $templatesTable (id)
+)
+''');
   }
 }

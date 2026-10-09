@@ -8,6 +8,7 @@ import 'package:daily_you/pages/entries_list_page.dart';
 import 'package:daily_you/pages/entry_timeline_page.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/providers/entry_songs_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/calendar_view_options_dialog.dart';
@@ -819,6 +820,11 @@ class _WeekRow extends StatelessWidget {
                       imagesProvider.getFirstImageForEntry(entry.id!))
                   .firstWhere((image) => image != null, orElse: () => null);
 
+          final songsProvider = EntrySongsProvider.instance;
+          final firstSong = entries
+              .map((entry) => songsProvider.getFirstSongForEntry(entry.id!))
+              .firstWhere((song) => song != null, orElse: () => null);
+
           final displayDayNum =
               isJalali ? TimeManager.jalaliDayNumber(day) : day.day;
 
@@ -830,6 +836,7 @@ class _WeekRow extends StatelessWidget {
               today: today,
               entries: entries,
               firstImage: firstImage,
+              firstSong: firstSong,
               cellSize: cellSize,
               dayNumber: dayNumberCache[displayDayNum],
               showImages: showImages,
