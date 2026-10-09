@@ -1,4 +1,5 @@
 import 'package:daily_you/database/image_storage.dart';
+import 'package:daily_you/utils/media_type_utils.dart';
 import 'package:daily_you/widgets/local_image_cache.dart';
 import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
@@ -57,8 +58,10 @@ class _LocalImageLoaderState extends State<LocalImageLoader> {
 
   @override
   Widget build(BuildContext context) {
+    final isVideo = MediaTypeUtils.isVideo(widget.imagePath);
+
     if (_bytes != null) {
-      return Image.memory(
+      final imgWidget = Image.memory(
         _bytes!,
         fit: BoxFit.cover,
         width: double.infinity,
@@ -73,8 +76,33 @@ class _LocalImageLoaderState extends State<LocalImageLoader> {
           );
         },
       );
+      if (!isVideo) return imgWidget;
+      return Stack(
+        fit: StackFit.expand,
+        children: [
+          imgWidget,
+          Center(
+            child: Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: Colors.black.withAlpha(120),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.play_arrow_rounded,
+                  color: Colors.white, size: 28),
+            ),
+          ),
+        ],
+      );
     } else {
       if (_imageNotFound) {
+        if (isVideo) {
+          return Container(
+            color: Theme.of(context).colorScheme.surfaceContainerHigh,
+            alignment: Alignment.center,
+            child: const Icon(Icons.videocam_rounded, size: 36),
+          );
+        }
         // Image not found
         return const Center(
           child: Icon(
@@ -83,6 +111,13 @@ class _LocalImageLoaderState extends State<LocalImageLoader> {
           ),
         );
       } else {
+        if (isVideo) {
+          return Container(
+            color: Theme.of(context).colorScheme.surfaceContainerHigh,
+            alignment: Alignment.center,
+            child: const Icon(Icons.videocam_rounded, size: 36),
+          );
+        }
         // Placeholder while image loads
         return const SizedBox.expand();
       }

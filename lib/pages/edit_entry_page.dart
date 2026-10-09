@@ -516,6 +516,12 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
           mayLeaveApp: true,
           onPressed: () => EntryImageActions.takePhoto(_addImage),
         ),
+      if (Platform.isAndroid)
+        ToolbarAction(
+          icon: const Icon(Icons.videocam_rounded),
+          mayLeaveApp: true,
+          onPressed: () => EntryImageActions.recordVideo(_addImage),
+        ),
       ToolbarAction(
         icon: const Icon(Icons.music_note_rounded),
         onPressed: _promptAddSong,

@@ -4,6 +4,7 @@ import 'dart:isolate';
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/database/image_storage.dart';
 import 'package:daily_you/utils/exif_orientation.dart';
+import 'package:daily_you/utils/media_type_utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
@@ -21,6 +22,40 @@ class EntryImageActions {
       final imageName = await _storeCompressed(pickedFile, quality);
       if (imageName == null) return;
       onChangedImage([imageName]);
+      if (Platform.isAndroid) {
+        await File(pickedFile.path).delete();
+      }
+    }
+  }
+
+  // Behavior based on DenserMeerkat/June (GPL-3.0)
+  static Future<void> recordVideo(
+      ValueChanged<List<String>> onChangedImage) async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickVideo(source: ImageSource.camera);
+    if (pickedFile != null) {
+      final bytes = await pickedFile.readAsBytes();
+      final name = await ImageStorage.instance.create(pickedFile.name, bytes);
+      if (name != null) {
+        onChangedImage([name]);
+      }
+      if (Platform.isAndroid) {
+        await File(pickedFile.path).delete();
+      }
+    }
+  }
+
+  // Behavior based on DenserMeerkat/June (GPL-3.0)
+  static Future<void> pickVideo(
+      ValueChanged<List<String>> onChangedImage) async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickVideo(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      final bytes = await pickedFile.readAsBytes();
+      final name = await ImageStorage.instance.create(pickedFile.name, bytes);
+      if (name != null) {
+        onChangedImage([name]);
+      }
       if (Platform.isAndroid) {
         await File(pickedFile.path).delete();
       }
@@ -60,6 +95,10 @@ class EntryImageActions {
   }
 
   static Future<String?> _storeCompressed(XFile file, String quality) async {
+    if (MediaTypeUtils.isVideo(file.name)) {
+      return await ImageStorage.instance
+          .create(file.name, await file.readAsBytes());
+    }
     return await ImageStorage.instance
         .create(file.name, await _compressImage(file, quality));
   }

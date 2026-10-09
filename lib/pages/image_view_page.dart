@@ -4,11 +4,13 @@ import 'package:daily_you/database/image_storage.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/storage/storage_picker.dart';
 import 'package:daily_you/models/image.dart';
+import 'package:daily_you/utils/media_type_utils.dart';
 import 'package:daily_you/widgets/zoomable_image_page_view.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ImageViewPage extends StatefulWidget {
   final List<EntryImage> images;
@@ -49,6 +51,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
     return Scaffold(
         appBar: AppBar(
           actions: [
+            playVideoButton(context),
             infoButton(context),
             shareButton(context),
             downloadButton(context)
@@ -63,6 +66,28 @@ class _ImageViewPageState extends State<ImageViewPage> {
             _currentPageNotifier.value = newIndex;
           },
         ));
+  }
+
+  Widget playVideoButton(BuildContext context) {
+    return ValueListenableBuilder(
+      valueListenable: _currentPageNotifier,
+      builder: (context, currentIndex, child) {
+        if (currentIndex >= widget.images.length) return const SizedBox.shrink();
+        final imageEntry = widget.images[currentIndex];
+        if (!MediaTypeUtils.isVideo(imageEntry.imgPath)) {
+          return const SizedBox.shrink();
+        }
+        return IconButton(
+          icon: const Icon(Icons.play_circle_fill_rounded),
+          tooltip: 'Play Video',
+          onPressed: () async {
+            final folder = await ImageStorage.instance.getInternalFolder();
+            final filePath = '$folder/${imageEntry.imgPath}';
+            await launchUrl(Uri.file(filePath));
+          },
+        );
+      },
+    );
   }
 
   Widget infoButton(BuildContext context) {
