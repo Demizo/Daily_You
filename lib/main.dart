@@ -32,6 +32,7 @@ import 'package:daily_you/theme_mode_provider.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:just_audio_media_kit/just_audio_media_kit.dart';
+import 'package:logging/logging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:statsfl/statsfl.dart';
@@ -96,14 +97,25 @@ Future<bool> _runAutoBackupWithBoundedRetry() async {
   return false;
 }
 
+final Logger _alarmLogger = Logger('Alarm');
+
+Future<bool> _openDatabaseForAlarm() async {
+  try {
+    // Skip syncing and migration for the alarm background task
+    return await AppDatabase.instance
+        .init(forceWithoutSync: true, allowMigration: false);
+  } catch (error, stackTrace) {
+    _alarmLogger.warning('Could not open the database', error, stackTrace);
+    return false;
+  }
+}
+
 @pragma('vm:entry-point')
 void onThisDayCallbackDispatcher() async {
   WidgetsFlutterBinding.ensureInitialized();
   configureLogging();
   await ConfigProvider.instance.init();
-  // Skip syncing and migration for the alarm background task
-  final ready = await AppDatabase.instance
-      .init(forceWithoutSync: true, allowMigration: false);
+  final ready = await _openDatabaseForAlarm();
 
   if (ready) {
     final now = DateTime.now();
@@ -157,9 +169,7 @@ void callbackDispatcher() async {
   WidgetsFlutterBinding.ensureInitialized();
   configureLogging();
   await ConfigProvider.instance.init();
-  // Skip syncing and migration for the alarm background task
-  final ready = await AppDatabase.instance
-      .init(forceWithoutSync: true, allowMigration: false);
+  final ready = await _openDatabaseForAlarm();
 
   if (ready) {
     if (EntriesProvider.instance.getEntryForDate(DateTime.now()) == null ||

@@ -30,6 +30,17 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
+class DatabaseNewerThanAppException implements Exception {
+  final int databaseVersion;
+
+  const DatabaseNewerThanAppException(this.databaseVersion);
+
+  @override
+  String toString() =>
+      'Database schema version $databaseVersion is newer than the supported '
+      'version ${AppDatabase.schemaVersion}';
+}
+
 class AppDatabase {
   static final AppDatabase instance = AppDatabase._init();
   AppDatabase._init();
@@ -139,7 +150,9 @@ class AppDatabase {
     _database = await openDatabase(_internalPath!,
         version: schemaVersion,
         onCreate: _createDatabase,
-        onUpgrade: onUpgrade);
+        onUpgrade: onUpgrade,
+        onDowngrade: (db, oldVersion, newVersion) =>
+            throw DatabaseNewerThanAppException(oldVersion));
 
     await EntriesProvider.instance.load();
     await EntryAttachmentsProvider.instance.load();
@@ -186,6 +199,18 @@ class AppDatabase {
       _logger.warning(
           'Database integrity check failed for $path', error, stackTrace);
       return false;
+    }
+  }
+
+  Future<bool> canOpen(String path) async {
+    if (!await _validateSqliteDatabase(path)) return false;
+    final db = await openDatabase(path, readOnly: true);
+    try {
+      final version = await db.getVersion();
+      if (version > schemaVersion) throw DatabaseNewerThanAppException(version);
+      return version > 0 && await _tableExists(db, entriesTable);
+    } finally {
+      await db.close();
     }
   }
 
