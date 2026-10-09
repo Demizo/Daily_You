@@ -38,11 +38,24 @@ class ScaledMarkdown extends StatelessWidget {
     // Apply custom scaling to the user's text scale
     final customScaler = TextScaler.linear(deviceScaler.scale(scaleFactor));
 
-    return MarkdownBlock(
-      selectable: selectable,
-      config: theme.brightness == Brightness.light
-          ? MarkdownConfig.defaultConfig
-          : MarkdownConfig.darkConfig,
+    final baseConfig = theme.brightness == Brightness.light
+        ? MarkdownConfig.defaultConfig
+        : MarkdownConfig.darkConfig;
+    final paragraphStyle = baseConfig.p.textStyle;
+    final bulletOffset =
+        (paragraphStyle.fontSize ?? 16.0) * (paragraphStyle.height ?? 1.2) / 2;
+    final config = baseConfig.copy(configs: [
+      ListConfig(
+        marker: (isOrdered, depth, index) => isOrdered
+            ? null
+            : getDefaultMarker(false, depth, theme.colorScheme.onSurface, index,
+                bulletOffset, baseConfig),
+      ),
+    ]);
+
+    final markdown = MarkdownBlock(
+      selectable: false,
+      config: config,
       generator: MarkdownGenerator(
         inlineSyntaxList: [HighlightSyntax()],
         generators: [highlightGenerator(Colors.yellow.shade700)],
@@ -69,6 +82,8 @@ class ScaledMarkdown extends StatelessWidget {
       ),
       data: text,
     );
+
+    return selectable ? SelectionArea(child: markdown) : markdown;
   }
 }
 
