@@ -401,22 +401,59 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
       return const SizedBox.shrink();
     }
     final label = _currentLocation!.placeName ??
-        '${_currentLocation!.latitude?.toStringAsFixed(4)}, ${_currentLocation!.longitude?.toStringAsFixed(4)}';
+        '${_currentLocation!.latitude?.toStringAsFixed(4)}°, ${_currentLocation!.longitude?.toStringAsFixed(4)}°';
     return Padding(
       padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
-      child: Chip(
-        avatar: const Icon(Icons.location_on_rounded, size: 16),
-        label: Text(label),
-        deleteIcon: const Icon(Icons.close_rounded, size: 16),
-        onDeleted: () async {
-          setState(() {
-            _currentLocation = null;
-          });
-          if (id != -1) {
-            await EntryLocationsProvider.instance.removeForEntry(id);
-          }
-          await _saveEntry();
-        },
+      child: Card(
+        elevation: 0,
+        color: theme.colorScheme.surfaceContainerHighest,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: EdgeInsets.zero,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: _promptEditLocation,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            child: Row(
+              children: [
+                Icon(Icons.location_on_rounded, size: 18, color: theme.colorScheme.primary),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.edit_rounded, size: 16),
+                  tooltip: 'Edit location',
+                  visualDensity: VisualDensity.compact,
+                  onPressed: _promptEditLocation,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close_rounded, size: 16),
+                  tooltip: 'Remove location',
+                  visualDensity: VisualDensity.compact,
+                  onPressed: () async {
+                    setState(() {
+                      _currentLocation = null;
+                    });
+                    if (id != -1) {
+                      await EntryLocationsProvider.instance.removeForEntry(id);
+                    }
+                    await _saveEntry();
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

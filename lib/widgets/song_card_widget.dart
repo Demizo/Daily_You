@@ -7,6 +7,7 @@ import 'package:daily_you/database/song_storage.dart';
 import 'package:daily_you/models/song.dart';
 import 'package:daily_you/utils/network_gate.dart';
 import 'package:daily_you/utils/youtube_url_parser.dart';
+import 'package:daily_you/widgets/add_song_dialog.dart';
 import 'package:daily_you/widgets/song_trim_dialog.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -135,101 +136,130 @@ class _SongCardWidgetState extends State<SongCardWidget> {
       color: theme.colorScheme.surfaceContainerHigh,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       margin: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
-        child: Row(
-          children: [
-            // Cover Artwork with subtle shadow and rounded corners
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: SizedBox(
-                width: size,
-                height: size,
-                child: _coverBytes != null
-                    ? Image.memory(
-                        _coverBytes!,
-                        fit: BoxFit.cover,
-                      )
-                    : Container(
-                        color: theme.colorScheme.primaryContainer,
-                        child: Icon(
-                          Icons.music_note_rounded,
-                          color: theme.colorScheme.onPrimaryContainer,
-                          size: size * 0.5,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: widget.onUpdate != null
+            ? () async {
+                final edited = await AddSongDialog.show(
+                  context,
+                  initialSong: widget.song,
+                );
+                if (edited != null) {
+                  widget.onUpdate!(edited);
+                }
+              }
+            : null,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
+          child: Row(
+            children: [
+              // Cover Artwork with subtle shadow and rounded corners
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: SizedBox(
+                  width: size,
+                  height: size,
+                  child: _coverBytes != null
+                      ? Image.memory(
+                          _coverBytes!,
+                          fit: BoxFit.cover,
+                        )
+                      : Container(
+                          color: theme.colorScheme.primaryContainer,
+                          child: Icon(
+                            Icons.music_note_rounded,
+                            color: theme.colorScheme.onPrimaryContainer,
+                            size: size * 0.5,
+                          ),
                         ),
-                      ),
+                ),
               ),
-            ),
-            const SizedBox(width: 12),
-            // Song Title, Artist, and Album
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    displayTitle,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 15,
-                    ),
-                  ),
-                  if (subtitleText.isNotEmpty) ...[
-                    const SizedBox(height: 2),
+              const SizedBox(width: 12),
+              // Song Title, Artist, and Album
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
                     Text(
-                      subtitleText,
+                      displayTitle,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                        fontSize: 12,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 15,
                       ),
                     ),
+                    if (subtitleText.isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        subtitleText,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
-            ),
-            // Play/Pause preview
-            if (widget.song.previewUrl != null && !widget.compact)
-              IconButton.filledTonal(
-                icon: Icon(_isPlaying
-                    ? Icons.pause_rounded
-                    : Icons.play_arrow_rounded),
-                tooltip: _isPlaying ? 'Pause preview' : 'Play preview',
-                onPressed: _togglePreview,
-              ),
-            if (widget.onUpdate != null && widget.song.previewUrl != null)
-              IconButton(
-                icon: const Icon(Icons.tune_rounded),
-                tooltip: 'Trim preview range',
-                color: theme.colorScheme.primary,
-                onPressed: () async {
-                  final trimmed =
-                      await SongTrimDialog.show(context, widget.song);
-                  if (trimmed != null) {
-                    widget.onUpdate!(trimmed);
-                  }
-                },
-              ),
-            // Open in YouTube Music
-            if (!widget.song.url.startsWith('file://'))
-              IconButton(
-                icon: const Icon(Icons.open_in_new_rounded),
-                tooltip: 'Open in YouTube Music',
-                color: theme.colorScheme.primary,
-                onPressed: _openYouTubeMusic,
-              ),
-            // Optional Delete Button (in editor)
-            if (widget.onDelete != null)
-              IconButton(
-                icon: const Icon(Icons.close_rounded),
-                tooltip: 'Remove song',
-                color: theme.colorScheme.error,
-                onPressed: widget.onDelete,
-              ),
-          ],
+              // Play/Pause preview
+              if (widget.song.previewUrl != null && !widget.compact)
+                IconButton.filledTonal(
+                  icon: Icon(_isPlaying
+                      ? Icons.pause_rounded
+                      : Icons.play_arrow_rounded),
+                  tooltip: _isPlaying ? 'Pause preview' : 'Play preview',
+                  onPressed: _togglePreview,
+                ),
+              if (widget.onUpdate != null)
+                IconButton(
+                  icon: const Icon(Icons.edit_rounded, size: 20),
+                  tooltip: 'Edit song details',
+                  color: theme.colorScheme.primary,
+                  onPressed: () async {
+                    final edited = await AddSongDialog.show(
+                      context,
+                      initialSong: widget.song,
+                    );
+                    if (edited != null) {
+                      widget.onUpdate!(edited);
+                    }
+                  },
+                ),
+              if (widget.onUpdate != null && widget.song.previewUrl != null)
+                IconButton(
+                  icon: const Icon(Icons.tune_rounded),
+                  tooltip: 'Trim preview range',
+                  color: theme.colorScheme.primary,
+                  onPressed: () async {
+                    final trimmed =
+                        await SongTrimDialog.show(context, widget.song);
+                    if (trimmed != null) {
+                      widget.onUpdate!(trimmed);
+                    }
+                  },
+                ),
+              // Open in YouTube Music
+              if (!widget.song.url.startsWith('file://'))
+                IconButton(
+                  icon: const Icon(Icons.open_in_new_rounded),
+                  tooltip: 'Open in YouTube Music',
+                  color: theme.colorScheme.primary,
+                  onPressed: _openYouTubeMusic,
+                ),
+              // Optional Delete Button (in editor)
+              if (widget.onDelete != null)
+                IconButton(
+                  icon: const Icon(Icons.close_rounded),
+                  tooltip: 'Remove song',
+                  color: theme.colorScheme.error,
+                  onPressed: widget.onDelete,
+                ),
+            ],
+          ),
         ),
       ),
     );

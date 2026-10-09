@@ -30,11 +30,23 @@ void main() {
       NetworkGate.debugOverrideCompiledIn = null;
     });
 
-    test('returns offline fallback without fabricated info when network is disabled', () async {
+    test('throws NetworkDisabledException when network is disabled', () async {
+      await ConfigProvider.instance.set(Settings.allowNetworkAccess, false);
+
+      expect(
+        () => SongService.instance.resolveSong(
+          'https://music.youtube.com/watch?v=dQw4w9WgXcQ',
+        ),
+        throwsA(isA<NetworkDisabledException>()),
+      );
+    });
+
+    test('returns offline fallback without fabricated info when allowOfflineFallback is true', () async {
       await ConfigProvider.instance.set(Settings.allowNetworkAccess, false);
 
       final result = await SongService.instance.resolveSong(
         'https://music.youtube.com/watch?v=dQw4w9WgXcQ',
+        allowOfflineFallback: true,
       );
 
       expect(result.isOfflineFallback, isTrue);

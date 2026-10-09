@@ -21,6 +21,7 @@ import 'package:daily_you/widgets/tag_chip.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class EntryViewPage extends StatefulWidget {
   const EntryViewPage({
@@ -186,26 +187,59 @@ class _EntryViewPageState extends State<EntryViewPage> {
                                     location.latitude != null))
                               Padding(
                                 padding:
-                                    const EdgeInsets.only(top: 4, bottom: 2),
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.location_on_rounded,
-                                        size: 16,
-                                        color: theme.colorScheme.primary),
-                                    const SizedBox(width: 4),
-                                    Expanded(
-                                      child: Text(
-                                        location.placeName ??
-                                            '${location.latitude?.toStringAsFixed(4)}, ${location.longitude?.toStringAsFixed(4)}',
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                            fontSize: 13,
-                                            color: theme
-                                                .colorScheme.onSurfaceVariant),
-                                      ),
+                                    const EdgeInsets.only(top: 6, bottom: 2),
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(8),
+                                  onTap: () async {
+                                    if (location.latitude != null &&
+                                        location.longitude != null) {
+                                      final uri = Uri.parse(
+                                          'https://www.openstreetmap.org/?mlat=${location.latitude}&mlon=${location.longitude}#map=16/${location.latitude}/${location.longitude}');
+                                      await launchUrl(uri,
+                                          mode: LaunchMode.externalApplication);
+                                    }
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: theme
+                                          .colorScheme.surfaceContainerHighest
+                                          .withAlpha(150),
+                                      borderRadius: BorderRadius.circular(8),
                                     ),
-                                  ],
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.location_on_rounded,
+                                            size: 16,
+                                            color: theme.colorScheme.primary),
+                                        const SizedBox(width: 6),
+                                        Expanded(
+                                          child: Text(
+                                            location.placeName != null &&
+                                                    location.placeName!.isNotEmpty
+                                                ? (location.latitude != null
+                                                    ? '${location.placeName} (${location.latitude?.toStringAsFixed(4)}°, ${location.longitude?.toStringAsFixed(4)}°)'
+                                                    : location.placeName!)
+                                                : '${location.latitude?.toStringAsFixed(4)}°, ${location.longitude?.toStringAsFixed(4)}°',
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w500,
+                                                color: theme
+                                                    .colorScheme.onSurface),
+                                          ),
+                                        ),
+                                        if (location.latitude != null &&
+                                            location.longitude != null)
+                                          Icon(Icons.open_in_new_rounded,
+                                              size: 14,
+                                              color: theme
+                                                  .colorScheme.onSurfaceVariant),
+                                      ],
+                                    ),
+                                  ),
                                 ),
                               ),
                           ],

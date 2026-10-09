@@ -1,8 +1,10 @@
 // Behavior based on DenserMeerkat/June (GPL-3.0)
 import 'package:daily_you/models/location.dart';
+import 'package:daily_you/utils/location_service.dart';
 import 'package:daily_you/utils/map_tile_service.dart';
 import 'package:daily_you/utils/network_gate.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LocationPickerDialog extends StatefulWidget {
   final EntryLocation? initialLocation;
@@ -28,6 +30,8 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
   late TextEditingController _lngController;
 
   bool _isSearching = false;
+  bool _isFetchingGps = false;
+  String? _errorMessage;
   List<MapSearchResult> _searchResults = const [];
 
   @override
@@ -36,9 +40,13 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
     _placeController = TextEditingController(
         text: widget.initialLocation?.placeName ?? '');
     _latController = TextEditingController(
-        text: widget.initialLocation?.latitude?.toString() ?? '');
+        text: widget.initialLocation?.latitude?.toStringAsFixed(6) ?? '');
     _lngController = TextEditingController(
-        text: widget.initialLocation?.longitude?.toString() ?? '');
+        text: widget.initialLocation?.longitude?.toStringAsFixed(6) ?? '');
+
+    _placeController.addListener(() => setState(() {}));
+    _latController.addListener(() => setState(() {}));
+    _lngController.addListener(() => setState(() {}));
   }
 
   @override
@@ -49,40 +57,181 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
     super.dispose();
   }
 
+  Future<void> _fetchCurrentLocation() async {
+    setState(() {
+      _isFetchingGps = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final loc = await LocationService.instance.fetchCurrentLocation(
+        entryId: widget.initialLocation?.entryId ?? -1,
+      );
+      if (loc != null && mounted) {
+        setState(() {
+          _latController.text = loc.latitude?.toStringAsFixed(6) ?? '';
+          _lngController.text = loc.longitude?.toStringAsFixed(6) ?? '';
+          if (loc.placeName != null && loc.placeName!.isNotEmpty) {
+            _placeController.text = loc.placeName!;
+          } else if (_placeController.text.trim().isEmpty) {
+            _placeController.text = 'Current Location';
+          }
+          _isFetchingGps = false;
+        });
+      } else {
+        if (mounted) {
+          setState(() {
+            _errorMessage = 'GPS unavailable or permission denied. Please enter coordinates manually.';
+            _isFetchingGps = false;
+          });
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'Location error: $e';
+          _isFetchingGps = false;
+        });
+      }
+    }
+  }
+
   Future<void> _searchPlace() async {
     final query = _placeController.text.trim();
     if (query.isEmpty) return;
-    setState(() => _isSearching = true);
-    final results = await MapTileService.instance.searchPlace(query);
-    if (mounted) {
-      setState(() {
-        _isSearching = false;
-        _searchResults = results;
-      });
+    setState(() {
+      _isSearching = true;
+      _errorMessage = null;
+    });
+    try {
+      final results = await MapTileService.instance.searchPlace(query);
+      if (mounted) {
+        setState(() {
+          _isSearching = false;
+          _searchResults = results;
+          if (results.isEmpty) {
+            _errorMessage = 'No places found matching "$query"';
+          }
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isSearching = false;
+          _errorMessage = 'Search error: $e';
+        });
+      }
     }
+  }
+
+  Future<void> _openExternalMap(double lat, double lon) async {
+    final uri = Uri.parse('https://www.openstreetmap.org/?mlat=$lat&mlon=$lon#map=16/$lat/$lon');
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final hasNetwork = NetworkGate.isNetworkAllowed;
+
+    final lat = double.tryParse(_latController.text.trim());
+    final lng = double.tryParse(_lngController.text.trim());
+    final place = _placeController.text.trim();
+    final hasValidCoords = lat != null && lng != null;
+
     return AlertDialog(
-      title: const Row(
+      title: Row(
         children: [
-          Icon(Icons.location_on_rounded),
-          SizedBox(width: 8),
-          Text('Set Location'),
+          Icon(Icons.location_on_rounded, color: theme.colorScheme.primary),
+          const SizedBox(width: 8),
+          const Text('Set Location'),
         ],
       ),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            // Live Preview Card
+            if (hasValidCoords || place.isNotEmpty) ...[
+              Card(
+                elevation: 0,
+                color: theme.colorScheme.surfaceContainerHighest,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primaryContainer,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.location_on_rounded,
+                          color: theme.colorScheme.onPrimaryContainer,
+                          size: 24,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              place.isNotEmpty ? place : 'Coordinates',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                            ),
+                            if (hasValidCoords) ...[
+                              const SizedBox(height: 2),
+                              Text(
+                                '${lat.toStringAsFixed(4)}°, ${lng.toStringAsFixed(4)}°',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                      if (hasValidCoords)
+                        IconButton(
+                          icon: const Icon(Icons.open_in_new_rounded, size: 20),
+                          tooltip: 'Preview on Map',
+                          onPressed: () => _openExternalMap(lat, lng),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+            ],
+
+            // Auto-fetch GPS button
+            FilledButton.tonalIcon(
+              icon: _isFetchingGps
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.my_location_rounded),
+              label: Text(_isFetchingGps ? 'Locating device…' : 'Use Current Location (GPS)'),
+              onPressed: _isFetchingGps ? null : _fetchCurrentLocation,
+            ),
+            const SizedBox(height: 12),
             TextField(
               controller: _placeController,
               decoration: InputDecoration(
-                labelText: 'Place Name',
+                labelText: 'Place Name / Address',
                 hintText: 'e.g. Central Park, Home, Cafe',
                 border: const OutlineInputBorder(),
-                suffixIcon: NetworkGate.isNetworkAllowed
+                prefixIcon: const Icon(Icons.place_rounded),
+                suffixIcon: hasNetwork
                     ? (_isSearching
                         ? const SizedBox(
                             width: 24,
@@ -100,7 +249,7 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
                     : null,
               ),
               onSubmitted: (_) {
-                if (NetworkGate.isNetworkAllowed) _searchPlace();
+                if (hasNetwork) _searchPlace();
               },
             ),
             if (_searchResults.isNotEmpty) ...[
@@ -109,7 +258,7 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
                 constraints: const BoxConstraints(maxHeight: 140),
                 decoration: BoxDecoration(
                   border: Border.all(color: Theme.of(context).dividerColor),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: ListView.builder(
                   shrinkWrap: true,
@@ -134,6 +283,32 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
                 ),
               ),
             ],
+            if (_errorMessage != null) ...[
+              const SizedBox(height: 10),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.errorContainer,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.error_outline_rounded,
+                        size: 16, color: theme.colorScheme.error),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        _errorMessage!,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: theme.colorScheme.onErrorContainer,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
             const SizedBox(height: 12),
             Row(
               children: [
@@ -146,6 +321,7 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
                       labelText: 'Latitude',
                       hintText: '37.7749',
                       border: OutlineInputBorder(),
+                      isDense: true,
                     ),
                   ),
                 ),
@@ -159,6 +335,7 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
                       labelText: 'Longitude',
                       hintText: '-122.4194',
                       border: OutlineInputBorder(),
+                      isDense: true,
                     ),
                   ),
                 ),
@@ -171,7 +348,6 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
         if (widget.initialLocation != null)
           TextButton(
             onPressed: () {
-              // Return a sentinel with null place and coords to clear
               Navigator.of(context).pop(EntryLocation(
                 entryId: widget.initialLocation!.entryId,
                 placeName: null,
@@ -188,18 +364,20 @@ class _LocationPickerDialogState extends State<LocationPickerDialog> {
         ),
         FilledButton(
           onPressed: () {
-            final place = _placeController.text.trim();
-            final lat = double.tryParse(_latController.text.trim());
-            final lng = double.tryParse(_lngController.text.trim());
-            if (place.isEmpty && lat == null && lng == null) {
+            final placeStr = _placeController.text.trim();
+            final latVal = double.tryParse(_latController.text.trim());
+            final lngVal = double.tryParse(_lngController.text.trim());
+
+            if (placeStr.isEmpty && latVal == null && lngVal == null) {
               Navigator.of(context).pop();
               return;
             }
+
             final loc = EntryLocation(
               entryId: widget.initialLocation?.entryId ?? -1,
-              placeName: place.isNotEmpty ? place : null,
-              latitude: lat,
-              longitude: lng,
+              placeName: placeStr.isNotEmpty ? placeStr : null,
+              latitude: latVal,
+              longitude: lngVal,
               timeCreate: DateTime.now(),
             );
             Navigator.of(context).pop(loc);

@@ -67,7 +67,7 @@ class SongService {
       request.headers.set(
         HttpHeaders.userAgentHeader,
         userAgent ??
-            'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
       );
       final response =
           await request.close().timeout(const Duration(seconds: 10));
@@ -84,27 +84,31 @@ class SongService {
   }
 
   /// Resolves song details from YouTube / YouTube Music URL or shared text.
-  /// Fails quietly without displaying fabricated information.
-  Future<SongFetchResult> resolveSong(String input) async {
+  /// Throws [NetworkDisabledException] if network access is disabled in settings.
+  Future<SongFetchResult> resolveSong(String input,
+      {bool allowOfflineFallback = false}) async {
     final videoId = YouTubeUrlParser.extractVideoId(input);
     if (videoId == null) {
-      throw ArgumentError('Invalid YouTube / YouTube Music link');
+      throw ArgumentError('Invalid YouTube or YouTube Music link');
     }
 
     final normalizedUrl = YouTubeUrlParser.normalizeUrl(videoId);
 
-    // If network disallowed, offline fallback without fabricated info
     if (!NetworkGate.isNetworkAllowed) {
-      return SongFetchResult(
-        videoId: videoId,
-        url: normalizedUrl,
-        title: '',
-        artist: '',
-        album: null,
-        coverPath: null,
-        previewUrl: null,
-        isOfflineFallback: true,
-      );
+      if (allowOfflineFallback) {
+        return SongFetchResult(
+          videoId: videoId,
+          url: normalizedUrl,
+          title: '',
+          artist: '',
+          album: null,
+          coverPath: null,
+          previewUrl: null,
+          isOfflineFallback: true,
+        );
+      }
+      throw const NetworkDisabledException(
+          'Network access is disabled in settings. Please enable network access to fetch online song details.');
     }
 
     String title = '';
@@ -125,8 +129,8 @@ class SongService {
             .firstMatch(html);
         if (match != null) {
           final nextData = jsonDecode(match.group(1)!) as Map<String, dynamic>;
-          final pageData =
-              nextData['props']?['pageProps']?['pageData'] as Map<String, dynamic>?;
+          final pageData = nextData['props']?['pageProps']?['pageData']
+              as Map<String, dynamic>?;
           final entityData = pageData?['entityData'] as Map<String, dynamic>?;
           if (entityData != null) {
             title = (entityData['title'] as String?)?.trim() ?? '';
@@ -183,10 +187,12 @@ class SongService {
               final cleanT = title.toLowerCase();
               final cleanA = artist.toLowerCase();
 
-              final titleMatches =
-                  cleanT.isEmpty || tName.contains(cleanT) || cleanT.contains(tName);
-              final artistMatches =
-                  cleanA.isEmpty || aName.contains(cleanA) || cleanA.contains(aName);
+              final titleMatches = cleanT.isEmpty ||
+                  tName.contains(cleanT) ||
+                  cleanT.contains(tName);
+              final artistMatches = cleanA.isEmpty ||
+                  aName.contains(cleanA) ||
+                  cleanA.contains(aName);
 
               if (titleMatches || artistMatches) {
                 if (title.isEmpty && item['trackName'] != null) {
@@ -248,6 +254,10 @@ class SongService {
               .saveCover(fileName, coverRes.body);
         }
       } catch (_) {}
+    }
+
+    if (title.isEmpty && artist.isEmpty) {
+      throw Exception('Could not fetch song metadata. Please enter details manually.');
     }
 
     return SongFetchResult(
