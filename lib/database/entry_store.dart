@@ -15,6 +15,7 @@ import 'package:daily_you/providers/entry_locations_provider.dart';
 import 'package:daily_you/providers/entry_songs_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:daily_you/utils/webdav_sync_engine.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -126,6 +127,7 @@ class EntryStore with ChangeNotifier {
     EntryImagesProvider.instance.applyForEntry(entry.id!, const []);
     EntrySongsProvider.instance.removeAllForEntry(entry.id!);
     EntryLocationsProvider.instance.removeForEntry(entry.id!);
+    await WebDavSyncEngine.recordTombstone(entry.id!);
     await AppDatabase.instance.updateExternalDatabase();
     notifyListeners();
   }

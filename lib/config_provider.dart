@@ -157,6 +157,12 @@ class Settings {
       Setting<String>("stadiaKey", "", secure: true, secretStore: true);
   static const mapboxKey =
       Setting<String>("mapboxKey", "", secure: true, secretStore: true);
+  static const webDavUrl = Setting<String>("webDavUrl", "");
+  static const webDavUsername = Setting<String>("webDavUsername", "");
+  static const webDavPassword =
+      Setting<String>("webDavPassword", "", secure: true, secretStore: true);
+  static const webDavLastSync = Setting<String>("webDavLastSync", "");
+  static const syncTombstones = Setting<String>("syncTombstones", "[]");
 
   static const List<Setting<Object?>> all = [
     configVersion,
@@ -242,6 +248,11 @@ class Settings {
     mapTilerKey,
     stadiaKey,
     mapboxKey,
+    webDavUrl,
+    webDavUsername,
+    webDavPassword,
+    webDavLastSync,
+    syncTombstones,
   ];
 
   static const moodIcons = <int, Setting<String>>{
