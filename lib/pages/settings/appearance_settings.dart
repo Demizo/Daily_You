@@ -225,6 +225,48 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
           Padding(
             padding: const EdgeInsets.only(bottom: 8.0),
             child: SettingsDropdown<String>(
+                title: AppLocalizations.of(context)!.settingsPaletteStyle,
+                value: configProvider.get(Settings.paletteStyle),
+                options: const [
+                  DropdownMenuItem(
+                      value: 'tonalSpot', child: Text('Tonal Spot')),
+                  DropdownMenuItem(
+                      value: 'neutral', child: Text('Neutral')),
+                  DropdownMenuItem(
+                      value: 'vibrant', child: Text('Vibrant')),
+                  DropdownMenuItem(
+                      value: 'expressive', child: Text('Expressive')),
+                  DropdownMenuItem(
+                      value: 'fidelity', child: Text('Fidelity')),
+                  DropdownMenuItem(
+                      value: 'monochrome', child: Text('Monochrome')),
+                ],
+                onChanged: (newValue) async {
+                  if (newValue == null) return;
+                  await configProvider.set(Settings.paletteStyle, newValue);
+                }),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: SettingsDropdown<String>(
+                title: AppLocalizations.of(context)!.settingsAppFont,
+                value: configProvider.get(Settings.appFont),
+                options: const [
+                  DropdownMenuItem(value: 'system', child: Text('System')),
+                  DropdownMenuItem(
+                      value: 'sans-serif', child: Text('Sans-Serif')),
+                  DropdownMenuItem(value: 'serif', child: Text('Serif')),
+                  DropdownMenuItem(
+                      value: 'monospace', child: Text('Monospace')),
+                ],
+                onChanged: (newValue) async {
+                  if (newValue == null) return;
+                  await configProvider.set(Settings.appFont, newValue);
+                }),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: SettingsDropdown<String>(
                 title: AppLocalizations.of(context)!.settingsFirstDayOfWeek,
                 value: configProvider.get(Settings.startingDayOfWeek),
                 options: _buildFirstDayOfWeekDropdownItems(context),

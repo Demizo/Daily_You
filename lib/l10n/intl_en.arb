@@ -598,5 +598,9 @@
   "alwaysOpenNewLogDescription": "Automatically open the editor when starting the app",
   "@alwaysOpenNewLogDescription": {},
   "calendarStreaksTitle": "Streaks & indicators",
-  "@calendarStreaksTitle": {}
+  "@calendarStreaksTitle": {},
+  "settingsPaletteStyle": "Palette style",
+  "@settingsPaletteStyle": {},
+  "settingsAppFont": "Font style",
+  "@settingsAppFont": {}
 }

@@ -1060,6 +1060,12 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get calendarStreaksTitle => 'Streaks & indicators';
+
+  @override
+  String get settingsPaletteStyle => 'Palette style';
+
+  @override
+  String get settingsAppFont => 'Font style';
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).

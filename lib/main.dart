@@ -407,10 +407,45 @@ class MainApp extends StatefulWidget {
 }
 
 class _MainAppState extends State<MainApp> {
+  DynamicSchemeVariant _resolveVariant(String key, {required bool noChroma}) {
+    if (noChroma) return DynamicSchemeVariant.fidelity;
+    switch (key) {
+      case 'neutral':
+        return DynamicSchemeVariant.neutral;
+      case 'vibrant':
+        return DynamicSchemeVariant.vibrant;
+      case 'expressive':
+        return DynamicSchemeVariant.expressive;
+      case 'fidelity':
+        return DynamicSchemeVariant.fidelity;
+      case 'monochrome':
+        return DynamicSchemeVariant.monochrome;
+      default:
+        return DynamicSchemeVariant.tonalSpot;
+    }
+  }
+
+  String? _resolveFontFamily(String fontKey) {
+    switch (fontKey) {
+      case 'sans-serif':
+        return 'sans-serif';
+      case 'serif':
+        return 'serif';
+      case 'monospace':
+        return 'monospace';
+      default:
+        return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeModeProvider = Provider.of<ThemeModeProvider>(context);
     final configProvider = Provider.of<ConfigProvider>(context);
+    final paletteStyle = configProvider.get(Settings.paletteStyle);
+    final appFont = configProvider.get(Settings.appFont);
+    final fontFamily = _resolveFontFamily(appFont);
+
     return DynamicColorBuilder(
         builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
       ThemeData lightTheme;
@@ -423,20 +458,23 @@ class _MainAppState extends State<MainApp> {
             (lightDynamic.primary.b == lightDynamic.primary.g);
         lightTheme = ThemeData(
             useMaterial3: true,
+            fontFamily: fontFamily,
             materialTapTargetSize: MaterialTapTargetSize.padded,
             colorScheme: ColorScheme.fromSeed(
                 seedColor: lightDynamic.primary,
                 primaryContainer: lightDynamic.primaryContainer,
-                dynamicSchemeVariant: noChroma
-                    ? DynamicSchemeVariant.fidelity
-                    : DynamicSchemeVariant.tonalSpot,
+                dynamicSchemeVariant:
+                    _resolveVariant(paletteStyle, noChroma: noChroma),
                 brightness: Brightness.light));
       } else {
         lightTheme = ThemeData(
             useMaterial3: true,
+            fontFamily: fontFamily,
             materialTapTargetSize: MaterialTapTargetSize.padded,
             colorScheme: ColorScheme.fromSeed(
                 seedColor: themeModeProvider.accentColor,
+                dynamicSchemeVariant:
+                    _resolveVariant(paletteStyle, noChroma: false),
                 brightness: Brightness.light));
       }
 
@@ -447,20 +485,23 @@ class _MainAppState extends State<MainApp> {
             (darkDynamic.primary.b == darkDynamic.primary.g);
         darkTheme = ThemeData(
             useMaterial3: true,
+            fontFamily: fontFamily,
             materialTapTargetSize: MaterialTapTargetSize.padded,
             colorScheme: ColorScheme.fromSeed(
                 seedColor: darkDynamic.primary,
                 primaryContainer: darkDynamic.primaryContainer,
-                dynamicSchemeVariant: noChroma
-                    ? DynamicSchemeVariant.fidelity
-                    : DynamicSchemeVariant.tonalSpot,
+                dynamicSchemeVariant:
+                    _resolveVariant(paletteStyle, noChroma: noChroma),
                 brightness: Brightness.dark));
       } else {
         darkTheme = ThemeData(
           useMaterial3: true,
+          fontFamily: fontFamily,
           materialTapTargetSize: MaterialTapTargetSize.padded,
           colorScheme: ColorScheme.fromSeed(
               seedColor: themeModeProvider.accentColor,
+              dynamicSchemeVariant:
+                  _resolveVariant(paletteStyle, noChroma: false),
               brightness: Brightness.dark),
         );
       }

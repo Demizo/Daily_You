@@ -1961,6 +1961,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Streaks & indicators'**
   String get calendarStreaksTitle;
+
+  /// No description provided for @settingsPaletteStyle.
+  ///
+  /// In en, this message translates to:
+  /// **'Palette style'**
+  String get settingsPaletteStyle;
+
+  /// No description provided for @settingsAppFont.
+  ///
+  /// In en, this message translates to:
+  /// **'Font style'**
+  String get settingsAppFont;
 }
 
 class _AppLocalizationsDelegate

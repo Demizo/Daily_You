@@ -1058,4 +1058,10 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get calendarStreaksTitle => 'Streaks & indicators';
+
+  @override
+  String get settingsPaletteStyle => 'Palette style';
+
+  @override
+  String get settingsAppFont => 'Font style';
 }

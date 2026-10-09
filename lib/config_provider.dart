@@ -146,6 +146,9 @@ class Settings {
   static const calendarStreaks = Setting<bool>("calendarStreaks", true);
   static const recentEmojis =
       Setting<String>("recentEmojis", "☺️,🙂,😐,😕,😔");
+  static const paletteStyle =
+      Setting<String>("paletteStyle", "tonalSpot");
+  static const appFont = Setting<String>("appFont", "system");
 
   static const List<Setting<Object?>> all = [
     configVersion,
@@ -225,6 +228,8 @@ class Settings {
     alwaysOpenNewLog,
     calendarStreaks,
     recentEmojis,
+    paletteStyle,
+    appFont,
   ];
 
   static const moodIcons = <int, Setting<String>>{
