@@ -510,6 +510,18 @@ abstract class AppLocalizations {
   /// **'Retry'**
   String get databaseMigrationErrorRetry;
 
+  /// No description provided for @databaseNewerErrorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Required'**
+  String get databaseNewerErrorTitle;
+
+  /// No description provided for @databaseNewerErrorDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Your data was saved by a newer version of Daily You. This version can\'t open it safely. Update the app to continue.'**
+  String get databaseNewerErrorDescription;
+
   /// No description provided for @errorReport.
   ///
   /// In en, this message translates to:

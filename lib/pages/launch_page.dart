@@ -22,7 +22,7 @@ import 'package:quick_actions/quick_actions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-enum _LaunchErrorType { externalAccess, migrationFailed }
+enum _LaunchErrorType { externalAccess, migrationFailed, appOutdated }
 
 class LaunchPage extends StatefulWidget {
   final Widget nextPage;
@@ -137,6 +137,11 @@ class _LaunchPageState extends State<LaunchPage> {
     bool initialized;
     try {
       initialized = await AppDatabase.instance.init();
+    } on DatabaseNewerThanAppException catch (error, stackTrace) {
+      _logger.severe('Database is newer than the app', error, stackTrace);
+      _errorType = _LaunchErrorType.appOutdated;
+      _showError();
+      return;
     } catch (error, stackTrace) {
       _logger.severe('Database initialization failed', error, stackTrace);
       initialized = false;
@@ -169,6 +174,10 @@ class _LaunchPageState extends State<LaunchPage> {
           : _LaunchErrorType.externalAccess;
     }
 
+    _showError();
+  }
+
+  void _showError() {
     if (!mounted) return;
     setState(() {
       isLoading = false;
@@ -301,6 +310,12 @@ class _LaunchPageState extends State<LaunchPage> {
                 onPressed: _reportIssue,
                 child: Text(localizations.errorReport)),
           ],
+        );
+      case _LaunchErrorType.appOutdated:
+        return _buildErrorScaffold(
+          title: localizations.databaseNewerErrorTitle,
+          description: localizations.databaseNewerErrorDescription,
+          actions: const [],
         );
       case _LaunchErrorType.externalAccess:
         return _buildErrorScaffold(

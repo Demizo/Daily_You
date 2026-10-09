@@ -268,6 +268,13 @@ class AppLocalizationsRo extends AppLocalizations {
   String get databaseMigrationErrorRetry => 'Reîncearcă';
 
   @override
+  String get databaseNewerErrorTitle => 'Update Required';
+
+  @override
+  String get databaseNewerErrorDescription =>
+      'Your data was saved by a newer version of Daily You. This version can\'t open it safely. Update the app to continue.';
+
+  @override
   String get errorReport => 'Raportează o Problemă';
 
   @override

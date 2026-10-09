@@ -433,7 +433,8 @@ class BackupRestoreUtils {
 
     final restoredDatabase =
         File(join(restoreFolder.path, AppDatabase.databaseFileName));
-    if (!await restoredDatabase.exists()) {
+    if (!await restoredDatabase.exists() ||
+        !await AppDatabase.instance.canOpen(restoredDatabase.path)) {
       return const OperationOutcome.failed();
     }
 
