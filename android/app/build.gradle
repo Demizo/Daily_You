@@ -29,7 +29,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.demizo.daily_you"
+    namespace = "com.demizo.daily_you.dyf"
     compileSdkVersion 37
     ndkVersion = flutter.ndkVersion
 
@@ -48,7 +48,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.demizo.daily_you"
+        applicationId "com.demizo.daily_you.dyf"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdkVersion flutter.minSdkVersion
@@ -57,7 +57,7 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
 	vectorDrawables.generatedDensities = []
-        resValue "string", "app_name", "Daily You"
+        resValue "string", "app_name", "Daily You+"
     }
 
     signingConfigs {

@@ -1,5 +1,5 @@
 // Behavior based on DenserMeerkat/June (GPL-3.0)
-package com.demizo.daily_you
+package com.demizo.daily_you.dyf
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -8,7 +8,7 @@ import android.view.WindowManager
 import android.content.Intent
 
 class MainActivity: FlutterFragmentActivity() {
-  private val CHANNEL = "com.demizo.daily_you/security"
+  private val CHANNEL = "com.demizo.daily_you.dyf/security"
 
   override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
     super.configureFlutterEngine(flutterEngine)

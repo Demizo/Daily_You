@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 
 class ScreenProtection {
   static const MethodChannel _channel =
-      MethodChannel('com.demizo.daily_you/security');
+      MethodChannel('com.demizo.daily_you.dyf/security');
 
   static bool isAndroidOverride = false;
 
