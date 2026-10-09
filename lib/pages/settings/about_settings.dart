@@ -1,5 +1,6 @@
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/device_info_service.dart';
+import 'package:daily_you/pages/settings/developer_settings_page.dart';
 import 'package:daily_you/theme_mode_provider.dart';
 import 'package:daily_you/widgets/settings_icon_action.dart';
 import 'package:material_ui/material_ui.dart';
@@ -51,6 +52,7 @@ class _AboutSettingsState extends State<AboutSettings> {
                 versionTapCount = 0;
 
                 await configProvider.set(Settings.followSystemColor, false);
+                await configProvider.set(Settings.developerModeEnabled, true);
 
                 themeProvider.accentColor = pinkAccentColor;
                 themeProvider.updateAccentColor();
@@ -122,6 +124,22 @@ class _AboutSettingsState extends State<AboutSettings> {
                     Uri.https("github.com", "/Demizo/Daily_You/issues"),
                     mode: LaunchMode.externalApplication);
               }),
+          if (configProvider.get(Settings.developerModeEnabled)) ...[
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+              child: Divider(),
+            ),
+            SettingsIconAction(
+              title: AppLocalizations.of(context)!.developerOptionsTitle,
+              hint: AppLocalizations.of(context)!.developerOptionsDescription,
+              icon: Icon(Icons.code_rounded),
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => const DeveloperSettingsPage(),
+                ));
+              },
+            ),
+          ],
         ],
       ),
     );

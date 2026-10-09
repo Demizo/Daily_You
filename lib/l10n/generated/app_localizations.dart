@@ -1775,6 +1775,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Choose a log'**
   String get shareAddToLogPickerTitle;
+
+  /// No description provided for @settingsAllowNetworkTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow network access'**
+  String get settingsAllowNetworkTitle;
+
+  /// No description provided for @settingsAllowNetworkDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable outbound network requests for online features'**
+  String get settingsAllowNetworkDescription;
+
+  /// No description provided for @developerOptionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Developer options'**
+  String get developerOptionsTitle;
+
+  /// No description provided for @developerOptionsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Diagnostic logging and developer tools'**
+  String get developerOptionsDescription;
+
+  /// No description provided for @settingsDiagnosticLoggingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Diagnostic logging'**
+  String get settingsDiagnosticLoggingTitle;
+
+  /// No description provided for @settingsDiagnosticLoggingDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Record internal debug logs in memory'**
+  String get settingsDiagnosticLoggingDescription;
+
+  /// No description provided for @consoleLogsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Console logs'**
+  String get consoleLogsTitle;
+
+  /// No description provided for @clearLogs.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear logs'**
+  String get clearLogs;
+
+  /// No description provided for @copyLogs.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy logs'**
+  String get copyLogs;
+
+  /// No description provided for @logsCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Logs copied to clipboard'**
+  String get logsCopied;
+
+  /// No description provided for @noLogsRecorded.
+  ///
+  /// In en, this message translates to:
+  /// **'No logs recorded yet'**
+  String get noLogsRecorded;
 }
 
 class _AppLocalizationsDelegate

@@ -944,6 +944,42 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get shareAddToLogPickerTitle => '选择日志';
+
+  @override
+  String get settingsAllowNetworkTitle => 'Allow network access';
+
+  @override
+  String get settingsAllowNetworkDescription =>
+      'Enable outbound network requests for online features';
+
+  @override
+  String get developerOptionsTitle => 'Developer options';
+
+  @override
+  String get developerOptionsDescription =>
+      'Diagnostic logging and developer tools';
+
+  @override
+  String get settingsDiagnosticLoggingTitle => 'Diagnostic logging';
+
+  @override
+  String get settingsDiagnosticLoggingDescription =>
+      'Record internal debug logs in memory';
+
+  @override
+  String get consoleLogsTitle => 'Console logs';
+
+  @override
+  String get clearLogs => 'Clear logs';
+
+  @override
+  String get copyLogs => 'Copy logs';
+
+  @override
+  String get logsCopied => 'Logs copied to clipboard';
+
+  @override
+  String get noLogsRecorded => 'No logs recorded yet';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).

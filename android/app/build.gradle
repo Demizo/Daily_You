@@ -86,6 +86,13 @@ android {
             resValue "string", "app_name", "Daily You Dev"
             signingConfig = signingConfigs.release
         }
+        full {
+            dimension "default"
+            applicationIdSuffix ".full"
+            versionNameSuffix "-full"
+            resValue "string", "app_name", "Daily You Full"
+            signingConfig = signingConfigs.release
+        }
     }
 
     buildTypes {

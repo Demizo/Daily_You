@@ -954,4 +954,40 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get shareAddToLogPickerTitle => 'Choose a log';
+
+  @override
+  String get settingsAllowNetworkTitle => 'Allow network access';
+
+  @override
+  String get settingsAllowNetworkDescription =>
+      'Enable outbound network requests for online features';
+
+  @override
+  String get developerOptionsTitle => 'Developer options';
+
+  @override
+  String get developerOptionsDescription =>
+      'Diagnostic logging and developer tools';
+
+  @override
+  String get settingsDiagnosticLoggingTitle => 'Diagnostic logging';
+
+  @override
+  String get settingsDiagnosticLoggingDescription =>
+      'Record internal debug logs in memory';
+
+  @override
+  String get consoleLogsTitle => 'Console logs';
+
+  @override
+  String get clearLogs => 'Clear logs';
+
+  @override
+  String get copyLogs => 'Copy logs';
+
+  @override
+  String get logsCopied => 'Logs copied to clipboard';
+
+  @override
+  String get noLogsRecorded => 'No logs recorded yet';
 }

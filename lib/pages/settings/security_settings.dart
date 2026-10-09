@@ -1,5 +1,6 @@
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/device_info_service.dart';
+import 'package:daily_you/utils/network_gate.dart';
 import 'package:daily_you/widgets/auth_popup.dart';
 import 'package:daily_you/widgets/settings_icon_action.dart';
 import 'package:daily_you/widgets/settings_toggle.dart';
@@ -130,6 +131,16 @@ class SecuritySettingsPageState extends State<SecuritySettings> {
                             },
                           ));
                 }),
+          if (NetworkGate.isCompiledIn)
+            SettingsToggle(
+              title: AppLocalizations.of(context)!.settingsAllowNetworkTitle,
+              hint:
+                  AppLocalizations.of(context)!.settingsAllowNetworkDescription,
+              setting: Settings.allowNetworkAccess,
+              onChanged: (value) async {
+                await configProvider.set(Settings.allowNetworkAccess, value);
+              },
+            ),
         ],
       ),
     );

@@ -123,6 +123,11 @@ class Settings {
   static const lastBackup = Setting<String>("lastBackup", "", secure: true);
   static const lastAutoBackup =
       Setting<String>("lastAutoBackup", "", secure: true);
+  static const allowNetworkAccess = Setting<bool>("allowNetworkAccess", false);
+  static const developerModeEnabled =
+      Setting<bool>("developerModeEnabled", false);
+  static const diagnosticLoggingEnabled =
+      Setting<bool>("diagnosticLoggingEnabled", false);
 
   static const List<Setting<Object?>> all = [
     configVersion,
@@ -189,6 +194,9 @@ class Settings {
     autoBackupMaxCount,
     lastBackup,
     lastAutoBackup,
+    allowNetworkAccess,
+    developerModeEnabled,
+    diagnosticLoggingEnabled,
   ];
 
   static const moodIcons = <int, Setting<String>>{
