@@ -108,11 +108,7 @@ class EntryImageActions {
 
           resizedImage.exif = originalImage.exif;
 
-          final compressedBytes = img.encodeJpg(resizedImage, quality: quality);
-
-          File(image.path).writeAsBytesSync(compressedBytes);
-
-          return compressedBytes;
+          return img.encodeJpg(resizedImage, quality: quality);
         });
       }
     }
