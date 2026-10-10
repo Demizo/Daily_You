@@ -1,28 +1,28 @@
 # appimage-builder recipe see https://appimage-builder.readthedocs.io for details
 version: 1
 script:
-- rm -rf AppDir || true
-- cp -r build/linux/x64/release/bundle AppDir
-- mkdir -p AppDir/usr/share/icons/
-- cp assets/logo.svg AppDir/usr/share/icons/
+  - rm -rf AppDir || true
+  - cp -r build/linux/x64/release/bundle AppDir
+  - mkdir -p AppDir/usr/share/icons/
+  - cp assets/logo.svg AppDir/usr/share/icons/
 AppDir:
   path: ./AppDir
   app_info:
     id: com.traxdinosaur.dailyyou
     name: Daily You
     icon: logo
-    version: 3.6.1
+    version: 1.0.0
     exec: daily_you
     exec_args: $@
   files:
     include:
-    - /lib64/ld-linux-x86-64.so.2
+      - /lib64/ld-linux-x86-64.so.2
     exclude:
-    - usr/share/man
-    - usr/share/doc/*/README.*
-    - usr/share/doc/*/changelog.*
-    - usr/share/doc/*/NEWS.*
-    - usr/share/doc/*/TODO.*
+      - usr/share/man
+      - usr/share/doc/*/README.*
+      - usr/share/doc/*/changelog.*
+      - usr/share/doc/*/NEWS.*
+      - usr/share/doc/*/TODO.*
   test:
     fedora-30:
       image: appimagecrafters/tests-env:fedora-30

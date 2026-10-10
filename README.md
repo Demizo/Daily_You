@@ -1,16 +1,14 @@
 <p align="center">
-<img width="500" src="https://github.com/Demizo/Daily_You/blob/master/assets/banner.gif" alt="Daily You Logo">
+<img width="500" src="assets/banner.gif" alt="Daily You Logo">
 </p>
 <div align="center">
   
 # Daily You
 
-[<img src="https://f-droid.org/badge/get-it-on.png" height="80">](https://f-droid.org/en/packages/com.demizo.daily_you/)
-[<img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png" height="80">](https://apt.izzysoft.de/fdroid/index/apk/com.demizo.daily_you)
-[<img src="https://github.com/machiav3lli/oandbackupx/blob/034b226cea5c1b30eb4f6a6f313e4dadcbb0ece4/badge_github.png" alt="Get it on GitHub" height="80">](https://github.com/Demizo/Daily_You/releases/latest)
+**A private, offline-first personal diary and memory journal.**  
+_An independent evolution combining the simplicity of Daily You with the rich journaling features of June._
 
-[<img src="https://img.shields.io/badge/Liberapay-F6C915?style=for-the-badge&logo=liberapay&logoColor=black" width="auto" height="100" alt="Donate using Liberapay">](https://liberapay.com/Daily-You/donate)
-[<img src="https://img.shields.io/badge/Buy_Me_A_Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black" width="auto" height="100" alt="Buy me a Coffee">](https://buymeacoffee.com/demizo)
+[<img src="https://raw.githubusercontent.com/machiav3lli/oandbackupx/034b226cea5c1b30eb4f6a6f313e4dadcbb0ece4/badge_github.png" alt="Get it on GitHub" height="80">](https://github.com/TraxDinosaur/DailyYou/releases/latest)
 
 ### Every day is worth remembering…
 
@@ -18,64 +16,82 @@
 
 </div>
 
-Capture the moments that matter. **Daily You** helps you log your thoughts, track your mood, and keep a diary of meaningful moments, every day. Whether you're journaling, reflecting, or just noting what made you smile, **Daily You** gives you a private space that's truly your own.
+Capture the moments that matter. **Daily You** is a standalone, open-source personal journal designed for complete privacy and ownership.
 
-Join a community that believes **your journal should be yours**, not a product.
+This project is an independent hybrid experience: it takes the rock-solid offline Flutter foundation, encryption, and local storage of **[Daily You by Demizo](https://github.com/Demizo/Daily_You)** and enriches it with the best feature concepts and visual elegance of **[June by DenserMeerkat](https://github.com/DenserMeerkat/June)** including rich media links, interactive map previews, smart people tagging, and personalized spaces.
+
+No accounts, no ads, no trackers, and no subscription paywalls your journal belongs to you.
 
 <p align="center">
-<img width="200" src="https://github.com/Demizo/Daily_You/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/1_home.png" alt="home page">
-<img width="200" src="https://github.com/Demizo/Daily_You/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/2_gallery.png" alt="gallery page">
-<img width="200" src="https://github.com/Demizo/Daily_You/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/3_stats.png" alt="stats page ">
-<img width="200" src="https://github.com/Demizo/Daily_You/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/4_entry_view.png" alt="journal entry">
+<img width="200" src="fastlane/metadata/android/en-US/images/phoneScreenshots/1_home.png" alt="home page">
+<img width="200" src="fastlane/metadata/android/en-US/images/phoneScreenshots/2_gallery.png" alt="gallery page">
+<img width="200" src="fastlane/metadata/android/en-US/images/phoneScreenshots/3_stats.png" alt="stats page">
+<img width="200" src="fastlane/metadata/android/en-US/images/phoneScreenshots/4_entry_view.png" alt="journal entry">
 </p>
 
-### Features
+## ✨ What's New in this Edition
 
-✍️ **Take daily logs:** Journal your thoughts, reflections, or routines.
+Building upon the original Daily You foundation, this release introduces major new features inspired by June while keeping both apps completely distinct:
 
-📈 **Track your mood:** Gain insight into how your mood changes over time.
+- 🎵 **Music & Media Links:** Add songs directly from YouTube Music, YouTube, and share links. Features automatic multi-source metadata resolution (title, artist, album, square cover art) with fallback support, cached offline covers, and playable 30-second audio previews right on your entry cards.
+- 📍 **Interactive Location & Visual Map Previews:** Pin where you were with one-tap native GPS auto-fetch and address reverse-geocoding. Entries feature live interactive map tile previews, with an elegant offline blueprint grid view when network access is disabled.
+- 👥 **Dedicated People Tagging (`@person`):** Track the people who matter most without cluttering your tag catalog. Enjoy smart `@name` autocomplete right from the editor toolbar and browse dedicated entries per person.
+- 🗂️ **Custom Spaces:** Organize entries by areas of life, work, or travel. Spaces are created purely on demand by you, keeping your normal journal entries clean and uncluttered.
+- 🏷️ **Native Independent Tags:** Daily You's tag system (labels, trackers, icons, and colors) remains completely independent and unconstrained by rigid prefixes.
+- 🎬 **Video Attachments:** Full video capture, thumbnail previews, and in-app video playback alongside your photo gallery.
+- 🛡️ **Master Network Switch:** Complete peace of mind with a global kill-switch. When off, zero internet requests are made and all offline fallbacks engage automatically.
+- 🔒 **Screen & Recents Protection:** Hardware-level screenshot blocking and recents thumbnail hiding via Android's `FLAG_SECURE`.
+- 🔑 **Security Question PIN Recovery:** Safe local recovery method if you ever forget your entry PIN.
+- 📦 **Comprehensive Encrypted Backups:** Full AES-GCM encrypted ZIP backup and restore covering all entries, tags, photos, videos, cached song covers, spaces, and people.
 
-🖼️ **Keep photo memories:** Add pictures to enrich your memories.
+---
+
+## 🌟 Core Features
+
+✍️ **Take daily logs:** Journal your thoughts, reflections, or daily routines.
+
+📈 **Track your mood:** Gain insight into how your emotions change over time with analytics.
+
+🖼️ **Keep photo memories:** Add multiple pictures to enrich your memories.
 
 📝 **Rich note taking:** Format notes your own way with Markdown.
 
-🔔 **Gentle reminders:** Random daily nudges to keep you consistent.
+🔔 **Gentle reminders:** Flexible reminders with custom schedules to keep you consistent.
 
-🔒 **Control your data:** Choose where your data lives, including external storage.
+🔒 **Control your data:** Choose where your data lives, including internal or external storage.
 
 🌐 **Offline-first:** Works without internet. Always.
 
-**Daily You** is free, open source, and community supported. Built around the belief that your diary should be yours forever, not a subscription. No accounts, no ads, no locked features, and no tracking or data collection. Just your story, on your device, owned by you.
+---
 
-## Download 
+## 📱 Download & Installation
 
-[![Downloads](https://img.shields.io/github/downloads/Demizo/Daily_You/total)](https://github.com/Demizo/Daily_You/releases)
-[<img src="https://shields.rbtlog.dev/simple/com.demizo.daily_you" alt="RB Status">](https://shields.rbtlog.dev/com.demizo.daily_you)
+[<img src="https://raw.githubusercontent.com/machiav3lli/oandbackupx/034b226cea5c1b30eb4f6a6f313e4dadcbb0ece4/badge_github.png" alt="Get it on GitHub" height="80">](https://github.com/TraxDinosaur/DailyYou/releases/latest)
 
-[<img src="https://f-droid.org/badge/get-it-on.png" height="80">](https://f-droid.org/en/packages/com.demizo.daily_you/)
-[<img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png" height="80">](https://apt.izzysoft.de/fdroid/index/apk/com.demizo.daily_you)
-[<img src="https://github.com/machiav3lli/oandbackupx/blob/034b226cea5c1b30eb4f6a6f313e4dadcbb0ece4/badge_github.png" alt="Get it on GitHub" height="80">](https://github.com/Demizo/Daily_You/releases/latest)
+Download the latest signed release APK from the [Releases](https://github.com/TraxDinosaur/DailyYou/releases) page.
 
-## Support The App
-**Daily You** is _free forever_ since everyone deserves a journal that is truly their own. If you find yourself enjoying the app, please consider supporting its continued development.
+1. Download `app-fdroid-release.apk` to your device.
+2. Open your device file manager and tap the APK file.
+3. Allow "Install unknown apps" if prompted.
+4. Tap **Install** and enjoy **Daily You**.
 
-[<img src="https://img.shields.io/badge/Liberapay-F6C915?style=for-the-badge&logo=liberapay&logoColor=black" width="auto" height="100" alt="Donate using Liberapay">](https://liberapay.com/Daily-You/donate)
-[<img src="https://img.shields.io/badge/Buy_Me_A_Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black" width="auto" height="100" alt="Buy me a Coffee">](https://buymeacoffee.com/demizo)
+---
 
-## Migrate From Another App
-Are you coming from another app? **Daily You** supports migrating from other apps. Simply go to `Settings > Backup & Restore > Import From Another App` and select your previous app. Feel free to request any apps not currently listed. **Note:** Imports from some apps may not be one-to-one since **Daily You** may have different features.
+## 🔄 Migrate From Another App
 
-## Languages 
-Everyone should have access to a journal! **Daily You** uses [Weblate](https://weblate.org) to easily manage translations. If you would like to help translate the app, please visit [the Daily You project on Weblate](https://hosted.weblate.org/projects/daily-you/), thank you!
+Are you coming from another journaling app? **Daily You** supports importing from other popular apps. Go to `Settings > Backup & Restore > Import From Another App` and select your previous app.
 
-<div align="center">
-<a href="https://hosted.weblate.org/engage/daily-you/">
-<img src="https://hosted.weblate.org/widget/daily-you/multi-auto.svg" alt="Translation status" />
-</a>
-</div>
+---
 
-## Development
-The full development environment is defined using [Nix](https://nixos.org/). Simply, install the [Nix Package Manager](https://nixos.org/download/), clone the repository, enter the project directory, and run `nix develop`, that's it! Alternatively, **Daily You** is built using Flutter. You can directly [install Flutter](https://docs.flutter.dev/get-started/install), clone the repository, enter the project directory, and run `flutter pub get`.
+## 🤝 Credits & Attribution
 
-## License
-This software is free software licensed under the GNU General Public License 3.0.
+This standalone project is maintained by **[TraxDinosaur](https://github.com/TraxDinosaur)** and is built upon the incredible work of the open-source community:
+
+- **[Daily You](https://github.com/Demizo/Daily_You)** by [Demizo](https://github.com/Demizo) (GPL-3.0) : The foundational diary engine, architecture, and database model.
+- **[June](https://github.com/DenserMeerkat/June)** by [DenserMeerkat](https://github.com/DenserMeerkat) (GPL-3.0) : Feature design, UX workflows, and behavioral inspirations for media links, map previews, people tagging, and spaces.
+
+---
+
+## 📄 License
+
+This software is free software licensed under the **GNU General Public License 3.0** (GPL-3.0). See [LICENSE.txt](LICENSE.txt) for details.
