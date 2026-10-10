@@ -83,8 +83,11 @@ class _AboutSettingsState extends State<AboutSettings> {
               icon: Icon(Icons.open_in_new_rounded),
               onPressed: () async {
                 await launchUrl(
-                    Uri.https("github.com",
-                        "/Demizo/Daily_You/blob/master/LICENSE.txt"),
+                    Uri(
+                        scheme: "https",
+                        host: "github.com",
+                        path: "/Demizo/Daily_You",
+                        fragment: "license"),
                     mode: LaunchMode.externalApplication);
               }),
           SettingsIconAction(
