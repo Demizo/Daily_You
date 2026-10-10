@@ -669,7 +669,7 @@ class AppLocalizationsEn extends AppLocalizations {
       '## Welcome to Daily You\n\n> Every day is worth remembering, capture it!\n\n**Daily You** is free, [open source](https://github.com/Demizo/Daily_You), and community supported. Built around the belief that your diary should be yours, not a product:\n\n- No ads\n- No locked features\n- No tracking or data collection\n\nWhether you\'re journaling, reflecting, or just noting what made you smile, **Daily You** gives you a private space that\'s _truly your own_.';
 
   @override
-  String get settingsStorageTitle => 'Storage';
+  String get settingsStorageTitle => 'Storage & Sync';
 
   @override
   String get settingsImageQuality => 'Image Quality';
@@ -699,11 +699,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsImageFolder => 'Image Folder';
 
   @override
+  String get settingsExternalSyncTitle => 'Sync with External Location';
+
+  @override
+  String get chooseFolderHint => 'Choose a folder';
+
+  @override
   String get warningTitle => 'Warning';
 
   @override
   String get logFolderWarningDescription =>
-      'If the selected folder already contains a \'daily_you.db\' file, it will be used to overwrite your existing logs!';
+      'The selected folder already contains a \'daily_you.db\' file, it will be used to overwrite your existing logs!';
 
   @override
   String get errorTitle => 'Error';
@@ -713,6 +719,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get imageFolderErrorDescription => 'Failed to change image folder!';
+
+  @override
+  String get syncErrorDescription =>
+      'Failed to sync with the external location!';
 
   @override
   String get backupErrorDescription => 'Failed to create backup!';

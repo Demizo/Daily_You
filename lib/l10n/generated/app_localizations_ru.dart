@@ -710,6 +710,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsImageFolder => 'Папка для картинок';
 
   @override
+  String get settingsExternalSyncTitle => 'Sync with External Location';
+
+  @override
+  String get chooseFolderHint => 'Choose a folder';
+
+  @override
   String get warningTitle => 'Внимание';
 
   @override
@@ -726,6 +732,10 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get imageFolderErrorDescription =>
       'Не удалось поменять папку для картинок!';
+
+  @override
+  String get syncErrorDescription =>
+      'Failed to sync with the external location!';
 
   @override
   String get backupErrorDescription => 'Не удалось создать резервную копию!';

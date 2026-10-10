@@ -700,6 +700,12 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settingsImageFolder => 'Pasta de Imagens';
 
   @override
+  String get settingsExternalSyncTitle => 'Sync with External Location';
+
+  @override
+  String get chooseFolderHint => 'Choose a folder';
+
+  @override
   String get warningTitle => 'Aviso';
 
   @override
@@ -716,6 +722,10 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get imageFolderErrorDescription =>
       'Não foi possível alterar a pasta de imagens!';
+
+  @override
+  String get syncErrorDescription =>
+      'Failed to sync with the external location!';
 
   @override
   String get backupErrorDescription => 'Não foi possível criar backup!';

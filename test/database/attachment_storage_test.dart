@@ -382,6 +382,26 @@ void main() {
     });
   });
 
+  group('a large upload', () {
+    test('gets longer to finish than a small one', () async {
+      final externalStore = FakeImageFolder();
+      useStores(internalStore, externalStore);
+      const name = 'daily_you_2026-01-02T03-04-05.jpg';
+      final upload = externalStore.holdUploadOf(name);
+      storage.externalTimeout = const Duration(milliseconds: 10);
+      addTearDown(() => storage.externalTimeout = const Duration(seconds: 60));
+
+      await storage.create(
+          null, Uint8List(8 * 1024 * 1024), AttachmentType.image,
+          currTime: DateTime(2026, 1, 2, 3, 4, 5));
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      upload.complete();
+      await pumpEventQueue();
+
+      expect(storage.externalSyncHealth.lastAttempt!.succeeded, isTrue);
+    });
+  });
+
   group('attachment types', () {
     final captureTime = DateTime(2026, 1, 2, 3, 4, 5);
     const stamp = 'daily_you_2026-01-02T03-04-05';
@@ -710,7 +730,7 @@ void main() {
         await (await externalOf(AttachmentType.video))
             .write('clip.mp4', bytesOf('clip'));
 
-        final summary = (await storage.reconcileAttachmentFolders())!;
+        final summary = await storage.reconcileAttachmentFolders();
 
         expect(summary.uploaded, 1);
         expect(summary.downloaded, 1);
@@ -719,6 +739,54 @@ void main() {
         expect(await (await internalOf(AttachmentType.video)).read('clip.mp4'),
             equals(bytesOf('clip')));
         expect(await internalStore.list(), isEmpty);
+      });
+
+      test('only reconciles the requested types', () async {
+        useAttachments([
+          (AttachmentType.audio, 'voice.m4a'),
+          (AttachmentType.video, 'clip.mp4'),
+        ]);
+        await (await internalOf(AttachmentType.audio))
+            .write('voice.m4a', bytesOf('voice'));
+        await (await internalOf(AttachmentType.video))
+            .write('clip.mp4', bytesOf('clip'));
+
+        await storage.reconcileAttachmentFolders(types: [AttachmentType.video]);
+
+        expect(await (await externalOf(AttachmentType.video)).list(),
+            ['clip.mp4']);
+        expect(await (await externalOf(AttachmentType.audio)).list(), isEmpty);
+      });
+
+      test('reports each type as a stage with its counts', () async {
+        useAttachments([
+          (AttachmentType.video, 'clip.mp4'),
+          (AttachmentType.audio, 'voice.m4a'),
+          (AttachmentType.audio, 'note.m4a'),
+        ]);
+        for (final (type, name) in [
+          (AttachmentType.video, 'clip.mp4'),
+          (AttachmentType.audio, 'voice.m4a'),
+          (AttachmentType.audio, 'note.m4a'),
+        ]) {
+          await (await internalOf(type)).write(name, bytesOf(name));
+        }
+        final reported = <String>[];
+
+        await storage.reconcileAttachmentFolders(
+            types: [AttachmentType.video, AttachmentType.audio],
+            onProgress: (progress) =>
+                reported.add('${progress.item.name} ${progress.counts}'));
+
+        expect(reported, [
+          'video null',
+          'video 0/1',
+          'video 1/1',
+          'audio null',
+          'audio 0/2',
+          'audio 1/2',
+          'audio 2/2',
+        ]);
       });
 
       test('a name referenced as audio does not cover the same video name',
@@ -767,7 +835,7 @@ void main() {
     const capturedName = 'daily_you_2026-01-02T03-04-05.jpg';
 
     Future<AttachmentSyncSummary> reconcile() async =>
-        (await storage.reconcileAttachmentFolders())!;
+        storage.reconcileAttachmentFolders();
 
     void useFolder(FakeImageFolder imageFolder, List<String> images) {
       folder = imageFolder;
@@ -799,7 +867,7 @@ void main() {
           await internalStore.write(name, bytesOf(name));
         }
 
-        expect(await storage.syncAttachmentFolders(false), isTrue);
+        await storage.syncAttachmentFolders(false);
 
         for (final name in names) {
           expect(await folder.read(name), equals(bytesOf(name)));
@@ -811,7 +879,7 @@ void main() {
         useFolder(FakeImageFolder(), ['a.jpg']);
         await folder.write('a.jpg', bytesOf('a'));
 
-        expect(await storage.syncAttachmentFolders(false), isTrue);
+        await storage.syncAttachmentFolders(false);
 
         expect(await internalStore.read('a.jpg'), equals(bytesOf('a')));
       });
@@ -1474,6 +1542,19 @@ void main() {
     expect(await internalStore.exists('orphan.jpg'), isFalse);
     expect(await externalStore.list(),
         unorderedEquals(['orphan.jpg', 'unknown.jpg']));
+  });
+
+  test('garbage collection leaves a download in progress alone', () async {
+    useStores(internalStore, InMemoryFileStore());
+    useImages(['kept.jpg']);
+    await internalStore.write(
+        'kept.jpg.1760000000000000.partial', bytesOf('half'));
+    await internalStore.write('orphan.jpg', bytesOf('orphan'));
+
+    await storage.garbageCollectAttachments();
+
+    expect(await internalStore.list(),
+        equals(['kept.jpg.1760000000000000.partial']));
   });
 
   group('deleteOrphanedAttachments', () {

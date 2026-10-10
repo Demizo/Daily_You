@@ -701,6 +701,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsImageFolder => 'Carpeta de Imágenes';
 
   @override
+  String get settingsExternalSyncTitle => 'Sync with External Location';
+
+  @override
+  String get chooseFolderHint => 'Choose a folder';
+
+  @override
   String get warningTitle => 'Advertencia';
 
   @override
@@ -717,6 +723,10 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get imageFolderErrorDescription =>
       '¡No se pudo cambiar la carpeta de imágenes!';
+
+  @override
+  String get syncErrorDescription =>
+      'Failed to sync with the external location!';
 
   @override
   String get backupErrorDescription => '¡Error al intentar crear un respaldo!';

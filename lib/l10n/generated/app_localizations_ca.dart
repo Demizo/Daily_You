@@ -703,6 +703,12 @@ class AppLocalizationsCa extends AppLocalizations {
   String get settingsImageFolder => 'Carpeta d\'imatges';
 
   @override
+  String get settingsExternalSyncTitle => 'Sync with External Location';
+
+  @override
+  String get chooseFolderHint => 'Choose a folder';
+
+  @override
   String get warningTitle => 'Advertiment';
 
   @override
@@ -719,6 +725,10 @@ class AppLocalizationsCa extends AppLocalizations {
   @override
   String get imageFolderErrorDescription =>
       'No s\'ha pogut canviar la carpeta d\'imatges.';
+
+  @override
+  String get syncErrorDescription =>
+      'Failed to sync with the external location!';
 
   @override
   String get backupErrorDescription =>

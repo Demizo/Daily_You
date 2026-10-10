@@ -699,6 +699,12 @@ class AppLocalizationsFa extends AppLocalizations {
   String get settingsImageFolder => 'پوشه تصاویر';
 
   @override
+  String get settingsExternalSyncTitle => 'Sync with External Location';
+
+  @override
+  String get chooseFolderHint => 'Choose a folder';
+
+  @override
   String get warningTitle => 'هشدار';
 
   @override
@@ -713,6 +719,10 @@ class AppLocalizationsFa extends AppLocalizations {
 
   @override
   String get imageFolderErrorDescription => 'خطا در تغییر پوشه عکس!';
+
+  @override
+  String get syncErrorDescription =>
+      'Failed to sync with the external location!';
 
   @override
   String get backupErrorDescription => 'خطا در پشتیبانی گیری!';

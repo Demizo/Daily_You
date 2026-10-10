@@ -700,11 +700,17 @@ class AppLocalizationsOc extends AppLocalizations {
   String get settingsImageFolder => 'Dossièrs dels imatges';
 
   @override
+  String get settingsExternalSyncTitle => 'Sync with External Location';
+
+  @override
+  String get chooseFolderHint => 'Choose a folder';
+
+  @override
   String get warningTitle => 'Avertiment';
 
   @override
   String get logFolderWarningDescription =>
-      'If the selected folder already contains a \'daily_you.db\' file, it will be used to overwrite your existing logs!';
+      'The selected folder already contains a \'daily_you.db\' file, it will be used to overwrite your existing logs!';
 
   @override
   String get errorTitle => 'Error';
@@ -714,6 +720,10 @@ class AppLocalizationsOc extends AppLocalizations {
 
   @override
   String get imageFolderErrorDescription => 'Failed to change image folder!';
+
+  @override
+  String get syncErrorDescription =>
+      'Failed to sync with the external location!';
 
   @override
   String get backupErrorDescription =>

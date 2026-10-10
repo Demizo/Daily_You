@@ -701,6 +701,12 @@ class AppLocalizationsFi extends AppLocalizations {
   String get settingsImageFolder => 'Kuvakansio';
 
   @override
+  String get settingsExternalSyncTitle => 'Sync with External Location';
+
+  @override
+  String get chooseFolderHint => 'Choose a folder';
+
+  @override
   String get warningTitle => 'Varoitus';
 
   @override
@@ -717,6 +723,10 @@ class AppLocalizationsFi extends AppLocalizations {
   @override
   String get imageFolderErrorDescription =>
       'Kuvakansion vaihtaminen epäonnistui!';
+
+  @override
+  String get syncErrorDescription =>
+      'Failed to sync with the external location!';
 
   @override
   String get backupErrorDescription => 'Varmuuskopion luominen epäonnistui!';

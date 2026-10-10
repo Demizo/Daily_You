@@ -695,6 +695,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get settingsImageFolder => '画像フォルダ';
 
   @override
+  String get settingsExternalSyncTitle => 'Sync with External Location';
+
+  @override
+  String get chooseFolderHint => 'Choose a folder';
+
+  @override
   String get warningTitle => '警告';
 
   @override
@@ -709,6 +715,10 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get imageFolderErrorDescription => '画像フォルダの変更に失敗しました！';
+
+  @override
+  String get syncErrorDescription =>
+      'Failed to sync with the external location!';
 
   @override
   String get backupErrorDescription => 'バックアップの作成に失敗しました！';

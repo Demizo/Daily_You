@@ -9,6 +9,10 @@ import 'package:daily_you/storage/file_store.dart';
 import 'package:path/path.dart';
 
 class LocalFileStore implements FileStore {
+  static const _temporarySuffix = '.partial';
+
+  static bool isTemporary(String name) => name.endsWith(_temporarySuffix);
+
   LocalFileStore(this.directoryPath);
 
   final String directoryPath;
@@ -103,8 +107,8 @@ class LocalFileStore implements FileStore {
       String name, Future<bool> Function(File temporary) fill) async {
     final file = _fileFor(name);
     await file.parent.create(recursive: true);
-    final temporary =
-        File('${file.path}.${DateTime.now().microsecondsSinceEpoch}.partial');
+    final temporary = File(
+        '${file.path}.${DateTime.now().microsecondsSinceEpoch}$_temporarySuffix');
     try {
       if (!await fill(temporary)) return false;
       await temporary.rename(file.path);
