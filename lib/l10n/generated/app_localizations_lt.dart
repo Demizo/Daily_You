@@ -715,6 +715,12 @@ class AppLocalizationsLt extends AppLocalizations {
   String get settingsImageFolder => 'Paveikslų aplankas';
 
   @override
+  String get settingsExternalSyncTitle => 'Sync with External Location';
+
+  @override
+  String get chooseFolderHint => 'Choose a folder';
+
+  @override
   String get warningTitle => 'Įspėjimas';
 
   @override
@@ -731,6 +737,10 @@ class AppLocalizationsLt extends AppLocalizations {
   @override
   String get imageFolderErrorDescription =>
       'Nepavyko pakeisti paveikslų aplanko!';
+
+  @override
+  String get syncErrorDescription =>
+      'Failed to sync with the external location!';
 
   @override
   String get backupErrorDescription => 'Nepavyko sukurti atsarginės kopijos!';

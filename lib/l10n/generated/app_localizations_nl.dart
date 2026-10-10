@@ -703,6 +703,12 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settingsImageFolder => 'Afbeeldingsmap';
 
   @override
+  String get settingsExternalSyncTitle => 'Sync with External Location';
+
+  @override
+  String get chooseFolderHint => 'Choose a folder';
+
+  @override
   String get warningTitle => 'Waarschuwing';
 
   @override
@@ -718,6 +724,10 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get imageFolderErrorDescription =>
       'Kan de afbeeldingsmap niet wijzigen!';
+
+  @override
+  String get syncErrorDescription =>
+      'Failed to sync with the external location!';
 
   @override
   String get backupErrorDescription => 'Kan geen back-up maken!';

@@ -698,6 +698,12 @@ class AppLocalizationsDa extends AppLocalizations {
   String get settingsImageFolder => 'Billedmappe';
 
   @override
+  String get settingsExternalSyncTitle => 'Sync with External Location';
+
+  @override
+  String get chooseFolderHint => 'Choose a folder';
+
+  @override
   String get warningTitle => 'Advarsel';
 
   @override
@@ -712,6 +718,10 @@ class AppLocalizationsDa extends AppLocalizations {
 
   @override
   String get imageFolderErrorDescription => 'Kunne ikke ændre billedmappe!';
+
+  @override
+  String get syncErrorDescription =>
+      'Failed to sync with the external location!';
 
   @override
   String get backupErrorDescription => 'Kunne ikke oprette sikkerhedskopi!';

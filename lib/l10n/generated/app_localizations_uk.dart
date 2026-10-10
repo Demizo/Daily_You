@@ -706,6 +706,12 @@ class AppLocalizationsUk extends AppLocalizations {
   String get settingsImageFolder => 'Тека для світлин';
 
   @override
+  String get settingsExternalSyncTitle => 'Sync with External Location';
+
+  @override
+  String get chooseFolderHint => 'Choose a folder';
+
+  @override
   String get warningTitle => 'Увага';
 
   @override
@@ -722,6 +728,10 @@ class AppLocalizationsUk extends AppLocalizations {
   @override
   String get imageFolderErrorDescription =>
       'Не вдалось змінити теку для світлин!';
+
+  @override
+  String get syncErrorDescription =>
+      'Failed to sync with the external location!';
 
   @override
   String get backupErrorDescription => 'Не вдалось створити резервну копію!';

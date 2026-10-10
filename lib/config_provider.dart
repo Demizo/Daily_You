@@ -29,12 +29,16 @@ class Setting<T> {
 }
 
 class Settings {
-  static const configVersion = Setting<String>("configVersion", "2");
+  static const configVersion = Setting<String>("configVersion", "3");
   static const theme = Setting<String>("theme", "system");
-  static const useExternalDb = Setting<bool>("useExternalDb", false);
-  static const externalDbUri = Setting<String>("externalDbUri", "");
-  static const useExternalImg = Setting<bool>("useExternalImg", false);
-  static const externalImgUri = Setting<String>("externalImgUri", "");
+  static const syncLogs = Setting<bool>("syncLogs", false);
+  static const syncImages = Setting<bool>("syncImages", false);
+  static const syncVideo = Setting<bool>("syncVideo", false);
+  static const syncAudio = Setting<bool>("syncAudio", false);
+  static const imageSyncFolderUri = Setting<String>("imageSyncFolderUri", "");
+  static const videoSyncFolderUri = Setting<String>("videoSyncFolderUri", "");
+  static const logSyncFolderUri = Setting<String>("logSyncFolderUri", "");
+  static const audioSyncFolderUri = Setting<String>("audioSyncFolderUri", "");
   static const startingDayOfWeek =
       Setting<String>("startingDayOfWeek", "system");
   static const galleryPageViewMode =
@@ -137,10 +141,14 @@ class Settings {
   static const List<Setting<Object?>> all = [
     configVersion,
     theme,
-    useExternalDb,
-    externalDbUri,
-    useExternalImg,
-    externalImgUri,
+    syncLogs,
+    logSyncFolderUri,
+    syncImages,
+    syncVideo,
+    syncAudio,
+    imageSyncFolderUri,
+    videoSyncFolderUri,
+    audioSyncFolderUri,
     startingDayOfWeek,
     galleryPageViewMode,
     veryHappyIcon,
@@ -311,6 +319,7 @@ class ConfigProvider with ChangeNotifier {
     await loadSecureConfig();
     await migrateSecretToSecretStore(Settings.passwordHash);
     await loadSecretStoreConfig();
+    await migrateSyncSettings();
     await _pruneUnknownKeys();
   }
 
@@ -339,6 +348,36 @@ class ConfigProvider with ChangeNotifier {
     } catch (error, stackTrace) {
       _logger.severe('Config migration failed', error, stackTrace);
     }
+  }
+
+  Future<void> migrateSyncSettings() async {
+    if (_config[Settings.configVersion.key] ==
+        Settings.configVersion.defaultValue) {
+      return;
+    }
+
+    final logFolder = _legacyFolder('useExternalDb', 'externalDbUri');
+    final imageFolder = _legacyFolder('useExternalImg', 'externalImgUri');
+    if (logFolder != null) {
+      _config[Settings.logSyncFolderUri.key] = logFolder;
+      _config[Settings.syncLogs.key] = true;
+      _config[Settings.syncVideo.key] = true;
+      _config[Settings.syncAudio.key] = true;
+    }
+    if (imageFolder != null) {
+      _config[Settings.syncImages.key] = true;
+      _config[Settings.imageSyncFolderUri.key] = imageFolder;
+    }
+
+    _config[Settings.configVersion.key] = Settings.configVersion.defaultValue;
+    await writeConfig();
+  }
+
+  String? _legacyFolder(String enabledKey, String uriKey) {
+    final uri = _config[uriKey];
+    return _config[enabledKey] == true && uri is String && uri.isNotEmpty
+        ? uri
+        : null;
   }
 
   Future<void> _pruneUnknownKeys() async {

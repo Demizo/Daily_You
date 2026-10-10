@@ -4,13 +4,13 @@
 
 import 'dart:io';
 
-import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/database/attachment_storage.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/storage/external_sync_health.dart';
+import 'package:daily_you/storage/external_sync_settings.dart';
 import 'package:daily_you/storage/file_store.dart';
 import 'package:daily_you/storage/local_file_store.dart';
-import 'package:daily_you/storage/storage_picker.dart';
+import 'package:daily_you/storage/sync_item.dart';
 import 'package:daily_you/utils/operation_outcome.dart';
 import 'package:daily_you/utils/generated/tag_icon_registry.dart';
 import 'package:daily_you/models/entry.dart';
@@ -71,8 +71,10 @@ class AppDatabase {
 
   FileStore get internalStore => LocalFileStore(dirname(_internalPath!));
 
-  FileStore? get externalStore =>
-      usingExternalLocation() ? FileStore.external(getExternalPath()) : null;
+  FileStore? get externalStore {
+    final location = ExternalSyncSettings.load().location(SyncItem.logs);
+    return location == null ? null : FileStore.external(location.uri);
+  }
 
   Future<bool> init(
       {bool forceWithoutSync = false, bool allowMigration = true}) async {
@@ -163,7 +165,7 @@ class AppDatabase {
   Future<void> close() async {
     final db = _database!;
     _database = null;
-    db.close();
+    await db.close();
   }
 
   Future<void> replaceDatabase(File replacement) async {
@@ -229,9 +231,8 @@ class AppDatabase {
     return false;
   }
 
-  bool usingExternalLocation() {
-    return ConfigProvider.instance.get(Settings.useExternalDb);
-  }
+  bool usingExternalLocation() =>
+      ExternalSyncSettings.load().location(SyncItem.logs) != null;
 
   Future<String> getInternalPath() async {
     final basePath = await getApplicationSupportDirectory();
@@ -239,72 +240,37 @@ class AppDatabase {
     return join(basePath.path, databaseFileName);
   }
 
-  String getExternalPath() {
-    return ConfigProvider.instance.get(Settings.externalDbUri);
-  }
-
   /// Return whether the app has permission to access the external location
   Future<bool> hasExternalLocationPermission() async {
     return await externalStore?.isAvailable() ?? false;
   }
 
-  Future<OperationOutcome> selectExternalLocation(
-      Function(String) updateStatus) async {
-    bool databaseUpdated = false;
+  Future<OperationOutcome> syncFromExternalLocation() async {
     var outcome = const OperationOutcome.succeeded();
-
-    // Save old external path
-    var oldExternalPath = getExternalPath();
-    var oldUseExternalPath = usingExternalLocation();
-    await _database!.close();
+    await close();
 
     try {
-      var selectedDirectory = await StoragePicker.pickDirectory();
-      if (selectedDirectory == null) {
-        outcome = const OperationOutcome.cancelled();
-      } else {
-        await ConfigProvider.instance
-            .set(Settings.externalDbUri, selectedDirectory.uri);
-        await ConfigProvider.instance.set(Settings.useExternalDb, true);
-
-        // Sync with external folder
-        databaseUpdated = await _syncWithExternalDatabase(forceOverwrite: true);
-        if (!databaseUpdated) outcome = const OperationOutcome.failed();
+      if (!await _syncWithExternalDatabase(forceOverwrite: true)) {
+        outcome = const OperationOutcome.failed();
       }
     } catch (error, stackTrace) {
       _logger.severe(
-          'Selecting an external database location failed', error, stackTrace);
+          'Syncing with the external database failed', error, stackTrace);
       outcome = OperationOutcome.failed(error);
     }
 
-    // Cleanup
     await open();
-    if (!databaseUpdated) {
-      // Restore state after failure
-      await ConfigProvider.instance
-          .set(Settings.externalDbUri, oldExternalPath);
-      await ConfigProvider.instance
-          .set(Settings.useExternalDb, oldUseExternalPath);
-    } else {
-      try {
-        if (AttachmentStorage.instance.usingExternalLocation() &&
-            await AttachmentStorage.instance.hasExternalLocationPermission()) {
-          await AttachmentStorage.instance
-              .syncAttachmentFolders(true, updateStatus: updateStatus);
-        }
-      } catch (error, stackTrace) {
-        _logger.severe(
-            'Syncing images after the database location changed failed',
-            error,
-            stackTrace);
-        outcome = OperationOutcome.failed(error);
-      }
-    }
     return outcome;
   }
 
-  Future<void> resetExternalLocation() async {
-    await ConfigProvider.instance.set(Settings.useExternalDb, false);
+  Future<bool> hasExternalDatabase(String uri) async {
+    try {
+      return await FileStore.external(uri).exists(databaseFileName);
+    } catch (error, stackTrace) {
+      _logger.warning(
+          'Could not look for a database in $uri', error, stackTrace);
+      return true;
+    }
   }
 
   /// Overwrite the external database with local changes
@@ -359,15 +325,19 @@ class AppDatabase {
       await internalStore.write(temporaryName, externalBytes);
 
       final temporaryPath = join(dirname(_internalPath!), temporaryName);
-      if (await _validateSqliteDatabase(temporaryPath)) {
-        final replaced =
-            await internalStore.rename(temporaryName, databaseFileName);
-        if (replaced) databaseReplacedThisSession = true;
-        return replaced;
+      var accepted = false;
+      try {
+        accepted = await canOpen(temporaryPath);
+        if (accepted) {
+          final replaced =
+              await internalStore.rename(temporaryName, databaseFileName);
+          if (replaced) databaseReplacedThisSession = true;
+          return replaced;
+        }
+        return false;
+      } finally {
+        if (!accepted) await internalStore.delete(temporaryName);
       }
-
-      await internalStore.delete(temporaryName);
-      return false;
     }
     return true;
   }

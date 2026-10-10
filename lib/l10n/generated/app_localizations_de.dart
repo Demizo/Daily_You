@@ -702,6 +702,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsImageFolder => 'Bild Ordner';
 
   @override
+  String get settingsExternalSyncTitle => 'Sync with External Location';
+
+  @override
+  String get chooseFolderHint => 'Choose a folder';
+
+  @override
   String get warningTitle => 'Achtung';
 
   @override
@@ -718,6 +724,10 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get imageFolderErrorDescription =>
       'Bilderordneränderung fehlgeschlagen!';
+
+  @override
+  String get syncErrorDescription =>
+      'Failed to sync with the external location!';
 
   @override
   String get backupErrorDescription => 'Sicherung Fehlgeschlagen!';

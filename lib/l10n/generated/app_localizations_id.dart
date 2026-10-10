@@ -700,6 +700,12 @@ class AppLocalizationsId extends AppLocalizations {
   String get settingsImageFolder => 'Folder gambar';
 
   @override
+  String get settingsExternalSyncTitle => 'Sync with External Location';
+
+  @override
+  String get chooseFolderHint => 'Choose a folder';
+
+  @override
   String get warningTitle => 'Hati hati';
 
   @override
@@ -714,6 +720,10 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get imageFolderErrorDescription => 'Gagal Mengubah Folder Gambar!';
+
+  @override
+  String get syncErrorDescription =>
+      'Failed to sync with the external location!';
 
   @override
   String get backupErrorDescription => 'Gagal membuat cadangan!';

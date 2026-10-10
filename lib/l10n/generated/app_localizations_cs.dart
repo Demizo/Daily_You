@@ -695,6 +695,12 @@ class AppLocalizationsCs extends AppLocalizations {
   String get settingsImageFolder => 'Složka obrázků';
 
   @override
+  String get settingsExternalSyncTitle => 'Sync with External Location';
+
+  @override
+  String get chooseFolderHint => 'Choose a folder';
+
+  @override
   String get warningTitle => 'Varování';
 
   @override
@@ -711,6 +717,10 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get imageFolderErrorDescription =>
       'Nepodařilo se změnit složku obrázků!';
+
+  @override
+  String get syncErrorDescription =>
+      'Failed to sync with the external location!';
 
   @override
   String get backupErrorDescription => 'Nepodařilo se vytvořit zálohu!';

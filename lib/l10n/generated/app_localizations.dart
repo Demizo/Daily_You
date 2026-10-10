@@ -1251,7 +1251,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsStorageTitle.
   ///
   /// In en, this message translates to:
-  /// **'Storage'**
+  /// **'Storage & Sync'**
   String get settingsStorageTitle;
 
   /// No description provided for @settingsImageQuality.
@@ -1308,6 +1308,18 @@ abstract class AppLocalizations {
   /// **'Image Folder'**
   String get settingsImageFolder;
 
+  /// No description provided for @settingsExternalSyncTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync with External Location'**
+  String get settingsExternalSyncTitle;
+
+  /// No description provided for @chooseFolderHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a folder'**
+  String get chooseFolderHint;
+
   /// No description provided for @warningTitle.
   ///
   /// In en, this message translates to:
@@ -1317,7 +1329,7 @@ abstract class AppLocalizations {
   /// No description provided for @logFolderWarningDescription.
   ///
   /// In en, this message translates to:
-  /// **'If the selected folder already contains a \'daily_you.db\' file, it will be used to overwrite your existing logs!'**
+  /// **'The selected folder already contains a \'daily_you.db\' file, it will be used to overwrite your existing logs!'**
   String get logFolderWarningDescription;
 
   /// No description provided for @errorTitle.
@@ -1337,6 +1349,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to change image folder!'**
   String get imageFolderErrorDescription;
+
+  /// No description provided for @syncErrorDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to sync with the external location!'**
+  String get syncErrorDescription;
 
   /// No description provided for @backupErrorDescription.
   ///

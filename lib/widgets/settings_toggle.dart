@@ -9,7 +9,9 @@ import 'package:provider/provider.dart';
 class SettingsToggle extends StatelessWidget {
   final String title;
   final String? hint;
-  final Setting<bool> setting;
+  final Setting<bool>? setting;
+
+  final bool? value;
   final Function(bool)? onChanged;
   final Icon? secondaryIcon;
   final Function()? onSecondaryPressed;
@@ -18,11 +20,12 @@ class SettingsToggle extends StatelessWidget {
     super.key,
     required this.title,
     this.hint,
-    required this.setting,
+    this.setting,
+    this.value,
     required this.onChanged,
     this.secondaryIcon,
     this.onSecondaryPressed,
-  });
+  }) : assert((setting == null) != (value == null));
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +54,9 @@ class SettingsToggle extends StatelessWidget {
           ),
           if (secondaryIcon != null && onSecondaryPressed != null)
             IconButton(onPressed: onSecondaryPressed, icon: secondaryIcon!),
-          Switch(value: configProvider.get(setting), onChanged: onChanged)
+          Switch(
+              value: value ?? configProvider.get(setting!),
+              onChanged: onChanged)
         ],
       ),
     );

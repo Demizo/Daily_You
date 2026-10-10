@@ -700,6 +700,12 @@ class AppLocalizationsTr extends AppLocalizations {
   String get settingsImageFolder => 'Görüntü Klasörü';
 
   @override
+  String get settingsExternalSyncTitle => 'Sync with External Location';
+
+  @override
+  String get chooseFolderHint => 'Choose a folder';
+
+  @override
   String get warningTitle => 'Uyarı';
 
   @override
@@ -714,6 +720,10 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get imageFolderErrorDescription => 'Görüntü klasörü değiştirilemedi!';
+
+  @override
+  String get syncErrorDescription =>
+      'Failed to sync with the external location!';
 
   @override
   String get backupErrorDescription => 'Yedekleme oluşturulamadı!';

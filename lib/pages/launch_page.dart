@@ -150,30 +150,28 @@ class _LaunchPageState extends State<LaunchPage> {
     if (initialized) {
       await _migrateImagesFromExternalStorage();
       if (AttachmentStorage.instance.usingExternalLocation()) {
-        if (await AttachmentStorage.instance.hasExternalLocationPermission()) {
-          unawaited(AttachmentStorage.instance
-              .syncAttachmentFolders(false)
-              .then((_) {}, onError: (Object error, StackTrace stackTrace) {
-            _logger.severe(
-                'Syncing the attachment folders failed', error, stackTrace);
-          }).whenComplete(_deleteOrphanedAttachments));
-          unawaited(_catchUpMissedAutoBackup());
-          await _nextPage();
+        if (!await AttachmentStorage.instance.hasExternalLocationPermission()) {
+          _errorType = _LaunchErrorType.externalAccess;
+          _showError();
           return;
         }
-        _errorType = _LaunchErrorType.externalAccess;
+        unawaited(AttachmentStorage.instance
+            .syncAttachmentFolders(false)
+            .catchError((Object error, StackTrace stackTrace) {
+          _logger.severe(
+              'Syncing the attachment folders failed', error, stackTrace);
+        }).whenComplete(_deleteOrphanedAttachments));
       } else {
         unawaited(_deleteOrphanedAttachments());
-        unawaited(_catchUpMissedAutoBackup());
-        await _nextPage();
-        return;
       }
-    } else {
-      _errorType = AppDatabase.instance.migrationFailed
-          ? _LaunchErrorType.migrationFailed
-          : _LaunchErrorType.externalAccess;
+      unawaited(_catchUpMissedAutoBackup());
+      await _nextPage();
+      return;
     }
 
+    _errorType = AppDatabase.instance.migrationFailed
+        ? _LaunchErrorType.migrationFailed
+        : _LaunchErrorType.externalAccess;
     _showError();
   }
 

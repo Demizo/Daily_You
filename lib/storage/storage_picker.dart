@@ -6,8 +6,10 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:daily_you/storage/file_store.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:path/path.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:saf_transfer/saf_transfer.dart';
 import 'package:saf_util/saf_util.dart';
 import 'package:shared_storage/shared_storage.dart' as saf;
@@ -72,6 +74,21 @@ class StoragePicker {
     } catch (e) {
       return uri;
     }
+  }
+
+  static Future<bool> requestStoragePermission() async {
+    if (!Platform.isAndroid) return true;
+    final androidInfo = await DeviceInfoPlugin().androidInfo;
+    if (androidInfo.version.sdkInt >= 33) return true;
+
+    var status = await Permission.storage.status;
+    if (!status.isGranted) status = await Permission.storage.request();
+    return status.isGranted;
+  }
+
+  static Future<PickedDirectory?> pickDirectoryWithAccess() async {
+    if (!await requestStoragePermission()) return null;
+    return pickDirectory();
   }
 
   static Future<PickedDirectory?> pickDirectory() async {

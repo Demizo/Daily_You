@@ -2,26 +2,30 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
-import 'dart:io';
-import 'package:daily_you/utils/backup_restore_utils.dart';
 import 'package:daily_you/config_provider.dart';
-import 'package:daily_you/database/app_database.dart';
+import 'package:daily_you/utils/backup_restore_utils.dart';
 import 'package:daily_you/database/attachment_storage.dart';
 import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/providers/entries_provider.dart';
+import 'package:daily_you/storage/external_sync.dart';
+import 'package:daily_you/storage/external_sync_settings.dart';
 import 'package:daily_you/storage/storage_picker.dart';
+import 'package:daily_you/storage/sync_progress.dart';
 import 'package:daily_you/utils/file_size_format.dart';
+import 'package:daily_you/utils/operation_outcome.dart';
 import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/attachment_type_presentation.dart';
+import 'package:daily_you/widgets/database_overwrite_dialog.dart';
+import 'package:daily_you/widgets/external_sync_dialog.dart';
 import 'package:daily_you/widgets/failure_dialog.dart';
 import 'package:daily_you/widgets/file_size_row.dart';
 import 'package:daily_you/widgets/media_quality_dialog.dart';
 import 'package:daily_you/widgets/settings_header.dart';
 import 'package:daily_you/widgets/settings_icon_action.dart';
-import 'package:device_info_plus/device_info_plus.dart';
+import 'package:daily_you/widgets/settings_toggle.dart';
+import 'package:daily_you/widgets/sync_progress_dialog.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 class StorageSettings extends StatefulWidget {
@@ -49,110 +53,51 @@ class _StorageSettingsState extends State<StorageSettings> {
     if (mounted) setState(() => _usage = _loadUsage());
   }
 
-  Future<bool> requestStoragePermission() async {
-    DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
-    AndroidDeviceInfo androidInfo = await deviceInfoPlugin.androidInfo;
-    if (androidInfo.version.sdkInt < 33) {
-      //Legacy Permission
-      var status = await Permission.storage.status;
-      if (!status.isGranted) {
-        status = await Permission.storage.request();
-      }
-      if (status.isGranted) {
-        return true;
-      }
-      return false;
-    }
-
-    //Modern Permission
-    return true;
+  Future<void> _editSync({ExternalSyncSettings? draft}) async {
+    final saved = ExternalSyncSettings.load();
+    final desired = await showAppDialog<ExternalSyncSettings>(
+        context: context,
+        builder: (_) => ExternalSyncDialog(initial: saved, draft: draft));
+    if (desired != null && mounted) await _applySync(saved, desired);
   }
 
-  Future<bool> requestPhotosPermission() async {
-    DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
-    AndroidDeviceInfo androidInfo = await deviceInfoPlugin.androidInfo;
-    if (androidInfo.version.sdkInt < 33) {
-      //Legacy Permission
-      var status = await Permission.storage.status;
-      if (!status.isGranted) {
-        status = await Permission.storage.request();
-      }
-      if (status.isGranted) {
-        return true;
-      }
-      return false;
-    } else {
-      //Modern Photos Permission
-      return true;
+  Future<void> _toggleSync(bool enabled) async {
+    if (!enabled) {
+      await _applySync(
+          ExternalSyncSettings.load(), const ExternalSyncSettings());
+      return;
     }
-  }
 
-  Future<void> _showChangeLogFolderWarning() async {
-    bool confirmed = false;
-    await showAppDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(AppLocalizations.of(context)!.warningTitle),
-          content:
-              Text(AppLocalizations.of(context)!.logFolderWarningDescription),
-          actions: [
-            TextButton(
-              child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
-              onPressed: () async {
-                Navigator.pop(context);
-              },
-            ),
-            TextButton(
-              child: Text(MaterialLocalizations.of(context).okButtonLabel),
-              onPressed: () async {
-                confirmed = true;
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        );
-      },
-    );
-    if (confirmed) {
-      if (!mounted) return;
-      ValueNotifier<String> statusNotifier = ValueNotifier<String>("");
-
-      BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
-      final outcome =
-          await AppDatabase.instance.selectExternalLocation((status) {
-        statusNotifier.value = status;
-      });
-
-      if (!mounted) return;
-      Navigator.of(context).pop();
-
-      if (outcome.failed) {
-        await showFailureDialog(context,
-            description:
-                AppLocalizations.of(context)!.logFolderErrorDescription,
-            error: outcome.error);
-      }
-    }
-  }
-
-  Future<void> _attemptImageFolderChange() async {
-    ValueNotifier<String> statusNotifier = ValueNotifier<String>("");
-
-    BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
-    final outcome =
-        await AttachmentStorage.instance.selectExternalLocation((status) {
-      statusNotifier.value = status;
-    });
-
+    final uri = (await StoragePicker.pickDirectoryWithAccess())?.uri;
+    if (uri == null || !mounted) return;
+    if (!await confirmDatabaseOverwrite(context, uri)) return;
     if (!mounted) return;
-    Navigator.of(context).pop();
+    await _editSync(draft: ExternalSyncSettings.withDefaults(uri));
+  }
+
+  Future<void> _applySync(
+      ExternalSyncSettings saved, ExternalSyncSettings desired) async {
+    final sync = ExternalSync(saved, desired);
+    if (!sync.hasWork) {
+      await sync.run((_) {});
+      return;
+    }
+
+    final navigator = Navigator.of(context);
+    final progress = ValueNotifier(SyncProgress(sync.items.first));
+    showSyncProgressDialog(context, progress);
+    final OperationOutcome outcome;
+    try {
+      outcome = await sync.run((value) => progress.value = value);
+    } finally {
+      navigator.pop();
+    }
+    if (!mounted) return;
     _refreshUsage();
 
     if (outcome.failed) {
       await showFailureDialog(context,
-          description:
-              AppLocalizations.of(context)!.imageFolderErrorDescription,
+          description: AppLocalizations.of(context)!.syncErrorDescription,
           error: outcome.error);
     }
   }
@@ -265,8 +210,10 @@ class _StorageSettingsState extends State<StorageSettings> {
 
   @override
   Widget build(BuildContext context) {
-    final configProvider = Provider.of<ConfigProvider>(context);
     final l10n = AppLocalizations.of(context)!;
+    Provider.of<ConfigProvider>(context);
+    final syncSettings = ExternalSyncSettings.load();
+    final syncedFolder = syncSettings.logFolderUri;
 
     return Scaffold(
       appBar: AppBar(
@@ -275,64 +222,17 @@ class _StorageSettingsState extends State<StorageSettings> {
       ),
       body: ListView(
         children: [
-          FutureBuilder(
-              future: AppDatabase.instance.getInternalPath(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData && snapshot.data != null) {
-                  var folderText = snapshot.data!;
-                  if (AppDatabase.instance.usingExternalLocation()) {
-                    folderText = StoragePicker.displayName(
-                        configProvider.get(Settings.externalDbUri));
-                  }
-                  return SettingsIconAction(
-                    title: AppLocalizations.of(context)!.settingsLogFolder,
-                    hint: folderText,
-                    icon: Icon(Icons.folder_rounded),
-                    secondaryIcon: Icon(Icons.refresh_rounded),
-                    onPressed: () async {
-                      if (Platform.isAndroid &&
-                          !await requestStoragePermission()) {
-                        return;
-                      }
-                      await _showChangeLogFolderWarning();
-                    },
-                    onSecondaryPressed: () async {
-                      await AppDatabase.instance.resetExternalLocation();
-                    },
-                  );
-                }
-                return const SizedBox();
-              }),
-          FutureBuilder(
-              future: AttachmentStorage.instance
-                  .getInternalFolder(AttachmentType.image),
-              builder: (context, snapshot) {
-                if (snapshot.hasData && snapshot.data != null) {
-                  var folderText = snapshot.data!;
-                  if (AttachmentStorage.instance.usingExternalLocation()) {
-                    folderText = StoragePicker.displayName(
-                        configProvider.get(Settings.externalImgUri));
-                  }
-                  return SettingsIconAction(
-                    title: AppLocalizations.of(context)!.settingsImageFolder,
-                    hint: folderText,
-                    icon: Icon(Icons.folder_rounded),
-                    secondaryIcon: Icon(Icons.refresh_rounded),
-                    onPressed: () async {
-                      if (Platform.isAndroid &&
-                          !await requestPhotosPermission()) {
-                        return;
-                      }
-                      await _attemptImageFolderChange();
-                    },
-                    onSecondaryPressed: () async {
-                      await AttachmentStorage.instance
-                          .resetImageFolderLocation();
-                    },
-                  );
-                }
-                return const SizedBox();
-              }),
+          SettingsToggle(
+            title: l10n.settingsExternalSyncTitle,
+            hint: syncedFolder == null
+                ? null
+                : StoragePicker.displayName(syncedFolder),
+            value: syncSettings.isOn,
+            onChanged: _toggleSync,
+            secondaryIcon:
+                syncSettings.isOn ? const Icon(Icons.edit_rounded) : null,
+            onSecondaryPressed: _editSync,
+          ),
           const Padding(
             padding: EdgeInsets.only(left: 8.0, right: 8.0),
             child: Divider(),

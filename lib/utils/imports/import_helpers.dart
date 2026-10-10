@@ -61,8 +61,8 @@ Future<OperationOutcome> finishImport(
   await EntryAttachmentsProvider.instance.load();
   if (AttachmentStorage.instance.usingExternalLocation()) {
     try {
-      await AttachmentStorage.instance
-          .syncAttachmentFolders(true, updateStatus: updateStatus);
+      await AttachmentStorage.instance.syncAttachmentFolders(true,
+          onProgress: (progress) => updateStatus(progress.counts ?? ''));
     } catch (error) {
       return outcome.failed ? outcome : OperationOutcome.failed(error);
     }
