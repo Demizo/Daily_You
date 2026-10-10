@@ -230,7 +230,7 @@
     "tagFavoriteName": "我的最愛",
     "tagEnergyName": "能量",
     "tagCategoryActivitiesName": "活動",
-    "welcomeLogBodyText": "## 歡迎使用 Daily You\n\n> 每一天都值得被記住、被捕捉下來！\n\n**Daily You** 是免費的、[開源](https://github.com/Demizo/Daily_You)的，並由社群支援。建立在「你的日記應該屬於你，而不是某個產品」這樣的信念之上：\n\n- 無廣告\n- 無鎖定功能\n- 無追蹤或資料蒐集\n\n無論你是在寫日誌、反思，還是只是記錄讓你微笑的事，**Daily You** 都為你提供一個_真正屬於你_的私密空間。",
+    "welcomeLogBodyText": "## 歡迎使用 Daily You\n\n> 每一天都值得被記住、被捕捉下來！\n\n**Daily You** 是免費的、[開源](https://github.com/TraxDinosaur/DailyYou)的，並由社群支援。建立在「你的日記應該屬於你，而不是某個產品」這樣的信念之上：\n\n- 無廣告\n- 無鎖定功能\n- 無追蹤或資料蒐集\n\n無論你是在寫日誌、反思，還是只是記錄讓你微笑的事，**Daily You** 都為你提供一個_真正屬於你_的私密空間。",
     "migratingImagesStatus": "正在移轉照片… {current}/{total}",
     "labelPresentLabel": "已設定",
     "labelAbsentLabel": "未設定",

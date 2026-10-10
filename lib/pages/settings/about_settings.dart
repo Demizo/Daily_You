@@ -43,7 +43,7 @@ class _AboutSettingsState extends State<AboutSettings> {
                 icon: Icon(Icons.open_in_new_rounded),
                 onPressed: () async {
                   await launchUrl(
-                      Uri.https("github.com", "/Demizo/Daily_You/releases"),
+                      Uri.https("github.com", "/TraxDinosaur/DailyYou/releases"),
                       mode: LaunchMode.externalApplication);
                 }),
             onTap: () async {
@@ -73,10 +73,10 @@ class _AboutSettingsState extends State<AboutSettings> {
           ),
           SettingsIconAction(
               title: AppLocalizations.of(context)!.settingsSourceCode,
-              hint: "github.com/Demizo/Daily_You",
+              hint: "github.com/TraxDinosaur/DailyYou",
               icon: Icon(Icons.open_in_new_rounded),
               onPressed: () async {
-                await launchUrl(Uri.https("github.com", "/Demizo/Daily_You"),
+                await launchUrl(Uri.https("github.com", "/TraxDinosaur/DailyYou"),
                     mode: LaunchMode.externalApplication);
               }),
           SettingsIconAction(
@@ -86,7 +86,7 @@ class _AboutSettingsState extends State<AboutSettings> {
               onPressed: () async {
                 await launchUrl(
                     Uri.https("github.com",
-                        "/Demizo/Daily_You/blob/master/LICENSE.txt"),
+                        "/TraxDinosaur/DailyYou/blob/master/LICENSE.txt"),
                     mode: LaunchMode.externalApplication);
               }),
           SettingsIconAction(
@@ -117,11 +117,11 @@ class _AboutSettingsState extends State<AboutSettings> {
           ),
           SettingsIconAction(
               title: AppLocalizations.of(context)!.errorReport,
-              hint: "github.com/Demizo/Daily_You/issues",
+              hint: "github.com/TraxDinosaur/DailyYou/issues",
               icon: Icon(Icons.open_in_new_rounded),
               onPressed: () async {
                 await launchUrl(
-                    Uri.https("github.com", "/Demizo/Daily_You/issues"),
+                    Uri.https("github.com", "/TraxDinosaur/DailyYou/issues"),
                     mode: LaunchMode.externalApplication);
               }),
           if (configProvider.get(Settings.developerModeEnabled)) ...[

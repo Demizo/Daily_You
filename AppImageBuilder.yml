@@ -8,7 +8,7 @@ script:
 AppDir:
   path: ./AppDir
   app_info:
-    id: com.demizo.daily_you
+    id: com.traxdinosaur.dailyyou
     name: Daily You
     icon: logo
     version: 3.6.1

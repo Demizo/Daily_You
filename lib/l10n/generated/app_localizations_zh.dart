@@ -621,7 +621,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get welcomeLogBodyText =>
-      '## 欢迎使用 Daily You\n\n> 每一天都值得被记住、捕捉下来！\n\n**Daily You** 是免费的、[开源](https://github.com/Demizo/Daily_You)的，并由社区支持。建立在「你的日记应该属于你，而不是某个产品」这样的理念之上：\n\n- 无广告\n- 无锁定功能\n- 无追踪或资料收集\n\n无论你是在写日记、反思，或者只是记录让你开心的瞬间，**Daily You** 都为你提供一个_真正属于你_的私密空间。';
+      '## 欢迎使用 Daily You\n\n> 每一天都值得被记住、捕捉下来！\n\n**Daily You** 是免费的、[开源](https://github.com/TraxDinosaur/DailyYou)的，并由社区支持。建立在「你的日记应该属于你，而不是某个产品」这样的理念之上：\n\n- 无广告\n- 无锁定功能\n- 无追踪或资料收集\n\n无论你是在写日记、反思，或者只是记录让你开心的瞬间，**Daily You** 都为你提供一个_真正属于你_的私密空间。';
 
   @override
   String get settingsStorageTitle => '存储';
@@ -1672,7 +1672,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get welcomeLogBodyText =>
-      '## 歡迎使用 Daily You\n\n> 每一天都值得被記住、被捕捉下來！\n\n**Daily You** 是免費的、[開源](https://github.com/Demizo/Daily_You)的，並由社群支援。建立在「你的日記應該屬於你，而不是某個產品」這樣的信念之上：\n\n- 無廣告\n- 無鎖定功能\n- 無追蹤或資料蒐集\n\n無論你是在寫日誌、反思，還是只是記錄讓你微笑的事，**Daily You** 都為你提供一個_真正屬於你_的私密空間。';
+      '## 歡迎使用 Daily You\n\n> 每一天都值得被記住、被捕捉下來！\n\n**Daily You** 是免費的、[開源](https://github.com/TraxDinosaur/DailyYou)的，並由社群支援。建立在「你的日記應該屬於你，而不是某個產品」這樣的信念之上：\n\n- 無廣告\n- 無鎖定功能\n- 無追蹤或資料蒐集\n\n無論你是在寫日誌、反思，還是只是記錄讓你微笑的事，**Daily You** 都為你提供一個_真正屬於你_的私密空間。';
 
   @override
   String get settingsStorageTitle => '存儲';

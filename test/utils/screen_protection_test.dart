@@ -11,7 +11,7 @@ void main() {
   useTemporaryConfig();
 
   group('ScreenProtection', () {
-    const channel = MethodChannel('com.demizo.daily_you.dyf/security');
+    const channel = MethodChannel('com.traxdinosaur.dailyyou/security');
     final log = <MethodCall>[];
 
     setUp(() {

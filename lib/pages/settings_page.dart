@@ -72,7 +72,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             Uri(
                                 scheme: "https",
                                 host: "github.com",
-                                path: "/Demizo/Daily_You",
+                                path: "/TraxDinosaur/DailyYou",
                                 queryParameters: {"tab": "readme-ov-file"},
                                 fragment: "support-the-app"),
                             mode: LaunchMode.externalApplication);

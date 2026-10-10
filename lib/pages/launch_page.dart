@@ -192,7 +192,7 @@ class _LaunchPageState extends State<LaunchPage> {
   }
 
   Future<void> _reportIssue() async {
-    await launchUrl(Uri.https("github.com", "/Demizo/Daily_You/issues"),
+    await launchUrl(Uri.https("github.com", "/TraxDinosaur/DailyYou/issues"),
         mode: LaunchMode.externalApplication);
   }
 

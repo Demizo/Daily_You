@@ -623,7 +623,7 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get welcomeLogBodyText =>
-      '## Vítejte v Daily You\n\n> Každý den si má cenu pamatovat, zapište si jej!\n\n**Daily You** je zdarma, [open source](https://github.com/Demizo/Daily_You), a podporovaný komunitou. Založenona myšlence, že deník by měl být soukromí a ne produkt:\n\n- Bez reklam\n- Žádný paywall\n- Žádné sledování a sběr dat\n\nAťuz si zapisujete každý den, vaše nápady, nebo co vás třeba rozesmálo, **Daily You** vám dává soukromí prostor, který _plně vlastníte_.';
+      '## Vítejte v Daily You\n\n> Každý den si má cenu pamatovat, zapište si jej!\n\n**Daily You** je zdarma, [open source](https://github.com/TraxDinosaur/DailyYou), a podporovaný komunitou. Založenona myšlence, že deník by měl být soukromí a ne produkt:\n\n- Bez reklam\n- Žádný paywall\n- Žádné sledování a sběr dat\n\nAťuz si zapisujete každý den, vaše nápady, nebo co vás třeba rozesmálo, **Daily You** vám dává soukromí prostor, který _plně vlastníte_.';
 
   @override
   String get settingsStorageTitle => 'Uložiště';

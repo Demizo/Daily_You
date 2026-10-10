@@ -631,7 +631,7 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get welcomeLogBodyText =>
-      '## Us donem la benvinguda al Daily You\n\n> Cada dia val la pena recordar-lo, captureu-lo!\n\nEl **Daily You** és gratuït, de [codi obert](https://github.com/Demizo/Daily_You), i el manté la comunitat. Es basa en la idea que el vostre diari ha de ser vós, no un producte:\n\n- Sense anuncis\n- Sense funcions bloquejades\n- Sense seguiment ni recollida de dades\n\nTant si porteu un diari, reflexioneu, com si simplement anoteu què us ha fet somriure, el **Daily You** us dona un espai privat que és _realment vostre_.';
+      '## Us donem la benvinguda al Daily You\n\n> Cada dia val la pena recordar-lo, captureu-lo!\n\nEl **Daily You** és gratuït, de [codi obert](https://github.com/TraxDinosaur/DailyYou), i el manté la comunitat. Es basa en la idea que el vostre diari ha de ser vós, no un producte:\n\n- Sense anuncis\n- Sense funcions bloquejades\n- Sense seguiment ni recollida de dades\n\nTant si porteu un diari, reflexioneu, com si simplement anoteu què us ha fet somriure, el **Daily You** us dona un espai privat que és _realment vostre_.';
 
   @override
   String get settingsStorageTitle => 'Emmagatzematge';

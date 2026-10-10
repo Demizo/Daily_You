@@ -1,5 +1,5 @@
 // Behavior based on DenserMeerkat/June (GPL-3.0)
-package com.demizo.daily_you.dyf
+package com.traxdinosaur.dailyyou
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -19,8 +19,8 @@ import androidx.core.content.ContextCompat
 import android.Manifest
 
 class MainActivity: FlutterFragmentActivity() {
-  private val SECURITY_CHANNEL = "com.demizo.daily_you.dyf/security"
-  private val LOCATION_CHANNEL = "com.demizo.daily_you.dyf/location"
+  private val SECURITY_CHANNEL = "com.traxdinosaur.dailyyou/security"
+  private val LOCATION_CHANNEL = "com.traxdinosaur.dailyyou/location"
   private val LOCATION_PERMISSION_REQUEST_CODE = 1001
 
   private var pendingLocationResult: MethodChannel.Result? = null

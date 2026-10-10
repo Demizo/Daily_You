@@ -226,7 +226,7 @@
     "tagTiredName": "Lelah",
     "tagAnxiousName": "Cemas",
     "tagAnnoyedName": "Kesal",
-    "welcomeLogBodyText": "## Selamat datang di Daily You\n\n> Setiap hari layak untuk dikenang, abadikanlah!\n\n**Daily You** gratis, [open source](https://github.com/Demizo/Daily_You), dan didukung oleh komunitas. Dibangun berdasarkan keyakinan bahwa buku harian Anda harus benar-benar menjadi milik Anda, bukan sebuah produk:\n\n- Tanpa iklan\n- Tanpa fitur terkunci\n- Tanpa pelacakan atau pengumpulan data\n\nBaik Anda menulis jurnal, berefleksi, atau sekadar mencatat hal yang membuat Anda tersenyum, **Daily You** memberi Anda ruang pribadi yang _benar-benar milik Anda sendiri_.",
+    "welcomeLogBodyText": "## Selamat datang di Daily You\n\n> Setiap hari layak untuk dikenang, abadikanlah!\n\n**Daily You** gratis, [open source](https://github.com/TraxDinosaur/DailyYou), dan didukung oleh komunitas. Dibangun berdasarkan keyakinan bahwa buku harian Anda harus benar-benar menjadi milik Anda, bukan sebuah produk:\n\n- Tanpa iklan\n- Tanpa fitur terkunci\n- Tanpa pelacakan atau pengumpulan data\n\nBaik Anda menulis jurnal, berefleksi, atau sekadar mencatat hal yang membuat Anda tersenyum, **Daily You** memberi Anda ruang pribadi yang _benar-benar milik Anda sendiri_.",
     "migratingImagesStatus": "Memigrasikan foto… {current}/{total}",
     "imagesTitle": "Gambar",
     "calendarTagDisplayLabel": "Tag",

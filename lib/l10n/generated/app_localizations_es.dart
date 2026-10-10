@@ -629,7 +629,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get welcomeLogBodyText =>
-      '## Bienvenido a Daily You\n\n> Cada día merece ser recordado, ¡captúralo!\n\n**Daily You** es gratuito, [de código abierto](https://github.com/Demizo/Daily_You), y mantenido por la comunidad. Ha sido construido con la idea de que tu diario debería ser tuyo, no un producto:\n\n- No tiene anuncios\n- No tiene características de pago\n- No rastrea ni recoge tus datos\n\nYa sea que estés escribiendo en tu diario, reflexionando, o simplemente apuntando algo que te hizo sonreír, **Daily You** te ofrece un espacio privado que es _exclusivamente tuyo_.';
+      '## Bienvenido a Daily You\n\n> Cada día merece ser recordado, ¡captúralo!\n\n**Daily You** es gratuito, [de código abierto](https://github.com/TraxDinosaur/DailyYou), y mantenido por la comunidad. Ha sido construido con la idea de que tu diario debería ser tuyo, no un producto:\n\n- No tiene anuncios\n- No tiene características de pago\n- No rastrea ni recoge tus datos\n\nYa sea que estés escribiendo en tu diario, reflexionando, o simplemente apuntando algo que te hizo sonreír, **Daily You** te ofrece un espacio privado que es _exclusivamente tuyo_.';
 
   @override
   String get settingsStorageTitle => 'Almacenamiento';

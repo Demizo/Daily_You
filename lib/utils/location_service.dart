@@ -14,7 +14,7 @@ class LocationService {
   static final LocationService instance = LocationService();
 
   static const MethodChannel _channel =
-      MethodChannel('com.demizo.daily_you.dyf/location');
+      MethodChannel('com.traxdinosaur.dailyyou/location');
 
   @visibleForTesting
   LocationNativeHandler? nativeLocationOverride;
