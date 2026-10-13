@@ -130,18 +130,20 @@ Future<OperationOutcome> importFromDaylio(
             skipUpdate: true);
 
         final assetIds = (entry['assets'] as List?)?.cast<int>() ?? [];
+        final photoFiles = <String>[];
         for (final assetId in assetIds) {
           final asset = assetById[assetId];
           if (asset == null || asset['type'] != 1) continue;
 
-          final checksum = asset['checksum'];
-          final file = checksumToFilePath[checksum];
-          if (file == null) continue;
+          final file = checksumToFilePath[asset['checksum']];
+          if (file != null) photoFiles.add(file);
+        }
 
+        for (var index = 0; index < photoFiles.length; index++) {
           await addImportedImage(
               addedEntry.id!,
-              Uint8List.fromList(await File(file).readAsBytes()),
-              0,
+              Uint8List.fromList(await File(photoFiles[index]).readAsBytes()),
+              photoFiles.length - 1 - index,
               datetime,
               takenNames);
         }
