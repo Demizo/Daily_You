@@ -12,6 +12,7 @@ import 'package:daily_you/pages/attachment_view_page.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:daily_you/utils/attachment_mime.dart';
 import 'package:daily_you/widgets/attachment_tile_background.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
 import 'package:daily_you/widgets/scaled_markdown.dart';
@@ -49,14 +50,10 @@ class _EntryViewPageState extends State<EntryViewPage> {
     if (entry == null) return const Scaffold();
 
     final attachments = entryAttachmentsProvider.getForEntry(entry);
-    final images = attachments
-        .where((attachment) => attachment.type == AttachmentType.image)
-        .toList();
-
     return Scaffold(
       appBar: AppBar(
         actions: [
-          _shareButton(context, entry, images),
+          _shareButton(context, entry, attachments),
           _editButton(context, entry, attachments),
         ],
       ),
@@ -207,8 +204,9 @@ class _EntryViewPageState extends State<EntryViewPage> {
   }
 
   Widget _shareButton(
-      BuildContext context, entry, List<EntryAttachment> images) {
-    if (Platform.isAndroid && (images.isNotEmpty || entry.text.isNotEmpty)) {
+      BuildContext context, entry, List<EntryAttachment> attachments) {
+    if (Platform.isAndroid &&
+        (attachments.isNotEmpty || entry.text.isNotEmpty)) {
       return IconButton(
           icon: const Icon(Icons.share_rounded),
           onPressed: () async {
@@ -219,18 +217,19 @@ class _EntryViewPageState extends State<EntryViewPage> {
             sharedText =
                 "$sharedText${TimeManager.formatDateWithWeekday(entry.timeCreate, context)}\n${entry.text}";
 
-            if (images.isNotEmpty) {
-              var bytes = await AttachmentStorage.instance
-                  .getBytes(images.first.filePath, AttachmentType.image);
-              if (bytes != null) {
-                await SharePlus.instance.share(ShareParams(
-                    files: [XFile.fromData(bytes, mimeType: "image/*")],
-                    fileNameOverrides: [images.first.filePath],
-                    text: sharedText));
-              }
-            } else {
-              SharePlus.instance.share(ShareParams(text: sharedText));
+            final files = <XFile>[];
+            final fileNames = <String>[];
+            for (final attachment in attachments) {
+              final localPath = await AttachmentStorage.instance
+                  .getLocalPath(attachment.filePath, attachment.type);
+              if (localPath == null) continue;
+              files.add(XFile(localPath,
+                  mimeType: attachmentMimeType(
+                      attachment.filePath, attachment.type)));
+              fileNames.add(attachment.filePath);
             }
+            await SharePlus.instance.share(ShareParams(
+                files: files, fileNameOverrides: fileNames, text: sharedText));
           });
     }
     return Container();
