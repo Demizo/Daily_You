@@ -324,7 +324,7 @@ groups:
         icon: outdoor_grill_rounded
 
   - id: home
-    l10nKey: pageHomeTitle
+    l10nKey: iconGroupHome
     icons:
       - key: home
         icon: home_rounded
