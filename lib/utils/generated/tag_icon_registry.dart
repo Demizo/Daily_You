@@ -244,6 +244,7 @@ class TagIconKey {
   static const String deliveryDining = 'delivery_dining';
   static const String stadium = 'stadium';
   static const String cabin = 'cabin';
+  static const String circle = 'circle';
   static const String star = 'star';
   static const String bolt = 'bolt';
   static const String diamond = 'diamond';
@@ -472,6 +473,7 @@ const Map<String, IconData> tagIconRegistry = {
   'delivery_dining': Icons.delivery_dining_rounded,
   'stadium': Icons.stadium_rounded,
   'cabin': Icons.cabin_rounded,
+  'circle': Icons.circle_rounded,
   'star': Icons.star_rounded,
   'bolt': Icons.bolt_rounded,
   'diamond': Icons.diamond_rounded,
@@ -719,6 +721,7 @@ const List<TagIconGroup> tagIconGroups = [
     'cabin',
   ]),
   TagIconGroup(id: TagIconGroupId.symbols, keys: [
+    'circle',
     'star',
     'bolt',
     'diamond',
