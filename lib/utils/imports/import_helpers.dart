@@ -56,7 +56,18 @@ Future<OperationOutcome> finishImport(
 DateTime diariumIdToDateTime(int ticks) {
   const int ticksAtUnixEpoch = 621355968000000000;
   final usSinceEpoch = ((ticks - ticksAtUnixEpoch) / 10).round();
-  return DateTime.fromMicrosecondsSinceEpoch(usSinceEpoch, isUtc: false);
+  // Wall-clock time the entry was written, with no zone attached
+  final wallClock =
+      DateTime.fromMicrosecondsSinceEpoch(usSinceEpoch, isUtc: true);
+  return DateTime(
+      wallClock.year,
+      wallClock.month,
+      wallClock.day,
+      wallClock.hour,
+      wallClock.minute,
+      wallClock.second,
+      wallClock.millisecond,
+      wallClock.microsecond);
 }
 
 DateTime convertWithOffset(int millisUtc, String tzOffset) {
