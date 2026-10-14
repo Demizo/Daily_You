@@ -52,14 +52,42 @@ class Layer:
         return centers
 
 
-def wobble(angle, rotation=0.0, scale=0.0, phase=0.0):
-    return "rotate(%.4f) scale(%.5f)" % (
-        rotation * math.sin(angle + phase),
-        1 + scale * math.sin(angle + phase + math.pi / 2),
+def wobble(progress, rotation=0.0, scale=0.0, phase=0.0):
+    angle = 2 * math.pi * progress + phase
+    return "rotate(%.4f) scale(%.5f)" % (rotation * math.sin(angle), 1 + scale * math.sin(angle + math.pi / 2)), 1.0
+
+
+def bob(progress, amplitude=0.0, cycles=1):
+    return "translate(0 %.3f)" % (amplitude * math.sin(2 * math.pi * progress * cycles)), 1.0
+
+
+def travel(progress, dx=0.0, dy=0.0, start=0.0, duration=1.0, ease=1.0, ease_x=None, turn=0.0, end_scale=1.0, fade_in=0.15, fade_out=0.15):
+    elapsed = (progress - start) % 1 / duration
+    if elapsed >= 1:
+        return "", 0.0
+    position = elapsed**ease
+    position_x = elapsed ** (ease if ease_x is None else ease_x)
+    transform = "translate(%.3f %.3f) rotate(%.3f) scale(%.4f)" % (
+        dx * position_x,
+        dy * position,
+        turn * position,
+        1 + (end_scale - 1) * position,
     )
+    return transform, min(1.0, elapsed / fade_in, (1 - elapsed) / fade_out)
 
 
-MOTIONS = {"wobble": wobble}
+def punch(progress, cycles=1, phase=0.0, decay=7.0, spring=9.0, dy=0.0, scale_x=0.0, scale_y=0.0):
+    elapsed = (progress * cycles - phase) % 1
+    amount = math.exp(-decay * elapsed) * math.cos(spring * elapsed)
+    return "translate(0 %.3f) scale(%.5f %.5f)" % (dy * amount, 1 + scale_x * amount, 1 + scale_y * amount), 1.0
+
+
+def show(progress, windows=((0.0, 1.0),), repeat=1):
+    position = progress * repeat % 1
+    return "", 1.0 if any(start <= position < end for start, end in windows) else 0.0
+
+
+MOTIONS = {"wobble": wobble, "bob": bob, "travel": travel, "punch": punch, "show": show}
 
 
 def load_layers(folder, layer_names, animations):
@@ -76,7 +104,6 @@ def load_layers(folder, layer_names, animations):
 
 
 def frame_svg(progress, layers, animations, centers):
-    angle = 2 * math.pi * progress
     width, height = layers[0].size
     root = ElementTree.Element(
         "{%s}svg" % SVG_NAMESPACE,
@@ -90,15 +117,17 @@ def frame_svg(progress, layers, animations, centers):
             if element.get("id") not in animations or element not in parents:
                 continue
             center_x, center_y = centers[element.get("id")]
-            motions = " ".join(
-                MOTIONS[motion["type"]](angle, **{key: value for key, value in motion.items() if key != "type"})
+            results = [
+                MOTIONS[motion["type"]](progress, **{key: value for key, value in motion.items() if key != "type"})
                 for motion in animations[element.get("id")]
-            )
+            ]
+            motions = " ".join(transform for transform, _ in results if transform)
+            opacity = math.prod(opacity for _, opacity in results)
             parent = parents[element]
-            wrapper = ElementTree.Element(
-                "{%s}g" % SVG_NAMESPACE,
-                {"transform": "translate(%.3f %.3f) %s translate(%.3f %.3f)" % (center_x, center_y, motions, -center_x, -center_y)},
-            )
+            attributes = {"transform": "translate(%.3f %.3f) %s translate(%.3f %.3f)" % (center_x, center_y, motions, -center_x, -center_y)}
+            if opacity < 1:
+                attributes["opacity"] = "%.3f" % opacity
+            wrapper = ElementTree.Element("{%s}g" % SVG_NAMESPACE, attributes)
             parent.insert(list(parent).index(element), wrapper)
             parent.remove(element)
             wrapper.append(element)
