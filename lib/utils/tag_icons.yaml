@@ -436,6 +436,8 @@ groups:
   - id: symbols
     l10nKey: iconGroupSymbols
     icons:
+      - key: circle
+        icon: circle_rounded
       - key: star
         icon: star_rounded
       - key: bolt
