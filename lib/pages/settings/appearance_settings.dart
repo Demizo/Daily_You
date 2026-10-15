@@ -6,6 +6,7 @@ import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/color_picker_dialog.dart';
+import 'package:daily_you/widgets/mood_scale_setting.dart';
 import 'package:daily_you/widgets/settings_dropdown.dart';
 import 'package:daily_you/widgets/settings_icon_action.dart';
 import 'package:daily_you/widgets/settings_toggle.dart';
@@ -139,6 +140,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
       ),
       body: ListView(
         children: [
+          const MoodScaleSetting(),
           SettingsDropdown<String>(
               title: AppLocalizations.of(context)!.settingsTheme,
               value: configProvider.get(Settings.theme),

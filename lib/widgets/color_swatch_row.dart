@@ -27,21 +27,34 @@ class ColorSwatchRow extends StatelessWidget {
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
           ),
         ),
-        GestureDetector(
-          onTap: onTap,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              CircleAvatar(backgroundColor: color, radius: 16),
-              Icon(
-                Icons.palette_rounded,
-                size: 20,
-                color: contrastingTextColor(color),
-              ),
-            ],
-          ),
-        ),
+        ColorSwatchButton(color: color, onTap: onTap),
       ],
+    );
+  }
+}
+
+class ColorSwatchButton extends StatelessWidget {
+  final Color color;
+  final VoidCallback onTap;
+
+  const ColorSwatchButton(
+      {super.key, required this.color, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          CircleAvatar(backgroundColor: color, radius: 16),
+          Icon(
+            Icons.palette_rounded,
+            size: 20,
+            color: contrastingTextColor(color),
+          ),
+        ],
+      ),
     );
   }
 }
