@@ -10,6 +10,7 @@ import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/database/entry_tag_dao.dart';
 import 'package:daily_you/database/tag_dao.dart';
 import 'package:daily_you/models/entry.dart';
+import 'package:daily_you/models/mood.dart';
 import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/providers/entries_provider.dart';
@@ -89,7 +90,7 @@ Future<OperationOutcome> importFromDiarium(
       }
 
       final rating = entry['Rating'] as int?;
-      final mood = rating != null ? rating.clamp(1, 5) - 3 : null;
+      final mood = rating != null ? Mood.fromRating(rating) : null;
 
       final parts = <String>[];
       if (heading.isNotEmpty) parts.add("# $heading");

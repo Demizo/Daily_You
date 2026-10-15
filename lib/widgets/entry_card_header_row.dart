@@ -34,7 +34,7 @@ class EntryCardHeaderRow extends StatelessWidget {
     final tagsProvider = context.watch<TagsProvider>();
     final hasTags = entry.id != null &&
         tagsProvider.getEntryTagsForEntry(entry.id!).isNotEmpty;
-    final hasMood = MoodIcon.getMoodIcon(entry.mood).isNotEmpty;
+    final hasMood = entry.mood != null;
 
     return LayoutBuilder(
       builder: (context, constraints) {

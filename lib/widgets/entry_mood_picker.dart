@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
+import 'package:daily_you/models/mood.dart';
 import 'package:daily_you/widgets/material_shapes.dart';
 import 'package:daily_you/widgets/punch_scale.dart';
 import 'package:material_ui/material_ui.dart';
@@ -29,12 +30,12 @@ class _EntryMoodPickerState extends State<EntryMoodPicker> {
     }
   }
 
-  Widget _moodOption(int index) {
-    final isSelected = index == _mood;
+  Widget _moodOption(int mood) {
+    final isSelected = mood == _mood;
     final cs = Theme.of(context).colorScheme;
 
     return GestureDetector(
-      onTap: () => _updateMood(index),
+      onTap: () => _updateMood(mood),
       child: SizedBox(
         width: 52,
         height: 52,
@@ -56,12 +57,12 @@ class _EntryMoodPickerState extends State<EntryMoodPicker> {
             );
           },
           child: PunchScale(
-            key: ValueKey(index),
+            key: ValueKey(mood),
             trigger: isSelected,
             child: Opacity(
                 opacity: isSelected ? 1.0 : 0.6,
                 child: MoodIcon(
-                  moodValue: index,
+                  moodValue: mood,
                   size: 24,
                   allowScaling: false,
                 )),
@@ -85,11 +86,7 @@ class _EntryMoodPickerState extends State<EntryMoodPicker> {
       mainAxisSize: MainAxisSize.max,
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        _moodOption(-2),
-        _moodOption(-1),
-        _moodOption(0),
-        _moodOption(1),
-        _moodOption(2),
+        for (final mood in Mood.levels) _moodOption(mood),
       ],
     );
   }

@@ -7,6 +7,7 @@ import 'dart:io';
 import 'package:daily_you/database/entry_store.dart';
 import 'package:daily_you/database/attachment_storage.dart';
 import 'package:daily_you/models/entry.dart';
+import 'package:daily_you/models/mood.dart';
 import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/providers/entry_attachments_provider.dart';
@@ -26,19 +27,19 @@ class ScreenshotSeedEntry {
 }
 
 const recentHighlights = <ScreenshotSeedEntry>[
-  ScreenshotSeedEntry(daysAgo: 1, mood: 2, imageCount: 1),
-  ScreenshotSeedEntry(daysAgo: 2, mood: 1, imageCount: 1),
-  ScreenshotSeedEntry(daysAgo: 3, mood: 1, imageCount: 2),
-  ScreenshotSeedEntry(daysAgo: 4, mood: -1, imageCount: 3),
-  ScreenshotSeedEntry(daysAgo: 5, mood: 2, imageCount: 1),
-  ScreenshotSeedEntry(daysAgo: 6, mood: 1, imageCount: 1),
-  ScreenshotSeedEntry(daysAgo: 7, mood: 2, imageCount: 1),
-  ScreenshotSeedEntry(daysAgo: 8, mood: 0, imageCount: 1),
-  ScreenshotSeedEntry(daysAgo: 9, mood: 0, imageCount: 1),
-  ScreenshotSeedEntry(daysAgo: 10, mood: 1, imageCount: 1),
-  ScreenshotSeedEntry(daysAgo: 11, mood: 2, imageCount: 1),
-  ScreenshotSeedEntry(daysAgo: 12, mood: -1, imageCount: 1),
-  ScreenshotSeedEntry(daysAgo: 13, mood: 1, imageCount: 1),
+  ScreenshotSeedEntry(daysAgo: 1, mood: Mood.veryPleasant, imageCount: 1),
+  ScreenshotSeedEntry(daysAgo: 2, mood: Mood.pleasant, imageCount: 1),
+  ScreenshotSeedEntry(daysAgo: 3, mood: Mood.pleasant, imageCount: 2),
+  ScreenshotSeedEntry(daysAgo: 4, mood: Mood.unpleasant, imageCount: 3),
+  ScreenshotSeedEntry(daysAgo: 5, mood: Mood.veryPleasant, imageCount: 1),
+  ScreenshotSeedEntry(daysAgo: 6, mood: Mood.pleasant, imageCount: 1),
+  ScreenshotSeedEntry(daysAgo: 7, mood: Mood.veryPleasant, imageCount: 1),
+  ScreenshotSeedEntry(daysAgo: 8, mood: Mood.neutral, imageCount: 1),
+  ScreenshotSeedEntry(daysAgo: 9, mood: Mood.neutral, imageCount: 1),
+  ScreenshotSeedEntry(daysAgo: 10, mood: Mood.pleasant, imageCount: 1),
+  ScreenshotSeedEntry(daysAgo: 11, mood: Mood.veryPleasant, imageCount: 1),
+  ScreenshotSeedEntry(daysAgo: 12, mood: Mood.unpleasant, imageCount: 1),
+  ScreenshotSeedEntry(daysAgo: 13, mood: Mood.pleasant, imageCount: 1),
 ];
 
 const _pictureWindowEndDaysAgo = 60;
@@ -47,16 +48,16 @@ const _moodWaveEndDaysAgo = 199;
 const _longTailStep = 2;
 
 const moodWaveTable = <int>[
-  0, 1, 1, 2, 1, 1, -1, 0, 0, 0, 2, 1, 0, 0, 1, 1, 1, 1, 0, 0, //
-  0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, -2, 1, 0, //
-  1, 1, 1, 0, 0, 2, 1, 1, 0, -1, 0, 0, 0, 1, 1, 0, 0, 2, -1, 0, //
-  0, 0, 0, 1, -1, 0, 1, 1, 2, 0, 2, 0, 0, 1, 0, 0, 1, 0, -1, 0, //
-  0, -2, 1, 0, -1, 0, 0, 0, 0, 0, -1, 0, 0, 0, 2, 1, 1, 0, -1, 0, //
-  0, 0, 0, 0, 0, 0, -1, 2, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, -2, 0, //
-  0, -2, 1, -1, 0, 0, -1, 0, 0, 2, 0, 0, 0, 1, 0, -1, -1, 0, 0, 0, //
-  0, -2, 0, 1, 0, 0, 2, -1, -1, -1, 1, 1, 0, 0, -1, 0, 0, 0, 0, -1, //
-  -1, -1, -1, 0, 0, 0, 0, 0, 0, 0, 1, -1, -1, -2, -1, -1, 0, 0, 0, 0, //
-  0, 0, 0, -1, -1, -1,
+  3, 4, 4, 5, 4, 4, 2, 3, 3, 3, 5, 4, 3, 3, 4, 4, 4, 4, 3, 3, //
+  3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 3, 3, 3, 3, 4, 3, 3, 1, 4, 3, //
+  4, 4, 4, 3, 3, 5, 4, 4, 3, 2, 3, 3, 3, 4, 4, 3, 3, 5, 2, 3, //
+  3, 3, 3, 4, 2, 3, 4, 4, 5, 3, 5, 3, 3, 4, 3, 3, 4, 3, 2, 3, //
+  3, 1, 4, 3, 2, 3, 3, 3, 3, 3, 2, 3, 3, 3, 5, 4, 4, 3, 2, 3, //
+  3, 3, 3, 3, 3, 3, 2, 5, 4, 3, 3, 4, 3, 3, 3, 3, 3, 3, 1, 3, //
+  3, 1, 4, 2, 3, 3, 2, 3, 3, 5, 3, 3, 3, 4, 3, 2, 2, 3, 3, 3, //
+  3, 1, 3, 4, 3, 3, 5, 2, 2, 2, 4, 4, 3, 3, 2, 3, 3, 3, 3, 2, //
+  2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 4, 2, 2, 1, 2, 2, 3, 3, 3, 3, //
+  3, 3, 3, 2, 2, 2,
 ];
 
 List<ScreenshotSeedEntry> moodWaveEntries() {
@@ -165,8 +166,8 @@ class ScreenshotSeeder {
     }
     for (final daysAgo in explicitImages.keys) {
       if (covered.contains(daysAgo)) continue;
-      final seed =
-          ScreenshotSeedEntry(daysAgo: daysAgo, mood: 1, imageCount: 1);
+      final seed = ScreenshotSeedEntry(
+          daysAgo: daysAgo, mood: Mood.pleasant, imageCount: 1);
       imageCursor = await _seedEntry(
           now, seed, imageCursor, tagsByIconKey, explicitImages);
     }

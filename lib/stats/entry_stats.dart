@@ -5,6 +5,7 @@
 import 'dart:math' as math;
 
 import 'package:daily_you/models/entry.dart';
+import 'package:daily_you/models/mood.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:word_count/word_count.dart';
 
@@ -26,10 +27,13 @@ int totalWordCount(List<Entry> entries) {
   return total;
 }
 
+double? moodPosition(Entry entry) =>
+    entry.mood == null ? null : Mood.position(entry.mood!).toDouble();
+
 int greatDayCount(List<Entry> entries) {
   final greatDays = <DateTime>{};
   for (final entry in entries) {
-    if (entry.mood == null || entry.mood! < 1) continue;
+    if (!Mood.isGreatDay(entry.mood)) continue;
     final date = entry.timeCreate;
     greatDays.add(DateTime(date.year, date.month, date.day));
   }
@@ -37,7 +41,7 @@ int greatDayCount(List<Entry> entries) {
 }
 
 Map<int, int> moodTotals(List<Entry> entries) {
-  final totals = {-2: 0, -1: 0, 0: 0, 1: 0, 2: 0};
+  final totals = {for (final level in Mood.levels) level: 0};
   for (final entry in entries) {
     if (entry.mood == null) continue;
     totals.update(entry.mood!, (count) => count + 1);

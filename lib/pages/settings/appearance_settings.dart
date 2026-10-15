@@ -3,6 +3,7 @@
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
 import 'package:daily_you/config_provider.dart';
+import 'package:daily_you/models/mood.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/color_picker_dialog.dart';
@@ -66,8 +67,8 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
               onPressed: () async {
                 if (newEmoji.isNotEmpty) {
                   if (value != null) {
-                    await ConfigProvider.instance
-                        .set(Settings.moodIcons[value]!, newEmoji);
+                    await ConfigProvider.instance.set(
+                        Settings.moodIcons[Mood.position(value)], newEmoji);
                   }
                 }
                 if (!context.mounted) return;
@@ -183,7 +184,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
   }
 
   Future _resetMoodIcons() async {
-    for (final setting in Settings.moodIcons.values) {
+    for (final setting in Settings.moodIcons) {
       await ConfigProvider.instance.set(setting, setting.defaultValue);
     }
   }
@@ -363,11 +364,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
               children: [
                 Row(
                   children: [
-                    moodIconButton(-2),
-                    moodIconButton(-1),
-                    moodIconButton(0),
-                    moodIconButton(1),
-                    moodIconButton(2),
+                    for (final mood in Mood.levels) moodIconButton(mood),
                   ],
                 ),
                 IconButton(

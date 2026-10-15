@@ -230,6 +230,32 @@ CREATE TABLE template_tags (
     await old.close();
   }
 
+  group('from schema version 6', () {
+    Future<void> createVersion6(List<int?> moods) async {
+      final old = await databaseFactory.openDatabase(path,
+          options: OpenDatabaseOptions(
+              version: 6, onCreate: (db, _) => db.execute(entries)));
+      for (final (index, mood) in moods.indexed) {
+        await old.insert('entries', {
+          'id': index + 1,
+          'text': 'entry $index',
+          'mood': mood,
+        });
+      }
+      await old.close();
+    }
+
+    test('moves each mood from the old scale onto the new one', () async {
+      await createVersion6([-2, -1, 0, 1, 2, null]);
+
+      final db = await upgrade();
+
+      final rows = await db.query('entries', orderBy: 'id');
+      expect(rows.map((row) => row['mood']), [1, 2, 3, 4, 5, null]);
+      await db.close();
+    });
+  });
+
   group('from schema version 5', () {
     Future<void> createVersion5(String entryImagesDdl) => createImageDatabase(
         version: 5,
@@ -491,7 +517,7 @@ CREATE TABLE template_tags (
         {
           'id': 1,
           'text': 'one',
-          'mood': 1,
+          'mood': 4,
           'time_create': '2024-03-02T09:30:00.000',
           'time_modified': '2024-03-02T09:31:00.000',
         },

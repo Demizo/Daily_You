@@ -215,13 +215,13 @@ class Settings {
     lastAutoBackup,
   ];
 
-  static const moodIcons = <int, Setting<String>>{
-    2: veryHappyIcon,
-    1: happyIcon,
-    0: neutralIcon,
-    -1: sadIcon,
-    -2: verySadIcon,
-  };
+  static const moodIcons = <Setting<String>>[
+    verySadIcon,
+    sadIcon,
+    neutralIcon,
+    happyIcon,
+    veryHappyIcon,
+  ];
 }
 
 class ImageQuality {
