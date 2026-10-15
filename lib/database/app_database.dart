@@ -4,7 +4,9 @@
 
 import 'dart:io';
 
+import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/database/attachment_storage.dart';
+import 'package:daily_you/database/mood_scale_dao.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/storage/external_sync_health.dart';
 import 'package:daily_you/storage/external_sync_settings.dart';
@@ -15,12 +17,15 @@ import 'package:daily_you/utils/operation_outcome.dart';
 import 'package:daily_you/utils/generated/tag_icon_registry.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/mood.dart';
+import 'package:daily_you/models/mood_scale_level.dart';
+import 'package:daily_you/models/mood_scale_preset.dart';
 import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/models/tag_category.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_attachments_provider.dart';
+import 'package:daily_you/providers/mood_scale_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/providers/templates_provider.dart';
 import 'package:easy_debounce/easy_debounce.dart';
@@ -161,6 +166,7 @@ class AppDatabase {
     await EntryAttachmentsProvider.instance.load();
     await TemplatesProvider.instance.load();
     await TagsProvider.instance.load();
+    await MoodScaleProvider.instance.load();
   }
 
   Future<void> close() async {
@@ -363,6 +369,7 @@ class AppDatabase {
     await createSchema(db);
     await TemplatesProvider.instance.createDefaultTemplates();
     await TagsProvider.instance.createDefaultTags();
+    await MoodScaleDao.save(MoodScalePreset.emoji.levels, executor: db);
     await createWelcomeEntry();
   }
 
@@ -398,6 +405,7 @@ CREATE TABLE $attachmentsTable (
 ''');
 
     await _createTagTables(db);
+    await _createMoodScaleLevelsTable(db);
     await _createTemplateTagTable(db);
   }
 
@@ -510,6 +518,18 @@ CREATE TABLE $entryTagsTable (
     ${EntryTagFields.timeCreate} DATETIME NOT NULL DEFAULT (DATETIME('now')),
     FOREIGN KEY (${EntryTagFields.entryId}) REFERENCES $entriesTable (id),
     FOREIGN KEY (${EntryTagFields.tagId}) REFERENCES $tagsTable (id)
+)
+''');
+  }
+
+  Future<void> _createMoodScaleLevelsTable(Database db) async {
+    await db.execute('''
+CREATE TABLE $moodScaleTable (
+  ${MoodScaleLevelFields.mood} INTEGER NOT NULL PRIMARY KEY,
+  ${MoodScaleLevelFields.label} TEXT,
+  ${MoodScaleLevelFields.icon} TEXT,
+  ${MoodScaleLevelFields.iconType} INTEGER NOT NULL DEFAULT 0,
+  ${MoodScaleLevelFields.color} INTEGER
 )
 ''');
   }
@@ -630,13 +650,23 @@ SELECT '$attachmentsTable', seq FROM sqlite_sequence WHERE name = 'entry_images'
         await txn.execute('DROP TABLE entry_images;');
       });
     }
-    if (oldVersion <= 6) {
+    if (oldVersion <= 6 && !await _tableExists(db, moodScaleTable)) {
+      await _createMoodScaleLevelsTable(db);
       await db.execute('''
 UPDATE $entriesTable SET ${EntryFields.mood} = ${EntryFields.mood} + 3
 WHERE ${EntryFields.mood} IS NOT NULL
 ''');
+      await MoodScaleDao.save(_legacyMoodScaleLevels(), executor: db);
     }
   }
+
+  List<MoodScaleLevel> _legacyMoodScaleLevels() => [
+        for (final (position, level) in MoodScalePreset.emoji.levels.indexed)
+          level.copyWith(
+            icon: ConfigProvider.instance
+                .get<String>(Settings.moodIcons[position]),
+          ),
+      ];
 
   Future<bool> _tableExists(Database db, String name) async {
     final rows = await db.query('sqlite_master',
