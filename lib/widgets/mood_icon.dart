@@ -5,6 +5,7 @@
 import 'dart:io';
 
 import 'package:daily_you/config_provider.dart';
+import 'package:daily_you/models/mood.dart';
 import 'package:material_ui/material_ui.dart';
 
 class MoodIcon extends StatefulWidget {
@@ -23,9 +24,9 @@ class MoodIcon extends StatefulWidget {
   State<MoodIcon> createState() => _MoodIconState();
 
   static String getMoodIcon(int? moodValue) {
-    final setting = Settings.moodIcons[moodValue];
-    if (setting == null) return "";
-    return ConfigProvider.instance.get(setting);
+    if (moodValue == null) return "";
+    return ConfigProvider.instance
+        .get(Settings.moodIcons[Mood.position(moodValue)]);
   }
 }
 

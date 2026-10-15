@@ -4,6 +4,7 @@
 
 import 'package:daily_you/database/entry_store.dart';
 import 'package:daily_you/models/entry.dart';
+import 'package:daily_you/models/mood.dart';
 import 'package:daily_you/utils/search_matcher.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -102,11 +103,7 @@ class EntriesProvider with ChangeNotifier {
     }
 
     if (_orderBy == OrderBy.mood) {
-      filteredEntries.sort((a, b) {
-        var aValue = a.mood ?? -999;
-        var bValue = b.mood ?? -999;
-        return bValue.compareTo(aValue);
-      });
+      filteredEntries.sort((a, b) => Mood.compare(b.mood, a.mood));
     }
 
     if (_sortOrder == SortOrder.ascending) {

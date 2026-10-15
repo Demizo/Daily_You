@@ -14,6 +14,7 @@ import 'package:daily_you/storage/sync_item.dart';
 import 'package:daily_you/utils/operation_outcome.dart';
 import 'package:daily_you/utils/generated/tag_icon_registry.dart';
 import 'package:daily_you/models/entry.dart';
+import 'package:daily_you/models/mood.dart';
 import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/models/tag_category.dart';
@@ -146,7 +147,7 @@ class AppDatabase {
     }
   }
 
-  static const schemaVersion = 6;
+  static const schemaVersion = 7;
 
   Future<void> open() async {
     _database = await openDatabase(_internalPath!,
@@ -418,7 +419,7 @@ CREATE TABLE $attachmentsTable (
     final welcomeEntry = await EntriesProvider.instance.add(
       Entry(
         text: l10n.welcomeLogBodyText,
-        mood: 1,
+        mood: Mood.pleasant,
         timeCreate: now,
         timeModified: now,
       ),
@@ -628,6 +629,12 @@ SELECT '$attachmentsTable', seq FROM sqlite_sequence WHERE name = 'entry_images'
     ''');
         await txn.execute('DROP TABLE entry_images;');
       });
+    }
+    if (oldVersion <= 6) {
+      await db.execute('''
+UPDATE $entriesTable SET ${EntryFields.mood} = ${EntryFields.mood} + 3
+WHERE ${EntryFields.mood} IS NOT NULL
+''');
     }
   }
 

@@ -3,6 +3,7 @@
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
 import 'package:daily_you/config_provider.dart';
+import 'package:daily_you/models/mood.dart';
 import 'package:daily_you/widgets/material_shapes.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
 import 'package:material_ui/material_ui.dart';
@@ -16,13 +17,15 @@ class MoodSummaryChart extends StatelessWidget {
   const MoodSummaryChart(
       {super.key, required this.moodCounts, required this.hasData});
 
-  static const _moodOrder = [2, 1, 0, -1, -2];
   static const _barHeight = 44.0;
   static const _iconSize = 40.0;
   static const _countWidth = 44.0;
   static const _gap = 4.0;
 
-  static const _dummyMoodCounts = {2: 4, 1: 8, 0: 9, -1: 3, -2: 1};
+  static final _dummyMoodCounts = {
+    for (final (position, count) in [1, 3, 9, 8, 4].indexed)
+      Mood.fromPosition(position): count,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +68,7 @@ class MoodSummaryChart extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(8),
                   child: Column(
-                    children: _moodOrder.map((mood) {
+                    children: Mood.levels.reversed.map((mood) {
                       final count = displayCounts[mood] ?? 0;
                       return _MoodBarRow(
                         mood: mood,

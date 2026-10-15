@@ -5,6 +5,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:daily_you/models/mood.dart';
 import 'package:daily_you/utils/imports/import_json.dart';
 import 'package:daily_you/utils/imports/import_mybrain.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -26,7 +27,7 @@ void main() {
 
       expect(decoded, hasLength(1));
       expect(decoded.single.entry.text, equals('a good day'));
-      expect(decoded.single.entry.mood, equals(2));
+      expect(decoded.single.entry.mood, equals(Mood.levels.last));
       expect(decoded.single.entry.timeCreate,
           equals(DateTime(2026, 1, 2, 3, 4, 5)));
       expect(decoded.single.entry.timeModified,
@@ -111,8 +112,8 @@ void main() {
           {'mood': mood, 'createdDate': 0, 'updatedDate': 0}
       ]));
 
-      expect(decoded.map((imported) => imported.entry.mood),
-          equals([-2, -1, 0, 1, 2]));
+      expect(
+          decoded.map((imported) => imported.entry.mood), equals(Mood.levels));
     });
 
     test('decodes an unknown or missing mood as null', () {
