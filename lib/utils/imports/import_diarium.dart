@@ -1,22 +1,25 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:daily_you/database/attachment_storage.dart';
 import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/database/entry_tag_dao.dart';
-import 'package:daily_you/database/image_storage.dart';
 import 'package:daily_you/database/tag_dao.dart';
 import 'package:daily_you/models/entry.dart';
-import 'package:daily_you/models/image.dart';
+import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/providers/entries_provider.dart';
-import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/storage/storage_picker.dart';
 import 'package:daily_you/utils/imports/import_helpers.dart';
 import 'package:daily_you/utils/operation_outcome.dart';
 import 'package:daily_you/utils/tag_name_sanitizer.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:html2md/html2md.dart' as html2md;
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -70,6 +73,8 @@ Future<OperationOutcome> importFromDiarium(
       ..sort((a, b) =>
           (a['DiaryEntryId'] as int).compareTo(b['DiaryEntryId'] as int));
 
+    final takenNames = await AttachmentStorage.instance
+        .takenLowerCaseNames(AttachmentType.image);
     final totalEntries = sortedEntries.length;
     int processedEntries = 0;
 
@@ -105,23 +110,8 @@ Future<OperationOutcome> importFromDiarium(
           final data = img['Data'] as Uint8List?;
           final rank = entryMedia.length - 1 - (img['Index'] as int? ?? 0);
           if (data != null) {
-            final newImage = await ImageStorage.instance.create(
-              null,
-              data,
-              currTime: timestamp,
-              skipExternalUpload: true,
-            );
-            if (newImage != null) {
-              await EntryImagesProvider.instance.add(
-                  EntryImage(
-                    id: null,
-                    entryId: addedEntry.id!,
-                    imgPath: newImage,
-                    imgRank: rank,
-                    timeCreate: timestamp,
-                  ),
-                  skipUpdate: true);
-            }
+            await addImportedImage(
+                addedEntry.id!, data, rank, timestamp, takenNames);
           }
         }
 

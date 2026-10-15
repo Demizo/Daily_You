@@ -1,3 +1,7 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 import 'dart:ui';
 
 import 'package:daily_you/l10n/generated/app_localizations.dart';
@@ -5,7 +9,7 @@ import 'package:daily_you/utils/markdown_preview_styles.dart';
 import 'package:daily_you/widgets/editor_action_bar/editor_keyboard_session.dart';
 import 'package:daily_you/widgets/markdown_preview_controller.dart';
 import 'package:daily_you/widgets/markdown_preview_decorations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class EntryTextField extends StatefulWidget {
   final MarkdownPreviewController controller;

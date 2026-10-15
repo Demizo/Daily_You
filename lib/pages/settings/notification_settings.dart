@@ -1,14 +1,17 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 import 'package:app_settings/app_settings.dart';
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/settings_icon_action.dart';
 import 'package:daily_you/widgets/settings_toggle.dart';
-import 'package:flutter/material.dart';
+import 'package:daily_you/widgets/time_range_picker_dialog.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:time_range_picker/time_range_picker.dart';
 
 class NotificationSettings extends StatefulWidget {
   const NotificationSettings({super.key});
@@ -60,56 +63,14 @@ class NotificationSettings extends StatefulWidget {
   }
 
   static Future<void> _selectTimeRange(BuildContext context) async {
-    ThemeData theme = Theme.of(context);
-    TimeRange currentRange = TimeManager.getReminderTimeRange();
-    TimeRange? range = await showTimeRangePicker(
-        context: context,
-        toText: "",
-        fromText: "",
-        use24HourFormat: ConfigProvider.instance.is24HourFormat(),
-        start: currentRange.startTime,
-        end: currentRange.endTime,
-        ticks: 24,
-        handlerColor: theme.colorScheme.primary,
-        strokeColor: theme.colorScheme.primary,
-        selectedColor: theme.colorScheme.primary,
-        backgroundColor: theme.disabledColor.withValues(alpha: 0.2),
-        ticksColor: theme.colorScheme.surface,
-        interval: Duration(minutes: 10),
-        ticksWidth: 2,
-        autoAdjustLabels: false,
-        labels: [
-          ClockLabel.fromTime(
-              time: TimeOfDay(hour: 0, minute: 0),
-              text: DateFormat.j(TimeManager.currentLocale(context)).format(
-                  TimeManager.addTimeOfDay(
-                      TimeManager.startOfDay(DateTime.now()),
-                      TimeOfDay(hour: 0, minute: 0)))),
-          ClockLabel.fromTime(
-              time: TimeOfDay(hour: 6, minute: 0),
-              text: DateFormat.j(TimeManager.currentLocale(context)).format(
-                  TimeManager.addTimeOfDay(
-                      TimeManager.startOfDay(DateTime.now()),
-                      TimeOfDay(hour: 6, minute: 0)))),
-          ClockLabel.fromTime(
-              time: TimeOfDay(hour: 12, minute: 0),
-              text: DateFormat.j(TimeManager.currentLocale(context)).format(
-                  TimeManager.addTimeOfDay(
-                      TimeManager.startOfDay(DateTime.now()),
-                      TimeOfDay(hour: 12, minute: 0)))),
-          ClockLabel.fromTime(
-              time: TimeOfDay(hour: 18, minute: 0),
-              text: DateFormat.j(TimeManager.currentLocale(context)).format(
-                  TimeManager.addTimeOfDay(
-                      TimeManager.startOfDay(DateTime.now()),
-                      TimeOfDay(hour: 18, minute: 0)))),
-        ]);
-    if (range != null) {
-      await TimeManager.setReminderTimeRange(range);
-      if (ConfigProvider.instance.get(Settings.dailyReminders)) {
-        await NotificationManager.instance.stopDailyReminders();
-        await NotificationManager.instance.startScheduledDailyReminders();
-      }
+    final range = await showTimeRangePicker(context,
+        initialRange: TimeManager.getReminderTimeRange());
+    if (range == null) return;
+
+    await TimeManager.setReminderTimeRange(range);
+    if (ConfigProvider.instance.get(Settings.dailyReminders)) {
+      await NotificationManager.instance.stopDailyReminders();
+      await NotificationManager.instance.startScheduledDailyReminders();
     }
   }
 

@@ -1,0 +1,18 @@
+{
+  "output": "assets/support_banner.gif",
+  "colors": 48,
+  "frames": 80,
+  "duration": 120,
+  "layers": ["background.svg", "scene.svg"],
+  "animations": {
+    "heart-bloom": [{"type": "bob", "amplitude": 8, "cycles": 2}, {"type": "punch", "cycles": 4, "decay": 5, "spring": 12, "scale_x": 0.07, "scale_y": 0.07}],
+    "heart": [{"type": "bob", "amplitude": 8, "cycles": 2}, {"type": "punch", "cycles": 4, "decay": 5, "spring": 12, "scale_x": 0.07, "scale_y": 0.07}],
+    "sprite-pose-0": [{"type": "show", "windows": [[0.0, 0.0625], [0.1875, 0.28125], [0.4375, 0.5625], [0.6875, 0.8125], [0.9375, 1.0]]}],
+    "sprite-pose-1": [{"type": "show", "windows": [[0.0625, 0.1875], [0.3125, 0.4375], [0.5625, 0.65625]]}],
+    "sprite-pose-2": [{"type": "show", "windows": [[0.28125, 0.3125]]}],
+    "sprite-pose-3": [{"type": "show", "windows": [[0.65625, 0.6875]]}],
+    "sprite-pose-4": [{"type": "show", "windows": [[0.8125, 0.84375], [0.875, 0.90625]]}],
+    "sprite-pose-5": [{"type": "show", "windows": [[0.84375, 0.875]]}],
+    "sprite-pose-6": [{"type": "show", "windows": [[0.90625, 0.9375]]}]
+  }
+}

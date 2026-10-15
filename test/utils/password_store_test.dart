@@ -1,3 +1,7 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -66,7 +70,8 @@ void main() {
       expect(ConfigProvider.instance.get(Settings.passwordHash), legacyHash);
     });
 
-    test('a PHC hash written with different params than this app uses still '
+    test(
+        'a PHC hash written with different params than this app uses still '
         'validates', () async {
       const memoryKiB = 8192;
       const iterations = 3;

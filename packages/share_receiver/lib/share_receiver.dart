@@ -1,3 +1,7 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 import 'dart:async';
 import 'dart:io';
 
@@ -7,20 +11,29 @@ import 'package:flutter/services.dart';
 class SharePayload {
   final String? text;
   final List<String> imagePaths;
+  final List<String> videoPaths;
+  final List<String> audioPaths;
 
-  const SharePayload({this.text, this.imagePaths = const []});
+  const SharePayload({
+    this.text,
+    this.imagePaths = const [],
+    this.videoPaths = const [],
+    this.audioPaths = const [],
+  });
 
-  void deleteImages() {
-    for (final path in imagePaths) {
+  bool get hasMedia =>
+      imagePaths.isNotEmpty || videoPaths.isNotEmpty || audioPaths.isNotEmpty;
+
+  void deleteMedia() {
+    final paths = [...imagePaths, ...videoPaths, ...audioPaths];
+    for (final path in paths) {
       try {
         File(path).deleteSync();
       } on FileSystemException {
         continue;
       }
     }
-    for (final directory in {
-      for (final path in imagePaths) File(path).parent
-    }) {
+    for (final directory in {for (final path in paths) File(path).parent}) {
       try {
         directory.deleteSync();
       } on FileSystemException {
@@ -32,13 +45,18 @@ class SharePayload {
   @visibleForTesting
   static SharePayload? fromMap(Map<Object?, Object?>? map) {
     if (map == null) return null;
-    final text = map['text'] as String?;
-    final imagePaths = [
-      for (final path in (map['imagePaths'] as List<Object?>? ?? const []))
-        path as String,
-    ];
-    if (text == null && imagePaths.isEmpty) return null;
-    return SharePayload(text: text, imagePaths: imagePaths);
+    List<String> paths(String key) => [
+          for (final path in (map[key] as List<Object?>? ?? const []))
+            path as String,
+        ];
+    final payload = SharePayload(
+      text: map['text'] as String?,
+      imagePaths: paths('imagePaths'),
+      videoPaths: paths('videoPaths'),
+      audioPaths: paths('audioPaths'),
+    );
+    if (payload.text == null && !payload.hasMedia) return null;
+    return payload;
   }
 }
 

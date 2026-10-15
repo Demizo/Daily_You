@@ -1,3 +1,7 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 // Generates lib/utils/generated/tag_icon_registry.dart from
 // lib/utils/tag_icons.yaml. Run with:
 //   dart run tool/generate_tag_icons.dart

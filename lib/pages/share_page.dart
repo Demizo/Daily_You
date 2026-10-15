@@ -1,18 +1,24 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 import 'dart:io';
 
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/models/entry.dart';
-import 'package:daily_you/models/image.dart';
+import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/pages/edit_entry_page.dart';
 import 'package:daily_you/providers/entries_provider.dart';
-import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/day_menu.dart';
-import 'package:daily_you/widgets/entry_image_actions.dart';
-import 'package:daily_you/widgets/image_grid.dart';
+import 'package:daily_you/widgets/entry_attachment_actions.dart';
+import 'package:daily_you/widgets/attachment_tile_background.dart';
+import 'package:daily_you/widgets/attachment_grid.dart';
+import 'package:daily_you/widgets/video_thumbnail_cache.dart';
 import 'package:daily_you/widgets/large_entry_card_widget.dart';
 import 'package:daily_you/widgets/vertical_calendar.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:share_receiver/share_receiver.dart';
 
 class SharePage extends StatefulWidget {
@@ -30,7 +36,7 @@ class _SharePageState extends State<SharePage> {
 
   @override
   void dispose() {
-    widget.payload.deleteImages();
+    widget.payload.deleteMedia();
     _scrollController.dispose();
     super.dispose();
   }
@@ -82,27 +88,39 @@ class _SharePageState extends State<SharePage> {
 
   Future<void> _openEditor(DateTime day, Entry? entry) async {
     setState(() => _opening = true);
-    final List<String> imageNames;
+    final newAttachments = <NewAttachment>[];
     try {
-      imageNames =
-          await EntryImageActions.importSharedImages(widget.payload.imagePaths);
+      final payload = widget.payload;
+      newAttachments
+        ..addAll(
+            await EntryAttachmentActions.importSharedImages(payload.imagePaths))
+        ..addAll(
+            await EntryAttachmentActions.importSharedVideos(payload.videoPaths))
+        ..addAll(
+            await EntryAttachmentActions.importSharedAudio(payload.audioPaths));
     } catch (_) {
+      await EntryAttachmentActions.deleteStoredAttachments(newAttachments);
       if (mounted) setState(() => _opening = false);
       rethrow;
     }
-    if (!mounted) return;
+    if (!mounted) {
+      await EntryAttachmentActions.deleteStoredAttachments(newAttachments);
+      return;
+    }
 
     final page = entry == null
         ? AddEditEntryPage(
             overrideCreateDate: TimeManager.currentTimeOnDifferentDate(day)
                 .copyWith(isUtc: false),
-            images: EntryImage.appendRanked(const [], imageNames, entryId: -1),
+            attachments: EntryAttachment.appendRanked(const [], newAttachments,
+                entryId: -1),
             sharedText: widget.payload.text,
           )
         : AddEditEntryPage(
             entry: entry,
-            images: EntryImage.appendRanked(
-                EntryImagesProvider.instance.getForEntry(entry), imageNames,
+            attachments: EntryAttachment.appendRanked(
+                EntryAttachmentsProvider.instance.getForEntry(entry),
+                newAttachments,
                 entryId: entry.id!),
             sharedText: widget.payload.text,
           );
@@ -112,23 +130,41 @@ class _SharePageState extends State<SharePage> {
     ));
   }
 
+  Widget _previewTile(String path) {
+    final payload = widget.payload;
+    if (payload.videoPaths.contains(path)) {
+      final cache = VideoThumbnailCache.instance;
+      return VideoTileBackground(
+        id: path,
+        peek: () => cache.peekForPath(path),
+        load: () => cache.getThumbnailForPath(path),
+      );
+    }
+    if (payload.audioPaths.contains(path)) {
+      return AudioTileBackground(seed: path.hashCode);
+    }
+    return Image.file(File(path), fit: BoxFit.cover, cacheWidth: 500);
+  }
+
   Widget _buildPreview() {
-    final text = widget.payload.text;
+    final payload = widget.payload;
+    final text = payload.text;
     final hasText = text != null && text.isNotEmpty;
+    final mediaPaths = [
+      ...payload.imagePaths,
+      ...payload.videoPaths,
+      ...payload.audioPaths,
+    ];
     final card = LargeCard(
-      media: widget.payload.imagePaths.isEmpty
+      media: mediaPaths.isEmpty
           ? null
-          : ImageGrid.fromPaths(
-              imagePaths: widget.payload.imagePaths,
-              imageBuilder: (path) => Image.file(
-                File(path),
-                fit: BoxFit.cover,
-                cacheWidth: 500,
-              ),
+          : AttachmentGrid.fromPaths(
+              attachmentPaths: mediaPaths,
+              pathTileBuilder: _previewTile,
             ),
       body: hasText ? LargeCard.markdownBody(text) : null,
     );
-    if (widget.payload.imagePaths.isEmpty || hasText) return card;
+    if (mediaPaths.isEmpty || hasText) return card;
     return Center(child: AspectRatio(aspectRatio: 1, child: card));
   }
 

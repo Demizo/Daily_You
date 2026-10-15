@@ -1,21 +1,25 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 import 'dart:io';
 
-import 'package:daily_you/config_provider.dart';
-import 'package:daily_you/database/image_storage.dart';
+import 'package:daily_you/database/attachment_storage.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/storage/external_sync_health.dart';
+import 'package:daily_you/storage/external_sync_settings.dart';
 import 'package:daily_you/storage/file_store.dart';
 import 'package:daily_you/storage/local_file_store.dart';
-import 'package:daily_you/storage/storage_picker.dart';
+import 'package:daily_you/storage/sync_item.dart';
 import 'package:daily_you/utils/operation_outcome.dart';
 import 'package:daily_you/utils/generated/tag_icon_registry.dart';
 import 'package:daily_you/models/entry.dart';
-import 'package:daily_you/models/image.dart';
+import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/models/tag_category.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:daily_you/providers/entries_provider.dart';
-import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/providers/templates_provider.dart';
 import 'package:easy_debounce/easy_debounce.dart';
@@ -25,6 +29,17 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
+
+class DatabaseNewerThanAppException implements Exception {
+  final int databaseVersion;
+
+  const DatabaseNewerThanAppException(this.databaseVersion);
+
+  @override
+  String toString() =>
+      'Database schema version $databaseVersion is newer than the supported '
+      'version ${AppDatabase.schemaVersion}';
+}
 
 class AppDatabase {
   static final AppDatabase instance = AppDatabase._init();
@@ -44,6 +59,8 @@ class AppDatabase {
   /// [init] but failed.
   bool migrationFailed = false;
 
+  bool databaseReplacedThisSession = false;
+
   static Database? _database;
   Database? get database => _database;
 
@@ -54,13 +71,16 @@ class AppDatabase {
 
   FileStore get internalStore => LocalFileStore(dirname(_internalPath!));
 
-  FileStore? get externalStore =>
-      usingExternalLocation() ? FileStore.external(getExternalPath()) : null;
+  FileStore? get externalStore {
+    final location = ExternalSyncSettings.load().location(SyncItem.logs);
+    return location == null ? null : FileStore.external(location.uri);
+  }
 
   Future<bool> init(
       {bool forceWithoutSync = false, bool allowMigration = true}) async {
     _internalPath = await getInternalPath();
     migrationFailed = false;
+    databaseReplacedThisSession = false;
     bool success = true;
 
     if (Platform.isAndroid && allowMigration) {
@@ -126,12 +146,18 @@ class AppDatabase {
     }
   }
 
+  static const schemaVersion = 6;
+
   Future<void> open() async {
     _database = await openDatabase(_internalPath!,
-        version: 5, onCreate: _createDatabase, onUpgrade: _onUpgrade);
+        version: schemaVersion,
+        onCreate: _createDatabase,
+        onUpgrade: onUpgrade,
+        onDowngrade: (db, oldVersion, newVersion) =>
+            throw DatabaseNewerThanAppException(oldVersion));
 
     await EntriesProvider.instance.load();
-    await EntryImagesProvider.instance.load();
+    await EntryAttachmentsProvider.instance.load();
     await TemplatesProvider.instance.load();
     await TagsProvider.instance.load();
   }
@@ -139,7 +165,29 @@ class AppDatabase {
   Future<void> close() async {
     final db = _database!;
     _database = null;
-    db.close();
+    await db.close();
+  }
+
+  Future<void> replaceDatabase(File replacement) async {
+    const previousName = '$databaseFileName.previous';
+    final store = LocalFileStore(dirname(_internalPath!));
+    await close();
+    var movedAside = false;
+    try {
+      await store.delete(previousName);
+      movedAside = await store.rename(databaseFileName, previousName);
+      await store.writeAtomically(databaseFileName, (temporary) async {
+        await replacement.copy(temporary.path);
+        return true;
+      });
+      await open();
+    } catch (_) {
+      if (_database != null) await close();
+      if (movedAside) await store.rename(previousName, databaseFileName);
+      await open();
+      rethrow;
+    }
+    await store.delete(previousName);
   }
 
   Future<bool> _validateSqliteDatabase(String path) async {
@@ -153,6 +201,18 @@ class AppDatabase {
       _logger.warning(
           'Database integrity check failed for $path', error, stackTrace);
       return false;
+    }
+  }
+
+  Future<bool> canOpen(String path) async {
+    if (!await _validateSqliteDatabase(path)) return false;
+    final db = await openDatabase(path, readOnly: true);
+    try {
+      final version = await db.getVersion();
+      if (version > schemaVersion) throw DatabaseNewerThanAppException(version);
+      return version > 0 && await _tableExists(db, entriesTable);
+    } finally {
+      await db.close();
     }
   }
 
@@ -171,9 +231,8 @@ class AppDatabase {
     return false;
   }
 
-  bool usingExternalLocation() {
-    return ConfigProvider.instance.get(Settings.useExternalDb);
-  }
+  bool usingExternalLocation() =>
+      ExternalSyncSettings.load().location(SyncItem.logs) != null;
 
   Future<String> getInternalPath() async {
     final basePath = await getApplicationSupportDirectory();
@@ -181,72 +240,37 @@ class AppDatabase {
     return join(basePath.path, databaseFileName);
   }
 
-  String getExternalPath() {
-    return ConfigProvider.instance.get(Settings.externalDbUri);
-  }
-
   /// Return whether the app has permission to access the external location
   Future<bool> hasExternalLocationPermission() async {
     return await externalStore?.isAvailable() ?? false;
   }
 
-  Future<OperationOutcome> selectExternalLocation(
-      Function(String) updateStatus) async {
-    bool databaseUpdated = false;
+  Future<OperationOutcome> syncFromExternalLocation() async {
     var outcome = const OperationOutcome.succeeded();
-
-    // Save old external path
-    var oldExternalPath = getExternalPath();
-    var oldUseExternalPath = usingExternalLocation();
-    await _database!.close();
+    await close();
 
     try {
-      var selectedDirectory = await StoragePicker.pickDirectory();
-      if (selectedDirectory == null) {
-        outcome = const OperationOutcome.cancelled();
-      } else {
-        await ConfigProvider.instance
-            .set(Settings.externalDbUri, selectedDirectory.uri);
-        await ConfigProvider.instance.set(Settings.useExternalDb, true);
-
-        // Sync with external folder
-        databaseUpdated = await _syncWithExternalDatabase(forceOverwrite: true);
-        if (!databaseUpdated) outcome = const OperationOutcome.failed();
+      if (!await _syncWithExternalDatabase(forceOverwrite: true)) {
+        outcome = const OperationOutcome.failed();
       }
     } catch (error, stackTrace) {
       _logger.severe(
-          'Selecting an external database location failed', error, stackTrace);
+          'Syncing with the external database failed', error, stackTrace);
       outcome = OperationOutcome.failed(error);
     }
 
-    // Cleanup
     await open();
-    if (!databaseUpdated) {
-      // Restore state after failure
-      await ConfigProvider.instance
-          .set(Settings.externalDbUri, oldExternalPath);
-      await ConfigProvider.instance
-          .set(Settings.useExternalDb, oldUseExternalPath);
-    } else {
-      try {
-        if (ImageStorage.instance.usingExternalLocation() &&
-            await ImageStorage.instance.hasExternalLocationPermission()) {
-          await ImageStorage.instance
-              .syncImageFolder(true, updateStatus: updateStatus);
-        }
-      } catch (error, stackTrace) {
-        _logger.severe(
-            'Syncing images after the database location changed failed',
-            error,
-            stackTrace);
-        outcome = OperationOutcome.failed(error);
-      }
-    }
     return outcome;
   }
 
-  Future<void> resetExternalLocation() async {
-    await ConfigProvider.instance.set(Settings.useExternalDb, false);
+  Future<bool> hasExternalDatabase(String uri) async {
+    try {
+      return await FileStore.external(uri).exists(databaseFileName);
+    } catch (error, stackTrace) {
+      _logger.warning(
+          'Could not look for a database in $uri', error, stackTrace);
+      return true;
+    }
   }
 
   /// Overwrite the external database with local changes
@@ -301,12 +325,19 @@ class AppDatabase {
       await internalStore.write(temporaryName, externalBytes);
 
       final temporaryPath = join(dirname(_internalPath!), temporaryName);
-      if (await _validateSqliteDatabase(temporaryPath)) {
-        return internalStore.rename(temporaryName, databaseFileName);
+      var accepted = false;
+      try {
+        accepted = await canOpen(temporaryPath);
+        if (accepted) {
+          final replaced =
+              await internalStore.rename(temporaryName, databaseFileName);
+          if (replaced) databaseReplacedThisSession = true;
+          return replaced;
+        }
+        return false;
+      } finally {
+        if (!accepted) await internalStore.delete(temporaryName);
       }
-
-      await internalStore.delete(temporaryName);
-      return false;
     }
     return true;
   }
@@ -326,6 +357,7 @@ class AppDatabase {
   // SQLite Database Actions
 
   Future _createDatabase(Database db, int version) async {
+    databaseReplacedThisSession = true;
     _database = db;
     await createSchema(db);
     await TemplatesProvider.instance.createDefaultTemplates();
@@ -353,13 +385,14 @@ CREATE TABLE $templatesTable (
 )
 ''');
     await db.execute('''
-CREATE TABLE $imagesTable (
-    ${EntryImageFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    ${EntryImageFields.entryId} INTEGER NOT NULL,
-    ${EntryImageFields.imgPath} TEXT NOT NULL,
-    ${EntryImageFields.imgRank} INTEGER NOT NULL,
-    ${EntryImageFields.timeCreate} DATETIME NOT NULL DEFAULT (DATETIME('now')),
-    FOREIGN KEY (${EntryImageFields.entryId}) REFERENCES $entriesTable (id)
+CREATE TABLE $attachmentsTable (
+    ${EntryAttachmentFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    ${EntryAttachmentFields.entryId} INTEGER NOT NULL,
+    ${EntryAttachmentFields.type} TEXT NOT NULL,
+    ${EntryAttachmentFields.filePath} TEXT NOT NULL,
+    ${EntryAttachmentFields.rank} INTEGER NOT NULL,
+    ${EntryAttachmentFields.timeCreate} DATETIME NOT NULL DEFAULT (DATETIME('now')),
+    FOREIGN KEY (${EntryAttachmentFields.entryId}) REFERENCES $entriesTable (id)
 )
 ''');
 
@@ -394,17 +427,19 @@ CREATE TABLE $imagesTable (
 
     final imageBytes =
         await rootBundle.load('assets/daily_you_First_Steps.webp');
-    final imageName = await ImageStorage.instance.create(
+    final imageName = await AttachmentStorage.instance.create(
       'daily_you_First_Steps.webp',
       imageBytes.buffer.asUint8List(),
+      AttachmentType.image,
       currTime: now,
     );
     if (imageName != null) {
-      await EntryImagesProvider.instance.add(
-        EntryImage(
+      await EntryAttachmentsProvider.instance.add(
+        EntryAttachment(
           entryId: welcomeEntry.id,
-          imgPath: imageName,
-          imgRank: 0,
+          type: AttachmentType.image,
+          filePath: imageName,
+          rank: 0,
           timeCreate: now,
         ),
         skipUpdate: true,
@@ -491,7 +526,8 @@ CREATE TABLE $templateTagsTable (
 ''');
   }
 
-  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+  @visibleForTesting
+  Future<void> onUpgrade(Database db, int oldVersion, int newVersion) async {
     _database = db;
     // In this case, oldVersion is 1, newVersion is 2
     if (oldVersion == 1) {
@@ -509,19 +545,19 @@ CREATE TABLE $templatesTable (
     }
     if (oldVersion <= 2) {
       await db.execute('''
-CREATE TABLE $imagesTable (
-    ${EntryImageFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    ${EntryImageFields.entryId} INTEGER NOT NULL,
-    ${EntryImageFields.imgPath} TEXT NOT NULL,
-    ${EntryImageFields.imgRank} INTEGER NOT NULL,
-    ${EntryImageFields.timeCreate} DATETIME NOT NULL DEFAULT (DATETIME('now')),
-    FOREIGN KEY (${EntryImageFields.entryId}) REFERENCES $entriesTable (id)
+CREATE TABLE entry_images (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    entry_id INTEGER NOT NULL,
+    img_path TEXT NOT NULL,
+    img_rank INTEGER NOT NULL,
+    time_create DATETIME NOT NULL DEFAULT (DATETIME('now')),
+    FOREIGN KEY (entry_id) REFERENCES $entriesTable (id)
 )
 ''');
       await db.transaction((txn) async {
         await txn.execute('''
--- Step 1: Insert the non-null imgPath entries into the imagesTable
-INSERT INTO $imagesTable (${EntryImageFields.entryId}, ${EntryImageFields.imgPath}, ${EntryImageFields.imgRank}, ${EntryImageFields.timeCreate})
+-- Step 1: Insert the non-null imgPath entries into entry_images
+INSERT INTO entry_images (entry_id, img_path, img_rank, time_create)
 SELECT ${EntryFields.id}, $deprecatedImgPath, 0, ${EntryFields.timeCreate}
 FROM $entriesTable
 WHERE $deprecatedImgPath IS NOT NULL;
@@ -563,5 +599,43 @@ DROP TABLE old_entries;
     if (oldVersion <= 4) {
       await _createTemplateTagTable(db);
     }
+    // An older app that pulled a version 6 database relabels it as version 5
+    if (oldVersion <= 5 && !await _tableExists(db, attachmentsTable)) {
+      await db.execute('''
+CREATE TABLE $attachmentsTable (
+    ${EntryAttachmentFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    ${EntryAttachmentFields.entryId} INTEGER NOT NULL,
+    ${EntryAttachmentFields.type} TEXT NOT NULL,
+    ${EntryAttachmentFields.filePath} TEXT NOT NULL,
+    ${EntryAttachmentFields.rank} INTEGER NOT NULL,
+    ${EntryAttachmentFields.timeCreate} DATETIME NOT NULL DEFAULT (DATETIME('now')),
+    FOREIGN KEY (${EntryAttachmentFields.entryId}) REFERENCES $entriesTable (id)
+)
+''');
+      await db.transaction((txn) async {
+        await txn.execute('''
+INSERT INTO $attachmentsTable (${EntryAttachmentFields.id}, ${EntryAttachmentFields.entryId}, ${EntryAttachmentFields.type}, ${EntryAttachmentFields.filePath}, ${EntryAttachmentFields.rank}, ${EntryAttachmentFields.timeCreate})
+SELECT id, entry_id, 'image', img_path, img_rank, time_create
+FROM entry_images
+WHERE img_path IS NOT NULL AND img_path != ''
+ORDER BY id;
+    ''');
+        await txn.execute(
+            "DELETE FROM sqlite_sequence WHERE name = '$attachmentsTable';");
+        await txn.execute('''
+INSERT INTO sqlite_sequence (name, seq)
+SELECT '$attachmentsTable', seq FROM sqlite_sequence WHERE name = 'entry_images';
+    ''');
+        await txn.execute('DROP TABLE entry_images;');
+      });
+    }
+  }
+
+  Future<bool> _tableExists(Database db, String name) async {
+    final rows = await db.query('sqlite_master',
+        columns: ['name'],
+        where: "type = 'table' AND name = ?",
+        whereArgs: [name]);
+    return rows.isNotEmpty;
   }
 }

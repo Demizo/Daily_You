@@ -1,3 +1,7 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -6,7 +10,7 @@ import 'package:daily_you/language_option.dart';
 import 'package:daily_you/storage/secret_store.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:easy_debounce/easy_debounce.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
@@ -25,12 +29,16 @@ class Setting<T> {
 }
 
 class Settings {
-  static const configVersion = Setting<String>("configVersion", "2");
+  static const configVersion = Setting<String>("configVersion", "3");
   static const theme = Setting<String>("theme", "system");
-  static const useExternalDb = Setting<bool>("useExternalDb", false);
-  static const externalDbUri = Setting<String>("externalDbUri", "");
-  static const useExternalImg = Setting<bool>("useExternalImg", false);
-  static const externalImgUri = Setting<String>("externalImgUri", "");
+  static const syncLogs = Setting<bool>("syncLogs", false);
+  static const syncImages = Setting<bool>("syncImages", false);
+  static const syncVideo = Setting<bool>("syncVideo", false);
+  static const syncAudio = Setting<bool>("syncAudio", false);
+  static const imageSyncFolderUri = Setting<String>("imageSyncFolderUri", "");
+  static const videoSyncFolderUri = Setting<String>("videoSyncFolderUri", "");
+  static const logSyncFolderUri = Setting<String>("logSyncFolderUri", "");
+  static const audioSyncFolderUri = Setting<String>("audioSyncFolderUri", "");
   static const startingDayOfWeek =
       Setting<String>("startingDayOfWeek", "system");
   static const galleryPageViewMode =
@@ -64,6 +72,12 @@ class Settings {
   static const defaultTemplate = Setting<int>("defaultTemplate", -1);
   static const imageQualityLevel =
       Setting<String>("imageQualityLevel", ImageQuality.medium);
+  static const audioQualityLevel =
+      Setting<String>("audioQualityLevel", AudioQuality.medium);
+  static const videoQualityLevel =
+      Setting<String>("videoQualityLevel", VideoQuality.medium);
+  static const suppressLargeAttachmentWarning =
+      Setting<bool>("suppressLargeAttachmentWarning", false);
   static const overrideLanguage =
       Setting<Map<String, dynamic>?>("overrideLanguage", null);
   static const showFlashbacks = Setting<bool>("showFlashbacks", true);
@@ -127,10 +141,14 @@ class Settings {
   static const List<Setting<Object?>> all = [
     configVersion,
     theme,
-    useExternalDb,
-    externalDbUri,
-    useExternalImg,
-    externalImgUri,
+    syncLogs,
+    logSyncFolderUri,
+    syncImages,
+    syncVideo,
+    syncAudio,
+    imageSyncFolderUri,
+    videoSyncFolderUri,
+    audioSyncFolderUri,
     startingDayOfWeek,
     galleryPageViewMode,
     veryHappyIcon,
@@ -155,6 +173,9 @@ class Settings {
     dismissedNotificationOnboarding,
     defaultTemplate,
     imageQualityLevel,
+    audioQualityLevel,
+    videoQualityLevel,
+    suppressLargeAttachmentWarning,
     overrideLanguage,
     showFlashbacks,
     excludeBadDaysFromFlashbacks,
@@ -207,6 +228,18 @@ class ImageQuality {
   static const String low = "low";
 }
 
+class AudioQuality {
+  static const String high = "high";
+  static const String medium = "medium";
+  static const String low = "low";
+}
+
+class VideoQuality {
+  static const String high = "high";
+  static const String medium = "medium";
+  static const String low = "low";
+}
+
 class ConfigProvider with ChangeNotifier {
   static final ConfigProvider instance = ConfigProvider._init();
 
@@ -235,6 +268,20 @@ class ConfigProvider with ChangeNotifier {
     ImageQuality.high: 2100.0,
     ImageQuality.medium: 1600.0,
     ImageQuality.low: 1024.0,
+  };
+
+  static final audioQualityBitRateMapping = {
+    AudioQuality.low: 32000,
+    AudioQuality.medium: 64000,
+    AudioQuality.high: 128000,
+  };
+
+  static const audioSampleRate = 44100;
+
+  static final audioQualityChannelsMapping = {
+    AudioQuality.low: 1,
+    AudioQuality.medium: 1,
+    AudioQuality.high: 2,
   };
 
   T get<T>(Setting<T> setting) {
@@ -272,6 +319,7 @@ class ConfigProvider with ChangeNotifier {
     await loadSecureConfig();
     await migrateSecretToSecretStore(Settings.passwordHash);
     await loadSecretStoreConfig();
+    await migrateSyncSettings();
     await _pruneUnknownKeys();
   }
 
@@ -300,6 +348,36 @@ class ConfigProvider with ChangeNotifier {
     } catch (error, stackTrace) {
       _logger.severe('Config migration failed', error, stackTrace);
     }
+  }
+
+  Future<void> migrateSyncSettings() async {
+    if (_config[Settings.configVersion.key] ==
+        Settings.configVersion.defaultValue) {
+      return;
+    }
+
+    final logFolder = _legacyFolder('useExternalDb', 'externalDbUri');
+    final imageFolder = _legacyFolder('useExternalImg', 'externalImgUri');
+    if (logFolder != null) {
+      _config[Settings.logSyncFolderUri.key] = logFolder;
+      _config[Settings.syncLogs.key] = true;
+      _config[Settings.syncVideo.key] = true;
+      _config[Settings.syncAudio.key] = true;
+    }
+    if (imageFolder != null) {
+      _config[Settings.syncImages.key] = true;
+      _config[Settings.imageSyncFolderUri.key] = imageFolder;
+    }
+
+    _config[Settings.configVersion.key] = Settings.configVersion.defaultValue;
+    await writeConfig();
+  }
+
+  String? _legacyFolder(String enabledKey, String uriKey) {
+    final uri = _config[uriKey];
+    return _config[enabledKey] == true && uri is String && uri.isNotEmpty
+        ? uri
+        : null;
   }
 
   Future<void> _pruneUnknownKeys() async {

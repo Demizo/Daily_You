@@ -1,7 +1,12 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
+import 'package:daily_you/layouts/wide_screen.dart';
 import 'package:daily_you/widgets/editor_action_bar.dart';
 import 'package:daily_you/widgets/entry_text_field.dart';
 import 'package:daily_you/widgets/markdown_preview_controller.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class EntryTextEditor extends StatefulWidget {
   final String text;
@@ -40,8 +45,7 @@ class _EntryTextEditorState extends State<EntryTextEditor> {
 
   @override
   Widget build(BuildContext context) {
-    final isWide =
-        MediaQuery.sizeOf(context).width >= EditorActionBar.wideBreakpoint;
+    final isWide = isWideScreen(context);
     final showExpandButton = isWide && widget.onExpand != null;
 
     return Stack(

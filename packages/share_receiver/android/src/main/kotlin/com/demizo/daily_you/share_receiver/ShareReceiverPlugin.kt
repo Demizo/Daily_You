@@ -1,3 +1,7 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 package com.demizo.daily_you.share_receiver
 
 import android.content.Context
@@ -90,9 +94,9 @@ class ShareReceiverPlugin : FlutterPlugin, ActivityAware, NewIntentListener, Met
         val text = share.getCharSequenceExtra(Intent.EXTRA_TEXT)?.toString()
         val uris = streamUris(share)
         CoroutineScope(Dispatchers.IO).launch {
-            val imagePaths = copyImagesToCache(uris)
+            val pathsByKind = copyMediaToCache(uris)
             withContext(Dispatchers.Main) {
-                result.success(mapOf("text" to text, "imagePaths" to imagePaths))
+                result.success(mapOf("text" to text) + pathsByKind.mapKeys { "${it.key}Paths" })
             }
         }
     }
@@ -105,26 +109,26 @@ class ShareReceiverPlugin : FlutterPlugin, ActivityAware, NewIntentListener, Met
         return listOfNotNull(IntentCompat.getParcelableExtra(share, Intent.EXTRA_STREAM, Uri::class.java))
     }
 
-    // Each share gets its own directory so a second share cannot delete images the first still shows.
-    private fun copyImagesToCache(uris: List<Uri>): List<String> {
-        val root = File(context.cacheDir, "shared_images")
+    private fun copyMediaToCache(uris: List<Uri>): Map<String, List<String>> {
+        val root = File(context.cacheDir, "shared_media")
         deleteStaleShares(root)
         val directory by lazy { File(root, UUID.randomUUID().toString()).also { it.mkdirs() } }
-        val paths = mutableListOf<String>()
+        val pathsByKind = MEDIA_KINDS.associateWith { mutableListOf<String>() }
         for ((index, uri) in uris.withIndex()) {
             try {
-                val mimeType = context.contentResolver.getType(uri) ?: continue
-                if (!mimeType.startsWith("image/")) continue
-                val target = File(directory, "${index}_${displayName(uri, mimeType)}")
+                val displayName = displayName(uri)
+                val mimeType = mimeType(uri, displayName) ?: continue
+                val kind = MEDIA_KINDS.firstOrNull { mimeType.startsWith("$it/") } ?: continue
+                val target = File(File(directory, index.toString()).also { it.mkdirs() }, fileName(displayName, mimeType))
                 context.contentResolver.openInputStream(uri)?.use { input ->
                     target.outputStream().use { output -> input.copyTo(output) }
                 } ?: continue
-                paths.add(target.path)
+                pathsByKind.getValue(kind).add(target.path)
             } catch (error: Exception) {
-                Log.w(TAG, "Skipping shared image that could not be copied: $uri", error)
+                Log.w(TAG, "Skipping shared file that could not be copied: $uri", error)
             }
         }
-        return paths
+        return pathsByKind
     }
 
     private fun deleteStaleShares(root: File) {
@@ -132,19 +136,30 @@ class ShareReceiverPlugin : FlutterPlugin, ActivityAware, NewIntentListener, Met
         root.listFiles()?.filter { it.lastModified() < cutoff }?.forEach { it.deleteRecursively() }
     }
 
-    private fun displayName(uri: Uri, mimeType: String): String {
-        val name = context.contentResolver
-            .query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)
-            ?.use { cursor -> if (cursor.moveToFirst()) cursor.getString(0) else null }
-            ?.replace('/', '_')
-            ?: "shared_image"
+    private fun displayName(uri: Uri): String? = context.contentResolver
+        .query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)
+        ?.use { cursor -> if (cursor.moveToFirst()) cursor.getString(0) else null }
+        ?.replace('/', '_')
+
+    private fun mimeType(uri: Uri, displayName: String?): String? {
+        val reported = context.contentResolver.getType(uri)
+        if (reported != null && reported != GENERIC_MIME_TYPE) return reported
+        val extension = displayName?.substringAfterLast('.', "")?.lowercase().orEmpty()
+        return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension) ?: reported
+    }
+
+    private fun fileName(displayName: String?, mimeType: String): String {
+        val name = displayName ?: "shared_file"
         if (name.substringAfterLast('.', "").isNotEmpty()) return name
-        val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType) ?: "jpg"
+        val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType) ?: mimeType.substringAfter('/')
         return "$name.$extension"
     }
 
     private companion object {
         const val TAG = "ShareReceiver"
         const val STALE_SHARE_MILLISECONDS = 24 * 60 * 60 * 1000L
+        const val GENERIC_MIME_TYPE = "application/octet-stream"
+
+        val MEDIA_KINDS = listOf("image", "video", "audio")
     }
 }

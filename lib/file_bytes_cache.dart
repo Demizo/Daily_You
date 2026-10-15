@@ -1,3 +1,7 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 import 'dart:typed_data';
 
 class FileBytesCache {
@@ -22,6 +26,15 @@ class FileBytesCache {
   void put(String key, Uint8List value) {
     final valueSize = value.lengthInBytes;
 
+    if (valueSize > maxCacheSize) {
+      final stale = _cache.remove(key);
+      if (stale != null) {
+        _currentSize -= stale.lengthInBytes;
+        _usageOrder.remove(key);
+      }
+      return;
+    }
+
     // If the key already exists, update the value
     if (_cache.containsKey(key)) {
       _currentSize -= _cache[key]!.lengthInBytes; // Subtract old size
@@ -45,6 +58,13 @@ class FileBytesCache {
     _cache[key] = value;
     _usageOrder.add(key);
     _currentSize += valueSize;
+  }
+
+  void remove(String key) {
+    final removed = _cache.remove(key);
+    if (removed == null) return;
+    _currentSize -= removed.lengthInBytes;
+    _usageOrder.remove(key);
   }
 
   void clear() {

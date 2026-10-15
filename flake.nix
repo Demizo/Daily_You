@@ -1,7 +1,7 @@
 {
   description = "Flutter";
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
   };
   outputs =
@@ -21,7 +21,7 @@
           };
         };
         buildToolsVersion = "35.0.1";
-        platformToolsVersion = "35.0.2";
+        platformToolsVersion = "37.0.1";
         ndkVersion = "28.2.13676358";
         androidEnv = pkgs.androidenv.override { licenseAccepted = true; };
         androidComposition = androidEnv.composeAndroidPackages {
@@ -30,12 +30,14 @@
           cmakeVersions = [ "3.22.1" ];
           includeNDK = true;
           buildToolsVersions = [
+            "36.0.0"
             buildToolsVersion
             "35.0.0"
             "34.0.0"
             "33.0.1"
           ];
           platformVersions = [
+            "37"
             "36"
             "35"
             "34"
@@ -66,7 +68,8 @@
             JAVA_HOME = jdk17.home;
             FLUTTER_ROOT = flutter;
             DART_ROOT = "${flutter}/bin/cache/dart-sdk";
-            LD_LIBRARY_PATH = lib.makeLibraryPath [ sqlite libsecret ];
+            LD_LIBRARY_PATH = lib.makeLibraryPath [ sqlite libsecret mpv-unwrapped alsa-lib ];
+            CMAKE_PREFIX_PATH = lib.makeSearchPath "" [ libjpeg.dev libjpeg.out ];
             GSETTINGS_SCHEMA_DIR = lib.concatStringsSep ":" (
               map (pkg: "${pkg}/share/gsettings-schemas/${pkg.name}/glib-2.0/schemas") [
                 gsettings-desktop-schemas
@@ -85,6 +88,13 @@
               # X Server for screenshot generation
               xvfb
               xvfb-run
+              alsa-lib
+              pulseaudio
+              ffmpeg
+              libjpeg
+              mpv-unwrapped
+              libepoxy
+              libsysprof-capture
             ];
           };
       }

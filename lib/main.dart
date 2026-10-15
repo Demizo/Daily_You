@@ -1,3 +1,7 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
@@ -11,7 +15,7 @@ import 'package:daily_you/flashback_manager.dart';
 import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/pages/launch_page.dart';
 import 'package:daily_you/providers/entries_provider.dart';
-import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/providers/templates_provider.dart';
 import 'package:daily_you/time_manager.dart';
@@ -19,18 +23,20 @@ import 'package:daily_you/utils/auto_backup_schedule.dart';
 import 'package:daily_you/utils/backup_restore_utils.dart';
 import 'package:daily_you/utils/logging.dart';
 import 'package:dynamic_color/dynamic_color.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/layouts/mobile_scaffold.dart';
 import 'package:daily_you/layouts/responsive_layout.dart';
 import 'package:daily_you/theme_mode_provider.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:just_audio_media_kit/just_audio_media_kit.dart';
+import 'package:logging/logging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:statsfl/statsfl.dart';
-import 'package:time_range_picker/time_range_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:video_player_media_kit/video_player_media_kit.dart';
 import 'package:workmanager/workmanager.dart';
 
 const String _autoBackupPeriodicWorkName = 'auto_backup_periodic';
@@ -90,14 +96,25 @@ Future<bool> _runAutoBackupWithBoundedRetry() async {
   return false;
 }
 
+final Logger _alarmLogger = Logger('Alarm');
+
+Future<bool> _openDatabaseForAlarm() async {
+  try {
+    // Skip syncing and migration for the alarm background task
+    return await AppDatabase.instance
+        .init(forceWithoutSync: true, allowMigration: false);
+  } catch (error, stackTrace) {
+    _alarmLogger.warning('Could not open the database', error, stackTrace);
+    return false;
+  }
+}
+
 @pragma('vm:entry-point')
 void onThisDayCallbackDispatcher() async {
   WidgetsFlutterBinding.ensureInitialized();
   configureLogging();
   await ConfigProvider.instance.init();
-  // Skip syncing and migration for the alarm background task
-  final ready = await AppDatabase.instance
-      .init(forceWithoutSync: true, allowMigration: false);
+  final ready = await _openDatabaseForAlarm();
 
   if (ready) {
     final now = DateTime.now();
@@ -151,9 +168,7 @@ void callbackDispatcher() async {
   WidgetsFlutterBinding.ensureInitialized();
   configureLogging();
   await ConfigProvider.instance.init();
-  // Skip syncing and migration for the alarm background task
-  final ready = await AppDatabase.instance
-      .init(forceWithoutSync: true, allowMigration: false);
+  final ready = await _openDatabaseForAlarm();
 
   if (ready) {
     if (EntriesProvider.instance.getEntryForDate(DateTime.now()) == null ||
@@ -207,6 +222,8 @@ void main() async {
   }
   databaseFactory = databaseFactoryFfi;
   WidgetsFlutterBinding.ensureInitialized();
+  VideoPlayerMediaKit.ensureInitialized(linux: true, windows: true);
+  JustAudioMediaKit.ensureInitialized(linux: true, windows: true);
 
   configureLogging();
 
@@ -239,8 +256,8 @@ void main() async {
     ChangeNotifierProvider<EntriesProvider>(
       create: (_) => EntriesProvider.instance,
     ),
-    ChangeNotifierProvider<EntryImagesProvider>(
-      create: (_) => EntryImagesProvider.instance,
+    ChangeNotifierProvider<EntryAttachmentsProvider>(
+      create: (_) => EntryAttachmentsProvider.instance,
     ),
     ChangeNotifierProvider<TemplatesProvider>(
       create: (_) => TemplatesProvider.instance,
@@ -268,14 +285,13 @@ Future<void> setAlarm({bool firstSet = false}) async {
     }
   } else {
     final random = Random();
-    TimeRange timeRange = TimeManager.getReminderTimeRange();
+    final timeRange = TimeManager.getReminderTimeRange();
 
     Duration startTime =
-        TimeManager.addTimeOfDay(referenceTime, timeRange.startTime)
+        TimeManager.addTimeOfDay(referenceTime, timeRange.start)
             .difference(referenceTime);
-    Duration endTime =
-        TimeManager.addTimeOfDay(referenceTime, timeRange.endTime)
-            .difference(referenceTime);
+    Duration endTime = TimeManager.addTimeOfDay(referenceTime, timeRange.end)
+        .difference(referenceTime);
 
     if (endTime < startTime) {
       // Extend end time to next day
@@ -390,6 +406,17 @@ class MainApp extends StatefulWidget {
   State<MainApp> createState() => _MainAppState();
 }
 
+ThemeData _buildTheme(ColorScheme colorScheme,
+    {Color? scaffoldBackgroundColor}) {
+  return ThemeData(
+    useMaterial3: true,
+    materialTapTargetSize: MaterialTapTargetSize.padded,
+    colorScheme: colorScheme,
+    iconTheme: IconThemeData(color: colorScheme.onSurfaceVariant),
+    scaffoldBackgroundColor: scaffoldBackgroundColor,
+  );
+}
+
 class _MainAppState extends State<MainApp> {
   @override
   Widget build(BuildContext context) {
@@ -405,23 +432,17 @@ class _MainAppState extends State<MainApp> {
         // Use dynamic theme for seed color but do not inject chroma
         bool noChroma = (lightDynamic.primary.r == lightDynamic.primary.b) &&
             (lightDynamic.primary.b == lightDynamic.primary.g);
-        lightTheme = ThemeData(
-            useMaterial3: true,
-            materialTapTargetSize: MaterialTapTargetSize.padded,
-            colorScheme: ColorScheme.fromSeed(
-                seedColor: lightDynamic.primary,
-                primaryContainer: lightDynamic.primaryContainer,
-                dynamicSchemeVariant: noChroma
-                    ? DynamicSchemeVariant.fidelity
-                    : DynamicSchemeVariant.tonalSpot,
-                brightness: Brightness.light));
+        lightTheme = _buildTheme(ColorScheme.fromSeed(
+            seedColor: lightDynamic.primary,
+            primaryContainer: lightDynamic.primaryContainer,
+            dynamicSchemeVariant: noChroma
+                ? DynamicSchemeVariant.fidelity
+                : DynamicSchemeVariant.tonalSpot,
+            brightness: Brightness.light));
       } else {
-        lightTheme = ThemeData(
-            useMaterial3: true,
-            materialTapTargetSize: MaterialTapTargetSize.padded,
-            colorScheme: ColorScheme.fromSeed(
-                seedColor: themeModeProvider.accentColor,
-                brightness: Brightness.light));
+        lightTheme = _buildTheme(ColorScheme.fromSeed(
+            seedColor: themeModeProvider.accentColor,
+            brightness: Brightness.light));
       }
 
       if (themeModeProvider.usingSystemColor && darkDynamic != null) {
@@ -429,32 +450,23 @@ class _MainAppState extends State<MainApp> {
         // Use dynamic theme for seed color but do not inject chroma
         bool noChroma = (darkDynamic.primary.r == darkDynamic.primary.b) &&
             (darkDynamic.primary.b == darkDynamic.primary.g);
-        darkTheme = ThemeData(
-            useMaterial3: true,
-            materialTapTargetSize: MaterialTapTargetSize.padded,
-            colorScheme: ColorScheme.fromSeed(
-                seedColor: darkDynamic.primary,
-                primaryContainer: darkDynamic.primaryContainer,
-                dynamicSchemeVariant: noChroma
-                    ? DynamicSchemeVariant.fidelity
-                    : DynamicSchemeVariant.tonalSpot,
-                brightness: Brightness.dark));
+        darkTheme = _buildTheme(ColorScheme.fromSeed(
+            seedColor: darkDynamic.primary,
+            primaryContainer: darkDynamic.primaryContainer,
+            dynamicSchemeVariant: noChroma
+                ? DynamicSchemeVariant.fidelity
+                : DynamicSchemeVariant.tonalSpot,
+            brightness: Brightness.dark));
       } else {
-        darkTheme = ThemeData(
-          useMaterial3: true,
-          materialTapTargetSize: MaterialTapTargetSize.padded,
-          colorScheme: ColorScheme.fromSeed(
-              seedColor: themeModeProvider.accentColor,
-              brightness: Brightness.dark),
-        );
+        darkTheme = _buildTheme(ColorScheme.fromSeed(
+            seedColor: themeModeProvider.accentColor,
+            brightness: Brightness.dark));
       }
 
       // amoled override
       if (ConfigProvider.instance.get(Settings.theme) == 'amoled') {
-        darkTheme = ThemeData(
-            useMaterial3: true,
-            materialTapTargetSize: MaterialTapTargetSize.padded,
-            colorScheme: ColorScheme.fromSeed(
+        darkTheme = _buildTheme(
+            ColorScheme.fromSeed(
               seedColor: themeModeProvider.accentColor,
               brightness: Brightness.dark,
               surfaceContainerLowest: Colors.black,
@@ -492,9 +504,7 @@ class _MainAppState extends State<MainApp> {
                 debugShowCheckedModeBanner: false,
                 localizationsDelegates: <LocalizationsDelegate<dynamic>>[
                   AppLocalizations.delegate,
-                  CustomMaterialLocalizationsDelegate(),
-                  CustomCupertinoLocalizationsDelegate(),
-                  CustomWidgetsLocalizationsDelegate(),
+                  ...appLocalizationsDelegates,
                 ],
                 locale: configProvider.getOverrideLanguage(),
                 supportedLocales: [

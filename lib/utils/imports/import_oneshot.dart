@@ -1,9 +1,13 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 import 'dart:convert';
 
 import 'package:daily_you/models/entry.dart';
-import 'package:daily_you/models/image.dart';
+import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/providers/entries_provider.dart';
-import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/storage/storage_picker.dart';
 import 'package:daily_you/utils/imports/import_helpers.dart';
 import 'package:daily_you/utils/operation_outcome.dart';
@@ -49,11 +53,12 @@ Future<OperationOutcome> importFromOneShot(
                 timeModified: DateTime.now()),
             skipUpdate: true);
         if (entry['relativePath'] != null) {
-          await EntryImagesProvider.instance.add(
-              EntryImage(
+          await EntryAttachmentsProvider.instance.add(
+              EntryAttachment(
                   entryId: addedEntry.id,
-                  imgPath: entry['relativePath'],
-                  imgRank: 0,
+                  type: AttachmentType.image,
+                  filePath: entry['relativePath'],
+                  rank: 0,
                   timeCreate: DateTime.now()),
               skipUpdate: true);
         }

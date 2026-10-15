@@ -1,9 +1,13 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 import 'dart:ui' show lerpDouble;
 
 import 'package:daily_you/widgets/editor_action_bar/dock_metrics.dart';
 import 'package:daily_you/widgets/editor_action_bar/toolbar_entry.dart';
 import 'package:daily_you/widgets/editor_action_bar/toolbar_morph.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class ActionBarPill extends StatelessWidget {
   static const double _iconTintHandoff = 0.5;

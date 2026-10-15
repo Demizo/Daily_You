@@ -1,5 +1,10 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 import 'dart:async';
 
+import 'package:daily_you/layouts/wide_screen.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:daily_you/utils/text_editing.dart';
 import 'package:daily_you/widgets/editor_action_bar/action_bar_pill.dart';
@@ -9,10 +14,11 @@ import 'package:daily_you/widgets/editor_action_bar/toolbar_actions.dart';
 import 'package:daily_you/widgets/editor_action_bar/action_bar_toggle_button.dart';
 import 'package:daily_you/widgets/editor_action_bar/toolbar_entry.dart';
 import 'package:daily_you/widgets/editor_action_bar/toolbar_focus_restorer.dart';
+import 'package:daily_you/widgets/editor_action_bar/toolbar_menu_action.dart';
 import 'package:daily_you/widgets/editor_action_bar/toolbar_morph.dart';
 import 'package:daily_you/widgets/editor_action_bar/toolbar_overflow_popup.dart';
 import 'package:daily_you/widgets/template_select_popup.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 export 'package:daily_you/widgets/editor_action_bar/editor_action_bar_overlay.dart';
 export 'package:daily_you/widgets/editor_action_bar/toolbar_actions.dart'
@@ -39,9 +45,6 @@ class EditorActionBar extends StatefulWidget {
   /// Space host pages reserve so content doesn't sit behind the bar
   static double reservedHeight(BuildContext context) =>
       DockMetrics.reservedHeight(context);
-
-  /// Threshold for wide screen layout
-  static const double wideBreakpoint = 600.0;
 
   static const double _dividerWidth = 8.0;
 
@@ -106,8 +109,13 @@ class _EditorActionBarState extends State<EditorActionBar> {
     return _spaced([
       if (widget.showTemplateButton) _templateEntry(metrics),
       for (final action in widget.mainActions ?? const <ToolbarAction>[])
-        _iconEntry(metrics, action.icon, action.onPressed,
-            claimsFocus: false, reconnectsKeyboard: action.mayLeaveApp),
+        switch (action.menu) {
+          null => _iconEntry(metrics, action.icon, action.onPressed!,
+              claimsFocus: false, reconnectsKeyboard: action.mayLeaveApp),
+          [final only] => _iconEntry(metrics, Icon(only.icon), only.onSelected,
+              claimsFocus: false, reconnectsKeyboard: true),
+          _ => _menuIconEntry(metrics, action),
+        },
     ]);
   }
 
@@ -121,7 +129,7 @@ class _EditorActionBarState extends State<EditorActionBar> {
         _dividerEntry(),
       ],
       for (final action in markdownActions(context, widget.controller))
-        _iconEntry(metrics, action.icon, action.onPressed,
+        _iconEntry(metrics, action.icon, action.onPressed!,
             reconnectsKeyboard: action.mayLeaveApp),
       if (undoController != null) ...[
         _dividerEntry(),
@@ -171,6 +179,34 @@ class _EditorActionBarState extends State<EditorActionBar> {
           _focusRestorer.run(action,
               claimsFocus: claimsFocus, reconnectsKeyboard: reconnectsKeyboard);
         },
+      ),
+    );
+  }
+
+  ToolbarEntry _menuIconEntry(DockMetrics metrics, ToolbarAction action) {
+    return ToolbarEntry(
+      width: metrics.buttonSize,
+      build: (context, dismissOverflow) => Builder(
+        builder: (buttonContext) => ToolbarIconButton(
+          size: metrics.buttonSize,
+          icon: action.icon,
+          onPressed: () {
+            dismissOverflow?.call();
+            _overflowPopup.showMenu(
+              buttonContext,
+              [
+                for (final item in action.menu!)
+                  ToolbarMenuAction(
+                    icon: item.icon,
+                    label: item.label,
+                    onSelected: () => _focusRestorer.run(item.onSelected,
+                        claimsFocus: false, reconnectsKeyboard: true),
+                  ),
+              ],
+              barPadding: metrics.pillPadding,
+            );
+          },
+        ),
       ),
     );
   }
@@ -231,8 +267,7 @@ class _EditorActionBarState extends State<EditorActionBar> {
     final showToggle = widget.mainActions != null && _isEditing;
     final showingMainActions = widget.mainActions != null &&
         (!_isEditing || _showMainActionsWhileFocused);
-    final isWide =
-        MediaQuery.sizeOf(context).width >= EditorActionBar.wideBreakpoint;
+    final isWide = isWideScreen(context);
 
     return Padding(
       padding: EdgeInsets.fromLTRB(

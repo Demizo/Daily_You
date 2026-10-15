@@ -1,0 +1,26 @@
+group = 'com.demizo.daily_you.external_opener'
+version = '1.0'
+
+apply plugin: 'com.android.library'
+
+if (project.findProperty("android.builtInKotlin")?.toString() != "true") {
+    apply plugin: "kotlin-android"
+}
+
+android {
+    namespace = 'com.demizo.daily_you.external_opener'
+    compileSdkVersion 36
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    defaultConfig {
+        minSdkVersion 24
+    }
+}
+
+dependencies {
+    implementation 'androidx.core:core-ktx:1.13.1'
+}

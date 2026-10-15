@@ -3,20 +3,20 @@ import 'dart:io';
 
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/database/app_database.dart';
-import 'package:daily_you/database/image_storage.dart';
+import 'package:daily_you/database/attachment_storage.dart';
 import 'package:daily_you/device_info_service.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/language_option.dart';
 import 'package:daily_you/main.dart';
 import 'package:daily_you/pages/entry_view_page.dart';
 import 'package:daily_you/providers/entries_provider.dart';
-import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/providers/templates_provider.dart';
 import 'package:daily_you/theme_mode_provider.dart';
 import 'package:daily_you/widgets/stats_overview_card.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:golden_screenshot/golden_screenshot.dart';
@@ -118,8 +118,8 @@ void main() {
               value: themeModeProvider),
           ChangeNotifierProvider<EntriesProvider>.value(
               value: EntriesProvider.instance),
-          ChangeNotifierProvider<EntryImagesProvider>.value(
-              value: EntryImagesProvider.instance),
+          ChangeNotifierProvider<EntryAttachmentsProvider>.value(
+              value: EntryAttachmentsProvider.instance),
           ChangeNotifierProvider<TemplatesProvider>.value(
               value: TemplatesProvider.instance),
           ChangeNotifierProvider<TagsProvider>.value(
@@ -153,7 +153,7 @@ void main() {
 
         // Reset entries/images between locales
         await EntriesProvider.instance.deleteAll((_) {});
-        await ImageStorage.instance.garbageCollectImages();
+        await AttachmentStorage.instance.garbageCollectAttachments();
         await _settle(tester);
 
         final l10n = await AppLocalizations.delegate.load(locale);
@@ -164,7 +164,7 @@ void main() {
         ).seed(DateTime.now());
 
         await EntriesProvider.instance.load();
-        await EntryImagesProvider.instance.load();
+        await EntryAttachmentsProvider.instance.load();
         await _settle(tester);
 
         await _captureHomeAndGallery(tester, themeModeProvider, fastlaneLocale);

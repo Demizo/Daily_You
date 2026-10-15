@@ -1,7 +1,13 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:daily_you/storage/file_store.dart';
 import 'package:logging/logging.dart';
+import 'package:saf_transfer/saf_transfer.dart';
 import 'package:saf_util/saf_util.dart';
 import 'package:shared_storage/shared_storage.dart' as saf;
 
@@ -109,6 +115,34 @@ class SafFileStore implements FileStore {
   }
 
   @override
+  Future<CreateResult> createNewFromFile(String name, File source) async {
+    final createdName = await SafTransfer.createInExternalLocation(
+        source.path, treeUri, name, "*/*");
+    if (createdName == null) return CreateResult.failed;
+    if (createdName == name) return CreateResult.created;
+    if (createdName.isEmpty) return CreateResult.failed;
+
+    if (!await delete(createdName)) {
+      _logger.warning('could not delete $createdName after $name collided');
+    }
+    return CreateResult.alreadyExists;
+  }
+
+  @override
+  Future<bool> copyToFile(String name, File destination) async {
+    final uri = await _listedDocument(name) ??
+        (await _child(name, requiresWriteAccess: false))?.uri;
+    if (uri == null) return false;
+    return await SafTransfer.copyFromExternalLocation(
+            uri.toString(), destination.path) &&
+        await destination.exists();
+  }
+
+  @override
+  Future<int?> size(String name) async =>
+      (await _child(name, requiresWriteAccess: false))?.size;
+
+  @override
   Future<bool> delete(String name) async {
     final listed = await _listedDocument(name);
     _listedDocuments.remove(name);
@@ -121,4 +155,15 @@ class SafFileStore implements FileStore {
   @override
   Future<DateTime?> modifiedTime(String name) async =>
       (await _child(name))?.lastModified;
+
+  @override
+  Future<FileStore> subfolder(String name) async {
+    final existing = await _child(name, requiresWriteAccess: false);
+    final childUri =
+        existing?.uri ?? (await saf.createDirectory(_tree, name))?.uri;
+    if (childUri == null) {
+      throw FileSystemException('could not create folder $name', treeUri);
+    }
+    return SafFileStore(childUri.toString());
+  }
 }

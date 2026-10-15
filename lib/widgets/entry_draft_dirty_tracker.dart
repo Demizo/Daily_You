@@ -1,3 +1,7 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 import 'package:daily_you/widgets/tag_attachment_source.dart';
 
 /// Tracks saved vs current entry fields and attachments
@@ -42,11 +46,11 @@ class EntryDraftDirtyTracker {
     required int? mood,
     required DateTime date,
     required TagAttachmentSource tagSource,
-    required bool hasImages,
+    required bool hasAttachments,
   }) {
     return hasFieldChanges(text: text, mood: mood, date: date) ||
         _tagsExceedSeed(tagSource) ||
-        hasImages;
+        hasAttachments;
   }
 
   bool _tagsExceedSeed(TagAttachmentSource tagSource) {

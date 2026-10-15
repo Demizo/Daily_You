@@ -1,6 +1,10 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 import 'package:daily_you/widgets/material_shapes.dart';
 import 'package:daily_you/widgets/punch_scale.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
 
 class EntryMoodPicker extends StatefulWidget {

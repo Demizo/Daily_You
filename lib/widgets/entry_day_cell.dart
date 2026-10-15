@@ -1,18 +1,22 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 import 'dart:ui' as ui;
 
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/models/entry.dart';
-import 'package:daily_you/models/image.dart';
+import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/pages/edit_entry_page.dart';
 import 'package:daily_you/pages/entry_timeline_page.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/utils/tag_visuals.dart';
+import 'package:daily_you/widgets/attachment_cover_thumbnail.dart';
 import 'package:daily_you/widgets/day_menu.dart';
-import 'package:daily_you/widgets/local_image_loader.dart';
 import 'package:daily_you/widgets/tag_icon_glyph.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
 import 'package:provider/provider.dart';
 import 'package:daily_you/pages/entries_list_page.dart';
@@ -23,7 +27,7 @@ class EntryDayCell extends StatelessWidget {
   final ui.Image? dayNumber;
   final double cellSize;
   final List<Entry> entries;
-  final EntryImage? firstImage;
+  final List<EntryAttachment> coverCandidates;
 
   final bool showImages;
   final bool showMood;
@@ -39,7 +43,7 @@ class EntryDayCell extends StatelessWidget {
     required this.dayNumber,
     required this.cellSize,
     required this.entries,
-    required this.firstImage,
+    required this.coverCandidates,
     this.showImages = true,
     this.showMood = true,
     this.isJalali = false,
@@ -261,7 +265,7 @@ class EntryDayCell extends StatelessWidget {
         hasOverrideTag && (!tagGoesCenter || isTrackerOverride);
 
     if (entries.isNotEmpty) {
-      final showImageBg = showImages && firstImage != null;
+      final showImageBg = showImages && coverCandidates.isNotEmpty;
       return MergeSemantics(
           child: GestureDetector(
         onTap: selectDay ??
@@ -294,10 +298,7 @@ class EntryDayCell extends StatelessWidget {
                 ),
                 clipBehavior: showImageBg ? Clip.hardEdge : Clip.none,
                 child: showImageBg
-                    ? LocalImageLoader(
-                        imagePath: firstImage!.imgPath,
-                        cacheSize: 100,
-                      )
+                    ? AttachmentCoverThumbnail(candidates: coverCandidates)
                     : Center(
                         child: tagGoesCenter
                             ? _buildTagCutoutCenter(

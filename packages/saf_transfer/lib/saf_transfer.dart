@@ -1,3 +1,7 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 import 'package:flutter/services.dart';
 import 'package:uuid/uuid.dart';
 
@@ -52,6 +56,26 @@ class SafTransfer {
     } finally {
       // Clean up callback memory to prevent leaks
       _progressCallbacks.remove(transferId);
+    }
+  }
+
+  static Future<String?> createInExternalLocation(String localFilePath,
+      String treeUri, String fileName, String mimeType) async {
+    _initListener();
+    try {
+      final result =
+          await _channel.invokeMethod<Map<Object?, Object?>>('copyToExternal', {
+        'treeUri': treeUri,
+        'fileName': fileName,
+        'mime': mimeType,
+        'localSrc': localFilePath,
+        'overwrite': false,
+        'append': false,
+        'transferId': const Uuid().v4(),
+      });
+      return result?['fileName'] as String? ?? '';
+    } catch (e) {
+      return null;
     }
   }
 

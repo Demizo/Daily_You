@@ -1,11 +1,15 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/models/entry.dart';
-import 'package:daily_you/models/image.dart';
-import 'package:daily_you/providers/entry_images_provider.dart';
-import 'package:daily_you/widgets/image_grid.dart';
+import 'package:daily_you/models/attachment.dart';
+import 'package:daily_you/providers/entry_attachments_provider.dart';
+import 'package:daily_you/widgets/attachment_grid.dart';
 import 'package:daily_you/widgets/scaled_markdown.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class FlashbackCard extends StatelessWidget {
   const FlashbackCard({
@@ -19,17 +23,20 @@ class FlashbackCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final imagesProvider = EntryImagesProvider.instance;
+    final attachmentsProvider = EntryAttachmentsProvider.instance;
     final hideImages =
         ConfigProvider.instance.get(Settings.hideImagesInFlashbacks);
     final theme = Theme.of(context);
     final text = entries.first.text;
 
     final coverImages = hideImages
-        ? <EntryImage>[]
+        ? <EntryAttachment>[]
         : entries
-            .map((e) => imagesProvider.getForEntry(e).firstOrNull)
-            .whereType<EntryImage>()
+            .map((e) => attachmentsProvider
+                .getForEntry(e)
+                .where((attachment) => attachment.type.isVisual)
+                .firstOrNull)
+            .whereType<EntryAttachment>()
             .take(4)
             .toList();
 
@@ -45,7 +52,7 @@ class FlashbackCard extends StatelessWidget {
           fit: StackFit.expand,
           children: [
             hasImages
-                ? ImageGrid(images: coverImages)
+                ? AttachmentGrid(attachments: coverImages)
                 : ClipRect(
                     clipBehavior: Clip.hardEdge,
                     child: ShaderMask(

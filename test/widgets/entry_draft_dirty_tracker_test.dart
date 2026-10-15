@@ -1,3 +1,7 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/widgets/entry_draft_dirty_tracker.dart';
 import 'package:daily_you/widgets/tag_attachment_source.dart';
@@ -49,7 +53,7 @@ void main() {
           mood: null,
           date: date,
           tagSource: tagSource,
-          hasImages: false,
+          hasAttachments: false,
         ),
         isFalse);
   });
@@ -65,7 +69,7 @@ void main() {
           mood: null,
           date: date,
           tagSource: tagSource,
-          hasImages: false,
+          hasAttachments: false,
         ),
         isTrue);
   });
@@ -84,7 +88,7 @@ void main() {
           mood: null,
           date: date,
           tagSource: tagSource,
-          hasImages: false,
+          hasAttachments: false,
         ),
         isTrue);
   });
@@ -100,7 +104,7 @@ void main() {
           mood: null,
           date: date,
           tagSource: tagSource,
-          hasImages: true,
+          hasAttachments: true,
         ),
         isTrue);
   });

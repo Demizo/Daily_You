@@ -1,23 +1,28 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 import 'dart:async';
 import 'dart:io';
 
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/database/app_database.dart';
-import 'package:daily_you/database/image_storage.dart';
+import 'package:daily_you/database/attachment_storage.dart';
 import 'package:daily_you/device_info_service.dart';
 import 'package:daily_you/launch_intent.dart';
 import 'package:daily_you/main.dart';
 import 'package:daily_you/utils/auto_backup_schedule.dart';
 import 'package:daily_you/utils/backup_restore_utils.dart';
+import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/auth_popup.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:logging/logging.dart';
 import 'package:quick_actions/quick_actions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-enum _LaunchErrorType { externalAccess, migrationFailed }
+enum _LaunchErrorType { externalAccess, migrationFailed, appOutdated }
 
 class LaunchPage extends StatefulWidget {
   final Widget nextPage;
@@ -117,7 +122,7 @@ class _LaunchPageState extends State<LaunchPage> {
     // Prompt unlock before initializing database
     if (ConfigProvider.instance.get(Settings.requirePassword)) {
       if (!mounted) return;
-      await showDialog(
+      await showAppDialog(
           context: context,
           builder: (context) => AuthPopup(
                 mode: AuthPopupMode.unlock,
@@ -132,6 +137,11 @@ class _LaunchPageState extends State<LaunchPage> {
     bool initialized;
     try {
       initialized = await AppDatabase.instance.init();
+    } on DatabaseNewerThanAppException catch (error, stackTrace) {
+      _logger.severe('Database is newer than the app', error, stackTrace);
+      _errorType = _LaunchErrorType.appOutdated;
+      _showError();
+      return;
     } catch (error, stackTrace) {
       _logger.severe('Database initialization failed', error, stackTrace);
       initialized = false;
@@ -139,33 +149,46 @@ class _LaunchPageState extends State<LaunchPage> {
 
     if (initialized) {
       await _migrateImagesFromExternalStorage();
-      if (ImageStorage.instance.usingExternalLocation()) {
-        if (await ImageStorage.instance.hasExternalLocationPermission()) {
-          unawaited(ImageStorage.instance.syncImageFolder(false).then((_) {},
-              onError: (Object error, StackTrace stackTrace) {
-            _logger.severe(
-                'Syncing the image folder failed', error, stackTrace);
-          }));
-          unawaited(_catchUpMissedAutoBackup());
-          await _nextPage();
+      if (AttachmentStorage.instance.usingExternalLocation()) {
+        if (!await AttachmentStorage.instance.hasExternalLocationPermission()) {
+          _errorType = _LaunchErrorType.externalAccess;
+          _showError();
           return;
         }
-        _errorType = _LaunchErrorType.externalAccess;
+        unawaited(AttachmentStorage.instance
+            .syncAttachmentFolders(false)
+            .catchError((Object error, StackTrace stackTrace) {
+          _logger.severe(
+              'Syncing the attachment folders failed', error, stackTrace);
+        }).whenComplete(_deleteOrphanedAttachments));
       } else {
-        unawaited(_catchUpMissedAutoBackup());
-        await _nextPage();
-        return;
+        unawaited(_deleteOrphanedAttachments());
       }
-    } else {
-      _errorType = AppDatabase.instance.migrationFailed
-          ? _LaunchErrorType.migrationFailed
-          : _LaunchErrorType.externalAccess;
+      unawaited(_catchUpMissedAutoBackup());
+      await _nextPage();
+      return;
     }
 
+    _errorType = AppDatabase.instance.migrationFailed
+        ? _LaunchErrorType.migrationFailed
+        : _LaunchErrorType.externalAccess;
+    _showError();
+  }
+
+  void _showError() {
     if (!mounted) return;
     setState(() {
       isLoading = false;
     });
+  }
+
+  Future<void> _deleteOrphanedAttachments() async {
+    try {
+      await AttachmentStorage.instance.deleteOrphanedAttachments();
+    } catch (error, stackTrace) {
+      _logger.warning(
+          'Deleting orphaned attachments failed', error, stackTrace);
+    }
   }
 
   Future<void> _catchUpMissedAutoBackup() async {
@@ -197,14 +220,14 @@ class _LaunchPageState extends State<LaunchPage> {
   }
 
   Future<void> _migrateImagesFromExternalStorage() async {
-    if (!await ImageStorage.instance.needsImageMigration()) return;
+    if (!await AttachmentStorage.instance.needsImageMigration()) return;
     if (!mounted) return;
 
     final statusNotifier = ValueNotifier<String>("");
     BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
 
     try {
-      await ImageStorage.instance.migrateImagesFromExternalStorage(
+      await AttachmentStorage.instance.migrateImagesFromExternalStorage(
         updateStatus: (migrated, total) {
           if (!mounted) return;
           statusNotifier.value = AppLocalizations.of(context)!
@@ -285,6 +308,12 @@ class _LaunchPageState extends State<LaunchPage> {
                 onPressed: _reportIssue,
                 child: Text(localizations.errorReport)),
           ],
+        );
+      case _LaunchErrorType.appOutdated:
+        return _buildErrorScaffold(
+          title: localizations.databaseNewerErrorTitle,
+          description: localizations.databaseNewerErrorDescription,
+          actions: const [],
         );
       case _LaunchErrorType.externalAccess:
         return _buildErrorScaffold(

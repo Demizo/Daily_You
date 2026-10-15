@@ -21,6 +21,21 @@ class AppLocalizationsMs extends AppLocalizations {
   String get actionTakePhoto => 'Ambil gambar';
 
   @override
+  String get actionTakeVideo => 'Take video';
+
+  @override
+  String get actionRecordAudio => 'Record audio';
+
+  @override
+  String get actionAddImage => 'Add image';
+
+  @override
+  String get actionAddVideo => 'Add video';
+
+  @override
+  String get actionAddAudio => 'Add audio';
+
+  @override
   String get actionToday => 'Hari ini';
 
   @override
@@ -203,6 +218,13 @@ class AppLocalizationsMs extends AppLocalizations {
   String get databaseMigrationErrorRetry => 'Retry';
 
   @override
+  String get databaseNewerErrorTitle => 'Update Required';
+
+  @override
+  String get databaseNewerErrorDescription =>
+      'Your data was saved by a newer version of Daily You. This version can\'t open it safely. Update the app to continue.';
+
+  @override
   String get errorReport => 'Report Issue';
 
   @override
@@ -225,6 +247,23 @@ class AppLocalizationsMs extends AppLocalizations {
 
   @override
   String get deletePhotoDescription => 'Adakah anda ingin memadam foto ini?';
+
+  @override
+  String get deleteAttachmentTitle => 'Delete Attachment';
+
+  @override
+  String get deleteAttachmentDescription =>
+      'Do you want to delete this attachment?';
+
+  @override
+  String get largeAttachmentWarningTitle => 'Large attachment';
+
+  @override
+  String get largeAttachmentWarningDescription =>
+      'This attachment is large and will increase your backup size.';
+
+  @override
+  String get dontShowAgain => 'Don\'t show again';
 
   @override
   String get pageSettingsTitle => 'Tetapan';
@@ -587,6 +626,9 @@ class AppLocalizationsMs extends AppLocalizations {
   String get settingsImageQuality => 'Kualiti Imej';
 
   @override
+  String get settingsMediaQualityTitle => 'Media Quality';
+
+  @override
   String get imageQualityHigh => 'Tinggi';
 
   @override
@@ -599,10 +641,19 @@ class AppLocalizationsMs extends AppLocalizations {
   String get imageQualityNoCompression => 'Tiada Pemampatan';
 
   @override
+  String get settingsStorageUsage => 'Storage Usage';
+
+  @override
   String get settingsLogFolder => 'Folder Log';
 
   @override
   String get settingsImageFolder => 'Folder Imej';
+
+  @override
+  String get settingsExternalSyncTitle => 'Sync with External Location';
+
+  @override
+  String get chooseFolderHint => 'Choose a folder';
 
   @override
   String get warningTitle => 'Amaran';
@@ -619,6 +670,10 @@ class AppLocalizationsMs extends AppLocalizations {
 
   @override
   String get imageFolderErrorDescription => 'Gagal menukar folder imej!';
+
+  @override
+  String get syncErrorDescription =>
+      'Failed to sync with the external location!';
 
   @override
   String get backupErrorDescription => 'Gagal mencipta sandaran!';
@@ -739,6 +794,9 @@ class AppLocalizationsMs extends AppLocalizations {
 
   @override
   String get exportImages => 'Export Images';
+
+  @override
+  String get exportIncludeTitle => 'Include';
 
   @override
   String get settingsImport => 'Import';
@@ -881,6 +939,12 @@ class AppLocalizationsMs extends AppLocalizations {
   String get imagesTitle => 'Images';
 
   @override
+  String get audioTitle => 'Audio';
+
+  @override
+  String get videoTitle => 'Video';
+
+  @override
   String get tagMoodTitle => 'Suasana';
 
   @override
@@ -905,4 +969,29 @@ class AppLocalizationsMs extends AppLocalizations {
 
   @override
   String get shareAddToLogPickerTitle => 'Choose a log';
+
+  @override
+  String get attachmentAddErrorDescription => 'Failed to add attachment!';
+
+  @override
+  String get attachmentLoadFailed => 'Could not open this attachment';
+
+  @override
+  String get attachmentNoAppToOpen => 'No app can open this attachment';
+
+  @override
+  String get recorderDiscardTitle => 'Discard recording?';
+
+  @override
+  String get recorderDiscardDescription => 'This recording will be deleted.';
+
+  @override
+  String get recorderDiscardAction => 'Discard';
+
+  @override
+  String get recorderPermissionDenied =>
+      'Microphone permission is required to record audio';
+
+  @override
+  String get recorderErrorDescription => 'Failed to record audio!';
 }

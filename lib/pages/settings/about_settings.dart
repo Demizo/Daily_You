@@ -1,8 +1,13 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/device_info_service.dart';
 import 'package:daily_you/theme_mode_provider.dart';
+import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/settings_icon_action.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -56,7 +61,7 @@ class _AboutSettingsState extends State<AboutSettings> {
                 themeProvider.updateAccentColor();
 
                 if (!context.mounted) return;
-                await showDialog(
+                await showAppDialog(
                   context: context,
                   builder: (BuildContext context) {
                     return AlertDialog(
@@ -83,8 +88,11 @@ class _AboutSettingsState extends State<AboutSettings> {
               icon: Icon(Icons.open_in_new_rounded),
               onPressed: () async {
                 await launchUrl(
-                    Uri.https("github.com",
-                        "/Demizo/Daily_You/blob/master/LICENSE.txt"),
+                    Uri(
+                        scheme: "https",
+                        host: "github.com",
+                        path: "/Demizo/Daily_You",
+                        fragment: "license"),
                     mode: LaunchMode.externalApplication);
               }),
           SettingsIconAction(

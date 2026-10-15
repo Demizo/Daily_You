@@ -1,3 +1,7 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 import 'dart:ui' as ui;
 
 import 'package:daily_you/config_provider.dart';
@@ -7,13 +11,15 @@ import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/pages/entries_list_page.dart';
 import 'package:daily_you/pages/entry_timeline_page.dart';
 import 'package:daily_you/providers/entries_provider.dart';
-import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/models/attachment.dart';
+import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/calendar_view_options_dialog.dart';
 import 'package:daily_you/widgets/entry_day_cell.dart';
 import 'package:daily_you/widgets/year_month_picker.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 
@@ -380,7 +386,7 @@ class _VerticalCalendarState extends State<VerticalCalendar>
     final showImages = !configProvider.get(Settings.hideImagesInCalendar);
     final showMood = configProvider.get(Settings.calendarShowMood);
     final entriesProvider = context.watch<EntriesProvider>();
-    final imagesProvider = context.watch<EntryImagesProvider>();
+    final attachmentsProvider = context.watch<EntryAttachmentsProvider>();
 
     final tagsProvider = context.watch<TagsProvider>();
     final overlayTagId = configProvider.get(Settings.calendarTagOverlay);
@@ -453,7 +459,7 @@ class _VerticalCalendarState extends State<VerticalCalendar>
                                 context,
                                 index,
                                 entriesProvider,
-                                imagesProvider,
+                                attachmentsProvider,
                                 showImages,
                                 showMood,
                                 calendarTagOverride,
@@ -560,7 +566,7 @@ class _VerticalCalendarState extends State<VerticalCalendar>
                   },
                 ),
                 IconButton(
-                  onPressed: () => showDialog(
+                  onPressed: () => showAppDialog(
                     context: context,
                     builder: (_) => const CalendarViewOptionsDialog(),
                   ),
@@ -667,7 +673,7 @@ class _VerticalCalendarState extends State<VerticalCalendar>
       BuildContext context,
       int index,
       EntriesProvider entriesProvider,
-      EntryImagesProvider imagesProvider,
+      EntryAttachmentsProvider attachmentsProvider,
       bool showImages,
       bool showMood,
       Tag? calendarTagOverride,
@@ -675,7 +681,7 @@ class _VerticalCalendarState extends State<VerticalCalendar>
     final item = _items[index];
     if (item is _MonthHeaderItem) return _buildMonthHeader(context, item.month);
     if (item is _WeekRowItem) {
-      return _buildWeekRow(context, item, entriesProvider, imagesProvider,
+      return _buildWeekRow(context, item, entriesProvider, attachmentsProvider,
           showImages, showMood, calendarTagOverride, calendarTagEntryMap);
     }
     return const SizedBox.shrink();
@@ -713,7 +719,7 @@ class _VerticalCalendarState extends State<VerticalCalendar>
       BuildContext context,
       _WeekRowItem item,
       EntriesProvider entriesProvider,
-      EntryImagesProvider imagesProvider,
+      EntryAttachmentsProvider attachmentsProvider,
       bool showImages,
       bool showMood,
       Tag? calendarTagOverride,
@@ -725,7 +731,7 @@ class _VerticalCalendarState extends State<VerticalCalendar>
         cellSize: _cellWidth,
         dayNumberCache: _dayNumberCache,
         entriesProvider: entriesProvider,
-        imagesProvider: imagesProvider,
+        attachmentsProvider: attachmentsProvider,
         showImages: showImages,
         showMood: showMood,
         isJalali: _isJalali,
@@ -743,7 +749,7 @@ class _WeekRow extends StatelessWidget {
   final double cellSize;
   final Map<int, ui.Image> dayNumberCache;
   final EntriesProvider entriesProvider;
-  final EntryImagesProvider imagesProvider;
+  final EntryAttachmentsProvider attachmentsProvider;
   final bool showImages;
   final bool showMood;
   final bool isJalali;
@@ -757,7 +763,7 @@ class _WeekRow extends StatelessWidget {
     required this.cellSize,
     required this.dayNumberCache,
     required this.entriesProvider,
-    required this.imagesProvider,
+    required this.attachmentsProvider,
     required this.showImages,
     required this.showMood,
     this.isJalali = false,
@@ -812,12 +818,13 @@ class _WeekRow extends StatelessWidget {
           }
 
           final entries = entriesProvider.getEntriesForDate(day);
-          final firstImage = !showImages
-              ? null
+          final coverCandidates = !showImages
+              ? const <EntryAttachment>[]
               : entries
                   .map((entry) =>
-                      imagesProvider.getFirstImageForEntry(entry.id!))
-                  .firstWhere((image) => image != null, orElse: () => null);
+                      attachmentsProvider.getCoverCandidatesForEntry(entry.id!))
+                  .firstWhere((candidates) => candidates.isNotEmpty,
+                      orElse: () => const []);
 
           final displayDayNum =
               isJalali ? TimeManager.jalaliDayNumber(day) : day.day;
@@ -829,7 +836,7 @@ class _WeekRow extends StatelessWidget {
               date: day,
               today: today,
               entries: entries,
-              firstImage: firstImage,
+              coverCandidates: coverCandidates,
               cellSize: cellSize,
               dayNumber: dayNumberCache[displayDayNum],
               showImages: showImages,

@@ -1,0 +1,16 @@
+{
+  "output": "assets/download_migrate_banner.gif",
+  "colors": 128,
+  "frames": 72,
+  "duration": 60,
+  "layers": ["background.svg", "scene.svg"],
+  "animations": {
+    "item-0-writing": [{"type": "travel", "dx": 330, "dy": 68, "start": 0.0, "duration": 0.26, "ease": 2.4, "ease_x": 0.7, "turn": 60, "end_scale": 0.5, "fade_in": 0.06, "fade_out": 0.05}],
+    "item-1-happy": [{"type": "travel", "dx": -300, "dy": 78, "start": 0.16666666666666666, "duration": 0.26, "ease": 2.4, "ease_x": 0.7, "turn": -60, "end_scale": 0.5, "fade_in": 0.06, "fade_out": 0.05}],
+    "item-2-package": [{"type": "travel", "dx": 200, "dy": 98, "start": 0.3333333333333333, "duration": 0.26, "ease": 2.4, "ease_x": 0.7, "turn": -72, "end_scale": 0.5, "fade_in": 0.06, "fade_out": 0.05}],
+    "item-3-image": [{"type": "travel", "dx": -210, "dy": 100, "start": 0.5, "duration": 0.26, "ease": 2.4, "ease_x": 0.7, "turn": 72, "end_scale": 0.5, "fade_in": 0.06, "fade_out": 0.05}],
+    "item-4-happy": [{"type": "travel", "dx": 90, "dy": 112, "start": 0.6666666666666666, "duration": 0.26, "ease": 2.4, "ease_x": 0.7, "turn": 48, "end_scale": 0.5, "fade_in": 0.06, "fade_out": 0.05}],
+    "item-5-package": [{"type": "travel", "dx": -100, "dy": 114, "start": 0.8333333333333334, "duration": 0.26, "ease": 2.4, "ease_x": 0.7, "turn": -48, "end_scale": 0.5, "fade_in": 0.06, "fade_out": 0.05}],
+    "download-arrow": [{"type": "punch", "cycles": 6, "phase": 0.56, "decay": 6, "spring": 10, "dy": 14, "scale_x": 0.05, "scale_y": -0.07}]
+  }
+}

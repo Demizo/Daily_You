@@ -1,9 +1,14 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/database/entry_tag_dao.dart';
 import 'package:daily_you/database/tag_dao.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/utils/imports/import_diarium.dart';
+import 'package:daily_you/utils/imports/import_helpers.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
@@ -38,6 +43,22 @@ void main() {
   tearDown(() async {
     AppDatabase.instance.database = null;
     await database.close();
+  });
+
+  group('diariumIdToDateTime', () {
+    // .NET ticks (100ns since 0001-01-01) for a wall-clock time.
+    int ticksFor(int y, int mo, int d, int h, int mi) {
+      const ticksAtUnixEpoch = 621355968000000000;
+      final us = DateTime.utc(y, mo, d, h, mi).microsecondsSinceEpoch;
+      return ticksAtUnixEpoch + us * 10;
+    }
+
+    test('keeps the wall-clock day and time recorded in Diarium', () {
+      expect(diariumIdToDateTime(ticksFor(2025, 6, 2, 23, 30)),
+          equals(DateTime(2025, 6, 2, 23, 30)));
+      expect(diariumIdToDateTime(ticksFor(2025, 6, 2, 0, 15)),
+          equals(DateTime(2025, 6, 2, 0, 15)));
+    });
   });
 
   group('parseDiariumColor', () {

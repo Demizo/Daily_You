@@ -1,3 +1,7 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -5,6 +9,10 @@ import 'package:daily_you/storage/file_store.dart';
 import 'package:path/path.dart';
 
 class LocalFileStore implements FileStore {
+  static const _temporarySuffix = '.partial';
+
+  static bool isTemporary(String name) => name.endsWith(_temporarySuffix);
+
   LocalFileStore(this.directoryPath);
 
   final String directoryPath;
@@ -65,7 +73,15 @@ class LocalFileStore implements FileStore {
   }
 
   @override
-  Future<CreateResult> createNew(String name, Uint8List bytes) async {
+  Future<CreateResult> createNew(String name, Uint8List bytes) =>
+      _createExclusive(name, (file) => file.writeAsBytes(bytes, flush: true));
+
+  @override
+  Future<CreateResult> createNewFromFile(String name, File source) =>
+      _createExclusive(name, (file) => source.copy(file.path));
+
+  Future<CreateResult> _createExclusive(
+      String name, Future<void> Function(File file) fill) async {
     final file = _fileFor(name);
     await file.parent.create(recursive: true);
     try {
@@ -76,12 +92,44 @@ class LocalFileStore implements FileStore {
     }
 
     try {
-      await file.writeAsBytes(bytes, flush: true);
+      await writeAtomically(name, (temporary) async {
+        await fill(temporary);
+        return true;
+      });
       return CreateResult.created;
     } catch (_) {
       if (await file.exists()) await file.delete();
       rethrow;
     }
+  }
+
+  Future<bool> writeAtomically(
+      String name, Future<bool> Function(File temporary) fill) async {
+    final file = _fileFor(name);
+    await file.parent.create(recursive: true);
+    final temporary = File(
+        '${file.path}.${DateTime.now().microsecondsSinceEpoch}$_temporarySuffix');
+    try {
+      if (!await fill(temporary)) return false;
+      await temporary.rename(file.path);
+      return true;
+    } finally {
+      if (await temporary.exists()) await temporary.delete();
+    }
+  }
+
+  @override
+  Future<bool> copyToFile(String name, File destination) async {
+    final file = _fileFor(name);
+    if (!await file.exists()) return false;
+    await file.copy(destination.path);
+    return true;
+  }
+
+  @override
+  Future<int?> size(String name) async {
+    final file = _fileFor(name);
+    return await file.exists() ? file.length() : null;
   }
 
   @override
@@ -96,5 +144,12 @@ class LocalFileStore implements FileStore {
     final file = _fileFor(name);
     if (!await file.exists()) return null;
     return file.lastModified();
+  }
+
+  @override
+  Future<FileStore> subfolder(String name) async {
+    final directory = Directory(join(directoryPath, name));
+    await directory.create(recursive: true);
+    return LocalFileStore(directory.path);
   }
 }

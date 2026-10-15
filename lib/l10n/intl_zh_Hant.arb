@@ -260,5 +260,6 @@
     "settingsOpenSourceLicenses": "開源授權條款",
     "settingsAutoBackupRequireCharging": "僅在充電時",
     "encryptingBackupStatus": "正在加密備份… {percent}%",
-    "decryptingBackupStatus": "正在解密備份… {percent}%"
+    "decryptingBackupStatus": "正在解密備份… {percent}%",
+    "shareAddToLogPickerTitle": "選擇一個紀錄"
 }

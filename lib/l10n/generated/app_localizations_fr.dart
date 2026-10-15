@@ -22,6 +22,21 @@ class AppLocalizationsFr extends AppLocalizations {
   String get actionTakePhoto => 'Prendre une photo';
 
   @override
+  String get actionTakeVideo => 'Take video';
+
+  @override
+  String get actionRecordAudio => 'Record audio';
+
+  @override
+  String get actionAddImage => 'Add image';
+
+  @override
+  String get actionAddVideo => 'Add video';
+
+  @override
+  String get actionAddAudio => 'Add audio';
+
+  @override
   String get actionToday => 'Aujourd\'hui';
 
   @override
@@ -256,6 +271,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get databaseMigrationErrorRetry => 'Réessayer';
 
   @override
+  String get databaseNewerErrorTitle => 'Update Required';
+
+  @override
+  String get databaseNewerErrorDescription =>
+      'Your data was saved by a newer version of Daily You. This version can\'t open it safely. Update the app to continue.';
+
+  @override
   String get errorReport => 'Signaler un problème';
 
   @override
@@ -278,6 +300,23 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get deletePhotoDescription => 'Voulez-vous supprimer cette photo ?';
+
+  @override
+  String get deleteAttachmentTitle => 'Delete Attachment';
+
+  @override
+  String get deleteAttachmentDescription =>
+      'Do you want to delete this attachment?';
+
+  @override
+  String get largeAttachmentWarningTitle => 'Large attachment';
+
+  @override
+  String get largeAttachmentWarningDescription =>
+      'This attachment is large and will increase your backup size.';
+
+  @override
+  String get dontShowAgain => 'Don\'t show again';
 
   @override
   String get pageSettingsTitle => 'Paramètres';
@@ -390,7 +429,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get settingsAlwaysSendReminderDescription =>
-      'Envoyer un rappel même une entrée est déjà commencée';
+      'Envoyer un rappel même si une entrée est déjà commencée';
 
   @override
   String get settingsCustomizeNotificationTitle =>
@@ -643,6 +682,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settingsImageQuality => 'Qualité d\'image';
 
   @override
+  String get settingsMediaQualityTitle => 'Media Quality';
+
+  @override
   String get imageQualityHigh => 'Élevée';
 
   @override
@@ -655,17 +697,26 @@ class AppLocalizationsFr extends AppLocalizations {
   String get imageQualityNoCompression => 'Sans compression';
 
   @override
+  String get settingsStorageUsage => 'Storage Usage';
+
+  @override
   String get settingsLogFolder => 'Dossier d\'enregistrement';
 
   @override
   String get settingsImageFolder => 'Dossier d\'images';
 
   @override
+  String get settingsExternalSyncTitle => 'Sync with External Location';
+
+  @override
+  String get chooseFolderHint => 'Choose a folder';
+
+  @override
   String get warningTitle => 'Attention';
 
   @override
   String get logFolderWarningDescription =>
-      'Si le dossier sélectionné contient déjà un fichier \'daily_you.db\', celui-ci sera utilisé pour écraser vos journaux existants !';
+      'Si le dossier sélectionné contient déjà un fichier \'daily_you.db\', celui-ci sera utilisé pour écraser vos enregistrements existants !';
 
   @override
   String get errorTitle => 'Erreur';
@@ -677,6 +728,10 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get imageFolderErrorDescription =>
       'Échec de la modification du dossier de l\'image !';
+
+  @override
+  String get syncErrorDescription =>
+      'Failed to sync with the external location!';
 
   @override
   String get backupErrorDescription =>
@@ -801,6 +856,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get exportImages => 'Exporter les images';
+
+  @override
+  String get exportIncludeTitle => 'Include';
 
   @override
   String get settingsImport => 'Importer';
@@ -945,6 +1003,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get imagesTitle => 'Images';
 
   @override
+  String get audioTitle => 'Audio';
+
+  @override
+  String get videoTitle => 'Video';
+
+  @override
   String get tagMoodTitle => 'Humeur';
 
   @override
@@ -968,5 +1032,30 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get shareAddToLogPickerTitle => 'Choose a log';
+  String get shareAddToLogPickerTitle => 'Choisir un enregistrement';
+
+  @override
+  String get attachmentAddErrorDescription => 'Failed to add attachment!';
+
+  @override
+  String get attachmentLoadFailed => 'Could not open this attachment';
+
+  @override
+  String get attachmentNoAppToOpen => 'No app can open this attachment';
+
+  @override
+  String get recorderDiscardTitle => 'Discard recording?';
+
+  @override
+  String get recorderDiscardDescription => 'This recording will be deleted.';
+
+  @override
+  String get recorderDiscardAction => 'Discard';
+
+  @override
+  String get recorderPermissionDenied =>
+      'Microphone permission is required to record audio';
+
+  @override
+  String get recorderErrorDescription => 'Failed to record audio!';
 }

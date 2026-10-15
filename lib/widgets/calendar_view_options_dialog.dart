@@ -1,10 +1,15 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/providers/tags_provider.dart';
+import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/settings_dropdown.dart';
 import 'package:daily_you/widgets/tag_picker_dialog.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
 class CalendarViewOptionsDialog extends StatelessWidget {
@@ -103,7 +108,7 @@ class CalendarViewOptionsDialog extends StatelessWidget {
           return;
         }
         final filter = value == 'tracker' ? TagType.tracker : TagType.label;
-        final tag = await showDialog<Tag>(
+        final tag = await showAppDialog<Tag>(
           context: context,
           builder: (_) => TagPickerDialog(
             mode: TagPickerMode.selectSingle,

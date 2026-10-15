@@ -1,3 +1,8 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:daily_you/storage/file_store.dart';
@@ -17,6 +22,7 @@ class InMemoryFileStore implements FileStore {
 
   final Map<String, Uint8List> _bytesByName = {};
   final Map<String, DateTime> _modifiedTimeByName = {};
+  final Map<String, InMemoryFileStore> _subfolders = {};
 
   @override
   Future<bool> isAvailable() async => true;
@@ -69,6 +75,21 @@ class InMemoryFileStore implements FileStore {
     return CreateResult.alreadyExists;
   }
 
+  @override
+  Future<CreateResult> createNewFromFile(String name, File source) async =>
+      createNew(name, await source.readAsBytes());
+
+  @override
+  Future<bool> copyToFile(String name, File destination) async {
+    final bytes = await read(name);
+    if (bytes == null) return false;
+    await destination.writeAsBytes(bytes);
+    return true;
+  }
+
+  @override
+  Future<int?> size(String name) async => _bytesByName[name]?.length;
+
   String _freeName(String name) {
     if (!uniqueNamesOnCollision) return name;
     var candidate = name;
@@ -88,4 +109,8 @@ class InMemoryFileStore implements FileStore {
   @override
   Future<DateTime?> modifiedTime(String name) async =>
       _modifiedTimeByName[name];
+
+  @override
+  Future<FileStore> subfolder(String name) async =>
+      _subfolders.putIfAbsent(name, InMemoryFileStore.new);
 }

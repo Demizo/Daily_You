@@ -1,13 +1,18 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/database/entry_store.dart';
-import 'package:daily_you/database/image_storage.dart';
+import 'package:daily_you/database/attachment_storage.dart';
 import 'package:daily_you/database/tag_dao.dart';
 import 'package:daily_you/models/entry.dart';
-import 'package:daily_you/models/image.dart';
+import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/models/tag.dart';
-import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/storage/in_memory_file_store.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -26,7 +31,7 @@ void main() {
   Future<void> reloadEverything() async {
     await store.load();
     await TagsProvider.instance.load();
-    await EntryImagesProvider.instance.load();
+    await EntryAttachmentsProvider.instance.load();
   }
 
   Future<Tag> addTag(String name) => TagDao.add(Tag(
@@ -35,10 +40,14 @@ void main() {
       timeCreate: time,
       timeModified: time));
 
-  Future<EntryImage> writeImageFile(String name) async {
+  Future<EntryAttachment> writeImageFile(String name) async {
     await imageFiles.write(name, Uint8List.fromList(name.codeUnits));
-    return EntryImage(
-        entryId: null, imgPath: name, imgRank: 0, timeCreate: time);
+    return EntryAttachment(
+        entryId: null,
+        type: AttachmentType.image,
+        filePath: name,
+        rank: 0,
+        timeCreate: time);
   }
 
   setUpAll(sqfliteFfiInit);
@@ -50,13 +59,13 @@ void main() {
     await AppDatabase.instance.createSchema(database);
 
     imageFiles = InMemoryFileStore();
-    ImageStorage.instance.overrideStores(imageFiles, InMemoryFileStore());
+    AttachmentStorage.instance.overrideStores(imageFiles, InMemoryFileStore());
 
     await reloadEverything();
   });
 
   tearDown(() async {
-    ImageStorage.instance.clearStoreOverrides();
+    AttachmentStorage.instance.clearStoreOverrides();
     AppDatabase.instance.database = null;
     await database.close();
   });
@@ -71,7 +80,7 @@ void main() {
           tags: [
             EntryTag(entryId: 0, tagId: tag.id!, value: '2', timeCreate: time)
           ],
-          images: [image],
+          attachments: [image],
         ));
 
     await reloadEverything();
@@ -85,8 +94,8 @@ void main() {
     expect(entryTags.single.value, '2');
 
     final entryImages =
-        EntryImagesProvider.instance.getForEntry(store.entries.single);
-    expect(entryImages.single.imgPath, 'photo.jpg');
+        EntryAttachmentsProvider.instance.getForEntry(store.entries.single);
+    expect(entryImages.single.filePath, 'photo.jpg');
   });
 
   test('reconciles tags and images on a later save', () async {
@@ -103,12 +112,12 @@ void main() {
             EntryTag(entryId: 0, tagId: kept.id!, timeCreate: time),
             EntryTag(entryId: 0, tagId: dropped.id!, timeCreate: time),
           ],
-          images: [keptImage, droppedImage],
+          attachments: [keptImage, droppedImage],
         ));
 
-    final survivingImage = EntryImagesProvider.instance
+    final survivingImage = EntryAttachmentsProvider.instance
         .getForEntry(store.entries.single)
-        .firstWhere((image) => image.imgPath == 'kept.jpg');
+        .firstWhere((image) => image.filePath == 'kept.jpg');
 
     await session.save((_) => EntryDraft(
           entry: saved.copy(text: 'trimmed'),
@@ -119,7 +128,7 @@ void main() {
                 value: '4',
                 timeCreate: time)
           ],
-          images: [survivingImage],
+          attachments: [survivingImage],
         ));
 
     await reloadEverything();
@@ -129,8 +138,8 @@ void main() {
     expect(entryTags.single.value, '4');
 
     final entryImages =
-        EntryImagesProvider.instance.getForEntry(store.entries.single);
-    expect(entryImages.single.imgPath, 'kept.jpg');
+        EntryAttachmentsProvider.instance.getForEntry(store.entries.single);
+    expect(entryImages.single.filePath, 'kept.jpg');
     expect(await imageFiles.exists('dropped.jpg'), isFalse);
     expect(await imageFiles.exists('kept.jpg'), isTrue);
   });
@@ -276,7 +285,7 @@ void main() {
     final saved = await store.beginDraft().save((_) => EntryDraft(
           entry: draftEntry(),
           tags: [EntryTag(entryId: 0, tagId: tag.id!, timeCreate: time)],
-          images: [image],
+          attachments: [image],
         ));
 
     await store.delete(saved);
@@ -284,7 +293,84 @@ void main() {
 
     expect(store.entries, isEmpty);
     expect(TagsProvider.instance.entryTags, isEmpty);
-    expect(EntryImagesProvider.instance.images, isEmpty);
+    expect(EntryAttachmentsProvider.instance.attachments, isEmpty);
     expect(await imageFiles.exists('photo.jpg'), isFalse);
   });
+
+  test('removes the audio and video files of a deleted entry', () async {
+    final audioFiles =
+        await AttachmentStorage.instance.internalStore(AttachmentType.audio);
+    final videoFiles =
+        await AttachmentStorage.instance.internalStore(AttachmentType.video);
+    await audioFiles.write('voice.m4a', Uint8List.fromList([1]));
+    await videoFiles.write('clip.mp4', Uint8List.fromList([2]));
+    await videoFiles.write('other.mp4', Uint8List.fromList([3]));
+    EntryAttachment attachment(AttachmentType type, String name, int rank) =>
+        EntryAttachment(
+            entryId: null,
+            type: type,
+            filePath: name,
+            rank: rank,
+            timeCreate: time);
+
+    final saved = await store.beginDraft().save((_) => EntryDraft(
+          entry: draftEntry(),
+          attachments: [
+            attachment(AttachmentType.audio, 'voice.m4a', 1),
+            attachment(AttachmentType.video, 'clip.mp4', 0),
+          ],
+        ));
+
+    await store.delete(saved);
+    await reloadEverything();
+
+    expect(EntryAttachmentsProvider.instance.attachments, isEmpty);
+    expect(await audioFiles.list(), isEmpty);
+    expect(await videoFiles.list(), equals(['other.mp4']));
+  });
+
+  test('a file that cannot be deleted does not stop the entry delete',
+      () async {
+    final stuckFiles = StuckFileStore();
+    AttachmentStorage.instance.overrideStores(stuckFiles, InMemoryFileStore());
+    final image = await writeImageFile('photo.jpg');
+    final saved = await store.beginDraft().save((_) => EntryDraft(
+          entry: draftEntry(),
+          attachments: [image],
+        ));
+
+    await store.delete(saved);
+
+    expect(store.entries, isEmpty);
+    expect(EntryAttachmentsProvider.instance.attachments, isEmpty);
+    await reloadEverything();
+    expect(store.entries, isEmpty);
+  });
+
+  test('loads the attachments it knows and skips a row of an unknown type',
+      () async {
+    final image = await writeImageFile('photo.jpg');
+    final saved = await store.beginDraft().save((_) => EntryDraft(
+          entry: draftEntry(),
+          attachments: [image],
+        ));
+    await database.insert('entry_attachments', {
+      'entry_id': saved.id,
+      'type': 'hologram',
+      'file_path': 'future.holo',
+      'rank': 5,
+      'time_create': time.toIso8601String(),
+    });
+
+    await EntryAttachmentsProvider.instance.load();
+
+    expect(EntryAttachmentsProvider.instance.attachments.map((a) => a.filePath),
+        equals(['photo.jpg']));
+  });
+}
+
+class StuckFileStore extends InMemoryFileStore {
+  @override
+  Future<bool> delete(String name) async =>
+      throw const FileSystemException('read-only');
 }

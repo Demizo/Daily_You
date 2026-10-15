@@ -1,5 +1,9 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 import 'package:daily_you/widgets/markdown_highlight_syntax.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:markdown_widget/markdown_widget.dart';
 
 // Fixes duplicate scaling issues with markdown_widget
@@ -34,11 +38,24 @@ class ScaledMarkdown extends StatelessWidget {
     // Apply custom scaling to the user's text scale
     final customScaler = TextScaler.linear(deviceScaler.scale(scaleFactor));
 
-    return MarkdownBlock(
-      selectable: selectable,
-      config: theme.brightness == Brightness.light
-          ? MarkdownConfig.defaultConfig
-          : MarkdownConfig.darkConfig,
+    final baseConfig = theme.brightness == Brightness.light
+        ? MarkdownConfig.defaultConfig
+        : MarkdownConfig.darkConfig;
+    final paragraphStyle = baseConfig.p.textStyle;
+    final bulletOffset =
+        (paragraphStyle.fontSize ?? 16.0) * (paragraphStyle.height ?? 1.2) / 2;
+    final config = baseConfig.copy(configs: [
+      ListConfig(
+        marker: (isOrdered, depth, index) => isOrdered
+            ? null
+            : getDefaultMarker(false, depth, theme.colorScheme.onSurface, index,
+                bulletOffset, baseConfig),
+      ),
+    ]);
+
+    final markdown = MarkdownBlock(
+      selectable: false,
+      config: config,
       generator: MarkdownGenerator(
         inlineSyntaxList: [HighlightSyntax()],
         generators: [highlightGenerator(Colors.yellow.shade700)],
@@ -65,6 +82,8 @@ class ScaledMarkdown extends StatelessWidget {
       ),
       data: text,
     );
+
+    return selectable ? SelectionArea(child: markdown) : markdown;
   }
 }
 

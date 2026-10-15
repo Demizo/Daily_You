@@ -21,6 +21,21 @@ class AppLocalizationsIt extends AppLocalizations {
   String get actionTakePhoto => 'Scatta una foto';
 
   @override
+  String get actionTakeVideo => 'Take video';
+
+  @override
+  String get actionRecordAudio => 'Record audio';
+
+  @override
+  String get actionAddImage => 'Add image';
+
+  @override
+  String get actionAddVideo => 'Add video';
+
+  @override
+  String get actionAddAudio => 'Add audio';
+
+  @override
   String get actionToday => 'Oggi';
 
   @override
@@ -254,6 +269,13 @@ class AppLocalizationsIt extends AppLocalizations {
   String get databaseMigrationErrorRetry => 'Riprova';
 
   @override
+  String get databaseNewerErrorTitle => 'Update Required';
+
+  @override
+  String get databaseNewerErrorDescription =>
+      'Your data was saved by a newer version of Daily You. This version can\'t open it safely. Update the app to continue.';
+
+  @override
   String get errorReport => 'Segnala un problema';
 
   @override
@@ -277,6 +299,23 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get deletePhotoDescription => 'Vuoi eliminare questa foto?';
+
+  @override
+  String get deleteAttachmentTitle => 'Delete Attachment';
+
+  @override
+  String get deleteAttachmentDescription =>
+      'Do you want to delete this attachment?';
+
+  @override
+  String get largeAttachmentWarningTitle => 'Large attachment';
+
+  @override
+  String get largeAttachmentWarningDescription =>
+      'This attachment is large and will increase your backup size.';
+
+  @override
+  String get dontShowAgain => 'Don\'t show again';
 
   @override
   String get pageSettingsTitle => 'Impostazioni';
@@ -645,6 +684,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get settingsImageQuality => 'Qualità delle immagini';
 
   @override
+  String get settingsMediaQualityTitle => 'Media Quality';
+
+  @override
   String get imageQualityHigh => 'Alta';
 
   @override
@@ -657,10 +699,19 @@ class AppLocalizationsIt extends AppLocalizations {
   String get imageQualityNoCompression => 'Qualità originale';
 
   @override
+  String get settingsStorageUsage => 'Storage Usage';
+
+  @override
   String get settingsLogFolder => 'Cartella delle entrate del diario';
 
   @override
   String get settingsImageFolder => 'Cartella delle immagini';
+
+  @override
+  String get settingsExternalSyncTitle => 'Sync with External Location';
+
+  @override
+  String get chooseFolderHint => 'Choose a folder';
 
   @override
   String get warningTitle => 'Attenzione';
@@ -679,6 +730,10 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get imageFolderErrorDescription =>
       'Impossibile modificare la cartella delle immagini!';
+
+  @override
+  String get syncErrorDescription =>
+      'Failed to sync with the external location!';
 
   @override
   String get backupErrorDescription => 'Impossibile creare il backup!';
@@ -799,6 +854,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get exportImages => 'Export Images';
+
+  @override
+  String get exportIncludeTitle => 'Include';
 
   @override
   String get settingsImport => 'Import';
@@ -945,6 +1003,12 @@ class AppLocalizationsIt extends AppLocalizations {
   String get imagesTitle => 'Foto';
 
   @override
+  String get audioTitle => 'Audio';
+
+  @override
+  String get videoTitle => 'Video';
+
+  @override
   String get tagMoodTitle => 'Stato d\'animo';
 
   @override
@@ -969,4 +1033,29 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get shareAddToLogPickerTitle => 'Choose a log';
+
+  @override
+  String get attachmentAddErrorDescription => 'Failed to add attachment!';
+
+  @override
+  String get attachmentLoadFailed => 'Could not open this attachment';
+
+  @override
+  String get attachmentNoAppToOpen => 'No app can open this attachment';
+
+  @override
+  String get recorderDiscardTitle => 'Discard recording?';
+
+  @override
+  String get recorderDiscardDescription => 'This recording will be deleted.';
+
+  @override
+  String get recorderDiscardAction => 'Discard';
+
+  @override
+  String get recorderPermissionDenied =>
+      'Microphone permission is required to record audio';
+
+  @override
+  String get recorderErrorDescription => 'Failed to record audio!';
 }

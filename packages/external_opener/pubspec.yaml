@@ -1,0 +1,19 @@
+name: external_opener
+description: Opens a local file in the device's default app for its type
+version: 0.0.1
+publish_to: 'none'
+
+environment:
+  sdk: '>=3.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  url_launcher: ^6.1.12
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        package: com.demizo.daily_you.external_opener
+        pluginClass: ExternalOpenerPlugin

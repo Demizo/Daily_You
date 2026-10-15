@@ -21,6 +21,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get actionTakePhoto => '拍张照';
 
   @override
+  String get actionTakeVideo => 'Take video';
+
+  @override
+  String get actionRecordAudio => 'Record audio';
+
+  @override
+  String get actionAddImage => 'Add image';
+
+  @override
+  String get actionAddVideo => 'Add video';
+
+  @override
+  String get actionAddAudio => 'Add audio';
+
+  @override
   String get actionToday => '今天';
 
   @override
@@ -252,6 +267,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get databaseMigrationErrorRetry => '重试';
 
   @override
+  String get databaseNewerErrorTitle => 'Update Required';
+
+  @override
+  String get databaseNewerErrorDescription =>
+      'Your data was saved by a newer version of Daily You. This version can\'t open it safely. Update the app to continue.';
+
+  @override
   String get errorReport => '报告问题';
 
   @override
@@ -274,6 +296,23 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get deletePhotoDescription => '您确定要删除这张图片吗？';
+
+  @override
+  String get deleteAttachmentTitle => 'Delete Attachment';
+
+  @override
+  String get deleteAttachmentDescription =>
+      'Do you want to delete this attachment?';
+
+  @override
+  String get largeAttachmentWarningTitle => 'Large attachment';
+
+  @override
+  String get largeAttachmentWarningDescription =>
+      'This attachment is large and will increase your backup size.';
+
+  @override
+  String get dontShowAgain => 'Don\'t show again';
 
   @override
   String get pageSettingsTitle => '设置';
@@ -630,6 +669,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsImageQuality => '图像质量';
 
   @override
+  String get settingsMediaQualityTitle => 'Media Quality';
+
+  @override
   String get imageQualityHigh => '高';
 
   @override
@@ -642,10 +684,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get imageQualityNoCompression => '无损';
 
   @override
+  String get settingsStorageUsage => 'Storage Usage';
+
+  @override
   String get settingsLogFolder => '日迹存储目录';
 
   @override
   String get settingsImageFolder => '图片存储目录';
+
+  @override
+  String get settingsExternalSyncTitle => 'Sync with External Location';
+
+  @override
+  String get chooseFolderHint => 'Choose a folder';
 
   @override
   String get warningTitle => '警告';
@@ -662,6 +713,10 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get imageFolderErrorDescription => '无法更改图片目录！';
+
+  @override
+  String get syncErrorDescription =>
+      'Failed to sync with the external location!';
 
   @override
   String get backupErrorDescription => '创建备份失败！';
@@ -780,6 +835,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get exportImages => '导出图片';
+
+  @override
+  String get exportIncludeTitle => 'Include';
 
   @override
   String get settingsImport => '导入数据';
@@ -920,6 +978,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get imagesTitle => '图像';
 
   @override
+  String get audioTitle => 'Audio';
+
+  @override
+  String get videoTitle => 'Video';
+
+  @override
   String get tagMoodTitle => '心情';
 
   @override
@@ -943,7 +1007,32 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get shareAddToLogPickerTitle => 'Choose a log';
+  String get shareAddToLogPickerTitle => '选择日志';
+
+  @override
+  String get attachmentAddErrorDescription => 'Failed to add attachment!';
+
+  @override
+  String get attachmentLoadFailed => 'Could not open this attachment';
+
+  @override
+  String get attachmentNoAppToOpen => 'No app can open this attachment';
+
+  @override
+  String get recorderDiscardTitle => 'Discard recording?';
+
+  @override
+  String get recorderDiscardDescription => 'This recording will be deleted.';
+
+  @override
+  String get recorderDiscardAction => 'Discard';
+
+  @override
+  String get recorderPermissionDenied =>
+      'Microphone permission is required to record audio';
+
+  @override
+  String get recorderErrorDescription => 'Failed to record audio!';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -1866,4 +1955,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String chartDistributionTitle(Object tag) {
     return '$tag 分佈';
   }
+
+  @override
+  String get shareAddToLogPickerTitle => '選擇一個紀錄';
 }

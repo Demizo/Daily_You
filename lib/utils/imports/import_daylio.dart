@@ -1,18 +1,21 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:daily_you/database/app_database.dart';
+import 'package:daily_you/database/attachment_storage.dart';
 import 'package:daily_you/database/entry_tag_dao.dart';
-import 'package:daily_you/database/image_storage.dart';
 import 'package:daily_you/database/tag_category_dao.dart';
 import 'package:daily_you/database/tag_dao.dart';
+import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/models/entry.dart';
-import 'package:daily_you/models/image.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/models/tag_category.dart';
 import 'package:daily_you/providers/entries_provider.dart';
-import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/storage/storage_picker.dart';
 import 'package:daily_you/utils/imports/import_helpers.dart';
@@ -20,7 +23,7 @@ import 'package:daily_you/utils/operation_outcome.dart';
 import 'package:daily_you/utils/tag_name_sanitizer.dart';
 import 'package:daily_you/utils/zip_utils.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:html2md/html2md.dart' as html2md;
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -96,6 +99,8 @@ Future<OperationOutcome> importFromDaylio(
       5: -2,
     };
 
+    final takenNames = await AttachmentStorage.instance
+        .takenLowerCaseNames(AttachmentType.image);
     final totalEntries = dayEntries.length;
     int processedEntries = 0;
 
@@ -125,27 +130,22 @@ Future<OperationOutcome> importFromDaylio(
             skipUpdate: true);
 
         final assetIds = (entry['assets'] as List?)?.cast<int>() ?? [];
+        final photoFiles = <String>[];
         for (final assetId in assetIds) {
           final asset = assetById[assetId];
           if (asset == null || asset['type'] != 1) continue;
 
-          final checksum = asset['checksum'];
-          final file = checksumToFilePath[checksum];
-          if (file == null) continue;
+          final file = checksumToFilePath[asset['checksum']];
+          if (file != null) photoFiles.add(file);
+        }
 
-          final imagePath = await ImageStorage.instance.create(
-              null, Uint8List.fromList(await File(file).readAsBytes()),
-              currTime: datetime, skipExternalUpload: true);
-          if (imagePath != null) {
-            await EntryImagesProvider.instance.add(
-                EntryImage(
-                  entryId: addedEntry.id!,
-                  imgPath: imagePath,
-                  imgRank: 0,
-                  timeCreate: datetime,
-                ),
-                skipUpdate: true);
-          }
+        for (var index = 0; index < photoFiles.length; index++) {
+          await addImportedImage(
+              addedEntry.id!,
+              Uint8List.fromList(await File(photoFiles[index]).readAsBytes()),
+              photoFiles.length - 1 - index,
+              datetime,
+              takenNames);
         }
 
         final tagIds = (entry['tags'] as List?)?.cast<int>() ?? [];

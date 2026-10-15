@@ -1,3 +1,7 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/stats_subject.dart';
@@ -8,6 +12,7 @@ import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/stats/entry_stats.dart';
 import 'package:daily_you/stats/stats_range.dart';
 import 'package:daily_you/stats/streaks.dart';
+import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/distribution_chart.dart';
 import 'package:daily_you/widgets/label_summary_card.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
@@ -21,7 +26,7 @@ import 'package:daily_you/utils/chart_y_range.dart';
 import 'package:daily_you/utils/tag_visuals.dart';
 import 'package:daily_you/widgets/value_by_day_chart.dart';
 import 'package:daily_you/widgets/value_over_time_chart.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:provider/provider.dart';
@@ -228,7 +233,7 @@ class _StatsPageState extends State<StatsPage>
       _applySubject(const MoodSubject());
       return;
     }
-    final tag = await showDialog<Tag>(
+    final tag = await showAppDialog<Tag>(
       context: context,
       builder: (_) => TagPickerDialog(
         mode: TagPickerMode.selectSingle,

@@ -1,10 +1,15 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 import 'dart:io';
 
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/layouts/fast_page_view_scroll_physics.dart';
 import 'package:daily_you/pages/settings/notification_settings.dart';
+import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:easy_debounce/easy_debounce.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/pages/statistics_page.dart';
 import 'package:daily_you/pages/gallery_page.dart';
@@ -119,7 +124,7 @@ class _MobileScaffoldState extends State<MobileScaffold> {
   }
 
   void _showNotificationOnboardingPopup() {
-    showDialog(
+    showAppDialog(
       context: context,
       builder: (BuildContext context) {
         final configProvider = Provider.of<ConfigProvider>(context);

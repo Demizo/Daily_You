@@ -1,10 +1,14 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 import 'package:daily_you/l10n/generated/app_localizations.dart';
-import 'package:daily_you/models/image.dart';
+import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/entry_card_header_row.dart';
-import 'package:daily_you/widgets/image_grid.dart';
+import 'package:daily_you/widgets/attachment_grid.dart';
 import 'package:daily_you/widgets/scaled_markdown.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/models/entry.dart';
 
 class EntryCardWidget extends StatelessWidget {
@@ -12,12 +16,12 @@ class EntryCardWidget extends StatelessWidget {
       {super.key,
       this.title,
       required this.entry,
-      required this.images,
+      required this.attachments,
       this.hideImage = false});
 
   final Entry entry;
   final String? title;
-  final List<EntryImage> images;
+  final List<EntryAttachment> attachments;
   final bool hideImage;
 
   @override
@@ -35,8 +39,8 @@ class EntryCardWidget extends StatelessWidget {
             child: ClipRRect(
               clipBehavior: Clip.hardEdge,
               borderRadius: BorderRadius.circular(12),
-              child: (images.isNotEmpty && !hideImage)
-                  ? ImageGrid(images: images)
+              child: (attachments.isNotEmpty && !hideImage)
+                  ? AttachmentGrid(attachments: attachments)
                   : (entry.text.isNotEmpty)
                       ? ShaderMask(
                           shaderCallback: (Rect bounds) {

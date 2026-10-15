@@ -1,9 +1,13 @@
-import 'package:daily_you/models/image.dart';
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
+import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/entry_card_header_row.dart';
-import 'package:daily_you/widgets/image_grid.dart';
+import 'package:daily_you/widgets/attachment_grid.dart';
 import 'package:daily_you/widgets/scaled_markdown.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/models/entry.dart';
 
@@ -89,12 +93,12 @@ class LargeEntryCardWidget extends StatelessWidget {
     super.key,
     this.title,
     required this.entry,
-    required this.images,
+    required this.attachments,
     this.hideImage = false,
   });
 
   final Entry entry;
-  final List<EntryImage> images;
+  final List<EntryAttachment> attachments;
   final String? title;
   final bool hideImage;
 
@@ -103,7 +107,9 @@ class LargeEntryCardWidget extends StatelessWidget {
     final theme = Theme.of(context);
     final time = TimeManager.formatDate(entry.timeCreate, context);
     return LargeCard(
-      media: images.isNotEmpty && !hideImage ? ImageGrid(images: images) : null,
+      media: attachments.isNotEmpty && !hideImage
+          ? AttachmentGrid(attachments: attachments)
+          : null,
       header: EntryCardHeaderRow(
         entry: entry,
         title: title == null ? time : title!,

@@ -1,9 +1,14 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/models/tag_category.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/utils/backup_restore_utils.dart';
 import 'package:daily_you/utils/tag_category_visuals.dart';
 import 'package:daily_you/utils/templates_tags_transfer.dart';
+import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/edit_category.dart';
 import 'package:daily_you/widgets/edit_tag.dart';
 import 'package:daily_you/widgets/expressive_fab_menu.dart';
@@ -11,7 +16,7 @@ import 'package:daily_you/widgets/failure_dialog.dart';
 import 'package:daily_you/widgets/share_tags_dialog.dart';
 import 'package:daily_you/widgets/tag_chip.dart';
 import 'package:daily_you/widgets/tag_icon_glyph.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:provider/provider.dart';
 
@@ -41,14 +46,14 @@ class _TagsSettingsState extends State<TagsSettings> {
   bool _isDraggingCategory = false;
 
   void _showEditTagDialog(BuildContext context, Tag? tag) {
-    showDialog(
+    showAppDialog(
       context: context,
       builder: (context) => EditTag(tag: tag),
     );
   }
 
   void _showCategoryDialog(BuildContext context, TagCategory? category) {
-    showDialog(
+    showAppDialog(
       context: context,
       builder: (_) => EditCategory(category: category),
     );

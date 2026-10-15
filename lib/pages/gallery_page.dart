@@ -1,13 +1,19 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 import 'package:daily_you/config_provider.dart';
+import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/providers/entries_provider.dart';
-import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
+import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/tag_picker_dialog.dart';
 import 'package:daily_you/widgets/hiding_widget.dart';
 import 'package:daily_you/widgets/large_entry_card_widget.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/widgets/entry_card_widget.dart';
 import 'package:daily_you/pages/entries_list_page.dart';
@@ -132,7 +138,7 @@ class _GalleryPageState extends State<GalleryPage>
   }
 
   void _showTagFilterDialog(BuildContext context) {
-    showDialog(
+    showAppDialog(
       context: context,
       builder: (_) => TagPickerDialog(
         mode: TagPickerMode.filter,
@@ -154,7 +160,7 @@ class _GalleryPageState extends State<GalleryPage>
     final entriesProvider =
         Provider.of<EntriesProvider>(context, listen: false);
     final tagsProvider = Provider.of<TagsProvider>(context, listen: false);
-    showDialog(
+    showAppDialog(
       context: context,
       builder: (context) {
         return StatefulBuilder(builder: (context, setDialogState) {
@@ -168,7 +174,7 @@ class _GalleryPageState extends State<GalleryPage>
             final previousOrderBy = entriesProvider.orderBy;
             setDialogState(() => entriesProvider.orderBy = OrderBy.tracker);
 
-            final tag = await showDialog<Tag>(
+            final tag = await showAppDialog<Tag>(
               context: context,
               builder: (_) => TagPickerDialog(
                 mode: TagPickerMode.selectSingle,
@@ -413,9 +419,18 @@ class _GalleryPageState extends State<GalleryPage>
     );
   }
 
+  List<EntryAttachment> _visualAttachmentsOf(
+      EntryAttachmentsProvider provider, Entry entry) {
+    return provider
+        .getForEntry(entry)
+        .where((attachment) => attachment.type.isVisual)
+        .toList();
+  }
+
   Widget buildEntries(BuildContext context, bool listView, List<Entry> entries,
       TagsProvider tagsProvider) {
-    final entryImagesProvider = Provider.of<EntryImagesProvider>(context);
+    final entryAttachmentsProvider =
+        Provider.of<EntryAttachmentsProvider>(context);
     final configProvider = Provider.of<ConfigProvider>(context);
     return entries.isEmpty
         ? Center(
@@ -453,13 +468,15 @@ class _GalleryPageState extends State<GalleryPage>
                 child: listView
                     ? LargeEntryCardWidget(
                         entry: entry,
-                        images: entryImagesProvider.getForEntry(entry),
+                        attachments: _visualAttachmentsOf(
+                            entryAttachmentsProvider, entry),
                         hideImage:
                             configProvider.get(Settings.hideImagesInGallery),
                       )
                     : EntryCardWidget(
                         entry: entry,
-                        images: entryImagesProvider.getForEntry(entry),
+                        attachments: _visualAttachmentsOf(
+                            entryAttachmentsProvider, entry),
                         hideImage:
                             configProvider.get(Settings.hideImagesInGallery),
                       ),

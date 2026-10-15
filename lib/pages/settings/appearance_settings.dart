@@ -1,11 +1,16 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/color_picker_dialog.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
 import 'package:daily_you/widgets/settings_dropdown.dart';
 import 'package:daily_you/widgets/settings_icon_action.dart';
 import 'package:daily_you/widgets/settings_toggle.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -27,7 +32,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
   Future<void> _showAccentColorPopup(ThemeModeProvider themeProvider) async {
     final initialColor =
         Color(ConfigProvider.instance.get(Settings.accentColor));
-    final result = await showDialog<ColorPickerResult>(
+    final result = await showAppDialog<ColorPickerResult>(
       context: context,
       builder: (context) => ColorPickerDialog(initialColor: initialColor),
     );
@@ -39,7 +44,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
 
   void _showMoodEmojiPopup(int? value) {
     String newEmoji = '';
-    showDialog(
+    showAppDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -113,7 +118,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
 
   void _showHideImagesDialog(
       BuildContext context, ConfigProvider configProvider) {
-    showDialog(
+    showAppDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(

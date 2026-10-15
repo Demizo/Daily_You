@@ -1,8 +1,12 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 import 'dart:math';
 
 import 'package:daily_you/utils/markdown_preview_scanner.dart';
 import 'package:daily_you/utils/markdown_preview_styles.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 
 /// A [TextEditingController] that styles Markdown syntax in place

@@ -1,72 +1,32 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
-class CustomMaterialLocalizationsDelegate
-    extends LocalizationsDelegate<MaterialLocalizations> {
-  const CustomMaterialLocalizationsDelegate();
+import 'package:cupertino_ui/cupertino_ui.dart';
+import 'package:flutter_localizations/flutter_localizations.dart' as sdk;
+import 'package:material_ui/material_ui.dart';
 
-  @override
-  bool isSupported(Locale locale) {
-    // Pretend to support everything
-    return true;
-  }
+class OccitanFrenchFallbackDelegate<T> extends LocalizationsDelegate<T> {
+  const OccitanFrenchFallbackDelegate(this.delegate);
 
-  @override
-  Future<MaterialLocalizations> load(Locale locale) {
-    if (locale.languageCode == 'oc') {
-      // Load French localization for Occitan
-      return GlobalMaterialLocalizations.delegate.load(const Locale('fr'));
-    }
-    return GlobalMaterialLocalizations.delegate.load(locale);
-  }
+  final LocalizationsDelegate<T> delegate;
 
   @override
-  bool shouldReload(covariant LocalizationsDelegate old) => false;
-}
-
-class CustomCupertinoLocalizationsDelegate
-    extends LocalizationsDelegate<CupertinoLocalizations> {
-  const CustomCupertinoLocalizationsDelegate();
+  Type get type => delegate.type;
 
   @override
-  bool isSupported(Locale locale) {
-    // Pretend to support everything
-    return true;
-  }
+  bool isSupported(Locale locale) => true;
 
   @override
-  Future<CupertinoLocalizations> load(Locale locale) {
-    if (locale.languageCode == 'oc') {
-      // Load French localization for Occitan
-      return GlobalCupertinoLocalizations.delegate.load(const Locale('fr'));
-    }
-    return GlobalCupertinoLocalizations.delegate.load(locale);
-  }
+  Future<T> load(Locale locale) =>
+      delegate.load(locale.languageCode == 'oc' ? const Locale('fr') : locale);
 
   @override
   bool shouldReload(covariant LocalizationsDelegate old) => false;
 }
 
-class CustomWidgetsLocalizationsDelegate
-    extends LocalizationsDelegate<WidgetsLocalizations> {
-  const CustomWidgetsLocalizationsDelegate();
-
-  @override
-  bool isSupported(Locale locale) {
-    // Pretend to support everything
-    return true;
-  }
-
-  @override
-  Future<WidgetsLocalizations> load(Locale locale) {
-    if (locale.languageCode == 'oc') {
-      // Load French localization for Occitan
-      return GlobalWidgetsLocalizations.delegate.load(const Locale('fr'));
-    }
-    return GlobalWidgetsLocalizations.delegate.load(locale);
-  }
-
-  @override
-  bool shouldReload(covariant LocalizationsDelegate old) => false;
-}
+const appLocalizationsDelegates = <LocalizationsDelegate<dynamic>>[
+  OccitanFrenchFallbackDelegate(GlobalMaterialLocalizations.delegate),
+  OccitanFrenchFallbackDelegate(GlobalCupertinoLocalizations.delegate),
+  OccitanFrenchFallbackDelegate(sdk.GlobalWidgetsLocalizations.delegate),
+];

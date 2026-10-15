@@ -1,4 +1,8 @@
-import 'package:flutter/material.dart';
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
+import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/stats/stats_range.dart';
 import 'package:daily_you/widgets/connected_button_group.dart';

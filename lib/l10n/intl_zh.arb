@@ -259,5 +259,6 @@
     "encryptingBackupStatus": "正在加密备份… {percent}%",
     "decryptingBackupStatus": "正在解密备份… {percent}%",
     "settingsOpenSourceLicenses": "开源许可",
-    "settingsAutoBackupMaxCount": "保留的备份数量"
+    "settingsAutoBackupMaxCount": "保留的备份数量",
+    "shareAddToLogPickerTitle": "选择日志"
 }

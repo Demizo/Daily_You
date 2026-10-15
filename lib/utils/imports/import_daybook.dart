@@ -1,19 +1,22 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:csv/csv.dart';
-import 'package:daily_you/database/image_storage.dart';
+import 'package:daily_you/database/attachment_storage.dart';
 import 'package:daily_you/models/entry.dart';
-import 'package:daily_you/models/image.dart';
+import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/providers/entries_provider.dart';
-import 'package:daily_you/providers/entry_images_provider.dart';
 import 'package:daily_you/storage/local_file_store.dart';
 import 'package:daily_you/storage/storage_picker.dart';
 import 'package:daily_you/utils/imports/import_helpers.dart';
 import 'package:daily_you/utils/operation_outcome.dart';
 import 'package:daily_you/utils/zip_utils.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -90,6 +93,8 @@ Future<OperationOutcome> importFromDaybook(
       });
     }
 
+    final takenNames = await AttachmentStorage.instance
+        .takenLowerCaseNames(AttachmentType.image);
     final totalEntries = parsedEntries.length;
     int processedEntries = 0;
 
@@ -118,19 +123,8 @@ Future<OperationOutcome> importFromDaybook(
         for (final filename in imageFilenames) {
           final bytes = await extractedFiles.read(filename);
           if (bytes == null) continue;
-          final imagePath = await ImageStorage.instance
-              .create(null, bytes, currTime: date, skipExternalUpload: true);
-          if (imagePath != null) {
-            await EntryImagesProvider.instance.add(
-              EntryImage(
-                entryId: addedEntry.id!,
-                imgPath: imagePath,
-                imgRank: rank++,
-                timeCreate: date,
-              ),
-              skipUpdate: true,
-            );
-          }
+          await addImportedImage(
+              addedEntry.id!, bytes, rank++, date, takenNames);
         }
       }
 

@@ -1,7 +1,12 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/models/tag_category.dart';
 import 'package:daily_you/models/tag_icon_type.dart';
 import 'package:daily_you/providers/tags_provider.dart';
+import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/color_picker_dialog.dart';
 import 'package:daily_you/widgets/color_swatch_row.dart';
 import 'package:daily_you/widgets/connected_button_group.dart';
@@ -10,7 +15,7 @@ import 'package:daily_you/widgets/edit_category.dart';
 import 'package:daily_you/widgets/icon_picker_dialog.dart';
 import 'package:daily_you/widgets/tag_icon_glyph.dart';
 import 'package:daily_you/utils/tag_name_sanitizer.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 
 class EditTag extends StatefulWidget {
@@ -114,7 +119,7 @@ class _EditTagState extends State<EditTag> {
   }
 
   Future<void> _showColorPicker() async {
-    final result = await showDialog<ColorPickerResult>(
+    final result = await showAppDialog<ColorPickerResult>(
       context: context,
       builder: (context) => ColorPickerDialog(
         initialColor: _color != null ? Color(_color!) : null,
@@ -127,7 +132,7 @@ class _EditTagState extends State<EditTag> {
   }
 
   Future<void> _showIconPicker() async {
-    final result = await showDialog<IconPickerResult>(
+    final result = await showAppDialog<IconPickerResult>(
       context: context,
       builder: (context) =>
           IconPickerDialog(previewColor: _effectiveColor(context)),
@@ -259,7 +264,7 @@ class _EditTagState extends State<EditTag> {
   Future<void> _createCategory(BuildContext context) async {
     final categoriesBefore =
         List<TagCategory>.from(TagsProvider.instance.categories);
-    await showDialog(
+    await showAppDialog(
       context: context,
       builder: (_) => const EditCategory(category: null),
     );

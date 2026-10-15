@@ -1,3 +1,7 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -27,7 +31,7 @@ void main() {
           equals(DateTime(2026, 1, 2, 3, 4, 5)));
       expect(decoded.single.entry.timeModified,
           equals(DateTime(2026, 1, 3, 3, 4, 5)));
-      expect(decoded.single.images, isEmpty);
+      expect(decoded.single.attachments, isEmpty);
     });
 
     test('decodes a missing mood as null', () {
@@ -63,11 +67,14 @@ void main() {
         }
       ]));
 
-      expect(decoded.single.images.map((image) => image.imgPath),
-          equals(['second.jpg', 'first.jpg']));
       expect(
-          decoded.single.images.map((image) => image.imgRank), equals([1, 0]));
-      expect(decoded.single.images.every((image) => image.entryId == null),
+          decoded.single.attachments.map((attachment) => attachment.filePath),
+          equals(['second.jpg', 'first.jpg']));
+      expect(decoded.single.attachments.map((attachment) => attachment.rank),
+          equals([1, 0]));
+      expect(
+          decoded.single.attachments
+              .every((attachment) => attachment.entryId == null),
           isTrue);
     });
 
@@ -88,9 +95,10 @@ void main() {
         }
       ]));
 
-      expect(decoded.single.images.map((image) => image.imgPath),
+      expect(
+          decoded.single.attachments.map((attachment) => attachment.filePath),
           equals(['legacy.jpg', 'modern.jpg']));
-      expect(decoded.single.images.first.imgRank, equals(0));
+      expect(decoded.single.attachments.first.rank, equals(0));
     });
   });
 

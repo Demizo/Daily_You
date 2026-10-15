@@ -1,10 +1,14 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 import 'dart:ui' show PlatformDispatcher;
 
 import 'package:daily_you/config_provider.dart';
-import 'package:flutter/material.dart';
+import 'package:daily_you/utils/jalali_calendar_delegate.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
-import 'package:persian_datetime_picker/persian_datetime_picker.dart';
-import 'package:time_range_picker/time_range_picker.dart';
+import 'package:shamsi_date/shamsi_date.dart';
 
 class TimeManager {
   static bool isToday(DateTime date) {
@@ -51,30 +55,31 @@ class TimeManager {
         minute: ConfigProvider.instance.get(Settings.scheduledReminderMinute));
   }
 
-  static TimeRange getReminderTimeRange() {
-    TimeOfDay startTime = TimeOfDay(
-        hour: ConfigProvider.instance.get(Settings.reminderStartHour),
-        minute: ConfigProvider.instance.get(Settings.reminderStartMinute));
-    TimeOfDay endTime = TimeOfDay(
-        hour: ConfigProvider.instance.get(Settings.reminderEndHour),
-        minute: ConfigProvider.instance.get(Settings.reminderEndMinute));
-
-    return TimeRange(startTime: startTime, endTime: endTime);
+  static ({TimeOfDay start, TimeOfDay end}) getReminderTimeRange() {
+    return (
+      start: TimeOfDay(
+          hour: ConfigProvider.instance.get(Settings.reminderStartHour),
+          minute: ConfigProvider.instance.get(Settings.reminderStartMinute)),
+      end: TimeOfDay(
+          hour: ConfigProvider.instance.get(Settings.reminderEndHour),
+          minute: ConfigProvider.instance.get(Settings.reminderEndMinute)),
+    );
   }
 
-  static Future<void> setReminderTimeRange(TimeRange range) async {
+  static Future<void> setReminderTimeRange(
+      ({TimeOfDay start, TimeOfDay end}) range) async {
     await ConfigProvider.instance
-        .set(Settings.reminderStartHour, range.startTime.hour);
+        .set(Settings.reminderStartHour, range.start.hour);
     await ConfigProvider.instance
-        .set(Settings.reminderStartMinute, range.startTime.minute);
+        .set(Settings.reminderStartMinute, range.start.minute);
+    await ConfigProvider.instance.set(Settings.reminderEndHour, range.end.hour);
     await ConfigProvider.instance
-        .set(Settings.reminderEndHour, range.endTime.hour);
-    await ConfigProvider.instance
-        .set(Settings.reminderEndMinute, range.endTime.minute);
+        .set(Settings.reminderEndMinute, range.end.minute);
   }
 
-  static String timeRangeString(BuildContext context, TimeRange timeRange) {
-    return '${timeOfDayString(context, timeRange.startTime)} - ${timeOfDayString(context, timeRange.endTime)}';
+  static String timeRangeString(
+      BuildContext context, ({TimeOfDay start, TimeOfDay end}) timeRange) {
+    return '${timeOfDayString(context, timeRange.start)} - ${timeOfDayString(context, timeRange.end)}';
   }
 
   static String timeOfDayString(BuildContext context, TimeOfDay timeOfDay) {
@@ -161,28 +166,21 @@ class TimeManager {
     required DateTime lastDate,
     bool Function(DateTime)? selectableDayPredicate,
   }) async {
-    if (isJalaliCalendar(context)) {
-      PersianSelectableDayPredicate? jalaliPredicate;
-      if (selectableDayPredicate != null) {
-        jalaliPredicate =
-            (Jalali day) => selectableDayPredicate(day.toDateTime());
-      }
-      final Jalali? picked = await showPersianDatePicker(
-        context: context,
-        initialDate: Jalali.fromDateTime(initialDate),
-        firstDate: Jalali.fromDateTime(firstDate),
-        lastDate: Jalali.fromDateTime(lastDate),
-        selectableDayPredicate: jalaliPredicate,
-      );
-      return picked?.toDateTime();
-    }
-    return showDatePicker(
+    final isJalali = isJalaliCalendar(context);
+    final picked = await showDatePicker(
       context: context,
       initialDate: initialDate,
       firstDate: firstDate,
       lastDate: lastDate,
-      selectableDayPredicate: selectableDayPredicate,
+      selectableDayPredicate: selectableDayPredicate == null
+          ? null
+          : (day) => selectableDayPredicate(JalaliDate.toGregorian(day)),
+      locale: isJalali ? const Locale('fa') : null,
+      calendarDelegate: isJalali
+          ? const JalaliCalendarDelegate()
+          : const GregorianCalendarDelegate(),
     );
+    return picked == null ? null : JalaliDate.toGregorian(picked);
   }
 
   // Returns true if entryDate falls on the same calendar day+month as referenceDate

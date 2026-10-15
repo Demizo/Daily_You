@@ -1,11 +1,15 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 import 'dart:io';
 
 import 'package:daily_you/database/entry_store.dart';
-import 'package:daily_you/database/image_storage.dart';
+import 'package:daily_you/database/attachment_storage.dart';
 import 'package:daily_you/models/entry.dart';
-import 'package:daily_you/models/image.dart';
+import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/models/tag.dart';
-import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/utils/generated/tag_icon_registry.dart';
 
@@ -195,17 +199,19 @@ class ScreenshotSeeder {
               : images[imageCursor++ % images.length];
       if (sourceFile == null) continue;
       final bytes = await sourceFile.readAsBytes();
-      final imageName = await ImageStorage.instance.create(
+      final imageName = await AttachmentStorage.instance.create(
         sourceFile.uri.pathSegments.last,
         bytes,
+        AttachmentType.image,
         currTime: timestamp,
       );
       if (imageName == null) continue;
-      await EntryImagesProvider.instance.add(
-        EntryImage(
+      await EntryAttachmentsProvider.instance.add(
+        EntryAttachment(
           entryId: entry.id,
-          imgPath: imageName,
-          imgRank: rank,
+          type: AttachmentType.image,
+          filePath: imageName,
+          rank: rank,
           timeCreate: timestamp,
         ),
         skipUpdate: true,

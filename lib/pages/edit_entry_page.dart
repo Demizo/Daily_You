@@ -1,30 +1,44 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 import 'dart:async';
 import 'dart:io';
 
+import 'package:daily_you/config_provider.dart';
+import 'package:daily_you/database/attachment_storage.dart';
 import 'package:daily_you/database/entry_store.dart';
-import 'package:daily_you/models/image.dart';
+import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/models/tag.dart';
-import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/providers/templates_provider.dart';
+import 'package:daily_you/widgets/app_dialog.dart';
+import 'package:daily_you/utils/file_size_format.dart';
+import 'package:daily_you/widgets/attachment_type_presentation.dart';
 import 'package:daily_you/widgets/entry_draft_dirty_tracker.dart';
+import 'package:daily_you/widgets/failure_dialog.dart';
+import 'package:daily_you/widgets/file_size_row.dart';
 import 'package:daily_you/widgets/tag_attachment_source.dart';
 import 'package:daily_you/widgets/tag_grouped_chip_list.dart';
 import 'package:daily_you/widgets/tag_picker_dialog.dart';
 import 'package:daily_you/widgets/tag_chip.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:provider/provider.dart';
+import 'package:daily_you/pages/audio_recorder_page.dart';
 import 'package:daily_you/pages/full_screen_text_editor_page.dart';
 import 'package:daily_you/widgets/editor_action_bar.dart';
 import 'package:daily_you/widgets/editor_action_bar/editor_keyboard_session.dart';
-import 'package:daily_you/widgets/entry_image_editable_list.dart';
+import 'package:daily_you/widgets/editor_action_bar/toolbar_menu_action.dart';
+import 'package:daily_you/widgets/entry_attachment_editable_list.dart';
+import 'package:daily_you/widgets/icons/svg_icon.dart';
 import 'package:easy_debounce/easy_debounce.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/models/entry.dart';
-import 'package:daily_you/widgets/entry_image_actions.dart';
+import 'package:daily_you/widgets/entry_attachment_actions.dart';
 import 'package:daily_you/widgets/entry_mood_picker.dart';
 import 'package:daily_you/widgets/entry_text_edit.dart';
 import 'package:daily_you/widgets/markdown_preview_controller.dart';
@@ -33,7 +47,7 @@ class AddEditEntryPage extends StatefulWidget {
   final Entry? entry;
   final DateTime? overrideCreateDate;
   final bool openCamera;
-  final List<EntryImage> images;
+  final List<EntryAttachment> attachments;
   final String? sharedText;
 
   const AddEditEntryPage({
@@ -41,7 +55,7 @@ class AddEditEntryPage extends StatefulWidget {
     this.entry,
     this.overrideCreateDate,
     this.openCamera = false,
-    this.images = const <EntryImage>[],
+    this.attachments = const <EntryAttachment>[],
     this.sharedText,
   });
 
@@ -63,7 +77,8 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   String text = "";
   int? mood;
   DateTime? entryDate;
-  late List<EntryImage> _currentImages;
+  late List<EntryAttachment> _currentAttachments;
+  int _pendingAttachmentCount = 0;
   bool _loadingEntry = true;
   bool _openedCamera = false;
   final ScrollController _scrollController = ScrollController();
@@ -147,7 +162,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
 
     if (widget.openCamera && !_openedCamera) {
       _openedCamera = true;
-      EntryImageActions.takePhoto(_addImage);
+      _importAttachments(EntryAttachmentActions.takePhoto());
     }
   }
 
@@ -155,9 +170,9 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _currentImages = List.empty(growable: true);
-    for (var image in widget.images) {
-      _currentImages.add(image.copy());
+    _currentAttachments = List.empty(growable: true);
+    for (var attachment in widget.attachments) {
+      _currentAttachments.add(attachment.copy());
     }
     _initEntry();
   }
@@ -201,7 +216,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
       Navigator.of(context).pop();
       return;
     }
-    showDialog(
+    showAppDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -215,7 +230,6 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                 EasyDebounce.cancel("save-entry");
                 final navigator = Navigator.of(context);
                 if (_newEntry) {
-                  // Persist so there is a saved entry (and any images) to delete
                   await _saveEntry();
                 }
                 final entryToDelete = _entry;
@@ -228,6 +242,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                   navigator.pop();
                 }
                 await EntryStore.instance.delete(entryToDelete);
+                await _deleteUnsavedFiles(_currentAttachments);
               },
             ),
             TextButton(
@@ -290,12 +305,18 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
-                                  if (_currentImages.isNotEmpty)
-                                    EntryImageEditableList(
-                                        images: _currentImages,
-                                        onImagesChanged: (images) async {
-                                          _currentImages = images;
+                                  if (_currentAttachments.isNotEmpty ||
+                                      _pendingAttachmentCount > 0)
+                                    EntryAttachmentEditableList(
+                                        attachments: _currentAttachments,
+                                        pendingCount: _pendingAttachmentCount,
+                                        onAttachmentsChanged:
+                                            (attachments) async {
+                                          final removed =
+                                              _unsavedRemovedBy(attachments);
+                                          _currentAttachments = attachments;
                                           await _saveEntry();
+                                          await _deleteUnsavedFiles(removed);
                                         }),
                                   StatefulBuilder(
                                     builder: (context, setLocalState) =>
@@ -444,26 +465,63 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   }
 
   List<ToolbarAction> _buildMainActions(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return [
       ToolbarAction(
         icon: const Icon(Icons.local_offer_rounded),
-        onPressed: () => showDialog(
+        onPressed: () => showAppDialog(
           context: context,
           builder: (_) =>
               TagPickerDialog(mode: TagPickerMode.attach, source: _tagSource),
         ),
       ),
       ToolbarAction(
-        icon: const Icon(Icons.photo),
-        mayLeaveApp: true,
-        onPressed: () => EntryImageActions.pickFromGallery(_addImage),
+        icon: const SvgIcon('assets/icons/attach_file.svg'),
+        menu: [
+          ToolbarMenuAction(
+            icon: Icons.mic_rounded,
+            label: l10n.actionAddAudio,
+            onSelected: () =>
+                _importAttachments(EntryAttachmentActions.pickAudioFile()),
+          ),
+          ToolbarMenuAction(
+            icon: Icons.videocam_rounded,
+            label: l10n.actionAddVideo,
+            onSelected: () => _importAttachments(
+                EntryAttachmentActions.pickVideosFromGallery()),
+          ),
+          ToolbarMenuAction(
+            icon: Icons.photo_rounded,
+            label: l10n.actionAddImage,
+            onSelected: () =>
+                _importAttachments(EntryAttachmentActions.pickFromGallery()),
+          ),
+        ],
       ),
-      if (Platform.isAndroid)
-        ToolbarAction(
-          icon: const Icon(Icons.photo_camera_rounded),
-          mayLeaveApp: true,
-          onPressed: () => EntryImageActions.takePhoto(_addImage),
-        ),
+      ToolbarAction(
+        icon: const Icon(Icons.photo_camera_rounded),
+        menu: [
+          ToolbarMenuAction(
+            icon: Icons.mic_rounded,
+            label: l10n.actionRecordAudio,
+            onSelected: _recordAudio,
+          ),
+          if (Platform.isAndroid) ...[
+            ToolbarMenuAction(
+              icon: Icons.videocam_rounded,
+              label: l10n.actionTakeVideo,
+              onSelected: () =>
+                  _importAttachments(EntryAttachmentActions.takeVideo()),
+            ),
+            ToolbarMenuAction(
+              icon: Icons.photo_camera_rounded,
+              label: l10n.actionTakePhoto,
+              onSelected: () =>
+                  _importAttachments(EntryAttachmentActions.takePhoto()),
+            ),
+          ],
+        ],
+      ),
     ];
   }
 
@@ -557,7 +615,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
 
     final saved = await _draftSession.save(_buildDraft);
     _adoptSavedEntry(saved);
-    _adoptSavedImages(saved);
+    _adoptSavedAttachments(saved);
     if (mounted) {
       setState(() {});
     }
@@ -576,7 +634,9 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     return EntryDraft(
       entry: entry,
       tags: _tagSource.toEntryTags(id),
-      images: [for (final image in _currentImages) image.copy()],
+      attachments: [
+        for (final attachment in _currentAttachments) attachment.copy()
+      ],
     );
   }
 
@@ -591,14 +651,16 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     );
   }
 
-  void _adoptSavedImages(Entry saved) {
+  void _adoptSavedAttachments(Entry saved) {
     final persistedIds = {
-      for (final image in EntryImagesProvider.instance.getForEntry(saved))
-        image.imgPath: image.id
+      for (final attachment
+          in EntryAttachmentsProvider.instance.getForEntry(saved))
+        attachment.filePath: attachment.id
     };
-    _currentImages = [
-      for (final image in _currentImages)
-        image.copy(id: persistedIds[image.imgPath], entryId: saved.id)
+    _currentAttachments = [
+      for (final attachment in _currentAttachments)
+        attachment.copy(
+            id: persistedIds[attachment.filePath], entryId: saved.id)
     ];
   }
 
@@ -617,7 +679,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
       mood: mood,
       date: entryDate!,
       tagSource: _tagSource,
-      hasImages: _currentImages.isNotEmpty,
+      hasAttachments: _currentAttachments.isNotEmpty,
     );
   }
 
@@ -631,9 +693,150 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     }
   }
 
-  Future<void> _addImage(List<String> imgPaths) async {
-    _currentImages =
-        EntryImage.appendRanked(_currentImages, imgPaths, entryId: id);
+  List<EntryAttachment> _unsavedRemovedBy(List<EntryAttachment> remaining) => [
+        for (final attachment in _currentAttachments)
+          if (attachment.id == null &&
+              !remaining.any((kept) =>
+                  kept.type == attachment.type &&
+                  kept.filePath == attachment.filePath))
+            attachment
+      ];
+
+  Future<void> _deleteUnsavedFiles(List<EntryAttachment> attachments) async {
+    for (final attachment in attachments) {
+      if (attachment.id != null) continue;
+      final inUse = EntryAttachmentsProvider.instance.attachments.any((saved) =>
+          saved.type == attachment.type &&
+          saved.filePath == attachment.filePath);
+      if (inUse) continue;
+      await AttachmentStorage.instance
+          .delete(attachment.filePath, attachment.type);
+    }
+  }
+
+  Future<void> _addAttachments(List<NewAttachment> newAttachments) async {
+    _currentAttachments = EntryAttachment.appendRanked(
+        _currentAttachments, newAttachments,
+        entryId: id);
     await _saveEntry();
+  }
+
+  Future<void> _importAttachments(
+      Future<List<PendingAttachment>> picking) async {
+    final List<PendingAttachment> pending;
+    try {
+      pending = await picking;
+    } catch (error) {
+      await _showAttachmentFailure(error);
+      return;
+    }
+    if (pending.isEmpty) return;
+    if (!mounted) {
+      await EntryAttachmentActions.discardAll(pending);
+      return;
+    }
+
+    setState(() => _pendingAttachmentCount += pending.length);
+    final large = pending.where((attachment) => attachment.isLarge).firstOrNull;
+    if (large != null) {
+      unawaited(_warnAboutSize(large.type, large.name, large.sizeBytes!));
+    }
+
+    Object? failure;
+    var stored = const <NewAttachment>[];
+    try {
+      stored = await EntryAttachmentActions.storeAll(pending,
+          isCancelled: () => !mounted);
+    } catch (error) {
+      failure = error;
+    } finally {
+      _pendingAttachmentCount -= pending.length;
+      if (stored.isEmpty && mounted) setState(() {});
+    }
+    if (stored.isNotEmpty) await _addAttachments(stored);
+    if (failure != null || (mounted && stored.length < pending.length)) {
+      await _showAttachmentFailure(failure);
+    }
+  }
+
+  Future<void> _showAttachmentFailure(Object? error) async {
+    if (!mounted) return;
+    await showFailureDialog(context,
+        description:
+            AppLocalizations.of(context)!.attachmentAddErrorDescription,
+        error: error);
+  }
+
+  Future<void> _recordAudio() async {
+    final attachment = await Navigator.of(context).push<NewAttachment>(
+      MaterialPageRoute(
+        allowSnapshotting: false,
+        fullscreenDialog: true,
+        builder: (context) => const AudioRecorderPage(),
+      ),
+    );
+    if (attachment == null) return;
+    await _addAttachments([attachment]);
+    final sizeBytes = await AttachmentStorage.instance
+        .sizeBytes(attachment.filePath, attachment.type);
+    if (sizeBytes != null && attachment.type.isLarge(sizeBytes)) {
+      await _warnAboutSize(attachment.type, attachment.filePath, sizeBytes);
+    }
+  }
+
+  Future<void> _warnAboutSize(
+      AttachmentType type, String name, int sizeBytes) async {
+    if (ConfigProvider.instance.get(Settings.suppressLargeAttachmentWarning) ||
+        !mounted) {
+      return;
+    }
+
+    var suppress = false;
+    await showAppDialog(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (dialogContext, setLocalState) => AlertDialog(
+          title: Text(
+              AppLocalizations.of(dialogContext)!.largeAttachmentWarningTitle),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(AppLocalizations.of(dialogContext)!
+                  .largeAttachmentWarningDescription),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: FileSizeRow(
+                  icon: type.icon,
+                  label: name,
+                  sizeText: formatFileSize(sizeBytes,
+                      AppLocalizations.of(dialogContext)!.localeName),
+                ),
+              ),
+              CheckboxListTile(
+                contentPadding: EdgeInsets.zero,
+                value: suppress,
+                onChanged: (value) =>
+                    setLocalState(() => suppress = value ?? false),
+                title: Text(AppLocalizations.of(dialogContext)!.dontShowAgain),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                if (suppress) {
+                  await ConfigProvider.instance
+                      .set(Settings.suppressLargeAttachmentWarning, true);
+                }
+                if (dialogContext.mounted) Navigator.pop(dialogContext);
+              },
+              child:
+                  Text(MaterialLocalizations.of(dialogContext).okButtonLabel),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

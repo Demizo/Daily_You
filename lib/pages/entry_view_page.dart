@@ -1,19 +1,24 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 import 'dart:io';
 
-import 'package:daily_you/database/image_storage.dart';
+import 'package:daily_you/database/attachment_storage.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
-import 'package:daily_you/models/image.dart';
+import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/pages/edit_entry_page.dart';
-import 'package:daily_you/pages/image_view_page.dart';
+import 'package:daily_you/pages/attachment_view_page.dart';
 import 'package:daily_you/providers/entries_provider.dart';
-import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/time_manager.dart';
-import 'package:daily_you/widgets/local_image_loader.dart';
+import 'package:daily_you/utils/attachment_mime.dart';
+import 'package:daily_you/widgets/attachment_tile_background.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
 import 'package:daily_you/widgets/scaled_markdown.dart';
 import 'package:daily_you/widgets/entry_tag_chips.dart';
 import 'package:daily_you/widgets/tag_chip.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -36,20 +41,20 @@ class _EntryViewPageState extends State<EntryViewPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final entriesProvider = Provider.of<EntriesProvider>(context);
-    final entryImagesProvider = Provider.of<EntryImagesProvider>(context);
+    final entryAttachmentsProvider =
+        Provider.of<EntryAttachmentsProvider>(context);
 
     final entry = entriesProvider.entries
         .where((e) => e.id == widget.entryId)
         .firstOrNull;
     if (entry == null) return const Scaffold();
 
-    final images = entryImagesProvider.getForEntry(entry);
-
+    final attachments = entryAttachmentsProvider.getForEntry(entry);
     return Scaffold(
       appBar: AppBar(
         actions: [
-          _shareButton(context, entry, images),
-          _editButton(context, entry, images),
+          _shareButton(context, entry, attachments),
+          _editButton(context, entry, attachments),
         ],
       ),
       body: ListView(
@@ -63,9 +68,9 @@ class _EntryViewPageState extends State<EntryViewPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    if (images.isNotEmpty && images.length > 1)
-                      _imagesList(context, images),
-                    if (images.isNotEmpty && images.length == 1)
+                    if (attachments.isNotEmpty && attachments.length > 1)
+                      _attachmentsList(context, attachments),
+                    if (attachments.isNotEmpty && attachments.length == 1)
                       GestureDetector(
                         child: Center(
                           child: SizedBox(
@@ -73,19 +78,14 @@ class _EntryViewPageState extends State<EntryViewPage> {
                             width: 220,
                             child: Card.filled(
                                 clipBehavior: Clip.antiAlias,
-                                child: LocalImageLoader(
-                                    imagePath: images.first.imgPath)),
+                                child: AttachmentTileBackground(
+                                    attachment: attachments.first)),
                           ),
                         ),
                         onTap: () async {
-                          await Navigator.of(context).push(MaterialPageRoute(
-                            allowSnapshotting: false,
-                            fullscreenDialog: true,
-                            builder: (context) => ImageViewPage(
-                              images: images,
-                              index: 0,
-                            ),
-                          ));
+                          await Navigator.of(context).push(
+                              AttachmentViewPage.route(
+                                  attachments: attachments, index: 0));
                         },
                       ),
                     Card.filled(
@@ -179,7 +179,8 @@ class _EntryViewPageState extends State<EntryViewPage> {
     );
   }
 
-  Widget _editButton(BuildContext context, entry, List<EntryImage> images) {
+  Widget _editButton(
+      BuildContext context, entry, List<EntryAttachment> attachments) {
     return IconButton(
         icon: const Icon(Icons.edit_rounded),
         onPressed: () async {
@@ -187,7 +188,7 @@ class _EntryViewPageState extends State<EntryViewPage> {
             allowSnapshotting: false,
             fullscreenDialog: true,
             pageBuilder: (context, _, __) =>
-                AddEditEntryPage(entry: entry, images: images),
+                AddEditEntryPage(entry: entry, attachments: attachments),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               return FadeTransition(
@@ -202,8 +203,10 @@ class _EntryViewPageState extends State<EntryViewPage> {
         });
   }
 
-  Widget _shareButton(BuildContext context, entry, List<EntryImage> images) {
-    if (Platform.isAndroid && (images.isNotEmpty || entry.text.isNotEmpty)) {
+  Widget _shareButton(
+      BuildContext context, entry, List<EntryAttachment> attachments) {
+    if (Platform.isAndroid &&
+        (attachments.isNotEmpty || entry.text.isNotEmpty)) {
       return IconButton(
           icon: const Icon(Icons.share_rounded),
           onPressed: () async {
@@ -214,57 +217,56 @@ class _EntryViewPageState extends State<EntryViewPage> {
             sharedText =
                 "$sharedText${TimeManager.formatDateWithWeekday(entry.timeCreate, context)}\n${entry.text}";
 
-            if (images.isNotEmpty) {
-              var bytes =
-                  await ImageStorage.instance.getBytes(images.first.imgPath);
-              if (bytes != null) {
-                await SharePlus.instance.share(ShareParams(
-                    files: [XFile.fromData(bytes, mimeType: "images/*")],
-                    fileNameOverrides: [images.first.imgPath],
-                    text: sharedText));
-              }
-            } else {
-              SharePlus.instance.share(ShareParams(text: sharedText));
+            final files = <XFile>[];
+            final fileNames = <String>[];
+            for (final attachment in attachments) {
+              final localPath = await AttachmentStorage.instance
+                  .getLocalPath(attachment.filePath, attachment.type);
+              if (localPath == null) continue;
+              files.add(XFile(localPath,
+                  mimeType: attachmentMimeType(
+                      attachment.filePath, attachment.type)));
+              fileNames.add(attachment.filePath);
             }
+            await SharePlus.instance.share(ShareParams(
+                files: files, fileNameOverrides: fileNames, text: sharedText));
           });
     }
     return Container();
   }
 
-  Widget _imagesList(BuildContext context, List<EntryImage> images) {
+  Widget _attachmentsList(
+      BuildContext context, List<EntryAttachment> attachments) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        const imageSize = 160.0;
-        final fits = images.length * imageSize <= constraints.maxWidth;
+        const tileSize = 160.0;
+        final fits = attachments.length * tileSize <= constraints.maxWidth;
 
         if (fits) {
           return Center(
             child: Row(
               mainAxisSize: MainAxisSize.min,
-              children: images
+              children: attachments
                   .map(
-                    (image) => SizedBox(
-                      width: imageSize,
+                    (attachment) => SizedBox(
+                      width: tileSize,
                       child: GestureDetector(
                         child: Center(
                           child: SizedBox(
-                            height: imageSize,
-                            width: imageSize,
+                            height: tileSize,
+                            width: tileSize,
                             child: Card.filled(
                                 clipBehavior: Clip.antiAlias,
-                                child:
-                                    LocalImageLoader(imagePath: image.imgPath)),
+                                child: AttachmentTileBackground(
+                                    attachment: attachment)),
                           ),
                         ),
                         onTap: () async {
-                          await Navigator.of(context).push(MaterialPageRoute(
-                            allowSnapshotting: false,
-                            fullscreenDialog: true,
-                            builder: (context) => ImageViewPage(
-                              images: images,
-                              index: images.indexWhere((x) => x.id == image.id),
-                            ),
-                          ));
+                          await Navigator.of(context).push(
+                              AttachmentViewPage.route(
+                                  attachments: attachments,
+                                  index: attachments.indexWhere(
+                                      (x) => x.id == attachment.id)));
                         },
                       ),
                     ),
@@ -275,31 +277,25 @@ class _EntryViewPageState extends State<EntryViewPage> {
         }
 
         return SizedBox(
-          height: imageSize,
+          height: tileSize,
           child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: images.length,
+              itemCount: attachments.length,
               itemBuilder: (context, index) {
                 return GestureDetector(
                   child: Center(
                     child: SizedBox(
-                      height: imageSize,
-                      width: imageSize,
+                      height: tileSize,
+                      width: tileSize,
                       child: Card.filled(
                           clipBehavior: Clip.antiAlias,
-                          child: LocalImageLoader(
-                              imagePath: images[index].imgPath)),
+                          child: AttachmentTileBackground(
+                              attachment: attachments[index])),
                     ),
                   ),
                   onTap: () async {
-                    await Navigator.of(context).push(MaterialPageRoute(
-                      allowSnapshotting: false,
-                      fullscreenDialog: true,
-                      builder: (context) => ImageViewPage(
-                        images: images,
-                        index: index,
-                      ),
-                    ));
+                    await Navigator.of(context).push(AttachmentViewPage.route(
+                        attachments: attachments, index: index));
                   },
                 );
               }),

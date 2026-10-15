@@ -1,3 +1,7 @@
+// Copyright (C) 2026 Demizo and contributors
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
+
 import 'dart:async';
 import 'dart:io';
 
@@ -6,10 +10,10 @@ import 'package:daily_you/device_info_service.dart';
 import 'package:daily_you/flashback_manager.dart';
 import 'package:daily_you/launch_intent.dart';
 import 'package:daily_you/models/flashback.dart';
-import 'package:daily_you/models/image.dart';
+import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/providers/entries_provider.dart';
-import 'package:daily_you/providers/entry_images_provider.dart';
+import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/pages/share_page.dart';
 import 'package:share_receiver/share_receiver.dart';
 import 'package:daily_you/time_manager.dart';
@@ -17,13 +21,12 @@ import 'package:daily_you/widgets/expressive_fab_menu.dart';
 import 'package:daily_you/widgets/flashback_card.dart';
 import 'package:daily_you/widgets/support_banner.dart';
 import 'package:daily_you/widgets/vertical_calendar.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/pages/entries_list_page.dart';
 import 'package:daily_you/pages/entry_timeline_page.dart';
 import 'package:daily_you/pages/edit_entry_page.dart';
-import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -37,7 +40,6 @@ class _HomePageState extends State<HomePage>
     with AutomaticKeepAliveClientMixin {
   bool firstLoad = true;
   final ScrollController _scrollController = ScrollController();
-  final _fabKey = GlobalKey<ExpandableFabState>();
   StreamSubscription<SharePayload>? _shareSubscription;
 
   @override
@@ -58,42 +60,33 @@ class _HomePageState extends State<HomePage>
     super.dispose();
   }
 
-  void _closeFab() {
-    final fabState = _fabKey.currentState;
-    if (fabState != null && fabState.isOpen) {
-      fabState.toggle();
-    }
-  }
-
-  Future<void> _openWithCamera(Entry? entry, List<EntryImage> images) async {
-    _closeFab();
+  Future<void> _openWithCamera(
+      Entry? entry, List<EntryAttachment> attachments) async {
     await Navigator.of(context).push(MaterialPageRoute(
       allowSnapshotting: false,
-      builder: (context) =>
-          AddEditEntryPage(entry: entry, openCamera: true, images: images),
+      builder: (context) => AddEditEntryPage(
+          entry: entry, openCamera: true, attachments: attachments),
     ));
   }
 
   Future<void> _addNewEntryForToday() async {
-    _closeFab();
     await Navigator.of(context).push(MaterialPageRoute(
       allowSnapshotting: false,
-      builder: (context) =>
-          AddEditEntryPage(entry: null, openCamera: false, images: const []),
+      builder: (context) => AddEditEntryPage(
+          entry: null, openCamera: false, attachments: const []),
     ));
   }
 
-  Future<void> _editEntry(Entry entry, List<EntryImage> images) async {
-    _closeFab();
+  Future<void> _editEntry(
+      Entry entry, List<EntryAttachment> attachments) async {
     await Navigator.of(context).push(MaterialPageRoute(
       allowSnapshotting: false,
-      builder: (context) =>
-          AddEditEntryPage(entry: entry, openCamera: false, images: images),
+      builder: (context) => AddEditEntryPage(
+          entry: entry, openCamera: false, attachments: attachments),
     ));
   }
 
   Future<void> _addEntryForPickedDay() async {
-    _closeFab();
     final picked = await TimeManager.pickDate(
       context,
       initialDate: DateTime.now(),
@@ -109,7 +102,7 @@ class _HomePageState extends State<HomePage>
       builder: (context) => AddEditEntryPage(
         entry: null,
         openCamera: false,
-        images: const [],
+        attachments: const [],
         overrideCreateDate: overrideDate,
       ),
     ));
@@ -119,14 +112,14 @@ class _HomePageState extends State<HomePage>
     final intent = DeviceInfoService().launchIntent;
     if (intent != null) {
       Entry? todayEntry = EntriesProvider.instance.getEntryForToday();
-      List<EntryImage> todayImages = todayEntry != null
-          ? EntryImagesProvider.instance.getForEntry(todayEntry)
+      List<EntryAttachment> todayAttachments = todayEntry != null
+          ? EntryAttachmentsProvider.instance.getForEntry(todayEntry)
           : [];
       DeviceInfoService().launchIntent = null;
       if (intent is TakePhotoIntent) {
-        await _openWithCamera(todayEntry, todayImages);
+        await _openWithCamera(todayEntry, todayAttachments);
       } else if (todayEntry != null) {
-        await _editEntry(todayEntry, todayImages);
+        await _editEntry(todayEntry, todayAttachments);
       } else {
         await _addNewEntryForToday();
       }
@@ -189,8 +182,8 @@ class _HomePageState extends State<HomePage>
         } else if (notifId == 0) {
           DateTime targetDate = DateTime.tryParse(payload) ?? DateTime.now();
           Entry? entry = EntriesProvider.instance.getEntryForDate(targetDate);
-          List<EntryImage> entryImages = entry != null
-              ? EntryImagesProvider.instance.getForEntry(entry)
+          List<EntryAttachment> entryAttachments = entry != null
+              ? EntryAttachmentsProvider.instance.getForEntry(entry)
               : [];
 
           if (!mounted) return;
@@ -200,7 +193,7 @@ class _HomePageState extends State<HomePage>
                 builder: (context) => AddEditEntryPage(
                       entry: entry,
                       openCamera: false,
-                      images: entryImages,
+                      attachments: entryAttachments,
                       overrideCreateDate: TimeManager.isToday(targetDate)
                           ? DateTime.now()
                           : TimeManager.currentTimeOnDifferentDate(targetDate),
@@ -287,11 +280,13 @@ class _HomePageState extends State<HomePage>
     super.build(context);
     final configProvider = Provider.of<ConfigProvider>(context);
     final entriesProvider = Provider.of<EntriesProvider>(context);
-    final entryImagesProvider = Provider.of<EntryImagesProvider>(context);
+    final entryAttachmentsProvider =
+        Provider.of<EntryAttachmentsProvider>(context);
 
     Entry? todayEntry = entriesProvider.getEntryForToday();
-    List<EntryImage> todayImages =
-        todayEntry != null ? entryImagesProvider.getForEntry(todayEntry) : [];
+    List<EntryAttachment> todayAttachments = todayEntry != null
+        ? entryAttachmentsProvider.getForEntry(todayEntry)
+        : [];
 
     final List<Flashback> flashbacks =
         FlashbackManager.getFlashbacks(context, entriesProvider.entries);
@@ -322,7 +317,7 @@ class _HomePageState extends State<HomePage>
                 icon: Icons.camera_alt_rounded,
                 label: AppLocalizations.of(context)!.actionTakePhoto,
                 onTap: () async =>
-                    await _openWithCamera(todayEntry, todayImages)),
+                    await _openWithCamera(todayEntry, todayAttachments)),
             ExpressiveFabMenuItem(
                 icon: Icons.event_rounded,
                 label: AppLocalizations.of(context)!.actionOtherDay,
@@ -333,7 +328,7 @@ class _HomePageState extends State<HomePage>
                 onTap: () async => await _addNewEntryForToday(),
                 secondaryIcon: todayEntry != null ? Icons.edit_rounded : null,
                 secondaryOnTap: todayEntry != null
-                    ? () async => await _editEntry(todayEntry, todayImages)
+                    ? () async => await _editEntry(todayEntry, todayAttachments)
                     : null),
           ]),
         ),
