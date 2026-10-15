@@ -364,6 +364,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get moodIconPrompt => '输入一个图标';
 
   @override
+  String get moodVeryUnpleasant => 'Very Unpleasant';
+
+  @override
+  String get moodUnpleasant => 'Unpleasant';
+
+  @override
+  String get moodNeutral => 'Neutral';
+
+  @override
+  String get moodPleasant => 'Pleasant';
+
+  @override
+  String get moodVeryPleasant => 'Very Pleasant';
+
+  @override
   String get settingsFlashbacksViewLayout => '往昔重现的视图布局';
 
   @override

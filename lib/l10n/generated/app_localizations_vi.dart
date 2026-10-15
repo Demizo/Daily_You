@@ -369,6 +369,21 @@ class AppLocalizationsVi extends AppLocalizations {
   String get moodIconPrompt => 'Nhập một biểu tượng';
 
   @override
+  String get moodVeryUnpleasant => 'Very Unpleasant';
+
+  @override
+  String get moodUnpleasant => 'Unpleasant';
+
+  @override
+  String get moodNeutral => 'Neutral';
+
+  @override
+  String get moodPleasant => 'Pleasant';
+
+  @override
+  String get moodVeryPleasant => 'Very Pleasant';
+
+  @override
   String get settingsFlashbacksViewLayout => 'Flashbacks View Layout';
 
   @override

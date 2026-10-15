@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
+import 'package:daily_you/l10n/generated/app_localizations.dart';
+
 abstract final class Mood {
   static const int veryUnpleasant = 1;
   static const int unpleasant = 2;
@@ -43,4 +45,13 @@ abstract final class Mood {
       mood == veryUnpleasant || mood == unpleasant;
 
   static bool isGreatDay(int? mood) => mood == pleasant || mood == veryPleasant;
+
+  static String defaultLabel(int position, AppLocalizations l10n) =>
+      switch (position) {
+        0 => l10n.moodVeryUnpleasant,
+        1 => l10n.moodUnpleasant,
+        2 => l10n.moodNeutral,
+        3 => l10n.moodPleasant,
+        _ => l10n.moodVeryPleasant,
+      };
 }

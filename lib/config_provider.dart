@@ -215,7 +215,7 @@ class Settings {
     lastAutoBackup,
   ];
 
-  static const moodIcons = <Setting<String>>[
+  static const legacyMoodIcons = <Setting<String>>[
     verySadIcon,
     sadIcon,
     neutralIcon,

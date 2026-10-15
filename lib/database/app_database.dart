@@ -664,7 +664,7 @@ WHERE ${EntryFields.mood} IS NOT NULL
         for (final (position, level) in MoodScalePreset.emoji.levels.indexed)
           level.copyWith(
             icon: ConfigProvider.instance
-                .get<String>(Settings.moodIcons[position]),
+                .get<String>(Settings.legacyMoodIcons[position]),
           ),
       ];
 

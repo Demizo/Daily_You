@@ -372,6 +372,21 @@ class AppLocalizationsFr extends AppLocalizations {
   String get moodIconPrompt => 'Saisir une icône';
 
   @override
+  String get moodVeryUnpleasant => 'Very Unpleasant';
+
+  @override
+  String get moodUnpleasant => 'Unpleasant';
+
+  @override
+  String get moodNeutral => 'Neutral';
+
+  @override
+  String get moodPleasant => 'Pleasant';
+
+  @override
+  String get moodVeryPleasant => 'Very Pleasant';
+
+  @override
   String get settingsFlashbacksViewLayout =>
       'Disposition de la vue des flashbacks';
 

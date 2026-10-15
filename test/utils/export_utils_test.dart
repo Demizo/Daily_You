@@ -25,7 +25,11 @@ void main() {
   setUp(() {
     sources = Directory.systemTemp.createTempSync('export_sources');
     noteStore = InMemoryFileStore();
-    writer = MarkdownExportWriter(noteStore: noteStore, locale: 'en');
+    writer = MarkdownExportWriter(
+      noteStore: noteStore,
+      locale: 'en',
+      moodPrefixOf: (mood) => mood == null ? '' : 'mood $mood ',
+    );
   });
 
   tearDown(() => sources.deleteSync(recursive: true));
@@ -38,8 +42,8 @@ void main() {
     return file.path;
   }
 
-  Entry entryOn(DateTime timeCreate, {String text = ''}) =>
-      Entry(text: text, timeCreate: timeCreate, timeModified: timeCreate);
+  Entry entryOn(DateTime timeCreate, {String text = '', int? mood}) => Entry(
+      text: text, mood: mood, timeCreate: timeCreate, timeModified: timeCreate);
 
   Future<String> noteNamed(String name) async =>
       utf8.decode((await noteStore.read(name))!);
@@ -50,6 +54,13 @@ void main() {
     expect(await noteStore.list(), equals(['log_2026-03-04.md']));
     expect(await noteNamed('log_2026-03-04.md'),
         equals('Wed, Mar 4, 2026\na good day\n'));
+  });
+
+  test('puts the mood text before the date', () async {
+    await writer.write(entryOn(DateTime(2026, 3, 4), mood: 4), []);
+
+    expect(await noteNamed('log_2026-03-04.md'),
+        equals('mood 4 Wed, Mar 4, 2026\n\n'));
   });
 
   test('numbers later notes that share a day', () async {
@@ -161,7 +172,9 @@ void main() {
     final timeCreate = DateTime(2026, 3, 4);
     final noteFolder = Directory(join(sources.path, 'logs'))..createSync();
     final diskWriter = MarkdownExportWriter(
-        noteStore: LocalFileStore(noteFolder.path), locale: 'en');
+        noteStore: LocalFileStore(noteFolder.path),
+        locale: 'en',
+        moodPrefixOf: (_) => '');
     await diskWriter.write(entryOn(timeCreate, text: 'body'), [
       (
         EntryAttachment(
