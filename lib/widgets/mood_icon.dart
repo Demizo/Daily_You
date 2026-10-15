@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
-import 'dart:io';
-
-import 'package:daily_you/config_provider.dart';
-import 'package:daily_you/models/mood.dart';
+import 'package:daily_you/models/mood_scale_level.dart';
+import 'package:daily_you/providers/mood_scale_provider.dart';
+import 'package:daily_you/widgets/mood_scale_glyph.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:provider/provider.dart';
 
-class MoodIcon extends StatefulWidget {
+class MoodIcon extends StatelessWidget {
   final int? moodValue;
   final double size;
   final bool allowScaling;
@@ -21,25 +21,16 @@ class MoodIcon extends StatefulWidget {
   });
 
   @override
-  State<MoodIcon> createState() => _MoodIconState();
-
-  static String getMoodIcon(int? moodValue) {
-    if (moodValue == null) return "";
-    return ConfigProvider.instance
-        .get(Settings.moodIcons[Mood.position(moodValue)]);
-  }
-}
-
-class _MoodIconState extends State<MoodIcon> {
-  @override
   Widget build(BuildContext context) {
-    return Text(
-      MoodIcon.getMoodIcon(widget.moodValue),
-      style: TextStyle(
-        fontSize: widget.size,
-        fontFamily: Platform.isLinux ? 'Noto Color Emoji' : null,
-      ),
-      textScaler: widget.allowScaling ? null : TextScaler.noScaling,
+    final level = context.select<MoodScaleProvider, MoodScaleLevel?>(
+      (provider) => provider.levelOf(moodValue),
+    );
+    if (level == null) return const SizedBox.shrink();
+
+    return MoodScaleGlyph(
+      level: level,
+      size: size,
+      allowScaling: allowScaling,
     );
   }
 }

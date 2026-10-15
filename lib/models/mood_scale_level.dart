@@ -29,6 +29,10 @@ class MoodScaleLevel {
     this.color,
   });
 
+  bool get hasIcon => (icon ?? '').isNotEmpty;
+
+  bool get hasTextIcon => iconType == TagIconType.character && hasIcon;
+
   static const _unset = Object();
 
   MoodScaleLevel copyWith({

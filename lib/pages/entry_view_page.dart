@@ -11,6 +11,7 @@ import 'package:daily_you/pages/edit_entry_page.dart';
 import 'package:daily_you/pages/attachment_view_page.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_attachments_provider.dart';
+import 'package:daily_you/providers/mood_scale_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/utils/attachment_mime.dart';
 import 'package:daily_you/widgets/attachment_tile_background.dart';
@@ -184,12 +185,10 @@ class _EntryViewPageState extends State<EntryViewPage> {
       return IconButton(
           icon: const Icon(Icons.share_rounded),
           onPressed: () async {
-            String sharedText = "";
-            if (entry.mood != null) {
-              sharedText = "${MoodIcon.getMoodIcon(entry.mood)} ";
-            }
-            sharedText =
-                "$sharedText${TimeManager.formatDateWithWeekday(entry.timeCreate, context)}\n${entry.text}";
+            final moodPrefix = MoodScaleProvider.instance
+                .moodPrefixOf(entry.mood, AppLocalizations.of(context)!);
+            final sharedText =
+                "$moodPrefix${TimeManager.formatDateWithWeekday(entry.timeCreate, context)}\n${entry.text}";
 
             final files = <XFile>[];
             final fileNames = <String>[];

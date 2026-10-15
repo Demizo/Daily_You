@@ -2,13 +2,11 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
-import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/models/mood.dart';
 import 'package:daily_you/widgets/material_shapes.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
-import 'package:provider/provider.dart';
 
 class MoodSummaryChart extends StatelessWidget {
   final Map<int, int> moodCounts;
@@ -29,12 +27,6 @@ class MoodSummaryChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ConfigProvider>(
-      builder: (context, configProvider, child) => _buildChart(context),
-    );
-  }
-
-  Widget _buildChart(BuildContext context) {
     final isRtl = Directionality.of(context) == TextDirection.rtl;
     final displayCounts = hasData ? moodCounts : _dummyMoodCounts;
     final maxCount = displayCounts.values.reduce((a, b) => a > b ? a : b);

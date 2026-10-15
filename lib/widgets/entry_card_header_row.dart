@@ -18,7 +18,6 @@ class EntryCardHeaderRow extends StatelessWidget {
   static const double _tagIconSize = 18;
   static const double _tagIconSpacing = 4;
 
-  static const double _moodReserve = 24;
   static const double _segmentGap = 2;
 
   const EntryCardHeaderRow({
@@ -34,50 +33,54 @@ class EntryCardHeaderRow extends StatelessWidget {
     final tagsProvider = context.watch<TagsProvider>();
     final hasTags = entry.id != null &&
         tagsProvider.getEntryTagsForEntry(entry.id!).isNotEmpty;
-    final hasMood = entry.mood != null;
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final moodReserve = _segmentGap + (hasMood ? _moodReserve : 0.0);
-        final minTagReserve = hasTags ? _tagIconSize + _segmentGap : 0.0;
-        final titleCap = (constraints.maxWidth - moodReserve - minTagReserve)
-            .clamp(0.0, constraints.maxWidth);
+    return Row(
+      children: [
+        Expanded(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final minTagReserve = hasTags ? _tagIconSize + _segmentGap : 0.0;
+              final titleCap = (constraints.maxWidth - minTagReserve)
+                  .clamp(0.0, constraints.maxWidth);
 
-        return Row(
-          children: [
-            ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: titleCap),
-              child: Padding(
-                padding: titlePadding,
-                child: Text(
-                  title,
-                  maxLines: 1,
-                  softWrap: false,
-                  overflow: TextOverflow.fade,
-                  style: titleStyle,
-                ),
-              ),
-            ),
-            Expanded(
-              child: hasTags
-                  ? Align(
-                      alignment: AlignmentDirectional.centerEnd,
-                      child: EntryTagIconPreview(
-                        entryId: entry.id,
-                        iconSize: _tagIconSize,
-                        spacing: _tagIconSpacing,
+              return Row(
+                children: [
+                  ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: titleCap),
+                    child: Padding(
+                      padding: titlePadding,
+                      child: Text(
+                        title,
+                        maxLines: 1,
+                        softWrap: false,
+                        overflow: TextOverflow.fade,
+                        style: titleStyle,
                       ),
-                    )
-                  : const SizedBox.shrink(),
-            ),
-            const SizedBox(width: _segmentGap),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 2.0),
-              child: MoodIcon(moodValue: entry.mood),
-            ),
-          ],
-        );
-      },
+                    ),
+                  ),
+                  Expanded(
+                    child: hasTags
+                        ? Align(
+                            alignment: AlignmentDirectional.centerEnd,
+                            child: EntryTagIconPreview(
+                              entryId: entry.id,
+                              iconSize: _tagIconSize,
+                              spacing: _tagIconSpacing,
+                            ),
+                          )
+                        : const SizedBox.shrink(),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+        const SizedBox(width: _segmentGap),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 2.0),
+          child: MoodIcon(moodValue: entry.mood),
+        ),
+      ],
     );
   }
 }

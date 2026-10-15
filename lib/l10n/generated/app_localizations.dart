@@ -702,6 +702,36 @@ abstract class AppLocalizations {
   /// **'Enter an icon'**
   String get moodIconPrompt;
 
+  /// No description provided for @moodVeryUnpleasant.
+  ///
+  /// In en, this message translates to:
+  /// **'Very Unpleasant'**
+  String get moodVeryUnpleasant;
+
+  /// No description provided for @moodUnpleasant.
+  ///
+  /// In en, this message translates to:
+  /// **'Unpleasant'**
+  String get moodUnpleasant;
+
+  /// No description provided for @moodNeutral.
+  ///
+  /// In en, this message translates to:
+  /// **'Neutral'**
+  String get moodNeutral;
+
+  /// No description provided for @moodPleasant.
+  ///
+  /// In en, this message translates to:
+  /// **'Pleasant'**
+  String get moodPleasant;
+
+  /// No description provided for @moodVeryPleasant.
+  ///
+  /// In en, this message translates to:
+  /// **'Very Pleasant'**
+  String get moodVeryPleasant;
+
   /// No description provided for @settingsFlashbacksViewLayout.
   ///
   /// In en, this message translates to:
