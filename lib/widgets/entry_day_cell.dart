@@ -229,8 +229,6 @@ class EntryDayCell extends StatelessWidget {
           getEntries: () => entriesProvider.entries
               .where((entry) => TimeManager.isSameCalendarDayOfYear(
                   entry.timeCreate, date, isJalali))
-              .toList()
-              .reversed
               .toList(),
           labelBuilder: (context, entry) =>
               TimeManager.formatYear(entry.timeCreate, context),

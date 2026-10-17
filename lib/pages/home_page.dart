@@ -245,8 +245,6 @@ class _HomePageState extends State<HomePage>
                           header: title,
                           getEntries: () => EntriesProvider.instance.entries
                               .where((e) => flashbackEntryIds.contains(e.id))
-                              .toList()
-                              .reversed
                               .toList(),
                           labelBuilder: (context, e) =>
                               TimeManager.localizedTimeFormat(context,

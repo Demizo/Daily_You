@@ -114,6 +114,8 @@ class Settings {
   static const statsSubject = Setting<String>("statsSubject", "mood");
   static const tagPickerSortMode =
       Setting<String>("tagPickerSortMode", "manual");
+  static const timelineSortOrder =
+      Setting<String>("timelineSortOrder", "descending");
   static const requirePassword =
       Setting<bool>("requirePassword", false, secure: true);
   static const biometricUnlock =
@@ -197,6 +199,7 @@ class Settings {
     statsRange,
     statsSubject,
     tagPickerSortMode,
+    timelineSortOrder,
     requirePassword,
     biometricUnlock,
     passwordHash,

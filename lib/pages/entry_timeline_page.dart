@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
+import 'package:daily_you/config_provider.dart';
+import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/pages/entries_list_page.dart';
 import 'package:daily_you/providers/entries_provider.dart';
@@ -23,8 +25,8 @@ class EntryTimelinePage extends StatefulWidget {
   final List<Entry> Function() getEntries;
   final String Function(BuildContext, Entry) labelBuilder;
 
-  /// Pushes a timeline listing every entry created on [date], ordered
-  /// newest first, with each entry labeled by its time of day.
+  /// Pushes a timeline listing every entry created on [date], with each
+  /// entry labeled by its time of day.
   static Future<void> pushForDay(BuildContext context, DateTime date) {
     final title = TimeManager.formatDate(date, context);
     return Navigator.of(context).push(MaterialPageRoute(
@@ -33,8 +35,6 @@ class EntryTimelinePage extends StatefulWidget {
         header: title,
         getEntries: () => EntriesProvider.instance.entries
             .where((entry) => TimeManager.isSameDay(entry.timeCreate, date))
-            .toList()
-            .reversed
             .toList(),
         labelBuilder: (context, entry) => TimeManager.localizedTimeFormat(
                 context, TimeManager.currentLocale(context))
@@ -53,8 +53,15 @@ class _EntryTimelinePageState extends State<EntryTimelinePage> {
     Provider.of<EntriesProvider>(context);
     final entryAttachmentsProvider =
         Provider.of<EntryAttachmentsProvider>(context);
+    final configProvider = Provider.of<ConfigProvider>(context);
 
-    final entries = widget.getEntries();
+    final sortOrder = SortOrder.values
+            .asNameMap()[configProvider.get(Settings.timelineSortOrder)] ??
+        SortOrder.descending;
+    final entries = widget.getEntries()
+      ..sort((a, b) => sortOrder == SortOrder.ascending
+          ? a.timeCreate.compareTo(b.timeCreate)
+          : b.timeCreate.compareTo(a.timeCreate));
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (entries.isEmpty && mounted) {
@@ -63,7 +70,10 @@ class _EntryTimelinePageState extends State<EntryTimelinePage> {
     });
 
     return Scaffold(
-      appBar: AppBar(title: Text(widget.header)),
+      appBar: AppBar(
+        title: Text(widget.header),
+        actions: [_sortButton(context, sortOrder)],
+      ),
       body: ListView.builder(
         padding: const EdgeInsets.only(top: 8, bottom: 16),
         itemCount: entries.length,
@@ -137,6 +147,37 @@ class _EntryTimelinePageState extends State<EntryTimelinePage> {
           );
         },
       ),
+    );
+  }
+
+  Widget _sortButton(BuildContext context, SortOrder sortOrder) {
+    final l10n = AppLocalizations.of(context)!;
+    final labels = {
+      SortOrder.ascending: l10n.sortOrderAscendingTitle,
+      SortOrder.descending: l10n.sortOrderDescendingTitle,
+    };
+    return PopupMenuButton<SortOrder>(
+      icon: const Icon(Icons.sort_rounded),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      onSelected: (value) =>
+          ConfigProvider.instance.set(Settings.timelineSortOrder, value.name),
+      itemBuilder: (context) => [
+        for (final order in SortOrder.values)
+          PopupMenuItem<SortOrder>(
+            value: order,
+            child: Row(children: [
+              Icon(Icons.check_rounded,
+                  size: 18,
+                  color: order == sortOrder
+                      ? Theme.of(context).colorScheme.primary
+                      : Colors.transparent),
+              const SizedBox(width: 8),
+              Text(labels[order]!),
+            ]),
+          ),
+      ],
     );
   }
 }
