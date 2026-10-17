@@ -508,7 +508,9 @@ class _TagPickerDialogState extends State<TagPickerDialog> {
       case TagPickerMode.filter:
         return [
           TextButton(
-            onPressed: _clearAllFilters,
+            onPressed: _selectedTagIds.isEmpty && !_noTagsOnly
+                ? null
+                : _clearAllFilters,
             child: Text(l10n.clearAllFilters),
           ),
           close,
