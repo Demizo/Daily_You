@@ -14,6 +14,7 @@ import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/utils/attachment_mime.dart';
 import 'package:daily_you/widgets/attachment_tile_background.dart';
+import 'package:daily_you/widgets/entry_date_time_labels.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
 import 'package:daily_you/widgets/scaled_markdown.dart';
 import 'package:daily_you/widgets/entry_tag_chips.dart';
@@ -90,64 +91,36 @@ class _EntryViewPageState extends State<EntryViewPage> {
                       ),
                     Card.filled(
                       color: Theme.of(context).colorScheme.surfaceContainer,
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                            left: 8, top: 4, bottom: 4, right: 8),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            SizedBox(
-                              width: double.infinity,
-                              child: Wrap(
-                                crossAxisAlignment: WrapCrossAlignment.center,
-                                alignment: WrapAlignment.spaceBetween,
-                                children: [
-                                  IntrinsicHeight(
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          TimeManager.formatDateWithWeekday(
-                                            entry.timeCreate,
-                                            context,
-                                          ),
-                                          style: const TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        VerticalDivider(
-                                          width: 16,
-                                          thickness: 2,
-                                          radius: BorderRadius.circular(4),
-                                        ),
-                                        Text(
-                                          TimeManager.localizedTimeFormat(
-                                                  context,
-                                                  TimeManager.currentLocale(
-                                                      context))
-                                              .format(entry.timeCreate),
-                                          style: TextStyle(
-                                              fontSize: 16,
-                                              color: theme.dividerColor),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  MoodIcon(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          SizedBox(
+                            width: double.infinity,
+                            child: Wrap(
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              alignment: WrapAlignment.spaceBetween,
+                              children: [
+                                EntryDateTimeLabels(
+                                  dateTime: entry.timeCreate,
+                                  timeColor: theme.dividerColor,
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 8),
+                                  child: MoodIcon(
                                     moodValue: entry.mood,
                                     size: 24,
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                            EntryTagChips(
-                              entryId: entry.id!,
-                              padding: const EdgeInsets.only(top: 2, bottom: 2),
-                              chipBuilder: (tag, entryTag) =>
-                                  TagChip(tag: tag, value: entryTag.value),
-                            ),
-                          ],
-                        ),
+                          ),
+                          EntryTagChips(
+                            entryId: entry.id!,
+                            padding: const EdgeInsets.fromLTRB(8, 0, 8, 6),
+                            chipBuilder: (tag, entryTag) =>
+                                TagChip(tag: tag, value: entryTag.value),
+                          ),
+                        ],
                       ),
                     ),
                     if (entry.text.isNotEmpty)

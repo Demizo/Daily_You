@@ -18,6 +18,7 @@ import 'package:daily_you/providers/templates_provider.dart';
 import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/utils/file_size_format.dart';
 import 'package:daily_you/widgets/attachment_type_presentation.dart';
+import 'package:daily_you/widgets/entry_date_time_labels.dart';
 import 'package:daily_you/widgets/entry_draft_dirty_tracker.dart';
 import 'package:daily_you/widgets/failure_dialog.dart';
 import 'package:daily_you/widgets/file_size_row.dart';
@@ -413,54 +414,12 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   }
 
   Widget _buildDateTimeButtons(BuildContext context, ThemeData theme) {
-    return IntrinsicHeight(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 2.0),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextButton(
-              onPressed: () async {
-                _chooseDate();
-              },
-              style: TextButton.styleFrom(
-                  visualDensity: VisualDensity.compact,
-                  padding: EdgeInsets.all(6)),
-              child: Text(
-                TimeManager.formatDateWithWeekday(entryDate!, context),
-                style: TextStyle(
-                    color: theme.colorScheme.primary,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold),
-              ),
-            ),
-            VerticalDivider(
-              width: 6,
-              indent: 8,
-              endIndent: 8,
-              thickness: 2,
-              radius: BorderRadius.circular(4),
-            ),
-            TextButton(
-              onPressed: () async {
-                _chooseTime();
-              },
-              style: TextButton.styleFrom(
-                  visualDensity: VisualDensity.compact,
-                  padding: EdgeInsets.all(6)),
-              child: Text(
-                TimeManager.localizedTimeFormat(
-                        context, TimeManager.currentLocale(context))
-                    .format(entryDate!),
-                style: TextStyle(
-                  color: theme.colorScheme.primary,
-                  fontSize: 16,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+    return EntryDateTimeLabels(
+      dateTime: entryDate!,
+      dateColor: theme.colorScheme.primary,
+      timeColor: theme.colorScheme.primary,
+      onDateTap: _chooseDate,
+      onTimeTap: _chooseTime,
     );
   }
 
