@@ -36,6 +36,7 @@ class MediaQualityDialog extends StatelessWidget {
             if (Platform.isAndroid)
               _qualityRow(config, AttachmentType.video.label(l10n),
                   Settings.videoQualityLevel, [
+                (VideoQuality.noCompression, l10n.imageQualityNoCompression),
                 (VideoQuality.high, l10n.imageQualityHigh),
                 (VideoQuality.medium, l10n.imageQualityMedium),
                 (VideoQuality.low, l10n.imageQualityLow),

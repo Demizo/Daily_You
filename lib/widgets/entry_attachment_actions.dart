@@ -198,10 +198,9 @@ class EntryAttachmentActions {
       String sourcePath, String? fileName) async {
     String? compressedPath;
     try {
-      if (Platform.isAndroid) {
+      final quality = ConfigProvider.instance.get(Settings.videoQualityLevel);
+      if (Platform.isAndroid && quality != VideoQuality.noCompression) {
         try {
-          final quality =
-              ConfigProvider.instance.get(Settings.videoQualityLevel);
           final result = await VVideoCompressor().compressVideo(
             sourcePath,
             VVideoCompressionConfig(quality: _videoCompressQuality(quality)),
