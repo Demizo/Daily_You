@@ -1,0 +1,7 @@
+Daily You v3.7.0 has arrived! Getting attached:
+
+• Added support for video and audio attachments!
+• Improved setup for syncing with an external location
+• Various animation and UI improvements
+• Fixed Diarium import timestamps
+• Updated translations
