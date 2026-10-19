@@ -22,19 +22,19 @@ class AppLocalizationsFr extends AppLocalizations {
   String get actionTakePhoto => 'Prendre une photo';
 
   @override
-  String get actionTakeVideo => 'Take video';
+  String get actionTakeVideo => 'Faire une vidéo';
 
   @override
-  String get actionRecordAudio => 'Record audio';
+  String get actionRecordAudio => 'Enregistrement un audio';
 
   @override
-  String get actionAddImage => 'Add image';
+  String get actionAddImage => 'Ajouter une image';
 
   @override
-  String get actionAddVideo => 'Add video';
+  String get actionAddVideo => 'Ajouter une vidéo';
 
   @override
-  String get actionAddAudio => 'Add audio';
+  String get actionAddAudio => 'Ajouter un audio';
 
   @override
   String get actionToday => 'Aujourd\'hui';
@@ -271,11 +271,11 @@ class AppLocalizationsFr extends AppLocalizations {
   String get databaseMigrationErrorRetry => 'Réessayer';
 
   @override
-  String get databaseNewerErrorTitle => 'Update Required';
+  String get databaseNewerErrorTitle => 'Mise à jour nécessaire';
 
   @override
   String get databaseNewerErrorDescription =>
-      'Your data was saved by a newer version of Daily You. This version can\'t open it safely. Update the app to continue.';
+      'Vos données ont été enregistrées avec une version plus récente de Daily You. Cette version ne peut pas les ouvrir en toute sécurité. Mettez l’application à jour pour continuer.';
 
   @override
   String get errorReport => 'Signaler un problème';
@@ -302,21 +302,21 @@ class AppLocalizationsFr extends AppLocalizations {
   String get deletePhotoDescription => 'Voulez-vous supprimer cette photo ?';
 
   @override
-  String get deleteAttachmentTitle => 'Delete Attachment';
+  String get deleteAttachmentTitle => 'Supprimer la pièce jointe';
 
   @override
   String get deleteAttachmentDescription =>
-      'Do you want to delete this attachment?';
+      'Voulez-vous suprimer cette pièce jointe ?';
 
   @override
-  String get largeAttachmentWarningTitle => 'Large attachment';
+  String get largeAttachmentWarningTitle => 'Pièce jointe lourde';
 
   @override
   String get largeAttachmentWarningDescription =>
-      'This attachment is large and will increase your backup size.';
+      'Cette pièce jointe est lourde et augmentera la taille de votre sauvegarde.';
 
   @override
-  String get dontShowAgain => 'Don\'t show again';
+  String get dontShowAgain => 'Ne plus afficher';
 
   @override
   String get pageSettingsTitle => 'Paramètres';
@@ -676,13 +676,13 @@ class AppLocalizationsFr extends AppLocalizations {
       '## Bienvenue dans Daily You\n\n> Chaque jour mérite qu\'on s\'en souvienne, immortalisez-le !\n\n**Daily You** est gratuit, [open source](https://github.com/Demizo/Daily_You) et soutenu par la communauté. Conçu avec la conviction que votre journal doit vous appartenir, et non être un produit :\n\n- Aucune publicité\n- Aucune fonctionnalité verrouillée\n- Aucun suivi ni collecte de données\n\nQue vous teniez un journal, que vous fassiez de l\'introspection ou que vous notiez simplement ce qui vous a fait sourire, **Daily You** vous offre un espace privé qui est _vraiment le vôtre_.';
 
   @override
-  String get settingsStorageTitle => 'Stockage';
+  String get settingsStorageTitle => 'Stockage et synchronisation';
 
   @override
   String get settingsImageQuality => 'Qualité d\'image';
 
   @override
-  String get settingsMediaQualityTitle => 'Media Quality';
+  String get settingsMediaQualityTitle => 'Qualité des médias';
 
   @override
   String get imageQualityHigh => 'Élevée';
@@ -697,7 +697,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get imageQualityNoCompression => 'Sans compression';
 
   @override
-  String get settingsStorageUsage => 'Storage Usage';
+  String get settingsStorageUsage => 'Occupation du stockage';
 
   @override
   String get settingsLogFolder => 'Dossier d\'enregistrement';
@@ -706,17 +706,18 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settingsImageFolder => 'Dossier d\'images';
 
   @override
-  String get settingsExternalSyncTitle => 'Sync with External Location';
+  String get settingsExternalSyncTitle =>
+      'Synchroniser avec un emplacement externe';
 
   @override
-  String get chooseFolderHint => 'Choose a folder';
+  String get chooseFolderHint => 'Choisir un dossier';
 
   @override
   String get warningTitle => 'Attention';
 
   @override
   String get logFolderWarningDescription =>
-      'Si le dossier sélectionné contient déjà un fichier \'daily_you.db\', celui-ci sera utilisé pour écraser vos enregistrements existants !';
+      'Le dossier sélectionné contient déjà un fichier \'daily_you.db\', celui-ci sera utilisé pour écraser vos enregistrements existants !';
 
   @override
   String get errorTitle => 'Erreur';
@@ -731,7 +732,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get syncErrorDescription =>
-      'Failed to sync with the external location!';
+      'Échec de la synchronisation avec l\'emplacement externe !';
 
   @override
   String get backupErrorDescription =>
@@ -858,7 +859,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get exportImages => 'Exporter les images';
 
   @override
-  String get exportIncludeTitle => 'Include';
+  String get exportIncludeTitle => 'Inclure';
 
   @override
   String get settingsImport => 'Importer';
@@ -1006,7 +1007,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get audioTitle => 'Audio';
 
   @override
-  String get videoTitle => 'Video';
+  String get videoTitle => 'Vidéo';
 
   @override
   String get tagMoodTitle => 'Humeur';
@@ -1035,27 +1036,31 @@ class AppLocalizationsFr extends AppLocalizations {
   String get shareAddToLogPickerTitle => 'Choisir un enregistrement';
 
   @override
-  String get attachmentAddErrorDescription => 'Failed to add attachment!';
+  String get attachmentAddErrorDescription =>
+      'Échec de l\'ajout de la pièce jointe !';
 
   @override
-  String get attachmentLoadFailed => 'Could not open this attachment';
+  String get attachmentLoadFailed =>
+      'Ouverture impossible de cette pièce jointe';
 
   @override
-  String get attachmentNoAppToOpen => 'No app can open this attachment';
+  String get attachmentNoAppToOpen =>
+      'Aucune app ne peut ouvrir cette pièce jointe';
 
   @override
-  String get recorderDiscardTitle => 'Discard recording?';
+  String get recorderDiscardTitle => 'Annuler l\'enregistrement ?';
 
   @override
-  String get recorderDiscardDescription => 'This recording will be deleted.';
+  String get recorderDiscardDescription => 'Cet enregistrement sera supprimé.';
 
   @override
-  String get recorderDiscardAction => 'Discard';
+  String get recorderDiscardAction => 'Ignorer';
 
   @override
   String get recorderPermissionDenied =>
-      'Microphone permission is required to record audio';
+      'L\'autorisation du microphone est nécessaire pour enregistrer un audio';
 
   @override
-  String get recorderErrorDescription => 'Failed to record audio!';
+  String get recorderErrorDescription =>
+      'Échec de l\'enregistrement de l\'audio !';
 }

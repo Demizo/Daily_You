@@ -21,19 +21,19 @@ class AppLocalizationsRu extends AppLocalizations {
   String get actionTakePhoto => 'Сделать фото';
 
   @override
-  String get actionTakeVideo => 'Take video';
+  String get actionTakeVideo => 'Снять видео';
 
   @override
-  String get actionRecordAudio => 'Record audio';
+  String get actionRecordAudio => 'Запись звука';
 
   @override
-  String get actionAddImage => 'Add image';
+  String get actionAddImage => 'Добавить изображение';
 
   @override
-  String get actionAddVideo => 'Add video';
+  String get actionAddVideo => 'Добавить видео';
 
   @override
-  String get actionAddAudio => 'Add audio';
+  String get actionAddAudio => 'Добавить аудио';
 
   @override
   String get actionToday => 'Сегодня';
@@ -150,7 +150,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get noLogs => 'Нет записей…';
 
   @override
-  String get noResults => 'No Results…';
+  String get noResults => 'Результаты отсутствуют…';
 
   @override
   String get sortDateTitle => 'Дата';
@@ -191,7 +191,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String chartOverTimeTitle(Object tag) {
-    return '$tag Over Time';
+    return '$tag С течением времени';
   }
 
   @override
@@ -237,7 +237,7 @@ class AppLocalizationsRu extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Great Days $count',
+      other: 'Несколько дней $count',
     );
     return '$_temp0';
   }
@@ -269,17 +269,17 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get databaseMigrationErrorDescription =>
-      'Your entries are safe but couldn\'t be moved to the app\'s storage.\n\nTry again, and report the issue if it keeps happening.';
+      'Ваши записи в безопасности, но их не удалось переместить в хранилище приложения.\n\nПопробуйте еще раз и сообщите о проблеме, если она повторится.';
 
   @override
   String get databaseMigrationErrorRetry => 'Повторить';
 
   @override
-  String get databaseNewerErrorTitle => 'Update Required';
+  String get databaseNewerErrorTitle => 'Требуется обновление';
 
   @override
   String get databaseNewerErrorDescription =>
-      'Your data was saved by a newer version of Daily You. This version can\'t open it safely. Update the app to continue.';
+      'Ваши данные были сохранены более новой версией Daily You. Эта версия не может безопасно открыть их. Обновите приложение, чтобы продолжить.';
 
   @override
   String get errorReport => 'Сообщить о проблеме';
@@ -306,21 +306,20 @@ class AppLocalizationsRu extends AppLocalizations {
   String get deletePhotoDescription => 'Вы хотите удалить это фото?';
 
   @override
-  String get deleteAttachmentTitle => 'Delete Attachment';
+  String get deleteAttachmentTitle => 'Удалить вложение';
 
   @override
-  String get deleteAttachmentDescription =>
-      'Do you want to delete this attachment?';
+  String get deleteAttachmentDescription => 'Вы хотите удалить это вложение?';
 
   @override
-  String get largeAttachmentWarningTitle => 'Large attachment';
+  String get largeAttachmentWarningTitle => 'Большое вложение';
 
   @override
   String get largeAttachmentWarningDescription =>
-      'This attachment is large and will increase your backup size.';
+      'Этот файл имеет большой размер и увеличит объем вашей резервной копии.';
 
   @override
-  String get dontShowAgain => 'Don\'t show again';
+  String get dontShowAgain => 'Больше не показывать';
 
   @override
   String get pageSettingsTitle => 'Настройки';
@@ -353,7 +352,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get calendarSystemGregorian => 'Григорианский календарь';
 
   @override
-  String get calendarSystemJalali => 'Jalali';
+  String get calendarSystemJalali => 'Джалали';
 
   @override
   String get settingsUseSystemAccentColor =>
@@ -482,7 +481,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get templateDefaultReflectionBody =>
-      '### What did you enjoy about today?\n- \n\n### What are you thankful for?\n- \n\n### What are you looking forward to?\n- ';
+      'Что вам понравилось сегодня?\n- \n\nЗа что вы благодарны?\n- \n\n### Чего вы с нетерпением ждёте?\n- ';
 
   @override
   String get settingsTagsTitle => 'Теги';
@@ -491,96 +490,96 @@ class AppLocalizationsRu extends AppLocalizations {
   String get manageTags => 'Управлять тегами';
 
   @override
-  String get tagTypeLabelTitle => 'Label';
+  String get tagTypeLabelTitle => 'Этикетка';
 
   @override
-  String get tagTypeTrackerTitle => 'Tracker';
+  String get tagTypeTrackerTitle => 'Трекер';
 
   @override
-  String get nameHint => 'Name';
+  String get nameHint => 'Имя';
 
   @override
-  String get tagColorLabel => 'Color';
+  String get tagColorLabel => 'Цвет';
 
   @override
-  String get iconPickerTitle => 'Choose Icon';
+  String get iconPickerTitle => 'Выберите значок';
 
   @override
-  String get iconPickerIconsTab => 'Icons';
+  String get iconPickerIconsTab => 'Иконки';
 
   @override
-  String get iconPickerCustomTab => 'Custom';
+  String get iconPickerCustomTab => 'Обычай';
 
   @override
-  String get iconPickerSearchHint => 'Search icons…';
+  String get iconPickerSearchHint => 'Значки поиска…';
 
   @override
-  String get colorPickerTitle => 'Choose Color';
+  String get colorPickerTitle => 'Выберите цвет';
 
   @override
-  String get colorPickerPaletteTab => 'Colors';
+  String get colorPickerPaletteTab => 'Цвета';
 
   @override
-  String get iconGroupMoodPeople => 'Mood & People';
+  String get iconGroupMoodPeople => 'Настроение и люди';
 
   @override
-  String get iconGroupHealth => 'Health';
+  String get iconGroupHealth => 'Здоровье';
 
   @override
-  String get iconGroupWorkFinance => 'Work & Finance';
+  String get iconGroupWorkFinance => 'Работа и финансы';
 
   @override
-  String get iconGroupHabitsGoals => 'Habits & Goals';
+  String get iconGroupHabitsGoals => 'Привычки и цели';
 
   @override
-  String get iconGroupNature => 'Nature';
+  String get iconGroupNature => 'Природа';
 
   @override
-  String get iconGroupFoodDrink => 'Food & Drink';
+  String get iconGroupFoodDrink => 'Еда и напитки';
 
   @override
-  String get iconGroupHome => 'Home';
+  String get iconGroupHome => 'Дом';
 
   @override
-  String get iconGroupTravel => 'Travel';
+  String get iconGroupTravel => 'Путешествовать';
 
   @override
-  String get iconGroupSymbols => 'Symbols';
+  String get iconGroupSymbols => 'Символы';
 
   @override
-  String get tagCategoryLabel => 'Category';
+  String get tagCategoryLabel => 'Категория';
 
   @override
-  String get tagLabel => 'Tag';
+  String get tagLabel => 'Ярлык';
 
   @override
-  String get tagCategoryUncategorized => 'Uncategorized';
+  String get tagCategoryUncategorized => 'Без категории';
 
   @override
-  String get newCategoryTitle => 'New Category';
+  String get newCategoryTitle => 'Новая категория';
 
   @override
-  String get shareButtonLabel => 'Share';
+  String get shareButtonLabel => 'Поделиться';
 
   @override
-  String get importErrorDescription => 'Failed to import file!';
+  String get importErrorDescription => 'Не удалось импортировать файл!';
 
   @override
-  String get exportErrorDescription => 'Failed to export file!';
+  String get exportErrorDescription => 'Не удалось экспортировать файл!';
 
   @override
-  String get deleteTitle => 'Delete';
+  String get deleteTitle => 'Удалить';
 
   @override
   String deleteTagMessage(num count, Object name) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: ' It is used in $count logs.',
-      one: ' It is used in 1 log.',
+      other: ' Он используется в $count логах.',
+      one: ' Используется в 1 логе.',
       zero: '',
     );
-    return 'Delete \"$name\"?$_temp0';
+    return 'Исключить \"$name\"?$_temp0';
   }
 
   @override
@@ -588,47 +587,46 @@ class AppLocalizationsRu extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: ' Its $count tags will also be deleted.',
-      one: ' Its 1 tag will also be deleted.',
-      zero: '',
+      other: ' Его теги ($count) также будут удалены.',
+      one: ' Его 1 тег также будет удален.',
     );
-    return 'Delete \"$name\"?$_temp0';
+    return 'Исключить \"$name\"?$_temp0';
   }
 
   @override
   String deleteTemplateMessage(Object name) {
-    return 'Delete \"$name\"?';
+    return 'Исключить \"$name\"?';
   }
 
   @override
-  String get filterTagsTitle => 'Filter';
+  String get filterTagsTitle => 'Фильтр';
 
   @override
-  String get tagFilterModeAny => 'Any Tag';
+  String get tagFilterModeAny => 'Любой';
 
   @override
-  String get tagFilterModeAll => 'All Tags';
+  String get tagFilterModeAll => 'Все теги';
 
   @override
-  String get clearAllFilters => 'Clear All';
+  String get clearAllFilters => 'Все';
 
   @override
-  String get noTagsFilterLabel => 'No Tags';
+  String get noTagsFilterLabel => 'Нет тегов';
 
   @override
-  String get addTagsTitle => 'Add Tags';
+  String get addTagsTitle => 'Добавить теги';
 
   @override
-  String get addTagsSearchHint => 'Search tags…';
+  String get addTagsSearchHint => 'Поиск тегов..';
 
   @override
-  String get tagPickerSortManualLabel => 'Manual order';
+  String get tagPickerSortManualLabel => 'Ручной заказ';
 
   @override
-  String get tagPickerSortUsageLabel => 'Sort by usage';
+  String get tagPickerSortUsageLabel => 'Сортировка по использованию';
 
   @override
-  String get tagFavoriteName => 'Favorite';
+  String get tagFavoriteName => 'Закладки';
 
   @override
   String get tagEnergyName => 'Energy';

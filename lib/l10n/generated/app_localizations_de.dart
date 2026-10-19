@@ -21,13 +21,13 @@ class AppLocalizationsDe extends AppLocalizations {
   String get actionTakePhoto => 'Foto machen';
 
   @override
-  String get actionTakeVideo => 'Take video';
+  String get actionTakeVideo => 'Video aufnehmen';
 
   @override
-  String get actionRecordAudio => 'Record audio';
+  String get actionRecordAudio => 'Audio aufnehmen';
 
   @override
-  String get actionAddImage => 'Add image';
+  String get actionAddImage => 'Bild hinzufügen';
 
   @override
   String get actionAddVideo => 'Add video';
@@ -753,34 +753,35 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsBackupPasswordProtect => 'Password Protect Backups';
 
   @override
-  String get backupEncryptedTitle => 'Encrypted Backup';
+  String get backupEncryptedTitle => 'Verschlüsseltes Backup';
 
   @override
-  String get backupEncryptedContent => 'This backup is password protected.';
+  String get backupEncryptedContent => 'Dieses Passwort ist passwortgeschützt.';
 
   @override
-  String get settingsAutoBackup => 'Automatic Backups';
+  String get settingsAutoBackup => 'Automatische Backups';
 
   @override
-  String get settingsAutoBackupLocation => 'Backup Location';
+  String get settingsAutoBackupLocation => 'Speicherort des Backups';
 
   @override
   String get settingsAutoBackupInterval => 'Backup Interval';
 
   @override
-  String get settingsAutoBackupIntervalDaily => 'Daily';
+  String get settingsAutoBackupIntervalDaily => 'Täglich';
 
   @override
-  String get settingsAutoBackupIntervalWeekly => 'Weekly';
+  String get settingsAutoBackupIntervalWeekly => 'Wöchentlich';
 
   @override
-  String get settingsAutoBackupIntervalMonthly => 'Monthly';
+  String get settingsAutoBackupIntervalMonthly => 'Monatlich';
 
   @override
   String get settingsAutoBackupMaxCount => 'Backups To Keep';
 
   @override
-  String get settingsAutoBackupRequireCharging => 'Only While Charging';
+  String get settingsAutoBackupRequireCharging =>
+      'Nur während des Ladevorgangs';
 
   @override
   String settingsBackupLast(Object time) {
@@ -788,18 +789,18 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get settingsBackupNever => 'Never backed up';
+  String get settingsBackupNever => 'noch kein Backup erstellt';
 
   @override
   String settingsAutoBackupNext(Object time) {
-    return 'Next backup $time';
+    return 'Nächstes Backup: $time';
   }
 
   @override
-  String get settingsAutoBackupKeepAll => 'All';
+  String get settingsAutoBackupKeepAll => 'Alles';
 
   @override
-  String get autoBackupFailedTitle => 'Backup Failed';
+  String get autoBackupFailedTitle => 'Backup gescheitert';
 
   @override
   String tranferStatus(Object percent) {
@@ -818,12 +819,12 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String encryptingBackupStatus(Object percent) {
-    return 'Encrypting Backup… $percent%';
+    return 'Backup wird verschlüsselt...$percent%';
   }
 
   @override
   String decryptingBackupStatus(Object percent) {
-    return 'Decrypting Backup… $percent%';
+    return 'Backup wird entschlüsselt...$percent%';
   }
 
   @override
@@ -983,7 +984,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsSourceCode => 'Quellcode';
 
   @override
-  String get settingsOpenSourceLicenses => 'Open Source Licenses';
+  String get settingsOpenSourceLicenses => 'Open Source Lizenzen';
 
   @override
   String get settingsMadeWithLove => 'Mit ❤️ gemacht';
