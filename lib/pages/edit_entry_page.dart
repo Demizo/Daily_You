@@ -549,7 +549,10 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
 
   Future<void> _chooseTime() async {
     final pickedTime = await showTimePicker(
-        context: context, initialTime: TimeOfDay.fromDateTime(entryDate!));
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(entryDate!),
+      builder: (context, child) => AppDialogTransition(child: child!),
+    );
     if (pickedTime == null) return;
 
     entryDate = entryDate!.copyWith(
