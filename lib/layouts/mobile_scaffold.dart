@@ -9,6 +9,8 @@ import 'package:daily_you/layouts/fast_page_view_scroll_physics.dart';
 import 'package:daily_you/pages/settings/notification_settings.dart';
 import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:easy_debounce/easy_debounce.dart';
+import 'package:flutter/rendering.dart' show ScrollCacheExtent;
+import 'package:flutter/scheduler.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/pages/statistics_page.dart';
@@ -29,6 +31,7 @@ class _MobileScaffoldState extends State<MobileScaffold> {
   int currentIndex = 0;
   late final PageController _pageController;
   final List<bool> _isScrolled = [false, false, false];
+  int _prebuildViewports = 0;
 
   late final List<ScrollController> _scrollControllers;
 
@@ -42,6 +45,7 @@ class _MobileScaffoldState extends State<MobileScaffold> {
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: currentIndex);
+    SchedulerBinding.instance.addPostFrameCallback((_) => _startPrebuild());
     _scrollControllers = List.generate(pages.length, (_) => ScrollController());
     for (int i = 0; i < _scrollControllers.length; i++) {
       final pageIndex = i;
@@ -58,6 +62,34 @@ class _MobileScaffoldState extends State<MobileScaffold> {
       c.dispose();
     }
     super.dispose();
+  }
+
+  void _startPrebuild() {
+    if (!mounted) return;
+    final route = ModalRoute.of(context);
+    final animation = route?.animation;
+    if (animation == null || (animation.isCompleted && !route!.offstage)) {
+      _prebuildNextPage();
+      return;
+    }
+    void onStatus(AnimationStatus status) {
+      if (status != AnimationStatus.completed) return;
+      animation.removeStatusListener(onStatus);
+      SchedulerBinding.instance
+          .addPostFrameCallback((_) => _prebuildNextPage());
+    }
+
+    animation.addStatusListener(onStatus);
+  }
+
+  void _prebuildNextPage() {
+    if (!mounted) return;
+    setState(
+        () => _prebuildViewports = (_prebuildViewports + 1) % pages.length);
+    if (_prebuildViewports > 0) {
+      SchedulerBinding.instance
+          .addPostFrameCallback((_) => _prebuildNextPage());
+    }
   }
 
   void _updateScrolledFromController(int pageIndex) {
@@ -351,6 +383,9 @@ class _MobileScaffoldState extends State<MobileScaffold> {
         body: PageView(
           controller: _pageController,
           physics: const FastPageViewScrollPhysics(),
+          allowImplicitScrolling: _prebuildViewports > 0,
+          scrollCacheExtent:
+              ScrollCacheExtent.viewport(_prebuildViewports.toDouble()),
           onPageChanged: (index) {
             FocusManager.instance.primaryFocus?.unfocus();
             EasyDebounce.debounce(
