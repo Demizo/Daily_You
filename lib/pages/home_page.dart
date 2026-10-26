@@ -17,6 +17,7 @@ import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/pages/share_page.dart';
 import 'package:share_receiver/share_receiver.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:daily_you/widgets/expressive_carousel.dart';
 import 'package:daily_you/widgets/expressive_fab_menu.dart';
 import 'package:daily_you/widgets/flashback_card.dart';
 import 'package:daily_you/widgets/support_banner.dart';
@@ -28,6 +29,10 @@ import 'package:daily_you/pages/entries_list_page.dart';
 import 'package:daily_you/pages/entry_timeline_page.dart';
 import 'package:daily_you/pages/edit_entry_page.dart';
 import 'package:provider/provider.dart';
+
+const _flashbackCardHeight = 140.0;
+const _flashbackMinWidth = 140.0;
+const _flashbackMaxWidth = 280.0;
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -204,71 +209,51 @@ class _HomePageState extends State<HomePage>
     }
   }
 
+  Future<void> _openFlashback(Flashback flashback) async {
+    if (flashback.isMultiEntry && flashback.isOnThisDay) {
+      await NotificationManager.instance.dismissOnThisDayNotification();
+      await _openOnThisDayTimeline(DateTime.now());
+    } else if (flashback.isMultiEntry) {
+      final flashbackEntryIds =
+          flashback.entries.map((entry) => entry.id).toList();
+      final title = flashback.title;
+      if (!context.mounted) return;
+      await Navigator.of(context).push(MaterialPageRoute(
+        allowSnapshotting: false,
+        builder: (context) => EntryTimelinePage(
+          header: title,
+          getEntries: () => EntriesProvider.instance.entries
+              .where((entry) => flashbackEntryIds.contains(entry.id))
+              .toList(),
+          labelBuilder: (context, entry) => TimeManager.localizedTimeFormat(
+                  context, TimeManager.currentLocale(context))
+              .format(entry.timeCreate),
+        ),
+      ));
+    } else {
+      await Navigator.of(context).push(MaterialPageRoute(
+        allowSnapshotting: false,
+        builder: (context) => EntriesListPage(
+            index: EntriesProvider.instance
+                .getIndexOfEntry(flashback.firstEntry.id!),
+            getEntries: () => EntriesProvider.instance.entries),
+      ));
+    }
+  }
+
   Widget _buildFlashbacksRow(BuildContext context, List<Flashback> flashbacks) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 4.0),
-      child: SizedBox(
-        height: 130,
-        child: ShaderMask(
-          shaderCallback: (Rect bounds) => const LinearGradient(
-            stops: [0, 0.02, 0.98, 1],
-            colors: [
-              Colors.transparent,
-              Colors.white,
-              Colors.white,
-              Colors.transparent
-            ],
-          ).createShader(bounds),
-          blendMode: BlendMode.dstIn,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            itemCount: flashbacks.length,
-            itemBuilder: (context, index) {
-              final flashback = flashbacks[index];
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 1),
-                child: GestureDetector(
-                  onTap: () async {
-                    if (flashback.isMultiEntry && flashback.isOnThisDay) {
-                      await NotificationManager.instance
-                          .dismissOnThisDayNotification();
-                      await _openOnThisDayTimeline(DateTime.now());
-                    } else if (flashback.isMultiEntry) {
-                      final flashbackEntryIds =
-                          flashback.entries.map((e) => e.id).toList();
-                      final title = flashback.title;
-                      if (!context.mounted) return;
-                      await Navigator.of(context).push(MaterialPageRoute(
-                        allowSnapshotting: false,
-                        builder: (context) => EntryTimelinePage(
-                          header: title,
-                          getEntries: () => EntriesProvider.instance.entries
-                              .where((e) => flashbackEntryIds.contains(e.id))
-                              .toList(),
-                          labelBuilder: (context, e) =>
-                              TimeManager.localizedTimeFormat(context,
-                                      TimeManager.currentLocale(context))
-                                  .format(e.timeCreate),
-                        ),
-                      ));
-                    } else {
-                      await Navigator.of(context).push(MaterialPageRoute(
-                        allowSnapshotting: false,
-                        builder: (context) => EntriesListPage(
-                            index: EntriesProvider.instance
-                                .getIndexOfEntry(flashback.firstEntry.id!),
-                            getEntries: () => EntriesProvider.instance.entries),
-                      ));
-                    }
-                  },
-                  child: FlashbackCard(
-                      title: flashback.title, entries: flashback.entries),
-                ),
-              );
-            },
-          ),
-        ),
+      child: ExpressiveCarousel(
+        heightForItemWidth: (_) => _flashbackCardHeight,
+        itemMinWidth: _flashbackMinWidth,
+        itemMaxWidth: _flashbackMaxWidth,
+        itemCount: flashbacks.length,
+        backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
+        alignment: AlignmentDirectional.centerStart,
+        onTap: (index) => _openFlashback(flashbacks[index]),
+        itemBuilder: (context, index) => FlashbackCard(
+            title: flashbacks[index].title, entries: flashbacks[index].entries),
       ),
     );
   }

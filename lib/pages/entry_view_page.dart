@@ -15,6 +15,7 @@ import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/utils/attachment_mime.dart';
 import 'package:daily_you/widgets/attachment_tile_background.dart';
 import 'package:daily_you/widgets/entry_date_time_labels.dart';
+import 'package:daily_you/widgets/expressive_carousel.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
 import 'package:daily_you/widgets/scaled_markdown.dart';
 import 'package:daily_you/widgets/entry_tag_chips.dart';
@@ -210,70 +211,17 @@ class _EntryViewPageState extends State<EntryViewPage> {
 
   Widget _attachmentsList(
       BuildContext context, List<EntryAttachment> attachments) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        const tileSize = 160.0;
-        final fits = attachments.length * tileSize <= constraints.maxWidth;
-
-        if (fits) {
-          return Center(
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: attachments
-                  .map(
-                    (attachment) => SizedBox(
-                      width: tileSize,
-                      child: GestureDetector(
-                        child: Center(
-                          child: SizedBox(
-                            height: tileSize,
-                            width: tileSize,
-                            child: Card.filled(
-                                clipBehavior: Clip.antiAlias,
-                                child: AttachmentTileBackground(
-                                    attachment: attachment)),
-                          ),
-                        ),
-                        onTap: () async {
-                          await Navigator.of(context).push(
-                              AttachmentViewPage.route(
-                                  attachments: attachments,
-                                  index: attachments.indexWhere(
-                                      (x) => x.id == attachment.id)));
-                        },
-                      ),
-                    ),
-                  )
-                  .toList(),
-            ),
-          );
-        }
-
-        return SizedBox(
-          height: tileSize,
-          child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: attachments.length,
-              itemBuilder: (context, index) {
-                return GestureDetector(
-                  child: Center(
-                    child: SizedBox(
-                      height: tileSize,
-                      width: tileSize,
-                      child: Card.filled(
-                          clipBehavior: Clip.antiAlias,
-                          child: AttachmentTileBackground(
-                              attachment: attachments[index])),
-                    ),
-                  ),
-                  onTap: () async {
-                    await Navigator.of(context).push(AttachmentViewPage.route(
-                        attachments: attachments, index: index));
-                  },
-                );
-              }),
-        );
+    return ExpressiveCarousel(
+      heightForItemWidth: (itemWidth) => itemWidth,
+      itemCount: attachments.length,
+      itemMinWidth: attachmentTileSize,
+      itemMaxWidth: attachmentTileSize,
+      onTap: (index) async {
+        await Navigator.of(context).push(
+            AttachmentViewPage.route(attachments: attachments, index: index));
       },
+      itemBuilder: (context, index) =>
+          AttachmentTileBackground(attachment: attachments[index]),
     );
   }
 }
