@@ -6,6 +6,7 @@ import 'dart:math' as math;
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/utils/bucket_combiner.dart';
+import 'package:daily_you/utils/chart_axis.dart';
 import 'package:daily_you/utils/chart_y_range.dart';
 import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/connected_button_group.dart';
@@ -187,6 +188,7 @@ class _ValueOverTimeChartState extends State<ValueOverTimeChart> {
 
     final totalDays = rangeEnd.difference(rangeStart).inDays.toDouble();
     final spanDays = totalDays.toInt().clamp(1, 999999);
+    final xUnit = axisUnitInDays(totalDays);
     final available = _availableGroupings(spanDays);
     final effective = _effectiveGrouping(spanDays);
     final smoothing = _smoothing;
@@ -203,23 +205,28 @@ class _ValueOverTimeChartState extends State<ValueOverTimeChart> {
     if (buckets.isEmpty) return const SizedBox.shrink();
 
     final spots = widget.hasData
-        ? _computeSpots(buckets, rangeStart)
-        : _dummySpots(buckets, rangeStart);
+        ? _computeSpots(buckets, rangeStart, xUnit)
+        : _dummySpots(buckets, rangeStart, xUnit);
 
     final yRange = widget.hasData
         ? widget.yRange.resolve(spots.whereType<FlSpot>().map((spot) => spot.y))
         : widget.yRange.previewRange;
 
-    final markerDates =
-        _computeMarkerDates(rangeStart, rangeEnd, spanDays, isJalali);
-    final labelDates = _computeLabelDates(markerDates, spanDays, isJalali);
+    final yearCount = _calendarYear(rangeEnd, isJalali) -
+        _calendarYear(rangeStart, isJalali) +
+        1;
+    final markerDates = _computeMarkerDates(
+        rangeStart, rangeEnd, spanDays, yearCount, isJalali);
+    final labelDates =
+        _computeLabelDates(markerDates, spanDays, yearCount, isJalali);
 
     final labelTextMap = <int, String>{
       for (final d in labelDates)
-        d.difference(rangeStart).inDays: _formatLabel(d, spanDays, context),
+        (d.difference(rangeStart).inDays / xUnit).round():
+            _formatLabel(d, spanDays, context),
     };
     final markerDayOffsets = markerDates
-        .map((d) => d.difference(rangeStart).inDays.toDouble())
+        .map((d) => d.difference(rangeStart).inDays / xUnit)
         .toList();
 
     final color = widget.color ?? Theme.of(context).colorScheme.primary;
@@ -237,7 +244,7 @@ class _ValueOverTimeChartState extends State<ValueOverTimeChart> {
             child: LineChart(
               LineChartData(
                 minX: 0,
-                maxX: totalDays,
+                maxX: totalDays / xUnit,
                 minY: yRange.minY,
                 maxY: yRange.maxY,
                 clipData: const FlClipData.all(),
@@ -550,30 +557,26 @@ class _ValueOverTimeChartState extends State<ValueOverTimeChart> {
     return buckets;
   }
 
-  List<FlSpot?> _computeSpots(List<DateTime> buckets, DateTime rangeStart) {
+  List<FlSpot?> _computeSpots(
+      List<DateTime> buckets, DateTime rangeStart, double xUnit) {
     final Map<int, List<double>> bucketValues = {};
     for (final point in widget.dataPoints) {
-      int bucketIndex = -1;
-      for (int i = buckets.length - 1; i >= 0; i--) {
-        if (!buckets[i].isAfter(point.date)) {
-          bucketIndex = i;
-          break;
-        }
-      }
+      final bucketIndex = bucketIndexAtOrBefore(buckets, point.date);
       if (bucketIndex < 0) continue;
       (bucketValues[bucketIndex] ??= []).add(point.value);
     }
     return List.generate(buckets.length, (i) {
       final values = bucketValues[i];
       if (values == null || values.isEmpty) return null;
-      final x = buckets[i].difference(rangeStart).inDays.toDouble();
+      final x = buckets[i].difference(rangeStart).inDays / xUnit;
       return FlSpot(x, widget.combine(values));
     });
   }
 
-  List<FlSpot?> _dummySpots(List<DateTime> buckets, DateTime rangeStart) {
+  List<FlSpot?> _dummySpots(
+      List<DateTime> buckets, DateTime rangeStart, double xUnit) {
     return List.generate(buckets.length, (i) {
-      final x = buckets[i].difference(rangeStart).inDays.toDouble();
+      final x = buckets[i].difference(rangeStart).inDays / xUnit;
       return FlSpot(x, _scaleDummy(_dummyYValues[i % _dummyYValues.length]));
     });
   }
@@ -671,8 +674,8 @@ class _ValueOverTimeChartState extends State<ValueOverTimeChart> {
     );
   }
 
-  List<DateTime> _computeMarkerDates(
-      DateTime rangeStart, DateTime rangeEnd, int spanDays, bool isJalali) {
+  List<DateTime> _computeMarkerDates(DateTime rangeStart, DateTime rangeEnd,
+      int spanDays, int yearCount, bool isJalali) {
     final markers = <DateTime>[];
     if (spanDays <= _monthThreshold) {
       DateTime current = rangeStart;
@@ -702,24 +705,19 @@ class _ValueOverTimeChartState extends State<ValueOverTimeChart> {
         }
       }
     } else {
-      if (isJalali) {
-        final jStart = Jalali.fromDateTime(rangeStart);
-        final jEnd = Jalali.fromDateTime(rangeEnd);
-        for (int year = jStart.year; year <= jEnd.year + 1; year++) {
-          for (final month in [1, 4, 7, 10]) {
-            final dt = Jalali(year, month, 1).toDateTime();
-            if (!dt.isBefore(rangeStart) && !dt.isAfter(rangeEnd)) {
-              markers.add(dt);
-            }
-          }
-        }
-      } else {
-        for (int year = rangeStart.year; year <= rangeEnd.year + 1; year++) {
-          for (final month in [1, 4, 7, 10]) {
-            final d = DateTime(year, month, 1);
-            if (!d.isBefore(rangeStart) && !d.isAfter(rangeEnd)) {
-              markers.add(d);
-            }
+      final months = markerMonths(yearCount);
+      final yearStep = markerYearStep(yearCount);
+      final lastYear = _calendarYear(rangeEnd, isJalali);
+      for (int year = _calendarYear(rangeStart, isJalali);
+          year <= lastYear + 1;
+          year++) {
+        if (year % yearStep != 0) continue;
+        for (final month in months) {
+          final date = isJalali
+              ? Jalali(year, month, 1).toDateTime()
+              : DateTime(year, month, 1);
+          if (!date.isBefore(rangeStart) && !date.isAfter(rangeEnd)) {
+            markers.add(date);
           }
         }
       }
@@ -727,15 +725,18 @@ class _ValueOverTimeChartState extends State<ValueOverTimeChart> {
     return markers;
   }
 
+  int _calendarYear(DateTime date, bool isJalali) =>
+      isJalali ? Jalali.fromDateTime(date).year : date.year;
+
   List<DateTime> _computeLabelDates(
-      List<DateTime> markerDates, int spanDays, bool isJalali) {
+      List<DateTime> markerDates, int spanDays, int yearCount, bool isJalali) {
     if (spanDays > 3 * _yearThreshold) {
-      if (isJalali) {
-        return markerDates
-            .where((d) => Jalali.fromDateTime(d).month == 1)
-            .toList();
-      }
-      return markerDates.where((d) => d.month == 1).toList();
+      final yearStep = axisYearStep(yearCount);
+      return markerDates
+          .where((d) =>
+              (isJalali ? Jalali.fromDateTime(d).month : d.month) == 1 &&
+              _calendarYear(d, isJalali) % yearStep == 0)
+          .toList();
     }
     if (markerDates.length <= 6) return List.from(markerDates);
     final result = <DateTime>[];
