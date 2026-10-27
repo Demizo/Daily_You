@@ -12,6 +12,9 @@ import 'package:intl/intl.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 
 class TimeManager {
+  // Gregorian calendar introduced; earlier dates would be proleptic
+  static final DateTime minEntryDate = DateTime(1583, 1, 1);
+
   static bool isToday(DateTime date) {
     return isSameDay(DateTime.now(), date);
   }
