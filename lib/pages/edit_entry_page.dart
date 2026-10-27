@@ -527,7 +527,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     DateTime? pickedDate = await TimeManager.pickDate(
       context,
       initialDate: entryDate!,
-      firstDate: DateTime(2000),
+      firstDate: TimeManager.minEntryDate,
       lastDate: DateTime.now(),
     );
     if (pickedDate == null) return;

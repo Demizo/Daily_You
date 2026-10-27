@@ -175,7 +175,7 @@ class TimeManager {
       context: context,
       builder: (context, child) => AppDialogTransition(child: child!),
       initialDate: initialDate,
-      firstDate: firstDate,
+      firstDate: initialDate.isBefore(firstDate) ? initialDate : firstDate,
       lastDate: lastDate,
       selectableDayPredicate: selectableDayPredicate == null
           ? null
