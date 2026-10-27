@@ -95,7 +95,7 @@ class _HomePageState extends State<HomePage>
     final picked = await TimeManager.pickDate(
       context,
       initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
+      firstDate: TimeManager.minEntryDate,
       lastDate: DateTime.now(),
     );
     if (picked == null || !mounted) return;
