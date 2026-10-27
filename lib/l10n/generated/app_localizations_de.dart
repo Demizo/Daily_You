@@ -15,7 +15,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get dailyReminderTitle => 'Heute eintragen!';
 
   @override
-  String get dailyReminderDescription => 'Mache deinen Eintrag …';
+  String get dailyReminderDescription => 'Mache deinen täglichen Eintrag…';
 
   @override
   String get actionTakePhoto => 'Foto machen';
@@ -30,10 +30,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get actionAddImage => 'Bild hinzufügen';
 
   @override
-  String get actionAddVideo => 'Add video';
+  String get actionAddVideo => 'Video hinzufügen';
 
   @override
-  String get actionAddAudio => 'Add audio';
+  String get actionAddAudio => 'Audio hinzufügen';
 
   @override
   String get actionToday => 'Heute';
@@ -48,13 +48,13 @@ class AppLocalizationsDe extends AppLocalizations {
   String get jumpToMonthTitle => 'Springe zu Monat';
 
   @override
-  String get jumpToLogTitle => 'Wechsle zum Log';
+  String get jumpToLogTitle => 'Wechsle zum Eintrag';
 
   @override
   String get flashbacksTitle => 'Rückblicke';
 
   @override
-  String get settingsFlashbacksExcludeBadDays => 'Schließe schlechte Tage aus';
+  String get settingsFlashbacksExcludeBadDays => 'Schlechte Tage ausschließen';
 
   @override
   String get flaskbacksEmpty => 'Bis jetzt keine Rückblicke…';
@@ -63,7 +63,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get flashbackGoodDay => 'Ein guter Tag';
 
   @override
-  String get flashbackRandomDay => 'Ein zufälliger Tag';
+  String get flashbackRandomDay => 'Zufälliger Tag';
 
   @override
   String flashbackWeek(num count) {
@@ -269,11 +269,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String get databaseMigrationErrorRetry => 'Erneut versuchen';
 
   @override
-  String get databaseNewerErrorTitle => 'Update Required';
+  String get databaseNewerErrorTitle => 'Aktualisierung benötigt';
 
   @override
   String get databaseNewerErrorDescription =>
-      'Your data was saved by a newer version of Daily You. This version can\'t open it safely. Update the app to continue.';
+      'Deine Daten wurden in einer neueren Version von Daily You gespeichert. Diese Version kann sie nicht sicher öffnen. Aktualisiere die App, um fortzufahren.';
 
   @override
   String get errorReport => 'Problem melden';
@@ -300,21 +300,21 @@ class AppLocalizationsDe extends AppLocalizations {
   String get deletePhotoDescription => 'Möchtest du das Foto löschen?';
 
   @override
-  String get deleteAttachmentTitle => 'Delete Attachment';
+  String get deleteAttachmentTitle => 'Anhang löschen';
 
   @override
   String get deleteAttachmentDescription =>
-      'Do you want to delete this attachment?';
+      'Möchtest du diesen Anhang löschen?';
 
   @override
-  String get largeAttachmentWarningTitle => 'Large attachment';
+  String get largeAttachmentWarningTitle => 'Großer Anhang';
 
   @override
   String get largeAttachmentWarningDescription =>
-      'This attachment is large and will increase your backup size.';
+      'Dieser Anhang ist groß und wird deine Backup vergößern.';
 
   @override
-  String get dontShowAgain => 'Don\'t show again';
+  String get dontShowAgain => 'Nicht erneut anzeigen';
 
   @override
   String get pageSettingsTitle => 'Einstellungen';
@@ -362,7 +362,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsShowFlashbacks => 'Zeige Rückblicke';
 
   @override
-  String get settingsChangeMoodIcons => 'Stimmung-Symbole ändern';
+  String get settingsChangeMoodIcons => 'Stimmungssymbole ändern';
 
   @override
   String get moodIconPrompt => 'Symbol hier eingeben';
@@ -672,13 +672,13 @@ class AppLocalizationsDe extends AppLocalizations {
       '## Willkommen bei Daily You\n\n> Jeder Tag ist es wert, in Erinnerung zu bleiben – halte ihn fest!\n\n**Daily You** ist kostenlos, [Open Source](https://github.com/Demizo/Daily_You) und wird von der Community unterstützt. Die App basiert auf der Überzeugung, dass dein Tagebuch dir gehören und kein Produkt sein sollte:\n\n- Keine Werbung\n- Keine gesperrten Funktionen\n- Kein Tracking und keine Datenerfassung\n\nEgal, ob du Tagebuch schreibst, nachdenkst oder einfach nur festhältst, was dich zum Lächeln gebracht hat: **Daily You** bietet dir einen privaten Raum, der _wirklich ganz dir gehört_.';
 
   @override
-  String get settingsStorageTitle => 'Speicher';
+  String get settingsStorageTitle => 'Speicher & Synchronisation';
 
   @override
   String get settingsImageQuality => 'Bildqualität';
 
   @override
-  String get settingsMediaQualityTitle => 'Media Quality';
+  String get settingsMediaQualityTitle => 'Medien-Qualität';
 
   @override
   String get imageQualityHigh => 'Hoch';
@@ -693,7 +693,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get imageQualityNoCompression => 'Keine Komprimierung';
 
   @override
-  String get settingsStorageUsage => 'Storage Usage';
+  String get settingsStorageUsage => 'Speichernutzung';
 
   @override
   String get settingsLogFolder => 'Einträge Ordner';
@@ -702,17 +702,17 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsImageFolder => 'Bild Ordner';
 
   @override
-  String get settingsExternalSyncTitle => 'Sync with External Location';
+  String get settingsExternalSyncTitle => 'Nach Extern synchronisieren';
 
   @override
-  String get chooseFolderHint => 'Choose a folder';
+  String get chooseFolderHint => 'Ordner auswählen';
 
   @override
   String get warningTitle => 'Achtung';
 
   @override
   String get logFolderWarningDescription =>
-      'Wenn der ausgewählte Ordner bereits eine \'daily_you.db\'-Datei enthält, wird diese verwendet, um Ihre bestehenden Einträge zu überschreiben!';
+      'Der ausgewählte Ordner enthält bereits eine \'daily_you.db\'-Datei, diese wird verwendet, um Ihre bestehenden Einträge zu überschreiben!';
 
   @override
   String get errorTitle => 'Fehler';
@@ -726,8 +726,7 @@ class AppLocalizationsDe extends AppLocalizations {
       'Bilderordneränderung fehlgeschlagen!';
 
   @override
-  String get syncErrorDescription =>
-      'Failed to sync with the external location!';
+  String get syncErrorDescription => 'Fehler beim synchronisieren mit Extern!';
 
   @override
   String get backupErrorDescription => 'Sicherung Fehlgeschlagen!';
@@ -750,7 +749,7 @@ class AppLocalizationsDe extends AppLocalizations {
       'Wiederherstellung einer Sicherung überschreibt vorhandene Daten!';
 
   @override
-  String get settingsBackupPasswordProtect => 'Password Protect Backups';
+  String get settingsBackupPasswordProtect => 'Passwort geschützte Backups';
 
   @override
   String get backupEncryptedTitle => 'Verschlüsseltes Backup';
@@ -777,7 +776,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsAutoBackupIntervalMonthly => 'Monatlich';
 
   @override
-  String get settingsAutoBackupMaxCount => 'Backups To Keep';
+  String get settingsAutoBackupMaxCount => 'Anzahl vorgehaltener Backups';
 
   @override
   String get settingsAutoBackupRequireCharging =>
@@ -785,7 +784,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String settingsBackupLast(Object time) {
-    return 'Last backup $time';
+    return 'Letztes Backup $time';
   }
 
   @override
@@ -804,7 +803,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String tranferStatus(Object percent) {
-    return 'Übertragen... $percent%';
+    return 'Übertragen ... $percent%';
   }
 
   @override
@@ -814,17 +813,17 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String restoringBackupStatus(Object percent) {
-    return 'Stelle Sicherung wieder her... $percent%';
+    return 'Stelle Sicherung wieder her ... $percent%';
   }
 
   @override
   String encryptingBackupStatus(Object percent) {
-    return 'Backup wird verschlüsselt...$percent%';
+    return 'Backup wird verschlüsselt ...$percent%';
   }
 
   @override
   String decryptingBackupStatus(Object percent) {
-    return 'Backup wird entschlüsselt...$percent%';
+    return 'Backup wird entschlüsselt ...$percent%';
   }
 
   @override
@@ -852,7 +851,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get exportImages => 'Bilder Exportieren';
 
   @override
-  String get exportIncludeTitle => 'Include';
+  String get exportIncludeTitle => 'Titel einschließen';
 
   @override
   String get settingsImport => 'Importieren';
@@ -1025,30 +1024,32 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get shareAddToLogPickerTitle => 'Choose a log';
+  String get shareAddToLogPickerTitle => 'Eintrag auswählen';
 
   @override
-  String get attachmentAddErrorDescription => 'Failed to add attachment!';
+  String get attachmentAddErrorDescription =>
+      'Fehler beim Hinzufügen des Anhangs!';
 
   @override
-  String get attachmentLoadFailed => 'Could not open this attachment';
+  String get attachmentLoadFailed => 'Der Anhang konnte nicht geöffnet werden';
 
   @override
-  String get attachmentNoAppToOpen => 'No app can open this attachment';
+  String get attachmentNoAppToOpen =>
+      'Keine App gefunden, um diesen Anhang zu öffnen';
 
   @override
-  String get recorderDiscardTitle => 'Discard recording?';
+  String get recorderDiscardTitle => 'Aufnahme verwerfen?';
 
   @override
-  String get recorderDiscardDescription => 'This recording will be deleted.';
+  String get recorderDiscardDescription => 'Die Beschreibung wird verworfen.';
 
   @override
-  String get recorderDiscardAction => 'Discard';
+  String get recorderDiscardAction => 'Verwerfen';
 
   @override
   String get recorderPermissionDenied =>
-      'Microphone permission is required to record audio';
+      'Mikrophon-Berechtgung benötigt, um Audio aufzunehmen';
 
   @override
-  String get recorderErrorDescription => 'Failed to record audio!';
+  String get recorderErrorDescription => 'Fehler beim Aufnehmen des Audios!';
 }

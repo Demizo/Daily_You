@@ -21,19 +21,19 @@ class AppLocalizationsId extends AppLocalizations {
   String get actionTakePhoto => 'Ambil foto';
 
   @override
-  String get actionTakeVideo => 'Take video';
+  String get actionTakeVideo => 'Rekam video';
 
   @override
-  String get actionRecordAudio => 'Record audio';
+  String get actionRecordAudio => 'Rekam audio';
 
   @override
-  String get actionAddImage => 'Add image';
+  String get actionAddImage => 'Tambahkan gambar';
 
   @override
-  String get actionAddVideo => 'Add video';
+  String get actionAddVideo => 'Tambahkan video';
 
   @override
-  String get actionAddAudio => 'Add audio';
+  String get actionAddAudio => 'Tambahkan audio';
 
   @override
   String get actionToday => 'Hari ini';
@@ -269,11 +269,11 @@ class AppLocalizationsId extends AppLocalizations {
   String get databaseMigrationErrorRetry => 'Coba Lagi';
 
   @override
-  String get databaseNewerErrorTitle => 'Update Required';
+  String get databaseNewerErrorTitle => 'Pembaruan Diperlukan';
 
   @override
   String get databaseNewerErrorDescription =>
-      'Your data was saved by a newer version of Daily You. This version can\'t open it safely. Update the app to continue.';
+      'Data Anda disimpan oleh versi Daily You yang lebih baru. Versi ini tidak dapat membukanya dengan aman. Perbarui aplikasi untuk melanjutkan.';
 
   @override
   String get errorReport => 'Laporkan Masalah';
@@ -300,21 +300,21 @@ class AppLocalizationsId extends AppLocalizations {
   String get deletePhotoDescription => 'Apakah Anda ingin menghapus foto ini?';
 
   @override
-  String get deleteAttachmentTitle => 'Delete Attachment';
+  String get deleteAttachmentTitle => 'Hapus Lampiran';
 
   @override
   String get deleteAttachmentDescription =>
-      'Do you want to delete this attachment?';
+      'Apakah Anda ingin menghapus lampiran ini?';
 
   @override
-  String get largeAttachmentWarningTitle => 'Large attachment';
+  String get largeAttachmentWarningTitle => 'Lampiran berukuran besar';
 
   @override
   String get largeAttachmentWarningDescription =>
-      'This attachment is large and will increase your backup size.';
+      'Lampiran ini berukuran besar dan akan menambah ukuran cadangan Anda.';
 
   @override
-  String get dontShowAgain => 'Don\'t show again';
+  String get dontShowAgain => 'Jangan tampilkan lagi';
 
   @override
   String get pageSettingsTitle => 'Pengaturan';
@@ -529,7 +529,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get iconGroupFoodDrink => 'Makanan & Minuman';
 
   @override
-  String get iconGroupHome => 'Home';
+  String get iconGroupHome => 'Beranda';
 
   @override
   String get iconGroupTravel => 'Perjalanan';
@@ -550,13 +550,13 @@ class AppLocalizationsId extends AppLocalizations {
   String get newCategoryTitle => 'Kategori Baru';
 
   @override
-  String get shareButtonLabel => 'Share';
+  String get shareButtonLabel => 'Bagikan';
 
   @override
-  String get importErrorDescription => 'Failed to import file!';
+  String get importErrorDescription => 'Gagal mengimpor berkas!';
 
   @override
-  String get exportErrorDescription => 'Failed to export file!';
+  String get exportErrorDescription => 'Gagal mengekspor berkas!';
 
   @override
   String get deleteTitle => 'Hapus';
@@ -587,7 +587,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String deleteTemplateMessage(Object name) {
-    return 'Delete \"$name\"?';
+    return 'Hapus \"$name\"?';
   }
 
   @override
@@ -670,13 +670,13 @@ class AppLocalizationsId extends AppLocalizations {
       '## Selamat datang di Daily You\n\n> Setiap hari layak untuk dikenang, abadikanlah!\n\n**Daily You** gratis, [open source](https://github.com/Demizo/Daily_You), dan didukung oleh komunitas. Dibangun berdasarkan keyakinan bahwa buku harian Anda harus benar-benar menjadi milik Anda, bukan sebuah produk:\n\n- Tanpa iklan\n- Tanpa fitur terkunci\n- Tanpa pelacakan atau pengumpulan data\n\nBaik Anda menulis jurnal, berefleksi, atau sekadar mencatat hal yang membuat Anda tersenyum, **Daily You** memberi Anda ruang pribadi yang _benar-benar milik Anda sendiri_.';
 
   @override
-  String get settingsStorageTitle => 'Penyimpanan';
+  String get settingsStorageTitle => 'Penyimpanan & Sinkronisasi';
 
   @override
   String get settingsImageQuality => 'Kualitas Gambar';
 
   @override
-  String get settingsMediaQualityTitle => 'Media Quality';
+  String get settingsMediaQualityTitle => 'Kualitas Media';
 
   @override
   String get imageQualityHigh => 'Tinggi';
@@ -691,7 +691,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get imageQualityNoCompression => 'Tidak dikompres';
 
   @override
-  String get settingsStorageUsage => 'Storage Usage';
+  String get settingsStorageUsage => 'Penggunaan Penyimpanan';
 
   @override
   String get settingsLogFolder => 'Folder Log';
@@ -700,17 +700,17 @@ class AppLocalizationsId extends AppLocalizations {
   String get settingsImageFolder => 'Folder gambar';
 
   @override
-  String get settingsExternalSyncTitle => 'Sync with External Location';
+  String get settingsExternalSyncTitle => 'Sinkronkan dengan Lokasi Eksternal';
 
   @override
-  String get chooseFolderHint => 'Choose a folder';
+  String get chooseFolderHint => 'Pilih folder';
 
   @override
   String get warningTitle => 'Hati hati';
 
   @override
   String get logFolderWarningDescription =>
-      'Jika folder yang dipilih sudah berisi file \'daily_you.db\', itu akan digunakan untuk menimpa log Anda yang ada!';
+      'Folder yang dipilih sudah berisi berkas \'daily_you.db\' yang akan digunakan untuk menimpa catatan Anda yang ada!';
 
   @override
   String get errorTitle => 'Eror';
@@ -723,7 +723,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get syncErrorDescription =>
-      'Failed to sync with the external location!';
+      'Gagal menyinkronkan dengan lokasi eksternal!';
 
   @override
   String get backupErrorDescription => 'Gagal membuat cadangan!';
@@ -745,56 +745,57 @@ class AppLocalizationsId extends AppLocalizations {
       'Memulihkan cadangan akan menimpa data yang sudah ada!';
 
   @override
-  String get settingsBackupPasswordProtect => 'Password Protect Backups';
+  String get settingsBackupPasswordProtect =>
+      'Lindungi Cadangan dengan Kata Sandi';
 
   @override
-  String get backupEncryptedTitle => 'Encrypted Backup';
+  String get backupEncryptedTitle => 'Cadangan Terenkripsi';
 
   @override
-  String get backupEncryptedContent => 'This backup is password protected.';
+  String get backupEncryptedContent => 'Cadangan ini dilindungi kata sandi.';
 
   @override
-  String get settingsAutoBackup => 'Automatic Backups';
+  String get settingsAutoBackup => 'Pencadangan Otomatis';
 
   @override
-  String get settingsAutoBackupLocation => 'Backup Location';
+  String get settingsAutoBackupLocation => 'Lokasi Cadangan';
 
   @override
-  String get settingsAutoBackupInterval => 'Backup Interval';
+  String get settingsAutoBackupInterval => 'Interval Pencadangan';
 
   @override
-  String get settingsAutoBackupIntervalDaily => 'Daily';
+  String get settingsAutoBackupIntervalDaily => 'Harian';
 
   @override
-  String get settingsAutoBackupIntervalWeekly => 'Weekly';
+  String get settingsAutoBackupIntervalWeekly => 'Mingguan';
 
   @override
-  String get settingsAutoBackupIntervalMonthly => 'Monthly';
+  String get settingsAutoBackupIntervalMonthly => 'Bulanan';
 
   @override
-  String get settingsAutoBackupMaxCount => 'Backups To Keep';
+  String get settingsAutoBackupMaxCount => 'Jumlah Cadangan yang Disimpan';
 
   @override
-  String get settingsAutoBackupRequireCharging => 'Only While Charging';
+  String get settingsAutoBackupRequireCharging => 'Hanya Saat Mengisi Daya';
 
   @override
   String settingsBackupLast(Object time) {
-    return 'Last backup $time';
+    return 'Pencadangan terakhir $time';
   }
 
   @override
-  String get settingsBackupNever => 'Never backed up';
+  String get settingsBackupNever => 'Belum pernah dicadangkan';
 
   @override
   String settingsAutoBackupNext(Object time) {
-    return 'Next backup $time';
+    return 'Pencadangan berikutnya $time';
   }
 
   @override
-  String get settingsAutoBackupKeepAll => 'All';
+  String get settingsAutoBackupKeepAll => 'Semua';
 
   @override
-  String get autoBackupFailedTitle => 'Backup Failed';
+  String get autoBackupFailedTitle => 'Pencadangan Gagal';
 
   @override
   String tranferStatus(Object percent) {
@@ -813,12 +814,12 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String encryptingBackupStatus(Object percent) {
-    return 'Encrypting Backup… $percent%';
+    return 'Mengenkripsi Cadangan… $percent%';
   }
 
   @override
   String decryptingBackupStatus(Object percent) {
-    return 'Decrypting Backup… $percent%';
+    return 'Mendekripsi Cadangan… $percent%';
   }
 
   @override
@@ -846,7 +847,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get exportImages => 'Ekspor Gambar';
 
   @override
-  String get exportIncludeTitle => 'Include';
+  String get exportIncludeTitle => 'Sertakan';
 
   @override
   String get settingsImport => 'Impor';
@@ -977,7 +978,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get settingsSourceCode => 'Sumber kode';
 
   @override
-  String get settingsOpenSourceLicenses => 'Open Source Licenses';
+  String get settingsOpenSourceLicenses => 'Lisensi Sumber Terbuka';
 
   @override
   String get settingsMadeWithLove => 'Dibuat dengan ❤️';
@@ -1018,30 +1019,31 @@ class AppLocalizationsId extends AppLocalizations {
   }
 
   @override
-  String get shareAddToLogPickerTitle => 'Choose a log';
+  String get shareAddToLogPickerTitle => 'Pilih catatan';
 
   @override
-  String get attachmentAddErrorDescription => 'Failed to add attachment!';
+  String get attachmentAddErrorDescription => 'Gagal menambahkan lampiran!';
 
   @override
-  String get attachmentLoadFailed => 'Could not open this attachment';
+  String get attachmentLoadFailed => 'Tidak dapat membuka lampiran ini';
 
   @override
-  String get attachmentNoAppToOpen => 'No app can open this attachment';
+  String get attachmentNoAppToOpen =>
+      'Tidak ada aplikasi yang dapat membuka lampiran ini';
 
   @override
-  String get recorderDiscardTitle => 'Discard recording?';
+  String get recorderDiscardTitle => 'Buang rekaman?';
 
   @override
-  String get recorderDiscardDescription => 'This recording will be deleted.';
+  String get recorderDiscardDescription => 'Rekaman ini akan dihapus.';
 
   @override
-  String get recorderDiscardAction => 'Discard';
+  String get recorderDiscardAction => 'Buang';
 
   @override
   String get recorderPermissionDenied =>
-      'Microphone permission is required to record audio';
+      'Izin mikrofon diperlukan untuk merekam audio';
 
   @override
-  String get recorderErrorDescription => 'Failed to record audio!';
+  String get recorderErrorDescription => 'Gagal merekam audio!';
 }

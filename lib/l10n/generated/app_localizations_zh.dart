@@ -691,7 +691,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsImageFolder => '图片存储目录';
 
   @override
-  String get settingsExternalSyncTitle => '与外部位置同步';
+  String get settingsExternalSyncTitle => '与外部存储位置同步';
 
   @override
   String get chooseFolderHint => '选择文件夹';
@@ -713,7 +713,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get imageFolderErrorDescription => '无法更改图片目录！';
 
   @override
-  String get syncErrorDescription => '与外部位置同步失败！';
+  String get syncErrorDescription => '与外部存储位置同步失败！';
 
   @override
   String get backupErrorDescription => '创建备份失败！';
