@@ -362,7 +362,10 @@ class BackupRestoreUtils {
   }
 
   static Future<OperationOutcome> restoreFromZip(
-      BuildContext context, void Function(String) updateStatus) async {
+      BuildContext context, void Function(String) updateStatus,
+      {required VoidCallback onFilePicked,
+      required Future<bool> Function(String fileName, int entryCount)
+          confirm}) async {
     final localizations = AppLocalizations.of(context)!;
     var outcome = const OperationOutcome.succeeded();
     var tempDir = await getTemporaryDirectory();
@@ -377,6 +380,8 @@ class BackupRestoreUtils {
           mimeTypes: ['application/zip', 'application/octet-stream']);
 
       if (archive == null) return const OperationOutcome.cancelled();
+
+      onFilePicked();
 
       // Import archive
       updateStatus(localizations.tranferStatus("0"));
@@ -397,7 +402,8 @@ class BackupRestoreUtils {
       }
 
       outcome = await restoreFromArchive(
-          tempZipFile, restoreFolder, localizations, updateStatus);
+          tempZipFile, restoreFolder, localizations, updateStatus,
+          confirm: (entryCount) => confirm(archive.name, entryCount));
     } on _RestoreCancelled {
       outcome = const OperationOutcome.cancelled();
     } catch (error) {
@@ -424,7 +430,8 @@ class BackupRestoreUtils {
       File archive,
       Directory restoreFolder,
       AppLocalizations localizations,
-      void Function(String) updateStatus) async {
+      void Function(String) updateStatus,
+      {required Future<bool> Function(int entryCount) confirm}) async {
     updateStatus(localizations.restoringBackupStatus("0"));
 
     await _extractBackup(archive, restoreFolder, (percent) {
@@ -436,6 +443,10 @@ class BackupRestoreUtils {
     if (!await restoredDatabase.exists() ||
         !await AppDatabase.instance.canOpen(restoredDatabase.path)) {
       return const OperationOutcome.failed();
+    }
+    if (!await confirm(
+        await AppDatabase.instance.countEntries(restoredDatabase.path))) {
+      return const OperationOutcome.cancelled();
     }
 
     await AppDatabase.instance.replaceDatabase(restoredDatabase);

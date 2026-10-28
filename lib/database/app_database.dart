@@ -223,6 +223,17 @@ class AppDatabase {
     }
   }
 
+  Future<int> countEntries(String path) async {
+    final database = await openDatabase(path, readOnly: true);
+    try {
+      return Sqflite.firstIntValue(
+              await database.rawQuery('SELECT COUNT(*) FROM $entriesTable')) ??
+          0;
+    } finally {
+      await database.close();
+    }
+  }
+
   Future<bool> exportSnapshotTo(String path) async {
     final db = _database;
     if (db == null) return false;

@@ -136,16 +136,37 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
   }
 
   Future<void> _restoreData(BuildContext context) async {
-    ValueNotifier<String> statusNotifier = ValueNotifier<String>("");
+    final statusNotifier = ValueNotifier<String>("");
+    var loadingShown = false;
 
-    BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
+    void showLoading() {
+      if (!context.mounted) return;
+      loadingShown = true;
+      BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
+    }
 
-    final outcome = await BackupRestoreUtils.restoreFromZip(context, (status) {
-      statusNotifier.value = status;
-    });
+    final outcome = await BackupRestoreUtils.restoreFromZip(
+        context,
+        (status) {
+          statusNotifier.value = status;
+        },
+        onFilePicked: showLoading,
+        confirm: (fileName, entryCount) async {
+          if (!context.mounted) return false;
+          Navigator.of(context).pop();
+          var confirmed = false;
+          try {
+            confirmed = await _confirmRestore(fileName, entryCount);
+          } finally {
+            if (context.mounted) {
+              BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
+            }
+          }
+          return confirmed && context.mounted;
+        });
 
     if (!context.mounted) return;
-    Navigator.of(context).pop();
+    if (loadingShown) Navigator.of(context).pop();
 
     if (outcome.failed) {
       await showFailureDialog(context,
@@ -154,37 +175,32 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
     }
   }
 
-  Future<void> _showRestoreWarning() async {
-    bool confirmed = false;
-    await showAppDialog(
+  Future<bool> _confirmRestore(String fileName, int entryCount) async {
+    final l10n = AppLocalizations.of(context)!;
+    final confirmed = await showSettingsDialog<bool>(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(AppLocalizations.of(context)!.warningTitle),
-          content: Text(
-              AppLocalizations.of(context)!.settingsRestorePromptDescription),
-          actions: [
-            TextButton(
-              child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
-              onPressed: () async {
-                Navigator.pop(context);
-              },
-            ),
-            TextButton(
-              child: Text(MaterialLocalizations.of(context).okButtonLabel),
-              onPressed: () async {
-                confirmed = true;
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        );
-      },
+      builder: (context) => [
+        SettingsInfoRow(
+          title: fileName,
+          subtitle: Text(l10n.logCount(entryCount)),
+        ),
+        SettingsInfoRow(
+          title: l10n.warningTitle,
+          subtitle: Text(l10n.settingsRestorePromptDescription),
+        ),
+      ],
+      actions: (context) => [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(true),
+          child: Text(l10n.settingsRestore),
+        ),
+      ],
     );
-    if (confirmed) {
-      if (!mounted) return;
-      await _restoreData(context);
-    }
+    return confirmed ?? false;
   }
 
   String _lastBackupText(String lastBackup) {
@@ -310,7 +326,7 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
           SettingsActionRow(
             icon: Icons.restore_rounded,
             title: l10n.settingsRestore,
-            onTap: _showRestoreWarning,
+            onTap: () => _restoreData(context),
           ),
           SettingsActionRow(
             icon: Icons.backup_rounded,
