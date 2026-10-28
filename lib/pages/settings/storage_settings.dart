@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
+import 'dart:io';
+
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/utils/backup_restore_utils.dart';
 import 'package:daily_you/database/attachment_storage.dart';
@@ -18,11 +20,8 @@ import 'package:daily_you/widgets/attachment_type_presentation.dart';
 import 'package:daily_you/widgets/database_overwrite_dialog.dart';
 import 'package:daily_you/widgets/external_sync_dialog.dart';
 import 'package:daily_you/widgets/failure_dialog.dart';
-import 'package:daily_you/widgets/file_size_row.dart';
-import 'package:daily_you/widgets/media_quality_dialog.dart';
-import 'package:daily_you/widgets/settings_header.dart';
-import 'package:daily_you/widgets/settings_icon_action.dart';
-import 'package:daily_you/widgets/settings_toggle.dart';
+import 'package:daily_you/widgets/segmented_group.dart';
+import 'package:daily_you/widgets/settings_rows.dart';
 import 'package:daily_you/widgets/sync_progress_dialog.dart';
 import 'package:daily_you/widgets/settings_page_scaffold.dart';
 import 'package:material_ui/material_ui.dart';
@@ -37,7 +36,7 @@ class StorageSettings extends StatefulWidget {
 }
 
 class _StorageSettingsState extends State<StorageSettings> {
-  late Map<AttachmentType, Future<int>> _usage;
+  late Future<Map<AttachmentType, int>> _usage;
 
   @override
   void initState() {
@@ -45,10 +44,13 @@ class _StorageSettingsState extends State<StorageSettings> {
     _usage = _loadUsage();
   }
 
-  Map<AttachmentType, Future<int>> _loadUsage() => {
-        for (final type in AttachmentType.values)
-          type: AttachmentStorage.instance.internalSizeBytes(type),
-      };
+  Future<Map<AttachmentType, int>> _loadUsage() async {
+    final sizes = await Future.wait([
+      for (final type in AttachmentType.values)
+        AttachmentStorage.instance.internalSizeBytes(type),
+    ]);
+    return Map.fromIterables(AttachmentType.values, sizes);
+  }
 
   void _refreshUsage() {
     if (mounted) setState(() => _usage = _loadUsage());
@@ -193,17 +195,44 @@ class _StorageSettingsState extends State<StorageSettings> {
     }
   }
 
-  String _formatBytes(int bytes) =>
-      formatFileSize(bytes, AppLocalizations.of(context)!.localeName);
+  static final List<AttachmentType> _mediaQualityTypes = [
+    for (final type in AttachmentType.values)
+      if (type != AttachmentType.video || Platform.isAndroid) type,
+  ];
 
-  Widget _storageUsageRow(IconData icon, String label, Future<int> usage) {
-    return FutureBuilder<int>(
-      future: usage,
+  List<Widget> _mediaQualityOptions(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final configProvider = ConfigProvider.instance;
+    return [
+      for (final type in _mediaQualityTypes)
+        SettingsChoiceRow<String>(
+          title: type.label(l10n),
+          value: configProvider.get(type.qualitySetting),
+          options: type.qualityLabels(l10n),
+          onChanged: (value) => configProvider.set(type.qualitySetting, value),
+        ),
+    ];
+  }
+
+  Widget _storageUsageRow(AppLocalizations l10n) {
+    String format(int bytes) => formatFileSize(bytes, l10n.localeName);
+    return FutureBuilder<Map<AttachmentType, int>>(
+      future: _usage,
       builder: (context, snapshot) {
-        final sizeText = snapshot.hasData ? _formatBytes(snapshot.data!) : '';
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          child: FileSizeRow(icon: icon, label: label, sizeText: sizeText),
+        final sizes = snapshot.data;
+        return SettingsInfoRow(
+          icon: Icons.pie_chart_rounded,
+          title: l10n.settingsStorageUsage,
+          subtitle: _UsageChips(entries: [
+            for (final type in AttachmentType.values)
+              (
+                label: type.label(l10n),
+                size: sizes == null ? null : format(sizes[type] ?? 0),
+              ),
+          ]),
+          value: sizes == null
+              ? null
+              : format(sizes.values.fold(0, (total, size) => total + size)),
         );
       },
     );
@@ -219,47 +248,87 @@ class _StorageSettingsState extends State<StorageSettings> {
     return SettingsPageScaffold(
       title: l10n.settingsStorageTitle,
       children: [
-        Column(children: [
-          SettingsToggle(
+        SegmentedGroup(children: [
+          SettingsToggleRow(
+            icon: Icons.sync_rounded,
             title: l10n.settingsExternalSyncTitle,
-            hint: syncedFolder == null
+            subtitle: syncedFolder == null
                 ? null
                 : StoragePicker.displayName(syncedFolder),
             value: syncSettings.isOn,
             onChanged: _toggleSync,
-            secondaryIcon:
-                syncSettings.isOn ? const Icon(Icons.edit_rounded) : null,
-            onSecondaryPressed: _editSync,
+            onOpenOptions: _editSync,
           ),
-          const Padding(
-            padding: EdgeInsets.only(left: 8.0, right: 8.0),
-            child: Divider(),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
-            child: SettingsHeader(text: l10n.settingsStorageUsage),
-          ),
-          for (final type in AttachmentType.values)
-            _storageUsageRow(type.icon, type.label(l10n), _usage[type]!),
-          SettingsIconAction(
+        ]),
+        SegmentedGroup(children: [
+          _storageUsageRow(l10n),
+          SettingsDialogRow(
+            icon: Icons.high_quality_rounded,
             title: l10n.settingsMediaQualityTitle,
-            icon: const Icon(Icons.chevron_right_rounded),
-            onPressed: () => showAppDialog(
-                context: context, builder: (_) => const MediaQualityDialog()),
+            options: _mediaQualityOptions,
           ),
-          const Padding(
-            padding: EdgeInsets.only(left: 8.0, right: 8.0),
-            child: Divider(),
+        ]),
+        SegmentedGroup(children: [
+          SettingsActionRow(
+            icon: Icons.delete_forever_rounded,
+            title: l10n.settingsDeleteAllLogsTitle,
+            destructive: true,
+            onTap: () => _showDeleteAllLogsDialog(context,
+                l10n.settingsDeleteAllLogsTitle, () => _deleteAllLogs(context)),
           ),
-          SettingsIconAction(
-              title: AppLocalizations.of(context)!.settingsDeleteAllLogsTitle,
-              icon: Icon(Icons.delete_forever_rounded),
-              onPressed: () => _showDeleteAllLogsDialog(
-                  context,
-                  AppLocalizations.of(context)!.settingsDeleteAllLogsTitle,
-                  () => _deleteAllLogs(context))),
         ]),
       ],
+    );
+  }
+}
+
+class _UsageChips extends StatelessWidget {
+  const _UsageChips({required this.entries});
+
+  final List<({String label, String? size})> entries;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(top: 4),
+      child: Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        children: [
+          for (final (:label, :size) in entries)
+            Chip(
+              label: size == null
+                  ? Row(
+                      mainAxisSize: MainAxisSize.min,
+                      spacing: 6,
+                      children: [Text(label), const _SizePlaceholder()],
+                    )
+                  : Text('$label $size'),
+              labelStyle: theme.textTheme.labelMedium,
+              backgroundColor: theme.colorScheme.surfaceContainerHighest,
+              side: BorderSide.none,
+              visualDensity: VisualDensity.compact,
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SizePlaceholder extends StatelessWidget {
+  const _SizePlaceholder();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 32,
+      height: 10,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(5),
+      ),
     );
   }
 }
