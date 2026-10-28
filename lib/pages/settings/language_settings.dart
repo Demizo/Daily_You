@@ -7,91 +7,63 @@ import 'dart:io';
 import 'package:app_settings/app_settings.dart';
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/device_info_service.dart';
-import 'package:daily_you/language_option.dart';
-import 'package:daily_you/widgets/settings_dropdown.dart';
-import 'package:daily_you/widgets/settings_icon_action.dart';
-import 'package:daily_you/widgets/settings_page_scaffold.dart';
-import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
+import 'package:daily_you/language_option.dart';
+import 'package:daily_you/widgets/segmented_group.dart';
+import 'package:daily_you/widgets/settings_page_scaffold.dart';
+import 'package:daily_you/widgets/settings_rows.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class LanguageSettings extends StatefulWidget {
+class LanguageSettings extends StatelessWidget {
   const LanguageSettings({super.key});
 
   @override
-  State<LanguageSettings> createState() => _LanguageSettingsState();
-}
-
-class _LanguageSettingsState extends State<LanguageSettings> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    ConfigProvider configProvider = Provider.of<ConfigProvider>(context);
+    final l10n = AppLocalizations.of(context)!;
+    final configProvider = Provider.of<ConfigProvider>(context);
+    final hasSystemLanguagePicker = Platform.isAndroid &&
+        DeviceInfoService().androidSdk != null &&
+        DeviceInfoService().androidSdk! >= 33;
+
     return SettingsPageScaffold(
-      title: AppLocalizations.of(context)!.settingsLanguageTitle,
+      title: l10n.settingsLanguageTitle,
       children: [
-        Column(children: [
-          if (Platform.isAndroid &&
-              DeviceInfoService().androidSdk != null &&
-              DeviceInfoService().androidSdk! >= 33)
-            SettingsIconAction(
-                title: AppLocalizations.of(context)!.settingsAppLanguageTitle,
-                icon: Icon(Icons.language_rounded),
-                onPressed: () => AppSettings.openAppSettings(
-                    type: AppSettingsType.appLocale)),
-          SettingsDropdown<LanguageOption?>(
-              title: (Platform.isAndroid &&
-                      DeviceInfoService().androidSdk != null &&
-                      DeviceInfoService().androidSdk! >= 33)
-                  ? AppLocalizations.of(context)!
-                      .settingsOverrideAppLanguageTitle
-                  : AppLocalizations.of(context)!.settingsAppLanguageTitle,
-              value: LanguageOption.fromJsonOrNull(
-                  configProvider.get(Settings.overrideLanguage)),
-              options: [
-                DropdownMenuItem(
-                    value: null,
-                    child: Text(AppLocalizations.of(context)!.themeSystem)),
-                for (var locale in AppLocalizations.supportedLocales)
-                  DropdownMenuItem(
-                      value: LanguageOption.fromLocale(locale),
-                      child:
-                          Text(LanguageOption.fromLocale(locale).displayName()))
-              ],
-              onChanged: (LanguageOption? newValue) {
-                configProvider.set(
-                    Settings.overrideLanguage, newValue?.toJson());
-              }),
-          Padding(
-            padding: const EdgeInsets.only(top: 16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(AppLocalizations.of(context)!
-                    .settingsTranslateCallToAction),
-                ElevatedButton.icon(
-                  icon: Icon(Icons.translate_rounded),
-                  label:
-                      Text(AppLocalizations.of(context)!.settingsHelpTranslate),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    foregroundColor: Theme.of(context).colorScheme.surface,
-                  ),
-                  onPressed: () async {
-                    await launchUrl(
-                        Uri.https("hosted.weblate.org", "/projects/daily-you"),
-                        mode: LaunchMode.externalApplication);
-                  },
-                )
-              ],
+        SegmentedGroup(children: [
+          if (hasSystemLanguagePicker)
+            SettingsActionRow(
+              icon: Icons.language_rounded,
+              title: l10n.settingsAppLanguageTitle,
+              onTap: () =>
+                  AppSettings.openAppSettings(type: AppSettingsType.appLocale),
             ),
-          )
+          SettingsChoiceRow<LanguageOption?>(
+            icon: Icons.translate_rounded,
+            title: hasSystemLanguagePicker
+                ? l10n.settingsOverrideAppLanguageTitle
+                : l10n.settingsAppLanguageTitle,
+            value: LanguageOption.fromJsonOrNull(
+                configProvider.get(Settings.overrideLanguage)),
+            options: {
+              null: l10n.themeSystem,
+              for (final locale in AppLocalizations.supportedLocales)
+                LanguageOption.fromLocale(locale):
+                    LanguageOption.fromLocale(locale).displayName(),
+            },
+            onChanged: (language) => configProvider.set(
+                Settings.overrideLanguage, language?.toJson()),
+          ),
+        ]),
+        SegmentedGroup(children: [
+          SettingsActionRow(
+            icon: Icons.volunteer_activism_rounded,
+            title: l10n.settingsHelpTranslate,
+            subtitle: l10n.settingsTranslateCallToAction,
+            onTap: () => launchUrl(
+                Uri.https("hosted.weblate.org", "/projects/daily-you"),
+                mode: LaunchMode.externalApplication),
+          ),
         ]),
       ],
     );

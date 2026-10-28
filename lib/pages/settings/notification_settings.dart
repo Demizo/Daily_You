@@ -7,19 +7,16 @@ import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/time_manager.dart';
-import 'package:daily_you/widgets/settings_icon_action.dart';
-import 'package:daily_you/widgets/settings_toggle.dart';
+import 'package:daily_you/widgets/segmented_group.dart';
+import 'package:daily_you/widgets/settings_rows.dart';
 import 'package:daily_you/widgets/time_range_picker_dialog.dart';
 import 'package:daily_you/widgets/settings_page_scaffold.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:provider/provider.dart';
 
-class NotificationSettings extends StatefulWidget {
+class NotificationSettings extends StatelessWidget {
   const NotificationSettings({super.key});
-
-  @override
-  State<NotificationSettings> createState() => _NotificationSettingsState();
 
   static Future<void> _selectTime(BuildContext context) async {
     final TimeOfDay? picked = await showTimePicker(
@@ -78,133 +75,128 @@ class NotificationSettings extends StatefulWidget {
     }
   }
 
+  static Future<void> _setNotifications(
+    Setting<bool> setting,
+    bool value, {
+    required Future<void> Function() start,
+    required Future<void> Function() stop,
+  }) async {
+    if (!await NotificationManager.instance.hasNotificationPermission()) return;
+    await (value ? start() : stop());
+    await ConfigProvider.instance.set(setting, value);
+  }
+
+  static Future<void> _setDailyReminders(bool value) {
+    return _setNotifications(
+      Settings.dailyReminders,
+      value,
+      start: NotificationManager.instance.startScheduledDailyReminders,
+      stop: NotificationManager.instance.stopDailyReminders,
+    );
+  }
+
+  static Future<void> _setFixedReminderTime(bool value) async {
+    await ConfigProvider.instance.set(Settings.setReminderTime, value);
+    await NotificationManager.instance.stopDailyReminders();
+    await NotificationManager.instance.startScheduledDailyReminders();
+  }
+
+  static Future<void> _setOnThisDay(bool value) {
+    return _setNotifications(
+      Settings.onThisDayNotifications,
+      value,
+      start: NotificationManager.instance.startOnThisDayNotifications,
+      stop: NotificationManager.instance.stopOnThisDayNotifications,
+    );
+  }
+
+  static String _onThisDayTime(BuildContext context) {
+    return TimeManager.timeOfDayString(context, _onThisDayNotificationTime());
+  }
+
+  static String _dailyReminderTime(BuildContext context) {
+    return ConfigProvider.instance.get(Settings.setReminderTime)
+        ? TimeManager.timeOfDayString(
+            context, TimeManager.scheduledReminderTime())
+        : TimeManager.timeRangeString(
+            context, TimeManager.getReminderTimeRange());
+  }
+
   static List<Widget> buildCoreReminderSettings(BuildContext context) {
-    final configProvider = Provider.of<ConfigProvider>(context);
+    final l10n = AppLocalizations.of(context)!;
+    final isOn = ConfigProvider.instance.get(Settings.dailyReminders);
+    final isFixedTime = ConfigProvider.instance.get(Settings.setReminderTime);
     return [
-      SettingsToggle(
-          title: AppLocalizations.of(context)!.settingsDailyReminderTitle,
-          hint: AppLocalizations.of(context)!.settingsDailyReminderDescription,
-          setting: Settings.dailyReminders,
-          onChanged: (value) async {
-            if (await NotificationManager.instance
-                .hasNotificationPermission()) {
-              if (value) {
-                await NotificationManager.instance
-                    .startScheduledDailyReminders();
-              } else {
-                await NotificationManager.instance.stopDailyReminders();
-              }
-              await configProvider.set(Settings.dailyReminders, value);
-            }
-          }),
-      if (configProvider.get(Settings.dailyReminders))
-        configProvider.get(Settings.setReminderTime)
-            ? SettingsIconAction(
-                title: AppLocalizations.of(context)!.settingsReminderTime,
-                hint: TimeManager.timeOfDayString(
-                    context, TimeManager.scheduledReminderTime()),
-                icon: Icon(Icons.schedule_rounded),
-                onPressed: () async {
-                  _selectTime(context);
-                })
-            : SettingsIconAction(
-                title: AppLocalizations.of(context)!.settingsReminderTime,
-                hint: TimeManager.timeRangeString(
-                    context, TimeManager.getReminderTimeRange()),
-                icon: Icon(Icons.timelapse_rounded),
-                onPressed: () async {
-                  _selectTimeRange(context);
-                }),
-      if (configProvider.get(Settings.dailyReminders))
-        SettingsToggle(
-            title: AppLocalizations.of(context)!.settingsFixedReminderTimeTitle,
-            hint: AppLocalizations.of(context)!
-                .settingsFixedReminderTimeDescription,
-            setting: Settings.setReminderTime,
-            onChanged: (value) async {
-              await configProvider.set(Settings.setReminderTime, value);
-              await NotificationManager.instance.stopDailyReminders();
-              await NotificationManager.instance.startScheduledDailyReminders();
-            }),
+      SettingsToggleRow(
+          title: l10n.settingsDailyReminderTitle,
+          subtitle: l10n.settingsDailyReminderDescription,
+          value: isOn,
+          onChanged: _setDailyReminders),
+      SettingsDependents(
+        enabled: isOn,
+        child: SettingsActionRow(
+            title: l10n.settingsReminderTime,
+            subtitle: _dailyReminderTime(context),
+            onTap: () =>
+                isFixedTime ? _selectTime(context) : _selectTimeRange(context)),
+      ),
+      SettingsDependents(
+        enabled: isOn,
+        child: SettingsToggleRow(
+            title: l10n.settingsFixedReminderTimeTitle,
+            subtitle: l10n.settingsFixedReminderTimeDescription,
+            value: isFixedTime,
+            onChanged: _setFixedReminderTime),
+      ),
     ];
   }
 
   static List<Widget> buildOnThisDaySettings(BuildContext context) {
-    final configProvider = Provider.of<ConfigProvider>(context);
+    final l10n = AppLocalizations.of(context)!;
+    final isOn = ConfigProvider.instance.get(Settings.onThisDayNotifications);
     return [
-      SettingsToggle(
-          title: AppLocalizations.of(context)!.flashbackOnThisDay,
-          hint: AppLocalizations.of(context)!.settingsOnThisDayDescription,
-          setting: Settings.onThisDayNotifications,
-          onChanged: (value) async {
-            if (await NotificationManager.instance
-                .hasNotificationPermission()) {
-              if (value) {
-                await NotificationManager.instance
-                    .startOnThisDayNotifications();
-              } else {
-                await NotificationManager.instance.stopOnThisDayNotifications();
-              }
-              await configProvider.set(Settings.onThisDayNotifications, value);
-            }
-          }),
-      if (configProvider.get(Settings.onThisDayNotifications))
-        SettingsIconAction(
-            title: AppLocalizations.of(context)!.settingsReminderTime,
-            hint: TimeManager.timeOfDayString(
-                context, NotificationSettings._onThisDayNotificationTime()),
-            icon: Icon(Icons.schedule_rounded),
-            onPressed: () async {
-              NotificationSettings._selectOnThisDayTime(context);
-            }),
+      SettingsToggleRow(
+          title: l10n.flashbackOnThisDay,
+          subtitle: l10n.settingsOnThisDayDescription,
+          value: isOn,
+          onChanged: _setOnThisDay),
+      SettingsDependents(
+        enabled: isOn,
+        child: SettingsActionRow(
+            title: l10n.settingsReminderTime,
+            subtitle: _onThisDayTime(context),
+            onTap: () => _selectOnThisDayTime(context)),
+      ),
     ];
-  }
-}
-
-class _NotificationSettingsState extends State<NotificationSettings> {
-  @override
-  void initState() {
-    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final configProvider = Provider.of<ConfigProvider>(context);
+    final dailyReminders = configProvider.get(Settings.dailyReminders);
+    final onThisDay = configProvider.get(Settings.onThisDayNotifications);
     return SettingsPageScaffold(
-      title: AppLocalizations.of(context)!.settingsNotificationsTitle,
+      title: l10n.settingsNotificationsTitle,
       children: [
-        Column(children: [
-          ...NotificationSettings.buildCoreReminderSettings(context),
-          if (configProvider.get(Settings.dailyReminders))
-            SettingsToggle(
-                title: AppLocalizations.of(context)!
-                    .settingsAlwaysSendReminderTitle,
-                hint: AppLocalizations.of(context)!
-                    .settingsAlwaysSendReminderDescription,
-                setting: Settings.alwaysRemind,
-                onChanged: (value) async {
-                  await configProvider.set(Settings.alwaysRemind, value);
-                }),
-          Padding(
-            padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-            child: Divider(),
+        SegmentedGroup(children: [
+          ...buildCoreReminderSettings(context),
+          SettingsDependents(
+            enabled: dailyReminders,
+            child: SettingsToggleRow.setting(
+                title: l10n.settingsAlwaysSendReminderTitle,
+                subtitle: l10n.settingsAlwaysSendReminderDescription,
+                setting: Settings.alwaysRemind),
           ),
-          ...NotificationSettings.buildOnThisDaySettings(context),
-          if (configProvider.get(Settings.dailyReminders) ||
-              configProvider.get(Settings.onThisDayNotifications))
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-              child: Divider(),
-            ),
-          if (configProvider.get(Settings.dailyReminders) ||
-              configProvider.get(Settings.onThisDayNotifications))
-            SettingsIconAction(
-                title: AppLocalizations.of(context)!
-                    .settingsCustomizeNotificationTitle,
-                icon: Icon(Icons.edit_notifications_rounded),
-                onPressed: () => AppSettings.openAppSettings(
-                    type: AppSettingsType.notification)),
         ]),
+        SegmentedGroup(children: buildOnThisDaySettings(context)),
+        if (dailyReminders || onThisDay)
+          SegmentedGroup(children: [
+            SettingsActionRow(
+                title: l10n.settingsCustomizeNotificationTitle,
+                onTap: () => AppSettings.openAppSettings(
+                    type: AppSettingsType.notification)),
+          ]),
       ],
     );
   }
