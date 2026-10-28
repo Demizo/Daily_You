@@ -7,118 +7,85 @@ import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/widgets/app_dialog.dart';
-import 'package:daily_you/widgets/settings_dropdown.dart';
+import 'package:daily_you/widgets/settings_dialog.dart';
+import 'package:daily_you/widgets/settings_rows.dart';
+import 'package:daily_you/widgets/tag_chip.dart';
 import 'package:daily_you/widgets/tag_picker_dialog.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
-class CalendarViewOptionsDialog extends StatelessWidget {
-  const CalendarViewOptionsDialog({super.key});
+Future<void> showCalendarViewOptionsDialog(BuildContext context) {
+  final l10n = AppLocalizations.of(context)!;
+  return showSettingsDialog(
+    context: context,
+    builder: (dialogContext) {
+      final configProvider = ConfigProvider.instance;
+      final tagsProvider = Provider.of<TagsProvider>(dialogContext);
+      final overlayTagId = configProvider.get(Settings.calendarTagOverlay);
+      final overlayTag = overlayTagId == null
+          ? null
+          : tagsProvider.tags
+              .where((tag) => tag.id == overlayTagId)
+              .firstOrNull;
+      return [
+        SettingsToggleRow(
+          icon: Icons.image_rounded,
+          title: l10n.imagesTitle,
+          value: !configProvider.get(Settings.hideImagesInCalendar),
+          onChanged: (value) =>
+              configProvider.set(Settings.hideImagesInCalendar, !value),
+        ),
+        SettingsToggleRow.setting(
+          icon: Icons.mood_rounded,
+          title: l10n.tagMoodTitle,
+          setting: Settings.calendarShowMood,
+        ),
+        _tagDisplayRow(context, l10n, configProvider, overlayTag),
+      ];
+    },
+  );
+}
 
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    return Consumer2<ConfigProvider, TagsProvider>(
-      builder: (context, config, tagsProvider, _) {
-        final showImages = !config.get(Settings.hideImagesInCalendar);
-        final showMood = config.get(Settings.calendarShowMood);
-        final overlayTagId = config.get(Settings.calendarTagOverlay);
-        final overlayTag = overlayTagId != null
-            ? tagsProvider.tags
-                .where((tag) => tag.id == overlayTagId)
-                .firstOrNull
-            : null;
+Widget _tagDisplayRow(
+  BuildContext context,
+  AppLocalizations l10n,
+  ConfigProvider configProvider,
+  Tag? overlayTag,
+) {
+  final currentValue = overlayTag == null
+      ? 'none'
+      : overlayTag.tagType == TagType.tracker
+          ? 'tracker'
+          : 'label';
 
-        return AlertDialog(
-          contentPadding: const EdgeInsets.fromLTRB(0, 12, 0, 0),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SwitchListTile(
-                secondary: const Icon(Icons.image_rounded),
-                title: Text(l10n.imagesTitle),
-                value: showImages,
-                onChanged: (value) =>
-                    config.set(Settings.hideImagesInCalendar, !value),
-              ),
-              SwitchListTile(
-                secondary: const Icon(Icons.mood_rounded),
-                title: Text(l10n.tagMoodTitle),
-                value: showMood,
-                onChanged: (value) =>
-                    config.set(Settings.calendarShowMood, value),
-              ),
-              _buildTagDisplayRow(context, l10n, config, overlayTag),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(MaterialLocalizations.of(context).closeButtonLabel),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _buildDropdownValueText(String text) {
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 120),
-      child: Text(
-        text,
-        maxLines: 1,
-        softWrap: false,
-        overflow: TextOverflow.fade,
-      ),
-    );
-  }
-
-  Widget _buildTagDisplayRow(
-    BuildContext context,
-    AppLocalizations l10n,
-    ConfigProvider config,
-    Tag? overlayTag,
-  ) {
-    final currentValue = overlayTag == null
-        ? 'none'
-        : overlayTag.tagType == TagType.tracker
-            ? 'tracker'
-            : 'label';
-
-    return SettingsDropdown<String>(
-      title: l10n.calendarTagDisplayLabel,
-      leadingIcon: Icons.local_offer_rounded,
-      value: currentValue,
-      options: [
-        DropdownMenuItem(value: 'none', child: Text(l10n.noTemplateTitle)),
-        DropdownMenuItem(value: 'label', child: Text(l10n.tagTypeLabelTitle)),
-        DropdownMenuItem(
-            value: 'tracker', child: Text(l10n.tagTypeTrackerTitle)),
-      ],
-      selectedItemBuilder: (context) => [
-        Text(l10n.noTemplateTitle),
-        _buildDropdownValueText(overlayTag?.name ?? l10n.tagTypeLabelTitle),
-        _buildDropdownValueText(overlayTag?.name ?? l10n.tagTypeTrackerTitle),
-      ],
-      onChanged: (value) async {
-        if (value == null) return;
-        if (value == 'none') {
-          config.set(Settings.calendarTagOverlay, null);
-          return;
-        }
-        final filter = value == 'tracker' ? TagType.tracker : TagType.label;
-        final tag = await showAppDialog<Tag>(
-          context: context,
-          builder: (_) => TagPickerDialog(
-            mode: TagPickerMode.selectSingle,
-            tagTypeFilter: filter,
-          ),
-        );
-        if (tag != null) {
-          config.set(Settings.calendarTagOverlay, tag.id);
-        }
-      },
-    );
-  }
+  return SettingsChoiceRow<String>(
+    icon: Icons.local_offer_rounded,
+    title: l10n.calendarTagDisplayLabel,
+    value: currentValue,
+    options: {
+      'none': l10n.noTemplateTitle,
+      'label': l10n.tagTypeLabelTitle,
+      'tracker': l10n.tagTypeTrackerTitle,
+    },
+    accessoryBuilder: (option) => option == currentValue && overlayTag != null
+        ? TagChip(tag: overlayTag)
+        : null,
+    onChanged: (value) async {
+      if (value == 'none') {
+        configProvider.set(Settings.calendarTagOverlay, null);
+        return;
+      }
+      final filter = value == 'tracker' ? TagType.tracker : TagType.label;
+      final tag = await showAppDialog<Tag>(
+        context: context,
+        builder: (_) => TagPickerDialog(
+          mode: TagPickerMode.selectSingle,
+          tagTypeFilter: filter,
+        ),
+      );
+      if (tag != null) {
+        configProvider.set(Settings.calendarTagOverlay, tag.id);
+      }
+    },
+  );
 }

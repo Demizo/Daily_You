@@ -36,7 +36,7 @@ class MoodScaleSetting extends StatelessWidget {
           child: PixelSnap(
             child: DecoratedBox(
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
                 border: level.hasTextIcon
                     ? Border.all(
                         color: level.resolvedColor(context),
@@ -63,20 +63,15 @@ class MoodScaleSetting extends StatelessWidget {
   Widget build(BuildContext context) {
     final levels = context.watch<MoodScaleProvider>().levels;
 
-    return Card.filled(
-      margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-      color: Theme.of(context).colorScheme.surfaceContainer,
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: () => _edit(context),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
-          child: Row(
-            children: [
-              for (final level in levels)
-                Expanded(child: _circle(context, level)),
-            ],
-          ),
+    return InkWell(
+      onTap: () => _edit(context),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
+        child: Row(
+          children: [
+            for (final level in levels)
+              Expanded(child: _circle(context, level)),
+          ],
         ),
       ),
     );

@@ -59,19 +59,21 @@ void main() {
       .map((box) => box.decoration as BoxDecoration)
       .toList();
 
-  testWidgets('rings text glyphs in their level color on the surface color',
+  testWidgets(
+      'rings text glyphs in their level color on the highest surface container color',
       (tester) async {
     await pumpSetting(tester);
 
-    final surface = Theme.of(tester.element(find.byType(MoodScaleSetting)))
-        .colorScheme
-        .surface;
+    final surfaceContainerHighest =
+        Theme.of(tester.element(find.byType(MoodScaleSetting)))
+            .colorScheme
+            .surfaceContainerHighest;
     final levels = MoodScalePreset.emoji.levels;
     final decorations = circleDecorations(tester);
 
     expect(decorations, hasLength(levels.length));
     for (final (index, decoration) in decorations.indexed) {
-      expect(decoration.color, surface);
+      expect(decoration.color, surfaceContainerHighest);
       expect(
           (decoration.border as Border).top.color, Color(levels[index].color!));
     }
