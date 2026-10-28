@@ -183,12 +183,33 @@ CREATE TABLE template_tags (
     return File(archive);
   }
 
-  Future<OperationOutcome> restore(File archive) async =>
+  late List<int> confirmedEntryCounts;
+  setUp(() => confirmedEntryCounts = []);
+
+  Future<OperationOutcome> restore(File archive,
+          {bool confirmed = true}) async =>
       BackupRestoreUtils.restoreFromArchive(
           archive,
           Directory(join(temporaryDirectory.path, 'Restore')),
           await AppLocalizations.delegate.load(const Locale('en')),
-          (_) {});
+          (_) {}, confirm: (entryCount) async {
+        confirmedEntryCounts.add(entryCount);
+        return confirmed;
+      });
+
+  test('asks to confirm with the backup entry count before replacing anything',
+      () async {
+    final images = await startWithCurrentLibrary();
+    final archive = await backupWith([(2, 'first.jpg', 0)]);
+
+    final outcome = await restore(archive, confirmed: false);
+
+    expect(outcome.status, OperationStatus.cancelled);
+    expect(confirmedEntryCounts, [1]);
+    final database = AppDatabase.instance.database!;
+    expect((await database.query('entries')).single['text'], 'current entry');
+    expect(File(join(images.path, 'first.jpg')).existsSync(), isFalse);
+  });
 
   test(
       'restores a backup made by the previous app version and removes what it does not reference',
@@ -242,6 +263,7 @@ CREATE TABLE template_tags (
     await ZipUtils.compress(archive, [backupDatabase], []);
 
     await expectLater(restore(File(archive)), throwsA(anything));
+    expect(confirmedEntryCounts, hasLength(1));
 
     final database = AppDatabase.instance.database!;
     expect((await database.query('entries')).single['text'], 'current entry');
