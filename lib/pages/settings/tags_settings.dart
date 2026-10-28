@@ -13,6 +13,7 @@ import 'package:daily_you/widgets/edit_category.dart';
 import 'package:daily_you/widgets/edit_tag.dart';
 import 'package:daily_you/widgets/expressive_fab_menu.dart';
 import 'package:daily_you/widgets/failure_dialog.dart';
+import 'package:daily_you/widgets/segmented_group.dart';
 import 'package:daily_you/widgets/share_tags_dialog.dart';
 import 'package:daily_you/widgets/settings_page_scaffold.dart';
 import 'package:daily_you/widgets/tag_chip.dart';
@@ -194,72 +195,49 @@ class _TagsSettingsState extends State<TagsSettings> {
     BuildContext context,
     int index,
     TagCategory? category,
-    TagsProvider provider, {
-    required Key key,
-  }) {
+  ) {
     final l10n = AppLocalizations.of(context)!;
-    final isUncategorized = category == null;
     final isCollapsed = _manuallyCollapsedIds.contains(category?.id);
-    final name =
-        isUncategorized ? l10n.tagCategoryUncategorized : category.name;
 
-    return Material(
-      key: key,
-      color: Theme.of(context).colorScheme.surfaceContainerLow,
-      child: InkWell(
-        onTap: () => _toggleCollapse(category?.id),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 2),
-          child: Row(
-            children: [
-              const SizedBox(height: kMinInteractiveDimension),
-              if (!isUncategorized)
-                ReorderableDragStartListener(
-                  index: index,
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12.0),
-                    child: Icon(Icons.drag_handle_rounded, size: 20),
-                  ),
-                )
-              else
-                const SizedBox(width: 44),
-              if (!isUncategorized) ...[
-                TagIconGlyph(
-                  icon: category.icon,
-                  iconType: category.iconType,
-                  fallbackIcon: Icons.folder_rounded,
-                  color: category.resolvedColor(context),
-                  size: 20,
-                ),
-                const SizedBox(width: 10),
-              ],
-              Expanded(
-                child: Text(
-                  name,
-                  overflow: TextOverflow.fade,
-                  softWrap: false,
-                  maxLines: 1,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                ),
-              ),
-              if (!isUncategorized)
-                IconButton(
-                  icon: const Icon(Icons.edit_rounded),
-                  onPressed: () => _showCategoryDialog(context, category),
-                ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Icon(
-                  isCollapsed
-                      ? Icons.expand_more_rounded
-                      : Icons.expand_less_rounded,
-                ),
-              ),
-            ],
+    return ListTile(
+      onTap: () => _toggleCollapse(category?.id),
+      leading: category == null
+          ? const Icon(Icons.folder_off_rounded)
+          : ReorderableDragStartListener(
+              index: index,
+              child: const Icon(Icons.drag_handle_rounded),
+            ),
+      title: Row(
+        spacing: 10,
+        children: [
+          if (category != null)
+            TagIconGlyph(
+              icon: category.icon,
+              iconType: category.iconType,
+              fallbackIcon: Icons.folder_rounded,
+              color: category.resolvedColor(context),
+              size: 20,
+            ),
+          Expanded(
+            child: Text(
+              category?.name ?? l10n.tagCategoryUncategorized,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
-        ),
+        ],
+      ),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (category != null)
+            IconButton(
+              icon: const Icon(Icons.edit_rounded),
+              onPressed: () => _showCategoryDialog(context, category),
+            ),
+          Icon(isCollapsed
+              ? Icons.expand_more_rounded
+              : Icons.expand_less_rounded),
+        ],
       ),
     );
   }
@@ -268,48 +246,22 @@ class _TagsSettingsState extends State<TagsSettings> {
     BuildContext context,
     int index,
     Tag tag,
-    TagsProvider provider, {
-    required Key key,
-  }) {
-    // Hidden while a category header is being dragged
-    if (_isDraggingCategory) return SizedBox(key: key);
-    return Material(
-      key: key,
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () => _showEditTagDialog(context, tag),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          child: Row(
-            children: [
-              ReorderableDragStartListener(
-                index: index,
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 12.0),
-                  child: Icon(Icons.drag_handle_rounded, size: 20),
-                ),
-              ),
-              Expanded(
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: TagChip(tag: tag),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Text(
-                  AppLocalizations.of(context)!
-                      .logCount(provider.entryCountForTag(tag.id!)),
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.edit_rounded),
-                onPressed: () => _showEditTagDialog(context, tag),
-              ),
-            ],
-          ),
-        ),
+    TagsProvider provider,
+  ) {
+    return ListTile(
+      onTap: () => _showEditTagDialog(context, tag),
+      leading: ReorderableDragStartListener(
+        index: index,
+        child: const Icon(Icons.drag_handle_rounded),
+      ),
+      title: Align(
+        alignment: Alignment.centerLeft,
+        child: TagChip(tag: tag),
+      ),
+      trailing: Text(
+        AppLocalizations.of(context)!
+            .logCount(provider.entryCountForTag(tag.id!)),
+        style: Theme.of(context).textTheme.bodySmall,
       ),
     );
   }
@@ -357,22 +309,35 @@ class _TagsSettingsState extends State<TagsSettings> {
     );
   }
 
+  Key _headerKey(TagCategory? category) => ValueKey('hdr_${category?.id}');
+
   List<Widget> _tagSlivers(TagsProvider provider) {
     final allItems = _buildFlatItems(provider);
     final firstItem = allItems.firstOrNull;
     final hasUncategorizedHeader =
         firstItem is _HeaderItem && firstItem.category == null;
-    final items = hasUncategorizedHeader ? allItems.sublist(1) : allItems;
+    final offset = hasUncategorizedHeader ? 1 : 0;
+    final items = allItems.sublist(offset);
+
+    Widget segmented(int allIndex, Key key, Widget child) {
+      final isHeader = allItems[allIndex] is _HeaderItem;
+      final endsGroup = _isDraggingCategory ||
+          allIndex + 1 == allItems.length ||
+          allItems[allIndex + 1] is _HeaderItem;
+      return Padding(
+        key: key,
+        padding: EdgeInsets.only(top: isHeader && allIndex > 0 ? 16 : 0),
+        child: SegmentedRow(isFirst: isHeader, isLast: endsGroup, child: child),
+      );
+    }
 
     return [
       if (hasUncategorizedHeader)
         SliverToBoxAdapter(
-          child: _buildHeaderRow(
-            context,
+          child: segmented(
             0,
-            null,
-            provider,
-            key: const ValueKey('hdr_null'),
+            _headerKey(null),
+            _buildHeaderRow(context, 0, null),
           ),
         ),
       SliverReorderableList(
@@ -398,24 +363,21 @@ class _TagsSettingsState extends State<TagsSettings> {
           _onReorder(from, to, provider, snapshot);
         },
         itemBuilder: (context, index) {
-          final item = items[index];
-          if (item is _HeaderItem) {
-            return _buildHeaderRow(
-              context,
-              index,
-              item.category,
-              provider,
-              key: ValueKey('hdr_${item.category?.id ?? 'null'}'),
-            );
-          } else {
-            final tagItem = item as _TagItem;
-            return _buildTagRow(
-              context,
-              index,
-              tagItem.tag,
-              provider,
-              key: ValueKey('tag_${tagItem.tag.id}'),
-            );
+          switch (items[index]) {
+            case _HeaderItem(:final category):
+              return segmented(
+                index + offset,
+                _headerKey(category),
+                _buildHeaderRow(context, index, category),
+              );
+            case _TagItem(:final tag):
+              final key = ValueKey('tag_${tag.id}');
+              if (_isDraggingCategory) return SizedBox(key: key);
+              return segmented(
+                index + offset,
+                key,
+                _buildTagRow(context, index, tag, provider),
+              );
           }
         },
       ),
