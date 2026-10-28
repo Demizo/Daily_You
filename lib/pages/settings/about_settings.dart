@@ -2,132 +2,76 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
-import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/device_info_service.dart';
-import 'package:daily_you/theme_mode_provider.dart';
-import 'package:daily_you/widgets/app_dialog.dart';
-import 'package:daily_you/widgets/settings_icon_action.dart';
-import 'package:daily_you/widgets/settings_page_scaffold.dart';
-import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
-import 'package:provider/provider.dart';
+import 'package:daily_you/widgets/segmented_group.dart';
+import 'package:daily_you/widgets/settings_page_scaffold.dart';
+import 'package:daily_you/widgets/settings_rows.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class AboutSettings extends StatefulWidget {
+class AboutSettings extends StatelessWidget {
   const AboutSettings({super.key});
 
-  @override
-  State<AboutSettings> createState() => _AboutSettingsState();
-}
-
-class _AboutSettingsState extends State<AboutSettings> {
-  final Color pinkAccentColor = const Color(0xffff00d5);
-  int versionTapCount = 0;
-
-  @override
-  void initState() {
-    super.initState();
-  }
+  Future<void> _open(Uri uri) =>
+      launchUrl(uri, mode: LaunchMode.externalApplication);
 
   @override
   Widget build(BuildContext context) {
-    final configProvider = Provider.of<ConfigProvider>(context);
-    final themeProvider = Provider.of<ThemeModeProvider>(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return SettingsPageScaffold(
-      title: AppLocalizations.of(context)!.settingsAboutTitle,
+      title: l10n.settingsAboutTitle,
       children: [
-        Column(children: [
-          GestureDetector(
-            child: SettingsIconAction(
-                title: AppLocalizations.of(context)!.settingsVersion,
-                hint: DeviceInfoService().appInfo?.version ?? "0.0.0",
-                icon: Icon(Icons.open_in_new_rounded),
-                onPressed: () async {
-                  await launchUrl(
-                      Uri.https("github.com", "/Demizo/Daily_You/releases"),
-                      mode: LaunchMode.externalApplication);
-                }),
-            onTap: () async {
-              versionTapCount += 1;
-              if (versionTapCount > 5) {
-                versionTapCount = 0;
-
-                await configProvider.set(Settings.followSystemColor, false);
-
-                themeProvider.accentColor = pinkAccentColor;
-                themeProvider.updateAccentColor();
-
-                if (!context.mounted) return;
-                await showAppDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: Center(
-                          child: Text(AppLocalizations.of(context)!
-                              .settingsMadeWithLove)),
-                    );
-                  },
-                );
-              }
-            },
+        SegmentedGroup(children: [
+          SettingsActionRow(
+            icon: Icons.info_rounded,
+            title: l10n.settingsVersion,
+            subtitle: DeviceInfoService().appInfo?.version ?? "0.0.0",
+            onTap: () =>
+                _open(Uri.https("github.com", "/Demizo/Daily_You/releases")),
           ),
-          SettingsIconAction(
-              title: AppLocalizations.of(context)!.settingsSourceCode,
-              hint: "github.com/Demizo/Daily_You",
-              icon: Icon(Icons.open_in_new_rounded),
-              onPressed: () async {
-                await launchUrl(Uri.https("github.com", "/Demizo/Daily_You"),
-                    mode: LaunchMode.externalApplication);
-              }),
-          SettingsIconAction(
-              title: AppLocalizations.of(context)!.settingsLicense,
-              hint: AppLocalizations.of(context)!.licenseGPLv3,
-              icon: Icon(Icons.open_in_new_rounded),
-              onPressed: () async {
-                await launchUrl(
-                    Uri(
-                        scheme: "https",
-                        host: "github.com",
-                        path: "/Demizo/Daily_You",
-                        fragment: "license"),
-                    mode: LaunchMode.externalApplication);
-              }),
-          SettingsIconAction(
-              title: AppLocalizations.of(context)!.settingsOpenSourceLicenses,
-              icon: Icon(Icons.chevron_right_rounded),
-              onPressed: () async {
-                await Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => LicensePage(
-                          applicationName:
-                              AppLocalizations.of(context)!.appTitle,
-                          applicationVersion:
-                              DeviceInfoService().appInfo?.version,
-                        )));
-              }),
-          Padding(
-            padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-            child: Divider(),
+          SettingsActionRow(
+            icon: Icons.code_rounded,
+            title: l10n.settingsSourceCode,
+            subtitle: "github.com/Demizo/Daily_You",
+            onTap: () => _open(Uri.https("github.com", "/Demizo/Daily_You")),
           ),
-          SettingsIconAction(
-            title: AppLocalizations.of(context)!.settingsHelpTranslate,
-            hint: "hosted.weblate.org/projects/daily-you",
-            icon: Icon(Icons.open_in_new_rounded),
-            onPressed: () async {
-              await launchUrl(
-                  Uri.https("hosted.weblate.org", "/projects/daily-you"),
-                  mode: LaunchMode.externalApplication);
-            },
+          SettingsActionRow(
+            icon: Icons.gavel_rounded,
+            title: l10n.settingsLicense,
+            subtitle: l10n.licenseGPLv3,
+            onTap: () => _open(Uri(
+                scheme: "https",
+                host: "github.com",
+                path: "/Demizo/Daily_You",
+                fragment: "license")),
           ),
-          SettingsIconAction(
-              title: AppLocalizations.of(context)!.errorReport,
-              hint: "github.com/Demizo/Daily_You/issues",
-              icon: Icon(Icons.open_in_new_rounded),
-              onPressed: () async {
-                await launchUrl(
-                    Uri.https("github.com", "/Demizo/Daily_You/issues"),
-                    mode: LaunchMode.externalApplication);
-              }),
+          SettingsActionRow(
+            icon: Icons.description_rounded,
+            title: l10n.settingsOpenSourceLicenses,
+            onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => LicensePage(
+                      applicationName: l10n.appTitle,
+                      applicationVersion: DeviceInfoService().appInfo?.version,
+                    ))),
+          ),
+        ]),
+        SegmentedGroup(children: [
+          SettingsActionRow(
+            icon: Icons.translate_rounded,
+            title: l10n.settingsHelpTranslate,
+            subtitle: "hosted.weblate.org/projects/daily-you",
+            onTap: () =>
+                _open(Uri.https("hosted.weblate.org", "/projects/daily-you")),
+          ),
+          SettingsActionRow(
+            icon: Icons.bug_report_rounded,
+            title: l10n.errorReport,
+            subtitle: "github.com/Demizo/Daily_You/issues",
+            onTap: () =>
+                _open(Uri.https("github.com", "/Demizo/Daily_You/issues")),
+          ),
         ]),
       ],
     );
