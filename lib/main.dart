@@ -420,6 +420,11 @@ ThemeData _buildTheme(ColorScheme colorScheme,
     colorScheme: colorScheme,
     iconTheme: IconThemeData(color: colorScheme.onSurfaceVariant),
     scaffoldBackgroundColor: scaffoldBackgroundColor,
+    listTileTheme: const ListTileThemeData(
+      contentPadding: EdgeInsets.symmetric(horizontal: 16),
+      minVerticalPadding: 10,
+    ),
+    switchTheme: const SwitchThemeData(padding: EdgeInsets.zero),
   );
 }
 

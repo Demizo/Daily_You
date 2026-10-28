@@ -30,3 +30,8 @@ void useTemporaryConfig() {
     await work.delete(recursive: true);
   });
 }
+
+void changeSetting<T>(Setting<T> setting, T value) {
+  ConfigProvider.instance.set(setting, value);
+  EasyDebounce.cancel('save-config');
+}
