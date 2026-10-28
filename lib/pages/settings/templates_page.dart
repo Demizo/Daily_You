@@ -8,6 +8,7 @@ import 'package:daily_you/utils/templates_tags_transfer.dart';
 import 'package:daily_you/widgets/edit_template.dart';
 import 'package:daily_you/widgets/failure_dialog.dart';
 import 'package:daily_you/widgets/share_templates_dialog.dart';
+import 'package:daily_you/widgets/segmented_group.dart';
 import 'package:daily_you/widgets/settings_page_scaffold.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/config_provider.dart';
@@ -74,44 +75,37 @@ class _TemplateSettingsState extends State<TemplateSettings> {
       );
     }
 
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: templates.length,
-      itemBuilder: (context, index) {
-        final template = templates[index];
-        final isDefault = defaultTemplateId == template.id;
-        return ListTile(
-          title: Padding(
-            padding: const EdgeInsets.only(
-                left: 16.0, right: 16, top: 8.0, bottom: 8.0),
-            child: Text(
-              template.name,
-              overflow: TextOverflow.ellipsis,
+    return SegmentedGroup(children: [
+      for (final template in templates)
+        _templateRow(context, template, defaultTemplateId == template.id),
+    ]);
+  }
+
+  Widget _templateRow(BuildContext context, Template template, bool isDefault) {
+    return ListTile(
+      title: Text(
+        template.name,
+        overflow: TextOverflow.ellipsis,
+      ),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            icon: Icon(
+              isDefault ? Icons.star_rounded : Icons.star_outline_rounded,
             ),
+            onPressed: () async {
+              await ConfigProvider.instance
+                  .set(Settings.defaultTemplate, isDefault ? -1 : template.id!);
+            },
           ),
-          contentPadding: EdgeInsets.zero,
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              IconButton(
-                icon: Icon(
-                  isDefault ? Icons.star_rounded : Icons.star_outline_rounded,
-                ),
-                onPressed: () async {
-                  await configProvider.set(
-                      Settings.defaultTemplate, isDefault ? -1 : template.id!);
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.edit),
-                onPressed: () => _showEditTemplatePopup(context, template),
-              ),
-            ],
+          IconButton(
+            icon: const Icon(Icons.edit),
+            onPressed: () => _showEditTemplatePopup(context, template),
           ),
-          onTap: () => _showEditTemplatePopup(context, template),
-        );
-      },
+        ],
+      ),
+      onTap: () => _showEditTemplatePopup(context, template),
     );
   }
 
