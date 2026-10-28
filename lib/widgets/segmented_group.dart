@@ -41,15 +41,13 @@ class SegmentedRow extends StatelessWidget {
   static const Radius _outerRadius = Radius.circular(16);
   static const Radius _innerRadius = Radius.circular(4);
   static const double _gap = 2;
-  static const double _hoverAlpha = 0.16;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Padding(
       padding: EdgeInsets.only(bottom: isLast ? 0 : _gap),
       child: Material(
-        color: theme.colorScheme.surfaceContainer,
+        color: Theme.of(context).colorScheme.surfaceContainer,
         clipBehavior: Clip.antiAlias,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(
@@ -57,13 +55,7 @@ class SegmentedRow extends StatelessWidget {
             bottom: isLast ? _outerRadius : _innerRadius,
           ),
         ),
-        child: Theme(
-          data: theme.copyWith(
-            hoverColor:
-                theme.colorScheme.onSurface.withValues(alpha: _hoverAlpha),
-          ),
-          child: child,
-        ),
+        child: child,
       ),
     );
   }

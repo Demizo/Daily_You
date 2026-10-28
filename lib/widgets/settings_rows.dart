@@ -10,6 +10,34 @@ Widget? _icon(IconData? icon) => icon == null ? null : Icon(icon);
 
 Widget? _text(String? text) => text == null ? null : Text(text);
 
+class SettingsSectionRow extends StatelessWidget {
+  const SettingsSectionRow({
+    super.key,
+    required this.icon,
+    required this.title,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String title;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return ListTile(
+      leading: Icon(icon),
+      title: Text(title),
+      selected: selected,
+      selectedTileColor: colorScheme.secondaryContainer,
+      selectedColor: colorScheme.onSecondaryContainer,
+      onTap: onTap,
+    );
+  }
+}
+
 class SettingsActionRow extends StatelessWidget {
   const SettingsActionRow({
     super.key,

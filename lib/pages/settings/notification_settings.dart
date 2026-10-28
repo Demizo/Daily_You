@@ -10,6 +10,7 @@ import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/settings_icon_action.dart';
 import 'package:daily_you/widgets/settings_toggle.dart';
 import 'package:daily_you/widgets/time_range_picker_dialog.dart';
+import 'package:daily_you/widgets/settings_page_scaffold.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:provider/provider.dart';
@@ -169,13 +170,10 @@ class _NotificationSettingsState extends State<NotificationSettings> {
   @override
   Widget build(BuildContext context) {
     final configProvider = Provider.of<ConfigProvider>(context);
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.settingsNotificationsTitle),
-        centerTitle: true,
-      ),
-      body: ListView(
-        children: [
+    return SettingsPageScaffold(
+      title: AppLocalizations.of(context)!.settingsNotificationsTitle,
+      children: [
+        Column(children: [
           ...NotificationSettings.buildCoreReminderSettings(context),
           if (configProvider.get(Settings.dailyReminders))
             SettingsToggle(
@@ -206,8 +204,8 @@ class _NotificationSettingsState extends State<NotificationSettings> {
                 icon: Icon(Icons.edit_notifications_rounded),
                 onPressed: () => AppSettings.openAppSettings(
                     type: AppSettingsType.notification)),
-        ],
-      ),
+        ]),
+      ],
     );
   }
 }

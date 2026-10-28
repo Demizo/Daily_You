@@ -14,6 +14,7 @@ import 'package:daily_you/widgets/edit_tag.dart';
 import 'package:daily_you/widgets/expressive_fab_menu.dart';
 import 'package:daily_you/widgets/failure_dialog.dart';
 import 'package:daily_you/widgets/share_tags_dialog.dart';
+import 'package:daily_you/widgets/settings_page_scaffold.dart';
 import 'package:daily_you/widgets/tag_chip.dart';
 import 'package:daily_you/widgets/tag_icon_glyph.dart';
 import 'package:material_ui/material_ui.dart';
@@ -319,21 +320,18 @@ class _TagsSettingsState extends State<TagsSettings> {
     final provider = Provider.of<TagsProvider>(context);
     final isEmpty = provider.tags.isEmpty && provider.categories.isEmpty;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.settingsTagsTitle),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.file_open_outlined),
-            onPressed: () => _importFile(context),
-          ),
-          IconButton(
-            icon: const Icon(Icons.share_rounded),
-            onPressed: () => _showShareDialog(context),
-          ),
-        ],
-      ),
+    return SettingsPageScaffold.slivers(
+      title: l10n.settingsTagsTitle,
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.file_open_outlined),
+          onPressed: () => _importFile(context),
+        ),
+        IconButton(
+          icon: const Icon(Icons.share_rounded),
+          onPressed: () => _showShareDialog(context),
+        ),
+      ],
       floatingActionButton: ExpressiveFabMenu(items: [
         ExpressiveFabMenuItem(
             icon: Icons.folder_rounded,
@@ -344,86 +342,83 @@ class _TagsSettingsState extends State<TagsSettings> {
             label: l10n.tagLabel,
             onTap: () => _showEditTagDialog(context, null)),
       ]),
-      body: isEmpty
-          ? Center(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 48),
-                child: Text(l10n.noResults),
+      slivers: isEmpty
+          ? [
+              SliverToBoxAdapter(
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 48),
+                    child: Text(l10n.noResults),
+                  ),
+                ),
               ),
-            )
-          : Builder(builder: (context) {
-              final allItems = _buildFlatItems(provider);
-              // Keep the uncategorized header out of the reorderable range so
-              // nothing can be dragged above
-              final hasUncategorizedHeader = allItems.isNotEmpty &&
-                  allItems[0] is _HeaderItem &&
-                  (allItems[0] as _HeaderItem).category == null;
-              final items =
-                  hasUncategorizedHeader ? allItems.sublist(1) : allItems;
-
-              return CustomScrollView(
-                slivers: [
-                  if (hasUncategorizedHeader)
-                    SliverToBoxAdapter(
-                      child: _buildHeaderRow(
-                        context,
-                        0,
-                        null,
-                        provider,
-                        key: const ValueKey('hdr_null'),
-                      ),
-                    ),
-                  SliverReorderableList(
-                    itemCount: items.length,
-                    onReorderStart: (index) {
-                      if (!_isDraggingCategory &&
-                          index < items.length &&
-                          items[index] is _HeaderItem &&
-                          (items[index] as _HeaderItem).category != null) {
-                        WidgetsBinding.instance.addPostFrameCallback((_) {
-                          if (mounted) {
-                            setState(() => _isDraggingCategory = true);
-                          }
-                        });
-                      }
-                    },
-                    onReorderEnd: (_) {
-                      if (_isDraggingCategory) {
-                        setState(() => _isDraggingCategory = false);
-                      }
-                    },
-                    onReorderItem: (from, to) {
-                      final snapshot = List<_ListItem>.from(items);
-                      _onReorder(from, to, provider, snapshot);
-                    },
-                    itemBuilder: (context, index) {
-                      final item = items[index];
-                      if (item is _HeaderItem) {
-                        return _buildHeaderRow(
-                          context,
-                          index,
-                          item.category,
-                          provider,
-                          key: ValueKey('hdr_${item.category?.id ?? 'null'}'),
-                        );
-                      } else {
-                        final tagItem = item as _TagItem;
-                        return _buildTagRow(
-                          context,
-                          index,
-                          tagItem.tag,
-                          provider,
-                          key: ValueKey('tag_${tagItem.tag.id}'),
-                        );
-                      }
-                    },
-                  ),
-                  const SliverToBoxAdapter(
-                    child: SizedBox(height: 90),
-                  ),
-                ],
-              );
-            }),
+            ]
+          : _tagSlivers(provider),
     );
+  }
+
+  List<Widget> _tagSlivers(TagsProvider provider) {
+    final allItems = _buildFlatItems(provider);
+    final firstItem = allItems.firstOrNull;
+    final hasUncategorizedHeader =
+        firstItem is _HeaderItem && firstItem.category == null;
+    final items = hasUncategorizedHeader ? allItems.sublist(1) : allItems;
+
+    return [
+      if (hasUncategorizedHeader)
+        SliverToBoxAdapter(
+          child: _buildHeaderRow(
+            context,
+            0,
+            null,
+            provider,
+            key: const ValueKey('hdr_null'),
+          ),
+        ),
+      SliverReorderableList(
+        itemCount: items.length,
+        onReorderStart: (index) {
+          if (_isDraggingCategory || index >= items.length) return;
+          final item = items[index];
+          if (item is _HeaderItem && item.category != null) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) {
+                setState(() => _isDraggingCategory = true);
+              }
+            });
+          }
+        },
+        onReorderEnd: (_) {
+          if (_isDraggingCategory) {
+            setState(() => _isDraggingCategory = false);
+          }
+        },
+        onReorderItem: (from, to) {
+          final snapshot = List<_ListItem>.from(items);
+          _onReorder(from, to, provider, snapshot);
+        },
+        itemBuilder: (context, index) {
+          final item = items[index];
+          if (item is _HeaderItem) {
+            return _buildHeaderRow(
+              context,
+              index,
+              item.category,
+              provider,
+              key: ValueKey('hdr_${item.category?.id ?? 'null'}'),
+            );
+          } else {
+            final tagItem = item as _TagItem;
+            return _buildTagRow(
+              context,
+              index,
+              tagItem.tag,
+              provider,
+              key: ValueKey('tag_${tagItem.tag.id}'),
+            );
+          }
+        },
+      ),
+    ];
   }
 }

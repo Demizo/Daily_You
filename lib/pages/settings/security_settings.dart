@@ -8,6 +8,7 @@ import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/auth_popup.dart';
 import 'package:daily_you/widgets/settings_icon_action.dart';
 import 'package:daily_you/widgets/settings_toggle.dart';
+import 'package:daily_you/widgets/settings_page_scaffold.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:flutter/services.dart';
@@ -32,13 +33,10 @@ class SecuritySettingsPageState extends State<SecuritySettings> {
     final configProvider = Provider.of<ConfigProvider>(context);
     final LocalAuthentication auth = LocalAuthentication();
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.settingsSecurityTitle),
-        centerTitle: true,
-      ),
-      body: ListView(
-        children: [
+    return SettingsPageScaffold(
+      title: AppLocalizations.of(context)!.settingsSecurityTitle,
+      children: [
+        Column(children: [
           SettingsToggle(
               title:
                   AppLocalizations.of(context)!.settingsSecurityRequirePassword,
@@ -135,8 +133,8 @@ class SecuritySettingsPageState extends State<SecuritySettings> {
                             },
                           ));
                 }),
-        ],
-      ),
+        ]),
+      ],
     );
   }
 }

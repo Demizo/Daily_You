@@ -24,6 +24,7 @@ import 'package:daily_you/widgets/settings_header.dart';
 import 'package:daily_you/widgets/settings_icon_action.dart';
 import 'package:daily_you/widgets/settings_toggle.dart';
 import 'package:daily_you/widgets/sync_progress_dialog.dart';
+import 'package:daily_you/widgets/settings_page_scaffold.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:provider/provider.dart';
@@ -215,13 +216,10 @@ class _StorageSettingsState extends State<StorageSettings> {
     final syncSettings = ExternalSyncSettings.load();
     final syncedFolder = syncSettings.logFolderUri;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.settingsStorageTitle),
-        centerTitle: true,
-      ),
-      body: ListView(
-        children: [
+    return SettingsPageScaffold(
+      title: l10n.settingsStorageTitle,
+      children: [
+        Column(children: [
           SettingsToggle(
             title: l10n.settingsExternalSyncTitle,
             hint: syncedFolder == null
@@ -260,8 +258,8 @@ class _StorageSettingsState extends State<StorageSettings> {
                   context,
                   AppLocalizations.of(context)!.settingsDeleteAllLogsTitle,
                   () => _deleteAllLogs(context))),
-        ],
-      ),
+        ]),
+      ],
     );
   }
 }

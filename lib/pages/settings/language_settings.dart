@@ -10,6 +10,7 @@ import 'package:daily_you/device_info_service.dart';
 import 'package:daily_you/language_option.dart';
 import 'package:daily_you/widgets/settings_dropdown.dart';
 import 'package:daily_you/widgets/settings_icon_action.dart';
+import 'package:daily_you/widgets/settings_page_scaffold.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:provider/provider.dart';
@@ -31,13 +32,10 @@ class _LanguageSettingsState extends State<LanguageSettings> {
   @override
   Widget build(BuildContext context) {
     ConfigProvider configProvider = Provider.of<ConfigProvider>(context);
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.settingsLanguageTitle),
-        centerTitle: true,
-      ),
-      body: ListView(
-        children: [
+    return SettingsPageScaffold(
+      title: AppLocalizations.of(context)!.settingsLanguageTitle,
+      children: [
+        Column(children: [
           if (Platform.isAndroid &&
               DeviceInfoService().androidSdk != null &&
               DeviceInfoService().androidSdk! >= 33)
@@ -94,8 +92,8 @@ class _LanguageSettingsState extends State<LanguageSettings> {
               ],
             ),
           )
-        ],
-      ),
+        ]),
+      ],
     );
   }
 }
