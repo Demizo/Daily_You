@@ -7,6 +7,7 @@ import 'package:daily_you/device_info_service.dart';
 import 'package:daily_you/theme_mode_provider.dart';
 import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/settings_icon_action.dart';
+import 'package:daily_you/widgets/settings_page_scaffold.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:provider/provider.dart';
@@ -33,13 +34,10 @@ class _AboutSettingsState extends State<AboutSettings> {
     final configProvider = Provider.of<ConfigProvider>(context);
     final themeProvider = Provider.of<ThemeModeProvider>(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.settingsAboutTitle),
-        centerTitle: true,
-      ),
-      body: ListView(
-        children: [
+    return SettingsPageScaffold(
+      title: AppLocalizations.of(context)!.settingsAboutTitle,
+      children: [
+        Column(children: [
           GestureDetector(
             child: SettingsIconAction(
                 title: AppLocalizations.of(context)!.settingsVersion,
@@ -130,8 +128,8 @@ class _AboutSettingsState extends State<AboutSettings> {
                     Uri.https("github.com", "/Demizo/Daily_You/issues"),
                     mode: LaunchMode.externalApplication);
               }),
-        ],
-      ),
+        ]),
+      ],
     );
   }
 }

@@ -22,6 +22,7 @@ import 'package:daily_you/widgets/auto_backup_settings_dialog.dart';
 import 'package:daily_you/widgets/failure_dialog.dart';
 import 'package:daily_you/widgets/settings_icon_action.dart';
 import 'package:daily_you/widgets/settings_toggle.dart';
+import 'package:daily_you/widgets/settings_page_scaffold.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:provider/provider.dart';
@@ -251,13 +252,10 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
   Widget build(BuildContext context) {
     final configProvider = Provider.of<ConfigProvider>(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.settingsBackupRestoreTitle),
-        centerTitle: true,
-      ),
-      body: ListView(
-        children: [
+    return SettingsPageScaffold(
+      title: AppLocalizations.of(context)!.settingsBackupRestoreTitle,
+      children: [
+        Column(children: [
           SettingsIconAction(
               title: AppLocalizations.of(context)!.settingsRestore,
               icon: Icon(Icons.restore_rounded),
@@ -344,8 +342,8 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
               onPressed: () async {
                 await _showExportSelectionPopup();
               }),
-        ],
-      ),
+        ]),
+      ],
     );
   }
 }

@@ -8,6 +8,7 @@ import 'package:daily_you/utils/templates_tags_transfer.dart';
 import 'package:daily_you/widgets/edit_template.dart';
 import 'package:daily_you/widgets/failure_dialog.dart';
 import 'package:daily_you/widgets/share_templates_dialog.dart';
+import 'package:daily_you/widgets/settings_page_scaffold.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/providers/templates_provider.dart';
@@ -117,33 +118,23 @@ class _TemplateSettingsState extends State<TemplateSettings> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.settingsTemplatesTitle),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.file_open_outlined),
-            onPressed: () => _importFile(context),
-          ),
-          IconButton(
-            icon: const Icon(Icons.share_rounded),
-            onPressed: () => _showShareDialog(context),
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            _templateList(context),
-            const SizedBox(height: 90),
-          ],
+    return SettingsPageScaffold(
+      title: l10n.settingsTemplatesTitle,
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.file_open_outlined),
+          onPressed: () => _importFile(context),
         ),
-      ),
+        IconButton(
+          icon: const Icon(Icons.share_rounded),
+          onPressed: () => _showShareDialog(context),
+        ),
+      ],
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showEditTemplatePopup(context, null),
         child: const Icon(Icons.add_rounded),
       ),
+      children: [_templateList(context)],
     );
   }
 }

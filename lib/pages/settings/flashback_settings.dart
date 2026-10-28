@@ -5,6 +5,7 @@
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/widgets/settings_header.dart';
 import 'package:daily_you/widgets/settings_toggle.dart';
+import 'package:daily_you/widgets/settings_page_scaffold.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:provider/provider.dart';
@@ -26,13 +27,10 @@ class _FlashbackSettingsPageState extends State<FlashbackSettings> {
   Widget build(BuildContext context) {
     final configProvider = Provider.of<ConfigProvider>(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.flashbacksTitle),
-        centerTitle: true,
-      ),
-      body: ListView(
-        children: [
+    return SettingsPageScaffold(
+      title: AppLocalizations.of(context)!.flashbacksTitle,
+      children: [
+        Column(children: [
           SettingsToggle(
               title: AppLocalizations.of(context)!.settingsShowFlashbacks,
               setting: Settings.showFlashbacks,
@@ -50,8 +48,8 @@ class _FlashbackSettingsPageState extends State<FlashbackSettings> {
                 }),
           if (configProvider.get(Settings.showFlashbacks))
             ...buildFlashbackOptions(configProvider),
-        ],
-      ),
+        ]),
+      ],
     );
   }
 

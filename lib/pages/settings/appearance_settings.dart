@@ -10,6 +10,7 @@ import 'package:daily_you/widgets/mood_scale_setting.dart';
 import 'package:daily_you/widgets/settings_dropdown.dart';
 import 'package:daily_you/widgets/settings_icon_action.dart';
 import 'package:daily_you/widgets/settings_toggle.dart';
+import 'package:daily_you/widgets/settings_page_scaffold.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:provider/provider.dart';
@@ -133,13 +134,10 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
     final themeProvider = Provider.of<ThemeModeProvider>(context);
     final configProvider = Provider.of<ConfigProvider>(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.settingsAppearanceTitle),
-        centerTitle: true,
-      ),
-      body: ListView(
-        children: [
+    return SettingsPageScaffold(
+      title: AppLocalizations.of(context)!.settingsAppearanceTitle,
+      children: [
+        Column(children: [
           const MoodScaleSetting(),
           SettingsDropdown<String>(
               title: AppLocalizations.of(context)!.settingsTheme,
@@ -255,8 +253,8 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
             icon: const Icon(Icons.chevron_right_rounded),
             onPressed: () => _showHideImagesDialog(context, configProvider),
           ),
-        ],
-      ),
+        ]),
+      ],
     );
   }
 }
