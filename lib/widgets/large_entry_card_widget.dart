@@ -43,7 +43,7 @@ class LargeCard extends StatelessWidget {
                 children: [
                   if (header != null)
                     Padding(
-                      padding: const EdgeInsets.all(2.0),
+                      padding: const EdgeInsets.symmetric(vertical: 2.0),
                       child: header,
                     )
                   else
@@ -118,7 +118,6 @@ class LargeEntryCardWidget extends StatelessWidget {
       header: EntryCardHeaderRow(
         entry: entry,
         title: title == null ? time : title!,
-        titlePadding: const EdgeInsets.only(left: 4.0),
         titleStyle: TextStyle(
           color: theme.textTheme.labelSmall?.color,
           fontWeight: FontWeight.bold,
