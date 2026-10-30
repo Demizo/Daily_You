@@ -98,6 +98,8 @@ flutter:
   assets:
     - assets/daily_you_First_Steps.webp
     - assets/icons/
+  shaders:
+    - shaders/mood_burst.frag
 
 icons_launcher:
   image_path: "assets/logo.png"

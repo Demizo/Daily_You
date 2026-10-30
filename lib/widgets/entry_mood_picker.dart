@@ -3,8 +3,9 @@
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
 import 'package:daily_you/models/mood.dart';
-import 'package:daily_you/widgets/material_shapes.dart';
+import 'package:daily_you/widgets/morphing_burst.dart';
 import 'package:daily_you/widgets/punch_scale.dart';
+import 'package:daily_you/widgets/pixel_snap.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
 
@@ -44,7 +45,8 @@ class _EntryMoodPickerState extends State<EntryMoodPicker> {
           duration: const Duration(milliseconds: 150),
           curve: Curves.easeInOut,
           builder: (context, progress, child) {
-            return CustomPaint(
+            return PixelSnap(
+                child: CustomPaint(
               painter: MorphingBurstPainter(
                 progress: progress,
                 color: Color.lerp(
@@ -54,7 +56,7 @@ class _EntryMoodPickerState extends State<EntryMoodPicker> {
                 )!,
               ),
               child: Center(child: child),
-            );
+            ));
           },
           child: PunchScale(
             key: ValueKey(mood),

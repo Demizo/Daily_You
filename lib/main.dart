@@ -19,6 +19,7 @@ import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/providers/mood_scale_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/providers/templates_provider.dart';
+import 'package:daily_you/widgets/morphing_burst.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/utils/auto_backup_schedule.dart';
 import 'package:daily_you/utils/backup_restore_utils.dart';
@@ -248,6 +249,8 @@ void main() async {
     await Workmanager().initialize(autoBackupCallbackDispatcher);
     await armAutoBackupWork();
   }
+
+  await BurstShader.load();
 
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider<ThemeModeProvider>(

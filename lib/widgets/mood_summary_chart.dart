@@ -3,8 +3,9 @@
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
 import 'package:daily_you/models/mood.dart';
-import 'package:daily_you/widgets/material_shapes.dart';
+import 'package:daily_you/widgets/morphing_burst.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
+import 'package:daily_you/widgets/pixel_snap.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 
@@ -202,10 +203,13 @@ class _MoodBarRow extends StatelessWidget {
       return SizedBox(
         width: iconSize,
         height: iconSize,
-        child: ClipPath(
-          clipper: SoftBurstClipper(),
-          child: Container(
-            color: surface,
+        child: PixelSnap(
+          child: CustomPaint(
+            painter: MorphingBurstPainter(
+              progress: 1,
+              color: surface,
+              radiusScale: 0.9,
+            ),
             child: Center(child: icon),
           ),
         ),
@@ -217,9 +221,11 @@ class _MoodBarRow extends StatelessWidget {
       height: iconSize,
       child: Padding(
         padding: const EdgeInsets.all(4.0),
-        child: Container(
-          decoration: BoxDecoration(color: surface, shape: BoxShape.circle),
-          child: Center(child: icon),
+        child: PixelSnap(
+          child: Container(
+            decoration: BoxDecoration(color: surface, shape: BoxShape.circle),
+            child: Center(child: icon),
+          ),
         ),
       ),
     );
