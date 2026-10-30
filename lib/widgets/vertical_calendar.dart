@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
+import 'dart:async';
 import 'dart:ui' as ui;
 
 import 'package:daily_you/config_provider.dart';
@@ -43,6 +44,7 @@ class _VerticalCalendarState extends State<VerticalCalendar>
 
   static const int _monthsPerBatch = 240;
   static const int _growMarginRows = 600;
+  static const Duration _dayNumberRebakeDelay = Duration(milliseconds: 150);
 
   double _weekRowHeight = 57.0;
   late CalendarMonthTable _table;
@@ -53,6 +55,7 @@ class _VerticalCalendarState extends State<VerticalCalendar>
   Map<int, ui.Image> _dayNumberCache = {};
   double? _lastDevicePixelRatio;
   double _lastWeekRowHeight = 0.0;
+  Timer? _dayNumberRebakeTimer;
   int _cacheGeneration = 0;
 
   bool _initialScrollDone = false;
@@ -113,6 +116,8 @@ class _VerticalCalendarState extends State<VerticalCalendar>
 
   @override
   void dispose() {
+    _dayNumberRebakeTimer?.cancel();
+    _disposeImages(_dayNumberCache);
     _showTodayButton.dispose();
     widget.scrollController.removeListener(_onScroll);
     super.dispose();
@@ -151,16 +156,42 @@ class _VerticalCalendarState extends State<VerticalCalendar>
     return recorder.endRecording().toImage(physicalSize, physicalSize);
   }
 
+  void _scheduleDayNumberCache(double devicePixelRatio) {
+    _dayNumberRebakeTimer?.cancel();
+    if (_dayNumberCache.isEmpty) {
+      _createDayNumberCache(devicePixelRatio);
+      return;
+    }
+    _dayNumberRebakeTimer = Timer(
+      _dayNumberRebakeDelay,
+      () => _createDayNumberCache(devicePixelRatio),
+    );
+  }
+
   Future<void> _createDayNumberCache(double devicePixelRatio) async {
     final generation = ++_cacheGeneration;
     final logicalSize = _weekRowHeight;
     final cache = <int, ui.Image>{};
     for (int day = 1; day <= 31; day++) {
-      cache[day] =
+      final image =
           await _bakeDayNumber(day.toString(), devicePixelRatio, logicalSize);
+      if (!mounted || generation != _cacheGeneration) {
+        image.dispose();
+        _disposeImages(cache);
+        return;
+      }
+      cache[day] = image;
     }
-    if (!mounted || generation != _cacheGeneration) return;
+    final previous = _dayNumberCache;
     setState(() => _dayNumberCache = cache);
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _disposeImages(previous));
+  }
+
+  void _disposeImages(Map<int, ui.Image> images) {
+    for (final image in images.values) {
+      image.dispose();
+    }
   }
 
   void _resetMonths(int firstDayIndex) {
@@ -286,7 +317,7 @@ class _VerticalCalendarState extends State<VerticalCalendar>
             _lastWeekRowHeight != _weekRowHeight) {
           _lastDevicePixelRatio = devicePixelRatio;
           _lastWeekRowHeight = _weekRowHeight;
-          _createDayNumberCache(devicePixelRatio);
+          _scheduleDayNumberCache(devicePixelRatio);
         }
 
         if (!_initialScrollDone) {
