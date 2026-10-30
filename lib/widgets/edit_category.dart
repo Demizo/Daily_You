@@ -165,7 +165,7 @@ class _EditCategoryState extends State<EditCategory> {
                         margin: EdgeInsets.zero,
                         color: Theme.of(context)
                             .colorScheme
-                            .surfaceContainerHighest,
+                            .surfaceContainerLowest,
                         child: Center(
                           child: TagIconGlyph(
                             icon: _icon,
@@ -183,7 +183,7 @@ class _EditCategoryState extends State<EditCategory> {
                     child: Card.filled(
                       margin: EdgeInsets.zero,
                       color:
-                          Theme.of(context).colorScheme.surfaceContainerHighest,
+                          Theme.of(context).colorScheme.surfaceContainerLowest,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 12.0),
                         child: TextField(
