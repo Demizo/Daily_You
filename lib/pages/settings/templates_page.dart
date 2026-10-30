@@ -39,16 +39,10 @@ class _TemplateSettingsState extends State<TemplateSettings> {
   }
 
   Future<void> _importFile(BuildContext context) async {
-    ValueNotifier<String> statusNotifier = ValueNotifier<String>("");
-
-    BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
-
-    final outcome = await TemplatesTagsTransfer.importTransferFile((status) {
-      statusNotifier.value = status;
-    });
+    final outcome = await BackupRestoreUtils.runWithLoadingStatus(
+        context, TemplatesTagsTransfer.importTransferFile);
 
     if (!context.mounted) return;
-    Navigator.of(context).pop();
 
     if (outcome.failed) {
       await showFailureDialog(context,

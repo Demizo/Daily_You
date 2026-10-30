@@ -56,17 +56,13 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
     if (format == null) return;
     if (!mounted) return;
 
-    ValueNotifier<String> statusNotifier = ValueNotifier<String>("");
-
-    BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
-
-    final outcome =
-        await ImportRegistry.instance.optionFor(format).run(context, (status) {
-      statusNotifier.value = status;
-    });
+    final outcome = await BackupRestoreUtils.runWithLoadingStatus(
+        context,
+        (updateStatus) => ImportRegistry.instance
+            .optionFor(format)
+            .run(context, updateStatus));
 
     if (!mounted) return;
-    Navigator.of(context).pop();
 
     if (outcome.failed) {
       await showFailureDialog(context,
@@ -95,19 +91,15 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
     if (format == null) return;
     if (!mounted) return;
 
-    ValueNotifier<String> statusNotifier = ValueNotifier<String>("");
-
-    BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
-
-    var outcome = const OperationOutcome.cancelled();
-    if (format == ExportFormat.markdown) {
-      outcome = await ExportUtils.exportToMarkdown(context, (status) {
-        statusNotifier.value = status;
-      });
-    }
+    final outcome = await BackupRestoreUtils.runWithLoadingStatus(context,
+        (updateStatus) async {
+      if (format != ExportFormat.markdown) {
+        return const OperationOutcome.cancelled();
+      }
+      return ExportUtils.exportToMarkdown(context, updateStatus);
+    });
 
     if (!mounted) return;
-    Navigator.of(context).pop();
 
     if (outcome.failed) {
       await showFailureDialog(context,
@@ -117,16 +109,12 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
   }
 
   Future<void> _backupData(BuildContext context) async {
-    ValueNotifier<String> statusNotifier = ValueNotifier<String>("");
-
-    BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
-
-    final outcome = await BackupRestoreUtils.backupToZip(context, (status) {
-      statusNotifier.value = status;
-    });
+    final outcome = await BackupRestoreUtils.runWithLoadingStatus(
+        context,
+        (updateStatus) =>
+            BackupRestoreUtils.backupToZip(context, updateStatus));
 
     if (!context.mounted) return;
-    Navigator.of(context).pop();
 
     if (outcome.failed) {
       await showFailureDialog(context,
@@ -136,37 +124,23 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
   }
 
   Future<void> _restoreData(BuildContext context) async {
-    final statusNotifier = ValueNotifier<String>("");
-    var loadingShown = false;
+    final loadingStatus = LoadingStatusDialog(context);
 
-    void showLoading() {
-      if (!context.mounted) return;
-      loadingShown = true;
-      BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
+    final OperationOutcome outcome;
+    try {
+      outcome = await BackupRestoreUtils.restoreFromZip(
+          context, loadingStatus.update, onFilePicked: loadingStatus.show,
+          confirm: (fileName, entryCount) async {
+        if (!context.mounted) return false;
+        final confirmed = await loadingStatus
+            .whileHidden(() => _confirmRestore(fileName, entryCount));
+        return confirmed && context.mounted;
+      });
+    } finally {
+      loadingStatus.dispose();
     }
 
-    final outcome = await BackupRestoreUtils.restoreFromZip(
-        context,
-        (status) {
-          statusNotifier.value = status;
-        },
-        onFilePicked: showLoading,
-        confirm: (fileName, entryCount) async {
-          if (!context.mounted) return false;
-          Navigator.of(context).pop();
-          var confirmed = false;
-          try {
-            confirmed = await _confirmRestore(fileName, entryCount);
-          } finally {
-            if (context.mounted) {
-              BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
-            }
-          }
-          return confirmed && context.mounted;
-        });
-
     if (!context.mounted) return;
-    if (loadingShown) Navigator.of(context).pop();
 
     if (outcome.failed) {
       await showFailureDialog(context,

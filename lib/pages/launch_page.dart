@@ -223,20 +223,15 @@ class _LaunchPageState extends State<LaunchPage> {
     if (!await AttachmentStorage.instance.needsImageMigration()) return;
     if (!mounted) return;
 
-    final statusNotifier = ValueNotifier<String>("");
-    BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
-
-    try {
-      await AttachmentStorage.instance.migrateImagesFromExternalStorage(
+    await BackupRestoreUtils.runWithLoadingStatus(context, (updateStatus) {
+      return AttachmentStorage.instance.migrateImagesFromExternalStorage(
         updateStatus: (migrated, total) {
           if (!mounted) return;
-          statusNotifier.value = AppLocalizations.of(context)!
-              .migratingImagesStatus(migrated, total);
+          updateStatus(AppLocalizations.of(context)!
+              .migratingImagesStatus(migrated, total));
         },
       );
-    } finally {
-      if (mounted) Navigator.of(context).pop();
-    }
+    });
   }
 
   Future _forceLocalDatabase() async {
