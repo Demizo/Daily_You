@@ -27,7 +27,6 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/layouts/mobile_scaffold.dart';
-import 'package:daily_you/layouts/responsive_layout.dart';
 import 'package:daily_you/theme_mode_provider.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -532,12 +531,7 @@ class _MainAppState extends State<MainApp> {
                 },
                 theme: lightTheme,
                 darkTheme: darkTheme,
-                home: LaunchPage(
-                    nextPage: ResponsiveLayout(
-                  mobileScaffold: MobileScaffold(),
-                  tabletScaffold: MobileScaffold(),
-                  desktopScaffold: MobileScaffold(),
-                )))),
+                home: LaunchPage(nextPage: MobileScaffold()))),
       );
     });
   }

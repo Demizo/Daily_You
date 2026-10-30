@@ -6,6 +6,7 @@ import 'dart:io';
 
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/layouts/fast_page_view_scroll_physics.dart';
+import 'package:daily_you/layouts/window_size_class.dart';
 import 'package:daily_you/pages/settings/notification_settings.dart';
 import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:easy_debounce/easy_debounce.dart';
@@ -528,14 +529,13 @@ class _MobileScaffoldState extends State<MobileScaffold> {
       l10n.pageStatisticsTitle,
     ];
 
-    return LayoutBuilder(builder: (context, constraints) {
-      if (constraints.maxWidth >= 1100) {
-        return _buildDesktopLayout(context, configProvider, pageTitles, l10n);
-      } else if (constraints.maxWidth >= 600) {
-        return _buildTabletLayout(context, configProvider, pageTitles, l10n);
-      } else {
-        return _buildMobileLayout(context, configProvider, pageTitles, l10n);
-      }
-    });
+    return switch (WindowSizeClass.of(context)) {
+      WindowSizeClass.expanded =>
+        _buildDesktopLayout(context, configProvider, pageTitles, l10n),
+      WindowSizeClass.medium =>
+        _buildTabletLayout(context, configProvider, pageTitles, l10n),
+      WindowSizeClass.compact =>
+        _buildMobileLayout(context, configProvider, pageTitles, l10n),
+    };
   }
 }
