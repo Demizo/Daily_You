@@ -32,13 +32,12 @@ void main() {
     }
   });
 
-  test('the icon and emoji presets share five distinct colors, yellow last',
-      () {
+  test('the icon and emoji presets share five distinct colors, amber last', () {
     final colors = MoodScalePreset.icons.levels.map((level) => level.color);
 
     expect(colors, everyElement(isNotNull));
     expect(colors.toSet(), hasLength(Mood.count));
     expect(MoodScalePreset.emoji.levels.map((level) => level.color), colors);
-    expect(colors.last, Colors.yellow.shade700.toARGB32());
+    expect(colors.last, Colors.amber.shade700.toARGB32());
   });
 }
