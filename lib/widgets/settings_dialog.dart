@@ -17,22 +17,21 @@ Future<T?> showSettingsDialog<T>({
   bool isSelection = false,
   SettingsRowsBuilder? actions,
 }) {
-  assert(!isSelection || actions == null);
   return showAppDialog<T>(
     context: context,
     builder: (context) => _SettingsDialog(
       title: title,
       builder: builder,
-      actions: isSelection
-          ? const []
-          : actions?.call(context) ??
-              [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child:
-                      Text(MaterialLocalizations.of(context).closeButtonLabel),
-                ),
-              ],
+      actions: actions?.call(context) ??
+          (isSelection
+              ? const []
+              : [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: Text(
+                        MaterialLocalizations.of(context).closeButtonLabel),
+                  ),
+                ]),
     ),
   );
 }

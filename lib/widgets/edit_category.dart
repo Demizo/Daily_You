@@ -7,7 +7,7 @@ import 'package:daily_you/models/tag_icon_type.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/color_picker_dialog.dart';
-import 'package:daily_you/widgets/color_swatch_row.dart';
+import 'package:daily_you/widgets/color_swatch_button.dart';
 import 'package:daily_you/widgets/delete_confirm_dialog.dart';
 import 'package:daily_you/widgets/icon_picker_dialog.dart';
 import 'package:daily_you/widgets/tag_icon_glyph.dart';
@@ -165,7 +165,7 @@ class _EditCategoryState extends State<EditCategory> {
                         margin: EdgeInsets.zero,
                         color: Theme.of(context)
                             .colorScheme
-                            .surfaceContainerLowest,
+                            .surfaceContainerHighest,
                         child: Center(
                           child: TagIconGlyph(
                             icon: _icon,
@@ -183,7 +183,7 @@ class _EditCategoryState extends State<EditCategory> {
                     child: Card.filled(
                       margin: EdgeInsets.zero,
                       color:
-                          Theme.of(context).colorScheme.surfaceContainerLowest,
+                          Theme.of(context).colorScheme.surfaceContainerHighest,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 12.0),
                         child: TextField(
@@ -203,16 +203,14 @@ class _EditCategoryState extends State<EditCategory> {
                       ),
                     ),
                   ),
+                  const SizedBox(width: 12),
+                  Center(
+                    child: ColorSwatchButton(
+                      color: _effectiveColor(context),
+                      onTap: _showColorPicker,
+                    ),
+                  ),
                 ],
-              ),
-            ),
-            const SizedBox(height: 12),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4.0),
-              child: ColorSwatchRow(
-                label: l10n.tagColorLabel,
-                color: _effectiveColor(context),
-                onTap: _showColorPicker,
               ),
             ),
           ],
