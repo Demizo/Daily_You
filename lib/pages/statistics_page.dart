@@ -71,6 +71,7 @@ class _StatsPageState extends State<StatsPage>
     final saved = ConfigProvider.instance.get(Settings.statsRange);
     statsRange = _stringToRange[saved] ?? StatsRange.allTime;
     _subjectConfig = ConfigProvider.instance.get(Settings.statsSubject);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _measureHeaderHeight());
   }
 
   @override
@@ -79,9 +80,6 @@ class _StatsPageState extends State<StatsPage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    // Recalculate header height when text size changes
-    MediaQuery.of(context);
-    WidgetsBinding.instance.addPostFrameCallback((_) => _measureHeaderHeight());
     return buildPage(context);
   }
 
@@ -214,14 +212,23 @@ class _StatsPageState extends State<StatsPage>
           left: 0,
           right: 0,
           top: 0,
-          child: Offstage(
-            offstage: true,
-            child: _HeaderContent(
-              key: _headerMeasureKey,
-              statsRange: statsRange,
-              subject: subject,
-              onRangeChanged: (_) {},
-              onSubjectTypeSelected: (_) {},
+          child: NotificationListener<SizeChangedLayoutNotification>(
+            onNotification: (_) {
+              WidgetsBinding.instance
+                  .addPostFrameCallback((_) => _measureHeaderHeight());
+              return true;
+            },
+            child: Offstage(
+              offstage: true,
+              child: SizeChangedLayoutNotifier(
+                child: _HeaderContent(
+                  key: _headerMeasureKey,
+                  statsRange: statsRange,
+                  subject: subject,
+                  onRangeChanged: (_) {},
+                  onSubjectTypeSelected: (_) {},
+                ),
+              ),
             ),
           ),
         ),
