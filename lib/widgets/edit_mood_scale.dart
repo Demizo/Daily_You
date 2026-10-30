@@ -10,7 +10,7 @@ import 'package:daily_you/models/tag_icon_type.dart';
 import 'package:daily_you/utils/mood_scale_visuals.dart';
 import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/color_picker_dialog.dart';
-import 'package:daily_you/widgets/color_swatch_row.dart';
+import 'package:daily_you/widgets/color_swatch_button.dart';
 import 'package:daily_you/widgets/icon_picker_dialog.dart';
 import 'package:daily_you/widgets/mood_scale_glyph.dart';
 import 'package:material_ui/material_ui.dart';
@@ -119,7 +119,7 @@ class _EditMoodScaleState extends State<EditMoodScale> {
 
   Widget _buildRow(BuildContext context, AppLocalizations l10n, int position) {
     final level = _levels[position];
-    final cardColor = Theme.of(context).colorScheme.surfaceContainerLowest;
+    final cardColor = Theme.of(context).colorScheme.surfaceContainerHighest;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: SizedBox(
@@ -236,7 +236,7 @@ class _PresetTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card.filled(
       margin: EdgeInsets.zero,
-      color: Theme.of(context).colorScheme.surfaceContainerLowest,
+      color: Theme.of(context).colorScheme.surfaceContainerHighest,
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,

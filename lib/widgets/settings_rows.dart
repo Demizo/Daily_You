@@ -130,6 +130,8 @@ class SettingsToggleRow extends StatelessWidget {
   }
 }
 
+typedef SettingsChoiceAction = ({String label, VoidCallback onPressed});
+
 class SettingsChoiceRow<T> extends StatelessWidget {
   const SettingsChoiceRow({
     super.key,
@@ -138,6 +140,7 @@ class SettingsChoiceRow<T> extends StatelessWidget {
     required this.value,
     required this.options,
     required this.onChanged,
+    this.action,
     this.accessoryBuilder,
   });
 
@@ -146,6 +149,8 @@ class SettingsChoiceRow<T> extends StatelessWidget {
   final T value;
   final Map<T, String> options;
   final ValueChanged<T> onChanged;
+
+  final SettingsChoiceAction? action;
   final Widget? Function(T option)? accessoryBuilder;
 
   Widget? _labelOf(T option) {
@@ -160,9 +165,26 @@ class SettingsChoiceRow<T> extends StatelessWidget {
   }
 
   Future<void> _choose(BuildContext context) {
+    final action = this.action;
     return showSettingsDialog(
       context: context,
       isSelection: true,
+      actions: action == null
+          ? null
+          : (context) => [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    action.onPressed();
+                  },
+                  child: Text(action.label),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child:
+                      Text(MaterialLocalizations.of(context).cancelButtonLabel),
+                ),
+              ],
       builder: (context) {
         void select(T option) {
           Navigator.of(context).pop();
