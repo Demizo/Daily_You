@@ -160,6 +160,8 @@ class _EditTagState extends State<EditTag> {
               alignment: Alignment.centerLeft,
               child: Chip(
                 side: BorderSide.none,
+                backgroundColor:
+                    Theme.of(context).colorScheme.surfaceContainerHighest,
                 label: Text(typeLabel),
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -198,7 +200,7 @@ class _EditTagState extends State<EditTag> {
               onTap: _showIconPicker,
               child: Card.filled(
                 margin: EdgeInsets.zero,
-                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                color: Theme.of(context).colorScheme.surfaceContainerLowest,
                 child: Center(
                   child: TagIconGlyph(
                     icon: _icon,
@@ -215,7 +217,7 @@ class _EditTagState extends State<EditTag> {
           Expanded(
             child: Card.filled(
               margin: EdgeInsets.zero,
-              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+              color: Theme.of(context).colorScheme.surfaceContainerLowest,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12.0),
                 child: TextField(

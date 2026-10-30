@@ -119,7 +119,7 @@ class _EditMoodScaleState extends State<EditMoodScale> {
 
   Widget _buildRow(BuildContext context, AppLocalizations l10n, int position) {
     final level = _levels[position];
-    final cardColor = Theme.of(context).colorScheme.surfaceContainerHighest;
+    final cardColor = Theme.of(context).colorScheme.surfaceContainerLowest;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: SizedBox(
@@ -236,7 +236,7 @@ class _PresetTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card.filled(
       margin: EdgeInsets.zero,
-      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+      color: Theme.of(context).colorScheme.surfaceContainerLowest,
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
