@@ -22,12 +22,13 @@ enum MoodScalePreset {
   static final _red = Colors.red.shade500.toARGB32();
   static final _orange = Colors.orange.shade600.toARGB32();
   static final _yellow = Colors.yellow.shade700.toARGB32();
+  static final _amber = Colors.amber.shade700.toARGB32();
   static final _green = Colors.green.shade600.toARGB32();
   static final _cyan = Colors.cyan.shade700.toARGB32();
   static final _lightBlue = Colors.lightBlue.shade600.toARGB32();
   static final _blueGrey = Colors.blueGrey.shade500.toARGB32();
 
-  static final _moodColors = [_red, _lightBlue, _blueGrey, _green, _yellow];
+  static final _moodColors = [_red, _lightBlue, _blueGrey, _green, _amber];
 
   static final _emojiLevels = [
     for (final (position, emoji) in ['😔', '😕', '😐', '🙂', '☺️'].indexed)
