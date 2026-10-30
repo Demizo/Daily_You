@@ -41,13 +41,7 @@ class LargeCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (header != null)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 2.0),
-                      child: header,
-                    )
-                  else
-                    const SizedBox(height: 8),
+                  if (header != null) header! else const SizedBox(height: 8),
                   if (body != null)
                     Expanded(
                       child: ShaderMask(

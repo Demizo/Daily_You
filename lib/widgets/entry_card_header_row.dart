@@ -19,8 +19,8 @@ class EntryCardHeaderRow extends StatelessWidget {
 
   static const double _segmentGap = 2;
   static const double _titleInset = 6;
-  static const double _moodInset = 4;
-  static const double _moodBottomInset = 1.5;
+  static const double _moodInset = 2;
+  static const double _moodVerticalInset = 2;
   static const double _moodSize = 20;
   static const double _moodLineHeightScale = 1.3;
 
@@ -85,7 +85,7 @@ class EntryCardHeaderRow extends StatelessWidget {
           ),
           const SizedBox(width: _segmentGap),
           Padding(
-            padding: const EdgeInsets.only(bottom: _moodBottomInset),
+            padding: const EdgeInsets.symmetric(vertical: _moodVerticalInset),
             child: SizedBox(
               height: moodHeight,
               child: Center(

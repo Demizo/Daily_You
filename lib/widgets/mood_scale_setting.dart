@@ -8,6 +8,7 @@ import 'package:daily_you/utils/mood_scale_visuals.dart';
 import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/edit_mood_scale.dart';
 import 'package:daily_you/widgets/mood_scale_glyph.dart';
+import 'package:daily_you/widgets/pixel_snap.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
@@ -32,22 +33,24 @@ class MoodScaleSetting extends StatelessWidget {
         constraints: const BoxConstraints(maxWidth: _circleSize),
         child: AspectRatio(
           aspectRatio: 1,
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
-              border: level.hasTextIcon
-                  ? Border.all(
-                      color: level.resolvedColor(context),
-                      width: _ringWidth,
-                    )
-                  : null,
-              shape: BoxShape.circle,
-            ),
-            child: Center(
-              child: MoodScaleGlyph(
-                level: level,
-                size: 24,
-                allowScaling: false,
+          child: PixelSnap(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
+                border: level.hasTextIcon
+                    ? Border.all(
+                        color: level.resolvedColor(context),
+                        width: _ringWidth,
+                      )
+                    : null,
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: MoodScaleGlyph(
+                  level: level,
+                  size: 24,
+                  allowScaling: false,
+                ),
               ),
             ),
           ),
