@@ -495,10 +495,29 @@ class BackupRestoreUtils {
     return failedFiles;
   }
 
-  static void showLoadingStatus(
-      BuildContext context, ValueNotifier<String> statusNotifier) {
+  static Future<T> runWithLoadingStatus<T>(BuildContext context,
+      Future<T> Function(void Function(String status) updateStatus) run) async {
+    final loadingStatus = LoadingStatusDialog(context)..show();
+    try {
+      return await run(loadingStatus.update);
+    } finally {
+      loadingStatus.dispose();
+    }
+  }
+}
+
+class LoadingStatusDialog {
+  LoadingStatusDialog(this._context);
+
+  final BuildContext _context;
+  final ValueNotifier<String> _status = ValueNotifier<String>("");
+  bool _visible = false;
+
+  void show() {
+    if (_visible || !_context.mounted) return;
+    _visible = true;
     showAppDialog(
-      context: context,
+      context: _context,
       barrierDismissible: false,
       builder: (context) {
         return PopScope(
@@ -512,7 +531,7 @@ class BackupRestoreUtils {
                   CircularProgressIndicator(),
                   const SizedBox(height: 20),
                   ValueListenableBuilder<String>(
-                    valueListenable: statusNotifier,
+                    valueListenable: _status,
                     builder: (context, message, child) {
                       return Text(message, textAlign: TextAlign.center);
                     },
@@ -524,5 +543,28 @@ class BackupRestoreUtils {
         );
       },
     );
+  }
+
+  void update(String status) => _status.value = status;
+
+  Future<T> whileHidden<T>(Future<T> Function() task) async {
+    final wasVisible = _visible;
+    _hide();
+    try {
+      return await task();
+    } finally {
+      if (wasVisible) show();
+    }
+  }
+
+  void dispose() {
+    _hide();
+    _status.dispose();
+  }
+
+  void _hide() {
+    if (!_visible || !_context.mounted) return;
+    _visible = false;
+    Navigator.of(_context).pop();
   }
 }

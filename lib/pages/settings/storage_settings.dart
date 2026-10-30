@@ -179,18 +179,13 @@ class _StorageSettingsState extends State<StorageSettings> {
   }
 
   Future<void> _deleteAllLogs(BuildContext context) async {
-    ValueNotifier<String> statusNotifier = ValueNotifier<String>("");
-
-    BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
-
     try {
-      await EntriesProvider.instance.deleteAll((status) {
-        statusNotifier.value = status;
+      await BackupRestoreUtils.runWithLoadingStatus(context,
+          (updateStatus) async {
+        await EntriesProvider.instance.deleteAll(updateStatus);
+        await AttachmentStorage.instance.garbageCollectAttachments();
       });
-
-      await AttachmentStorage.instance.garbageCollectAttachments();
     } finally {
-      if (context.mounted) Navigator.of(context).pop();
       _refreshUsage();
     }
   }

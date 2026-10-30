@@ -31,16 +31,12 @@ class _ShareTemplatesDialogState extends State<ShareTemplatesDialog> {
     final bytes = TemplatesTagsTransfer.exportTemplates(_selectedIds);
     final fileName = _fileName();
 
-    ValueNotifier<String> statusNotifier = ValueNotifier<String>("");
-    BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
-
-    final outcome =
-        await TemplatesTagsTransfer.saveBytesToFile(bytes, fileName, (status) {
-      statusNotifier.value = status;
-    });
+    final outcome = await BackupRestoreUtils.runWithLoadingStatus(
+        context,
+        (updateStatus) => TemplatesTagsTransfer.saveBytesToFile(
+            bytes, fileName, updateStatus));
 
     if (!mounted) return;
-    Navigator.of(context).pop();
 
     if (outcome.failed) {
       await showFailureDialog(context,
