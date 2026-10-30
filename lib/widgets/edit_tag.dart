@@ -329,7 +329,7 @@ class _EditTagState extends State<EditTag> {
   Widget build(BuildContext context) {
     final categories = TagsProvider.instance.categories;
     final l10n = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery.sizeOf(context).width;
     final dialogWidth = (screenWidth - 80).clamp(280.0, 400.0);
     return Dialog(
       child: SizedBox(

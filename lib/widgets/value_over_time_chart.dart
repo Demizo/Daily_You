@@ -411,7 +411,7 @@ class _ValueOverTimeChartState extends State<ValueOverTimeChart> {
         builder: (context, setDialogState) {
           final l10n = AppLocalizations.of(context)!;
           final smoothingValue = _smoothing;
-          final screenWidth = MediaQuery.of(context).size.width;
+          final screenWidth = MediaQuery.sizeOf(context).width;
           final dialogWidth = (screenWidth - 80).clamp(240.0, 360.0);
           return Dialog(
             child: SizedBox(
