@@ -241,13 +241,13 @@ class _PresetTile extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.all(12.0),
+          padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 12.0),
           child: FittedBox(
             child: Row(
               children: [
                 for (final level in preset.levels)
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 1.0),
                     child: MoodScaleGlyph(
                       level: level,
                       size: 18,
