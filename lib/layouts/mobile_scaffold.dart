@@ -30,7 +30,7 @@ class MobileScaffold extends StatefulWidget {
 
 class _MobileScaffoldState extends State<MobileScaffold> {
   int currentIndex = 0;
-  late final PageController _pageController;
+  final _swipePagesKey = GlobalKey<_SwipePagesState>();
   final List<bool> _isScrolled = [false, false, false];
   int _prebuildViewports = 0;
 
@@ -45,7 +45,6 @@ class _MobileScaffoldState extends State<MobileScaffold> {
   @override
   void initState() {
     super.initState();
-    _pageController = PageController(initialPage: currentIndex);
     SchedulerBinding.instance.addPostFrameCallback((_) => _startPrebuild());
     _scrollControllers = List.generate(pages.length, (_) => ScrollController());
     for (int i = 0; i < _scrollControllers.length; i++) {
@@ -58,7 +57,6 @@ class _MobileScaffoldState extends State<MobileScaffold> {
 
   @override
   void dispose() {
-    _pageController.dispose();
     for (final c in _scrollControllers) {
       c.dispose();
     }
@@ -381,12 +379,10 @@ class _MobileScaffoldState extends State<MobileScaffold> {
             ),
           ],
         ),
-        body: PageView(
-          controller: _pageController,
-          physics: const FastPageViewScrollPhysics(),
-          allowImplicitScrolling: _prebuildViewports > 0,
-          scrollCacheExtent:
-              ScrollCacheExtent.viewport(_prebuildViewports.toDouble()),
+        body: _SwipePages(
+          key: _swipePagesKey,
+          initialIndex: currentIndex,
+          prebuildViewports: _prebuildViewports,
           onPageChanged: (index) {
             FocusManager.instance.primaryFocus?.unfocus();
             EasyDebounce.debounce(
@@ -408,11 +404,7 @@ class _MobileScaffoldState extends State<MobileScaffold> {
             setState(() {
               currentIndex = index;
             });
-            _pageController.animateToPage(
-              index,
-              duration: const Duration(milliseconds: 250),
-              curve: Curves.easeOut,
-            );
+            _swipePagesKey.currentState?.animateTo(index);
           },
           destinations: [
             NavigationDestination(
@@ -537,5 +529,55 @@ class _MobileScaffoldState extends State<MobileScaffold> {
       WindowSizeClass.compact =>
         _buildMobileLayout(context, configProvider, pageTitles, l10n),
     };
+  }
+}
+
+class _SwipePages extends StatefulWidget {
+  final int initialIndex;
+  final int prebuildViewports;
+  final ValueChanged<int> onPageChanged;
+  final List<Widget> children;
+
+  const _SwipePages({
+    super.key,
+    required this.initialIndex,
+    required this.prebuildViewports,
+    required this.onPageChanged,
+    required this.children,
+  });
+
+  @override
+  State<_SwipePages> createState() => _SwipePagesState();
+}
+
+class _SwipePagesState extends State<_SwipePages> {
+  late final PageController _pageController =
+      PageController(initialPage: widget.initialIndex);
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void animateTo(int index) {
+    _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeOut,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return PageView(
+      controller: _pageController,
+      physics: const FastPageViewScrollPhysics(),
+      allowImplicitScrolling: widget.prebuildViewports > 0,
+      scrollCacheExtent:
+          ScrollCacheExtent.viewport(widget.prebuildViewports.toDouble()),
+      onPageChanged: widget.onPageChanged,
+      children: widget.children,
+    );
   }
 }
