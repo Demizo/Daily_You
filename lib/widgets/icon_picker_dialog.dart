@@ -8,16 +8,22 @@ import 'package:daily_you/utils/generated/tag_icon_registry.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 
-/// Result of [IconPickerDialog]: either a curated material icon (identified
-/// by its stable registry key) or a free-typed character/emoji.
-typedef IconPickerResult = ({TagIconType type, String value});
+/// Result of [IconPickerDialog]: a curated material icon (identified by its
+/// stable registry key), a free-typed character/emoji, or a null value for no
+/// icon.
+typedef IconPickerResult = ({TagIconType type, String? value});
 
 /// Dialog letting the user pick either a curated Material icon or type a
 /// custom character/emoji, shared by the tag and category editors.
 class IconPickerDialog extends StatefulWidget {
   final Color previewColor;
+  final IconPickerResult initial;
 
-  const IconPickerDialog({super.key, required this.previewColor});
+  const IconPickerDialog({
+    super.key,
+    required this.previewColor,
+    required this.initial,
+  });
 
   @override
   State<IconPickerDialog> createState() => _IconPickerDialogState();
@@ -30,11 +36,25 @@ class _IconPickerDialogState extends State<IconPickerDialog>
   final TextEditingController _customController = TextEditingController();
   final FocusNode _customFocusNode = FocusNode();
 
+  bool get _hasNoInitialIcon =>
+      widget.initial.value == null || widget.initial.value!.isEmpty;
+
+  bool get _hasCustomInitialIcon =>
+      !_hasNoInitialIcon && widget.initial.type == TagIconType.character;
+
+  bool _isInitialMaterialIcon(String key) =>
+      widget.initial.type == TagIconType.materialIcon &&
+      widget.initial.value == key;
+
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this)
-      ..addListener(_onTabChanged);
+    _tabController = TabController(
+      length: 2,
+      vsync: this,
+      initialIndex: _hasCustomInitialIcon ? 1 : 0,
+    )..addListener(_onTabChanged);
+    if (_hasCustomInitialIcon) _customController.text = widget.initial.value!;
     _searchController.addListener(() => setState(() {}));
     _customController.addListener(() => setState(() {}));
   }
@@ -57,6 +77,10 @@ class _IconPickerDialogState extends State<IconPickerDialog>
 
   void _selectIcon(String key) {
     Navigator.of(context).pop((type: TagIconType.materialIcon, value: key));
+  }
+
+  void _selectNone() {
+    Navigator.of(context).pop((type: TagIconType.character, value: null));
   }
 
   void _confirmCustom() {
@@ -131,6 +155,16 @@ class _IconPickerDialogState extends State<IconPickerDialog>
     return Column(
       children: [
         Padding(
+          padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+          child: OutlinedButton.icon(
+            onPressed: _selectNone,
+            icon: Icon(
+              _hasNoInitialIcon ? Icons.check_rounded : Icons.block_rounded,
+            ),
+            label: Text(l10n.noTemplateTitle),
+          ),
+        ),
+        Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           child: SearchBar(
             controller: _searchController,
@@ -182,9 +216,25 @@ class _IconPickerDialogState extends State<IconPickerDialog>
                         itemCount: group.keys.length,
                         itemBuilder: (context, index) {
                           final key = group.keys[index];
+                          final isSelected = _isInitialMaterialIcon(key);
                           return IconButton(
-                            icon: Icon(tagIconRegistry[key],
-                                color: widget.previewColor),
+                            icon: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Icon(
+                                  tagIconRegistry[key],
+                                  color: isSelected
+                                      ? widget.previewColor
+                                          .withValues(alpha: 0.3)
+                                      : widget.previewColor,
+                                ),
+                                if (isSelected)
+                                  Icon(
+                                    Icons.check_rounded,
+                                    color: widget.previewColor,
+                                  ),
+                              ],
+                            ),
                             onPressed: () => _selectIcon(key),
                           );
                         },

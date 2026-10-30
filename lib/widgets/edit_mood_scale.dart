@@ -64,8 +64,10 @@ class _EditMoodScaleState extends State<EditMoodScale> {
     final level = _levels[position];
     final result = await showAppDialog<IconPickerResult>(
       context: context,
-      builder: (context) =>
-          IconPickerDialog(previewColor: level.resolvedColor(context)),
+      builder: (context) => IconPickerDialog(
+        previewColor: level.resolvedColor(context),
+        initial: (type: level.iconType, value: level.icon),
+      ),
     );
     if (result == null) return;
     _setLook(position,
@@ -126,32 +128,15 @@ class _EditMoodScaleState extends State<EditMoodScale> {
           children: [
             AspectRatio(
               aspectRatio: 1,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  GestureDetector(
-                    onTap: () => _pickIcon(position),
-                    child: Card.filled(
-                      margin: EdgeInsets.zero,
-                      color: cardColor,
-                      child: Center(
-                        child: MoodScaleGlyph(level: level, size: 24),
-                      ),
-                    ),
+              child: GestureDetector(
+                onTap: () => _pickIcon(position),
+                child: Card.filled(
+                  margin: EdgeInsets.zero,
+                  color: cardColor,
+                  child: Center(
+                    child: MoodScaleGlyph(level: level, size: 24),
                   ),
-                  if (level.hasIcon)
-                    Positioned(
-                      top: 0,
-                      right: 0,
-                      child: GestureDetector(
-                        onTap: () => _setLook(position,
-                            icon: null,
-                            iconType: TagIconType.character,
-                            color: level.color),
-                        child: const Icon(Icons.close, size: 14),
-                      ),
-                    ),
-                ],
+                ),
               ),
             ),
             const SizedBox(width: 8),

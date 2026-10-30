@@ -103,6 +103,7 @@ class _EditCategoryState extends State<EditCategory> {
       context: context,
       builder: (context) => IconPickerDialog(
         previewColor: _effectiveColor(context),
+        initial: (type: _iconType, value: _icon),
       ),
     );
     if (result != null) {
@@ -129,7 +130,6 @@ class _EditCategoryState extends State<EditCategory> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final hasIcon = _icon != null && _icon!.isNotEmpty;
 
     return AlertDialog(
       title: Row(
@@ -159,40 +159,23 @@ class _EditCategoryState extends State<EditCategory> {
                 children: [
                   AspectRatio(
                     aspectRatio: 1,
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        GestureDetector(
-                          onTap: _showIconPicker,
-                          child: Card.filled(
-                            margin: EdgeInsets.zero,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .surfaceContainerHighest,
-                            child: Center(
-                              child: TagIconGlyph(
-                                icon: _icon,
-                                iconType: _iconType,
-                                fallbackIcon: Icons.folder_rounded,
-                                color: _effectiveColor(context),
-                                size: 28,
-                              ),
-                            ),
+                    child: GestureDetector(
+                      onTap: _showIconPicker,
+                      child: Card.filled(
+                        margin: EdgeInsets.zero,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .surfaceContainerHighest,
+                        child: Center(
+                          child: TagIconGlyph(
+                            icon: _icon,
+                            iconType: _iconType,
+                            fallbackIcon: Icons.folder_rounded,
+                            color: _effectiveColor(context),
+                            size: 28,
                           ),
                         ),
-                        if (hasIcon)
-                          Positioned(
-                            top: 0,
-                            right: 0,
-                            child: GestureDetector(
-                              onTap: () => setState(() {
-                                _icon = null;
-                                _iconType = TagIconType.character;
-                              }),
-                              child: const Icon(Icons.close, size: 14),
-                            ),
-                          ),
-                      ],
+                      ),
                     ),
                   ),
                   const SizedBox(width: 12),
