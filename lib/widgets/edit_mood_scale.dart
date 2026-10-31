@@ -10,7 +10,7 @@ import 'package:daily_you/models/tag_icon_type.dart';
 import 'package:daily_you/utils/mood_scale_visuals.dart';
 import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/color_picker_dialog.dart';
-import 'package:daily_you/widgets/color_swatch_button.dart';
+import 'package:daily_you/widgets/icon_color_label_row.dart';
 import 'package:daily_you/widgets/icon_picker_dialog.dart';
 import 'package:daily_you/widgets/mood_scale_glyph.dart';
 import 'package:material_ui/material_ui.dart';
@@ -119,55 +119,15 @@ class _EditMoodScaleState extends State<EditMoodScale> {
 
   Widget _buildRow(BuildContext context, AppLocalizations l10n, int position) {
     final level = _levels[position];
-    final cardColor = Theme.of(context).colorScheme.surfaceContainerHighest;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
-      child: SizedBox(
-        height: 48,
-        child: Row(
-          children: [
-            AspectRatio(
-              aspectRatio: 1,
-              child: GestureDetector(
-                onTap: () => _pickIcon(position),
-                child: Card.filled(
-                  margin: EdgeInsets.zero,
-                  color: cardColor,
-                  child: Center(
-                    child: MoodScaleGlyph(level: level, size: 24),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Card.filled(
-                margin: EdgeInsets.zero,
-                color: cardColor,
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                    child: TextField(
-                      controller: _labelControllers[position],
-                      maxLines: 1,
-                      textCapitalization: TextCapitalization.words,
-                      decoration: InputDecoration(
-                        hintText: Mood.defaultLabel(position, l10n),
-                        border: InputBorder.none,
-                        isDense: true,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-            ColorSwatchButton(
-              color: level.resolvedColor(context),
-              onTap: () => _pickColor(position),
-            ),
-          ],
-        ),
+      child: IconColorLabelRow(
+        icon: MoodScaleGlyph(level: level, size: 24),
+        color: level.resolvedColor(context),
+        controller: _labelControllers[position],
+        hintText: Mood.defaultLabel(position, l10n),
+        onPickIcon: () => _pickIcon(position),
+        onPickColor: () => _pickColor(position),
       ),
     );
   }
@@ -236,7 +196,7 @@ class _PresetTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card.filled(
       margin: EdgeInsets.zero,
-      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+      color: Theme.of(context).colorScheme.surfaceContainerLowest,
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,

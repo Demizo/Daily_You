@@ -36,7 +36,7 @@ class MoodScaleSetting extends StatelessWidget {
           child: PixelSnap(
             child: DecoratedBox(
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                color: Theme.of(context).colorScheme.surfaceContainerLowest,
                 border: level.hasTextIcon
                     ? Border.all(
                         color: level.resolvedColor(context),

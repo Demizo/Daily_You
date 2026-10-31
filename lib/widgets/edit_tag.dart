@@ -8,10 +8,10 @@ import 'package:daily_you/models/tag_icon_type.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/color_picker_dialog.dart';
-import 'package:daily_you/widgets/color_swatch_button.dart';
 import 'package:daily_you/widgets/connected_button_group.dart';
 import 'package:daily_you/widgets/delete_confirm_dialog.dart';
 import 'package:daily_you/widgets/edit_category.dart';
+import 'package:daily_you/widgets/icon_color_label_row.dart';
 import 'package:daily_you/widgets/icon_picker_dialog.dart';
 import 'package:daily_you/widgets/settings_dialog.dart';
 import 'package:daily_you/widgets/settings_rows.dart';
@@ -192,58 +192,20 @@ class _EditTagState extends State<EditTag> {
     final fallbackIcon = _tagType == TagType.tracker
         ? Icons.timeline_rounded
         : Icons.label_rounded;
-    return IntrinsicHeight(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          AspectRatio(
-            aspectRatio: 1,
-            child: GestureDetector(
-              onTap: _showIconPicker,
-              child: Card.filled(
-                margin: EdgeInsets.zero,
-                color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                child: Center(
-                  child: TagIconGlyph(
-                    icon: _icon,
-                    iconType: _iconType,
-                    fallbackIcon: fallbackIcon,
-                    color: tagColor,
-                    size: 28,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Card.filled(
-              margin: EdgeInsets.zero,
-              color: Theme.of(context).colorScheme.surfaceContainerHighest,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                child: TextField(
-                  autofocus: widget.tag == null,
-                  controller: _nameController,
-                  maxLines: 1,
-                  textCapitalization: TextCapitalization.words,
-                  decoration: InputDecoration(
-                    hintText: AppLocalizations.of(context)!.nameHint,
-                    border: InputBorder.none,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Center(
-            child: ColorSwatchButton(
-              color: tagColor,
-              onTap: _showColorPicker,
-            ),
-          ),
-        ],
+    return IconColorLabelRow(
+      icon: TagIconGlyph(
+        icon: _icon,
+        iconType: _iconType,
+        fallbackIcon: fallbackIcon,
+        color: tagColor,
+        size: 28,
       ),
+      color: tagColor,
+      controller: _nameController,
+      hintText: AppLocalizations.of(context)!.nameHint,
+      autofocus: widget.tag == null,
+      onPickIcon: _showIconPicker,
+      onPickColor: _showColorPicker,
     );
   }
 
