@@ -13,6 +13,7 @@ import 'package:daily_you/utils/attachment_mime.dart';
 import 'package:daily_you/utils/duration_format.dart';
 import 'package:daily_you/utils/file_size_format.dart';
 import 'package:daily_you/widgets/app_dialog.dart';
+import 'package:daily_you/widgets/edge_navigation_arrows.dart';
 import 'package:daily_you/widgets/failure_dialog.dart';
 import 'package:daily_you/widgets/media_attachment_page.dart';
 import 'package:daily_you/widgets/scale_fade_page_route.dart';
@@ -83,30 +84,42 @@ class _AttachmentViewPageState extends State<AttachmentViewPage> {
             downloadButton(context)
           ],
         ),
-        body: ZoomableAttachmentPageView(
-          controller: _pageController,
-          imageProviders: widget.attachments
-              .map((attachment) => attachment.type == AttachmentType.image
-                  ? EntryImageProvider(attachment.filePath)
-                  : null)
-              .toList(),
-          customPageBuilder: (context, index) {
-            final attachment = widget.attachments[index];
-            return switch (attachment.type) {
-              AttachmentType.video ||
-              AttachmentType.audio =>
-                MediaAttachmentPage(
-                  filePath: attachment.filePath,
-                  type: attachment.type,
-                  pauseRequests: _pauseRequests,
-                ),
-              AttachmentType.image => const SizedBox.shrink(),
-            };
-          },
-          onPageChanged: (int newIndex) {
-            _currentPageNotifier.value = newIndex;
-            _probeOnceSettled(newIndex);
-          },
+        body: ValueListenableBuilder<int>(
+          valueListenable: _currentPageNotifier,
+          child: ZoomableAttachmentPageView(
+            controller: _pageController,
+            imageProviders: widget.attachments
+                .map((attachment) => attachment.type == AttachmentType.image
+                    ? EntryImageProvider(attachment.filePath)
+                    : null)
+                .toList(),
+            customPageBuilder: (context, index) {
+              final attachment = widget.attachments[index];
+              return switch (attachment.type) {
+                AttachmentType.video ||
+                AttachmentType.audio =>
+                  MediaAttachmentPage(
+                    filePath: attachment.filePath,
+                    type: attachment.type,
+                    pauseRequests: _pauseRequests,
+                  ),
+                AttachmentType.image => const SizedBox.shrink(),
+              };
+            },
+            onPageChanged: (int newIndex) {
+              _currentPageNotifier.value = newIndex;
+              _probeOnceSettled(newIndex);
+            },
+          ),
+          builder: (context, currentIndex, pages) => EdgeNavigationArrows(
+            onBackward: currentIndex > 0
+                ? () => stepToPage(_pageController, currentIndex - 1)
+                : null,
+            onForward: currentIndex < widget.attachments.length - 1
+                ? () => stepToPage(_pageController, currentIndex + 1)
+                : null,
+            child: pages!,
+          ),
         ));
   }
 

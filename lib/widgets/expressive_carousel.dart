@@ -2,17 +2,15 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
-import 'dart:io';
-
 import 'package:daily_you/utils/carousel_fling.dart';
 import 'package:daily_you/utils/carousel_layout.dart';
+import 'package:daily_you/widgets/desktop_arrow_button.dart';
 import 'package:flutter/physics.dart';
 import 'package:flutter/rendering.dart';
 import 'package:material_ui/material_ui.dart';
 
 const _cardShape =
     RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12)));
-final _showArrows = Platform.isLinux || Platform.isWindows || Platform.isMacOS;
 
 const _mediumLowStiffness = 400.0;
 const _noBounceDampingRatio = 1.0;
@@ -270,7 +268,6 @@ class _ExpressiveCarouselState extends State<ExpressiveCarousel> {
   }
 
   Widget _arrow({required bool forward, required int targetItem}) {
-    final isRightToLeft = Directionality.of(context) == TextDirection.rtl;
     return Positioned.fill(
       child: Align(
         alignment: forward
@@ -278,10 +275,8 @@ class _ExpressiveCarouselState extends State<ExpressiveCarousel> {
             : AlignmentDirectional.centerStart,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: IconButton.filledTonal(
-            icon: Icon(forward != isRightToLeft
-                ? Icons.chevron_right_rounded
-                : Icons.chevron_left_rounded),
+          child: DesktopArrowButton(
+            forward: forward,
             onPressed: () => _controller.animateTo(
               targetItem * _layout!.largeItemWidth,
               duration: _carouselSettleDuration,
@@ -390,7 +385,7 @@ class _ExpressiveCarouselState extends State<ExpressiveCarousel> {
                   ],
                 ),
               ),
-              if (_showArrows && layout.scrolls) _arrows(layout),
+              if (isDesktopPlatform && layout.scrolls) _arrows(layout),
             ],
           ),
         ),
