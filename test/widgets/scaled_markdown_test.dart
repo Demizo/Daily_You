@@ -13,7 +13,7 @@ void main() {
   Future<void> pumpMarkdown(WidgetTester tester, String data, String query) {
     return tester.pumpWidget(
       MaterialApp(
-        localizationsDelegates: sdkLocalizationsDelegates,
+        localizationsDelegates: appLocalizationsDelegates,
         home: Scaffold(
           body: SingleChildScrollView(
             child: ScaledMarkdown(data: data, highlightQuery: query),
