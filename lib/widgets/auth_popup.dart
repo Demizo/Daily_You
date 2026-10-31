@@ -312,7 +312,8 @@ class _AuthPopupState extends State<AuthPopup> {
                         ? const CircularProgressIndicator()
                         : IconButton.filled(
                             onPressed: _handleSubmit,
-                            icon: Icon(Icons.check_rounded),
+                            icon: const Icon(Icons.check_rounded),
+                            color: Theme.of(context).colorScheme.onPrimary,
                             iconSize: 28,
                           ),
                   ],
