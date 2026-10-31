@@ -18,6 +18,7 @@ import 'package:daily_you/providers/templates_provider.dart';
 import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/utils/file_size_format.dart';
 import 'package:daily_you/widgets/attachment_type_presentation.dart';
+import 'package:daily_you/widgets/content_width_limit.dart';
 import 'package:daily_you/widgets/entry_date_time_labels.dart';
 import 'package:daily_you/widgets/entry_draft_dirty_tracker.dart';
 import 'package:daily_you/widgets/failure_dialog.dart';
@@ -71,8 +72,6 @@ class AddEditEntryPage extends StatefulWidget {
 
 class _AddEditEntryPageState extends State<AddEditEntryPage>
     with WidgetsBindingObserver {
-  static const double _pageWidth = 800;
-
   late Entry _entry;
   int id = -1;
   String text = "";
@@ -282,9 +281,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                 keyboardInset: keyboardInset,
                 body: LayoutBuilder(
                   builder: (context, constraints) {
-                    final sidePadding =
-                        ((constraints.maxWidth - _pageWidth) / 2)
-                            .clamp(0.0, double.infinity);
+                    final sidePadding = contentSideInset(constraints.maxWidth);
                     final capPadding =
                         EdgeInsets.symmetric(horizontal: sidePadding);
                     return CustomScrollView(

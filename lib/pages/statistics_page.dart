@@ -15,6 +15,7 @@ import 'package:daily_you/stats/entry_stats.dart';
 import 'package:daily_you/stats/stats_range.dart';
 import 'package:daily_you/stats/streaks.dart';
 import 'package:daily_you/widgets/app_dialog.dart';
+import 'package:daily_you/widgets/content_width_limit.dart';
 import 'package:daily_you/widgets/distribution_chart.dart';
 import 'package:daily_you/widgets/label_summary_card.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
@@ -167,14 +168,15 @@ class _StatsPageState extends State<StatsPage>
           slivers: [
             if (primaryStreakItem != null || writingItems.isNotEmpty)
               SliverToBoxAdapter(
-                child: Padding(
+                child: ContentWidthLimit(
+                    child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 2.0),
                   child: StatsOverviewCard(
                     primary: primaryStreakItem,
                     sideItems: streakSideItems,
                     writingItems: writingItems,
                   ),
-                ),
+                )),
               ),
             SliverPersistentHeader(
               pinned: true,
@@ -192,7 +194,8 @@ class _StatsPageState extends State<StatsPage>
               ),
             ),
             SliverToBoxAdapter(
-              child: Padding(
+              child: ContentWidthLimit(
+                  child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 2.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -204,7 +207,7 @@ class _StatsPageState extends State<StatsPage>
                     const SizedBox(height: 8.0),
                   ],
                 ),
-              ),
+              )),
             ),
           ],
         ),
@@ -224,12 +227,15 @@ class _StatsPageState extends State<StatsPage>
             child: Offstage(
               offstage: true,
               child: SizeChangedLayoutNotifier(
-                child: _HeaderContent(
-                  key: _headerMeasureKey,
-                  statsRange: statsRange,
-                  subject: subject,
-                  onRangeChanged: (_) {},
-                  onSubjectTypeSelected: (_) {},
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: contentMaxWidth),
+                  child: _HeaderContent(
+                    key: _headerMeasureKey,
+                    statsRange: statsRange,
+                    subject: subject,
+                    onRangeChanged: (_) {},
+                    onSubjectTypeSelected: (_) {},
+                  ),
                 ),
               ),
             ),
@@ -481,12 +487,13 @@ class _HeaderDelegate extends SliverPersistentHeaderDelegate {
                 ),
               ),
             ),
-            _HeaderContent(
+            ContentWidthLimit(
+                child: _HeaderContent(
               statsRange: statsRange,
               subject: subject,
               onRangeChanged: onRangeChanged,
               onSubjectTypeSelected: onSubjectTypeSelected,
-            ),
+            )),
           ],
         ),
       ),

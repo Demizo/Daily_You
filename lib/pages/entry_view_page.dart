@@ -15,6 +15,7 @@ import 'package:daily_you/providers/mood_scale_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/utils/attachment_mime.dart';
 import 'package:daily_you/widgets/attachment_tile_background.dart';
+import 'package:daily_you/widgets/content_width_limit.dart';
 import 'package:daily_you/widgets/entry_date_time_labels.dart';
 import 'package:daily_you/widgets/expressive_carousel.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
@@ -62,90 +63,86 @@ class _EntryViewPageState extends State<EntryViewPage> {
       ),
       body: ListView(
         children: [
-          Align(
-            alignment: Alignment.topCenter,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 800),
-              child: Padding(
-                padding: const EdgeInsets.only(left: 8, right: 8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    if (attachments.isNotEmpty && attachments.length > 1)
-                      _attachmentsList(context, attachments),
-                    if (attachments.isNotEmpty && attachments.length == 1)
-                      GestureDetector(
-                        child: Center(
-                          child: SizedBox(
-                            height: 220,
-                            width: 220,
-                            child: Card.filled(
-                                clipBehavior: Clip.antiAlias,
-                                child: AttachmentTileBackground(
-                                    attachment: attachments.first)),
+          ContentWidthLimit(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 8, right: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (attachments.isNotEmpty && attachments.length > 1)
+                    _attachmentsList(context, attachments),
+                  if (attachments.isNotEmpty && attachments.length == 1)
+                    GestureDetector(
+                      child: Center(
+                        child: SizedBox(
+                          height: 220,
+                          width: 220,
+                          child: Card.filled(
+                              clipBehavior: Clip.antiAlias,
+                              child: AttachmentTileBackground(
+                                  attachment: attachments.first)),
+                        ),
+                      ),
+                      onTap: () async {
+                        await Navigator.of(context).push(
+                            AttachmentViewPage.route(
+                                attachments: attachments, index: 0));
+                      },
+                    ),
+                  Card.filled(
+                    color: Theme.of(context).colorScheme.surfaceContainer,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        SizedBox(
+                          width: double.infinity,
+                          child: Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            alignment: WrapAlignment.spaceBetween,
+                            children: [
+                              EntryDateTimeLabels(
+                                dateTime: entry.timeCreate,
+                                timeColor: theme.dividerColor,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(right: 8),
+                                child: MoodIcon(
+                                  moodValue: entry.mood,
+                                  size: 24,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        onTap: () async {
-                          await Navigator.of(context).push(
-                              AttachmentViewPage.route(
-                                  attachments: attachments, index: 0));
-                        },
-                      ),
+                        EntryTagChips(
+                          entryId: entry.id!,
+                          padding: const EdgeInsets.fromLTRB(8, 0, 8, 6),
+                          chipBuilder: (tag, entryTag) =>
+                              TagChip(tag: tag, value: entryTag.value),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (entry.text.isNotEmpty)
                     Card.filled(
-                      color: Theme.of(context).colorScheme.surfaceContainer,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          SizedBox(
-                            width: double.infinity,
-                            child: Wrap(
-                              crossAxisAlignment: WrapCrossAlignment.center,
-                              alignment: WrapAlignment.spaceBetween,
-                              children: [
-                                EntryDateTimeLabels(
-                                  dateTime: entry.timeCreate,
-                                  timeColor: theme.dividerColor,
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(right: 8),
-                                  child: MoodIcon(
-                                    moodValue: entry.mood,
-                                    size: 24,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          EntryTagChips(
-                            entryId: entry.id!,
-                            padding: const EdgeInsets.fromLTRB(8, 0, 8, 6),
-                            chipBuilder: (tag, entryTag) =>
-                                TagChip(tag: tag, value: entryTag.value),
-                          ),
-                        ],
-                      ),
+                        color: Theme.of(context).colorScheme.surfaceContainer,
+                        child: Padding(
+                            padding: const EdgeInsets.only(
+                                left: 8, top: 4, bottom: 4, right: 8),
+                            child: ScaledMarkdown(
+                              data: entry.text,
+                              selectable: false,
+                            ))),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        left: 8, top: 4, bottom: 18, right: 8),
+                    child: Text(
+                      "${AppLocalizations.of(context)!.lastModified}: ${TimeManager.formatDateWithWeekday(entry.timeModified, context)} ${TimeManager.localizedTimeFormat(context, TimeManager.currentLocale(context)).format(entry.timeModified)}",
+                      style:
+                          TextStyle(fontSize: 12, color: theme.disabledColor),
                     ),
-                    if (entry.text.isNotEmpty)
-                      Card.filled(
-                          color: Theme.of(context).colorScheme.surfaceContainer,
-                          child: Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 8, top: 4, bottom: 4, right: 8),
-                              child: ScaledMarkdown(
-                                data: entry.text,
-                                selectable: false,
-                              ))),
-                    Padding(
-                      padding: const EdgeInsets.only(
-                          left: 8, top: 4, bottom: 18, right: 8),
-                      child: Text(
-                        "${AppLocalizations.of(context)!.lastModified}: ${TimeManager.formatDateWithWeekday(entry.timeModified, context)} ${TimeManager.localizedTimeFormat(context, TimeManager.currentLocale(context)).format(entry.timeModified)}",
-                        style:
-                            TextStyle(fontSize: 12, color: theme.disabledColor),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),

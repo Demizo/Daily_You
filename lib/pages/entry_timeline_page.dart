@@ -9,6 +9,7 @@ import 'package:daily_you/pages/entries_list_page.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:daily_you/widgets/content_width_limit.dart';
 import 'package:daily_you/widgets/large_entry_card_widget.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
@@ -84,7 +85,8 @@ class _EntryTimelinePageState extends State<EntryTimelinePage> {
               .where((attachment) => attachment.type.isVisual)
               .toList();
           final label = widget.labelBuilder(context, entry);
-          return AspectRatio(
+          return ContentWidthLimit(
+              child: AspectRatio(
             aspectRatio: 2.2,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -144,7 +146,7 @@ class _EntryTimelinePageState extends State<EntryTimelinePage> {
                 ),
               ],
             ),
-          );
+          ));
         },
       ),
     );
