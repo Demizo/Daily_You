@@ -3,6 +3,7 @@
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
 import 'dart:async';
+import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:daily_you/config_provider.dart';
@@ -40,6 +41,8 @@ class VerticalCalendar extends StatefulWidget {
 class _VerticalCalendarState extends State<VerticalCalendar>
     with AutomaticKeepAliveClientMixin {
   static const double _daysOfWeekRowHeight = 32.0;
+  static const double _panelGap = 16.0;
+  static const double _minPanelWidth = 360.0;
 
   static const int _monthsPerBatch = 240;
   static const int _growMarginRows = 600;
@@ -47,9 +50,12 @@ class _VerticalCalendarState extends State<VerticalCalendar>
 
   double _weekRowHeight = 57.0;
   late CalendarMonthTable _table;
+  int _columns = 1;
+  double _panelWidth = 0;
 
-  double get _todayOffset =>
-      _table.todayRow <= 1 ? 0.0 : (_table.todayRow - 1) * _weekRowHeight;
+  double get _todayOffset => _table.rowsBelowToday <= 1
+      ? 0.0
+      : (_table.rowsBelowToday - 1) * _weekRowHeight;
 
   Map<int, ui.Image> _dayNumberCache = {};
   double? _lastDevicePixelRatio;
@@ -198,6 +204,7 @@ class _VerticalCalendarState extends State<VerticalCalendar>
       today: _today,
       isJalali: _isJalali,
       firstWeekday: firstDayIndex == 6 ? 7 : firstDayIndex + 1,
+      columns: _columns,
     )..extend(_floorDate, _monthsPerBatch);
   }
 
@@ -246,7 +253,7 @@ class _VerticalCalendarState extends State<VerticalCalendar>
     }
     if (index < 0) return;
 
-    final target = _table.months[index].firstRow * _weekRowHeight;
+    final target = _table.firstRowOfMonth(index) * _weekRowHeight;
     setState(() {});
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (widget.scrollController.hasClients) {
@@ -267,7 +274,8 @@ class _VerticalCalendarState extends State<VerticalCalendar>
   void _updateVisibleMonthFromOffset(double offset) {
     if (_table.months.isEmpty || _weekRowHeight <= 0) return;
     final row = (offset / _weekRowHeight).floor();
-    _visibleMonth = _table.months[_table.monthIndexForRow(row)].firstDate;
+    _visibleMonth =
+        _table.bands[_table.bandIndexForRow(row)].months.first.firstDate;
   }
 
   @override
@@ -305,7 +313,18 @@ class _VerticalCalendarState extends State<VerticalCalendar>
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final newCellWidth = constraints.maxWidth / 7;
+        final columns = math.max(
+            1,
+            ((constraints.maxWidth + _panelGap) / (_minPanelWidth + _panelGap))
+                .floor());
+        if (columns != _columns) {
+          _columns = columns;
+          _resetMonths(_lastFirstDayIndex!);
+          _initialScrollDone = false;
+        }
+        _panelWidth =
+            (constraints.maxWidth - _panelGap * (columns - 1)) / columns;
+        final newCellWidth = _panelWidth / 7;
         if (newCellWidth != _cellWidth) {
           _cellWidth = newCellWidth;
           _weekRowHeight = newCellWidth;
@@ -375,6 +394,24 @@ class _VerticalCalendarState extends State<VerticalCalendar>
 
   Widget _buildWeekdayHeader(BuildContext context, List<String> dayLabels) {
     final theme = Theme.of(context);
+    return _panelRow([
+      for (int column = 0; column < _columns; column++)
+        _buildWeekdayPanel(theme, dayLabels),
+    ]);
+  }
+
+  Widget _panelRow(List<Widget> panels) {
+    return Row(
+      children: [
+        for (int column = 0; column < panels.length; column++) ...[
+          if (column > 0) const SizedBox(width: _panelGap),
+          SizedBox(width: _panelWidth, child: panels[column]),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildWeekdayPanel(ThemeData theme, List<String> dayLabels) {
     return Container(
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainer,
@@ -570,11 +607,42 @@ class _VerticalCalendarState extends State<VerticalCalendar>
       Tag? calendarTagOverride,
       Map<int, EntryTag> calendarTagEntryMap) {
     _growIfNeeded(index);
-    final layout = _table.months[_table.monthIndexForRow(index)];
-    final weekIndex = index - layout.firstRow;
-    if (weekIndex == layout.weekCount) {
-      return _buildMonthHeader(context, layout.firstDate);
-    }
+    final band = _table.bands[_table.bandIndexForRow(index)];
+    final rowFromTop = band.rowCount - 1 - (index - band.firstRow);
+    return RepaintBoundary(
+      child: _panelRow([
+        for (int column = 0; column < _columns; column++)
+          _buildPanelRow(
+              context,
+              band,
+              _columns - 1 - column,
+              rowFromTop,
+              entriesProvider,
+              attachmentsProvider,
+              showImages,
+              showMood,
+              calendarTagOverride,
+              calendarTagEntryMap),
+      ]),
+    );
+  }
+
+  Widget _buildPanelRow(
+      BuildContext context,
+      MonthBand band,
+      int monthIndexInBand,
+      int rowFromTop,
+      EntriesProvider entriesProvider,
+      EntryAttachmentsProvider attachmentsProvider,
+      bool showImages,
+      bool showMood,
+      Tag? calendarTagOverride,
+      Map<int, EntryTag> calendarTagEntryMap) {
+    if (monthIndexInBand >= band.months.length) return const SizedBox.shrink();
+    final layout = band.months[monthIndexInBand];
+    if (rowFromTop == 0) return _buildMonthHeader(context, layout.firstDate);
+    final weekIndex = layout.weekCount - rowFromTop;
+    if (weekIndex < 0) return const SizedBox.shrink();
     return _buildWeekRow(
         context,
         _table.weekDays(layout, weekIndex,
@@ -626,21 +694,19 @@ class _VerticalCalendarState extends State<VerticalCalendar>
       bool showMood,
       Tag? calendarTagOverride,
       Map<int, EntryTag> calendarTagEntryMap) {
-    return RepaintBoundary(
-      child: _WeekRow(
-        days: days,
-        today: _today,
-        cellSize: _cellWidth,
-        dayNumberCache: _dayNumberCache,
-        entriesProvider: entriesProvider,
-        attachmentsProvider: attachmentsProvider,
-        showImages: showImages,
-        showMood: showMood,
-        isJalali: _isJalali,
-        calendarTagOverride: calendarTagOverride,
-        calendarTagEntryMap: calendarTagEntryMap,
-        onSelectDay: widget.onDaySelected,
-      ),
+    return _WeekRow(
+      days: days,
+      today: _today,
+      cellSize: _cellWidth,
+      dayNumberCache: _dayNumberCache,
+      entriesProvider: entriesProvider,
+      attachmentsProvider: attachmentsProvider,
+      showImages: showImages,
+      showMood: showMood,
+      isJalali: _isJalali,
+      calendarTagOverride: calendarTagOverride,
+      calendarTagEntryMap: calendarTagEntryMap,
+      onSelectDay: widget.onDaySelected,
     );
   }
 }

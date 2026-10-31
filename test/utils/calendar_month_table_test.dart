@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
+import 'dart:math' as math;
+
 import 'package:daily_you/utils/calendar_month_table.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shamsi_date/shamsi_date.dart';
@@ -37,7 +39,7 @@ void main() {
         final table = _table(isJalali: isJalali);
 
         final first = table.months.first;
-        expect(first.firstRow, 0);
+        expect(table.bands.first.firstRow, 0);
         expect(first.firstDate.isAfter(_today), isFalse);
         expect(first.lastDate.isBefore(_today), isFalse);
       });
@@ -46,9 +48,9 @@ void main() {
         final table = _table(isJalali: isJalali);
 
         var expectedRow = 0;
-        for (final layout in table.months) {
-          expect(layout.firstRow, expectedRow);
-          expectedRow += layout.weekCount + 1;
+        for (final band in table.bands) {
+          expect(band.firstRow, expectedRow);
+          expectedRow += band.rowCount;
         }
         expect(table.rowCount, expectedRow);
       });
@@ -94,16 +96,16 @@ void main() {
         }
       });
 
-      test('finds the month for every row, header included', () {
+      test('finds the band for every row, header included', () {
         final table = _table(isJalali: isJalali);
 
         for (int row = 0; row < table.rowCount; row += 7) {
-          final layout = table.months[table.monthIndexForRow(row)];
-          expect(row, greaterThanOrEqualTo(layout.firstRow));
-          expect(row, lessThanOrEqualTo(layout.firstRow + layout.weekCount));
+          final band = table.bands[table.bandIndexForRow(row)];
+          expect(row, greaterThanOrEqualTo(band.firstRow));
+          expect(row, lessThan(band.firstRow + band.rowCount));
         }
         final lastRow = table.rowCount - 1;
-        expect(table.monthIndexForRow(lastRow), table.months.length - 1);
+        expect(table.bandIndexForRow(lastRow), table.bands.length - 1);
       });
 
       test('finds the month containing a date', () {
@@ -177,6 +179,41 @@ void main() {
       });
     });
   }
+
+  test('groups months into bands of the column count', () {
+    final table = CalendarMonthTable(
+      today: _today,
+      isJalali: false,
+      firstWeekday: DateTime.monday,
+      columns: 3,
+    )..extend(DateTime(2020, 1, 1), 100000);
+
+    expect(table.bands.first.months.length, 3);
+    expect(table.bands.first.months.first, table.months.first);
+    expect(table.firstRowOfMonth(4), table.bands[1].firstRow);
+    var expectedRow = 0;
+    for (final band in table.bands) {
+      expect(band.firstRow, expectedRow);
+      expect(band.rowCount,
+          band.months.map((month) => month.weekCount).reduce(math.max) + 1);
+      expectedRow += band.rowCount;
+    }
+    expect(table.rowCount, expectedRow);
+  });
+
+  test('counts the rows below today inside its band', () {
+    final table = CalendarMonthTable(
+      today: _today,
+      isJalali: false,
+      firstWeekday: DateTime.monday,
+      columns: 2,
+    )..extend(DateTime(2026, 1, 1), 100000);
+
+    final band = table.bands.first;
+    final month = table.months.first;
+    final rowFromTop = month.weekCount - table.todayRow;
+    expect(table.rowsBelowToday, band.rowCount - 1 - rowFromTop);
+  });
 
   test('Jalali months follow Jalali boundaries', () {
     final table = _table(isJalali: true, floorDate: DateTime(2026, 1, 1));

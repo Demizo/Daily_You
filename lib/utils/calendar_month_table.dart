@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
+import 'dart:math' as math;
+
 import 'package:shamsi_date/shamsi_date.dart';
 
 // Rows count up from the bottom of the reversed list: last week first, header last
@@ -10,7 +12,6 @@ class MonthLayout {
   final int calendarMonth;
   final DateTime firstDate;
   final DateTime lastDate;
-  final int firstRow;
   final int weekCount;
 
   const MonthLayout({
@@ -18,9 +19,19 @@ class MonthLayout {
     required this.calendarMonth,
     required this.firstDate,
     required this.lastDate,
-    required this.firstRow,
     required this.weekCount,
   });
+}
+
+class MonthBand {
+  final int firstRow;
+  final List<MonthLayout> months;
+
+  MonthBand({required this.firstRow, required MonthLayout first})
+      : months = [first];
+
+  int get rowCount =>
+      months.map((month) => month.weekCount).reduce(math.max) + 1;
 }
 
 class CalendarMonthTable {
@@ -28,16 +39,22 @@ class CalendarMonthTable {
     required this.today,
     required this.isJalali,
     required this.firstWeekday,
+    this.columns = 1,
   });
 
   final DateTime today;
   final bool isJalali;
   final int firstWeekday;
+  final int columns;
 
   final List<MonthLayout> months = [];
+  final List<MonthBand> bands = [];
   int rowCount = 0;
 
   late final int todayRow = _weekIndexOfToday();
+
+  int get rowsBelowToday =>
+      bands.first.rowCount - 1 - (months.first.weekCount - todayRow);
 
   bool reachedFloor(DateTime floorDate) =>
       months.isNotEmpty && !months.last.firstDate.isAfter(floorDate);
@@ -49,23 +66,30 @@ class CalendarMonthTable {
       final month = _monthsBeforeToday(months.length);
       final daysBeforeFirst = (month.firstDate.weekday - firstWeekday + 7) % 7;
       final weekCount = ((daysBeforeFirst + month.length) / 7).ceil();
-      months.add(MonthLayout(
+      final layout = MonthLayout(
         calendarYear: month.year,
         calendarMonth: month.month,
         firstDate: month.firstDate,
         lastDate: month.lastDate,
-        firstRow: rowCount,
         weekCount: weekCount,
-      ));
-      rowCount += weekCount + 1;
+      );
+      if (months.length % columns == 0) {
+        bands.add(MonthBand(firstRow: rowCount, first: layout));
+      } else {
+        bands.last.months.add(layout);
+      }
+      months.add(layout);
+      rowCount = bands.last.firstRow + bands.last.rowCount;
     }
   }
 
-  int monthIndexForRow(int row) {
-    int lowIndex = 0, highIndex = months.length - 1;
+  int firstRowOfMonth(int monthIndex) => bands[monthIndex ~/ columns].firstRow;
+
+  int bandIndexForRow(int row) {
+    int lowIndex = 0, highIndex = bands.length - 1;
     while (lowIndex < highIndex) {
       final middleIndex = (lowIndex + highIndex + 1) >> 1;
-      if (months[middleIndex].firstRow > row) {
+      if (bands[middleIndex].firstRow > row) {
         highIndex = middleIndex - 1;
       } else {
         lowIndex = middleIndex;
