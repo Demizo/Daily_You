@@ -3,6 +3,7 @@
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
 import 'package:daily_you/config_provider.dart';
+import 'package:daily_you/layouts/window_size_class.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/mood.dart';
 import 'package:daily_you/models/stats_subject.dart';
@@ -196,8 +197,10 @@ class _StatsPageState extends State<StatsPage>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    ..._buildChartsForSubject(
-                        context, subject, rangedEntries, tagsProvider),
+                    ..._arrangeCharts(
+                        context,
+                        _buildChartsForSubject(
+                            context, subject, rangedEntries, tagsProvider)),
                     const SizedBox(height: 8.0),
                   ],
                 ),
@@ -255,6 +258,19 @@ class _StatsPageState extends State<StatsPage>
   void _applySubject(StatsSubject subject) {
     setState(() => _subjectConfig = subject.toConfigString());
     ConfigProvider.instance.set(Settings.statsSubject, _subjectConfig);
+  }
+
+  List<Widget> _arrangeCharts(BuildContext context, List<Widget> charts) {
+    if (WindowSizeClass.of(context) != WindowSizeClass.expanded) return charts;
+    return [
+      charts.first,
+      Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (final chart in charts.skip(1)) Expanded(child: chart),
+        ],
+      ),
+    ];
   }
 
   List<Widget> _buildChartsForSubject(
