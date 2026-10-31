@@ -29,6 +29,28 @@ class MoodScaleGlyph extends StatefulWidget {
 }
 
 class _MoodScaleGlyphState extends State<MoodScaleGlyph> {
+  TextPainter? _textPainter;
+  GlyphSpec? _laidOutSpec;
+  Color? _laidOutColor;
+
+  TextPainter _layoutFor(GlyphSpec spec, Color color) {
+    if (_textPainter == null ||
+        _laidOutSpec != spec ||
+        _laidOutColor != color) {
+      _textPainter?.dispose();
+      _textPainter = spec.layout(color);
+      _laidOutSpec = spec;
+      _laidOutColor = color;
+    }
+    return _textPainter!;
+  }
+
+  @override
+  void dispose() {
+    _textPainter?.dispose();
+    super.dispose();
+  }
+
   GlyphSpec _specFor(double scaledSize, double boxSize) {
     final level = widget.level;
     if (level.hasTextIcon) {
@@ -67,8 +89,7 @@ class _MoodScaleGlyphState extends State<MoodScaleGlyph> {
       dimension: boxSize,
       child: CustomPaint(
         painter: _GlyphPainter(
-          spec: spec,
-          color: widget.level.resolvedColor(context),
+          textPainter: _layoutFor(spec, widget.level.resolvedColor(context)),
           inkOffset: GlyphInk.offsetOf(spec),
         ),
       ),
@@ -82,27 +103,23 @@ class _MoodScaleGlyphState extends State<MoodScaleGlyph> {
 
 class _GlyphPainter extends CustomPainter {
   _GlyphPainter({
-    required this.spec,
-    required this.color,
+    required this.textPainter,
     required this.inkOffset,
   });
 
-  final GlyphSpec spec;
-  final Color color;
+  final TextPainter textPainter;
   final Offset inkOffset;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final painter = spec.layout(color);
     final center = Offset(
-      (size.width - painter.width) / 2,
-      (size.height - painter.height) / 2,
+      (size.width - textPainter.width) / 2,
+      (size.height - textPainter.height) / 2,
     );
-    painter.paint(canvas, center - inkOffset);
-    painter.dispose();
+    textPainter.paint(canvas, center - inkOffset);
   }
 
   @override
   bool shouldRepaint(_GlyphPainter old) =>
-      old.spec != spec || old.color != color || old.inkOffset != inkOffset;
+      old.textPainter != textPainter || old.inkOffset != inkOffset;
 }
