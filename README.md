@@ -51,11 +51,11 @@ Nhóm sử dụng các nhánh sau:
 | Nhánh | Mục đích |
 |---|---|
 | `main` | Chứa phiên bản code chính thức của dự án |
-| `feature/tv1-database` | Nhánh làm việc của TV1 |
-| `feature/tv2-progress` | Nhánh làm việc của TV2 |
-| `feature/tv3-reminder-ui` | Nhánh làm việc của TV3 |
-| `feature/tv4-audio-api` | Nhánh làm việc của TV4 |
-| `feature/tv5-pronunciation` | Nhánh làm việc của TV5 |
+| `feature/tv1-database` hoặc `feature/hathu`  | Nhánh làm việc của TV1 |
+| `feature/tv2-progress` hoặc `feature/manhduc` | Nhánh làm việc của TV2 |
+| `feature/tv3-reminder-ui` hoặc `feature/kimqanh` | Nhánh làm việc của TV3 |
+| `feature/tv4-audio-api` hoặc `feature/tiendung`| Nhánh làm việc của TV4 |
+| `feature/tv5-pronunciation` hoặc `feature/ductrung`| Nhánh làm việc của TV5 |
 
 **Quy định:**
 
