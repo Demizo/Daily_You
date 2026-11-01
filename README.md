@@ -1,97 +1,406 @@
-<p align="center">
-<img width="500" src="assets/banner.gif" alt="Daily You Logo">
-</p>
-<div align="center">
-  
-# Daily You
+# 📚 DAILY YOU – TH3 LEARNING ENGLISH
 
-[<img src="https://f-droid.org/badge/get-it-on.png" height="80">](https://f-droid.org/en/packages/com.demizo.daily_you/)
-[<img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png" height="80">](https://apt.izzysoft.de/fdroid/index/apk/com.demizo.daily_you)
-[<img src="https://github.com/machiav3lli/oandbackupx/blob/034b226cea5c1b30eb4f6a6f313e4dadcbb0ece4/badge_github.png" alt="Get it on GitHub" height="80">](https://github.com/Demizo/Daily_You/releases/latest)
+## 1. Giới thiệu dự án
 
-[<img src="https://img.shields.io/badge/Liberapay-F6C915?style=for-the-badge&logo=liberapay&logoColor=black" width="auto" height="100" alt="Donate using Liberapay">](https://liberapay.com/Daily-You/donate)
-[<img src="https://img.shields.io/badge/Buy_Me_A_Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black" width="auto" height="100" alt="Buy me a Coffee">](https://buymeacoffee.com/demizo)
+**Daily You – TH3 Learning English** là dự án phát triển ứng dụng học tiếng Anh dựa trên mã nguồn Daily You (Flutter).
 
-### Every day is worth remembering…
+Dự án hướng đến việc hỗ trợ người học xây dựng thói quen học tiếng Anh mỗi ngày, theo dõi tiến độ học tập và luyện tập phát âm thông qua các tính năng có ứng dụng AI.
 
----
+### Mục tiêu dự án
 
-</div>
+- Xây dựng thói quen học tiếng Anh hằng ngày.
+- Theo dõi thời gian học tập, mục tiêu và tiến độ cá nhân.
+- Hỗ trợ luyện tập và đánh giá phát âm tiếng Anh.
+- Cung cấp điểm số, phản hồi và gợi ý cải thiện phát âm.
+- Phát triển các chức năng hỗ trợ học tập và tương tác.
 
-Capture the moments that matter. **Daily You** helps you log your thoughts, track your mood, and keep a diary of meaningful moments, every day. Whether you're journaling, reflecting, or just noting what made you smile, **Daily You** gives you a private space that's truly your own.
+### Công nghệ chính
 
-Join a community that believes **your journal should be yours**, not a product.
-
-<p align="center">
-<img width="200" src="fastlane/metadata/android/en-US/images/phoneScreenshots/1_home.png" alt="home page">
-<img width="200" src="fastlane/metadata/android/en-US/images/phoneScreenshots/2_gallery.png" alt="gallery page">
-<img width="200" src="fastlane/metadata/android/en-US/images/phoneScreenshots/3_stats.png" alt="stats page ">
-<img width="200" src="fastlane/metadata/android/en-US/images/phoneScreenshots/4_entry_view.png" alt="journal entry">
-</p>
-
-### Features
-
-✍️ **Take daily logs:** Journal your thoughts, reflections, or routines.
-
-📈 **Track your mood:** Gain insight into how your mood changes over time.
-
-🖼️ **Keep photo memories:** Add pictures to enrich your memories.
-
-📝 **Rich note taking:** Format notes your own way with Markdown.
-
-🔔 **Gentle reminders:** Random daily nudges to keep you consistent.
-
-🔒 **Control your data:** Choose where your data lives, including external storage.
-
-🌐 **Offline-first:** Works without internet. Always.
-
-**Daily You** is free, open source, and community supported. Built around the belief that your diary should be yours forever, not a subscription. No accounts, no ads, no locked features, and no tracking or data collection. Just your story, on your device, owned by you.
+- **Framework:** Flutter
+- **Programming Language:** Dart
+- **Version Control:** Git & GitHub
 
 ---
 
-<p align="center">
-<img width="500" src="assets/download_migrate_banner.gif" alt="Daily You Logo">
-</p>
+## 2. Phân chia thành viên
 
-<div align="center">
+| Thành viên | Checklist tương ứng |
+|---|---|
+| Đào Hà Thu (TV1) | Checklist 1 – Thiết kế cơ sở dữ liệu |
+| Mạnh Đức (TV2) | Checklist 2 – Theo dõi tiến độ học tập |
+| Kim Anh (TV3) | Checklist 6 – Nhắc nhở và giao diện tiến độ |
+| Dũng (TV4) | Checklist 3 – Speech Recognition API và xử lý âm thanh |
+| Trung (TV5) | Checklist 4, 5 – Đánh giá phát âm và phản hồi kết quả |
 
-## Download
-
-[![Downloads](https://img.shields.io/github/downloads/Demizo/Daily_You/total)](https://github.com/Demizo/Daily_You/releases)
-[<img src="https://shields.rbtlog.dev/simple/com.demizo.daily_you" alt="RB Status">](https://shields.rbtlog.dev/com.demizo.daily_you)
-
-[<img src="https://f-droid.org/badge/get-it-on.png" height="80">](https://f-droid.org/en/packages/com.demizo.daily_you/)
-[<img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png" height="80">](https://apt.izzysoft.de/fdroid/index/apk/com.demizo.daily_you)
-[<img src="https://github.com/machiav3lli/oandbackupx/blob/034b226cea5c1b30eb4f6a6f313e4dadcbb0ece4/badge_github.png" alt="Get it on GitHub" height="80">](https://github.com/Demizo/Daily_You/releases/latest)
-
-</div>
-
-### Migrate From Another App
-Are you coming from another app? Simply go to `Settings > Backup & Restore > Import From Another App` to import a backup from another app. Feel free to request any apps not currently listed. **Note:** Imports from some apps may not be one-to-one since **Daily You** may have different features.
-
-### Development
-The full development environment is defined using [Nix](https://nixos.org/). Simply, install the [Nix Package Manager](https://nixos.org/download/), clone the repository, enter the project directory, and run `nix develop`, that's it! Alternatively, **Daily You** is built using Flutter. You can directly [install Flutter](https://docs.flutter.dev/get-started/install), clone the repository, enter the project directory, and run `flutter pub get`.
+**Checklist 7 – Kiểm thử:** Tất cả thành viên cùng thực hiện.
 
 ---
 
-<p align="center">
-<img width="500" src="assets/support_banner.gif" alt="Daily You Logo">
-</p>
+## 3. Quy tắc làm việc với GitHub
 
-<div align="center">
-  
-## Support The App
+Repository chính của nhóm:
 
-</div>
+**Daily_You_TH3_learningenglish**
 
-**Daily You** is _free forever_ since everyone deserves a journal that is truly their own. If you find yourself enjoying the app, please consider supporting its continued development.
+Repository: https://github.com/Maya0612/Daily_You_TH3_learningenglish
 
-[<img src="https://img.shields.io/badge/Liberapay-F6C915?style=for-the-badge&logo=liberapay&logoColor=black" width="auto" height="100" alt="Donate using Liberapay">](https://liberapay.com/Daily-You/donate)
-[<img src="https://img.shields.io/badge/Buy_Me_A_Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black" width="auto" height="100" alt="Buy me a Coffee">](https://buymeacoffee.com/demizo)
+### 3.1. Quy tắc sử dụng nhánh (Branch)
 
-### Translations 
-**Daily You** uses [Weblate](https://weblate.org) to easily manage translations. If you would like to help translate the app, please visit [the Daily You project on Weblate](https://hosted.weblate.org/projects/daily-you/). Everyone should have access to a journal!
+Nhóm sử dụng các nhánh sau:
+
+| Nhánh | Mục đích |
+|---|---|
+| `main` | Chứa phiên bản code chính thức của dự án |
+| `feature/tv1-database` | Nhánh làm việc của TV1 |
+| `feature/tv2-progress` | Nhánh làm việc của TV2 |
+| `feature/tv3-reminder-ui` | Nhánh làm việc của TV3 |
+| `feature/tv4-audio-api` | Nhánh làm việc của TV4 |
+| `feature/tv5-pronunciation` | Nhánh làm việc của TV5 |
+
+**Quy định:**
+
+1. Mỗi thành viên chỉ làm việc trên nhánh riêng của mình.
+2. Không chỉnh sửa trực tiếp trên nhánh `main`.
+3. Trước khi làm việc phải cập nhật code mới nhất từ `main`.
+4. Khi hoàn thành chức năng, thành viên phải tự kiểm thử trước khi tạo Pull Request.
+5. Mọi thay đổi phải được đưa lên GitHub thông qua Pull Request.
+6. Thành viên chịu trách nhiệm xử lý conflict trong phần code của mình.
+7. Sau khi Pull Request không còn conflict và đã kiểm thử thành công, thành viên thực hiện Merge vào `main`.
+
+### MỖI THÀNH VIÊN PHẢI CHỊU TRÁCH NHIỆM NẾU MERGE XONG MÀ ẢNH HƯỞNG TỚI DỰ ÁN (TỨC ẢNH HƯỞNG TỚI THÀNH VIÊN KHÁC HOẶC LÀM DỰ ÁN LỖI )
+
+---
+
+## 4. Hướng dẫn Clone dự án về máy
+
+ 1. Mở Terminal hoặc CMD VÀ Clone repository
+
+Chạy lệnh:
+
+```bash
+git clone https://github.com/Maya0612/Daily_You_TH3_learningenglish.git
+```
+
+2. Di chuyển vào thư mục dự án
+
+```bash
+cd Daily_You_TH3_learningenglish
+```
+
+3. Mở dự án bằng VS Code
+
+```bash
+code .
+```
+
+4. Cài đặt các thư viện Flutter
+
+```bash
+flutter pub get
+```
+
+Sau khi cài đặt thành công, có thể chạy ứng dụng bằng:
+
+```bash
+flutter run
+```
+
+---
+
+## 5. Hướng dẫn Pull – Cập nhật code mới nhất
+
+**Trước khi bắt đầu làm việc hoặc chỉnh sửa code, cần cập nhật phiên bản mới nhất từ `main`.**
+
+### Bước 1. Kiểm tra nhánh hiện tại
+
+```bash
+git branch
+```
+
+### Bước 2. Chuyển về nhánh main
+
+```bash
+git checkout main
+```
+
+### Bước 3. Lấy code mới nhất từ GitHub
+
+```bash
+git pull origin main
+```
+
+### Bước 4. Chuyển về nhánh cá nhân
+
+Ví dụ TV2:
+
+```bash
+git checkout feature/tv2-progress
+```
+
+### Bước 5. Cập nhật code mới từ main vào nhánh cá nhân
+
+```bash
+git merge main
+```
+
+Nếu có conflict, xử lý theo hướng dẫn tại mục 8.
+
+---
 
 
-## License
-This software is free software licensed under the [GNU General Public License 3.0](LICENSE.txt). Additional terms under section 7 of that license apply; see [ADDITIONAL_TERMS.md](ADDITIONAL_TERMS.md).
+
+## 6. Hướng dẫn Push – Đẩy code lên GitHub
+
+Sau khi hoàn thành một phần chức năng, thành viên thực hiện:
+
+### Bước 1. Kiểm tra nhánh đang làm việc
+
+```bash
+git branch
+```
+
+Đảm bảo dấu `*` đang nằm ở nhánh cá nhân, không phải `main`.
+
+### Bước 2. Kiểm tra các file đã thay đổi
+
+```bash
+git status
+```
+
+### Bước 3. Thêm các file cần cập nhật
+
+```bash
+git add .
+```
+
+### Bước 4. Commit code
+
+```bash
+git commit -m "Mo ta noi dung da thay doi"
+```
+
+Ví dụ:
+
+```bash
+git commit -m "Implement study progress"
+```
+
+### Bước 5. Push code lên nhánh cá nhân
+
+Ví dụ TV2:
+
+```bash
+git push origin feature/tv2-progress
+```
+
+**Lưu ý:**
+
+- Chỉ push lên nhánh cá nhân.
+- Không push trực tiếp lên `main`.
+- Không sử dụng `git push --force` khi chưa trao đổi với nhóm.
+
+---
+
+
+
+## 7. Hướng dẫn tạo Pull Request và Merge vào main
+
+Sau khi push code thành công:
+
+### Bước 1. Truy cập repository trên GitHub
+
+https://github.com/Maya0612/Daily_You_TH3_learningenglish
+
+### Bước 2. Tạo Pull Request
+
+1. Chọn tab `Pull requests`.
+2. Nhấn `New pull request`.
+3. Thiết lập:
+   - **Base:** `main`
+   - **Compare:** Nhánh cá nhân của bạn.
+4. Kiểm tra danh sách file thay đổi.
+5. Đặt tiêu đề mô tả chức năng đã hoàn thành.
+6. Nhấn `Create pull request`.
+
+Ví dụ:
+
+- Base: `main`
+- Compare: `feature/tv2-progress`
+
+### Bước 3. Kiểm tra Pull Request
+
+Thành viên cần kiểm tra:
+
+- Đã chọn đúng nhánh cá nhân chưa?
+- Đã chọn đúng nhánh đích `main` chưa?
+- Các file thay đổi có đúng với chức năng phụ trách không?
+- Chức năng đã được kiểm thử và hoạt động bình thường chưa?
+- Có phát sinh conflict không?
+
+### Bước 4. Merge vào main
+
+Nếu Pull Request không còn conflict và chức năng đã được kiểm thử thành công:
+
+1. Nhấn `Merge pull request`.
+2. Chọn `Confirm merge`.
+3. Kiểm tra code đã được cập nhật vào nhánh `main`.
+
+**Mỗi thành viên chịu trách nhiệm hoàn thành Pull Request và thực hiện Merge phần code của mình sau khi đáp ứng các điều kiện trên.**
+
+---
+
+
+
+## 8. Hướng dẫn tự xử lý Conflict
+
+### 8.1. Conflict là gì?
+
+Conflict xảy ra khi Git không thể tự động kết hợp các thay đổi, thường do nhiều nhánh cùng chỉnh sửa một đoạn trong cùng một file.
+
+Khi xảy ra conflict, thành viên cần tự xử lý phần code thuộc chức năng mình phụ trách.
+
+### 8.2. Cách xử lý conflict bằng VS Code
+
+**Bước 1. Cập nhật code mới nhất từ main**
+
+```bash
+git fetch origin
+```
+
+**Bước 2. Chuyển sang nhánh cá nhân**
+
+Ví dụ:
+
+```bash
+git checkout feature/tv2-progress
+```
+
+**Bước 3. Kết hợp code mới nhất từ main**
+
+```bash
+git merge origin/main
+```
+
+Nếu xảy ra conflict, Git sẽ thông báo các file đang có xung đột.
+
+**Bước 4. Mở các file bị conflict bằng VS Code**
+
+Trong file có thể xuất hiện các ký hiệu:
+
+```text
+<<<<<<< HEAD
+Code trên nhánh cá nhân
+=======
+Code từ nhánh main
+>>>>>>> origin/main
+```
+
+Ý nghĩa:
+
+- `<<<<<<< HEAD`: Phần code hiện tại trên nhánh cá nhân.
+- `=======`: Dấu phân cách hai phần code.
+- `>>>>>>> origin/main`: Phần code từ nhánh main.
+
+**Bước 5. Tự kiểm tra và chỉnh sửa**
+
+Thành viên cần đọc cả hai phần code, xác định nội dung nào cần giữ hoặc kết hợp.
+
+Không xóa tùy tiện một phần code khi chưa hiểu chức năng của nó.
+
+Sau khi xử lý xong:
+
+- Xóa các dấu `<<<<<<<`, `=======`, `>>>>>>>`.
+- Đảm bảo code hoàn chỉnh và đúng logic.
+- Lưu file.
+
+**Bước 6. Đánh dấu conflict đã được xử lý**
+
+```bash
+git add .
+```
+
+**Bước 7. Commit phần đã xử lý**
+
+```bash
+git commit -m "Resolve merge conflicts"
+```
+
+**Bước 8. Kiểm thử lại chức năng**
+
+Chạy ứng dụng và kiểm tra chức năng của mình hoạt động bình thường.
+
+**Bước 9. Push nhánh cá nhân lên GitHub**
+
+```bash
+git push origin feature/tv2-progress
+```
+
+Sau đó quay lại Pull Request trên GitHub để kiểm tra trạng thái conflict.
+
+Nếu không còn conflict, thành viên tiếp tục thực hiện Merge vào `main`.
+
+### 8.3. Nếu không xử lý được conflict
+
+- Không cố xóa code để hết thông báo conflict.
+- Không sử dụng lệnh force push.
+- Trao đổi với thành viên sở hữu phần code liên quan.
+- Chỉ tiếp tục Merge khi đã hiểu và kiểm tra được phần code sau khi xử lý.
+
+---
+
+
+
+
+## 9. Quy định kiểm thử chức năng
+
+**TẤT CẢ THÀNH VIÊN BẮT BUỘC TỰ KIỂM THỬ CHỨC NĂNG DO MÌNH PHÁT TRIỂN.**
+
+Trước khi tạo Pull Request, mỗi thành viên cần:
+
+1. Chạy thử chức năng trên máy cá nhân.
+2. Kiểm tra các trường hợp hoạt động bình thường.
+3. Kiểm tra các trường hợp nhập dữ liệu sai hoặc thiếu dữ liệu (nếu có).
+4. Kiểm tra chức năng có hoạt động đúng với các phần liên quan không.
+5. Sửa các lỗi phát hiện được trước khi gửi Pull Request.
+6. Chuẩn bị ảnh chụp màn hình hoặc video minh chứng chức năng hoạt động.
+
+Không tạo Pull Request khi chức năng chưa được kiểm thử.
+
+### Kiểm thử toàn bộ ứng dụng
+
+Sau khi các thành viên hoàn thành và Merge code, cả nhóm phối hợp kiểm thử luồng hoạt động tổng thể của ứng dụng để phát hiện lỗi tích hợp.
+
+---
+
+## 10. Một số lệnh Git thường dùng
+
+| Lệnh | Chức năng |
+|---|---|
+| `git status` | Kiểm tra trạng thái file |
+| `git branch` | Xem các nhánh |
+| `git branch -a` | Xem tất cả nhánh local và remote |
+| `git checkout main` | Chuyển sang nhánh main |
+| `git checkout <branch>` | Chuyển sang nhánh chỉ định |
+| `git fetch origin` | Lấy thông tin cập nhật từ GitHub |
+| `git pull origin main` | Kéo code mới nhất từ main |
+| `git add .` | Thêm các thay đổi vào staging |
+| `git commit -m "message"` | Lưu thay đổi vào lịch sử Git |
+| `git push origin <branch>` | Đẩy code lên nhánh chỉ định |
+| `git merge origin/main` | Kết hợp code mới nhất từ main vào nhánh hiện tại |
+| `git log --oneline` | Xem lịch sử commit |
+
+---
+
+## 11. Nguyên tắc chung
+
+1. Mỗi thành viên chịu trách nhiệm đối với chức năng được phân công.
+2. Làm việc trên nhánh cá nhân, không chỉnh sửa trực tiếp `main`.
+3. Thường xuyên Pull code mới nhất để tránh xung đột.
+4. Tự kiểm thử chức năng trước khi tạo Pull Request.
+5. Tự xử lý conflict trong phạm vi code mình phụ trách.
+6. Không xóa hoặc sửa code của thành viên khác khi chưa trao đổi.
+7. Không Merge code khi chức năng chưa hoạt động hoặc chưa được kiểm thử.
+8. Không commit API key, mật khẩu hoặc thông tin bí mật lên repository.
+9. Nếu gặp lỗi ảnh hưởng đến phần việc của thành viên khác, cần trao đổi trước khi chỉnh sửa.
+
+**Mục tiêu chung: Mỗi thành viên hoàn thành, kiểm thử và tích hợp tốt chức năng của mình để tạo thành một ứng dụng học tiếng Anh hoàn chỉnh.**
