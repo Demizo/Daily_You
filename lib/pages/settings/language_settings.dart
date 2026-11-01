@@ -8,6 +8,8 @@ import 'package:app_settings/app_settings.dart';
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/device_info_service.dart';
 import 'package:daily_you/language_option.dart';
+import 'package:daily_you/providers/tags_provider.dart';
+import 'package:daily_you/providers/templates_provider.dart';
 import 'package:daily_you/widgets/settings_dropdown.dart';
 import 'package:daily_you/widgets/settings_icon_action.dart';
 import 'package:material_ui/material_ui.dart';
@@ -68,6 +70,10 @@ class _LanguageSettingsState extends State<LanguageSettings> {
               onChanged: (LanguageOption? newValue) {
                 configProvider.set(
                     Settings.overrideLanguage, newValue?.toJson());
+                if (newValue == null || newValue.languageCode == 'vi') {
+                  TagsProvider.instance.migrateDefaultTagsToVietnamese();
+                  TemplatesProvider.instance.migrateDefaultTemplatesToVietnamese();
+                }
               }),
           Padding(
             padding: const EdgeInsets.only(top: 16.0),

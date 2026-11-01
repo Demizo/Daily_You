@@ -4,6 +4,7 @@
 
 import 'dart:math';
 
+import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/database/entry_tag_dao.dart';
 import 'package:daily_you/database/tag_category_dao.dart';
@@ -64,8 +65,71 @@ class TagsProvider with ChangeNotifier {
     tags = await TagDao.getAll();
     _setEntryTags(await EntryTagDao.getAll());
     _setTemplateTags(await TemplateTagDao.getAll());
+    await _migrateDefaultEnglishTagsIfNeeded();
     notifyListeners();
   }
+
+  Future<void> _migrateDefaultEnglishTagsIfNeeded() async {
+    final override = ConfigProvider.instance.getOverrideLanguage();
+    final langCode = override?.languageCode ??
+        WidgetsBinding.instance.platformDispatcher.locale.languageCode;
+    if (langCode != 'vi') return;
+
+    final viL10n = await AppLocalizations.delegate.load(const Locale('vi'));
+
+    final defaultCategoryNames = {
+      'Emotions': viL10n.tagCategoryEmotionsName,
+      'Activities': viL10n.tagCategoryActivitiesName,
+    };
+
+    final defaultTagNames = {
+      'Favorite': viL10n.tagFavoriteName,
+      'Energy': viL10n.tagEnergyName,
+      'Excited': viL10n.tagExcitedName,
+      'Grateful': viL10n.tagGratefulName,
+      'Calm': viL10n.tagCalmName,
+      'Tired': viL10n.tagTiredName,
+      'Anxious': viL10n.tagAnxiousName,
+      'Annoyed': viL10n.tagAnnoyedName,
+      'Exercise': viL10n.tagExerciseName,
+      'Socializing': viL10n.tagSocializingName,
+      'Hobby': viL10n.tagHobbyName,
+      'Entertainment': viL10n.tagEntertainmentName,
+      'Dining': viL10n.tagDiningName,
+      'Chores': viL10n.tagChoresName,
+    };
+
+    bool changed = false;
+
+    for (int i = 0; i < categories.length; i++) {
+      final cat = categories[i];
+      final translatedName = defaultCategoryNames[cat.name];
+      if (translatedName != null && cat.name != translatedName) {
+        final updated = cat.copy(name: translatedName);
+        await TagCategoryDao.update(updated);
+        categories[i] = updated;
+        changed = true;
+      }
+    }
+
+    for (int i = 0; i < tags.length; i++) {
+      final tag = tags[i];
+      final translatedName = defaultTagNames[tag.name];
+      if (translatedName != null && tag.name != translatedName) {
+        final updated = tag.copy(name: translatedName);
+        await TagDao.update(updated);
+        tags[i] = updated;
+        changed = true;
+      }
+    }
+
+    if (changed) {
+      await AppDatabase.instance.updateExternalDatabase();
+    }
+  }
+
+  Future<void> migrateDefaultTagsToVietnamese() =>
+      _migrateDefaultEnglishTagsIfNeeded();
 
   Future<TagCategory> addCategory(TagCategory category) async {
     final nextOrder = categories.isEmpty
@@ -308,15 +372,20 @@ class TagsProvider with ChangeNotifier {
   }
 
   Future<void> createDefaultTags() async {
-    final deviceLocale = WidgetsBinding.instance.platformDispatcher.locale;
+    final override = ConfigProvider.instance.getOverrideLanguage();
     Locale locale;
-    if (AppLocalizations.delegate.isSupported(deviceLocale)) {
-      locale = deviceLocale;
+    if (override != null && AppLocalizations.delegate.isSupported(override)) {
+      locale = override;
     } else {
-      final langOnly = Locale(deviceLocale.languageCode);
-      locale = AppLocalizations.delegate.isSupported(langOnly)
-          ? langOnly
-          : const Locale('en');
+      final deviceLocale = WidgetsBinding.instance.platformDispatcher.locale;
+      if (AppLocalizations.delegate.isSupported(deviceLocale)) {
+        locale = deviceLocale;
+      } else {
+        final langOnly = Locale(deviceLocale.languageCode);
+        locale = AppLocalizations.delegate.isSupported(langOnly)
+            ? langOnly
+            : const Locale('vi');
+      }
     }
     final l10n = await AppLocalizations.delegate.load(locale);
     final now = DateTime.now();

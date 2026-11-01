@@ -21,8 +21,51 @@ class TemplatesProvider with ChangeNotifier {
   /// Load the provider's data from the app database
   Future<void> load() async {
     templates = await TemplateDao.getAll();
+    await _migrateDefaultEnglishTemplatesIfNeeded();
     notifyListeners();
   }
+
+  Future<void> _migrateDefaultEnglishTemplatesIfNeeded() async {
+    final override = ConfigProvider.instance.getOverrideLanguage();
+    final langCode = override?.languageCode ??
+        WidgetsBinding.instance.platformDispatcher.locale.languageCode;
+    if (langCode != 'vi') return;
+
+    final viL10n = await AppLocalizations.delegate.load(const Locale('vi'));
+
+    final defaultTemplateNames = {
+      'Timestamp': viL10n.templateDefaultTimestampTitle,
+      'Day Summary': viL10n.templateDefaultSummaryTitle,
+      'Reflection': viL10n.templateDefaultReflectionTitle,
+    };
+
+    bool changed = false;
+    for (int i = 0; i < templates.length; i++) {
+      final t = templates[i];
+      final translatedName = defaultTemplateNames[t.name];
+      if (translatedName != null && t.name != translatedName) {
+        String? newText = t.text;
+        if (t.name == 'Timestamp') {
+          newText = viL10n.templateDefaultTimestampBody("{{date}}", "{{time}}");
+        } else if (t.name == 'Day Summary') {
+          newText = viL10n.templateDefaultSummaryBody;
+        } else if (t.name == 'Reflection') {
+          newText = viL10n.templateDefaultReflectionBody;
+        }
+        final updated = t.copy(name: translatedName, text: newText);
+        await TemplateDao.update(updated);
+        templates[i] = updated;
+        changed = true;
+      }
+    }
+
+    if (changed) {
+      await AppDatabase.instance.updateExternalDatabase();
+    }
+  }
+
+  Future<void> migrateDefaultTemplatesToVietnamese() =>
+      _migrateDefaultEnglishTemplatesIfNeeded();
 
   // CRUD operations
 
@@ -58,15 +101,20 @@ class TemplatesProvider with ChangeNotifier {
   }
 
   Future<void> createDefaultTemplates() async {
-    final deviceLocale = WidgetsBinding.instance.platformDispatcher.locale;
+    final override = ConfigProvider.instance.getOverrideLanguage();
     Locale locale;
-    if (AppLocalizations.delegate.isSupported(deviceLocale)) {
-      locale = deviceLocale;
+    if (override != null && AppLocalizations.delegate.isSupported(override)) {
+      locale = override;
     } else {
-      final langOnly = Locale(deviceLocale.languageCode);
-      locale = AppLocalizations.delegate.isSupported(langOnly)
-          ? langOnly
-          : const Locale('en');
+      final deviceLocale = WidgetsBinding.instance.platformDispatcher.locale;
+      if (AppLocalizations.delegate.isSupported(deviceLocale)) {
+        locale = deviceLocale;
+      } else {
+        final langOnly = Locale(deviceLocale.languageCode);
+        locale = AppLocalizations.delegate.isSupported(langOnly)
+            ? langOnly
+            : const Locale('vi');
+      }
     }
     final l10n = await AppLocalizations.delegate.load(locale);
     final defaultTemplates = [
