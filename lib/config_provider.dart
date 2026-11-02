@@ -48,8 +48,8 @@ class Settings {
   static const neutralIcon = Setting<String>("neutralIcon", "😐");
   static const sadIcon = Setting<String>("sadIcon", "😕");
   static const verySadIcon = Setting<String>("verySadIcon", "😔");
-  static const followSystemColor = Setting<bool>("followSystemColor", true);
-  static const accentColor = Setting<int>("accentColor", 0xff62A0EA);
+  static const followSystemColor = Setting<bool>("followSystemColor", false);
+  static const accentColor = Setting<int>("accentColor", 0xffB1B2FF);
   static const dailyReminders = Setting<bool>("dailyReminders", false);
   static const setReminderTime = Setting<bool>("setReminderTime", false);
   static const scheduledReminderHour =

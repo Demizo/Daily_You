@@ -3,7 +3,7 @@
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
 import 'package:daily_you/models/learning_progress.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Widget biểu đồ cột hiển thị tiến độ học tập 7 ngày gần nhất (Weekly Progress Chart).
 class WeeklyProgressChart extends StatelessWidget {

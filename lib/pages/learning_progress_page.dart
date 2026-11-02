@@ -5,9 +5,11 @@
 import 'package:daily_you/models/learning_progress.dart';
 import 'package:daily_you/models/practice_history.dart';
 import 'package:daily_you/providers/learning_progress_provider.dart';
+import 'package:daily_you/providers/user_session_provider.dart';
+import 'package:daily_you/widgets/user_profile_bar.dart';
 import 'package:daily_you/widgets/learning_reminder_dialog.dart';
 import 'package:daily_you/widgets/weekly_progress_chart.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
 /// Màn hình Tổng quan Tiến độ Học tập (Checklist 6 - TV3).
@@ -32,9 +34,15 @@ class _LearningProgressPageState extends State<LearningProgressPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      UserSessionProvider? session;
+      try {
+        session = context.read<UserSessionProvider>();
+      } catch (_) {
+        session = UserSessionProvider.instance;
+      }
       final provider = context.read<LearningProgressProvider>();
       if (provider.state == ProgressViewState.initial) {
-        provider.loadProgress();
+        provider.loadProgress(userId: session.currentUserId);
       }
     });
   }
@@ -45,26 +53,43 @@ class _LearningProgressPageState extends State<LearningProgressPage> {
     final provider = context.watch<LearningProgressProvider>();
     final progress = provider.progress;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Tiến độ học tập',
-          style: TextStyle(fontWeight: FontWeight.bold),
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Tiến độ học tập',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const UserProfileBar(isCard: false),
+                  const SizedBox(width: 6),
+                  IconButton(
+                    icon: const Icon(Icons.notifications_active_outlined),
+                    tooltip: 'Cài đặt nhắc nhở & mục tiêu',
+                    onPressed: () => LearningReminderDialog.show(context),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.refresh_rounded),
+                    tooltip: 'Làm mới',
+                    onPressed: () => provider.refresh(),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_active_outlined),
-            tooltip: 'Cài đặt nhắc nhở & mục tiêu',
-            onPressed: () => LearningReminderDialog.show(context),
-          ),
-          IconButton(
-            icon: const Icon(Icons.refresh_rounded),
-            tooltip: 'Làm mới',
-            onPressed: () => provider.refresh(),
-          ),
-        ],
-      ),
-      body: _buildBody(context, provider, progress),
+        const Divider(height: 1),
+        Expanded(child: _buildBody(context, provider, progress)),
+      ],
     );
   }
 
@@ -117,23 +142,18 @@ class _LearningProgressPageState extends State<LearningProgressPage> {
 
     // 3. Trạng thái Người dùng mới (Empty State)
     if (provider.isEmpty) {
-      return RefreshIndicator(
-        onRefresh: () => provider.refresh(),
-        child: ListView(
+      return ListView(
           padding: const EdgeInsets.all(20.0),
           children: [
             _buildEmptyStateCard(context),
             const SizedBox(height: 24),
             _buildStreakCard(context, progress),
           ],
-        ),
-      );
+        );
     }
 
     // 4. Trạng thái Đầy đủ dữ liệu (Loaded State)
-    return RefreshIndicator(
-      onRefresh: () => provider.refresh(),
-      child: ListView(
+    return ListView(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
         children: [
           // 1. Card Streak ngọn lửa
@@ -156,8 +176,7 @@ class _LearningProgressPageState extends State<LearningProgressPage> {
           _buildRecentSessionsCard(context, progress),
           const SizedBox(height: 24),
         ],
-      ),
-    );
+      );
   }
 
   /// Card Chuỗi ngày học liên tiếp (Streak).
@@ -413,8 +432,6 @@ class _LearningProgressPageState extends State<LearningProgressPage> {
   /// Grid 3 thẻ thống kê nhanh (Quick Stats).
   Widget _buildQuickStatsRow(
       BuildContext context, DailyLearningProgress progress) {
-    final theme = Theme.of(context);
-
     final scoreText = progress.averagePronunciationScore != null
         ? '${progress.averagePronunciationScore!.toStringAsFixed(0)}/100'
         : '--';
@@ -686,7 +703,6 @@ class _LearningProgressPageState extends State<LearningProgressPage> {
       case ActivityType.reading:
         return Icons.auto_stories_rounded;
       case ActivityType.other:
-      default:
         return Icons.school_rounded;
     }
   }

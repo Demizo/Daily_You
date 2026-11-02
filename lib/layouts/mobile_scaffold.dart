@@ -15,6 +15,9 @@ import 'package:daily_you/pages/statistics_page.dart';
 import 'package:daily_you/pages/gallery_page.dart';
 import 'package:daily_you/pages/home_page.dart';
 import 'package:daily_you/pages/learning_progress_page.dart';
+import 'package:daily_you/pages/practice_speech_page.dart';
+import 'package:daily_you/widgets/user_switch_dialog.dart';
+import 'package:daily_you/widgets/user_profile_bar.dart';
 import 'package:provider/provider.dart';
 
 import '../pages/settings_page.dart';
@@ -29,20 +32,22 @@ class MobileScaffold extends StatefulWidget {
 class _MobileScaffoldState extends State<MobileScaffold> {
   int currentIndex = 0;
   late final PageController _pageController;
-  final List<bool> _isScrolled = [false, false, false, false];
+  final List<bool> _isScrolled = [false, false, false, false, false];
 
   late final List<ScrollController> _scrollControllers;
 
-  final List<Widget> pages = [
-    const HomePage(),
-    const LearningProgressPage(),
-    const GalleryPage(),
-    const StatsPage(),
-  ];
+  late final List<Widget> pages;
 
   @override
   void initState() {
     super.initState();
+    pages = [
+      const HomePage(),
+      LearningProgressPage(onStartPractice: () => _switchPage(2)),
+      const PracticeSpeechPage(),
+      const GalleryPage(),
+      const StatsPage(),
+    ];
     _pageController = PageController(initialPage: currentIndex);
     _scrollControllers = List.generate(pages.length, (_) => ScrollController());
     for (int i = 0; i < _scrollControllers.length; i++) {
@@ -275,6 +280,11 @@ class _MobileScaffoldState extends State<MobileScaffold> {
             padding: const EdgeInsets.fromLTRB(28, 16, 16, 10),
             child: Text(l10n.appTitle, style: theme.textTheme.headlineSmall),
           ),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+            child: UserProfileBar(isCard: true),
+          ),
+          const SizedBox(height: 6),
           _buildNavItem(
             context,
             theme,
@@ -305,8 +315,8 @@ class _MobileScaffoldState extends State<MobileScaffold> {
             context,
             theme,
             2,
-            Icons.photo_library_rounded,
-            l10n.pageGalleryTitle,
+            Icons.record_voice_over_rounded,
+            'Luyện phát âm',
             onTap: closeDrawer
                 ? () {
                     Navigator.of(context).pop();
@@ -318,12 +328,25 @@ class _MobileScaffoldState extends State<MobileScaffold> {
             context,
             theme,
             3,
+            Icons.photo_library_rounded,
+            l10n.pageGalleryTitle,
+            onTap: closeDrawer
+                ? () {
+                    Navigator.of(context).pop();
+                    _switchPage(3);
+                  }
+                : null,
+          ),
+          _buildNavItem(
+            context,
+            theme,
+            4,
             Icons.auto_graph_rounded,
             l10n.pageStatisticsTitle,
             onTap: closeDrawer
                 ? () {
                     Navigator.of(context).pop();
-                    _switchPage(3);
+                    _switchPage(4);
                   }
                 : null,
           ),
@@ -352,6 +375,11 @@ class _MobileScaffoldState extends State<MobileScaffold> {
           elevation: _isScrolled[currentIndex] ? 1 : 0,
           scrolledUnderElevation: 1,
           actions: [
+            IconButton(
+              icon: const Icon(Icons.account_circle_outlined),
+              tooltip: 'Tài khoản học viên',
+              onPressed: () => UserSwitchDialog.show(context),
+            ),
             if (_shouldShowNotificationButton(configProvider))
               IconButton(
                 icon: const Icon(Icons.notifications_off_rounded),
@@ -400,7 +428,11 @@ class _MobileScaffoldState extends State<MobileScaffold> {
             ),
             NavigationDestination(
               icon: const Icon(Icons.school_rounded),
-              label: 'Tiến độ học',
+              label: 'Tiến độ',
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.record_voice_over_rounded),
+              label: 'Phát âm',
             ),
             NavigationDestination(
               icon: const Icon(Icons.photo_library_rounded),
@@ -433,6 +465,11 @@ class _MobileScaffoldState extends State<MobileScaffold> {
         elevation: 0,
         scrolledUnderElevation: 0,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.account_circle_outlined),
+            tooltip: 'Tài khoản học viên',
+            onPressed: () => UserSwitchDialog.show(context),
+          ),
           if (_shouldShowNotificationButton(configProvider))
             IconButton(
               icon: const Icon(Icons.notifications_off_rounded),
@@ -485,6 +522,11 @@ class _MobileScaffoldState extends State<MobileScaffold> {
                     elevation: 0,
                     scrolledUnderElevation: 0,
                     actions: [
+                      IconButton(
+                        icon: const Icon(Icons.account_circle_outlined),
+                        tooltip: 'Tài khoản học viên',
+                        onPressed: () => UserSwitchDialog.show(context),
+                      ),
                       if (_shouldShowNotificationButton(configProvider))
                         IconButton(
                           icon: const Icon(Icons.notifications_off_rounded),
@@ -509,6 +551,7 @@ class _MobileScaffoldState extends State<MobileScaffold> {
     final List<String> pageTitles = [
       l10n.pageHomeTitle,
       'Tiến độ học tiếng Anh',
+      'Luyện phát âm tiếng Anh',
       l10n.pageGalleryTitle,
       l10n.pageStatisticsTitle,
     ];

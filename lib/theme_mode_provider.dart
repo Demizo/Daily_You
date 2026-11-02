@@ -12,7 +12,7 @@ class ThemeModeProvider with ChangeNotifier {
   ThemeMode _themeMode = ThemeMode.system;
   ThemeMode get themeMode => _themeMode;
 
-  Color _accentColor = const Color(0xff62A0EA);
+  Color _accentColor = const Color(0xffB1B2FF);
   Color get accentColor => _accentColor;
   bool get usingSystemColor =>
       ConfigProvider.instance.get(Settings.followSystemColor);
@@ -31,7 +31,13 @@ class ThemeModeProvider with ChangeNotifier {
     if (ConfigProvider.instance.get(Settings.followSystemColor)) {
       _accentColor = SystemTheme.accentColor.accent;
     } else {
-      _accentColor = Color(ConfigProvider.instance.get(Settings.accentColor));
+      final savedColor = ConfigProvider.instance.get(Settings.accentColor);
+      if (savedColor == 0xff62A0EA) {
+        _accentColor = const Color(0xffB1B2FF);
+        ConfigProvider.instance.set(Settings.accentColor, 0xffB1B2FF);
+      } else {
+        _accentColor = Color(savedColor);
+      }
     }
     notifyListeners();
   }
@@ -42,7 +48,13 @@ class ThemeModeProvider with ChangeNotifier {
     if (ConfigProvider.instance.get(Settings.followSystemColor)) {
       _accentColor = SystemTheme.accentColor.accent;
     } else {
-      _accentColor = Color(ConfigProvider.instance.get(Settings.accentColor));
+      final savedColor = ConfigProvider.instance.get(Settings.accentColor);
+      if (savedColor == 0xff62A0EA) {
+        _accentColor = const Color(0xffB1B2FF);
+        ConfigProvider.instance.set(Settings.accentColor, 0xffB1B2FF);
+      } else {
+        _accentColor = Color(savedColor);
+      }
     }
 
     final configTheme = ConfigProvider.instance.get(Settings.theme);

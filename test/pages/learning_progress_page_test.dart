@@ -4,9 +4,9 @@
 
 import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/models/learning_progress.dart';
-import 'package:daily_you/models/practice_history.dart';
 import 'package:daily_you/pages/learning_progress_page.dart';
 import 'package:daily_you/providers/learning_progress_provider.dart';
+import 'package:daily_you/providers/user_session_provider.dart';
 import 'package:daily_you/widgets/weekly_progress_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -25,6 +25,7 @@ void main() {
     database = await databaseFactory.openDatabase(inMemoryDatabasePath);
     AppDatabase.instance.database = database;
     await AppDatabase.instance.createSchema(database);
+    await UserSessionProvider.instance.reloadUsers();
     await LearningProgressProvider.instance.loadProgress();
   });
 
@@ -35,8 +36,15 @@ void main() {
 
   Widget createTestWidget(Widget child,
       {Size size = const Size(390, 844)}) {
-    return ChangeNotifierProvider<LearningProgressProvider>.value(
-      value: LearningProgressProvider.instance,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<LearningProgressProvider>.value(
+          value: LearningProgressProvider.instance,
+        ),
+        ChangeNotifierProvider<UserSessionProvider>.value(
+          value: UserSessionProvider.instance,
+        ),
+      ],
       child: MaterialApp(
         home: MediaQuery(
           data: MediaQueryData(size: size),

@@ -4,7 +4,7 @@
 
 import 'package:daily_you/providers/learning_progress_provider.dart';
 import 'package:daily_you/services/daily_reminder_service.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
 /// Hộp thoại Cài đặt Nhắc nhở và Mục tiêu học tập (Checklist 6 - TV3).
