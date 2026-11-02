@@ -24,6 +24,7 @@ import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/utils/auto_backup_schedule.dart';
 import 'package:daily_you/utils/backup_restore_utils.dart';
 import 'package:daily_you/utils/logging.dart';
+import 'package:performance_hint/performance_hint.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
@@ -243,6 +244,7 @@ void main() async {
   // Notification only supported on android
   if (Platform.isAndroid) {
     await FlutterDisplayMode.setHighRefreshRate();
+    PerformanceHint.install();
     await NotificationManager.instance.init();
 
     await AndroidAlarmManager.initialize();

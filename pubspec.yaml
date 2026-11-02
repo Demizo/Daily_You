@@ -38,6 +38,8 @@ dependencies:
     path: packages/backup_crypto
   external_opener:
     path: packages/external_opener
+  performance_hint:
+    path: packages/performance_hint
   device_info_plus: ^13.3.0
   fl_chart: ^1.2.0
   markdown_widget: ^2.3.2+8
