@@ -9,6 +9,7 @@ import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
+import 'package:daily_you/widgets/hide_semantics_while_dragging.dart';
 import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/tag_picker_dialog.dart';
 import 'package:daily_you/widgets/hiding_widget.dart';
@@ -32,7 +33,7 @@ class _GalleryPageState extends State<GalleryPage>
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   late final FocusNode _focusNode = FocusNode();
-  double _searchElevation = 0.0;
+  final ValueNotifier<double> _searchElevation = ValueNotifier(0.0);
 
   List<int> _filterTagIds = [];
   TagFilterMode _filterTagMode = TagFilterMode.any;
@@ -48,19 +49,15 @@ class _GalleryPageState extends State<GalleryPage>
     super.initState();
     _searchController.text = EntriesProvider.instance.searchText;
     _scrollController.addListener(() {
-      final elevation = _scrollController.position.pixels > 0 ? 1.0 : 0.0;
-
-      if (_searchElevation != elevation) {
-        setState(() {
-          _searchElevation = elevation;
-        });
-      }
+      _searchElevation.value =
+          _scrollController.position.pixels > 0 ? 1.0 : 0.0;
     });
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _searchElevation.dispose();
     _scrollController.dispose();
     _focusNode.dispose();
     super.dispose();
@@ -288,97 +285,102 @@ class _GalleryPageState extends State<GalleryPage>
             Padding(
               padding:
                   const EdgeInsets.only(top: 4, bottom: 8, left: 8, right: 8),
-              child: SearchBar(
-                focusNode: _focusNode,
-                controller: _searchController,
-                elevation: WidgetStatePropertyAll(_searchElevation),
-                leading: Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Icon(
-                    Icons.search_rounded,
-                    color: Theme.of(context).colorScheme.secondary,
-                  ),
-                ),
-                trailing: [
-                  AnimatedSwitcher(
-                    duration: Duration(milliseconds: 300),
-                    transitionBuilder:
-                        (Widget child, Animation<double> animation) {
-                      final rotationAnimation =
-                          Tween<double>(begin: 0.0, end: 0.5).animate(
-                        CurvedAnimation(
-                            parent: animation, curve: Curves.easeOut),
-                      );
+              child: ValueListenableBuilder<double>(
+                  valueListenable: _searchElevation,
+                  builder: (context, searchElevation, _) => SearchBar(
+                        focusNode: _focusNode,
+                        controller: _searchController,
+                        elevation: WidgetStatePropertyAll(searchElevation),
+                        leading: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Icon(
+                            Icons.search_rounded,
+                            color: Theme.of(context).colorScheme.secondary,
+                          ),
+                        ),
+                        trailing: [
+                          AnimatedSwitcher(
+                            duration: Duration(milliseconds: 300),
+                            transitionBuilder:
+                                (Widget child, Animation<double> animation) {
+                              final rotationAnimation =
+                                  Tween<double>(begin: 0.0, end: 0.5).animate(
+                                CurvedAnimation(
+                                    parent: animation, curve: Curves.easeOut),
+                              );
 
-                      final scaleAnimation = TweenSequence([
-                        TweenSequenceItem(
-                          tween: Tween<double>(begin: 0.0, end: 1.1)
-                              .chain(CurveTween(curve: Curves.easeOut)),
-                          weight: 50,
-                        ),
-                        TweenSequenceItem(
-                          tween: Tween<double>(begin: 1.1, end: 1.0)
-                              .chain(CurveTween(curve: Curves.easeIn)),
-                          weight: 50,
-                        ),
-                      ]).animate(animation);
+                              final scaleAnimation = TweenSequence([
+                                TweenSequenceItem(
+                                  tween: Tween<double>(begin: 0.0, end: 1.1)
+                                      .chain(CurveTween(curve: Curves.easeOut)),
+                                  weight: 50,
+                                ),
+                                TweenSequenceItem(
+                                  tween: Tween<double>(begin: 1.1, end: 1.0)
+                                      .chain(CurveTween(curve: Curves.easeIn)),
+                                  weight: 50,
+                                ),
+                              ]).animate(animation);
 
-                      return RotationTransition(
-                        turns: rotationAnimation,
-                        child: ScaleTransition(
-                          scale: scaleAnimation,
-                          child: child,
-                        ),
-                      );
-                    },
-                    child: showClear
-                        ? IconButton(
-                            visualDensity: VisualDensity(
-                                horizontal: VisualDensity.minimumDensity),
-                            key: ValueKey('clearButton'),
-                            icon: Icon(Icons.clear),
-                            onPressed: () {
-                              _searchController.clear();
-                              entriesProvider.searchText = "";
-                              setState(() {
-                                _filterTagIds = [];
-                                _filterTagMode = TagFilterMode.any;
-                                _filterNoTags = false;
-                              });
+                              return RotationTransition(
+                                turns: rotationAnimation,
+                                child: ScaleTransition(
+                                  scale: scaleAnimation,
+                                  child: child,
+                                ),
+                              );
                             },
-                          )
-                        : SizedBox.shrink(key: ValueKey('empty')),
-                  ),
-                  if (entriesProvider.searchText.isNotEmpty || _hasTagFilter)
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: Text(AppLocalizations.of(context)!
-                          .logCount(entries.length)),
-                    ),
-                  IconButton(
-                    icon: Icon(
-                      Icons.filter_list_rounded,
-                      color: _hasTagFilter
-                          ? Theme.of(context).colorScheme.primary
-                          : null,
-                    ),
-                    onPressed: () => _showTagFilterDialog(context),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.sort_rounded),
-                    onPressed: () => _showSortSelectionPopup(context),
-                  ),
-                ],
-                hintText: AppLocalizations.of(context)!.searchLogsHint,
-                padding: WidgetStateProperty.all(
-                    const EdgeInsets.only(left: 4, right: 4)),
-                backgroundColor: WidgetStatePropertyAll(
-                    Theme.of(context).colorScheme.secondaryContainer),
-                onChanged: (queryText) => EasyDebounce.debounce(
-                    'search-debounce', const Duration(milliseconds: 300), () {
-                  entriesProvider.searchText = queryText;
-                }),
-              ),
+                            child: showClear
+                                ? IconButton(
+                                    visualDensity: VisualDensity(
+                                        horizontal:
+                                            VisualDensity.minimumDensity),
+                                    key: ValueKey('clearButton'),
+                                    icon: Icon(Icons.clear),
+                                    onPressed: () {
+                                      _searchController.clear();
+                                      entriesProvider.searchText = "";
+                                      setState(() {
+                                        _filterTagIds = [];
+                                        _filterTagMode = TagFilterMode.any;
+                                        _filterNoTags = false;
+                                      });
+                                    },
+                                  )
+                                : SizedBox.shrink(key: ValueKey('empty')),
+                          ),
+                          if (entriesProvider.searchText.isNotEmpty ||
+                              _hasTagFilter)
+                            Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: Text(AppLocalizations.of(context)!
+                                  .logCount(entries.length)),
+                            ),
+                          IconButton(
+                            icon: Icon(
+                              Icons.filter_list_rounded,
+                              color: _hasTagFilter
+                                  ? Theme.of(context).colorScheme.primary
+                                  : null,
+                            ),
+                            onPressed: () => _showTagFilterDialog(context),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.sort_rounded),
+                            onPressed: () => _showSortSelectionPopup(context),
+                          ),
+                        ],
+                        hintText: AppLocalizations.of(context)!.searchLogsHint,
+                        padding: WidgetStateProperty.all(
+                            const EdgeInsets.only(left: 4, right: 4)),
+                        backgroundColor: WidgetStatePropertyAll(
+                            Theme.of(context).colorScheme.secondaryContainer),
+                        onChanged: (queryText) => EasyDebounce.debounce(
+                            'search-debounce',
+                            const Duration(milliseconds: 300), () {
+                          entriesProvider.searchText = queryText;
+                        }),
+                      )),
             ),
             if (entries.isNotEmpty)
               HidingWidget(
@@ -442,11 +444,11 @@ class _GalleryPageState extends State<GalleryPage>
                   : AppLocalizations.of(context)!.noLogs,
             ),
           )
-        : GridView.builder(
+        : HideSemanticsWhileDragging(
+            child: GridView.builder(
             controller: _scrollController,
             padding: const EdgeInsets.only(top: 70, bottom: 70),
             physics: const ScrollPhysics(),
-            shrinkWrap: true,
             gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
                 maxCrossAxisExtent: largeCards ? 500 : 300,
                 crossAxisSpacing: 1.0,
@@ -485,6 +487,6 @@ class _GalleryPageState extends State<GalleryPage>
                       ),
               );
             },
-          );
+          ));
   }
 }
