@@ -16,6 +16,7 @@ import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/pages/launch_page.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_attachments_provider.dart';
+import 'package:daily_you/providers/learning_progress_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/providers/templates_provider.dart';
 import 'package:daily_you/time_manager.dart';
@@ -267,7 +268,10 @@ void main() async {
     ),
     ChangeNotifierProvider<ConfigProvider>(
       create: (_) => ConfigProvider.instance,
-    )
+    ),
+    ChangeNotifierProvider<LearningProgressProvider>(
+      create: (_) => LearningProgressProvider.instance,
+    ),
   ], builder: (context, child) => const MainApp()));
 }
 

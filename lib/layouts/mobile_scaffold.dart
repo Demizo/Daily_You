@@ -14,6 +14,7 @@ import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/pages/statistics_page.dart';
 import 'package:daily_you/pages/gallery_page.dart';
 import 'package:daily_you/pages/home_page.dart';
+import 'package:daily_you/pages/learning_progress_page.dart';
 import 'package:provider/provider.dart';
 
 import '../pages/settings_page.dart';
@@ -28,12 +29,13 @@ class MobileScaffold extends StatefulWidget {
 class _MobileScaffoldState extends State<MobileScaffold> {
   int currentIndex = 0;
   late final PageController _pageController;
-  final List<bool> _isScrolled = [false, false, false];
+  final List<bool> _isScrolled = [false, false, false, false];
 
   late final List<ScrollController> _scrollControllers;
 
   final List<Widget> pages = [
     const HomePage(),
+    const LearningProgressPage(),
     const GalleryPage(),
     const StatsPage(),
   ];
@@ -290,8 +292,8 @@ class _MobileScaffoldState extends State<MobileScaffold> {
             context,
             theme,
             1,
-            Icons.photo_library_rounded,
-            l10n.pageGalleryTitle,
+            Icons.school_rounded,
+            'Tiến độ học',
             onTap: closeDrawer
                 ? () {
                     Navigator.of(context).pop();
@@ -303,12 +305,25 @@ class _MobileScaffoldState extends State<MobileScaffold> {
             context,
             theme,
             2,
+            Icons.photo_library_rounded,
+            l10n.pageGalleryTitle,
+            onTap: closeDrawer
+                ? () {
+                    Navigator.of(context).pop();
+                    _switchPage(2);
+                  }
+                : null,
+          ),
+          _buildNavItem(
+            context,
+            theme,
+            3,
             Icons.auto_graph_rounded,
             l10n.pageStatisticsTitle,
             onTap: closeDrawer
                 ? () {
                     Navigator.of(context).pop();
-                    _switchPage(2);
+                    _switchPage(3);
                   }
                 : null,
           ),
@@ -382,6 +397,10 @@ class _MobileScaffoldState extends State<MobileScaffold> {
             NavigationDestination(
               icon: const Icon(Icons.home_rounded),
               label: l10n.pageHomeTitle,
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.school_rounded),
+              label: 'Tiến độ học',
             ),
             NavigationDestination(
               icon: const Icon(Icons.photo_library_rounded),
@@ -489,6 +508,7 @@ class _MobileScaffoldState extends State<MobileScaffold> {
     final l10n = AppLocalizations.of(context)!;
     final List<String> pageTitles = [
       l10n.pageHomeTitle,
+      'Tiến độ học tiếng Anh',
       l10n.pageGalleryTitle,
       l10n.pageStatisticsTitle,
     ];
