@@ -8,6 +8,7 @@ import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/widgets/attachment_grid.dart';
+import 'package:daily_you/widgets/bottom_fade.dart';
 import 'package:daily_you/widgets/expressive_carousel.dart';
 import 'package:daily_you/widgets/scaled_markdown.dart';
 import 'package:material_ui/material_ui.dart';
@@ -55,16 +56,10 @@ class FlashbackCard extends StatelessWidget {
             ? AttachmentGrid(attachments: coverImages)
             : ClipRect(
                 clipBehavior: Clip.hardEdge,
-                child: ShaderMask(
-                  shaderCallback: (Rect bounds) {
-                    return const LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [Colors.black, Colors.transparent],
-                      stops: [0.60, 0.75],
-                    ).createShader(bounds);
-                  },
-                  blendMode: BlendMode.dstIn,
+                child: BottomFade(
+                  color: theme.colorScheme.surfaceContainer,
+                  start: 0.60,
+                  end: 0.75,
                   child: Padding(
                     padding: const EdgeInsets.all(_cardInset),
                     child: Wrap(children: [

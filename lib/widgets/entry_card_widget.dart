@@ -5,6 +5,8 @@
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:daily_you/utils/entry_semantics_label.dart';
+import 'package:daily_you/widgets/bottom_fade.dart';
 import 'package:daily_you/widgets/entry_card_header_row.dart';
 import 'package:daily_you/widgets/attachment_grid.dart';
 import 'package:daily_you/widgets/scaled_markdown.dart';
@@ -28,67 +30,66 @@ class EntryCardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final time = TimeManager.formatDate(entry.timeCreate, context);
-    return Card.filled(
-      color: Theme.of(context).colorScheme.surfaceContainer,
-      clipBehavior: Clip.antiAlias,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Expanded(
-            child: ClipRRect(
-              clipBehavior: Clip.hardEdge,
-              borderRadius: BorderRadius.circular(12),
-              child: (attachments.isNotEmpty && !hideImage)
-                  ? AttachmentGrid(attachments: attachments)
-                  : (entry.text.isNotEmpty)
-                      ? ShaderMask(
-                          shaderCallback: (Rect bounds) {
-                            return const LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [Colors.black, Colors.transparent],
-                              stops: [0.85, 1.0],
-                            ).createShader(bounds);
-                          },
-                          blendMode: BlendMode.dstIn,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Wrap(children: [
-                              IgnorePointer(
-                                  child: SizedBox(
-                                width: double.maxFinite,
-                                child: ScaledMarkdown(
-                                  data: entry.text,
-                                  maxCharacters: 250,
-                                  scaleFactor: 0.95,
+    final cardTitle = title ?? time;
+    return Semantics(
+        label: entrySemanticsLabel(context, entry, cardTitle),
+        excludeSemantics: true,
+        child: Card.filled(
+          color: Theme.of(context).colorScheme.surfaceContainer,
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Expanded(
+                child: ClipRRect(
+                  clipBehavior: Clip.hardEdge,
+                  borderRadius: BorderRadius.circular(12),
+                  child: (attachments.isNotEmpty && !hideImage)
+                      ? AttachmentGrid(attachments: attachments)
+                      : (entry.text.isNotEmpty)
+                          ? BottomFade(
+                              color: theme.colorScheme.surfaceContainer,
+                              start: 0.85,
+                              end: 1.0,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Wrap(children: [
+                                  IgnorePointer(
+                                      child: SizedBox(
+                                    width: double.maxFinite,
+                                    child: ScaledMarkdown(
+                                      data: entry.text,
+                                      maxCharacters: 250,
+                                      scaleFactor: 0.95,
+                                    ),
+                                  ))
+                                ]),
+                              ),
+                            )
+                          : Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Align(
+                                alignment: AlignmentDirectional.topStart,
+                                child: Text(
+                                  AppLocalizations.of(context)!
+                                      .writeSomethingHint,
+                                  style: TextStyle(
+                                      color: theme.disabledColor, fontSize: 16),
                                 ),
-                              ))
-                            ]),
-                          ),
-                        )
-                      : Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Align(
-                            alignment: AlignmentDirectional.topStart,
-                            child: Text(
-                              AppLocalizations.of(context)!.writeSomethingHint,
-                              style: TextStyle(
-                                  color: theme.disabledColor, fontSize: 16),
+                              ),
                             ),
-                          ),
-                        ),
-            ),
+                ),
+              ),
+              EntryCardHeaderRow(
+                entry: entry,
+                title: cardTitle,
+                titleStyle: TextStyle(
+                    color: theme.textTheme.labelSmall?.color,
+                    fontWeight: FontWeight.bold),
+              ),
+            ],
           ),
-          EntryCardHeaderRow(
-            entry: entry,
-            title: title == null ? time : title!,
-            titleStyle: TextStyle(
-                color: theme.textTheme.labelSmall?.color,
-                fontWeight: FontWeight.bold),
-          ),
-        ],
-      ),
-    );
+        ));
   }
 }

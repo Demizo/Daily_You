@@ -4,7 +4,9 @@
 
 import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:daily_you/utils/entry_semantics_label.dart';
 import 'package:daily_you/utils/search_text_window.dart';
+import 'package:daily_you/widgets/bottom_fade.dart';
 import 'package:daily_you/widgets/entry_card_header_row.dart';
 import 'package:daily_you/widgets/attachment_grid.dart';
 import 'package:daily_you/widgets/scaled_markdown.dart';
@@ -44,16 +46,10 @@ class LargeCard extends StatelessWidget {
                   if (header != null) header! else const SizedBox(height: 8),
                   if (body != null)
                     Expanded(
-                      child: ShaderMask(
-                        shaderCallback: (Rect bounds) {
-                          return const LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [Colors.black, Colors.transparent],
-                            stops: [0.8, 0.95],
-                          ).createShader(bounds);
-                        },
-                        blendMode: BlendMode.dstIn,
+                      child: BottomFade(
+                        color: Theme.of(context).colorScheme.surfaceContainer,
+                        start: 0.8,
+                        end: 0.95,
                         child: ClipRect(
                           clipBehavior: Clip.hardEdge,
                           child: Padding(
@@ -104,28 +100,32 @@ class LargeEntryCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final time = TimeManager.formatDate(entry.timeCreate, context);
-    return LargeCard(
-      media: attachments.isNotEmpty && !hideImage
-          ? AttachmentGrid(attachments: attachments)
-          : null,
-      header: EntryCardHeaderRow(
-        entry: entry,
-        title: title == null ? time : title!,
-        titleStyle: TextStyle(
-          color: theme.textTheme.labelSmall?.color,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      body: entry.text.isNotEmpty
-          ? LargeCard.markdownBody(
-              searchTextWindow(entry.text, searchQuery),
-              highlightQuery: searchQuery,
-            )
-          : Text(
-              AppLocalizations.of(context)!.writeSomethingHint,
-              style: TextStyle(color: theme.disabledColor, fontSize: 16),
+    final cardTitle =
+        title ?? TimeManager.formatDate(entry.timeCreate, context);
+    return Semantics(
+        label: entrySemanticsLabel(context, entry, cardTitle),
+        excludeSemantics: true,
+        child: LargeCard(
+          media: attachments.isNotEmpty && !hideImage
+              ? AttachmentGrid(attachments: attachments)
+              : null,
+          header: EntryCardHeaderRow(
+            entry: entry,
+            title: cardTitle,
+            titleStyle: TextStyle(
+              color: theme.textTheme.labelSmall?.color,
+              fontWeight: FontWeight.bold,
             ),
-    );
+          ),
+          body: entry.text.isNotEmpty
+              ? LargeCard.markdownBody(
+                  searchTextWindow(entry.text, searchQuery),
+                  highlightQuery: searchQuery,
+                )
+              : Text(
+                  AppLocalizations.of(context)!.writeSomethingHint,
+                  style: TextStyle(color: theme.disabledColor, fontSize: 16),
+                ),
+        ));
   }
 }

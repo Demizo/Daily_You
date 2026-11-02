@@ -60,6 +60,17 @@ void main() {
     expect(highlightedTexts(tester), isEmpty);
   });
 
+  testWidgets('announces the date and text as one node', (tester) async {
+    final handle = tester.ensureSemantics();
+    await pumpCard(tester);
+
+    final node = tester.getSemantics(find.byType(LargeEntryCardWidget));
+    expect(node.label, contains('first line'));
+    expect(node.label, contains('2025'));
+    expect(find.semantics.byLabel(RegExp('needle')), findsOneWidget);
+    handle.dispose();
+  });
+
   testWidgets('starts at the matching line and highlights the match',
       (tester) async {
     await pumpCard(tester, searchQuery: 'needle');
