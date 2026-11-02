@@ -216,7 +216,7 @@ https://github.com/Maya0612/Daily_You_TH3_learningenglish
 1. Chọn tab `Pull requests`.
 2. Nhấn `New pull request`.
 3. Thiết lập:
-   - **Base:** `main`
+   - **Base:** `Maya0612/Daily_You_TH3_learningenglish`
    - **Compare:** Nhánh cá nhân của bạn.
 4. Kiểm tra danh sách file thay đổi.
 5. Đặt tiêu đề mô tả chức năng đã hoàn thành.
