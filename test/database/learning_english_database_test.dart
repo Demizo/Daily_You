@@ -8,6 +8,8 @@ import 'package:daily_you/database/pronunciation_result_dao.dart';
 import 'package:daily_you/database/user_dao.dart';
 import 'package:daily_you/models/practice_history.dart';
 import 'package:daily_you/models/pronunciation_result.dart';
+import 'package:daily_you/models/study_sentence.dart';
+import 'package:daily_you/database/study_sentence_dao.dart';
 import 'package:daily_you/models/user.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -359,5 +361,69 @@ void main() {
       await testDb.close();
     });
   });
-}
 
+  group('StudySentenceDao Tests', () {
+    test('Default seeds 24 sentences and getByTopic works', () async {
+      final all = await StudySentenceDao.getAll();
+      expect(all.length, 24);
+
+      final daily = await StudySentenceDao.getByTopic('daily');
+      expect(daily.length, 6);
+
+      final travel = await StudySentenceDao.getByTopic('travel');
+      expect(travel.length, 6);
+
+      final work = await StudySentenceDao.getByTopic('work');
+      expect(work.length, 6);
+
+      final dining = await StudySentenceDao.getByTopic('dining');
+      expect(dining.length, 6);
+    });
+
+    test('Add, filter custom sentences by user and remove', () async {
+      final custom = await StudySentenceDao.add(StudySentence(
+        userId: 1,
+        topic: 'custom',
+        sentence: 'Could you please help me with this task?',
+        meaning: 'Bạn có thể giúp tôi nhiệm vụ này được không?',
+        timeCreate: now,
+      ));
+
+      expect(custom.id, isNotNull);
+      expect(custom.isCustom, isTrue);
+
+      // Lấy theo topic custom của user 1
+      final user1Custom = await StudySentenceDao.getByTopic('custom', userId: 1);
+      expect(user1Custom.length, 1);
+      expect(user1Custom.first.sentence, 'Could you please help me with this task?');
+
+      // User 2 không nhìn thấy câu custom của user 1
+      final user2Custom = await StudySentenceDao.getByTopic('custom', userId: 2);
+      expect(user2Custom.length, 0);
+
+      // Xóa câu tự tạo
+      await StudySentenceDao.remove(custom.id!);
+      final afterDelete = await StudySentenceDao.getByTopic('custom', userId: 1);
+      expect(afterDelete.length, 0);
+    });
+  });
+
+  group('Database Migration v7 -> v8 Test', () {
+    test('onUpgrade successfully creates study_sentences table and seeds', () async {
+      final testDb = await databaseFactory.openDatabase(inMemoryDatabasePath);
+      await AppDatabase.instance.onUpgrade(testDb, 7, 8);
+
+      final tables = await testDb.query(
+        'sqlite_master',
+        where: "type = 'table' AND name = ?",
+        whereArgs: [studySentencesTable],
+      );
+      expect(tables.length, 1);
+
+      final seeded = await testDb.query(studySentencesTable);
+      expect(seeded.length, 24);
+
+      await testDb.close();
+    });
+  });
+}

@@ -22,6 +22,8 @@ import 'package:daily_you/models/template.dart';
 import 'package:daily_you/models/user.dart';
 import 'package:daily_you/models/practice_history.dart';
 import 'package:daily_you/models/pronunciation_result.dart';
+import 'package:daily_you/models/study_sentence.dart';
+import 'package:daily_you/database/study_sentence_dao.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
@@ -150,7 +152,7 @@ class AppDatabase {
     }
   }
 
-  static const schemaVersion = 7;
+  static const schemaVersion = 8;
 
   Future<void> open() async {
     _database = await openDatabase(_internalPath!,
@@ -403,6 +405,7 @@ CREATE TABLE $attachmentsTable (
     await _createTagTables(db);
     await _createTemplateTagTable(db);
     await _createLearningEnglishTables(db);
+    await _createStudySentenceTable(db);
   }
 
   @visibleForTesting
@@ -642,6 +645,9 @@ SELECT '$attachmentsTable', seq FROM sqlite_sequence WHERE name = 'entry_images'
     if (oldVersion <= 6) {
       await _createLearningEnglishTables(db);
     }
+    if (oldVersion <= 7) {
+      await _createStudySentenceTable(db);
+    }
   }
 
   Future<void> _createLearningEnglishTables(Database db) async {
@@ -715,5 +721,27 @@ CREATE INDEX IF NOT EXISTS idx_result_practice
         where: "type = 'table' AND name = ?",
         whereArgs: [name]);
     return rows.isNotEmpty;
+  }
+
+  Future<void> _createStudySentenceTable(Database db) async {
+    await db.execute('''
+CREATE TABLE IF NOT EXISTS $studySentencesTable (
+  ${StudySentenceFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  ${StudySentenceFields.userId} INTEGER,
+  ${StudySentenceFields.topic} TEXT NOT NULL,
+  ${StudySentenceFields.sentence} TEXT NOT NULL,
+  ${StudySentenceFields.meaning} TEXT NOT NULL,
+  ${StudySentenceFields.ipa} TEXT,
+  ${StudySentenceFields.timeCreate} TEXT NOT NULL,
+  FOREIGN KEY (${StudySentenceFields.userId}) REFERENCES $usersTable (${UserFields.id}) ON DELETE CASCADE
+);
+''');
+    await db.execute('''
+CREATE INDEX IF NOT EXISTS idx_study_sentence_topic ON $studySentencesTable (${StudySentenceFields.topic});
+''');
+    await db.execute('''
+CREATE INDEX IF NOT EXISTS idx_study_sentence_user ON $studySentencesTable (${StudySentenceFields.userId});
+''');
+    await StudySentenceDao.seedDefaultSentences(db);
   }
 }

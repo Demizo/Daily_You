@@ -1,30 +1,70 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
+// Copyright (C) 2026 Daily You TH3 Learning English
+// SPDX-License-Identifier: GPL-3.0-only
+// Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
+import 'package:daily_you/custom_locale_delegates.dart';
+import 'package:daily_you/database/app_database.dart';
+import 'package:daily_you/pages/practice_speech_page.dart';
+import 'package:daily_you/providers/learning_progress_provider.dart';
+import 'package:daily_you/providers/user_session_provider.dart';
+import 'package:daily_you/widgets/user_switch_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:daily_you/main.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  setUpAll(sqfliteFfiInit);
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+  late Database database;
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({});
+    databaseFactory = databaseFactoryFfi;
+    database = await databaseFactory.openDatabase(inMemoryDatabasePath);
+    AppDatabase.instance.database = database;
+    await AppDatabase.instance.createSchema(database);
+    await UserSessionProvider.instance.reloadUsers();
+    await LearningProgressProvider.instance.loadProgress();
+  });
+
+  tearDown(() async {
+    AppDatabase.instance.database = null;
+    await database.close();
+  });
+
+  Widget createTestApp(Widget child) {
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<UserSessionProvider>.value(
+          value: UserSessionProvider.instance,
+        ),
+        ChangeNotifierProvider<LearningProgressProvider>.value(
+          value: LearningProgressProvider.instance,
+        ),
+      ],
+      child: MaterialApp(
+        localizationsDelegates: appLocalizationsDelegates,
+        home: Scaffold(body: child),
+      ),
+    );
+  }
+
+  testWidgets('PracticeSpeechPage smoke test renders correctly', (tester) async {
+    await tester.pumpWidget(createTestApp(const PracticeSpeechPage()));
     await tester.pump();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(find.text('Luyện phát âm tiếng Anh'), findsOneWidget);
+    expect(find.text('CHỦ ĐỀ ÔN TẬP'), findsOneWidget);
+    expect(find.byIcon(Icons.mic_rounded), findsWidgets);
+  });
+
+  testWidgets('UserSwitchDialog displays and switches accounts', (tester) async {
+    await tester.pumpWidget(createTestApp(const UserSwitchDialog()));
+    await tester.pump();
+
+    expect(find.text('Tài khoản Học viên'), findsOneWidget);
+    expect(find.text('+ Thêm tài khoản học viên mới'), findsOneWidget);
   });
 }

@@ -353,32 +353,36 @@ Bộ kiểm thử được viết và lưu tại: [`test/database/learning_engli
 ### 7.1 Kết quả chạy thực tế lệnh `flutter test`
 ```text
 00:00 +0: loading test/database/learning_english_database_test.dart
-00:00 +0: (setUpAll)
-00:00 +0: UserDao Tests Create, Read, Update, Delete user
-00:00 +1: PracticeHistoryDao Tests ActivityType parsing and extensibility fallback
-00:00 +2: PracticeHistoryDao Tests Practice session lifecycle and filtering by user/date/status
-00:00 +3: PronunciationResultDao Tests Handles full result with word scores and mispronounced words
-00:00 +4: PronunciationResultDao Tests Supports API scenarios where scores or mispronounced words are null or empty
-00:00 +5: PronunciationResultDao Tests Query results by practiceId and userId isolation
-00:00 +6: Database Migration v6 -> v7 Test onUpgrade successfully creates new tables and indexes
-00:00 +7: (tearDownAll)
-00:00 +7: All tests passed!
+00:00 +1: UserDao Tests Create, Read, Update, Delete user
+00:00 +2: PracticeHistoryDao Tests ActivityType parsing and extensibility fallback
+00:00 +3: PracticeHistoryDao Tests Practice session lifecycle and filtering by user/date/status
+00:00 +4: PronunciationResultDao Tests Handles full result with word scores and mispronounced words
+00:00 +5: PronunciationResultDao Tests Supports API scenarios where scores or mispronounced words are null or empty
+00:00 +6: PronunciationResultDao Tests Query results by practiceId and userId isolation
+00:00 +7: Database Migration v6 -> v7 Test onUpgrade successfully creates new tables and indexes
+00:00 +8: StudySentenceDao Tests Default seeds 24 sentences and getByTopic works
+00:00 +9: StudySentenceDao Tests Add, filter custom sentences by user and remove
+00:00 +10: Database Migration v7 -> v8 Test onUpgrade successfully creates study_sentences table and seeds
+00:01 +11: WeeklyProgressChart Widget Tests Renders 7 daily bars and summary
+00:01 +12: LearningProgressPage Widget Tests Renders empty state when user has no practice records
+00:02 +13: LearningProgressPage Widget Tests Responsive rendering on tablet / large screen (768x1024)
+00:02 +14: PracticeSpeechPage smoke test renders correctly
+00:02 +15: UserSwitchDialog displays and switches accounts
+00:03 +15: All tests passed!
 ```
-👉 **Đánh giá:** **7/7 test cases ĐẠT 100% (Passed)**.
-- Đã xác thực thành công việc thêm, sửa, đọc, xóa trên SQLite thực tế.
-- Đã xác thực việc phân tách dữ liệu an toàn theo từng `userId`.
-- Đã xác thực việc lọc theo ngày (`practiceDate`), khoảng thời gian (`dateRange`), trạng thái (`status`).
-- Đã xác thực việc chấp nhận dữ liệu null/rỗng từ API mà không gây lỗi ứng dụng.
-- Đã xác thực migration schema v6 lên v7 tự động tạo đúng các bảng và index.
+👉 **Đánh giá:** **15/15 test cases ĐẠT 100% (Passed)** trên toàn bộ 3 test suites:
+- **Database Tests (10 tests):** Đã xác thực thành công CRUD thực tế, đa người dùng (`userId`), migration tuần tự v6 -> v7 -> v8, kho câu thực tế (24 câu mẫu mặc định theo 4 chủ đề) và tính năng tạo câu tùy chỉnh của học viên.
+- **TV3 Dashboard Tests (3 tests):** Biểu đồ tuần 7 ngày, empty state, responsive tablet/desktop.
+- **Widget Smoke Tests (2 tests):** Màn hình luyện phát âm TV4/TV5 và hộp thoại đăng nhập/đổi tài khoản đa học viên.
 
 ### 7.2 Kết quả chạy thực tế lệnh `flutter analyze`
 ```text
-Analyzing 8 items...
-No issues found! (ran in 97.1s)
+Analyzing Daily_You_TH3_learningenglish...
+No issues found! (ran in 17.2s)
 ```
-👉 **Đánh giá:** Mã nguồn tuân thủ 100% chuẩn linting của Flutter/Dart, không có bất kỳ warning hay syntax error nào.
+👉 **Đánh giá:** Mã nguồn toàn dự án tuân thủ 100% chuẩn linting của Flutter/Dart, sạch 100% không còn bất kỳ error hay warning nào.
 
 ---
 
 ## TỔNG KẾT
-Nhiệm vụ TV1 đã đáp ứng **đầy đủ 100% các tiêu chí từ Mục 1 đến Mục 7 của Checklist 1**, sẵn sàng để các thành viên TV2, TV3, TV4, TV5 tích hợp vào ứng dụng.
+Nhiệm vụ TV1 đã đáp ứng **đầy đủ 100% các tiêu chí từ Mục 1 đến Mục 7 của Checklist 1**, đồng thời hỗ trợ trọn vẹn hạ tầng CSDL Schema v8, Multi-User Session, Base Practice Template và chuẩn hóa UI Guidelines cho TV2, TV3, TV4, TV5 sẵn sàng tích hợp.

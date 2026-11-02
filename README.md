@@ -22,17 +22,43 @@ Dự án hướng đến việc hỗ trợ người học xây dựng thói quen
 
 ---
 
-## 2. Phân chia thành viên
+## 2. Phân chia thành viên & Trách nhiệm kỹ thuật
 
-| Thành viên | Checklist tương ứng |
-|---|---|
-| Đào Hà Thu (TV1) | Checklist 1 – Thiết kế cơ sở dữ liệu |
-| Mạnh Đức (TV2) | Checklist 2 – Theo dõi tiến độ học tập |
-| Kim Anh (TV3) | Checklist 6 – Nhắc nhở và giao diện tiến độ |
-| Dũng (TV4) | Checklist 3 – Speech Recognition API và xử lý âm thanh |
-| Trung (TV5) | Checklist 4, 5 – Đánh giá phát âm và phản hồi kết quả |
+| Thành viên | Checklist | Vai trò & Đầu ra kỹ thuật |
+|---|---|---|
+| **Đào Hà Thu (TV1)** | Checklist 1 – CSDL & Phiên người dùng | • Thiết kế SQLite schema v8: bảng `users`, `practice_histories`, `pronunciation_results`, `study_sentences`<br>• Viết DAO CRUD: `UserDao`, `PracticeHistoryDao`, `PronunciationResultDao`, `StudySentenceDao`<br>• Quản lý phiên đa tài khoản: `UserSessionProvider`, `UserSwitchDialog`, `UserProfileBar`<br>• Bảng màu Color Hunt `#B1B2FF` & bảo tồn màu nhận thức ngữ nghĩa (Streak cam, Sai đỏ, Đúng xanh) |
+| **Mạnh Đức (TV2)** | Checklist 2 – Tiến độ học tập | • Mô hình dữ liệu `DailyLearningProgress`<br>• Thuật toán tính Streak ngọn lửa & thống kê thời gian học hôm nay<br>• Tổng hợp dữ liệu biểu đồ tuần 7 ngày |
+| **Kim Anh (TV3)** | Checklist 6 – Nhắc nhở & Giao diện | • Giao diện Dashboard `LearningProgressPage`<br>• Biểu đồ tuần `WeeklyProgressChart`<br>• Nhắc nhở học tập hằng ngày `DailyReminderService` & `LearningReminderDialog` |
+| **Dũng (TV4)** | Checklist 3 – Speech API & Âm thanh | • Quản lý quyền Microphone & thu âm giọng nói<br>• Tích hợp Speech-to-Text API nhận dạng văn bản tiếng Anh<br>• Lưu file ghi âm qua `AttachmentStorage`<br>• *Gắn code trực tiếp vào khu vực TV4 trên màn hình mẫu `lib/pages/practice_speech_page.dart`* |
+| **Trung (TV5)** | Checklist 4, 5 – Đánh giá phát âm | • Chấm điểm phát âm tiếng Anh (`PronunciationResult`): Tổng điểm, Chuẩn xác, Trôi chảy<br>• Phân tích từng từ (`WordScore`): tô màu xanh/vàng/đỏ<br>• Phát hiện âm sai (`MispronouncedWord`) & gợi ý sửa phát âm<br>• Lưu kết quả vào CSDL SQLite thông qua hàm `_saveResultToDatabase()`<br>• *Gắn code trực tiếp vào khu vực TV5 trên màn hình mẫu `lib/pages/practice_speech_page.dart`* |
 
 **Checklist 7 – Kiểm thử:** Tất cả thành viên cùng thực hiện.
+
+---
+
+### 2.1. Quy chuẩn Giao diện & Màn hình mẫu (UI Guidelines)
+
+Để ứng dụng đồng nhất và **không gặp lỗi màn hình đỏ (`No MaterialLocalizations found`)**, tất cả thành viên tuân thủ các nguyên tắc sau:
+
+1. **Tuyệt đối KHÔNG khai báo `Scaffold` hoặc `AppBar` lồng bên trong các trang con**: Toàn bộ ứng dụng đã được quản lý bởi khung sườn `MobileScaffold`. Các trang con chỉ trả về `Column` với Header row + `Expanded(child: ListView(...))` hoặc `SingleChildScrollView`.
+2. **Sử dụng gói giao diện của Daily You**: Import `package:material_ui/material_ui.dart` thay vì `package:flutter/material.dart` thuần để tự động đồng bộ theme Dark/Light mode và Material 3.
+3. **Màn hình mẫu sẵn sàng cho TV4 & TV5**: Nhóm đã dựng sẵn màn hình [`lib/pages/practice_speech_page.dart`](lib/pages/practice_speech_page.dart) với 2 khu vực đánh dấu rõ ràng `[TV4 CODE SECTION]` và `[TV5 CODE SECTION]`. TV4 và TV5 chỉ cần viết logic vào đúng các hàm đã định nghĩa sẵn.
+4. **Chi tiết hướng dẫn UI:** Xem tài liệu đầy đủ tại [`docs/UI_GUIDELINES.md`](docs/UI_GUIDELINES.md).
+
+---
+
+### 2.2. Hướng dẫn Kiểm thử Đa tài khoản (Multi-User Testing Workflow)
+
+Ứng dụng hỗ trợ kiểm thử nhiều học viên độc lập ngay trên cùng một máy mà không cần xóa app:
+
+1. **Xem tài khoản hiện tại**: Nhìn vào góc trên bên phải trang Tiến độ học tập / Luyện phát âm hoặc thanh Sidebar bên trái để biết học viên nào đang hoạt động.
+2. **Chuyển đổi hoặc Thêm tài khoản mới**:
+   - Nhấn vào tên/avatar học viên hoặc biểu tượng `Account` trên thanh công cụ để mở hộp thoại `UserSwitchDialog`.
+   - Bấm **"Chọn"** ở tài khoản khác để chuyển đổi ngay.
+   - Hoặc bấm **"+ Thêm tài khoản học viên mới"** -> Nhập tên (ví dụ: `Học viên B (Test)`) -> Bấm `Tạo & Đăng nhập ngay`.
+3. **Xác minh tính độc lập dữ liệu (Data Isolation)**:
+   - Khi ở tài khoản A: Thử luyện một bài phát âm -> Lưu kết quả -> Streak và biểu đồ của A cập nhật.
+   - Chuyển sang tài khoản B: Streak và lịch sử của B độc lập hoàn toàn với A, không bị ghi đè hay lẫn lộn dữ liệu.
 
 ---
 
@@ -366,7 +392,26 @@ Trước khi tạo Pull Request, mỗi thành viên cần:
 
 Không tạo Pull Request khi chức năng chưa được kiểm thử.
 
-### Kiểm thử toàn bộ ứng dụng
+### 9.1. Lệnh chạy Kiểm thử Tự động (Automated Tests)
+
+Mỗi thành viên trước khi tạo Pull Request cần chạy các lệnh sau để đảm bảo không làm gãy dự án:
+
+1. **Kiểm tra CSDL SQLite và DAOs (TV1):**
+```bash
+flutter test test/database/learning_english_database_test.dart
+```
+
+2. **Kiểm tra Giao diện Dashboard Tiến độ học (TV3):**
+```bash
+flutter test test/pages/learning_progress_page_test.dart
+```
+
+3. **Kiểm tra toàn bộ cú pháp và mã nguồn:**
+```bash
+flutter analyze
+```
+
+### 9.2. Kiểm thử toàn bộ ứng dụng
 
 Sau khi các thành viên hoàn thành và Merge code, cả nhóm phối hợp kiểm thử luồng hoạt động tổng thể của ứng dụng để phát hiện lỗi tích hợp.
 

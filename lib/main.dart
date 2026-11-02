@@ -16,6 +16,8 @@ import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/pages/launch_page.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_attachments_provider.dart';
+import 'package:daily_you/providers/learning_progress_provider.dart';
+import 'package:daily_you/providers/user_session_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/providers/templates_provider.dart';
 import 'package:daily_you/time_manager.dart';
@@ -267,7 +269,13 @@ void main() async {
     ),
     ChangeNotifierProvider<ConfigProvider>(
       create: (_) => ConfigProvider.instance,
-    )
+    ),
+    ChangeNotifierProvider<LearningProgressProvider>(
+      create: (_) => LearningProgressProvider.instance,
+    ),
+    ChangeNotifierProvider<UserSessionProvider>(
+      create: (_) => UserSessionProvider.instance..init(),
+    ),
   ], builder: (context, child) => const MainApp()));
 }
 
@@ -438,11 +446,13 @@ class _MainAppState extends State<MainApp> {
             dynamicSchemeVariant: noChroma
                 ? DynamicSchemeVariant.fidelity
                 : DynamicSchemeVariant.tonalSpot,
-            brightness: Brightness.light));
+            brightness: Brightness.light),
+            scaffoldBackgroundColor: const Color(0xffEEF1FF));
       } else {
         lightTheme = _buildTheme(ColorScheme.fromSeed(
             seedColor: themeModeProvider.accentColor,
-            brightness: Brightness.light));
+            brightness: Brightness.light),
+            scaffoldBackgroundColor: const Color(0xffEEF1FF));
       }
 
       if (themeModeProvider.usingSystemColor && darkDynamic != null) {
