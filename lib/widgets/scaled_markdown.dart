@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
+import 'package:daily_you/markdown/markdown_blocks.dart';
 import 'package:daily_you/utils/color_utils.dart';
 import 'package:daily_you/utils/search_highlight.dart';
 import 'package:daily_you/widgets/markdown_highlight_syntax.dart';
@@ -15,7 +16,6 @@ class ScaledMarkdown extends StatelessWidget {
   final int? maxCharacters;
   final double scaleFactor;
   final bool compact;
-  final bool selectable;
   final String highlightQuery;
 
   const ScaledMarkdown({
@@ -24,7 +24,6 @@ class ScaledMarkdown extends StatelessWidget {
     this.maxCharacters,
     this.scaleFactor = 1,
     this.compact = false,
-    this.selectable = true,
     this.highlightQuery = '',
   });
 
@@ -57,45 +56,17 @@ class ScaledMarkdown extends StatelessWidget {
       ),
     ]);
 
-    final markdown = MarkdownBlock(
-      selectable: false,
-      config: config,
-      generator: MarkdownGenerator(
-        inlineSyntaxList: [HighlightSyntax()],
-        generators: [highlightGenerator(highlightBackgroundColor)],
-        richTextBuilder: (span) {
-          return Builder(builder: (context) {
-            final shouldIgnoreTextScaler =
-                context.getInheritedWidgetOfExactType<_WithTextScalar>() !=
-                    null;
-
-            final child = Text.rich(
-              highlightSpan(span, highlightQuery, highlightBackgroundColor),
-              textScaler:
-                  shouldIgnoreTextScaler ? TextScaler.noScaling : customScaler,
-            );
-
-            return shouldIgnoreTextScaler
-                ? child
-                : _WithTextScalar(child: child);
-          });
-        },
-        linesMargin: compact
-            ? EdgeInsets.zero
-            : const EdgeInsets.only(bottom: 8, top: 2),
-      ),
+    return MarkdownBlocks(
       data: text,
+      config: config,
+      inlineSyntaxes: [HighlightSyntax()],
+      generators: [highlightGenerator(highlightBackgroundColor)],
+      richTextBuilder: (span) => Text.rich(
+        highlightSpan(span, highlightQuery, highlightBackgroundColor),
+        textScaler: customScaler,
+      ),
+      linesMargin:
+          compact ? EdgeInsets.zero : const EdgeInsets.only(bottom: 8, top: 2),
     );
-
-    return selectable ? SelectionArea(child: markdown) : markdown;
-  }
-}
-
-class _WithTextScalar extends InheritedWidget {
-  const _WithTextScalar({required super.child});
-
-  @override
-  bool updateShouldNotify(covariant _WithTextScalar oldWidget) {
-    return false;
   }
 }

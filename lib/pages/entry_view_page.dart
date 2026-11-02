@@ -131,7 +131,6 @@ class _EntryViewPageState extends State<EntryViewPage> {
                                 left: 8, top: 4, bottom: 4, right: 8),
                             child: ScaledMarkdown(
                               data: entry.text,
-                              selectable: false,
                             ))),
                   Padding(
                     padding: const EdgeInsets.only(
