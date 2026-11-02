@@ -19,6 +19,9 @@ import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/models/tag_category.dart';
 import 'package:daily_you/models/template.dart';
+import 'package:daily_you/models/user.dart';
+import 'package:daily_you/models/practice_history.dart';
+import 'package:daily_you/models/pronunciation_result.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
@@ -147,7 +150,7 @@ class AppDatabase {
     }
   }
 
-  static const schemaVersion = 6;
+  static const schemaVersion = 7;
 
   Future<void> open() async {
     _database = await openDatabase(_internalPath!,
@@ -399,6 +402,7 @@ CREATE TABLE $attachmentsTable (
 
     await _createTagTables(db);
     await _createTemplateTagTable(db);
+    await _createLearningEnglishTables(db);
   }
 
   @visibleForTesting
@@ -635,6 +639,74 @@ SELECT '$attachmentsTable', seq FROM sqlite_sequence WHERE name = 'entry_images'
         await txn.execute('DROP TABLE entry_images;');
       });
     }
+    if (oldVersion <= 6) {
+      await _createLearningEnglishTables(db);
+    }
+  }
+
+  Future<void> _createLearningEnglishTables(Database db) async {
+    await db.execute('''
+CREATE TABLE IF NOT EXISTS $usersTable (
+  ${UserFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  ${UserFields.authId} TEXT UNIQUE,
+  ${UserFields.name} TEXT NOT NULL,
+  ${UserFields.email} TEXT,
+  ${UserFields.timeCreate} DATETIME NOT NULL DEFAULT (DATETIME('now')),
+  ${UserFields.timeModified} DATETIME NOT NULL DEFAULT (DATETIME('now'))
+);
+''');
+
+    await db.execute('''
+CREATE TABLE IF NOT EXISTS $practiceHistoryTable (
+  ${PracticeHistoryFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  ${PracticeHistoryFields.userId} INTEGER NOT NULL,
+  ${PracticeHistoryFields.activityType} TEXT NOT NULL,
+  ${PracticeHistoryFields.content} TEXT NOT NULL,
+  ${PracticeHistoryFields.startedAt} DATETIME NOT NULL,
+  ${PracticeHistoryFields.endedAt} DATETIME,
+  ${PracticeHistoryFields.durationSeconds} INTEGER,
+  ${PracticeHistoryFields.practiceDate} TEXT NOT NULL,
+  ${PracticeHistoryFields.status} TEXT NOT NULL DEFAULT 'IN_PROGRESS',
+  ${PracticeHistoryFields.timeCreate} DATETIME NOT NULL DEFAULT (DATETIME('now')),
+  ${PracticeHistoryFields.timeModified} DATETIME NOT NULL DEFAULT (DATETIME('now')),
+  FOREIGN KEY (${PracticeHistoryFields.userId}) REFERENCES $usersTable (${UserFields.id})
+);
+''');
+
+    await db.execute('''
+CREATE INDEX IF NOT EXISTS idx_practice_user_date
+  ON $practiceHistoryTable (${PracticeHistoryFields.userId}, ${PracticeHistoryFields.practiceDate});
+''');
+
+    await db.execute('''
+CREATE TABLE IF NOT EXISTS $pronunciationResultsTable (
+  ${PronunciationResultFields.id} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  ${PronunciationResultFields.userId} INTEGER NOT NULL,
+  ${PronunciationResultFields.practiceId} INTEGER NOT NULL,
+  ${PronunciationResultFields.referenceSentence} TEXT NOT NULL,
+  ${PronunciationResultFields.recognizedText} TEXT,
+  ${PronunciationResultFields.overallScore} REAL,
+  ${PronunciationResultFields.wordScores} TEXT,
+  ${PronunciationResultFields.mispronouncedWords} TEXT,
+  ${PronunciationResultFields.feedback} TEXT,
+  ${PronunciationResultFields.suggestions} TEXT,
+  ${PronunciationResultFields.evaluatedAt} DATETIME NOT NULL,
+  ${PronunciationResultFields.audioFilePath} TEXT,
+  ${PronunciationResultFields.timeCreate} DATETIME NOT NULL DEFAULT (DATETIME('now')),
+  FOREIGN KEY (${PronunciationResultFields.userId}) REFERENCES $usersTable (${UserFields.id}),
+  FOREIGN KEY (${PronunciationResultFields.practiceId}) REFERENCES $practiceHistoryTable (${PracticeHistoryFields.id})
+);
+''');
+
+    await db.execute('''
+CREATE INDEX IF NOT EXISTS idx_result_user
+  ON $pronunciationResultsTable (${PronunciationResultFields.userId});
+''');
+
+    await db.execute('''
+CREATE INDEX IF NOT EXISTS idx_result_practice
+  ON $pronunciationResultsTable (${PronunciationResultFields.practiceId});
+''');
   }
 
   Future<bool> _tableExists(Database db, String name) async {
