@@ -15,6 +15,7 @@ class GlyphSpec {
     this.fontFamily,
     this.fontPackage,
     this.fixedLineHeight = false,
+    this.fontWeight,
   });
 
   final String text;
@@ -23,6 +24,7 @@ class GlyphSpec {
   final String? fontPackage;
 
   final bool fixedLineHeight;
+  final FontWeight? fontWeight;
 
   TextPainter layout(Color color) {
     return TextPainter(
@@ -32,6 +34,7 @@ class GlyphSpec {
           inherit: false,
           color: color,
           fontSize: fontSize,
+          fontWeight: fontWeight,
           fontFamily: fontFamily,
           package: fontPackage,
         ),
@@ -62,11 +65,26 @@ class GlyphSpec {
       other.fontSize == fontSize &&
       other.fontFamily == fontFamily &&
       other.fontPackage == fontPackage &&
-      other.fixedLineHeight == fixedLineHeight;
+      other.fixedLineHeight == fixedLineHeight &&
+      other.fontWeight == fontWeight;
 
   @override
-  int get hashCode =>
-      Object.hash(text, fontSize, fontFamily, fontPackage, fixedLineHeight);
+  int get hashCode => Object.hash(
+      text, fontSize, fontFamily, fontPackage, fixedLineHeight, fontWeight);
+}
+
+abstract final class GlyphLayouts {
+  static const int _maxEntries = 512;
+
+  static final Map<(GlyphSpec, Color), TextPainter> _painters = {};
+
+  static TextPainter of(GlyphSpec spec, Color color) {
+    final key = (spec, color);
+    final cached = _painters[key];
+    if (cached != null) return cached;
+    if (_painters.length >= _maxEntries) _painters.clear();
+    return _painters[key] = spec.layout(color);
+  }
 }
 
 abstract final class GlyphInk {
@@ -132,4 +150,27 @@ abstract final class GlyphInk {
     _offsets.clear();
     _pending.clear();
   }
+}
+
+class GlyphPainter extends CustomPainter {
+  GlyphPainter({
+    required this.textPainter,
+    this.inkOffset = Offset.zero,
+  });
+
+  final TextPainter textPainter;
+  final Offset inkOffset;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(
+      (size.width - textPainter.width) / 2,
+      (size.height - textPainter.height) / 2,
+    );
+    textPainter.paint(canvas, center - inkOffset);
+  }
+
+  @override
+  bool shouldRepaint(GlyphPainter old) =>
+      old.textPainter != textPainter || old.inkOffset != inkOffset;
 }

@@ -29,28 +29,6 @@ class MoodScaleGlyph extends StatefulWidget {
 }
 
 class _MoodScaleGlyphState extends State<MoodScaleGlyph> {
-  TextPainter? _textPainter;
-  GlyphSpec? _laidOutSpec;
-  Color? _laidOutColor;
-
-  TextPainter _layoutFor(GlyphSpec spec, Color color) {
-    if (_textPainter == null ||
-        _laidOutSpec != spec ||
-        _laidOutColor != color) {
-      _textPainter?.dispose();
-      _textPainter = spec.layout(color);
-      _laidOutSpec = spec;
-      _laidOutColor = color;
-    }
-    return _textPainter!;
-  }
-
-  @override
-  void dispose() {
-    _textPainter?.dispose();
-    super.dispose();
-  }
-
   GlyphSpec _specFor(double scaledSize, double boxSize) {
     final level = widget.level;
     if (level.hasTextIcon) {
@@ -88,8 +66,9 @@ class _MoodScaleGlyphState extends State<MoodScaleGlyph> {
     final glyph = SizedBox.square(
       dimension: boxSize,
       child: CustomPaint(
-        painter: _GlyphPainter(
-          textPainter: _layoutFor(spec, widget.level.resolvedColor(context)),
+        painter: GlyphPainter(
+          textPainter:
+              GlyphLayouts.of(spec, widget.level.resolvedColor(context)),
           inkOffset: GlyphInk.offsetOf(spec),
         ),
       ),
@@ -99,27 +78,4 @@ class _MoodScaleGlyphState extends State<MoodScaleGlyph> {
             label: widget.level.icon, excludeSemantics: true, child: glyph)
         : glyph;
   }
-}
-
-class _GlyphPainter extends CustomPainter {
-  _GlyphPainter({
-    required this.textPainter,
-    required this.inkOffset,
-  });
-
-  final TextPainter textPainter;
-  final Offset inkOffset;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final center = Offset(
-      (size.width - textPainter.width) / 2,
-      (size.height - textPainter.height) / 2,
-    );
-    textPainter.paint(canvas, center - inkOffset);
-  }
-
-  @override
-  bool shouldRepaint(_GlyphPainter old) =>
-      old.textPainter != textPainter || old.inkOffset != inkOffset;
 }
