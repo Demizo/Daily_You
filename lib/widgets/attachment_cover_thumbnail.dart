@@ -5,6 +5,7 @@
 import 'dart:typed_data';
 
 import 'package:daily_you/models/attachment.dart';
+import 'package:daily_you/widgets/image_decoded_notification.dart';
 import 'package:daily_you/widgets/local_image_cache.dart';
 import 'package:daily_you/widgets/local_image_loader.dart';
 import 'package:daily_you/widgets/video_thumbnail_cache.dart';
@@ -66,7 +67,10 @@ class _AttachmentCoverThumbnailState extends State<AttachmentCoverThumbnail> {
       initialData: VideoThumbnailCache.instance.peek(first.filePath),
       builder: (context, snapshot) {
         final bytes = snapshot.data;
-        if (bytes != null) return Image.memory(bytes, fit: BoxFit.cover);
+        if (bytes != null) {
+          return Image.memory(bytes,
+              fit: BoxFit.cover, frameBuilder: notifyWhenDecoded);
+        }
         if (snapshot.connectionState != ConnectionState.done) {
           return const SizedBox.shrink();
         }

@@ -4,6 +4,7 @@
 
 import 'package:daily_you/database/attachment_storage.dart';
 import 'package:daily_you/widgets/local_image_cache.dart';
+import 'package:daily_you/widgets/image_decoded_notification.dart';
 import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -68,6 +69,7 @@ class _LocalImageLoaderState extends State<LocalImageLoader> {
         width: double.infinity,
         height: double.infinity,
         cacheWidth: widget.cacheSize,
+        frameBuilder: notifyWhenDecoded,
         errorBuilder: (_, __, ___) {
           return const Center(
             child: Icon(

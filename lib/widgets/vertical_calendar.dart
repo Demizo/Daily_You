@@ -20,6 +20,8 @@ import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/utils/calendar_month_table.dart';
 import 'package:daily_you/widgets/calendar_view_options_dialog.dart';
 import 'package:daily_you/widgets/entry_day_cell.dart';
+import 'package:daily_you/widgets/hide_semantics_while_dragging.dart';
+import 'package:daily_you/widgets/snapshot_while_scrolling.dart';
 import 'package:daily_you/widgets/year_month_picker.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
@@ -69,6 +71,7 @@ class _VerticalCalendarState extends State<VerticalCalendar>
   bool _growScheduled = false;
 
   final _showTodayButton = ValueNotifier<bool>(false);
+  final _scrolling = ValueNotifier<bool>(false);
   DateTime _visibleMonth = DateTime.now();
   String _cachedLocale = '';
 
@@ -124,6 +127,7 @@ class _VerticalCalendarState extends State<VerticalCalendar>
     _dayNumberRebakeTimer?.cancel();
     _disposeImages(_dayNumberCache);
     _showTodayButton.dispose();
+    _scrolling.dispose();
     widget.scrollController.removeListener(_onScroll);
     super.dispose();
   }
@@ -262,6 +266,15 @@ class _VerticalCalendarState extends State<VerticalCalendar>
     });
   }
 
+  bool _onScrollNotification(ScrollNotification notification) {
+    if (notification is ScrollStartNotification) {
+      _scrolling.value = true;
+    } else if (notification is ScrollEndNotification) {
+      _scrolling.value = false;
+    }
+    return false;
+  }
+
   void _onScroll() {
     final offset = widget.scrollController.offset;
     final showToday = (offset - _todayOffset).abs() > _weekRowHeight * 12;
@@ -358,28 +371,33 @@ class _VerticalCalendarState extends State<VerticalCalendar>
                     child: ScrollConfiguration(
                       behavior: ScrollConfiguration.of(context)
                           .copyWith(scrollbars: false),
-                      child: CustomScrollView(
-                        controller: widget.scrollController,
-                        reverse: true,
-                        slivers: [
-                          const SliverPadding(
-                              padding: EdgeInsets.only(bottom: 85)),
-                          SliverFixedExtentList(
-                            itemExtent: _weekRowHeight,
-                            delegate: SliverChildBuilderDelegate(
-                              (context, index) => _buildItem(
-                                  context,
-                                  index,
-                                  entriesProvider,
-                                  attachmentsProvider,
-                                  showImages,
-                                  showMood,
-                                  calendarTagOverride,
-                                  calendarTagEntryMap),
-                              childCount: _table.rowCount,
-                            ),
+                      child: HideSemanticsWhileDragging(
+                        child: NotificationListener<ScrollNotification>(
+                          onNotification: _onScrollNotification,
+                          child: CustomScrollView(
+                            controller: widget.scrollController,
+                            reverse: true,
+                            slivers: [
+                              const SliverPadding(
+                                  padding: EdgeInsets.only(bottom: 85)),
+                              SliverFixedExtentList(
+                                itemExtent: _weekRowHeight,
+                                delegate: SliverChildBuilderDelegate(
+                                  (context, index) => _buildItem(
+                                      context,
+                                      index,
+                                      entriesProvider,
+                                      attachmentsProvider,
+                                      showImages,
+                                      showMood,
+                                      calendarTagOverride,
+                                      calendarTagEntryMap),
+                                  childCount: _table.rowCount,
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
                     ),
                   ),
@@ -694,19 +712,22 @@ class _VerticalCalendarState extends State<VerticalCalendar>
       bool showMood,
       Tag? calendarTagOverride,
       Map<int, EntryTag> calendarTagEntryMap) {
-    return _WeekRow(
-      days: days,
-      today: _today,
-      cellSize: _cellWidth,
-      dayNumberCache: _dayNumberCache,
-      entriesProvider: entriesProvider,
-      attachmentsProvider: attachmentsProvider,
-      showImages: showImages,
-      showMood: showMood,
-      isJalali: _isJalali,
-      calendarTagOverride: calendarTagOverride,
-      calendarTagEntryMap: calendarTagEntryMap,
-      onSelectDay: widget.onDaySelected,
+    return SnapshotWhileScrolling(
+      scrolling: _scrolling,
+      child: _WeekRow(
+        days: days,
+        today: _today,
+        cellSize: _cellWidth,
+        dayNumberCache: _dayNumberCache,
+        entriesProvider: entriesProvider,
+        attachmentsProvider: attachmentsProvider,
+        showImages: showImages,
+        showMood: showMood,
+        isJalali: _isJalali,
+        calendarTagOverride: calendarTagOverride,
+        calendarTagEntryMap: calendarTagEntryMap,
+        onSelectDay: widget.onDaySelected,
+      ),
     );
   }
 }

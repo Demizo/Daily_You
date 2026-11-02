@@ -11,9 +11,11 @@ import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/pages/edit_entry_page.dart';
 import 'package:daily_you/pages/entry_timeline_page.dart';
 import 'package:daily_you/providers/entries_provider.dart';
+import 'package:daily_you/providers/mood_scale_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/utils/tag_visuals.dart';
 import 'package:daily_you/widgets/attachment_cover_thumbnail.dart';
+import 'package:daily_you/widgets/cached_text.dart';
 import 'package:daily_you/widgets/day_menu.dart';
 import 'package:daily_you/widgets/tag_icon_glyph.dart';
 import 'package:daily_you/widgets/pixel_snap.dart';
@@ -162,6 +164,11 @@ class EntryDayCell extends StatelessWidget {
     );
   }
 
+  String get _dayLabel =>
+      '${isJalali ? TimeManager.jalaliDayNumber(date) : date.day}';
+
+  bool get _isToday => TimeManager.isSameDay(date, today);
+
   String _countLabel(int count) => count > 99 ? '99+' : '$count';
 
   Widget _countBadge(BuildContext context, int count) {
@@ -250,6 +257,21 @@ class EntryDayCell extends StatelessWidget {
     }
   }
 
+  String _semanticsLabel(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final detail = entries.length > 1
+        ? l10n.logCount(entries.length)
+        : MoodScaleProvider.instance
+            .moodPrefixOf(entries.firstOrNull?.mood, l10n)
+            .trim();
+    return [TimeManager.formatDate(date, context), detail]
+        .where((part) => part.isNotEmpty)
+        .join('. ');
+  }
+
+  Widget _announce(BuildContext context, Widget child) => Semantics(
+      label: _semanticsLabel(context), excludeSemantics: true, child: child);
+
   @override
   Widget build(BuildContext context) {
     final firstEntry = entries.firstOrNull;
@@ -286,97 +308,93 @@ class EntryDayCell extends StatelessWidget {
             },
         onLongPress:
             selectDay ?? () => _showPopupMenu(context, entriesProvider),
-        child: SizedBox(
-          width: cellSize,
-          height: cellSize,
-          child: Stack(
-            fit: StackFit.expand,
-            alignment: Alignment.center,
-            children: [
-              Container(
-                margin: const EdgeInsets.all(2),
-                decoration: BoxDecoration(
-                  color: colorScheme.secondaryContainer,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                clipBehavior: showImageBg ? Clip.hardEdge : Clip.none,
-                child: showImageBg
-                    ? AttachmentCoverThumbnail(candidates: coverCandidates)
-                    : Center(
-                        child: tagGoesCenter
-                            ? _buildTagCutoutCenter(
-                                context,
-                                calendarTagOverride!,
-                                overrideEntryTag,
-                                colorScheme)
-                            : !showImages &&
-                                    showMood &&
-                                    firstEntry?.mood != null
-                                ? PixelSnap(
-                                    child: Container(
-                                    width: 40,
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                      color: colorScheme.surface,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Center(
-                                      child: MoodIcon(
-                                        moodValue: firstEntry!.mood,
-                                        size: 28,
-                                        allowScaling: false,
-                                      ),
-                                    ),
-                                  ))
-                                : Text(
-                                    '${isJalali ? TimeManager.jalaliDayNumber(date) : date.day}',
-                                    style: TextStyle(
-                                        color: colorScheme.onSecondaryContainer,
-                                        fontSize: 16)),
-                      ),
-              ),
-              if (showImageBg)
-                ExcludeSemantics(
-                  child: RawImage(
-                    image: dayNumber,
+        child: _announce(
+            context,
+            SizedBox(
+              width: cellSize,
+              height: cellSize,
+              child: Stack(
+                fit: StackFit.expand,
+                alignment: Alignment.center,
+                children: [
+                  Container(
+                    margin: const EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                      color: colorScheme.secondaryContainer,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    clipBehavior: showImageBg ? Clip.hardEdge : Clip.none,
+                    child: showImageBg
+                        ? AttachmentCoverThumbnail(candidates: coverCandidates)
+                        : Center(
+                            child: tagGoesCenter
+                                ? _buildTagCutoutCenter(
+                                    context,
+                                    calendarTagOverride!,
+                                    overrideEntryTag,
+                                    colorScheme)
+                                : !showImages &&
+                                        showMood &&
+                                        firstEntry?.mood != null
+                                    ? PixelSnap(
+                                        child: Container(
+                                        width: 40,
+                                        height: 40,
+                                        decoration: BoxDecoration(
+                                          color: colorScheme.surface,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Center(
+                                          child: MoodIcon(
+                                            moodValue: firstEntry!.mood,
+                                            size: 28,
+                                            allowScaling: false,
+                                          ),
+                                        ),
+                                      ))
+                                    : CachedText(_dayLabel,
+                                        size: 16,
+                                        color:
+                                            colorScheme.onSecondaryContainer),
+                          ),
                   ),
-                ),
-              Positioned(
-                bottom: 0,
-                right: 0,
-                child: isMulti
-                    ? _countBadge(context, entries.length)
-                    : showImages && showMood && firstEntry!.mood != null
-                        ? PixelSnap(
-                            child: Container(
-                            width: 23,
-                            height: 23,
-                            decoration: BoxDecoration(
-                              color: colorScheme.surface.withAlpha(255),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Center(
-                              child: MoodIcon(
-                                moodValue: firstEntry.mood,
-                                size: 16,
-                                allowScaling: false,
-                              ),
-                            ),
-                          ))
+                  if (showImageBg) RawImage(image: dayNumber),
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: isMulti
+                        ? _countBadge(context, entries.length)
+                        : showImages && showMood && firstEntry!.mood != null
+                            ? PixelSnap(
+                                child: Container(
+                                width: 23,
+                                height: 23,
+                                decoration: BoxDecoration(
+                                  color: colorScheme.surface.withAlpha(255),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Center(
+                                  child: MoodIcon(
+                                    moodValue: firstEntry.mood,
+                                    size: 16,
+                                    allowScaling: false,
+                                  ),
+                                ),
+                              ))
+                            : const SizedBox.shrink(),
+                  ),
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: tagGoesCorner
+                        ? _buildTagCutout(context, calendarTagOverride!,
+                            overrideEntryTag, colorScheme,
+                            iconOnly: tagGoesCenter)
                         : const SizedBox.shrink(),
+                  ),
+                ],
               ),
-              Positioned(
-                top: 0,
-                right: 0,
-                child: tagGoesCorner
-                    ? _buildTagCutout(context, calendarTagOverride!,
-                        overrideEntryTag, colorScheme,
-                        iconOnly: tagGoesCenter)
-                    : const SizedBox.shrink(),
-              ),
-            ],
-          ),
-        ),
+            )),
       ));
     } else {
       return MergeSemantics(
@@ -395,27 +413,29 @@ class EntryDayCell extends StatelessWidget {
                   },
               onLongPress:
                   selectDay ?? () => _showPopupMenu(context, entriesProvider),
-              child: SizedBox(
-                width: cellSize,
-                height: cellSize,
-                child: Container(
-                  margin: const EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                    color: colorScheme.surfaceContainerLow,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Center(
-                    child: Text(
-                        '${isJalali ? TimeManager.jalaliDayNumber(date) : date.day}',
-                        style: TimeManager.isSameDay(date, today)
-                            ? TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: colorScheme.primary)
-                            : const TextStyle(fontSize: 16)),
-                  ),
-                ),
-              )));
+              child: _announce(
+                  context,
+                  SizedBox(
+                    width: cellSize,
+                    height: cellSize,
+                    child: Container(
+                      margin: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        color: colorScheme.surfaceContainerLow,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Center(
+                        child: CachedText(
+                          _dayLabel,
+                          size: 16,
+                          color: _isToday
+                              ? colorScheme.primary
+                              : colorScheme.onSurface,
+                          fontWeight: _isToday ? FontWeight.bold : null,
+                        ),
+                      ),
+                    ),
+                  ))));
     }
   }
 }
