@@ -13,6 +13,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   permission_handler_windows
   record_windows
   share_plus
+  speech_to_text_windows
   system_theme
   url_launcher_windows
 )

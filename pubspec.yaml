@@ -76,6 +76,8 @@ dependencies:
   material_ui: ^1.5.0
   cupertino_ui: ^1.1.1
   record: ^7.1.1
+  speech_to_text: ^7.0.0
+  audio_session: ^0.2.4
   v_video_compressor: ^2.2.3
   video_player: ^2.14.1
   just_audio: ^0.10.6
