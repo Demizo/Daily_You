@@ -34,6 +34,20 @@ void main() {
     expect(streaks.longest, 3);
   });
 
+  test('counts entries over 24 hours apart on adjacent days', () {
+    final streaks = calculateStreaks(
+      [
+        entryAt(DateTime(2026, 11, 2, 0, 30)),
+        entryAt(DateTime(2026, 11, 1, 0, 30)),
+        entryAt(DateTime(2026, 10, 31, 0, 30)),
+      ],
+      now: DateTime(2026, 11, 2, 8),
+    );
+
+    expect(streaks.current, 3);
+    expect(streaks.longest, 3);
+  });
+
   test('counts adjacent calendar days written an hour apart', () {
     final streaks = calculateStreaks(
       [

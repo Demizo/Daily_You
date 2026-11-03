@@ -160,8 +160,8 @@ class FlashbackManager {
         continue;
       }
       if (configProvider.get(Settings.showflashback1WeekAgo) &&
-          TimeManager.isSameDay(entry.timeCreate,
-              DateTime.now().subtract(const Duration(days: 7)))) {
+          TimeManager.isSameDay(
+              entry.timeCreate, DateTime(now.year, now.month, now.day - 7))) {
         final label = AppLocalizations.of(context)!.flashbackWeek(1);
         singleFlashbacks.putIfAbsent(label, () => []).add(entry);
         usedEntries.add(entry);

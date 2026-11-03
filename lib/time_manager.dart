@@ -113,9 +113,8 @@ class TimeManager {
     final formatter = DateFormat.E(TimeManager.currentLocale(context));
 
     List<String> days = List.generate(7, (index) {
-      final day = now
-          .subtract(Duration(days: now.weekday - 1))
-          .add(Duration(days: index));
+      final day =
+          DateTime(now.year, now.month, now.day - (now.weekday - 1) + index);
       return formatter.format(day); // Gets localized short name
     });
 

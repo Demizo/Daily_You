@@ -41,3 +41,18 @@ int bucketIndexAtOrBefore(List<DateTime> buckets, DateTime date) {
   }
   return foundIndex;
 }
+
+int calendarDaysBetween(DateTime from, DateTime to) =>
+    DateTime.utc(to.year, to.month, to.day)
+        .difference(DateTime.utc(from.year, from.month, from.day))
+        .inDays;
+
+List<DateTime> dayStepBuckets(DateTime start, DateTime end, int stepDays) {
+  final buckets = <DateTime>[];
+  var current = DateTime(start.year, start.month, start.day);
+  while (!current.isAfter(end)) {
+    buckets.add(current);
+    current = DateTime(current.year, current.month, current.day + stepDays);
+  }
+  return buckets;
+}

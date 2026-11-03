@@ -87,4 +87,43 @@ void main() {
       expect(bucketIndexAtOrBefore(buckets, DateTime(2030, 1, 1)), 2);
     });
   });
+
+  group('calendarDaysBetween', () {
+    test('counts calendar days', () {
+      expect(
+          calendarDaysBetween(DateTime(2026, 1, 1), DateTime(2026, 1, 1)), 0);
+      expect(
+          calendarDaysBetween(
+              DateTime(2026, 1, 1, 23, 59), DateTime(2026, 1, 2, 0, 1)),
+          1);
+      expect(
+          calendarDaysBetween(DateTime(2026, 1, 1), DateTime(2027, 1, 1)), 365);
+    });
+
+    test('is not shortened by a day in a daylight saving month', () {
+      expect(calendarDaysBetween(DateTime(2026, 1, 1), DateTime(2026, 11, 2)),
+          305);
+      expect(calendarDaysBetween(DateTime(2026, 10, 3), DateTime(2026, 11, 2)),
+          30);
+    });
+  });
+
+  group('dayStepBuckets', () {
+    test('steps by calendar days and stays on midnight', () {
+      for (final stepDays in [1, 7]) {
+        final buckets = dayStepBuckets(
+            DateTime(2026, 1, 1, 15), DateTime(2026, 12, 31, 23, 59), stepDays);
+        for (final (index, bucket) in buckets.indexed) {
+          expect(bucket, DateTime(2026, 1, 1 + index * stepDays));
+        }
+      }
+    });
+
+    test('ends on the last bucket starting at or before the end', () {
+      final buckets = dayStepBuckets(
+          DateTime(2026, 10, 3), DateTime(2026, 11, 2, 23, 59, 59), 1);
+      expect(buckets.length, 31);
+      expect(buckets.last, DateTime(2026, 11, 2));
+    });
+  });
 }

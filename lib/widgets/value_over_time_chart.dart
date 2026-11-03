@@ -186,7 +186,7 @@ class _ValueOverTimeChartState extends State<ValueOverTimeChart> {
     final rangeStart =
         widget.hasData ? _dataRangeStart() : _dummyRangeStart(today, isJalali);
 
-    final totalDays = rangeEnd.difference(rangeStart).inDays.toDouble();
+    final totalDays = calendarDaysBetween(rangeStart, rangeEnd).toDouble();
     final spanDays = totalDays.toInt().clamp(1, 999999);
     final xUnit = axisUnitInDays(totalDays);
     final available = _availableGroupings(spanDays);
@@ -194,8 +194,8 @@ class _ValueOverTimeChartState extends State<ValueOverTimeChart> {
     final smoothing = _smoothing;
 
     final buckets = switch (effective) {
-      ChartGrouping.day => _generateDailyBuckets(rangeStart, rangeEnd),
-      ChartGrouping.week => _generateWeeklyBuckets(rangeStart, rangeEnd),
+      ChartGrouping.day => dayStepBuckets(rangeStart, rangeEnd, 1),
+      ChartGrouping.week => dayStepBuckets(rangeStart, rangeEnd, 7),
       ChartGrouping.month =>
         _generateMonthlyBuckets(rangeStart, rangeEnd, isJalali: isJalali),
       ChartGrouping.year =>
@@ -222,11 +222,11 @@ class _ValueOverTimeChartState extends State<ValueOverTimeChart> {
 
     final labelTextMap = <int, String>{
       for (final d in labelDates)
-        (d.difference(rangeStart).inDays / xUnit).round():
+        (calendarDaysBetween(rangeStart, d) / xUnit).round():
             _formatLabel(d, spanDays, context),
     };
     final markerDayOffsets = markerDates
-        .map((d) => d.difference(rangeStart).inDays / xUnit)
+        .map((d) => calendarDaysBetween(rangeStart, d) / xUnit)
         .toList();
 
     final color = widget.color ?? Theme.of(context).colorScheme.primary;
@@ -492,26 +492,6 @@ class _ValueOverTimeChartState extends State<ValueOverTimeChart> {
     return DateTime(today.year, today.month - 12, today.day);
   }
 
-  List<DateTime> _generateDailyBuckets(DateTime start, DateTime end) {
-    final buckets = <DateTime>[];
-    DateTime current = DateTime(start.year, start.month, start.day);
-    while (!current.isAfter(end)) {
-      buckets.add(current);
-      current = current.add(const Duration(days: 1));
-    }
-    return buckets;
-  }
-
-  List<DateTime> _generateWeeklyBuckets(DateTime start, DateTime end) {
-    final buckets = <DateTime>[];
-    DateTime current = DateTime(start.year, start.month, start.day);
-    while (!current.isAfter(end)) {
-      buckets.add(current);
-      current = current.add(const Duration(days: 7));
-    }
-    return buckets;
-  }
-
   List<DateTime> _generateMonthlyBuckets(DateTime start, DateTime end,
       {bool isJalali = false}) {
     final buckets = <DateTime>[];
@@ -568,7 +548,7 @@ class _ValueOverTimeChartState extends State<ValueOverTimeChart> {
     return List.generate(buckets.length, (i) {
       final values = bucketValues[i];
       if (values == null || values.isEmpty) return null;
-      final x = buckets[i].difference(rangeStart).inDays / xUnit;
+      final x = calendarDaysBetween(rangeStart, buckets[i]) / xUnit;
       return FlSpot(x, widget.combine(values));
     });
   }
@@ -576,7 +556,7 @@ class _ValueOverTimeChartState extends State<ValueOverTimeChart> {
   List<FlSpot?> _dummySpots(
       List<DateTime> buckets, DateTime rangeStart, double xUnit) {
     return List.generate(buckets.length, (i) {
-      final x = buckets[i].difference(rangeStart).inDays / xUnit;
+      final x = calendarDaysBetween(rangeStart, buckets[i]) / xUnit;
       return FlSpot(x, _scaleDummy(_dummyYValues[i % _dummyYValues.length]));
     });
   }
@@ -678,11 +658,7 @@ class _ValueOverTimeChartState extends State<ValueOverTimeChart> {
       int spanDays, int yearCount, bool isJalali) {
     final markers = <DateTime>[];
     if (spanDays <= _monthThreshold) {
-      DateTime current = rangeStart;
-      while (!current.isAfter(rangeEnd)) {
-        markers.add(current);
-        current = current.add(const Duration(days: 7));
-      }
+      markers.addAll(dayStepBuckets(rangeStart, rangeEnd, 7));
     } else if (spanDays <= _yearThreshold) {
       if (isJalali) {
         final jStart = Jalali.fromDateTime(rangeStart);
