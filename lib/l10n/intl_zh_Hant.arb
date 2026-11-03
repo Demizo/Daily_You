@@ -289,5 +289,10 @@
     "recorderPermissionDenied": "需要麥克風權限才能錄製音訊",
     "recorderErrorDescription": "錄音失敗！",
     "settingsMediaQualityTitle": "媒體品質",
-    "exportIncludeTitle": "包含"
+    "exportIncludeTitle": "包含",
+    "moodVeryUnpleasant": "非常不愉快",
+    "moodUnpleasant": "不愉快",
+    "moodNeutral": "中性",
+    "moodPleasant": "愉快",
+    "moodVeryPleasant": "非常愉快"
 }
