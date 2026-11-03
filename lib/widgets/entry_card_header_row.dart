@@ -13,20 +13,22 @@ class EntryCardHeaderRow extends StatelessWidget {
   final Entry entry;
   final String title;
   final TextStyle? titleStyle;
-  final EdgeInsetsGeometry titlePadding;
 
   static const double _tagIconSize = 18;
   static const double _tagIconSpacing = 4;
 
-  static const double _moodReserve = 24;
   static const double _segmentGap = 2;
+  static const double _titleInset = 6;
+  static const double _moodInset = 2;
+  static const double _moodVerticalInset = 2;
+  static const double _moodSize = 20;
+  static const double _moodLineHeightScale = 1.3;
 
   const EntryCardHeaderRow({
     super.key,
     required this.entry,
     required this.title,
     this.titleStyle,
-    this.titlePadding = EdgeInsets.zero,
   });
 
   @override
@@ -34,50 +36,65 @@ class EntryCardHeaderRow extends StatelessWidget {
     final tagsProvider = context.watch<TagsProvider>();
     final hasTags = entry.id != null &&
         tagsProvider.getEntryTagsForEntry(entry.id!).isNotEmpty;
-    final hasMood = MoodIcon.getMoodIcon(entry.mood).isNotEmpty;
+    final moodHeight = MediaQuery.textScalerOf(context).scale(_moodSize) *
+        _moodLineHeightScale;
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final moodReserve = _segmentGap + (hasMood ? _moodReserve : 0.0);
-        final minTagReserve = hasTags ? _tagIconSize + _segmentGap : 0.0;
-        final titleCap = (constraints.maxWidth - moodReserve - minTagReserve)
-            .clamp(0.0, constraints.maxWidth);
+    return Padding(
+      padding: const EdgeInsetsDirectional.only(
+        start: _titleInset,
+        end: _moodInset,
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final minTagReserve =
+                    hasTags ? _tagIconSize + _segmentGap : 0.0;
+                final titleCap = (constraints.maxWidth - minTagReserve)
+                    .clamp(0.0, constraints.maxWidth);
 
-        return Row(
-          children: [
-            ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: titleCap),
-              child: Padding(
-                padding: titlePadding,
-                child: Text(
-                  title,
-                  maxLines: 1,
-                  softWrap: false,
-                  overflow: TextOverflow.fade,
-                  style: titleStyle,
-                ),
+                return Row(
+                  children: [
+                    ConstrainedBox(
+                      constraints: BoxConstraints(maxWidth: titleCap),
+                      child: Text(
+                        title,
+                        maxLines: 1,
+                        softWrap: false,
+                        overflow: TextOverflow.fade,
+                        style: titleStyle,
+                      ),
+                    ),
+                    Expanded(
+                      child: hasTags
+                          ? Align(
+                              alignment: AlignmentDirectional.centerEnd,
+                              child: EntryTagIconPreview(
+                                entryId: entry.id,
+                                iconSize: _tagIconSize,
+                                spacing: _tagIconSpacing,
+                              ),
+                            )
+                          : const SizedBox.shrink(),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+          const SizedBox(width: _segmentGap),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: _moodVerticalInset),
+            child: SizedBox(
+              height: moodHeight,
+              child: Center(
+                child: MoodIcon(moodValue: entry.mood, size: _moodSize),
               ),
             ),
-            Expanded(
-              child: hasTags
-                  ? Align(
-                      alignment: AlignmentDirectional.centerEnd,
-                      child: EntryTagIconPreview(
-                        entryId: entry.id,
-                        iconSize: _tagIconSize,
-                        spacing: _tagIconSpacing,
-                      ),
-                    )
-                  : const SizedBox.shrink(),
-            ),
-            const SizedBox(width: _segmentGap),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 2.0),
-              child: MoodIcon(moodValue: entry.mood),
-            ),
-          ],
-        );
-      },
+          ),
+        ],
+      ),
     );
   }
 }

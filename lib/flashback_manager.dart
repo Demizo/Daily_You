@@ -10,6 +10,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/flashback.dart';
+import 'package:daily_you/models/mood.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
@@ -107,7 +108,7 @@ class FlashbackManager {
     if (configProvider.get(Settings.excludeBadDaysFromFlashbacks)) {
       // Filter out unhappy entries
       filteredEntries =
-          filteredEntries.where((entry) => (entry.mood ?? 0) >= 0).toList();
+          filteredEntries.where((entry) => !Mood.isBadDay(entry.mood)).toList();
     }
 
     List<Flashback> flashbacksList = List.empty(growable: true);
@@ -166,7 +167,7 @@ class FlashbackManager {
         usedEntries.add(entry);
         continue;
       }
-      if (entry.mood == 1 || entry.mood == 2) {
+      if (Mood.isGreatDay(entry.mood)) {
         happyEntries.add(entry);
         continue;
       }

@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:daily_you/models/entry.dart';
+import 'package:daily_you/models/mood.dart';
 import 'package:daily_you/storage/storage_picker.dart';
 import 'package:daily_you/utils/imports/import_helpers.dart';
 import 'package:daily_you/utils/operation_outcome.dart';
@@ -33,12 +34,12 @@ Future<OperationOutcome> importFromMyBrain(
 }
 
 List<ImportedEntry> decodeMyBrainEntries(Uint8List bytes) {
-  const moodMap = {
-    'TERRIBLE': -2,
-    'BAD': -1,
-    'OKAY': 0,
-    'GOOD': 1,
-    'AWESOME': 2,
+  final moodByName = {
+    'TERRIBLE': Mood.veryUnpleasant,
+    'BAD': Mood.unpleasant,
+    'OKAY': Mood.neutral,
+    'GOOD': Mood.pleasant,
+    'AWESOME': Mood.veryPleasant,
   };
 
   final jsonData = json.decode(utf8.decode(bytes.toList()));
@@ -51,7 +52,7 @@ List<ImportedEntry> decodeMyBrainEntries(Uint8List bytes) {
           if (entry['title'] != null) "# ${entry['title']}",
           if (entry['content'] != null) entry['content'] as String,
         ].join("\n\n"),
-        mood: entry['mood'] != null ? moodMap[entry['mood']] : null,
+        mood: moodByName[entry['mood']],
         timeCreate: DateTime.fromMillisecondsSinceEpoch(entry['createdDate'],
                 isUtc: true)
             .toLocal(),

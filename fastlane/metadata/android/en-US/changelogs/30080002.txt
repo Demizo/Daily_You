@@ -1,0 +1,7 @@
+Daily You v3.8.0 has arrived! Highlights & polish:
+
+• Display flashbacks and attachments in a carousel
+• Highlight searched text in results
+• Added the ability to sort timelines
+• Various animation and UI improvements
+• Updated translations

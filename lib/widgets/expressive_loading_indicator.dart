@@ -4,7 +4,7 @@
 
 import 'dart:math' as math;
 
-import 'package:daily_you/widgets/material_shapes.dart';
+import 'package:daily_you/widgets/morphing_burst.dart';
 import 'package:material_ui/material_ui.dart';
 
 class ExpressiveLoadingIndicator extends StatefulWidget {

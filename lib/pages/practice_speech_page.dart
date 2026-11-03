@@ -3,6 +3,7 @@
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
 import 'dart:async';
+import 'dart:io';
 import 'package:daily_you/database/practice_history_dao.dart';
 import 'package:daily_you/database/pronunciation_result_dao.dart';
 import 'package:daily_you/database/study_sentence_dao.dart';
@@ -11,8 +12,12 @@ import 'package:daily_you/models/pronunciation_result.dart';
 import 'package:daily_you/models/study_sentence.dart';
 import 'package:daily_you/providers/learning_progress_provider.dart';
 import 'package:daily_you/providers/user_session_provider.dart';
+import 'package:daily_you/services/audio_recorder_service.dart';
+import 'package:daily_you/services/speech_to_text_service.dart';
 import 'package:daily_you/widgets/add_sentence_dialog.dart';
 import 'package:daily_you/widgets/user_profile_bar.dart';
+import 'package:audio_session/audio_session.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
@@ -46,10 +51,17 @@ class _PracticeSpeechPageState extends State<PracticeSpeechPage> {
   // TRẠNG THÁI CỦA TV4 (GHI ÂM VÀ SPEECH API)
   // -------------------------------------------------------------
   bool _isRecording = false;
+  bool _isRecognizingSpeech = false;
   int _recordingSeconds = 0;
+  double _currentMicLevel = -160;
+  double _peakMicLevel = -160;
   Timer? _recordingTimer;
+  StreamSubscription<double>? _amplitudeSubscription;
   String? _recognizedText;
   String? _recordedAudioPath;
+  final AudioPlayer _audioPlayer = AudioPlayer();
+  String? _loadedAudioPath;
+  final AudioRecorderService _audioRecorderService = AudioRecorderService();
 
   // -------------------------------------------------------------
   // TRẠNG THÁI CỦA TV5 (ĐÁNH GIÁ VÀ CHẤM ĐIỂM PHÁT ÂM)
@@ -75,6 +87,12 @@ class _PracticeSpeechPageState extends State<PracticeSpeechPage> {
   @override
   void dispose() {
     _recordingTimer?.cancel();
+    unawaited(_amplitudeSubscription?.cancel());
+    if (_isRecognizingSpeech) {
+      unawaited(SpeechToTextService.cancel());
+    }
+    unawaited(_audioPlayer.dispose());
+    unawaited(_audioRecorderService.dispose());
     super.dispose();
   }
 
@@ -129,7 +147,8 @@ class _PracticeSpeechPageState extends State<PracticeSpeechPage> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Xác nhận xóa câu'),
-        content: Text('Bạn có chắc chắn muốn xóa câu "${sentence.sentence}" khỏi danh sách?'),
+        content: Text(
+            'Bạn có chắc chắn muốn xóa câu "${sentence.sentence}" khỏi danh sách?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
@@ -153,20 +172,40 @@ class _PracticeSpeechPageState extends State<PracticeSpeechPage> {
   // =============================================================
   // [TV4 CODE SECTION] - GHI ÂM VÀ NHẬN DẠNG GIỌNG NÓI
   // =============================================================
-  void _toggleRecording() {
+  Future<void> _toggleRecording() async {
     if (_isRecording) {
-      _stopRecording();
+      await _stopRecording();
     } else {
-      _startRecording();
+      await _startRecording();
     }
   }
 
-  void _startRecording() {
+  Future<void> _startRecording() async {
+    try {
+      await _audioPlayer.stop();
+      await _audioRecorderService.startRecording();
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Không thể bắt đầu ghi âm: $error')),
+      );
+      return;
+    }
+
+    if (!mounted) {
+      await _audioRecorderService.stopRecording();
+      return;
+    }
+
     setState(() {
       _isRecording = true;
       _recordingSeconds = 0;
+      _currentMicLevel = -160;
+      _peakMicLevel = -160;
       _recognizedText = null;
+      _recordedAudioPath = null;
       _latestResult = null;
+      _loadedAudioPath = null;
     });
 
     _recordingTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -174,30 +213,140 @@ class _PracticeSpeechPageState extends State<PracticeSpeechPage> {
         setState(() => _recordingSeconds++);
       }
     });
-
-    // TODO [TV4]: Gắn bộ ghi âm mic tại đây (record package / Speech-to-Text API)
+    _amplitudeSubscription =
+        _audioRecorderService.amplitudeStream.listen((amplitude) {
+      if (!mounted) return;
+      setState(() {
+        _currentMicLevel = amplitude;
+        if (amplitude > _peakMicLevel) {
+          _peakMicLevel = amplitude;
+        }
+      });
+    }, onError: (Object error, StackTrace stackTrace) {
+      debugPrint('Reading microphone level failed: $error');
+    });
   }
 
-  void _stopRecording() {
+  Future<void> _stopRecording() async {
     _recordingTimer?.cancel();
+    await _amplitudeSubscription?.cancel();
+    _amplitudeSubscription = null;
     setState(() => _isRecording = false);
 
-    if (_sentences.isEmpty) return;
-    final currentSentence = _sentences[_selectedSentenceIndex].sentence;
+    String? audioPath;
+    try {
+      audioPath = await _audioRecorderService.stopRecording();
+      if (audioPath == null) {
+        throw StateError('No recorded audio file was produced.');
+      }
+      if (mounted) {
+        setState(() {
+          _recordedAudioPath = _peakMicLevel >= -55 ? audioPath : null;
+          _recognizedText = null;
+        });
+      }
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _recordedAudioPath = audioPath);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Không thể hoàn tất ghi âm: $error')),
+      );
+      return;
+    }
 
-    // TODO [TV4]: Dừng ghi âm, lưu file qua AttachmentStorage và lấy kết quả STT
-    setState(() {
-      _recordedAudioPath = '/simulated/audio/practice_record.m4a';
-      _recognizedText = currentSentence;
-    });
+    if (!mounted) return;
+    if (_peakMicLevel < -55) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Không thu được tiếng từ micro '
+            '(mức cao nhất ${_peakMicLevel.toStringAsFixed(0)} dBFS). '
+            'Hãy kiểm tra đầu vào micro rồi ghi lại.',
+          ),
+          duration: const Duration(seconds: 5),
+        ),
+      );
+      return;
+    }
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Đã ghi âm xong! Sẵn sàng cho TV5 chấm điểm.'),
+        content: Text(
+          'Đã lưu bản ghi. Bạn có thể nghe lại hoặc đọc lại để nhận dạng.',
+        ),
         behavior: SnackBarBehavior.floating,
-        duration: Duration(seconds: 2),
+        duration: Duration(seconds: 3),
       ),
     );
+  }
+
+  Future<void> _recognizeRecordedSpeech() async {
+    if (_recordedAudioPath == null || _isRecognizingSpeech) return;
+
+    setState(() {
+      _isRecognizingSpeech = true;
+      _recognizedText = null;
+    });
+
+    try {
+      await _audioPlayer.stop();
+      final recognizedText = await SpeechToTextService.recognize(
+        onTextUpdate: (text) {
+          if (mounted) setState(() => _recognizedText = text);
+        },
+      );
+      if (mounted) setState(() => _recognizedText = recognizedText);
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Không thể chuẩn bị nhận dạng giọng nói: $error'),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isRecognizingSpeech = false);
+    }
+  }
+
+  Future<void> _playRecordedAudio() async {
+    final audioPath = _recordedAudioPath;
+    if (audioPath == null) return;
+
+    try {
+      final audioFile = File(audioPath);
+      if (!await audioFile.exists() || await audioFile.length() == 0) {
+        throw StateError('Bản ghi không có dữ liệu âm thanh.');
+      }
+      if (_audioPlayer.playing) {
+        await _audioPlayer.pause();
+        return;
+      }
+
+      final audioSession = await AudioSession.instance;
+      await audioSession.configure(const AudioSessionConfiguration.music());
+      if (!await audioSession.setActive(true)) {
+        throw StateError('Không thể kích hoạt đầu ra âm thanh.');
+      }
+
+      if (_loadedAudioPath != audioPath) {
+        final duration = await _audioPlayer.setFilePath(audioPath);
+        if (duration == null || duration <= Duration.zero) {
+          throw StateError('Không thể đọc nội dung âm thanh của bản ghi.');
+        }
+        _loadedAudioPath = audioPath;
+      }
+      if (_audioPlayer.processingState == ProcessingState.completed) {
+        await _audioPlayer.seek(Duration.zero);
+      }
+      await _audioPlayer.setVolume(1);
+      await _audioPlayer.play();
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Không thể phát lại bản ghi: $error')),
+      );
+    }
   }
 
   // =============================================================
@@ -205,11 +354,28 @@ class _PracticeSpeechPageState extends State<PracticeSpeechPage> {
   // =============================================================
   Future<void> _evaluatePronunciation() async {
     if (_sentences.isEmpty) return;
+    final recognizedText = _recognizedText?.trim();
+    if (recognizedText == null ||
+        recognizedText.isEmpty ||
+        recognizedText == SpeechToTextService.fallbackText) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Hãy nhận dạng câu nói thành công trước khi gửi kết quả cho TV5.',
+          ),
+        ),
+      );
+      return;
+    }
     setState(() => _isScoring = true);
 
     final currentUserId = context.read<UserSessionProvider>().currentUserId;
     final targetText = _sentences[_selectedSentenceIndex].sentence;
-    final words = targetText.replaceAll('.', '').replaceAll('?', '').replaceAll(',', '').split(' ');
+    final words = targetText
+        .replaceAll('.', '')
+        .replaceAll('?', '')
+        .replaceAll(',', '')
+        .split(' ');
 
     await Future.delayed(const Duration(milliseconds: 800));
 
@@ -237,7 +403,7 @@ class _PracticeSpeechPageState extends State<PracticeSpeechPage> {
       userId: currentUserId,
       practiceId: 0,
       referenceSentence: targetText,
-      recognizedText: _recognizedText ?? targetText,
+      recognizedText: recognizedText,
       overallScore: 88.0,
       wordScores: wordScores,
       mispronouncedWords: mispronounced,
@@ -286,7 +452,9 @@ class _PracticeSpeechPageState extends State<PracticeSpeechPage> {
     }
 
     if (mounted) {
-      context.read<LearningProgressProvider>().loadProgress(userId: currentUserId);
+      context
+          .read<LearningProgressProvider>()
+          .loadProgress(userId: currentUserId);
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -303,9 +471,10 @@ class _PracticeSpeechPageState extends State<PracticeSpeechPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final activeSentence = _sentences.isNotEmpty && _selectedSentenceIndex < _sentences.length
-        ? _sentences[_selectedSentenceIndex]
-        : null;
+    final activeSentence =
+        _sentences.isNotEmpty && _selectedSentenceIndex < _sentences.length
+            ? _sentences[_selectedSentenceIndex]
+            : null;
 
     return Column(
       children: [
@@ -356,9 +525,11 @@ class _PracticeSpeechPageState extends State<PracticeSpeechPage> {
                   FilledButton.tonalIcon(
                     style: FilledButton.styleFrom(
                       visualDensity: VisualDensity.compact,
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
                     ),
-                    icon: const Icon(Icons.add_circle_outline_rounded, size: 18),
+                    icon:
+                        const Icon(Icons.add_circle_outline_rounded, size: 18),
                     label: const Text('+ Thêm câu mới'),
                     onPressed: _openAddSentenceDialog,
                   ),
@@ -386,7 +557,8 @@ class _PracticeSpeechPageState extends State<PracticeSpeechPage> {
                             _loadSentences();
                           },
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 8),
                             decoration: BoxDecoration(
                               color: isSelected
                                   ? theme.colorScheme.primary
@@ -395,7 +567,8 @@ class _PracticeSpeechPageState extends State<PracticeSpeechPage> {
                               border: Border.all(
                                 color: isSelected
                                     ? theme.colorScheme.primary
-                                    : theme.colorScheme.outlineVariant.withAlpha(80),
+                                    : theme.colorScheme.outlineVariant
+                                        .withAlpha(80),
                               ),
                             ),
                             child: Text(
@@ -429,12 +602,14 @@ class _PracticeSpeechPageState extends State<PracticeSpeechPage> {
                 Card(
                   elevation: 0,
                   color: theme.colorScheme.surfaceContainerLow,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16)),
                   child: Padding(
                     padding: const EdgeInsets.all(24.0),
                     child: Column(
                       children: [
-                        const Icon(Icons.note_alt_outlined, size: 40, color: Colors.grey),
+                        const Icon(Icons.note_alt_outlined,
+                            size: 40, color: Colors.grey),
                         const SizedBox(height: 10),
                         const Text('Chưa có câu nào trong chủ đề này.'),
                         const SizedBox(height: 10),
@@ -453,7 +628,8 @@ class _PracticeSpeechPageState extends State<PracticeSpeechPage> {
                   color: theme.colorScheme.surfaceContainerLow,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
-                    side: BorderSide(color: theme.colorScheme.outlineVariant.withAlpha(80)),
+                    side: BorderSide(
+                        color: theme.colorScheme.outlineVariant.withAlpha(80)),
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
@@ -472,12 +648,14 @@ class _PracticeSpeechPageState extends State<PracticeSpeechPage> {
                                 letterSpacing: 1.1,
                               ),
                             ),
-                            if (activeSentence != null && activeSentence.isCustom)
+                            if (activeSentence != null &&
+                                activeSentence.isCustom)
                               Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 2),
                                     decoration: BoxDecoration(
                                       color: Colors.amber.shade100,
                                       borderRadius: BorderRadius.circular(8),
@@ -492,9 +670,12 @@ class _PracticeSpeechPageState extends State<PracticeSpeechPage> {
                                     ),
                                   ),
                                   IconButton(
-                                    icon: const Icon(Icons.delete_outline, size: 18, color: Color(0xFFD32F2F)),
+                                    icon: const Icon(Icons.delete_outline,
+                                        size: 18, color: Color(0xFFD32F2F)),
                                     tooltip: 'Xóa câu tự tạo này',
-                                    onPressed: () => _handleDeleteCustomSentence(activeSentence),
+                                    onPressed: () =>
+                                        _handleDeleteCustomSentence(
+                                            activeSentence),
                                   ),
                                 ],
                               ),
@@ -522,11 +703,13 @@ class _PracticeSpeechPageState extends State<PracticeSpeechPage> {
                                       });
                                     },
                                     child: Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10, vertical: 5),
                                       decoration: BoxDecoration(
                                         color: isSelected
                                             ? theme.colorScheme.primary
-                                            : theme.colorScheme.surfaceContainerHighest,
+                                            : theme.colorScheme
+                                                .surfaceContainerHighest,
                                         borderRadius: BorderRadius.circular(14),
                                       ),
                                       child: Text(
@@ -543,9 +726,9 @@ class _PracticeSpeechPageState extends State<PracticeSpeechPage> {
                                   ),
                                 ),
                               );
-                              }),
-                            ),
+                            }),
                           ),
+                        ),
                         const SizedBox(height: 12),
 
                         // Nội dung câu
@@ -601,7 +784,9 @@ class _PracticeSpeechPageState extends State<PracticeSpeechPage> {
                         children: [
                           Icon(
                             Icons.mic_rounded,
-                            color: _isRecording ? const Color(0xFFD32F2F) : theme.colorScheme.primary,
+                            color: _isRecording
+                                ? const Color(0xFFD32F2F)
+                                : theme.colorScheme.primary,
                           ),
                           const SizedBox(width: 8),
                           Text(
@@ -616,7 +801,7 @@ class _PracticeSpeechPageState extends State<PracticeSpeechPage> {
 
                       // Nút Micro lớn
                       GestureDetector(
-                        onTap: _toggleRecording,
+                        onTap: _isRecognizingSpeech ? null : _toggleRecording,
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 300),
                           width: 80,
@@ -629,7 +814,8 @@ class _PracticeSpeechPageState extends State<PracticeSpeechPage> {
                             boxShadow: _isRecording
                                 ? [
                                     BoxShadow(
-                                      color: const Color(0xFFD32F2F).withAlpha(120),
+                                      color: const Color(0xFFD32F2F)
+                                          .withAlpha(120),
                                       blurRadius: 20,
                                       spreadRadius: 4,
                                     ),
@@ -637,35 +823,103 @@ class _PracticeSpeechPageState extends State<PracticeSpeechPage> {
                                 : null,
                           ),
                           child: Icon(
-                            _isRecording ? Icons.stop_rounded : Icons.mic_rounded,
+                            _isRecording
+                                ? Icons.stop_rounded
+                                : Icons.mic_rounded,
                             size: 40,
-                            color: _isRecording ? Colors.white : theme.colorScheme.primary,
+                            color: _isRecording
+                                ? Colors.white
+                                : theme.colorScheme.primary,
                           ),
                         ),
                       ),
                       const SizedBox(height: 12),
 
                       Text(
-                        _isRecording
-                            ? 'Đang ghi âm: 00:${_recordingSeconds.toString().padLeft(2, '0')} (Nhấn để dừng)'
-                            : 'Nhấn vào micro để bắt đầu nói',
+                        _isRecognizingSpeech
+                            ? 'Đang nghe. Hãy đọc câu tiếng Anh để nhận dạng.'
+                            : _isRecording
+                                ? 'Đang ghi âm: 00:${_recordingSeconds.toString().padLeft(2, '0')} (Nhấn để dừng)'
+                                : _recordedAudioPath != null
+                                    ? 'Đã ghi âm. Đọc lại câu khi nhấn nút nhận dạng.'
+                                    : 'Nhấn vào micro để bắt đầu ghi âm.',
                         style: theme.textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.w600,
-                          color: _isRecording ? const Color(0xFFD32F2F) : theme.colorScheme.onSurfaceVariant,
+                          color: _isRecording || _isRecognizingSpeech
+                              ? const Color(0xFFD32F2F)
+                              : theme.colorScheme.onSurfaceVariant,
                         ),
                       ),
+                      if (_isRecording) ...[
+                        const SizedBox(height: 8),
+                        Text(
+                          'Tín hiệu micro: ${_currentMicLevel.toStringAsFixed(0)} dBFS',
+                          style: theme.textTheme.bodySmall,
+                        ),
+                        LinearProgressIndicator(
+                          value: ((_currentMicLevel + 60) / 60)
+                              .clamp(0.0, 1.0)
+                              .toDouble(),
+                        ),
+                      ],
+
+                      if (_recordedAudioPath != null) ...[
+                        const SizedBox(height: 12),
+                        ElevatedButton.icon(
+                          onPressed: _isRecognizingSpeech
+                              ? null
+                              : _recognizeRecordedSpeech,
+                          icon: _isRecognizingSpeech
+                              ? const SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Icon(Icons.record_voice_over),
+                          label: Text(
+                            _isRecognizingSpeech
+                                ? 'Đang nhận dạng...'
+                                : 'Đọc lại câu để nhận dạng',
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        StreamBuilder<PlayerState>(
+                          stream: _audioPlayer.playerStateStream,
+                          builder: (context, snapshot) {
+                            final isPlaying =
+                                snapshot.data?.playing ?? _audioPlayer.playing;
+                            return ElevatedButton.icon(
+                              onPressed: _isRecognizingSpeech
+                                  ? null
+                                  : _playRecordedAudio,
+                              icon: Icon(
+                                isPlaying ? Icons.pause_rounded : Icons.replay,
+                              ),
+                              label: Text(
+                                isPlaying
+                                    ? 'Tạm dừng phát lại'
+                                    : 'Nghe lại đoạn vừa ghi',
+                              ),
+                            );
+                          },
+                        ),
+                      ],
 
                       if (_recognizedText != null) ...[
                         const SizedBox(height: 16),
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: theme.colorScheme.surfaceContainerHighest.withAlpha(100),
+                            color: theme.colorScheme.surfaceContainerHighest
+                                .withAlpha(100),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.record_voice_over_outlined, size: 20),
+                              const Icon(Icons.record_voice_over_outlined,
+                                  size: 20),
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
@@ -691,7 +945,8 @@ class _PracticeSpeechPageState extends State<PracticeSpeechPage> {
                 color: theme.colorScheme.surfaceContainerLow,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
-                  side: BorderSide(color: theme.colorScheme.outlineVariant.withAlpha(80)),
+                  side: BorderSide(
+                      color: theme.colorScheme.outlineVariant.withAlpha(80)),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(20.0),
@@ -700,7 +955,8 @@ class _PracticeSpeechPageState extends State<PracticeSpeechPage> {
                     children: [
                       Row(
                         children: [
-                          Icon(Icons.auto_awesome_rounded, color: theme.colorScheme.primary),
+                          Icon(Icons.auto_awesome_rounded,
+                              color: theme.colorScheme.primary),
                           const SizedBox(width: 8),
                           Text(
                             'Khu vực TV5: Đánh giá & Chấm điểm phát âm',
@@ -711,7 +967,6 @@ class _PracticeSpeechPageState extends State<PracticeSpeechPage> {
                         ],
                       ),
                       const SizedBox(height: 16),
-
                       if (_latestResult == null) ...[
                         FilledButton.tonalIcon(
                           onPressed: _isScoring ? null : _evaluatePronunciation,
@@ -719,7 +974,8 @@ class _PracticeSpeechPageState extends State<PracticeSpeechPage> {
                               ? const SizedBox(
                                   width: 16,
                                   height: 16,
-                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                  child:
+                                      CircularProgressIndicator(strokeWidth: 2),
                                 )
                               : const Icon(Icons.analytics_outlined),
                           label: Text(_isScoring
@@ -733,7 +989,8 @@ class _PracticeSpeechPageState extends State<PracticeSpeechPage> {
                           decoration: BoxDecoration(
                             color: const Color(0xFF2E7D32).withAlpha(20),
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: const Color(0xFF2E7D32).withAlpha(80)),
+                            border: Border.all(
+                                color: const Color(0xFF2E7D32).withAlpha(80)),
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -772,7 +1029,8 @@ class _PracticeSpeechPageState extends State<PracticeSpeechPage> {
                           children: (_latestResult!.wordScores ?? []).map((w) {
                             final isGood = (w.score ?? 0) >= 80;
                             return Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 6),
                               decoration: BoxDecoration(
                                 color: isGood
                                     ? const Color(0xFFE8F5E9) // Xanh lá nhạt
@@ -801,11 +1059,13 @@ class _PracticeSpeechPageState extends State<PracticeSpeechPage> {
                         const SizedBox(height: 12),
 
                         // Nhận xét & gợi ý
-                        if (_latestResult!.feedback != null || _latestResult!.suggestions != null)
+                        if (_latestResult!.feedback != null ||
+                            _latestResult!.suggestions != null)
                           Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: theme.colorScheme.surfaceContainerHighest.withAlpha(80),
+                              color: theme.colorScheme.surfaceContainerHighest
+                                  .withAlpha(80),
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: Column(
@@ -813,9 +1073,11 @@ class _PracticeSpeechPageState extends State<PracticeSpeechPage> {
                               children: [
                                 if (_latestResult!.feedback != null)
                                   Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      const Icon(Icons.feedback_outlined, size: 18),
+                                      const Icon(Icons.feedback_outlined,
+                                          size: 18),
                                       const SizedBox(width: 8),
                                       Expanded(
                                         child: Text(
@@ -828,9 +1090,13 @@ class _PracticeSpeechPageState extends State<PracticeSpeechPage> {
                                 if (_latestResult!.suggestions != null) ...[
                                   const SizedBox(height: 6),
                                   Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      const Icon(Icons.tips_and_updates_outlined, size: 18, color: Color(0xFFF57C00)),
+                                      const Icon(
+                                          Icons.tips_and_updates_outlined,
+                                          size: 18,
+                                          color: Color(0xFFF57C00)),
                                       const SizedBox(width: 8),
                                       Expanded(
                                         child: Text(
@@ -852,7 +1118,8 @@ class _PracticeSpeechPageState extends State<PracticeSpeechPage> {
                             Expanded(
                               child: FilledButton.icon(
                                 icon: const Icon(Icons.save_rounded),
-                                label: const Text('Lưu kết quả học tập vào CSDL'),
+                                label:
+                                    const Text('Lưu kết quả học tập vào CSDL'),
                                 onPressed: _saveResultToDatabase,
                               ),
                             ),

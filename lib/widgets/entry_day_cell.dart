@@ -16,6 +16,7 @@ import 'package:daily_you/utils/tag_visuals.dart';
 import 'package:daily_you/widgets/attachment_cover_thumbnail.dart';
 import 'package:daily_you/widgets/day_menu.dart';
 import 'package:daily_you/widgets/tag_icon_glyph.dart';
+import 'package:daily_you/widgets/pixel_snap.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
 import 'package:provider/provider.dart';
@@ -118,14 +119,16 @@ class EntryDayCell extends StatelessWidget {
         ),
       );
     }
-    return Container(
-      width: 23,
-      height: 23,
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        shape: BoxShape.circle,
+    return PixelSnap(
+      child: Container(
+        width: 23,
+        height: 23,
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          shape: BoxShape.circle,
+        ),
+        child: Center(child: _buildTagIconGlyph(tag, color, 13, 14)),
       ),
-      child: Center(child: _buildTagIconGlyph(tag, color, 13, 14)),
     );
   }
 
@@ -146,14 +149,16 @@ class EntryDayCell extends StatelessWidget {
             align: TextAlign.center),
       );
     }
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        shape: BoxShape.circle,
+    return PixelSnap(
+      child: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          shape: BoxShape.circle,
+        ),
+        child: Center(child: _buildTagIconGlyph(tag, color, 22, 26)),
       ),
-      child: Center(child: _buildTagIconGlyph(tag, color, 22, 26)),
     );
   }
 
@@ -229,8 +234,6 @@ class EntryDayCell extends StatelessWidget {
           getEntries: () => entriesProvider.entries
               .where((entry) => TimeManager.isSameCalendarDayOfYear(
                   entry.timeCreate, date, isJalali))
-              .toList()
-              .reversed
               .toList(),
           labelBuilder: (context, entry) =>
               TimeManager.formatYear(entry.timeCreate, context),
@@ -309,7 +312,8 @@ class EntryDayCell extends StatelessWidget {
                             : !showImages &&
                                     showMood &&
                                     firstEntry?.mood != null
-                                ? Container(
+                                ? PixelSnap(
+                                    child: Container(
                                     width: 40,
                                     height: 40,
                                     decoration: BoxDecoration(
@@ -323,7 +327,7 @@ class EntryDayCell extends StatelessWidget {
                                         allowScaling: false,
                                       ),
                                     ),
-                                  )
+                                  ))
                                 : Text(
                                     '${isJalali ? TimeManager.jalaliDayNumber(date) : date.day}',
                                     style: TextStyle(
@@ -343,7 +347,8 @@ class EntryDayCell extends StatelessWidget {
                 child: isMulti
                     ? _countBadge(context, entries.length)
                     : showImages && showMood && firstEntry!.mood != null
-                        ? Container(
+                        ? PixelSnap(
+                            child: Container(
                             width: 23,
                             height: 23,
                             decoration: BoxDecoration(
@@ -357,7 +362,7 @@ class EntryDayCell extends StatelessWidget {
                                 allowScaling: false,
                               ),
                             ),
-                          )
+                          ))
                         : const SizedBox.shrink(),
               ),
               Positioned(

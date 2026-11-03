@@ -371,6 +371,22 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get settingsFlashbacksViewLayout => 'Bố cục hiển thị hồi tưởng';
+  String get moodVeryUnpleasant => 'Very Unpleasant';
+
+  @override
+  String get moodUnpleasant => 'Unpleasant';
+
+  @override
+  String get moodNeutral => 'Neutral';
+
+  @override
+  String get moodPleasant => 'Pleasant';
+
+  @override
+  String get moodVeryPleasant => 'Very Pleasant';
+
+  @override
+  String get settingsFlashbacksViewLayout => 'Flashbacks View Layout';
 
   @override
   String get settingsGalleryViewLayout => 'Bố cục hiển thị thư viện';

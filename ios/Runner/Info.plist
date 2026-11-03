@@ -24,6 +24,10 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Daily You uses the microphone to record and recognize your pronunciation.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Daily You uses speech recognition to transcribe your English practice.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

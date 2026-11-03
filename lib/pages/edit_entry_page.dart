@@ -274,18 +274,10 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
             },
             child: Scaffold(
               appBar: AppBar(
-                  leading: BackButton(
-                    onPressed: () {
-                      // Pop edit page
-                      Navigator.of(context).pop();
-                      if (!_creatingNewEntry &&
-                          Navigator.of(context).canPop()) {
-                        // Pop view page
-                        Navigator.of(context).pop();
-                      }
-                    },
-                  ),
-                  actions: [_deleteButton(), _closeButton()]),
+                iconTheme: Theme.of(context).iconTheme,
+                leading: _deleteButton(),
+                actions: [_closeButton()],
+              ),
               body: EditorActionBarOverlay(
                 keyboardInset: keyboardInset,
                 body: LayoutBuilder(
@@ -521,12 +513,13 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
 
   Widget _deleteButton() => IconButton(
         icon: const Icon(Icons.delete),
+        tooltip: MaterialLocalizations.of(context).deleteButtonTooltip,
         onPressed: () => _showDeleteEntryPopup(),
       );
 
   Widget _closeButton() => IconButton(
-        icon: Icon(
-            _creatingNewEntry ? Icons.check_rounded : Icons.edit_off_rounded),
+        icon: const Icon(Icons.check_rounded),
+        tooltip: MaterialLocalizations.of(context).okButtonLabel,
         onPressed: () => Navigator.of(context).pop(),
       );
 
@@ -534,7 +527,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
     DateTime? pickedDate = await TimeManager.pickDate(
       context,
       initialDate: entryDate!,
-      firstDate: DateTime(2000),
+      firstDate: TimeManager.minEntryDate,
       lastDate: DateTime.now(),
     );
     if (pickedDate == null) return;
@@ -549,7 +542,10 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
 
   Future<void> _chooseTime() async {
     final pickedTime = await showTimePicker(
-        context: context, initialTime: TimeOfDay.fromDateTime(entryDate!));
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(entryDate!),
+      builder: (context, child) => AppDialogTransition(child: child!),
+    );
     if (pickedTime == null) return;
 
     entryDate = entryDate!.copyWith(

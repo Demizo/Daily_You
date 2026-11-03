@@ -104,40 +104,46 @@ class _EntryAttachmentEditableListState
     final totalCount = _attachments.length + pendingCount;
     if (totalCount == 0) return const SizedBox.shrink();
     if (totalCount > 1) {
-      return SizedBox(
-        height: 160,
-        child: ReorderableListView.builder(
-            scrollController: _scrollController,
-            scrollDirection: Axis.horizontal,
-            proxyDecorator: _proxyDecorator,
-            footer: pendingCount == 0
-                ? null
-                : Row(children: [
-                    for (var i = 0; i < pendingCount; i++)
-                      const SizedBox(
-                          width: 160, height: 160, child: _PendingTile()),
-                  ]),
-            itemBuilder: (context, index) {
-              return SizedBox(
-                key: ValueKey(
-                    (_attachments[index].type, _attachments[index].filePath)),
-                width: 160,
-                height: 160,
-                child: editableWidget(
-                  index,
-                ),
-              );
-            },
-            itemCount: _attachments.length,
-            onReorderItem: (int oldIndex, int newIndex) {
-              final EntryAttachment attachment =
-                  _attachments.removeAt(oldIndex);
-              _attachments.insert(newIndex, attachment);
-              _updateAttachmentRanks();
-              setState(() {});
-              widget.onAttachmentsChanged(List.of(_attachments));
-            }),
-      );
+      return LayoutBuilder(builder: (context, constraints) {
+        final tileExtent = attachmentTileExtent(
+            availableWidth: constraints.maxWidth, attachmentCount: totalCount);
+        return SizedBox(
+          height: tileExtent,
+          child: ReorderableListView.builder(
+              scrollController: _scrollController,
+              scrollDirection: Axis.horizontal,
+              proxyDecorator: _proxyDecorator,
+              footer: pendingCount == 0
+                  ? null
+                  : Row(children: [
+                      for (var i = 0; i < pendingCount; i++)
+                        SizedBox(
+                            width: tileExtent,
+                            height: tileExtent,
+                            child: const _PendingTile()),
+                    ]),
+              itemBuilder: (context, index) {
+                return SizedBox(
+                  key: ValueKey(
+                      (_attachments[index].type, _attachments[index].filePath)),
+                  width: tileExtent,
+                  height: tileExtent,
+                  child: editableWidget(
+                    index,
+                  ),
+                );
+              },
+              itemCount: _attachments.length,
+              onReorderItem: (int oldIndex, int newIndex) {
+                final EntryAttachment attachment =
+                    _attachments.removeAt(oldIndex);
+                _attachments.insert(newIndex, attachment);
+                _updateAttachmentRanks();
+                setState(() {});
+                widget.onAttachmentsChanged(List.of(_attachments));
+              }),
+        );
+      });
     } else {
       return Center(
           child: SizedBox(

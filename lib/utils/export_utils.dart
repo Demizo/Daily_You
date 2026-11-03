@@ -13,12 +13,12 @@ import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_attachments_provider.dart';
+import 'package:daily_you/providers/mood_scale_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/utils/operation_outcome.dart';
 import 'package:daily_you/utils/zip_utils.dart';
 import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/attachment_type_presentation.dart';
-import 'package:daily_you/widgets/mood_icon.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart';
@@ -63,8 +63,12 @@ class ExportUtils {
       final entries = EntriesProvider.instance.entries;
       final totalLogs = entries.length;
       int processedLogs = 0;
-      final writer =
-          MarkdownExportWriter(noteStore: exportStore, locale: locale);
+      final writer = MarkdownExportWriter(
+        noteStore: exportStore,
+        locale: locale,
+        moodPrefixOf: (mood) =>
+            MoodScaleProvider.instance.moodPrefixOf(mood, localizations),
+      );
 
       for (Entry entry in entries) {
         final attachments = <(EntryAttachment, String)>[];
@@ -158,10 +162,15 @@ class ExportUtils {
 }
 
 class MarkdownExportWriter {
-  MarkdownExportWriter({required this.noteStore, required this.locale});
+  MarkdownExportWriter({
+    required this.noteStore,
+    required this.locale,
+    required this.moodPrefixOf,
+  });
 
   final FileStore noteStore;
   final String locale;
+  final String Function(int? mood) moodPrefixOf;
 
   final Map<String, String> attachmentSources = {};
 
@@ -188,10 +197,9 @@ class MarkdownExportWriter {
       attachmentSources['$folderName/$prettyName'] = sourcePath;
     }
 
-    final moodText =
-        entry.mood != null ? "${MoodIcon.getMoodIcon(entry.mood)} " : "";
+    final moodPrefix = moodPrefixOf(entry.mood);
     noteBody.writeln(
-        "$moodText${DateFormat.yMMMEd(locale).format(entry.timeCreate)}\n${entry.text}");
+        "$moodPrefix${DateFormat.yMMMEd(locale).format(entry.timeCreate)}\n${entry.text}");
 
     await noteStore.write(
         "log_$timestamp$indexSuffix.md", utf8.encode(noteBody.toString()));

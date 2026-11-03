@@ -5,6 +5,7 @@
 import 'dart:convert';
 
 import 'package:daily_you/models/entry.dart';
+import 'package:daily_you/models/mood.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/storage/storage_picker.dart';
 import 'package:daily_you/utils/imports/import_helpers.dart';
@@ -38,7 +39,7 @@ Future<OperationOutcome> importFromPixels(Function(String) updateStatus) async {
           int avgMood =
               (entry['scores'] as List<dynamic>).reduce((a, b) => a + b) ~/
                   entry['scores'].length;
-          int mappedMood = avgMood - 3;
+          int mappedMood = Mood.fromRating(avgMood);
 
           await EntriesProvider.instance.add(
               Entry(

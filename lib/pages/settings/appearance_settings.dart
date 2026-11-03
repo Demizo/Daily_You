@@ -6,13 +6,12 @@ import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/color_picker_dialog.dart';
-import 'package:daily_you/widgets/mood_icon.dart';
+import 'package:daily_you/widgets/mood_scale_setting.dart';
 import 'package:daily_you/widgets/settings_dropdown.dart';
 import 'package:daily_you/widgets/settings_icon_action.dart';
 import 'package:daily_you/widgets/settings_toggle.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:daily_you/theme_mode_provider.dart';
 
@@ -40,80 +39,6 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
       themeProvider.accentColor = result!.color!;
       themeProvider.updateAccentColor();
     }
-  }
-
-  void _showMoodEmojiPopup(int? value) {
-    String newEmoji = '';
-    showAppDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Center(
-            child: MoodIcon(
-              moodValue: value,
-              size: 32,
-            ),
-          ),
-          actions: [
-            TextButton(
-              child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
-              onPressed: () async {
-                Navigator.pop(context);
-              },
-            ),
-            TextButton(
-              child: Text(MaterialLocalizations.of(context).okButtonLabel),
-              onPressed: () async {
-                if (newEmoji.isNotEmpty) {
-                  if (value != null) {
-                    await ConfigProvider.instance
-                        .set(Settings.moodIcons[value]!, newEmoji);
-                  }
-                }
-                if (!context.mounted) return;
-                Navigator.pop(context);
-              },
-            ),
-          ],
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                AppLocalizations.of(context)!.moodIconPrompt,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(height: 16),
-              Card.filled(
-                color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                child: SizedBox(
-                  width: 96,
-                  height: 96,
-                  child: Center(
-                    child: TextField(
-                      autofocus: true,
-                      textAlign: TextAlign.center,
-                      textAlignVertical: TextAlignVertical.center,
-                      style: Theme.of(context).textTheme.headlineLarge,
-                      inputFormatters: [
-                        LengthLimitingTextInputFormatter(
-                            1), // Limit to one character
-                      ],
-                      onChanged: (value) {
-                        newEmoji = value;
-                      },
-                      decoration: const InputDecoration(
-                        hintText: '?',
-                        border: InputBorder.none,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
   }
 
   void _showHideImagesDialog(
@@ -182,26 +107,6 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
     );
   }
 
-  Future _resetMoodIcons() async {
-    for (final setting in Settings.moodIcons.values) {
-      await ConfigProvider.instance.set(setting, setting.defaultValue);
-    }
-  }
-
-  Widget moodIconButton(int? index) {
-    return GestureDetector(
-      child: Card.filled(
-          color: Theme.of(context).colorScheme.surfaceContainer,
-          child: Padding(
-            padding: const EdgeInsets.all(4.0),
-            child: Container(
-                constraints: const BoxConstraints(minWidth: 32),
-                child: Center(child: MoodIcon(moodValue: index, size: 24))),
-          )),
-      onTap: () => _showMoodEmojiPopup(index),
-    );
-  }
-
   List<DropdownMenuItem<String>> _buildFirstDayOfWeekDropdownItems(
       BuildContext context) {
     final dayLabels = TimeManager.daysOfWeekLabels(context);
@@ -235,6 +140,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
       ),
       body: ListView(
         children: [
+          const MoodScaleSetting(),
           SettingsDropdown<String>(
               title: AppLocalizations.of(context)!.settingsTheme,
               value: configProvider.get(Settings.theme),
@@ -348,33 +254,6 @@ class _AppearanceSettingsPageState extends State<AppearanceSettings> {
             title: AppLocalizations.of(context)!.settingsHideImages,
             icon: const Icon(Icons.chevron_right_rounded),
             onPressed: () => _showHideImagesDialog(context, configProvider),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
-            child: Text(
-              AppLocalizations.of(context)!.settingsChangeMoodIcons,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    moodIconButton(-2),
-                    moodIconButton(-1),
-                    moodIconButton(0),
-                    moodIconButton(1),
-                    moodIconButton(2),
-                  ],
-                ),
-                IconButton(
-                    onPressed: _resetMoodIcons,
-                    icon: const Icon(Icons.refresh_rounded))
-              ],
-            ),
           ),
         ],
       ),

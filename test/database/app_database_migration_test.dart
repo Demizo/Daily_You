@@ -4,11 +4,16 @@
 
 import 'dart:io';
 
+import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/database/app_database.dart';
+import 'package:daily_you/models/mood_scale_level.dart';
+import 'package:daily_you/models/mood_scale_preset.dart';
 import 'package:daily_you/models/attachment.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' show join;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+
+import '../support/config_provider_harness.dart';
 
 typedef _Image = (int id, int entryId, String? path, int rank, String time);
 
@@ -160,7 +165,8 @@ CREATE TABLE template_tags (
           'tag_categories',
           'tags',
           'entry_tags',
-          'template_tags'
+          'template_tags',
+          'mood_scale'
         ]));
     expect(tables, isNot(contains('entry_images')));
     expect(tables, isNot(contains('old_entries')));
@@ -229,6 +235,78 @@ CREATE TABLE template_tags (
     await old.delete('entry_images', where: 'id IN (11, 12)');
     await old.close();
   }
+
+  group('from schema version 6', () {
+    useTemporaryConfig();
+
+    Future<void> createVersion6(List<int?> moods) async {
+      final old = await databaseFactory.openDatabase(path,
+          options: OpenDatabaseOptions(
+              version: 6, onCreate: (db, _) => db.execute(entries)));
+      for (final (index, mood) in moods.indexed) {
+        await old.insert('entries', {
+          'id': index + 1,
+          'text': 'entry $index',
+          'mood': mood,
+        });
+      }
+      await old.close();
+    }
+
+    test('moves each mood from the old scale onto the new one', () async {
+      await createVersion6([-2, -1, 0, 1, 2, null]);
+
+      final db = await upgrade();
+
+      final rows = await db.query('entries', orderBy: 'id');
+      expect(rows.map((row) => row['mood']), [1, 2, 3, 4, 5, null]);
+      await db.close();
+    });
+
+    test('seeds the emoji look when no mood icon was changed', () async {
+      await createVersion6([]);
+
+      final db = await upgrade();
+
+      final levels = (await db.query('mood_scale', orderBy: 'mood'))
+          .map(MoodScaleLevel.fromJson);
+      expect(levels.map((level) => level.toJson()),
+          MoodScalePreset.emoji.levels.map((level) => level.toJson()));
+      await db.close();
+    });
+
+    test('seeds the changed mood icons with the default colors', () async {
+      await createVersion6([]);
+      await ConfigProvider.instance.set(Settings.verySadIcon, '😭');
+      await ConfigProvider.instance.set(Settings.veryHappyIcon, '😁');
+
+      final db = await upgrade();
+
+      final levels = (await db.query('mood_scale', orderBy: 'mood'))
+          .map(MoodScaleLevel.fromJson)
+          .toList();
+      expect(levels.map((level) => level.icon), ['😭', '😕', '😐', '🙂', '😁']);
+      expect(levels.map((level) => level.color),
+          MoodScalePreset.emoji.levels.map((level) => level.color));
+      expect(levels.map((level) => level.label), everyElement(isNull));
+      await db.close();
+    });
+
+    test('leaves moods alone when the mood scale already exists', () async {
+      await createVersion6([-2, 2]);
+      final upgraded = await upgrade();
+      await upgraded.close();
+      final relabelled = await databaseFactory.openDatabase(path);
+      await relabelled.setVersion(6);
+      await relabelled.close();
+
+      final db = await upgrade();
+
+      final rows = await db.query('entries', orderBy: 'id');
+      expect(rows.map((row) => row['mood']), [1, 5]);
+      await db.close();
+    });
+  });
 
   group('from schema version 5', () {
     Future<void> createVersion5(String entryImagesDdl) => createImageDatabase(
@@ -491,7 +569,7 @@ CREATE TABLE template_tags (
         {
           'id': 1,
           'text': 'one',
-          'mood': 1,
+          'mood': 4,
           'time_create': '2024-03-02T09:30:00.000',
           'time_modified': '2024-03-02T09:31:00.000',
         },

@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
+import 'package:daily_you/utils/color_utils.dart';
+import 'package:daily_you/utils/search_highlight.dart';
 import 'package:daily_you/widgets/markdown_highlight_syntax.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:markdown_widget/markdown_widget.dart';
@@ -14,6 +16,7 @@ class ScaledMarkdown extends StatelessWidget {
   final double scaleFactor;
   final bool compact;
   final bool selectable;
+  final String highlightQuery;
 
   const ScaledMarkdown({
     super.key,
@@ -22,6 +25,7 @@ class ScaledMarkdown extends StatelessWidget {
     this.scaleFactor = 1,
     this.compact = false,
     this.selectable = true,
+    this.highlightQuery = '',
   });
 
   @override
@@ -58,7 +62,7 @@ class ScaledMarkdown extends StatelessWidget {
       config: config,
       generator: MarkdownGenerator(
         inlineSyntaxList: [HighlightSyntax()],
-        generators: [highlightGenerator(Colors.yellow.shade700)],
+        generators: [highlightGenerator(highlightBackgroundColor)],
         richTextBuilder: (span) {
           return Builder(builder: (context) {
             final shouldIgnoreTextScaler =
@@ -66,7 +70,7 @@ class ScaledMarkdown extends StatelessWidget {
                     null;
 
             final child = Text.rich(
-              span,
+              highlightSpan(span, highlightQuery, highlightBackgroundColor),
               textScaler:
                   shouldIgnoreTextScaler ? TextScaler.noScaling : customScaler,
             );

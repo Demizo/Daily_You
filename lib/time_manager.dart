@@ -6,11 +6,15 @@ import 'dart:ui' show PlatformDispatcher;
 
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/utils/jalali_calendar_delegate.dart';
+import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 
 class TimeManager {
+  // Gregorian calendar introduced; earlier dates would be proleptic
+  static final DateTime minEntryDate = DateTime(1583, 1, 1);
+
   static bool isToday(DateTime date) {
     return isSameDay(DateTime.now(), date);
   }
@@ -169,8 +173,9 @@ class TimeManager {
     final isJalali = isJalaliCalendar(context);
     final picked = await showDatePicker(
       context: context,
+      builder: (context, child) => AppDialogTransition(child: child!),
       initialDate: initialDate,
-      firstDate: firstDate,
+      firstDate: initialDate.isBefore(firstDate) ? initialDate : firstDate,
       lastDate: lastDate,
       selectableDayPredicate: selectableDayPredicate == null
           ? null

@@ -3,6 +3,7 @@
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
 import 'package:daily_you/models/entry.dart';
+import 'package:daily_you/models/mood.dart';
 import 'package:daily_you/stats/streaks.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shamsi_date/shamsi_date.dart';
@@ -116,12 +117,21 @@ void main() {
     expect(streaks.longest, 2);
   });
 
+  test('ignores entries without a mood when looking for a bad day', () {
+    final streaks = calculateStreaks(
+      [entryAt(DateTime(2025, 6, 2))],
+      now: DateTime(2025, 6, 2, 18),
+    );
+
+    expect(streaks.daysSinceBadDay, isNull);
+  });
+
   test('measures the days since the most recent bad day', () {
     final streaks = calculateStreaks(
       [
-        entryAt(DateTime(2025, 6, 2), mood: 2),
-        entryAt(DateTime(2025, 5, 30), mood: -1),
-        entryAt(DateTime(2025, 5, 20), mood: -2),
+        entryAt(DateTime(2025, 6, 2), mood: Mood.levels.last),
+        entryAt(DateTime(2025, 5, 30), mood: Mood.levels[1]),
+        entryAt(DateTime(2025, 5, 20), mood: Mood.levels.first),
       ],
       now: DateTime(2025, 6, 2, 18),
     );

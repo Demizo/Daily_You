@@ -27,20 +27,20 @@ Future<T?> showAppDialog<T>({
       curve: _enterCurve,
       reverseCurve: _exitCurve,
     ),
-    builder: (context) => _DialogSlide(child: builder(context)),
+    builder: (context) => AppDialogTransition(child: builder(context)),
   );
 }
 
-class _DialogSlide extends StatefulWidget {
-  const _DialogSlide({required this.child});
+class AppDialogTransition extends StatefulWidget {
+  const AppDialogTransition({super.key, required this.child});
 
   final Widget child;
 
   @override
-  State<_DialogSlide> createState() => _DialogSlideState();
+  State<AppDialogTransition> createState() => _AppDialogTransitionState();
 }
 
-class _DialogSlideState extends State<_DialogSlide> {
+class _AppDialogTransitionState extends State<AppDialogTransition> {
   CurvedAnimation? _progress;
 
   @override

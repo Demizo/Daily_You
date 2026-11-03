@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
-import 'package:daily_you/layouts/wide_screen.dart';
+import 'package:daily_you/layouts/window_size_class.dart';
 import 'package:daily_you/utils/duration_format.dart';
 import 'package:daily_you/widgets/expressive_icon_button.dart';
 import 'package:material_ui/material_ui.dart';
@@ -38,7 +38,7 @@ class _MediaPlaybackControlsState extends State<MediaPlaybackControls> {
 
   @override
   Widget build(BuildContext context) {
-    final isWide = isWideScreen(context);
+    final isWide = WindowSizeClass.of(context).isWide;
     final totalMs = widget.duration.inMilliseconds;
     final sliderMax = totalMs == 0 ? 1.0 : totalMs.toDouble();
     final positionMs = (_dragValue ?? widget.position.inMilliseconds.toDouble())

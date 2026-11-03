@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
-import 'package:daily_you/config_provider.dart';
-import 'package:daily_you/widgets/material_shapes.dart';
+import 'package:daily_you/models/mood.dart';
+import 'package:daily_you/widgets/morphing_burst.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
+import 'package:daily_you/widgets/pixel_snap.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
-import 'package:provider/provider.dart';
 
 class MoodSummaryChart extends StatelessWidget {
   final Map<int, int> moodCounts;
@@ -16,22 +16,18 @@ class MoodSummaryChart extends StatelessWidget {
   const MoodSummaryChart(
       {super.key, required this.moodCounts, required this.hasData});
 
-  static const _moodOrder = [2, 1, 0, -1, -2];
   static const _barHeight = 44.0;
   static const _iconSize = 40.0;
   static const _countWidth = 44.0;
   static const _gap = 4.0;
 
-  static const _dummyMoodCounts = {2: 4, 1: 8, 0: 9, -1: 3, -2: 1};
+  static final _dummyMoodCounts = {
+    for (final (position, count) in [1, 3, 9, 8, 4].indexed)
+      Mood.fromPosition(position): count,
+  };
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ConfigProvider>(
-      builder: (context, configProvider, child) => _buildChart(context),
-    );
-  }
-
-  Widget _buildChart(BuildContext context) {
     final isRtl = Directionality.of(context) == TextDirection.rtl;
     final displayCounts = hasData ? moodCounts : _dummyMoodCounts;
     final maxCount = displayCounts.values.reduce((a, b) => a > b ? a : b);
@@ -65,7 +61,7 @@ class MoodSummaryChart extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(8),
                   child: Column(
-                    children: _moodOrder.map((mood) {
+                    children: Mood.levels.reversed.map((mood) {
                       final count = displayCounts[mood] ?? 0;
                       return _MoodBarRow(
                         mood: mood,
@@ -207,10 +203,13 @@ class _MoodBarRow extends StatelessWidget {
       return SizedBox(
         width: iconSize,
         height: iconSize,
-        child: ClipPath(
-          clipper: SoftBurstClipper(),
-          child: Container(
-            color: surface,
+        child: PixelSnap(
+          child: CustomPaint(
+            painter: MorphingBurstPainter(
+              progress: 1,
+              color: surface,
+              radiusScale: 0.9,
+            ),
             child: Center(child: icon),
           ),
         ),
@@ -222,9 +221,11 @@ class _MoodBarRow extends StatelessWidget {
       height: iconSize,
       child: Padding(
         padding: const EdgeInsets.all(4.0),
-        child: Container(
-          decoration: BoxDecoration(color: surface, shape: BoxShape.circle),
-          child: Center(child: icon),
+        child: PixelSnap(
+          child: Container(
+            decoration: BoxDecoration(color: surface, shape: BoxShape.circle),
+            child: Center(child: icon),
+          ),
         ),
       ),
     );

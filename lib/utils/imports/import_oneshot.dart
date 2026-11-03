@@ -5,6 +5,7 @@
 import 'dart:convert';
 
 import 'package:daily_you/models/entry.dart';
+import 'package:daily_you/models/mood.dart';
 import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_attachments_provider.dart';
@@ -27,12 +28,12 @@ Future<OperationOutcome> importFromOneShot(
     if (bytes == null) return const OperationOutcome.failed();
     final jsonData = json.decode(utf8.decode(bytes.toList()));
 
-    const happinessMapping = {
-      "VERY_SAD": -2,
-      "SAD": -1,
-      "NEUTRAL": 0,
-      "HAPPY": 1,
-      "VERY_HAPPY": 2,
+    final moodByHappiness = {
+      "VERY_SAD": Mood.veryUnpleasant,
+      "SAD": Mood.unpleasant,
+      "NEUTRAL": Mood.neutral,
+      "HAPPY": Mood.pleasant,
+      "VERY_HAPPY": Mood.veryPleasant,
     };
 
     final totalEntries = jsonData.length;
@@ -42,7 +43,7 @@ Future<OperationOutcome> importFromOneShot(
       final createdTimestamp = entry['created'];
       final createdDateTime =
           DateTime.fromMillisecondsSinceEpoch(createdTimestamp * 1000);
-      final mood = happinessMapping[entry['happiness']];
+      final mood = moodByHappiness[entry['happiness']];
 
       if (!EntriesProvider.instance.hasEntryAtTimestamp(createdDateTime)) {
         var addedEntry = await EntriesProvider.instance.add(

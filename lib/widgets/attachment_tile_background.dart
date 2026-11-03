@@ -5,11 +5,25 @@
 import 'dart:typed_data';
 
 import 'package:daily_you/models/attachment.dart';
+import 'package:daily_you/utils/carousel_layout.dart';
 import 'package:daily_you/widgets/attachment_type_presentation.dart';
 import 'package:daily_you/widgets/audio_waveform_decoration.dart';
 import 'package:daily_you/widgets/local_image_loader.dart';
 import 'package:daily_you/widgets/video_thumbnail_cache.dart';
 import 'package:material_ui/material_ui.dart';
+
+const attachmentTileSize = 168.0;
+
+double attachmentTileExtent({
+  required double availableWidth,
+  required int attachmentCount,
+}) =>
+    CarouselLayout(
+      availableWidth: availableWidth,
+      itemCount: attachmentCount,
+      itemMinWidth: attachmentTileSize,
+      itemMaxWidth: attachmentTileSize,
+    ).largeItemWidth;
 
 class AttachmentTileBackground extends StatelessWidget {
   const AttachmentTileBackground({super.key, required this.attachment});
