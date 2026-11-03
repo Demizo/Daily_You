@@ -40,13 +40,12 @@ class TagChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = tag.resolvedColor(context,
         fallback: Theme.of(context).colorScheme.secondary);
-    final screenWidth = MediaQuery.of(context).size.width;
 
     return LayoutBuilder(
       builder: (context, constraints) {
         final maxWidth = constraints.maxWidth.isFinite
             ? constraints.maxWidth
-            : screenWidth - 32;
+            : MediaQuery.sizeOf(context).width - 32;
         return ConstrainedBox(
           constraints: BoxConstraints(maxWidth: maxWidth),
           child: GestureDetector(

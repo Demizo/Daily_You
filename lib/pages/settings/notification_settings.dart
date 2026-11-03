@@ -5,6 +5,7 @@
 import 'package:app_settings/app_settings.dart';
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/notification_manager.dart';
+import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/settings_icon_action.dart';
 import 'package:daily_you/widgets/settings_toggle.dart';
@@ -23,6 +24,7 @@ class NotificationSettings extends StatefulWidget {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: TimeManager.scheduledReminderTime(),
+      builder: (context, child) => AppDialogTransition(child: child!),
     );
 
     if (picked != null) {
@@ -48,6 +50,7 @@ class NotificationSettings extends StatefulWidget {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: _onThisDayNotificationTime(),
+      builder: (context, child) => AppDialogTransition(child: child!),
     );
 
     if (picked != null) {

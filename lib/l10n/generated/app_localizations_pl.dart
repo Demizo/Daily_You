@@ -368,6 +368,21 @@ class AppLocalizationsPl extends AppLocalizations {
   String get moodIconPrompt => 'Wprowadź ikonę';
 
   @override
+  String get moodVeryUnpleasant => 'Very Unpleasant';
+
+  @override
+  String get moodUnpleasant => 'Unpleasant';
+
+  @override
+  String get moodNeutral => 'Neutral';
+
+  @override
+  String get moodPleasant => 'Pleasant';
+
+  @override
+  String get moodVeryPleasant => 'Very Pleasant';
+
+  @override
   String get settingsFlashbacksViewLayout => 'Układ widoku wspomnień';
 
   @override

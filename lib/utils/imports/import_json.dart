@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:daily_you/models/entry.dart';
+import 'package:daily_you/models/mood.dart';
 import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/storage/storage_picker.dart';
 import 'package:daily_you/utils/imports/import_helpers.dart';
@@ -40,7 +41,7 @@ List<ImportedEntry> decodeJsonEntries(Uint8List bytes) {
       ImportedEntry(
         Entry(
             text: entry['text'],
-            mood: entry['mood'] as int?,
+            mood: Mood.fromLegacy(entry['mood'] as int?),
             timeCreate: DateTime.parse(entry['timeCreated']),
             timeModified: DateTime.parse(entry['timeModified'])),
         attachments: [

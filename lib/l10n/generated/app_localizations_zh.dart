@@ -364,6 +364,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get moodIconPrompt => '输入一个图标';
 
   @override
+  String get moodVeryUnpleasant => 'Very Unpleasant';
+
+  @override
+  String get moodUnpleasant => 'Unpleasant';
+
+  @override
+  String get moodNeutral => 'Neutral';
+
+  @override
+  String get moodPleasant => 'Pleasant';
+
+  @override
+  String get moodVeryPleasant => 'Very Pleasant';
+
+  @override
   String get settingsFlashbacksViewLayout => '往昔重现的视图布局';
 
   @override
@@ -691,7 +706,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsImageFolder => '图片存储目录';
 
   @override
-  String get settingsExternalSyncTitle => '与外部位置同步';
+  String get settingsExternalSyncTitle => '与外部存储位置同步';
 
   @override
   String get chooseFolderHint => '选择文件夹';
@@ -713,7 +728,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get imageFolderErrorDescription => '无法更改图片目录！';
 
   @override
-  String get syncErrorDescription => '与外部位置同步失败！';
+  String get syncErrorDescription => '与外部存储位置同步失败！';
 
   @override
   String get backupErrorDescription => '创建备份失败！';

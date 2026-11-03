@@ -3,12 +3,19 @@
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
 import 'package:daily_you/models/entry.dart';
+import 'package:daily_you/models/mood.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/stats/entry_stats.dart';
 import 'package:daily_you/stats/stats_range.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  final worst = Mood.levels.first;
+  final bad = Mood.levels[1];
+  final neutral = Mood.levels[2];
+  final good = Mood.levels[3];
+  final best = Mood.levels.last;
+
   Entry entryAt(DateTime time, {int? id, int? mood, String text = ''}) => Entry(
       id: id, text: text, mood: mood, timeCreate: time, timeModified: time);
 
@@ -20,11 +27,11 @@ void main() {
 
   test('counts each great day once', () {
     final count = greatDayCount([
-      entryAt(DateTime(2025, 6, 2, 20), mood: 2),
-      entryAt(DateTime(2025, 6, 2, 8), mood: 1),
-      entryAt(DateTime(2025, 6, 1), mood: 0),
+      entryAt(DateTime(2025, 6, 2, 20), mood: best),
+      entryAt(DateTime(2025, 6, 2, 8), mood: good),
+      entryAt(DateTime(2025, 6, 1), mood: neutral),
       entryAt(DateTime(2025, 5, 31), mood: null),
-      entryAt(DateTime(2025, 5, 30), mood: 1),
+      entryAt(DateTime(2025, 5, 30), mood: good),
     ]);
 
     expect(count, 2);
@@ -32,50 +39,50 @@ void main() {
 
   test('totals every mood level including the unused ones', () {
     final totals = moodTotals([
-      entryAt(DateTime(2025, 6, 2), mood: 2),
-      entryAt(DateTime(2025, 6, 1), mood: 2),
-      entryAt(DateTime(2025, 5, 31), mood: -2),
+      entryAt(DateTime(2025, 6, 2), mood: best),
+      entryAt(DateTime(2025, 6, 1), mood: best),
+      entryAt(DateTime(2025, 5, 31), mood: worst),
       entryAt(DateTime(2025, 5, 30)),
     ]);
 
-    expect(totals, {-2: 1, -1: 0, 0: 0, 1: 0, 2: 2});
+    expect(totals, {worst: 1, bad: 0, neutral: 0, good: 0, best: 2});
   });
 
   test('averages values per weekday and marks the empty ones', () {
     // 2025-06-02 is a Monday.
     final averages = averageByDayOfWeek(
       [
-        entryAt(DateTime(2025, 6, 2), mood: 2),
-        entryAt(DateTime(2025, 6, 9), mood: 0),
-        entryAt(DateTime(2025, 6, 3), mood: -1),
+        entryAt(DateTime(2025, 6, 2), mood: best),
+        entryAt(DateTime(2025, 6, 9), mood: neutral),
+        entryAt(DateTime(2025, 6, 3), mood: bad),
       ],
-      (entry) => entry.mood?.toDouble(),
+      moodPosition,
     );
 
-    expect(averages['Mon'], 1.0);
-    expect(averages['Tue'], -1.0);
+    expect(averages['Mon'], 3.0);
+    expect(averages['Tue'], 1.0);
     expect(averages['Wed'], isNull);
   });
 
   test('falls back to the empty day value where nothing was written', () {
     final averages = averageByDayOfWeek(
-      [entryAt(DateTime(2025, 6, 2), mood: 2)],
-      (entry) => entry.mood?.toDouble(),
-      emptyDayValue: -2,
+      [entryAt(DateTime(2025, 6, 2), mood: best)],
+      moodPosition,
+      emptyDayValue: -1,
     );
 
-    expect(averages['Mon'], 2.0);
-    expect(averages['Sun'], -2.0);
+    expect(averages['Mon'], 4.0);
+    expect(averages['Sun'], -1.0);
   });
 
   test('counts matching entries per weekday', () {
     final counts = countByDayOfWeek(
       [
-        entryAt(DateTime(2025, 6, 2), mood: 2),
-        entryAt(DateTime(2025, 6, 9), mood: 2),
-        entryAt(DateTime(2025, 6, 3), mood: -1),
+        entryAt(DateTime(2025, 6, 2), mood: best),
+        entryAt(DateTime(2025, 6, 9), mood: best),
+        entryAt(DateTime(2025, 6, 3), mood: bad),
       ],
-      (entry) => (entry.mood ?? 0) > 0,
+      (entry) => Mood.isGreatDay(entry.mood),
     );
 
     expect(counts['Mon'], 2.0);

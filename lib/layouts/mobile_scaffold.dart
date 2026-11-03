@@ -6,9 +6,12 @@ import 'dart:io';
 
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/layouts/fast_page_view_scroll_physics.dart';
+import 'package:daily_you/layouts/window_size_class.dart';
 import 'package:daily_you/pages/settings/notification_settings.dart';
 import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:easy_debounce/easy_debounce.dart';
+import 'package:flutter/rendering.dart' show ScrollCacheExtent;
+import 'package:flutter/scheduler.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/pages/statistics_page.dart';
@@ -33,6 +36,9 @@ class _MobileScaffoldState extends State<MobileScaffold> {
   int currentIndex = 0;
   late final PageController _pageController;
   final List<bool> _isScrolled = [false, false, false, false, false];
+  final _swipePagesKey = GlobalKey<_SwipePagesState>();
+  final List<bool> _isScrolled = [false, false, false];
+  int _prebuildViewports = 0;
 
   late final List<ScrollController> _scrollControllers;
 
@@ -49,6 +55,7 @@ class _MobileScaffoldState extends State<MobileScaffold> {
       const StatsPage(),
     ];
     _pageController = PageController(initialPage: currentIndex);
+    SchedulerBinding.instance.addPostFrameCallback((_) => _startPrebuild());
     _scrollControllers = List.generate(pages.length, (_) => ScrollController());
     for (int i = 0; i < _scrollControllers.length; i++) {
       final pageIndex = i;
@@ -60,11 +67,38 @@ class _MobileScaffoldState extends State<MobileScaffold> {
 
   @override
   void dispose() {
-    _pageController.dispose();
     for (final c in _scrollControllers) {
       c.dispose();
     }
     super.dispose();
+  }
+
+  void _startPrebuild() {
+    if (!mounted) return;
+    final route = ModalRoute.of(context);
+    final animation = route?.animation;
+    if (animation == null || (animation.isCompleted && !route!.offstage)) {
+      _prebuildNextPage();
+      return;
+    }
+    void onStatus(AnimationStatus status) {
+      if (status != AnimationStatus.completed) return;
+      animation.removeStatusListener(onStatus);
+      SchedulerBinding.instance
+          .addPostFrameCallback((_) => _prebuildNextPage());
+    }
+
+    animation.addStatusListener(onStatus);
+  }
+
+  void _prebuildNextPage() {
+    if (!mounted) return;
+    setState(
+        () => _prebuildViewports = (_prebuildViewports + 1) % pages.length);
+    if (_prebuildViewports > 0) {
+      SchedulerBinding.instance
+          .addPostFrameCallback((_) => _prebuildNextPage());
+    }
   }
 
   void _updateScrolledFromController(int pageIndex) {
@@ -391,9 +425,10 @@ class _MobileScaffoldState extends State<MobileScaffold> {
             ),
           ],
         ),
-        body: PageView(
-          controller: _pageController,
-          physics: const FastPageViewScrollPhysics(),
+        body: _SwipePages(
+          key: _swipePagesKey,
+          initialIndex: currentIndex,
+          prebuildViewports: _prebuildViewports,
           onPageChanged: (index) {
             FocusManager.instance.primaryFocus?.unfocus();
             EasyDebounce.debounce(
@@ -415,11 +450,7 @@ class _MobileScaffoldState extends State<MobileScaffold> {
             setState(() {
               currentIndex = index;
             });
-            _pageController.animateToPage(
-              index,
-              duration: const Duration(milliseconds: 250),
-              curve: Curves.easeOut,
-            );
+            _swipePagesKey.currentState?.animateTo(index);
           },
           destinations: [
             NavigationDestination(
@@ -556,14 +587,63 @@ class _MobileScaffoldState extends State<MobileScaffold> {
       l10n.pageStatisticsTitle,
     ];
 
-    return LayoutBuilder(builder: (context, constraints) {
-      if (constraints.maxWidth >= 1100) {
-        return _buildDesktopLayout(context, configProvider, pageTitles, l10n);
-      } else if (constraints.maxWidth >= 600) {
-        return _buildTabletLayout(context, configProvider, pageTitles, l10n);
-      } else {
-        return _buildMobileLayout(context, configProvider, pageTitles, l10n);
-      }
-    });
+    return switch (WindowSizeClass.of(context)) {
+      WindowSizeClass.expanded =>
+        _buildDesktopLayout(context, configProvider, pageTitles, l10n),
+      WindowSizeClass.medium =>
+        _buildTabletLayout(context, configProvider, pageTitles, l10n),
+      WindowSizeClass.compact =>
+        _buildMobileLayout(context, configProvider, pageTitles, l10n),
+    };
+  }
+}
+
+class _SwipePages extends StatefulWidget {
+  final int initialIndex;
+  final int prebuildViewports;
+  final ValueChanged<int> onPageChanged;
+  final List<Widget> children;
+
+  const _SwipePages({
+    super.key,
+    required this.initialIndex,
+    required this.prebuildViewports,
+    required this.onPageChanged,
+    required this.children,
+  });
+
+  @override
+  State<_SwipePages> createState() => _SwipePagesState();
+}
+
+class _SwipePagesState extends State<_SwipePages> {
+  late final PageController _pageController =
+      PageController(initialPage: widget.initialIndex);
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void animateTo(int index) {
+    _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeOut,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return PageView(
+      controller: _pageController,
+      physics: const FastPageViewScrollPhysics(),
+      allowImplicitScrolling: widget.prebuildViewports > 0,
+      scrollCacheExtent:
+          ScrollCacheExtent.viewport(widget.prebuildViewports.toDouble()),
+      onPageChanged: widget.onPageChanged,
+      children: widget.children,
+    );
   }
 }

@@ -114,6 +114,8 @@ class Settings {
   static const statsSubject = Setting<String>("statsSubject", "mood");
   static const tagPickerSortMode =
       Setting<String>("tagPickerSortMode", "manual");
+  static const timelineSortOrder =
+      Setting<String>("timelineSortOrder", "descending");
   static const requirePassword =
       Setting<bool>("requirePassword", false, secure: true);
   static const biometricUnlock =
@@ -197,6 +199,7 @@ class Settings {
     statsRange,
     statsSubject,
     tagPickerSortMode,
+    timelineSortOrder,
     requirePassword,
     biometricUnlock,
     passwordHash,
@@ -212,13 +215,13 @@ class Settings {
     lastAutoBackup,
   ];
 
-  static const moodIcons = <int, Setting<String>>{
-    2: veryHappyIcon,
-    1: happyIcon,
-    0: neutralIcon,
-    -1: sadIcon,
-    -2: verySadIcon,
-  };
+  static const legacyMoodIcons = <Setting<String>>[
+    verySadIcon,
+    sadIcon,
+    neutralIcon,
+    happyIcon,
+    veryHappyIcon,
+  ];
 }
 
 class ImageQuality {

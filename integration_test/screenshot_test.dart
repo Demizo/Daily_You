@@ -11,6 +11,7 @@ import 'package:daily_you/main.dart';
 import 'package:daily_you/pages/entry_view_page.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_attachments_provider.dart';
+import 'package:daily_you/providers/mood_scale_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/providers/templates_provider.dart';
 import 'package:daily_you/theme_mode_provider.dart';
@@ -124,6 +125,8 @@ void main() {
               value: TemplatesProvider.instance),
           ChangeNotifierProvider<TagsProvider>.value(
               value: TagsProvider.instance),
+          ChangeNotifierProvider<MoodScaleProvider>.value(
+              value: MoodScaleProvider.instance),
           ChangeNotifierProvider<ConfigProvider>.value(
               value: ConfigProvider.instance),
         ],

@@ -83,7 +83,6 @@ class EntryCardWidget extends StatelessWidget {
           EntryCardHeaderRow(
             entry: entry,
             title: title == null ? time : title!,
-            titlePadding: const EdgeInsets.symmetric(horizontal: 4.0),
             titleStyle: TextStyle(
                 color: theme.textTheme.labelSmall?.color,
                 fontWeight: FontWeight.bold),

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
-import 'package:daily_you/layouts/wide_screen.dart';
+import 'package:daily_you/layouts/window_size_class.dart';
 import 'package:daily_you/widgets/editor_action_bar.dart';
 import 'package:daily_you/widgets/entry_text_field.dart';
 import 'package:daily_you/widgets/markdown_preview_controller.dart';
@@ -45,7 +45,7 @@ class _EntryTextEditorState extends State<EntryTextEditor> {
 
   @override
   Widget build(BuildContext context) {
-    final isWide = isWideScreen(context);
+    final isWide = WindowSizeClass.of(context).isWide;
     final showExpandButton = isWide && widget.onExpand != null;
 
     return Stack(

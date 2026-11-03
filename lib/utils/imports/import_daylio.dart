@@ -13,6 +13,7 @@ import 'package:daily_you/database/tag_category_dao.dart';
 import 'package:daily_you/database/tag_dao.dart';
 import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/models/entry.dart';
+import 'package:daily_you/models/mood.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/models/tag_category.dart';
 import 'package:daily_you/providers/entries_provider.dart';
@@ -91,14 +92,6 @@ Future<OperationOutcome> importFromDaylio(
       (parsed['tag_groups'] as List?) ?? const [],
     );
 
-    const Map<int, int> moodValueMapping = {
-      1: 2,
-      2: 1,
-      3: 0,
-      4: -1,
-      5: -2,
-    };
-
     final takenNames = await AttachmentStorage.instance
         .takenLowerCaseNames(AttachmentType.image);
     final totalEntries = dayEntries.length;
@@ -117,7 +110,7 @@ Future<OperationOutcome> importFromDaylio(
 
       final mood = entry['mood'];
       final mappedMood =
-          mood != null ? moodValueMapping[mood.clamp(1, 5)] : null;
+          mood != null ? Mood.fromRating(mood, bestFirst: true) : null;
 
       if (!EntriesProvider.instance.hasEntryAtTimestamp(datetime)) {
         final addedEntry = await EntriesProvider.instance.add(

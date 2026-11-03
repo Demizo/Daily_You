@@ -8,6 +8,7 @@ import 'dart:io';
 import 'package:daily_you/database/attachment_storage.dart';
 import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/models/entry.dart';
+import 'package:daily_you/models/mood.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/storage/local_file_store.dart';
 import 'package:daily_you/storage/storage_picker.dart';
@@ -83,14 +84,6 @@ Future<OperationOutcome> importFromDiaro(
       });
     }
 
-    const Map<int, int> moodValueMapping = {
-      1: 2,
-      2: 1,
-      3: 0,
-      4: -1,
-      5: -2,
-    };
-
     final entries = <Map<String, dynamic>>[];
     for (final r in entriesTable.findAllElements('r')) {
       final uid = r.getElement('uid')?.innerText ?? "";
@@ -108,7 +101,7 @@ Future<OperationOutcome> importFromDiaro(
       if (moodString.isNotEmpty) {
         final m = int.tryParse(moodString);
         if (m != null) {
-          mood = moodValueMapping[m.clamp(1, 5)];
+          mood = Mood.fromRating(m, bestFirst: true);
         }
       }
 

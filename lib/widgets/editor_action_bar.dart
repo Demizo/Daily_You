@@ -4,7 +4,7 @@
 
 import 'dart:async';
 
-import 'package:daily_you/layouts/wide_screen.dart';
+import 'package:daily_you/layouts/window_size_class.dart';
 import 'package:daily_you/models/template.dart';
 import 'package:daily_you/utils/text_editing.dart';
 import 'package:daily_you/widgets/editor_action_bar/action_bar_pill.dart';
@@ -267,7 +267,7 @@ class _EditorActionBarState extends State<EditorActionBar> {
     final showToggle = widget.mainActions != null && _isEditing;
     final showingMainActions = widget.mainActions != null &&
         (!_isEditing || _showMainActionsWhileFocused);
-    final isWide = isWideScreen(context);
+    final isWide = WindowSizeClass.of(context).isWide;
 
     return Padding(
       padding: EdgeInsets.fromLTRB(

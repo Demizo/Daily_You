@@ -4,6 +4,7 @@
 
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/models/entry.dart';
+import 'package:daily_you/models/mood.dart';
 import 'package:daily_you/models/stats_subject.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/models/tag_icon_type.dart';
@@ -70,6 +71,7 @@ class _StatsPageState extends State<StatsPage>
     final saved = ConfigProvider.instance.get(Settings.statsRange);
     statsRange = _stringToRange[saved] ?? StatsRange.allTime;
     _subjectConfig = ConfigProvider.instance.get(Settings.statsSubject);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _measureHeaderHeight());
   }
 
   @override
@@ -78,9 +80,6 @@ class _StatsPageState extends State<StatsPage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    // Recalculate header height when text size changes
-    MediaQuery.of(context);
-    WidgetsBinding.instance.addPostFrameCallback((_) => _measureHeaderHeight());
     return buildPage(context);
   }
 
@@ -213,14 +212,23 @@ class _StatsPageState extends State<StatsPage>
           left: 0,
           right: 0,
           top: 0,
-          child: Offstage(
-            offstage: true,
-            child: _HeaderContent(
-              key: _headerMeasureKey,
-              statsRange: statsRange,
-              subject: subject,
-              onRangeChanged: (_) {},
-              onSubjectTypeSelected: (_) {},
+          child: NotificationListener<SizeChangedLayoutNotification>(
+            onNotification: (_) {
+              WidgetsBinding.instance
+                  .addPostFrameCallback((_) => _measureHeaderHeight());
+              return true;
+            },
+            child: Offstage(
+              offstage: true,
+              child: SizeChangedLayoutNotifier(
+                child: _HeaderContent(
+                  key: _headerMeasureKey,
+                  statsRange: statsRange,
+                  subject: subject,
+                  onRangeChanged: (_) {},
+                  onSubjectTypeSelected: (_) {},
+                ),
+              ),
             ),
           ),
         ),
@@ -264,14 +272,24 @@ class _StatsPageState extends State<StatsPage>
     };
   }
 
-  static const _moodRange = FixedYRange(minY: -2, maxY: 2, interval: 1);
+  static final _moodRange =
+      FixedYRange(minY: 0, maxY: (Mood.count - 1).toDouble(), interval: 1);
+
+  Widget _buildMoodAxisTitle(double value, TitleMeta meta) => SideTitleWidget(
+        meta: meta,
+        child: MoodIcon(
+          moodValue: Mood.fromPosition(value.toInt()),
+          allowScaling: false,
+        ),
+      );
 
   List<Widget> _buildMoodCharts(BuildContext context, List<Entry> entries) {
     final l10n = AppLocalizations.of(context)!;
-    final moodPoints = entries
-        .where((entry) => entry.mood != null)
-        .map((entry) => (date: entry.timeCreate, value: entry.mood!.toDouble()))
-        .toList();
+    final moodPoints = [
+      for (final entry in entries)
+        if (moodPosition(entry) case final position?)
+          (date: entry.timeCreate, value: position),
+    ];
     final hasData = moodPoints.length > 1;
 
     return [
@@ -281,26 +299,19 @@ class _StatsPageState extends State<StatsPage>
         yRange: _moodRange,
         combine: combineByAverage,
         title: l10n.chartOverTimeTitle(l10n.tagMoodTitle),
-        buildLeftTitle: (value, meta) => SideTitleWidget(
-          meta: meta,
-          child: MoodIcon(moodValue: value.toInt(), allowScaling: false),
-        ),
+        buildLeftTitle: _buildMoodAxisTitle,
       ),
       MoodSummaryChart(
         moodCounts: moodTotals(entries),
         hasData: hasData,
       ),
       ValueByDayChart(
-        averageValues: averageByDayOfWeek(
-            entries, (entry) => entry.mood?.toDouble(),
-            emptyDayValue: -2),
+        averageValues: averageByDayOfWeek(entries, moodPosition,
+            emptyDayValue: _moodRange.minY),
         hasData: hasData,
         yRange: _moodRange,
         title: l10n.chartByDayTitle(l10n.tagMoodTitle),
-        buildLeftTitle: (value, meta) => SideTitleWidget(
-          meta: meta,
-          child: MoodIcon(moodValue: value.toInt(), allowScaling: false),
-        ),
+        buildLeftTitle: _buildMoodAxisTitle,
       ),
     ];
   }

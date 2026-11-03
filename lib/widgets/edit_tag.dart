@@ -134,8 +134,10 @@ class _EditTagState extends State<EditTag> {
   Future<void> _showIconPicker() async {
     final result = await showAppDialog<IconPickerResult>(
       context: context,
-      builder: (context) =>
-          IconPickerDialog(previewColor: _effectiveColor(context)),
+      builder: (context) => IconPickerDialog(
+        previewColor: _effectiveColor(context),
+        initial: (type: _iconType, value: _icon),
+      ),
     );
     if (result != null) {
       setState(() {
@@ -158,6 +160,8 @@ class _EditTagState extends State<EditTag> {
               alignment: Alignment.centerLeft,
               child: Chip(
                 side: BorderSide.none,
+                backgroundColor:
+                    Theme.of(context).colorScheme.surfaceContainerHighest,
                 label: Text(typeLabel),
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -182,7 +186,6 @@ class _EditTagState extends State<EditTag> {
   }
 
   Widget _buildTopRow(BuildContext context) {
-    final hasIcon = _icon != null && _icon!.isNotEmpty;
     final tagColor = _effectiveColor(context);
     final fallbackIcon = _tagType == TagType.tracker
         ? Icons.timeline_rounded
@@ -193,46 +196,28 @@ class _EditTagState extends State<EditTag> {
         children: [
           AspectRatio(
             aspectRatio: 1,
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                GestureDetector(
-                  onTap: _showIconPicker,
-                  child: Card.filled(
-                    margin: EdgeInsets.zero,
-                    color:
-                        Theme.of(context).colorScheme.surfaceContainerHighest,
-                    child: Center(
-                      child: TagIconGlyph(
-                        icon: _icon,
-                        iconType: _iconType,
-                        fallbackIcon: fallbackIcon,
-                        color: tagColor,
-                        size: 28,
-                      ),
-                    ),
+            child: GestureDetector(
+              onTap: _showIconPicker,
+              child: Card.filled(
+                margin: EdgeInsets.zero,
+                color: Theme.of(context).colorScheme.surfaceContainerLowest,
+                child: Center(
+                  child: TagIconGlyph(
+                    icon: _icon,
+                    iconType: _iconType,
+                    fallbackIcon: fallbackIcon,
+                    color: tagColor,
+                    size: 28,
                   ),
                 ),
-                if (hasIcon)
-                  Positioned(
-                    top: 0,
-                    right: 0,
-                    child: GestureDetector(
-                      onTap: () => setState(() {
-                        _icon = null;
-                        _iconType = TagIconType.character;
-                      }),
-                      child: const Icon(Icons.close, size: 14),
-                    ),
-                  ),
-              ],
+              ),
             ),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Card.filled(
               margin: EdgeInsets.zero,
-              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+              color: Theme.of(context).colorScheme.surfaceContainerLowest,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12.0),
                 child: TextField(
@@ -344,7 +329,7 @@ class _EditTagState extends State<EditTag> {
   Widget build(BuildContext context) {
     final categories = TagsProvider.instance.categories;
     final l10n = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery.sizeOf(context).width;
     final dialogWidth = (screenWidth - 80).clamp(280.0, 400.0);
     return Dialog(
       child: SizedBox(

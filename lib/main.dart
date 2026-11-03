@@ -18,8 +18,10 @@ import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/providers/learning_progress_provider.dart';
 import 'package:daily_you/providers/user_session_provider.dart';
+import 'package:daily_you/providers/mood_scale_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/providers/templates_provider.dart';
+import 'package:daily_you/widgets/morphing_burst.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/utils/auto_backup_schedule.dart';
 import 'package:daily_you/utils/backup_restore_utils.dart';
@@ -28,7 +30,6 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/layouts/mobile_scaffold.dart';
-import 'package:daily_you/layouts/responsive_layout.dart';
 import 'package:daily_you/theme_mode_provider.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -251,6 +252,8 @@ void main() async {
     await armAutoBackupWork();
   }
 
+  await BurstShader.load();
+
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider<ThemeModeProvider>(
       create: (_) => themeProvider,
@@ -266,6 +269,9 @@ void main() async {
     ),
     ChangeNotifierProvider<TagsProvider>(
       create: (_) => TagsProvider.instance,
+    ),
+    ChangeNotifierProvider<MoodScaleProvider>(
+      create: (_) => MoodScaleProvider.instance,
     ),
     ChangeNotifierProvider<ConfigProvider>(
       create: (_) => ConfigProvider.instance,
@@ -538,12 +544,7 @@ class _MainAppState extends State<MainApp> {
                 },
                 theme: lightTheme,
                 darkTheme: darkTheme,
-                home: LaunchPage(
-                    nextPage: ResponsiveLayout(
-                  mobileScaffold: MobileScaffold(),
-                  tabletScaffold: MobileScaffold(),
-                  desktopScaffold: MobileScaffold(),
-                )))),
+                home: LaunchPage(nextPage: MobileScaffold()))),
       );
     });
   }
