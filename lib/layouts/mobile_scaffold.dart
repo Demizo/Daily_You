@@ -34,10 +34,9 @@ class MobileScaffold extends StatefulWidget {
 
 class _MobileScaffoldState extends State<MobileScaffold> {
   int currentIndex = 0;
-  late final PageController _pageController;
   final List<bool> _isScrolled = [false, false, false, false, false];
   final _swipePagesKey = GlobalKey<_SwipePagesState>();
-  final List<bool> _isScrolled = [false, false, false];
+
   int _prebuildViewports = 0;
 
   late final List<ScrollController> _scrollControllers;
@@ -54,7 +53,6 @@ class _MobileScaffoldState extends State<MobileScaffold> {
       const GalleryPage(),
       const StatsPage(),
     ];
-    _pageController = PageController(initialPage: currentIndex);
     SchedulerBinding.instance.addPostFrameCallback((_) => _startPrebuild());
     _scrollControllers = List.generate(pages.length, (_) => ScrollController());
     for (int i = 0; i < _scrollControllers.length; i++) {

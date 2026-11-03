@@ -370,7 +370,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get moodIconPrompt => 'Nhập một biểu tượng';
 
   @override
-  String get settingsFlashbacksViewLayout => 'Bố cục hiển thị hồi tưởng';
   String get moodVeryUnpleasant => 'Very Unpleasant';
 
   @override
@@ -386,7 +385,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get moodVeryPleasant => 'Very Pleasant';
 
   @override
-  String get settingsFlashbacksViewLayout => 'Flashbacks View Layout';
+  String get settingsFlashbacksViewLayout => 'Bố cục hiển thị hồi tưởng';
 
   @override
   String get settingsGalleryViewLayout => 'Bố cục hiển thị thư viện';
