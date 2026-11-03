@@ -41,6 +41,8 @@ import 'package:statsfl/statsfl.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player_media_kit/video_player_media_kit.dart';
 import 'package:workmanager/workmanager.dart';
+import 'package:flutter/foundation.dart';
+import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 
 const String _autoBackupPeriodicWorkName = 'auto_backup_periodic';
 const String _autoBackupCatchupWorkName = 'auto_backup_catchup';
@@ -219,12 +221,16 @@ void callbackDispatcher() async {
 }
 
 void main() async {
-  if (Platform.isLinux || Platform.isWindows) {
-    // Initialize FFI
-    sqfliteFfiInit();
-  }
-  databaseFactory = databaseFactoryFfi;
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Chỉ khởi tạo SQLite FFI trên Linux và Windows.
+  // Flutter Web không hỗ trợ dart:io Platform.
+  if (kIsWeb) {
+    databaseFactory = databaseFactoryFfiWeb;
+  } else if (Platform.isLinux || Platform.isWindows) {
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
+  }
   VideoPlayerMediaKit.ensureInitialized(linux: true, windows: true);
   JustAudioMediaKit.ensureInitialized(linux: true, windows: true);
 
@@ -243,7 +249,7 @@ void main() async {
   await DeviceInfoService().init();
 
   // Notification only supported on android
-  if (Platform.isAndroid) {
+  if (!kIsWeb && Platform.isAndroid) {
     await FlutterDisplayMode.setHighRefreshRate();
     await NotificationManager.instance.init();
 
@@ -446,18 +452,20 @@ class _MainAppState extends State<MainApp> {
         // Use dynamic theme for seed color but do not inject chroma
         bool noChroma = (lightDynamic.primary.r == lightDynamic.primary.b) &&
             (lightDynamic.primary.b == lightDynamic.primary.g);
-        lightTheme = _buildTheme(ColorScheme.fromSeed(
-            seedColor: lightDynamic.primary,
-            primaryContainer: lightDynamic.primaryContainer,
-            dynamicSchemeVariant: noChroma
-                ? DynamicSchemeVariant.fidelity
-                : DynamicSchemeVariant.tonalSpot,
-            brightness: Brightness.light),
+        lightTheme = _buildTheme(
+            ColorScheme.fromSeed(
+                seedColor: lightDynamic.primary,
+                primaryContainer: lightDynamic.primaryContainer,
+                dynamicSchemeVariant: noChroma
+                    ? DynamicSchemeVariant.fidelity
+                    : DynamicSchemeVariant.tonalSpot,
+                brightness: Brightness.light),
             scaffoldBackgroundColor: const Color(0xffEEF1FF));
       } else {
-        lightTheme = _buildTheme(ColorScheme.fromSeed(
-            seedColor: themeModeProvider.accentColor,
-            brightness: Brightness.light),
+        lightTheme = _buildTheme(
+            ColorScheme.fromSeed(
+                seedColor: themeModeProvider.accentColor,
+                brightness: Brightness.light),
             scaffoldBackgroundColor: const Color(0xffEEF1FF));
       }
 
@@ -508,7 +516,7 @@ class _MainAppState extends State<MainApp> {
       return StatsFl(
         isEnabled: false,
         child: GestureDetector(
-            onTap: Platform.isAndroid
+            onTap: !kIsWeb && Platform.isAndroid
                 ? () => FocusManager.instance.primaryFocus
                     ?.unfocus(disposition: UnfocusDisposition.scope)
                 : null,

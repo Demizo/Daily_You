@@ -22,6 +22,7 @@ import 'package:daily_you/pages/practice_speech_page.dart';
 import 'package:daily_you/widgets/user_switch_dialog.dart';
 import 'package:daily_you/widgets/user_profile_bar.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/foundation.dart';
 
 import '../pages/settings_page.dart';
 
@@ -208,7 +209,8 @@ class _MobileScaffoldState extends State<MobileScaffold> {
   }
 
   bool _shouldShowNotificationButton(ConfigProvider configProvider) {
-    return Platform.isAndroid &&
+    return !kIsWeb &&
+        Platform.isAndroid &&
         !configProvider.get(Settings.dailyReminders) &&
         !configProvider.get(Settings.onThisDayNotifications) &&
         !configProvider.get(Settings.dismissedNotificationOnboarding);

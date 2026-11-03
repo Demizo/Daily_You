@@ -1,7 +1,7 @@
 // Copyright (C) 2026 Demizo and contributors
 // SPDX-License-Identifier: GPL-3.0-only
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
-
+import 'package:flutter/foundation.dart';
 import 'dart:io';
 import 'package:daily_you/pages/settings/about_settings.dart';
 import 'package:daily_you/pages/settings/appearance_settings.dart';
@@ -96,7 +96,7 @@ class _SettingsPageState extends State<SettingsPage> {
               title: AppLocalizations.of(context)!.settingsLanguageTitle,
               icon: Icons.language_rounded,
               page: LanguageSettings()),
-          if (Platform.isAndroid)
+          if (!kIsWeb && Platform.isAndroid)
             SettingsCategory(
                 title: AppLocalizations.of(context)!.settingsNotificationsTitle,
                 icon: Icons.notifications_rounded,

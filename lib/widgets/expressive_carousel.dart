@@ -1,7 +1,7 @@
 // Copyright (C) 2026 Demizo and contributors
 // SPDX-License-Identifier: GPL-3.0-only
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
-
+import 'package:flutter/foundation.dart';
 import 'dart:io';
 
 import 'package:daily_you/utils/carousel_fling.dart';
@@ -12,7 +12,8 @@ import 'package:material_ui/material_ui.dart';
 
 const _cardShape =
     RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12)));
-final _showArrows = Platform.isLinux || Platform.isWindows || Platform.isMacOS;
+final _showArrows =
+    !kIsWeb && (Platform.isLinux || Platform.isWindows || Platform.isMacOS);
 
 const _mediumLowStiffness = 400.0;
 const _noBounceDampingRatio = 1.0;

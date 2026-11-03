@@ -145,7 +145,7 @@ class AttachmentStorage {
   }
 
   Future<Directory?> _oldExternalImagesDirectory() async {
-    if (!Platform.isAndroid) return null;
+    if (kIsWeb || !Platform.isAndroid) return null;
     final oldBaseDir = await getExternalStorageDirectory();
     if (oldBaseDir == null) return null;
     final oldImagesDir = Directory('${oldBaseDir.path}/Images');
@@ -485,6 +485,8 @@ class AttachmentStorage {
 
   Future<int> deleteOrphanedAttachments(
       {Duration minAge = const Duration(days: 1), DateTime? now}) async {
+    if (kIsWeb) return 0;
+
     final referenced = _referencedFileNames('delete orphaned');
     if (AppDatabase.instance.databaseReplacedThisSession ||
         referenced.values.every((names) => names.isEmpty)) {

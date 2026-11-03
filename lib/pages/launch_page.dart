@@ -21,6 +21,7 @@ import 'package:logging/logging.dart';
 import 'package:quick_actions/quick_actions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/foundation.dart';
 
 enum _LaunchErrorType { externalAccess, migrationFailed, appOutdated }
 
@@ -61,7 +62,7 @@ class _LaunchPageState extends State<LaunchPage> {
   }
 
   Future _updateAppShortcuts() async {
-    if (!Platform.isAndroid) return;
+    if (kIsWeb || !Platform.isAndroid) return;
     final QuickActions quickActions = const QuickActions();
     await quickActions.initialize((shortcutType) {
       if (shortcutType == 'action_log_today') {
@@ -192,7 +193,7 @@ class _LaunchPageState extends State<LaunchPage> {
   }
 
   Future<void> _catchUpMissedAutoBackup() async {
-    if (!Platform.isAndroid) return;
+    if (kIsWeb || !Platform.isAndroid) return;
     final configProvider = ConfigProvider.instance;
     if (!configProvider.get(Settings.autoBackupEnabled)) return;
 

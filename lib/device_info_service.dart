@@ -3,6 +3,8 @@
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
 import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:daily_you/launch_intent.dart';
 import 'package:daily_you/storage/secret_store.dart';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -22,15 +24,24 @@ class DeviceInfoService {
   LaunchIntent? launchIntent;
 
   Future<void> init() async {
-    final plugin = DeviceInfoPlugin();
-    appInfo = await PackageInfo.fromPlatform();
-    final auth = LocalAuthentication();
+    // Các thông tin hệ điều hành chỉ lấy trên nền tảng native.
+    if (!kIsWeb) {
+      final plugin = DeviceInfoPlugin();
 
-    if (Platform.isAndroid) {
-      final androidInfo = await plugin.androidInfo;
-      androidSdk = androidInfo.version.sdkInt;
-      model = androidInfo.model;
-      supportsBiometrics = await auth.canCheckBiometrics;
+      appInfo = await PackageInfo.fromPlatform();
+
+      if (Platform.isAndroid) {
+        final androidInfo = await plugin.androidInfo;
+
+        androidSdk = androidInfo.version.sdkInt;
+        model = androidInfo.model;
+
+        final auth = LocalAuthentication();
+        supportsBiometrics = await auth.canCheckBiometrics;
+      }
+    } else {
+      // Các thông tin Android không áp dụng trên trình duyệt.
+      supportsBiometrics = false;
     }
 
     supportsSecureStorage = await SecretStore.instance.isAvailable();

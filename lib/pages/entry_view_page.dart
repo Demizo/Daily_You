@@ -1,7 +1,7 @@
 // Copyright (C) 2026 Demizo and contributors
 // SPDX-License-Identifier: GPL-3.0-only
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
-
+import 'package:flutter/foundation.dart';
 import 'dart:io';
 
 import 'package:daily_you/database/attachment_storage.dart';
@@ -180,7 +180,8 @@ class _EntryViewPageState extends State<EntryViewPage> {
 
   Widget _shareButton(
       BuildContext context, entry, List<EntryAttachment> attachments) {
-    if (Platform.isAndroid &&
+    if (!kIsWeb &&
+        Platform.isAndroid &&
         (attachments.isNotEmpty || entry.text.isNotEmpty)) {
       return IconButton(
           icon: const Icon(Icons.share_rounded),

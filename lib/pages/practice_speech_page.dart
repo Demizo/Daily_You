@@ -20,6 +20,8 @@ import 'package:audio_session/audio_session.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
+import '../services/pronunciation_assessment_service.dart';
+import 'package:flutter/foundation.dart';
 
 /// Màn hình Luyện phát âm tiếng Anh thực tế (Template chuẩn cho TV4 & TV5).
 ///
@@ -314,37 +316,62 @@ class _PracticeSpeechPageState extends State<PracticeSpeechPage> {
     if (audioPath == null) return;
 
     try {
-      final audioFile = File(audioPath);
-      if (!await audioFile.exists() || await audioFile.length() == 0) {
-        throw StateError('Bản ghi không có dữ liệu âm thanh.');
+      // Web uses a browser Blob URL, not a local File.
+      if (!kIsWeb) {
+        final audioFile = File(audioPath);
+
+        if (!await audioFile.exists() || await audioFile.length() == 0) {
+          throw StateError('Bản ghi không có dữ liệu âm thanh.');
+        }
       }
+
       if (_audioPlayer.playing) {
         await _audioPlayer.pause();
         return;
       }
 
-      final audioSession = await AudioSession.instance;
-      await audioSession.configure(const AudioSessionConfiguration.music());
-      if (!await audioSession.setActive(true)) {
-        throw StateError('Không thể kích hoạt đầu ra âm thanh.');
+      // AudioSession is only configured on native platforms.
+      if (!kIsWeb) {
+        final audioSession = await AudioSession.instance;
+        await audioSession.configure(
+          const AudioSessionConfiguration.music(),
+        );
+
+        if (!await audioSession.setActive(true)) {
+          throw StateError('Không thể kích hoạt đầu ra âm thanh.');
+        }
       }
 
       if (_loadedAudioPath != audioPath) {
-        final duration = await _audioPlayer.setFilePath(audioPath);
+        final duration = kIsWeb
+            ? await _audioPlayer.setUrl(audioPath)
+            : await _audioPlayer.setFilePath(audioPath);
+
         if (duration == null || duration <= Duration.zero) {
-          throw StateError('Không thể đọc nội dung âm thanh của bản ghi.');
+          throw StateError(
+            'Không thể đọc nội dung âm thanh của bản ghi.',
+          );
         }
+
         _loadedAudioPath = audioPath;
       }
+
       if (_audioPlayer.processingState == ProcessingState.completed) {
         await _audioPlayer.seek(Duration.zero);
       }
+
       await _audioPlayer.setVolume(1);
       await _audioPlayer.play();
-    } catch (error) {
+    } catch (error, stackTrace) {
+      debugPrint('Audio playback failed: $error');
+      debugPrintStack(stackTrace: stackTrace);
+
       if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Không thể phát lại bản ghi: $error')),
+        SnackBar(
+          content: Text('Không thể phát lại bản ghi: $error'),
+        ),
       );
     }
   }
@@ -354,7 +381,9 @@ class _PracticeSpeechPageState extends State<PracticeSpeechPage> {
   // =============================================================
   Future<void> _evaluatePronunciation() async {
     if (_sentences.isEmpty) return;
+
     final recognizedText = _recognizedText?.trim();
+
     if (recognizedText == null ||
         recognizedText.isEmpty ||
         recognizedText == SpeechToTextService.fallbackText) {
@@ -367,58 +396,38 @@ class _PracticeSpeechPageState extends State<PracticeSpeechPage> {
       );
       return;
     }
+
     setState(() => _isScoring = true);
 
-    final currentUserId = context.read<UserSessionProvider>().currentUserId;
-    final targetText = _sentences[_selectedSentenceIndex].sentence;
-    final words = targetText
-        .replaceAll('.', '')
-        .replaceAll('?', '')
-        .replaceAll(',', '')
-        .split(' ');
+    try {
+      final currentUserId = context.read<UserSessionProvider>().currentUserId;
 
-    await Future.delayed(const Duration(milliseconds: 800));
+      final targetText = _sentences[_selectedSentenceIndex].sentence;
 
-    // TODO [TV5]: Thay thế logic bên dưới bằng AI Scoring API
-    final wordScores = words.asMap().entries.map((entry) {
-      final isNearPerfect = entry.key % 2 == 0;
-      return WordScore(
-        word: entry.value,
-        score: isNearPerfect ? 95.0 : 75.0,
+      final result = PronunciationAssessmentService.assess(
+        userId: currentUserId,
+        practiceId: 0,
+        targetSentence: targetText,
+        recognizedText: recognizedText,
+        audioFilePath: _recordedAudioPath,
       );
-    }).toList();
 
-    final mispronounced = [
-      MispronouncedWord(
-        word: words.last,
-        expectedPhoneme: '/t/',
-        actualPhoneme: '/-/',
-        errorType: 'Ending consonant reduction',
-      ),
-    ];
+      if (!mounted) return;
 
-    final now = DateTime.now();
-
-    final result = PronunciationResult(
-      userId: currentUserId,
-      practiceId: 0,
-      referenceSentence: targetText,
-      recognizedText: recognizedText,
-      overallScore: 88.0,
-      wordScores: wordScores,
-      mispronouncedWords: mispronounced,
-      feedback: 'Phát âm to, rõ ràng và trôi chảy!',
-      suggestions: 'Chú ý phát âm rõ âm gió và âm bật hơi cuối từ.',
-      evaluatedAt: now,
-      audioFilePath: _recordedAudioPath,
-      timeCreate: now,
-    );
-
-    if (mounted) {
       setState(() {
-        _isScoring = false;
         _latestResult = result;
+        _isScoring = false;
       });
+    } catch (e) {
+      if (!mounted) return;
+
+      setState(() => _isScoring = false);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Không thể phân tích kết quả: $e'),
+        ),
+      );
     }
   }
 

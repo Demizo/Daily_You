@@ -1,7 +1,7 @@
 // Copyright (C) 2026 Demizo and contributors
 // SPDX-License-Identifier: GPL-3.0-only
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
-
+import 'package:flutter/foundation.dart';
 import 'dart:async';
 import 'dart:io';
 
@@ -132,7 +132,7 @@ class _HomePageState extends State<HomePage>
   }
 
   void _listenForShares() {
-    if (!Platform.isAndroid) return;
+    if (kIsWeb || !Platform.isAndroid) return;
     _shareSubscription = ShareReceiver.instance.shares.listen(_handleShare);
   }
 
@@ -170,7 +170,7 @@ class _HomePageState extends State<HomePage>
   Future _checkForNotificationLaunch() async {
     if (firstLoad) {
       firstLoad = false;
-      if (Platform.isAndroid) {
+      if (!kIsWeb && Platform.isAndroid) {
         var launchDetails = await NotificationManager.instance.notifications
             .getNotificationAppLaunchDetails();
 

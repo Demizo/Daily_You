@@ -17,6 +17,7 @@ import 'package:logging/logging.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/foundation.dart';
 
 class Setting<T> {
   const Setting(this.key, this.defaultValue,
@@ -311,12 +312,21 @@ class ConfigProvider with ChangeNotifier {
   Future<void> init() async {
     initializeDateFormatting();
 
-    final dbPath = await getApplicationSupportDirectory();
-    if (!dbPath.existsSync()) dbPath.createSync(recursive: true);
-    configFilePath = join(dbPath.path, 'config.json');
+    if (kIsWeb) {
+      // Web sử dụng SharedPreferences, không truy cập thư mục hệ thống.
+      configFilePath = '';
+    } else {
+      final dbPath = await getApplicationSupportDirectory();
 
-    if (Platform.isAndroid) {
-      await _migrateConfigFromExternalStorage(dbPath);
+      if (!dbPath.existsSync()) {
+        dbPath.createSync(recursive: true);
+      }
+
+      configFilePath = join(dbPath.path, 'config.json');
+
+      if (Platform.isAndroid) {
+        await _migrateConfigFromExternalStorage(dbPath);
+      }
     }
 
     await readConfig();
@@ -465,6 +475,37 @@ class ConfigProvider with ChangeNotifier {
   }
 
   Future<void> readConfig() async {
+    // Flutter Web: đọc cấu hình từ SharedPreferences.
+    if (kIsWeb) {
+      final prefs = await SharedPreferences.getInstance();
+      final content = prefs.getString('daily_you_config_json');
+
+      if (content == null) {
+        _config = {};
+        return;
+      }
+
+      try {
+        final decoded = json.decode(content);
+
+        if (decoded is Map<String, dynamic>) {
+          _config = decoded;
+        } else {
+          throw const FormatException('Config is not a map');
+        }
+      } catch (error, stackTrace) {
+        _logger.severe(
+          'Config could not be read, falling back to defaults',
+          error,
+          stackTrace,
+        );
+        _config = {};
+      }
+
+      return;
+    }
+
+    // Android, Windows, Linux: giữ nguyên cách đọc config.json.
     final configFile = File(configFilePath);
 
     if (!await configFile.exists()) {
@@ -482,9 +523,11 @@ class ConfigProvider with ChangeNotifier {
         throw const FormatException('Config is not a map');
       }
     } catch (error, stackTrace) {
-      // Corrupted config: reset to defaults
-      _logger.severe('Config could not be read, falling back to defaults',
-          error, stackTrace);
+      _logger.severe(
+        'Config could not be read, falling back to defaults',
+        error,
+        stackTrace,
+      );
       _config = {};
     }
   }
@@ -494,9 +537,17 @@ class ConfigProvider with ChangeNotifier {
       final filteredConfig = Map<String, dynamic>.from(_config)
         ..removeWhere((key, _) => _secureKeys.contains(key));
 
-      final tempFile = File('$configFilePath.tmp');
-
       final jsonString = json.encode(filteredConfig);
+
+      // Flutter Web: lưu cấu hình vào SharedPreferences.
+      if (kIsWeb) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('daily_you_config_json', jsonString);
+        return;
+      }
+
+      // Android, Windows, Linux: giữ nguyên cơ chế ghi file.
+      final tempFile = File('$configFilePath.tmp');
 
       await tempFile.writeAsString(jsonString, flush: true);
       await tempFile.rename(configFilePath);

@@ -40,6 +40,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:flutter/foundation.dart';
 
 class DatabaseNewerThanAppException implements Exception {
   final int databaseVersion;
@@ -94,7 +95,7 @@ class AppDatabase {
     databaseReplacedThisSession = false;
     bool success = true;
 
-    if (Platform.isAndroid && allowMigration) {
+    if (!kIsWeb && Platform.isAndroid && allowMigration) {
       final migrated = await _migrateDbFromExternalStorage();
       if (!migrated && !forceWithoutSync) {
         // Migration was attempted but failed
@@ -106,11 +107,11 @@ class AppDatabase {
     // Migration is foreground-only. A background task (allowMigration: false)
     // must never create a fresh database before the user has migrated their
     // data, so bail if there is nothing to open yet.
-    if (!allowMigration && !await File(_internalPath!).exists()) {
+    if (!kIsWeb && !allowMigration && !await File(_internalPath!).exists()) {
       return false;
     }
 
-    if (usingExternalLocation() && !forceWithoutSync) {
+    if (!kIsWeb && usingExternalLocation() && !forceWithoutSync) {
       if (await hasExternalLocationPermission()) {
         await _syncWithExternalDatabase();
       } else {
@@ -247,8 +248,15 @@ class AppDatabase {
       ExternalSyncSettings.load().location(SyncItem.logs) != null;
 
   Future<String> getInternalPath() async {
+    if (kIsWeb) {
+      return databaseFileName;
+    }
+
     final basePath = await getApplicationSupportDirectory();
-    if (!basePath.existsSync()) basePath.createSync(recursive: true);
+    if (!basePath.existsSync()) {
+      basePath.createSync(recursive: true);
+    }
+
     return join(basePath.path, databaseFileName);
   }
 
@@ -288,7 +296,7 @@ class AppDatabase {
   /// Overwrite the external database with local changes
   /// If an external database is not in use, no action is taken
   Future<void> updateExternalDatabase() async {
-    if (!usingExternalLocation()) return;
+    if (kIsWeb || !usingExternalLocation()) return;
 
     EasyDebounce.debounce("update-remote-database", Duration(seconds: 1),
         () async {
@@ -446,27 +454,33 @@ CREATE TABLE $attachmentsTable (
       skipUpdate: true,
     );
 
-    final imageBytes =
-        await rootBundle.load('assets/daily_you_First_Steps.webp');
-    final imageName = await AttachmentStorage.instance.create(
-      'daily_you_First_Steps.webp',
-      imageBytes.buffer.asUint8List(),
-      AttachmentType.image,
-      currTime: now,
-    );
-    if (imageName != null) {
-      await EntryAttachmentsProvider.instance.add(
-        EntryAttachment(
-          entryId: welcomeEntry.id,
-          type: AttachmentType.image,
-          filePath: imageName,
-          rank: 0,
-          timeCreate: now,
-        ),
-        skipUpdate: true,
-      );
-    }
+    // Native platforms: save the default welcome image.
+// Web: skip local file storage because AttachmentStorage
+// currently depends on path_provider.
+    if (!kIsWeb) {
+      final imageBytes =
+          await rootBundle.load('assets/daily_you_First_Steps.webp');
 
+      final imageName = await AttachmentStorage.instance.create(
+        'daily_you_First_Steps.webp',
+        imageBytes.buffer.asUint8List(),
+        AttachmentType.image,
+        currTime: now,
+      );
+
+      if (imageName != null) {
+        await EntryAttachmentsProvider.instance.add(
+          EntryAttachment(
+            entryId: welcomeEntry.id,
+            type: AttachmentType.image,
+            filePath: imageName,
+            rank: 0,
+            timeCreate: now,
+          ),
+          skipUpdate: true,
+        );
+      }
+    }
     final favoriteTag = TagsProvider.instance.tags
         .where((tag) => tag.icon == TagIconKey.favorite)
         .firstOrNull;
