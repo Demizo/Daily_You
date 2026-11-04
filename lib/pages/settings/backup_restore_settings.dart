@@ -13,7 +13,8 @@ import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/utils/auto_backup_schedule.dart';
 import 'package:daily_you/utils/backup_restore_utils.dart';
 import 'package:daily_you/utils/imports/import_registry.dart';
-import 'package:daily_you/utils/export_utils.dart';
+import 'package:daily_you/utils/exports/export_registry.dart';
+import 'package:daily_you/utils/exports/export_runner.dart';
 import 'package:daily_you/utils/operation_outcome.dart';
 import 'package:daily_you/utils/password_store.dart';
 import 'package:daily_you/widgets/app_dialog.dart';
@@ -73,7 +74,7 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
 
   Future<void> _showExportSelectionPopup() async {
     final l10n = AppLocalizations.of(context)!;
-    final format = await showSettingsDialog<ExportFormat>(
+    final option = await showSettingsDialog<ExportFormatOption>(
       context: context,
       title: l10n.logFormatTitle,
       isSelection: true,
@@ -81,23 +82,19 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
         SettingsInfoRow(
             title: l10n.warningTitle,
             subtitle: Text(l10n.settingsExportFormatDescription)),
-        SettingsActionRow(
-          title: l10n.formatMarkdown,
-          onTap: () => Navigator.of(context).pop(ExportFormat.markdown),
-        ),
+        for (final option in ExportRegistry.instance.options)
+          SettingsActionRow(
+            title: option.name(l10n),
+            onTap: () => Navigator.of(context).pop(option),
+          ),
       ],
     );
 
-    if (format == null) return;
+    if (option == null) return;
     if (!mounted) return;
 
     final outcome = await BackupRestoreUtils.runWithLoadingStatus(context,
-        (updateStatus) async {
-      if (format != ExportFormat.markdown) {
-        return const OperationOutcome.cancelled();
-      }
-      return ExportUtils.exportToMarkdown(context, updateStatus);
-    });
+        (updateStatus) => runExport(context, updateStatus, option: option));
 
     if (!mounted) return;
 
