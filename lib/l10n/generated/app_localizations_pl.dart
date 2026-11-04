@@ -922,6 +922,9 @@ class AppLocalizationsPl extends AppLocalizations {
   String get formatMarkdown => 'Markdown';
 
   @override
+  String get formatJson => 'JSON';
+
+  @override
   String get settingsDeleteAllLogsTitle => 'Usuń wszystkie wpisy';
 
   @override

@@ -511,6 +511,8 @@
   "@formatPixels": {},
   "formatMarkdown": "Markdown",
   "@formatMarkdown": {},
+  "formatJson": "JSON",
+  "@formatJson": {},
   "settingsDeleteAllLogsTitle": "Delete All Logs",
   "@settingsDeleteAllLogsTitle": {},
   "settingsDeleteAllLogsDescription": "Do you want to delete all of your logs?",

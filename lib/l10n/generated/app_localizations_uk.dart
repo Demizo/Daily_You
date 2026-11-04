@@ -925,6 +925,9 @@ class AppLocalizationsUk extends AppLocalizations {
   String get formatMarkdown => 'Markdown';
 
   @override
+  String get formatJson => 'JSON';
+
+  @override
   String get settingsDeleteAllLogsTitle => 'Видалити всі записи';
 
   @override

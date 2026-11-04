@@ -917,6 +917,9 @@ class AppLocalizationsHi extends AppLocalizations {
   String get formatMarkdown => 'मार्कडाउन';
 
   @override
+  String get formatJson => 'JSON';
+
+  @override
   String get settingsDeleteAllLogsTitle => 'सभी लॉग हटाएं';
 
   @override

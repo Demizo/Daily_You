@@ -918,6 +918,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get formatMarkdown => 'Markdown';
 
   @override
+  String get formatJson => 'JSON';
+
+  @override
   String get settingsDeleteAllLogsTitle => 'Hapus semua log';
 
   @override

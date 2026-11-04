@@ -1,0 +1,182 @@
+{
+  "format": "daily-you",
+  "version": 2,
+  "exportedAt": "2026-04-01T12:00:00.000",
+  "moodScale": [
+    {
+      "mood": 1,
+      "label": "Awful",
+      "icon": null,
+      "iconType": "character",
+      "color": 4294198070
+    },
+    {
+      "mood": 2,
+      "label": "Bad",
+      "icon": "😕",
+      "iconType": "character",
+      "color": null
+    },
+    {
+      "mood": 3,
+      "label": "Okay",
+      "icon": null,
+      "iconType": "character",
+      "color": null
+    },
+    {
+      "mood": 4,
+      "label": "Good: really",
+      "icon": "sentiment_satisfied",
+      "iconType": "materialIcon",
+      "color": 4283215696
+    },
+    {
+      "mood": 5,
+      "label": "Great",
+      "icon": null,
+      "iconType": "character",
+      "color": null
+    }
+  ],
+  "categories": [
+    {
+      "name": "Life",
+      "icon": null,
+      "iconType": "character",
+      "color": 4280391411,
+      "sortOrder": 0
+    },
+    {
+      "name": "Health",
+      "icon": "favorite",
+      "iconType": "materialIcon",
+      "color": null,
+      "sortOrder": 1
+    }
+  ],
+  "tags": [
+    {
+      "name": "Work",
+      "type": "label",
+      "category": "Life",
+      "icon": "💼",
+      "iconType": "character",
+      "color": null,
+      "sortOrder": 0
+    },
+    {
+      "name": "Gym",
+      "type": "label",
+      "category": null,
+      "icon": null,
+      "iconType": "character",
+      "color": null,
+      "sortOrder": 1
+    },
+    {
+      "name": "Water",
+      "type": "tracker",
+      "category": "Health",
+      "icon": null,
+      "iconType": "character",
+      "color": 4278430196,
+      "sortOrder": 0
+    },
+    {
+      "name": "Sleep",
+      "type": "tracker",
+      "category": null,
+      "icon": null,
+      "iconType": "character",
+      "color": null,
+      "sortOrder": 1
+    },
+    {
+      "name": "date",
+      "type": "tracker",
+      "category": null,
+      "icon": null,
+      "iconType": "character",
+      "color": null,
+      "sortOrder": 2
+    }
+  ],
+  "entries": [
+    {
+      "text": "He said \"hi\", then left\r\nsecond line\nthird line 🙂",
+      "mood": 4,
+      "timeCreate": "2026-03-04T08:30:00.000",
+      "timeModified": "2026-03-04T09:00:00.000",
+      "tags": [
+        {
+          "name": "Work",
+          "type": "label",
+          "value": null
+        },
+        {
+          "name": "Gym",
+          "type": "label",
+          "value": null
+        },
+        {
+          "name": "Water",
+          "type": "tracker",
+          "value": 3
+        },
+        {
+          "name": "Sleep",
+          "type": "tracker",
+          "value": 7.5
+        },
+        {
+          "name": "date",
+          "type": "tracker",
+          "value": 1
+        }
+      ],
+      "attachments": [
+        {
+          "type": "video",
+          "path": "Video/video_2026-03-04_2.mp4",
+          "rank": 2,
+          "timeCreate": "2026-03-04T08:32:00.000"
+        },
+        {
+          "type": "image",
+          "path": "Images/image_2026-03-04_1.png",
+          "rank": 1,
+          "timeCreate": "2026-03-04T08:31:00.000"
+        },
+        {
+          "type": "audio",
+          "path": "Audio/audio_2026-03-04_0.m4a",
+          "rank": 0,
+          "timeCreate": "2026-03-04T08:33:00.000"
+        }
+      ]
+    },
+    {
+      "text": "- starts with a dash\n=1+1",
+      "mood": null,
+      "timeCreate": "2026-03-04T20:15:00.000",
+      "timeModified": "2026-03-04T20:15:00.000",
+      "tags": [],
+      "attachments": []
+    },
+    {
+      "text": "",
+      "mood": 1,
+      "timeCreate": "2026-03-05T09:00:00.000",
+      "timeModified": "2026-03-05T09:00:00.000",
+      "tags": [
+        {
+          "name": "Water",
+          "type": "tracker",
+          "value": null
+        }
+      ],
+      "attachments": []
+    }
+  ]
+}

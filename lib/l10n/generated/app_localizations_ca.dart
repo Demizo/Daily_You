@@ -927,6 +927,9 @@ class AppLocalizationsCa extends AppLocalizations {
   String get formatMarkdown => 'Markdown';
 
   @override
+  String get formatJson => 'JSON';
+
+  @override
   String get settingsDeleteAllLogsTitle => 'Suprimeix tots els registres';
 
   @override

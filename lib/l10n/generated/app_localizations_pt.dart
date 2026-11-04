@@ -919,6 +919,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get formatMarkdown => 'Markdown';
 
   @override
+  String get formatJson => 'JSON';
+
+  @override
   String get settingsDeleteAllLogsTitle => 'Apagar Todos os Registos';
 
   @override

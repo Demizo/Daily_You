@@ -914,6 +914,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get formatMarkdown => 'Markdown';
 
   @override
+  String get formatJson => 'JSON';
+
+  @override
   String get settingsDeleteAllLogsTitle => 'Smazat všechny záznamy';
 
   @override

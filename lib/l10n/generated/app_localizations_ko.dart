@@ -909,6 +909,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get formatMarkdown => '마크다운';
 
   @override
+  String get formatJson => 'JSON';
+
+  @override
   String get settingsDeleteAllLogsTitle => '모든 기록 삭제';
 
   @override

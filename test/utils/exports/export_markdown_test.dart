@@ -14,6 +14,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:yaml/yaml.dart';
 
+import '../../support/export_golden.dart';
 import '../../support/export_snapshots.dart';
 
 const _frontMatterEnd = '\n---\n';
@@ -203,5 +204,20 @@ void main() {
       expect(await noteNamed('log_2026-03-04.md'),
           'Bad Wed, Mar 4, 2026\n- not a list\n= not a formula\n');
     });
+  });
+
+  test('matches the pinned note layout', () async {
+    await write(kitchenSinkSnapshot());
+
+    final names = await (await notes()).list();
+    expect(names..sort(), [
+      'log_2026-03-04.md',
+      'log_2026-03-04_2.md',
+      'log_2026-03-05.md',
+    ]);
+    for (final name in names) {
+      await expectMatchesGolden(
+          'markdown/$name', (await (await notes()).read(name))!);
+    }
   });
 }

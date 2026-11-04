@@ -5,6 +5,7 @@
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/storage/file_store.dart';
 import 'package:daily_you/utils/exports/export_format.dart';
+import 'package:daily_you/utils/exports/export_json.dart';
 import 'package:daily_you/utils/exports/export_markdown.dart';
 import 'package:daily_you/utils/exports/export_snapshot.dart';
 
@@ -37,6 +38,13 @@ class ExportRegistry {
       ExportFormat.markdown,
       (localizations) => localizations.formatMarkdown,
       writeMarkdown,
+    ),
+    ExportFormatOption(
+      ExportFormat.json,
+      (localizations) => localizations.formatJson,
+      writeJson,
+      documentName: jsonDocumentName,
+      documentMimeType: 'application/json',
     ),
   ]);
 

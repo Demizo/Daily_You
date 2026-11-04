@@ -926,6 +926,9 @@ class AppLocalizationsTa extends AppLocalizations {
   String get formatMarkdown => 'மார்க் பேரூர்';
 
   @override
+  String get formatJson => 'JSON';
+
+  @override
   String get settingsDeleteAllLogsTitle => 'அனைத்து பதிவுகளையும் நீக்கு';
 
   @override

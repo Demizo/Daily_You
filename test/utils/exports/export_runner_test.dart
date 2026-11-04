@@ -224,4 +224,71 @@ void main() {
       expect(harness.temporaryDirectory.listSync(), isEmpty);
     });
   });
+
+  group('JSON', () {
+    final option = ExportRegistry.instance.optionFor(ExportFormat.json);
+
+    Future<void> seedEntryWithImage() => harness
+            .addEntry(DateTime(2026, 3, 4), text: 'a good day', attachments: [
+          const SeededAttachment(AttachmentType.image, 'a.jpg', [1, 2, 3]),
+        ]);
+
+    testWidgets('is a single file when no attachment type is included',
+        (tester) async {
+      final context = await harness.pumpContext(tester);
+
+      await tester.runAsync(() async {
+        await seedEntryWithImage();
+
+        final outcome = await run(context, option, includedTypes: {});
+
+        final exported = harness.destinationDirectory.listSync().single as File;
+        expect(outcome.succeeded, isTrue);
+        expect(basename(exported.path),
+            matches(RegExp(r'^daily_you_json_export_.+\.json$')));
+        final document = jsonDecode(exported.readAsStringSync()) as Map;
+        expect(document['format'], 'daily-you');
+        expect((document['entries'] as List).single['attachments'], isEmpty);
+      });
+    });
+
+    testWidgets('is a zip of the document and attachments when any is included',
+        (tester) async {
+      final context = await harness.pumpContext(tester);
+
+      await tester.runAsync(() async {
+        await seedEntryWithImage();
+
+        final outcome = await run(context, option);
+
+        final exported = harness.destinationDirectory.listSync().single as File;
+        expect(outcome.succeeded, isTrue);
+        expect(basename(exported.path),
+            matches(RegExp(r'^daily_you_json_export_.+\.zip$')));
+        final extracted = await extractOnlyExport();
+        final document = jsonDecode(
+            File(join(extracted.path, 'daily_you_export.json'))
+                .readAsStringSync()) as Map;
+        final path =
+            ((document['entries'] as List).single['attachments'] as List)
+                .single['path'] as String;
+        expect(path, 'Images/image_2026-03-04_0.jpg');
+        expect(File(join(extracted.path, path)).readAsBytesSync(), [1, 2, 3]);
+      });
+    });
+
+    testWidgets('is a single file when the included types have no attachment',
+        (tester) async {
+      final context = await harness.pumpContext(tester);
+
+      await tester.runAsync(() async {
+        await seedEntryWithImage();
+
+        await run(context, option, includedTypes: {AttachmentType.audio});
+
+        expect(basename(harness.destinationDirectory.listSync().single.path),
+            endsWith('.json'));
+      });
+    });
+  });
 }

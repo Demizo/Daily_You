@@ -927,6 +927,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get formatMarkdown => 'Markdown';
 
   @override
+  String get formatJson => 'JSON';
+
+  @override
   String get settingsDeleteAllLogsTitle =>
       'Cancella tutte le entrate del diario';
 

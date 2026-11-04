@@ -916,6 +916,9 @@ class AppLocalizationsFa extends AppLocalizations {
   String get formatMarkdown => 'مارک داون';
 
   @override
+  String get formatJson => 'JSON';
+
+  @override
   String get settingsDeleteAllLogsTitle => 'حذف همه گزارش ها';
 
   @override

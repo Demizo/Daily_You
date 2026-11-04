@@ -1698,6 +1698,12 @@ abstract class AppLocalizations {
   /// **'Markdown'**
   String get formatMarkdown;
 
+  /// No description provided for @formatJson.
+  ///
+  /// In en, this message translates to:
+  /// **'JSON'**
+  String get formatJson;
+
   /// No description provided for @settingsDeleteAllLogsTitle.
   ///
   /// In en, this message translates to:

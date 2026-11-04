@@ -867,6 +867,9 @@ class AppLocalizationsMs extends AppLocalizations {
   String get formatMarkdown => 'Markdown';
 
   @override
+  String get formatJson => 'JSON';
+
+  @override
   String get settingsDeleteAllLogsTitle => 'Padam Semua Log';
 
   @override
