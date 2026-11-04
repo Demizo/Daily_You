@@ -113,10 +113,12 @@ class ExportHarness {
   Future<void> saveMoodScale(List<MoodScaleLevel> levels) =>
       MoodScaleProvider.instance.save(levels);
 
-  Future<TagCategory> addCategory(String name, {int? color}) async {
+  Future<TagCategory> addCategory(String name,
+      {int? color, int sortOrder = 0}) async {
     final category = await TagCategoryDao.add(TagCategory(
         name: name,
         color: color,
+        sortOrder: sortOrder,
         timeCreate: DateTime(2026),
         timeModified: DateTime(2026)));
     await TagsProvider.instance.load();
