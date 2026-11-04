@@ -22,6 +22,8 @@ export 'package:daily_you/utils/imports/import_format.dart';
 
 const _jsonExtensions = ['json'];
 const _jsonMimeTypes = ['application/json'];
+const _jsonAndZipExtensions = ['json', 'zip'];
+const _jsonAndZipMimeTypes = ['application/json', 'application/zip'];
 
 class ImportFormatOption {
   const ImportFormatOption(
@@ -61,8 +63,8 @@ class ImportRegistry {
       ImportFormat.dailyYouJson,
       (localizations) => localizations.formatDailyYouJson,
       json.parseJson,
-      pickerExtensions: _jsonExtensions,
-      pickerMimeTypes: _jsonMimeTypes,
+      pickerExtensions: _jsonAndZipExtensions,
+      pickerMimeTypes: _jsonAndZipMimeTypes,
     ),
     ImportFormatOption(
       ImportFormat.daybook,
