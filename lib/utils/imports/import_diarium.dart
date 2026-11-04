@@ -2,220 +2,152 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
-import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:daily_you/database/attachment_storage.dart';
-import 'package:daily_you/database/app_database.dart';
-import 'package:daily_you/database/entry_tag_dao.dart';
-import 'package:daily_you/database/tag_dao.dart';
+import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/mood.dart';
-import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/models/tag.dart';
-import 'package:daily_you/providers/entries_provider.dart';
-import 'package:daily_you/providers/tags_provider.dart';
-import 'package:daily_you/storage/storage_picker.dart';
-import 'package:daily_you/utils/imports/import_helpers.dart';
-import 'package:daily_you/utils/operation_outcome.dart';
+import 'package:daily_you/utils/imports/import_bundle.dart';
+import 'package:daily_you/utils/imports/import_source.dart';
+import 'package:daily_you/utils/imports/import_text.dart';
+import 'package:daily_you/utils/imports/import_time.dart';
 import 'package:daily_you/utils/tag_name_sanitizer.dart';
-import 'package:daily_you/l10n/generated/app_localizations.dart';
-import 'package:material_ui/material_ui.dart';
 import 'package:html2md/html2md.dart' as html2md;
-import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
-Future<OperationOutcome> importFromDiarium(
-    BuildContext context, Function(String) updateStatus) async {
-  final localizations = AppLocalizations.of(context)!;
-  updateStatus("0%");
+const int _labelTagType = 0;
+const int _numericTrackerType = 2;
+const int _ticksAtUnixEpoch = 621355968000000000;
 
-  var tempDir = await getTemporaryDirectory();
-  const tempDbName = "temp_diarium.db";
-  Database? db;
-  var outcome = const OperationOutcome.succeeded();
-
+Future<ImportBundle> parseDiarium(ImportSource source) async {
+  final database = await openDatabase(source.file.path, readOnly: true);
   try {
-    final selectedFile = await StoragePicker.pickFile();
-    if (selectedFile == null) return const OperationOutcome.cancelled();
+    final entries = await database.rawQuery('SELECT * FROM Entries');
+    final media = await database.rawQuery('SELECT * FROM Media WHERE Type = 0');
+    final tags = await database.rawQuery('SELECT * FROM Tags');
+    final entryTags = await database.rawQuery('SELECT * FROM EntryTags');
 
-    updateStatus(localizations.tranferStatus("0"));
-    await selectedFile.copyInto(tempDir.path, tempDbName,
-        onProgress: (percent) {
-      updateStatus(localizations.tranferStatus("${percent.round()}"));
-    });
-
-    db = await openDatabase(join(tempDir.path, tempDbName), readOnly: true);
-    final entries = await db.rawQuery('SELECT * FROM Entries');
-    final media = await db.rawQuery('SELECT * FROM Media WHERE Type = 0');
-    final tagsByDiariumId =
-        await importDiariumTags(await db.rawQuery('SELECT * FROM Tags'));
-    final entryTagsByEntryId = <int, List<Map<String, Object?>>>{};
-    for (final row in await db.rawQuery('SELECT * FROM EntryTags')) {
-      final entryId = row['DiaryEntryId'] as int;
-      entryTagsByEntryId.putIfAbsent(entryId, () => []).add(row);
-    }
-
-    final Map<int, DateTime> idToTimestamp = {};
-    for (final entry in entries) {
-      final id = entry['DiaryEntryId'] as int;
-      idToTimestamp[id] = diariumIdToDateTime(id);
-    }
-
-    final mediaByEntryId = <int, List<Map<String, Object?>>>{};
-    for (final item in media) {
-      final entryId = item['DiaryEntryId'] as int;
-      mediaByEntryId.putIfAbsent(entryId, () => []).add(item);
-    }
-
-    // Sort entries chronologically
-    final sortedEntries = List<Map<String, Object?>>.from(entries)
-      ..sort((a, b) =>
-          (a['DiaryEntryId'] as int).compareTo(b['DiaryEntryId'] as int));
-
-    final takenNames = await AttachmentStorage.instance
-        .takenLowerCaseNames(AttachmentType.image);
-    final totalEntries = sortedEntries.length;
-    int processedEntries = 0;
-
-    for (final entry in sortedEntries) {
-      final id = entry['DiaryEntryId'] as int;
-      final timestamp = idToTimestamp[id]!;
-
-      final heading = entry['Heading'] as String? ?? '';
-      var body = entry['Text'] as String? ?? '';
-      if (body.isNotEmpty) {
-        body = html2md.convert(body);
-      }
-
-      final rating = entry['Rating'] as int?;
-      final mood = rating != null ? Mood.fromRating(rating) : null;
-
-      final parts = <String>[];
-      if (heading.isNotEmpty) parts.add("# $heading");
-      if (body.isNotEmpty) parts.add(body);
-
-      if (!EntriesProvider.instance.hasEntryAtTimestamp(timestamp)) {
-        final addedEntry = await EntriesProvider.instance.add(
-            Entry(
-              text: parts.join('\n\n'),
-              mood: mood,
-              timeCreate: timestamp,
-              timeModified: timestamp,
-            ),
-            skipUpdate: true);
-
-        final entryMedia = mediaByEntryId[id] ?? [];
-        for (final img in entryMedia) {
-          final data = img['Data'] as Uint8List?;
-          final rank = entryMedia.length - 1 - (img['Index'] as int? ?? 0);
-          if (data != null) {
-            await addImportedImage(
-                addedEntry.id!, data, rank, timestamp, takenNames);
-          }
-        }
-
-        await addDiariumEntryTags(addedEntry.id!, timestamp,
-            entryTagsByEntryId[id] ?? const [], tagsByDiariumId);
-      }
-
-      processedEntries++;
-      updateStatus("${((processedEntries / totalEntries) * 100).round()}%");
-    }
-  } catch (error) {
-    outcome = OperationOutcome.failed(error);
-  }
-
-  updateStatus(localizations.cleanUpStatus);
-
-  outcome = await finishImport(updateStatus, outcome);
-  await TagsProvider.instance.load();
-  await AppDatabase.instance.updateExternalDatabase();
-
-  if (db != null && db.isOpen) {
-    await db.close();
-  }
-
-  if (await File(join(tempDir.path, tempDbName)).exists()) {
-    await File(join(tempDir.path, tempDbName)).delete();
-  }
-
-  return outcome;
-}
-
-const int _diariumLabelTagType = 0;
-const int _diariumNumericTrackerType = 2;
-
-int? parseDiariumColor(String? hex) {
-  if (hex == null || !RegExp(r'^#[0-9a-fA-F]{8}$').hasMatch(hex)) return null;
-  return int.parse(hex.substring(1), radix: 16);
-}
-
-Future<Map<int, Tag>> importDiariumTags(
-    List<Map<String, Object?>> diariumTags) async {
-  String tagLookupKey(TagType tagType, String name) =>
-      '${tagType.name}:${name.toLowerCase()}';
-
-  final tagByLookupKey = <String, Tag>{};
-  var nextSortOrder = 0;
-  for (final tag in TagsProvider.instance.tags) {
-    tagByLookupKey.putIfAbsent(tagLookupKey(tag.tagType, tag.name), () => tag);
-    if (tag.categoryId == null && tag.sortOrder >= nextSortOrder) {
-      nextSortOrder = tag.sortOrder + 1;
-    }
-  }
-
-  final tagsByDiariumId = <int, Tag>{};
-  for (final diariumTag in diariumTags) {
-    final tagType = switch (diariumTag['Type']) {
-      _diariumLabelTagType => TagType.label,
-      _diariumNumericTrackerType => TagType.tracker,
-      _ => null,
-    };
-    final name = sanitizeTagName((diariumTag['Value'] as String?) ?? '');
-    if (tagType == null || name.isEmpty) continue;
-
-    var tag = tagByLookupKey[tagLookupKey(tagType, name)];
-    if (tag == null) {
-      final now = DateTime.now();
-      tag = await TagDao.add(Tag(
+    final tagDefinitionById = <int, ImportedTagDefinition>{};
+    for (final tag in tags) {
+      final tagType = switch (tag['Type']) {
+        _labelTagType => TagType.label,
+        _numericTrackerType => TagType.tracker,
+        _ => null,
+      };
+      final name = sanitizeTagName((tag['Value'] as String?) ?? '');
+      if (tagType == null || name.isEmpty) continue;
+      tagDefinitionById[tag['DiaryTagId'] as int] = ImportedTagDefinition(
         name: name,
         tagType: tagType,
-        color: parseDiariumColor(diariumTag['Color'] as String?),
-        sortOrder: nextSortOrder++,
-        timeCreate: now,
-        timeModified: now,
-      ));
-      tagByLookupKey[tagLookupKey(tagType, name)] = tag;
+        color: _parseColor(tag['Color'] as String?),
+      );
     }
-    tagsByDiariumId[diariumTag['DiaryTagId'] as int] = tag;
+
+    final mediaByEntryId = _groupByEntryId(media);
+    final entryTagsByEntryId = _groupByEntryId(entryTags);
+
+    final sortedEntries = [...entries]..sort((a, b) =>
+        (a['DiaryEntryId'] as int).compareTo(b['DiaryEntryId'] as int));
+
+    return ImportBundle(
+      tagDefinitions: tagDefinitionById.values.toList(),
+      entries: [
+        for (final entry in sortedEntries)
+          _parseEntry(
+            entry,
+            mediaByEntryId[entry['DiaryEntryId']] ?? const [],
+            entryTagsByEntryId[entry['DiaryEntryId']] ?? const [],
+            tagDefinitionById,
+          ),
+      ],
+    );
+  } finally {
+    await database.close();
   }
-  return tagsByDiariumId;
 }
 
-Future<void> addDiariumEntryTags(
-    int entryId,
-    DateTime timestamp,
-    List<Map<String, Object?>> diariumEntryTags,
-    Map<int, Tag> tagsByDiariumId) async {
-  final addedTagIds = <int>{};
-  for (final diariumEntryTag in diariumEntryTags) {
-    final tag = tagsByDiariumId[diariumEntryTag['DiaryTagId']];
-    if (tag == null) continue;
-
-    String? value;
-    if (tag.tagType == TagType.tracker) {
-      value = (diariumEntryTag['TrackingValue'] as String?)?.trim();
-      if (!(double.tryParse(value ?? '')?.isFinite ?? false)) continue;
-    }
-    if (!addedTagIds.add(tag.id!)) continue;
-
-    await EntryTagDao.add(EntryTag(
-      entryId: entryId,
-      tagId: tag.id!,
-      value: value,
-      timeCreate: timestamp,
-    ));
+Map<int, List<Map<String, Object?>>> _groupByEntryId(
+    List<Map<String, Object?>> rows) {
+  final grouped = <int, List<Map<String, Object?>>>{};
+  for (final row in rows) {
+    grouped.putIfAbsent(row['DiaryEntryId'] as int, () => []).add(row);
   }
+  return grouped;
+}
+
+ImportedEntry _parseEntry(
+  Map<String, Object?> entry,
+  List<Map<String, Object?>> media,
+  List<Map<String, Object?>> entryTags,
+  Map<int, ImportedTagDefinition> tagDefinitionById,
+) {
+  final timeCreate = _timeOfEntryId(entry['DiaryEntryId'] as int);
+  final body = entry['Text'] as String? ?? '';
+  final rating = entry['Rating'] as int?;
+
+  return ImportedEntry(
+    Entry(
+      text: titledText(entry['Heading'] as String?,
+          body.isEmpty ? null : html2md.convert(body)),
+      mood: rating == null ? null : Mood.fromRating(rating),
+      timeCreate: timeCreate,
+      timeModified: timeCreate,
+    ),
+    tags: entryTags
+        .map((entryTag) => _parseEntryTag(entryTag, tagDefinitionById))
+        .nonNulls
+        .toList(),
+    attachments: _imageAttachments(media, timeCreate),
+  );
+}
+
+List<ImportedAttachment> _imageAttachments(
+    List<Map<String, Object?>> media, DateTime timeCreate) {
+  final images = [
+    for (final item in media)
+      if (item['Data'] != null) item
+  ];
+  int mediaIndex(int imagePosition) =>
+      images[imagePosition]['Index'] as int? ?? 0;
+
+  final orderedPositions = List.generate(images.length, (position) => position)
+    ..sort((a, b) {
+      final byIndex = mediaIndex(a).compareTo(mediaIndex(b));
+      return byIndex != 0 ? byIndex : a.compareTo(b);
+    });
+
+  return [
+    for (final (rankFromEnd, imagePosition) in orderedPositions.indexed)
+      ImportedAttachment(
+        type: AttachmentType.image,
+        rank: images.length - 1 - rankFromEnd,
+        timeCreate: timeCreate,
+        media: BytesMedia(images[imagePosition]['Data'] as Uint8List),
+      ),
+  ];
+}
+
+ImportedEntryTag? _parseEntryTag(Map<String, Object?> entryTag,
+    Map<int, ImportedTagDefinition> tagDefinitionById) {
+  final definition = tagDefinitionById[entryTag['DiaryTagId']];
+  if (definition == null) return null;
+
+  String? value;
+  if (definition.tagType == TagType.tracker) {
+    value = (entryTag['TrackingValue'] as String?)?.trim();
+    if (!(double.tryParse(value ?? '')?.isFinite ?? false)) return null;
+  }
+  return ImportedEntryTag(
+      name: definition.name, tagType: definition.tagType, value: value);
+}
+
+DateTime _timeOfEntryId(int ticks) =>
+    wallClockOf(DateTime.fromMicrosecondsSinceEpoch(
+        ((ticks - _ticksAtUnixEpoch) / 10).round(),
+        isUtc: true));
+
+int? _parseColor(String? hex) {
+  if (hex == null || !RegExp(r'^#[0-9a-fA-F]{8}$').hasMatch(hex)) return null;
+  return int.parse(hex.substring(1), radix: 16);
 }

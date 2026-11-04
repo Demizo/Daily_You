@@ -5,172 +5,83 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:daily_you/database/attachment_storage.dart';
-import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/mood.dart';
-import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/storage/local_file_store.dart';
-import 'package:daily_you/storage/storage_picker.dart';
-import 'package:daily_you/utils/imports/import_helpers.dart';
-import 'package:daily_you/utils/operation_outcome.dart';
-import 'package:daily_you/utils/zip_utils.dart';
-import 'package:daily_you/l10n/generated/app_localizations.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:daily_you/utils/imports/import_attachments.dart';
+import 'package:daily_you/utils/imports/import_bundle.dart';
+import 'package:daily_you/utils/imports/import_source.dart';
+import 'package:daily_you/utils/imports/import_text.dart';
+import 'package:daily_you/utils/imports/import_time.dart';
 import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:xml/xml.dart';
 
-Future<OperationOutcome> importFromDiaro(
-    BuildContext context, Function(String) updateStatus) async {
-  final localizations = AppLocalizations.of(context)!;
-  updateStatus("0%");
+Future<ImportBundle> parseDiaro(ImportSource source) async {
+  final files = LocalFileStore(source.directoryPath);
+  final xmlName = (await files.list()).firstWhere(
+      (name) => name.endsWith('DiaroBackup.xml'),
+      orElse: () => throw Exception('DiaroBackup.xml not found in archive'));
+  final xmlBytes = (await files.read(xmlName))!;
+  final document = XmlDocument.parse(utf8.decode(xmlBytes));
 
-  final selectedFile = await StoragePicker.pickFile();
-  if (selectedFile == null) return const OperationOutcome.cancelled();
+  XmlElement tableNamed(String name) => document
+      .findAllElements('table')
+      .firstWhere((table) => table.getAttribute('name') == name);
 
-  var outcome = const OperationOutcome.succeeded();
+  final photosByEntryUid = <String, List<({String fileName, int position})>>{};
+  for (final row in tableNamed('diaro_attachments').findAllElements('r')) {
+    if (row.getElement('type')?.innerText != 'photo') continue;
+    final entryUid = row.getElement('entry_uid')?.innerText ?? "";
+    final fileName = row.getElement('filename')?.innerText ?? "";
+    final position = int.tryParse(row.getElement('position')?.innerText ?? "");
+    if (entryUid.isEmpty || fileName.isEmpty || position == null) continue;
 
-  var tempDir = await getTemporaryDirectory();
-  const tempZip = "temp_diaro.zip";
-  final tempZipFolder = Directory(join(tempDir.path, "Diaro"));
-  await tempZipFolder.create(recursive: true);
-
-  try {
-    updateStatus(localizations.tranferStatus("0"));
-    await selectedFile.copyInto(tempDir.path, tempZip, onProgress: (percent) {
-      updateStatus(localizations.tranferStatus("${percent.round()}"));
-    });
-
-    await ZipUtils.extract(
-      join(tempDir.path, tempZip),
-      tempZipFolder.path,
-    );
-
-    final extractedFiles = LocalFileStore(tempZipFolder.path);
-    final extractedPhotos =
-        LocalFileStore(join(tempZipFolder.path, 'media', 'photo'));
-    final xmlName = (await extractedFiles.list()).firstWhere(
-        (name) => name.endsWith('DiaroBackup.xml'),
-        orElse: () => throw Exception('DiaroBackup.xml not found in archive'));
-
-    final xmlBytes = await extractedFiles.read(xmlName);
-    if (xmlBytes == null) {
-      throw Exception('DiaroBackup.xml not found in archive');
-    }
-    final xmlString = utf8.decode(xmlBytes);
-    final xmlDoc = XmlDocument.parse(xmlString);
-
-    final entriesTable = xmlDoc
-        .findAllElements('table')
-        .firstWhere((t) => t.getAttribute('name') == 'diaro_entries');
-
-    final attachmentTable = xmlDoc
-        .findAllElements('table')
-        .firstWhere((t) => t.getAttribute('name') == 'diaro_attachments');
-
-    final attachmentsByEntry = <String, List<Map<String, dynamic>>>{};
-    for (final r in attachmentTable.findAllElements('r')) {
-      if (r.getElement('type')?.innerText != 'photo') continue;
-      final entryUid = r.getElement('entry_uid')?.innerText ?? "";
-      final filename = r.getElement('filename')?.innerText ?? "";
-      final position = int.tryParse(r.getElement('position')?.innerText ?? "");
-
-      if (entryUid.isEmpty || filename.isEmpty || position == null) continue;
-
-      attachmentsByEntry.putIfAbsent(entryUid, () => []).add({
-        'filename': filename,
-        'position': position,
-      });
-    }
-
-    final entries = <Map<String, dynamic>>[];
-    for (final r in entriesTable.findAllElements('r')) {
-      final uid = r.getElement('uid')?.innerText ?? "";
-      final title = r.getElement('title')?.innerText ?? "";
-      final text = r.getElement('text')?.innerText ?? "";
-      final moodString = r.getElement('mood')?.innerText ?? "";
-      final utcTimestamp = r.getElement('date')?.innerText ?? "";
-      final tzOffset = r.getElement('tz_offset')?.innerText ?? "";
-
-      if (uid.isEmpty || utcTimestamp.isEmpty || tzOffset.isEmpty) continue;
-
-      final created = convertWithOffset(int.parse(utcTimestamp), tzOffset);
-
-      int? mood;
-      if (moodString.isNotEmpty) {
-        final m = int.tryParse(moodString);
-        if (m != null) {
-          mood = Mood.fromRating(m, bestFirst: true);
-        }
-      }
-
-      entries.add({
-        'uid': uid,
-        'title': title,
-        'text': text,
-        'date': created,
-        'mood': mood,
-        'attachments': attachmentsByEntry[uid] ?? [],
-      });
-    }
-
-    final takenNames = await AttachmentStorage.instance
-        .takenLowerCaseNames(AttachmentType.image);
-    final totalEntries = entries.length;
-    int processedEntries = 0;
-
-    for (final entry in entries) {
-      final created = entry['date'] as DateTime;
-      final title = entry['title'] as String? ?? "";
-      final text = entry['text'] as String? ?? "";
-      final mood = entry['mood'] as int?;
-      final atts = entry['attachments'] as List<Map<String, dynamic>>;
-
-      final parts = <String>[];
-      if (title.isNotEmpty) parts.add("# $title");
-      if (text.isNotEmpty) parts.add(text);
-
-      if (!EntriesProvider.instance.hasEntryAtTimestamp(created)) {
-        final addedEntry = await EntriesProvider.instance.add(
-            Entry(
-              text: parts.join("\n\n"),
-              mood: mood,
-              timeCreate: created,
-              timeModified: created,
-            ),
-            skipUpdate: true);
-
-        if (atts.isNotEmpty) {
-          atts.sort((a, b) => a['position'].compareTo(b['position']));
-          int rank = 0;
-          for (final att in atts) {
-            final filename = att['filename'] as String;
-            final photoBytes = await extractedPhotos.read(filename);
-            if (photoBytes == null) continue;
-            await addImportedImage(
-                addedEntry.id!, photoBytes, rank++, created, takenNames);
-          }
-        }
-      }
-
-      processedEntries++;
-      updateStatus("${((processedEntries / totalEntries) * 100).round()}%");
-    }
-  } catch (error) {
-    outcome = OperationOutcome.failed(error);
+    photosByEntryUid
+        .putIfAbsent(entryUid, () => [])
+        .add((fileName: fileName, position: position));
   }
 
-  updateStatus(localizations.cleanUpStatus);
+  final entries = <ImportedEntry>[];
+  for (final row in tableNamed('diaro_entries').findAllElements('r')) {
+    final uid = row.getElement('uid')?.innerText ?? "";
+    final utcMilliseconds = row.getElement('date')?.innerText ?? "";
+    final timeZoneOffset = row.getElement('tz_offset')?.innerText ?? "";
+    if (uid.isEmpty || utcMilliseconds.isEmpty || timeZoneOffset.isEmpty) {
+      continue;
+    }
 
-  outcome = await finishImport(updateStatus, outcome);
+    final timeCreate = _localTime(int.parse(utcMilliseconds), timeZoneOffset);
+    final rating = int.tryParse(row.getElement('mood')?.innerText ?? "");
 
-  if (await File(join(tempDir.path, tempZip)).exists()) {
-    await File(join(tempDir.path, tempZip)).delete();
+    final photos = [...?photosByEntryUid[uid]]
+      ..sort((a, b) => a.position.compareTo(b.position));
+    final attachments = await existingImageAttachments(
+        photos.map((photo) =>
+            File(join(source.directoryPath, 'media', 'photo', photo.fileName))),
+        timeCreate);
+
+    entries.add(ImportedEntry(
+      Entry(
+        text: titledText(row.getElement('title')?.innerText,
+            row.getElement('text')?.innerText),
+        mood: rating == null ? null : Mood.fromRating(rating, bestFirst: true),
+        timeCreate: timeCreate,
+        timeModified: timeCreate,
+      ),
+      attachments: attachments,
+    ));
   }
-  if (await tempZipFolder.exists()) {
-    await tempZipFolder.delete(recursive: true);
-  }
+  return ImportBundle(entries: entries);
+}
 
-  return outcome;
+DateTime _localTime(int utcMilliseconds, String timeZoneOffset) {
+  final sign = timeZoneOffset.startsWith('-') ? -1 : 1;
+  final parts = timeZoneOffset.substring(1).split(':');
+  final offset = Duration(
+    hours: int.parse(parts[0]) * sign,
+    minutes: int.parse(parts[1]) * sign,
+  );
+  return wallClockOf(
+      DateTime.fromMillisecondsSinceEpoch(utcMilliseconds, isUtc: true)
+          .add(offset));
 }

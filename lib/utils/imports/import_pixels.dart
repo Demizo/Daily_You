@@ -6,56 +6,28 @@ import 'dart:convert';
 
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/mood.dart';
-import 'package:daily_you/providers/entries_provider.dart';
-import 'package:daily_you/storage/storage_picker.dart';
-import 'package:daily_you/utils/imports/import_helpers.dart';
-import 'package:daily_you/utils/operation_outcome.dart';
+import 'package:daily_you/utils/imports/import_bundle.dart';
+import 'package:daily_you/utils/imports/import_source.dart';
 import 'package:intl/intl.dart';
 
-Future<OperationOutcome> importFromPixels(Function(String) updateStatus) async {
-  updateStatus("0%");
+Future<ImportBundle> parsePixels(ImportSource source) async {
+  final root = json.decode(utf8.decode(await source.file.readAsBytes()));
 
-  var outcome = const OperationOutcome.succeeded();
+  return ImportBundle(entries: [
+    for (final entry in root as List<dynamic>)
+      if (entry['type'] == 'Mood') _parseEntry(entry as Map<String, dynamic>),
+  ]);
+}
 
-  try {
-    final selectedFile = await StoragePicker.pickFile(
-        allowedExtensions: ['json'], mimeTypes: ['application/json']);
-    if (selectedFile == null) return const OperationOutcome.cancelled();
+ImportedEntry _parseEntry(Map<String, dynamic> entry) {
+  final timeCreate = DateFormat("yyyy-MM-dd").parse(entry['date']);
+  final scores = (entry['scores'] as List<dynamic>).cast<int>();
+  final averageScore = scores.reduce((a, b) => a + b) ~/ scores.length;
 
-    final bytes = await selectedFile.readBytes();
-    if (bytes == null) return const OperationOutcome.failed();
-    final jsonData = json.decode(utf8.decode(bytes.toList()));
-
-    final totalEntries = jsonData.length;
-    var processedEntries = 0;
-
-    for (var entry in jsonData) {
-      if (entry['type'] == 'Mood') {
-        DateTime timeCreated = DateFormat("yyyy-MM-dd").parse(entry['date']);
-        DateTime timeModified = DateTime.now();
-
-        if (!EntriesProvider.instance.hasEntryAtTimestamp(timeCreated)) {
-          // Average multiple scores within a single Pixels entry
-          int avgMood =
-              (entry['scores'] as List<dynamic>).reduce((a, b) => a + b) ~/
-                  entry['scores'].length;
-          int mappedMood = Mood.fromRating(avgMood);
-
-          await EntriesProvider.instance.add(
-              Entry(
-                  text: entry['notes'] ?? '',
-                  mood: mappedMood,
-                  timeCreate: timeCreated,
-                  timeModified: timeModified),
-              skipUpdate: true);
-        }
-      }
-      processedEntries += 1;
-      updateStatus("${((processedEntries / totalEntries) * 100).round()}%");
-    }
-  } catch (error) {
-    outcome = OperationOutcome.failed(error);
-  }
-
-  return finishImport(updateStatus, outcome);
+  return ImportedEntry(Entry(
+    text: entry['notes'] ?? '',
+    mood: Mood.fromRating(averageScore),
+    timeCreate: timeCreate,
+    timeModified: timeCreate,
+  ));
 }

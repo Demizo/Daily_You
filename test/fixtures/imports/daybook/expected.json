@@ -1,0 +1,79 @@
+{
+  "categories": [],
+  "tagDefinitions": [],
+  "entries": [
+    {
+      "text": "# Morning\n\nWrote, with a comma",
+      "mood": null,
+      "timeCreate": "2026-01-02T09:00:00.000",
+      "timeModified": "2026-01-02T09:00:00.000",
+      "tags": [],
+      "attachments": []
+    },
+    {
+      "text": "Evening text only",
+      "mood": null,
+      "timeCreate": "2026-01-02T21:30:00.000",
+      "timeModified": "2026-01-02T21:30:00.000",
+      "tags": [],
+      "attachments": []
+    },
+    {
+      "text": "# Title only",
+      "mood": null,
+      "timeCreate": "2026-01-03T08:00:00.000",
+      "timeModified": "2026-01-03T08:00:00.000",
+      "tags": [],
+      "attachments": []
+    },
+    {
+      "text": "# With photos\n\nTwo photos",
+      "mood": null,
+      "timeCreate": "2026-01-04T10:00:00.000",
+      "timeModified": "2026-01-04T10:00:00.000",
+      "tags": [],
+      "attachments": [
+        {
+          "type": "image",
+          "rank": 0,
+          "timeCreate": "2026-01-04T10:00:00.000",
+          "media": {
+            "file": "images/b.jpg"
+          }
+        },
+        {
+          "type": "image",
+          "rank": 1,
+          "timeCreate": "2026-01-04T10:00:00.000",
+          "media": {
+            "file": "images/a.jpg"
+          }
+        }
+      ]
+    },
+    {
+      "text": "# Duplicate\n\nSame time as the entry above",
+      "mood": null,
+      "timeCreate": "2026-01-04T10:00:00.000",
+      "timeModified": "2026-01-04T10:00:00.000",
+      "tags": [],
+      "attachments": []
+    },
+    {
+      "text": "# Missing file",
+      "mood": null,
+      "timeCreate": "2026-01-05T12:00:00.000",
+      "timeModified": "2026-01-05T12:00:00.000",
+      "tags": [],
+      "attachments": []
+    },
+    {
+      "text": "# Multi line\n\nline one\nline two",
+      "mood": null,
+      "timeCreate": "2026-01-06T07:15:00.000",
+      "timeModified": "2026-01-06T07:15:00.000",
+      "tags": [],
+      "attachments": []
+    }
+  ]
+}

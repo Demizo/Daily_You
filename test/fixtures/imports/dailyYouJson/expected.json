@@ -1,0 +1,122 @@
+{
+  "categories": [],
+  "tagDefinitions": [],
+  "entries": [
+    {
+      "text": "no mood",
+      "mood": null,
+      "timeCreate": "2026-01-02T09:00:00.000",
+      "timeModified": "2026-01-02T09:05:00.000",
+      "tags": [],
+      "attachments": []
+    },
+    {
+      "text": "worst mood",
+      "mood": 1,
+      "timeCreate": "2026-01-02T21:00:00.000",
+      "timeModified": "2026-01-02T21:00:00.000",
+      "tags": [],
+      "attachments": []
+    },
+    {
+      "text": "best mood",
+      "mood": 5,
+      "timeCreate": "2026-01-03T08:30:00.000",
+      "timeModified": "2026-01-03T08:30:00.000",
+      "tags": [],
+      "attachments": []
+    },
+    {
+      "text": "",
+      "mood": 3,
+      "timeCreate": "2026-01-04T10:00:00.000",
+      "timeModified": "2026-01-04T10:00:00.000",
+      "tags": [],
+      "attachments": [
+        {
+          "type": "image",
+          "rank": 1,
+          "timeCreate": "2026-01-04T10:01:00.000",
+          "media": {
+            "reference": "second.jpg"
+          }
+        },
+        {
+          "type": "image",
+          "rank": 0,
+          "timeCreate": "2026-01-04T10:02:00.000",
+          "media": {
+            "reference": "first.jpg"
+          }
+        }
+      ]
+    },
+    {
+      "text": "deprecated image field",
+      "mood": null,
+      "timeCreate": "2026-01-05T12:00:00.000",
+      "timeModified": "2026-01-05T12:00:00.000",
+      "tags": [],
+      "attachments": [
+        {
+          "type": "image",
+          "rank": 0,
+          "timeCreate": "2026-01-05T12:00:00.000",
+          "media": {
+            "reference": "legacy.jpg"
+          }
+        }
+      ]
+    },
+    {
+      "text": "legacy image and images list",
+      "mood": null,
+      "timeCreate": "2026-01-06T12:00:00.000",
+      "timeModified": "2026-01-06T12:00:00.000",
+      "tags": [],
+      "attachments": [
+        {
+          "type": "image",
+          "rank": 0,
+          "timeCreate": "2026-01-06T12:00:00.000",
+          "media": {
+            "reference": "legacy.jpg"
+          }
+        },
+        {
+          "type": "image",
+          "rank": 1,
+          "timeCreate": "2026-01-06T12:01:00.000",
+          "media": {
+            "reference": "listed.jpg"
+          }
+        }
+      ]
+    },
+    {
+      "text": "stored with a zone",
+      "mood": null,
+      "timeCreate": "2026-01-07T10:00:00.000",
+      "timeModified": "2026-01-07T11:00:00.000",
+      "tags": [],
+      "attachments": [
+        {
+          "type": "image",
+          "rank": 0,
+          "timeCreate": "2026-01-07T10:30:00.000",
+          "media": {
+            "reference": "zoned.jpg"
+          }
+        }
+      ]
+    },
+    {
+      "text": "duplicate of the first entry",
+      "mood": null,
+      "timeCreate": "2026-01-02T09:00:00.000",
+      "timeModified": "2026-01-02T09:00:00.000",
+      "tags": [],
+      "attachments": []
+    }
+  ]
+}

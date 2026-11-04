@@ -1,0 +1,70 @@
+{
+  "categories": [],
+  "tagDefinitions": [],
+  "entries": [
+    {
+      "text": "# Worst day\n\nEverything went wrong",
+      "mood": 1,
+      "timeCreate": "2026-01-02T10:00:00.000",
+      "timeModified": "2026-01-02T11:00:00.000",
+      "tags": [],
+      "attachments": []
+    },
+    {
+      "text": "Best day, text only",
+      "mood": 5,
+      "timeCreate": "2026-01-02T16:00:00.000",
+      "timeModified": "2026-01-02T16:00:00.000",
+      "tags": [],
+      "attachments": []
+    },
+    {
+      "text": "# Title only",
+      "mood": null,
+      "timeCreate": "2026-01-03T10:00:00.000",
+      "timeModified": "2026-01-03T10:00:00.000",
+      "tags": [],
+      "attachments": []
+    },
+    {
+      "text": "Plain middle day",
+      "mood": 3,
+      "timeCreate": "2026-01-03T11:00:00.000",
+      "timeModified": "2026-01-03T11:00:00.000",
+      "tags": [],
+      "attachments": []
+    },
+    {
+      "text": "Duplicate time",
+      "mood": 4,
+      "timeCreate": "2026-01-03T11:00:00.000",
+      "timeModified": "2026-01-03T11:00:00.000",
+      "tags": [],
+      "attachments": []
+    },
+    {
+      "text": "Bad mood",
+      "mood": 2,
+      "timeCreate": "2026-01-03T12:00:00.000",
+      "timeModified": "2026-01-03T12:00:00.000",
+      "tags": [],
+      "attachments": []
+    },
+    {
+      "text": "Unknown mood name",
+      "mood": null,
+      "timeCreate": "2026-01-03T12:30:00.000",
+      "timeModified": "2026-01-03T12:30:00.000",
+      "tags": [],
+      "attachments": []
+    },
+    {
+      "text": "No mood field",
+      "mood": null,
+      "timeCreate": "2026-01-03T13:00:00.000",
+      "timeModified": "2026-01-03T13:00:00.000",
+      "tags": [],
+      "attachments": []
+    }
+  ]
+}

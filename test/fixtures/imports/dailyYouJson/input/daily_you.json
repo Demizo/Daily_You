@@ -1,0 +1,73 @@
+[
+  {
+    "text": "no mood",
+    "timeCreated": "2026-01-02T09:00:00.000",
+    "timeModified": "2026-01-02T09:05:00.000"
+  },
+  {
+    "text": "worst mood",
+    "mood": -2,
+    "timeCreated": "2026-01-02T21:00:00.000",
+    "timeModified": "2026-01-02T21:00:00.000"
+  },
+  {
+    "text": "best mood",
+    "mood": 2,
+    "timeCreated": "2026-01-03T08:30:00.000",
+    "timeModified": "2026-01-03T08:30:00.000"
+  },
+  {
+    "text": "",
+    "mood": 0,
+    "timeCreated": "2026-01-04T10:00:00.000",
+    "timeModified": "2026-01-04T10:00:00.000",
+    "images": [
+      {
+        "imgPath": "second.jpg",
+        "imgRank": 1,
+        "timeCreated": "2026-01-04T10:01:00.000"
+      },
+      {
+        "imgPath": "first.jpg",
+        "imgRank": 0,
+        "timeCreated": "2026-01-04T10:02:00.000"
+      }
+    ]
+  },
+  {
+    "text": "deprecated image field",
+    "timeCreated": "2026-01-05T12:00:00.000",
+    "timeModified": "2026-01-05T12:00:00.000",
+    "imgPath": "legacy.jpg"
+  },
+  {
+    "text": "legacy image and images list",
+    "timeCreated": "2026-01-06T12:00:00.000",
+    "timeModified": "2026-01-06T12:00:00.000",
+    "imgPath": "legacy.jpg",
+    "images": [
+      {
+        "imgPath": "listed.jpg",
+        "imgRank": 0,
+        "timeCreated": "2026-01-06T12:01:00.000"
+      }
+    ]
+  },
+  {
+    "text": "stored with a zone",
+    "timeCreated": "2026-01-07T03:00:00.000Z",
+    "timeModified": "2026-01-07T04:00:00.000Z",
+    "images": [
+      {
+        "imgPath": "zoned.jpg",
+        "imgRank": 0,
+        "timeCreated": "2026-01-07T03:30:00.000Z"
+      }
+    ]
+  },
+  {
+    "text": "duplicate of the first entry",
+    "timeCreated": "2026-01-02T09:00:00.000",
+    "timeModified": "2026-01-02T09:00:00.000"
+  }
+]

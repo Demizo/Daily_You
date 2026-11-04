@@ -1,0 +1,158 @@
+{
+  "categories": [],
+  "tagDefinitions": [
+    {
+      "name": "Thoughts",
+      "type": "label",
+      "categoryName": null,
+      "color": 4294960640,
+      "icon": null,
+      "iconType": "character",
+      "timeCreate": null
+    },
+    {
+      "name": "stress",
+      "type": "tracker",
+      "categoryName": null,
+      "color": null,
+      "icon": null,
+      "iconType": "character",
+      "timeCreate": null
+    },
+    {
+      "name": "BadName",
+      "type": "label",
+      "categoryName": null,
+      "color": null,
+      "icon": null,
+      "iconType": "character",
+      "timeCreate": null
+    },
+    {
+      "name": "thoughts",
+      "type": "label",
+      "categoryName": null,
+      "color": null,
+      "icon": null,
+      "iconType": "character",
+      "timeCreate": null
+    }
+  ],
+  "entries": [
+    {
+      "text": "# Morning\n\nFirst **entry**",
+      "mood": 1,
+      "timeCreate": "2026-01-02T09:00:00.000",
+      "timeModified": "2026-01-02T09:00:00.000",
+      "tags": [
+        {
+          "name": "Thoughts",
+          "type": "label",
+          "value": null
+        },
+        {
+          "name": "stress",
+          "type": "tracker",
+          "value": "2.31"
+        }
+      ],
+      "attachments": []
+    },
+    {
+      "text": "Evening text only",
+      "mood": 5,
+      "timeCreate": "2026-01-02T21:30:00.000",
+      "timeModified": "2026-01-02T21:30:00.000",
+      "tags": [
+        {
+          "name": "stress",
+          "type": "tracker",
+          "value": "4"
+        }
+      ],
+      "attachments": []
+    },
+    {
+      "text": "# Title only",
+      "mood": null,
+      "timeCreate": "2026-01-03T08:00:00.000",
+      "timeModified": "2026-01-03T08:00:00.000",
+      "tags": [],
+      "attachments": [
+        {
+          "type": "image",
+          "rank": 2,
+          "timeCreate": "2026-01-03T08:00:00.000",
+          "media": {
+            "bytes": "IQ=="
+          }
+        },
+        {
+          "type": "image",
+          "rank": 1,
+          "timeCreate": "2026-01-03T08:00:00.000",
+          "media": {
+            "bytes": "Ig=="
+          }
+        },
+        {
+          "type": "image",
+          "rank": 0,
+          "timeCreate": "2026-01-03T08:00:00.000",
+          "media": {
+            "bytes": "IA=="
+          }
+        }
+      ]
+    },
+    {
+      "text": "# With photos\n\nTwo photos",
+      "mood": 3,
+      "timeCreate": "2026-01-04T10:00:00.000",
+      "timeModified": "2026-01-04T10:00:00.000",
+      "tags": [
+        {
+          "name": "Thoughts",
+          "type": "label",
+          "value": null
+        },
+        {
+          "name": "thoughts",
+          "type": "label",
+          "value": null
+        },
+        {
+          "name": "BadName",
+          "type": "label",
+          "value": null
+        }
+      ],
+      "attachments": [
+        {
+          "type": "image",
+          "rank": 1,
+          "timeCreate": "2026-01-04T10:00:00.000",
+          "media": {
+            "bytes": "Cgs="
+          }
+        },
+        {
+          "type": "image",
+          "rank": 0,
+          "timeCreate": "2026-01-04T10:00:00.000",
+          "media": {
+            "bytes": "DA0="
+          }
+        }
+      ]
+    },
+    {
+      "text": "# Duplicate time\n\nSame moment as the entry above",
+      "mood": 4,
+      "timeCreate": "2026-01-04T10:00:00.000",
+      "timeModified": "2026-01-04T10:00:00.000",
+      "tags": [],
+      "attachments": []
+    }
+  ]
+}

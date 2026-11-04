@@ -1,0 +1,46 @@
+{
+  "categories": [],
+  "tagDefinitions": [],
+  "entries": [
+    {
+      "text": "Worst day",
+      "mood": 1,
+      "timeCreate": "2026-01-02T00:00:00.000",
+      "timeModified": "2026-01-02T00:00:00.000",
+      "tags": [],
+      "attachments": []
+    },
+    {
+      "text": "",
+      "mood": 5,
+      "timeCreate": "2026-01-03T00:00:00.000",
+      "timeModified": "2026-01-03T00:00:00.000",
+      "tags": [],
+      "attachments": []
+    },
+    {
+      "text": "Scores are averaged and rounded down",
+      "mood": 3,
+      "timeCreate": "2026-01-04T00:00:00.000",
+      "timeModified": "2026-01-04T00:00:00.000",
+      "tags": [],
+      "attachments": []
+    },
+    {
+      "text": "",
+      "mood": 2,
+      "timeCreate": "2026-01-05T00:00:00.000",
+      "timeModified": "2026-01-05T00:00:00.000",
+      "tags": [],
+      "attachments": []
+    },
+    {
+      "text": "Duplicate day",
+      "mood": 4,
+      "timeCreate": "2026-01-02T00:00:00.000",
+      "timeModified": "2026-01-02T00:00:00.000",
+      "tags": [],
+      "attachments": []
+    }
+  ]
+}

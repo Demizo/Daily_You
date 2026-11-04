@@ -1,0 +1,51 @@
+{
+  "diary": [
+    {
+      "title": "Worst day",
+      "content": "Everything went wrong",
+      "mood": "TERRIBLE",
+      "createdDate": 1767322800000,
+      "updatedDate": 1767326400000
+    },
+    {
+      "content": "Best day, text only",
+      "mood": "AWESOME",
+      "createdDate": 1767344400000,
+      "updatedDate": 1767344400000
+    },
+    {
+      "title": "Title only",
+      "createdDate": 1767409200000,
+      "updatedDate": 1767409200000
+    },
+    {
+      "content": "Plain middle day",
+      "mood": "OKAY",
+      "createdDate": 1767412800000,
+      "updatedDate": 1767412800000
+    },
+    {
+      "content": "Duplicate time",
+      "mood": "GOOD",
+      "createdDate": 1767412800000,
+      "updatedDate": 1767412800000
+    },
+    {
+      "content": "Bad mood",
+      "mood": "BAD",
+      "createdDate": 1767416400000,
+      "updatedDate": 1767416400000
+    },
+    {
+      "content": "Unknown mood name",
+      "mood": "ECSTATIC",
+      "createdDate": 1767418200000,
+      "updatedDate": 1767418200000
+    },
+    {
+      "content": "No mood field",
+      "createdDate": 1767420000000,
+      "updatedDate": 1767420000000
+    }
+  ]
+}

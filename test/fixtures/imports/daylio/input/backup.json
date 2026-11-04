@@ -1,0 +1,61 @@
+{
+  "version": 15,
+  "tag_groups": [
+    {"id": 1, "name": "Activities", "order": 2},
+    {"id": 2, "name": "Feelings", "order": 1},
+    {"id": 3, "name": ":::", "order": 3}
+  ],
+  "tags": [
+    {"id": 10, "name": "Exercise", "order": 1, "id_tag_group": 1, "createdAt": 1767322800000},
+    {"id": 11, "name": "Calm", "order": 2, "id_tag_group": 2},
+    {"id": 12, "name": "Orphan", "order": 3, "id_tag_group": 99},
+    {"id": 13, "name": "exercise", "order": 4, "id_tag_group": 1},
+    {"id": 14, "name": "Bad:Name", "order": 5, "id_tag_group": 3},
+    {"id": 15, "name": "", "order": 6, "id_tag_group": 1}
+  ],
+  "assets": [
+    {"id": 100, "type": 1, "checksum": "aaa111"},
+    {"id": 101, "type": 1, "checksum": "bbb222"},
+    {"id": 102, "type": 2, "checksum": "ccc333"},
+    {"id": 103, "type": 1, "checksum": "missing"}
+  ],
+  "dayEntries": [
+    {
+      "datetime": 1767322800000,
+      "timeZoneOffset": 3600000,
+      "note_title": "",
+      "note": "<p>First <b>entry</b></p>",
+      "tags": [10, 11]
+    },
+    {
+      "datetime": 1767330000000,
+      "timeZoneOffset": 0,
+      "mood": 1,
+      "note_title": "Best mood, title only",
+      "note": "",
+      "tags": [12, 99, 13]
+    },
+    {
+      "datetime": 1767409200000,
+      "mood": 5,
+      "note_title": "Worst mood",
+      "note": "<p>Offset missing</p>",
+      "assets": [100, 101, 102, 103],
+      "tags": [14]
+    },
+    {
+      "datetime": 1767409200000,
+      "timeZoneOffset": 0,
+      "mood": 3,
+      "note_title": "",
+      "note": "<p>Duplicate time</p>"
+    },
+    {
+      "datetime": 1767412800000,
+      "timeZoneOffset": -7200000,
+      "mood": 2,
+      "note_title": "Evening",
+      "note": "<p>Same day as the entry above</p>"
+    }
+  ]
+}

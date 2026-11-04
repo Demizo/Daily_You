@@ -3,6 +3,7 @@
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
 import 'package:daily_you/l10n/generated/app_localizations.dart';
+import 'package:daily_you/storage/storage_picker.dart';
 import 'package:daily_you/utils/imports/import_daybook.dart' as daybook;
 import 'package:daily_you/utils/imports/import_daylio.dart' as daylio;
 import 'package:daily_you/utils/imports/import_diarium.dart' as diarium;
@@ -12,20 +13,44 @@ import 'package:daily_you/utils/imports/import_json.dart' as json;
 import 'package:daily_you/utils/imports/import_mybrain.dart' as mybrain;
 import 'package:daily_you/utils/imports/import_oneshot.dart' as oneshot;
 import 'package:daily_you/utils/imports/import_pixels.dart' as pixels;
+import 'package:daily_you/utils/imports/import_runner.dart';
+import 'package:daily_you/utils/imports/import_source.dart';
 import 'package:daily_you/utils/operation_outcome.dart';
 import 'package:flutter/widgets.dart';
 
 export 'package:daily_you/utils/imports/import_format.dart';
 
-typedef ImportRunner = Future<OperationOutcome> Function(
-    BuildContext context, Function(String) updateStatus);
+const _jsonExtensions = ['json'];
+const _jsonMimeTypes = ['application/json'];
 
 class ImportFormatOption {
-  const ImportFormatOption(this.format, this.name, this.run);
+  const ImportFormatOption(
+    this.format,
+    this.name,
+    this.parse, {
+    this.kind = ImportSourceKind.file,
+    this.pickerExtensions,
+    this.pickerMimeTypes,
+  });
 
   final ImportFormat format;
   final String Function(AppLocalizations localizations) name;
-  final ImportRunner run;
+  final ImportParser parse;
+  final ImportSourceKind kind;
+  final List<String>? pickerExtensions;
+  final List<String>? pickerMimeTypes;
+
+  Future<OperationOutcome> run(
+    BuildContext context,
+    void Function(String) updateStatus, {
+    ImportFilePicker pickFile = StoragePicker.pickFile,
+  }) =>
+      runImport(context, updateStatus,
+          kind: kind,
+          parse: parse,
+          pickerExtensions: pickerExtensions,
+          pickerMimeTypes: pickerMimeTypes,
+          pickFile: pickFile);
 }
 
 class ImportRegistry {
@@ -35,42 +60,53 @@ class ImportRegistry {
     ImportFormatOption(
       ImportFormat.dailyYouJson,
       (localizations) => localizations.formatDailyYouJson,
-      (context, updateStatus) => json.importFromJson(updateStatus),
+      json.parseJson,
+      pickerExtensions: _jsonExtensions,
+      pickerMimeTypes: _jsonMimeTypes,
     ),
     ImportFormatOption(
       ImportFormat.daybook,
       (localizations) => localizations.formatDaybook,
-      daybook.importFromDaybook,
+      daybook.parseDaybook,
+      kind: ImportSourceKind.archive,
     ),
     ImportFormatOption(
       ImportFormat.daylio,
       (localizations) => localizations.formatDaylio,
-      daylio.importFromDaylio,
+      daylio.parseDaylio,
+      kind: ImportSourceKind.archive,
     ),
     ImportFormatOption(
       ImportFormat.diarium,
       (localizations) => localizations.formatDiarium,
-      diarium.importFromDiarium,
+      diarium.parseDiarium,
     ),
     ImportFormatOption(
       ImportFormat.diaro,
       (localizations) => localizations.formatDiaro,
-      diaro.importFromDiaro,
+      diaro.parseDiaro,
+      kind: ImportSourceKind.archive,
     ),
     ImportFormatOption(
       ImportFormat.myBrain,
       (localizations) => localizations.formatMyBrain,
-      (context, updateStatus) => mybrain.importFromMyBrain(updateStatus),
+      mybrain.parseMyBrain,
+      pickerExtensions: _jsonExtensions,
+      pickerMimeTypes: _jsonMimeTypes,
     ),
     ImportFormatOption(
       ImportFormat.oneShot,
       (localizations) => localizations.formatOneShot,
-      (context, updateStatus) => oneshot.importFromOneShot(updateStatus),
+      oneshot.parseOneShot,
+      pickerExtensions: _jsonExtensions,
+      pickerMimeTypes: _jsonMimeTypes,
     ),
     ImportFormatOption(
       ImportFormat.pixels,
       (localizations) => localizations.formatPixels,
-      (context, updateStatus) => pixels.importFromPixels(updateStatus),
+      pixels.parsePixels,
+      pickerExtensions: _jsonExtensions,
+      pickerMimeTypes: _jsonMimeTypes,
     ),
   ]);
 

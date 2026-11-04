@@ -1,0 +1,79 @@
+{
+  "categories": [],
+  "tagDefinitions": [],
+  "entries": [
+    {
+      "text": "Worst day with a photo",
+      "mood": 1,
+      "timeCreate": "2026-01-02T10:00:00.000",
+      "timeModified": "2026-01-02T10:00:00.000",
+      "tags": [],
+      "attachments": [
+        {
+          "type": "image",
+          "rank": 0,
+          "timeCreate": "2026-01-02T10:00:00.000",
+          "media": {
+            "reference": "photos/worst.jpg"
+          }
+        }
+      ]
+    },
+    {
+      "text": "Best day",
+      "mood": 5,
+      "timeCreate": "2026-01-02T16:00:00.000",
+      "timeModified": "2026-01-02T16:00:00.000",
+      "tags": [],
+      "attachments": []
+    },
+    {
+      "text": "Sad, same day as the first",
+      "mood": 2,
+      "timeCreate": "2026-01-02T11:00:00.000",
+      "timeModified": "2026-01-02T11:00:00.000",
+      "tags": [],
+      "attachments": []
+    },
+    {
+      "text": "",
+      "mood": 3,
+      "timeCreate": "2026-01-03T10:00:00.000",
+      "timeModified": "2026-01-03T10:00:00.000",
+      "tags": [],
+      "attachments": []
+    },
+    {
+      "text": "Happy",
+      "mood": 4,
+      "timeCreate": "2026-01-03T11:00:00.000",
+      "timeModified": "2026-01-03T11:00:00.000",
+      "tags": [],
+      "attachments": []
+    },
+    {
+      "text": "Duplicate time",
+      "mood": 4,
+      "timeCreate": "2026-01-03T11:00:00.000",
+      "timeModified": "2026-01-03T11:00:00.000",
+      "tags": [],
+      "attachments": []
+    },
+    {
+      "text": "Unknown mood name",
+      "mood": null,
+      "timeCreate": "2026-01-03T12:00:00.000",
+      "timeModified": "2026-01-03T12:00:00.000",
+      "tags": [],
+      "attachments": []
+    },
+    {
+      "text": "No mood",
+      "mood": null,
+      "timeCreate": "2026-01-03T13:00:00.000",
+      "timeModified": "2026-01-03T13:00:00.000",
+      "tags": [],
+      "attachments": []
+    }
+  ]
+}

@@ -44,6 +44,7 @@ class ImportedTagDefinition {
     this.color,
     this.icon,
     this.iconType = TagIconType.character,
+    this.timeCreate,
   });
 
   final String name;
@@ -52,6 +53,7 @@ class ImportedTagDefinition {
   final int? color;
   final String? icon;
   final TagIconType iconType;
+  final DateTime? timeCreate;
 }
 
 class ImportedEntryTag {

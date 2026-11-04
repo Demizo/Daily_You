@@ -1,0 +1,42 @@
+[
+  {
+    "created": 1767322800,
+    "happiness": "VERY_SAD",
+    "textContent": "Worst day with a photo",
+    "relativePath": "photos/worst.jpg"
+  },
+  {
+    "created": 1767344400,
+    "happiness": "VERY_HAPPY",
+    "textContent": "Best day"
+  },
+  {
+    "created": 1767326400,
+    "happiness": "SAD",
+    "textContent": "Sad, same day as the first"
+  },
+  {
+    "created": 1767409200,
+    "happiness": "NEUTRAL",
+    "textContent": ""
+  },
+  {
+    "created": 1767412800,
+    "happiness": "HAPPY",
+    "textContent": "Happy"
+  },
+  {
+    "created": 1767412800,
+    "happiness": "HAPPY",
+    "textContent": "Duplicate time"
+  },
+  {
+    "created": 1767416400,
+    "happiness": "UNKNOWN",
+    "textContent": "Unknown mood name"
+  },
+  {
+    "created": 1767420000,
+    "textContent": "No mood"
+  }
+]

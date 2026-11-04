@@ -107,7 +107,7 @@ class ImportWriter {
     final sortOrder = _nextTagOrderByCategory[categoryId] ?? 0;
     _nextTagOrderByCategory[categoryId] = sortOrder + 1;
 
-    final now = DateTime.now();
+    final timeCreate = definition.timeCreate ?? DateTime.now();
     final added = await TagDao.add(Tag(
       categoryId: categoryId,
       name: definition.name,
@@ -116,8 +116,8 @@ class ImportWriter {
       iconType: definition.iconType,
       color: definition.color,
       sortOrder: sortOrder,
-      timeCreate: now,
-      timeModified: now,
+      timeCreate: timeCreate,
+      timeModified: timeCreate,
     ));
     _tagIdByKey[key] = added.id!;
     return added.id!;

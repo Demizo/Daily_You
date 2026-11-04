@@ -4,262 +4,132 @@
 
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
-import 'package:daily_you/database/app_database.dart';
-import 'package:daily_you/database/attachment_storage.dart';
-import 'package:daily_you/database/entry_tag_dao.dart';
-import 'package:daily_you/database/tag_category_dao.dart';
-import 'package:daily_you/database/tag_dao.dart';
 import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/mood.dart';
 import 'package:daily_you/models/tag.dart';
-import 'package:daily_you/models/tag_category.dart';
-import 'package:daily_you/providers/entries_provider.dart';
-import 'package:daily_you/providers/tags_provider.dart';
-import 'package:daily_you/storage/storage_picker.dart';
-import 'package:daily_you/utils/imports/import_helpers.dart';
-import 'package:daily_you/utils/operation_outcome.dart';
+import 'package:daily_you/storage/local_file_store.dart';
+import 'package:daily_you/utils/imports/import_bundle.dart';
+import 'package:daily_you/utils/imports/import_source.dart';
+import 'package:daily_you/utils/imports/import_text.dart';
+import 'package:daily_you/utils/imports/import_time.dart';
 import 'package:daily_you/utils/tag_name_sanitizer.dart';
-import 'package:daily_you/utils/zip_utils.dart';
-import 'package:daily_you/l10n/generated/app_localizations.dart';
-import 'package:material_ui/material_ui.dart';
 import 'package:html2md/html2md.dart' as html2md;
 import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
 
-Future<OperationOutcome> importFromDaylio(
-    BuildContext context, Function(String) updateStatus) async {
-  final localizations = AppLocalizations.of(context)!;
-  updateStatus("0%");
+Future<ImportBundle> parseDaylio(ImportSource source) async {
+  final backupName = (await LocalFileStore(source.directoryPath).list())
+      .firstWhere((name) => name.endsWith('backup.daylio'),
+          orElse: () => throw Exception('backup.daylio not found in archive'));
+  final encoded = utf8
+      .decode(await File(join(source.directoryPath, backupName)).readAsBytes())
+      .replaceAll('\r', '')
+      .replaceAll('\n', '');
+  final backup = json.decode(utf8.decode(base64.decode(encoded)));
 
-  final selectedFile = await StoragePicker.pickFile();
-  if (selectedFile == null) return const OperationOutcome.cancelled();
+  final photoFilesByChecksum = await _photoFilesByChecksum(source);
+  final assetsById = {
+    for (final asset in backup['assets'] as List<dynamic>) asset['id']: asset,
+  };
 
-  var outcome = const OperationOutcome.succeeded();
-
-  var tempDir = await getTemporaryDirectory();
-  const tempDaylioZip = "temp_daylio.zip";
-  final tempDaylioFolder = Directory(join(tempDir.path, "Daylio"));
-  await tempDaylioFolder.create(recursive: true);
-
-  try {
-    updateStatus(localizations.tranferStatus("0"));
-    await selectedFile.copyInto(tempDir.path, tempDaylioZip,
-        onProgress: (percent) {
-      updateStatus(localizations.tranferStatus("${percent.round()}"));
-    });
-
-    await ZipUtils.extract(
-      join(tempDir.path, tempDaylioZip),
-      tempDaylioFolder.path,
-    );
-
-    final backupEntry = await tempDaylioFolder.list().firstWhere(
-          (f) => basename(f.path).endsWith('backup.daylio'),
-          orElse: () => throw Exception('backup.daylio not found in archive'),
-        );
-
-    final base64String = utf8
-        .decode(await File(backupEntry.path).readAsBytes())
-        .replaceAll('\r', '')
-        .replaceAll('\n', '');
-    final decodedBase64 = utf8.decode(base64.decode(base64String));
-    final parsed = json.decode(decodedBase64);
-
-    final List<dynamic> dayEntries = parsed['dayEntries'];
-    final List<dynamic> assets = parsed['assets'];
-    final Map<String, String> checksumToFilePath = {};
-
-    final photosFolder =
-        Directory(join(tempDaylioFolder.path, 'assets', 'photos'));
-    if (await photosFolder.exists()) {
-      for (final file in await photosFolder.list(recursive: true).toList()) {
-        if (file is File) {
-          final checksum = basenameWithoutExtension(file.path);
-          checksumToFilePath[checksum] = file.path;
-        }
-      }
-    }
-
-    final Map<int, dynamic> assetById = {
-      for (var asset in assets) asset['id']: asset,
-    };
-
-    final Map<int, int> tagIdMapping = await _importTags(
-      (parsed['tags'] as List?) ?? const [],
-      (parsed['tag_groups'] as List?) ?? const [],
-    );
-
-    final takenNames = await AttachmentStorage.instance
-        .takenLowerCaseNames(AttachmentType.image);
-    final totalEntries = dayEntries.length;
-    int processedEntries = 0;
-
-    for (final entry in dayEntries) {
-      final datetime = DateTime.fromMillisecondsSinceEpoch(entry['datetime'])
-          .add(Duration(milliseconds: entry['timeZoneOffset'] ?? 0));
-
-      final title = entry['note_title'] ?? '';
-      final note = entry['note'] ?? '';
-
-      final parts = <String>[];
-      if (title.isNotEmpty) parts.add("# $title");
-      if (note.isNotEmpty) parts.add(html2md.convert(note));
-
-      final mood = entry['mood'];
-      final mappedMood =
-          mood != null ? Mood.fromRating(mood, bestFirst: true) : null;
-
-      if (!EntriesProvider.instance.hasEntryAtTimestamp(datetime)) {
-        final addedEntry = await EntriesProvider.instance.add(
-            Entry(
-              text: parts.join('\n\n'),
-              mood: mappedMood,
-              timeCreate: datetime,
-              timeModified: datetime,
-            ),
-            skipUpdate: true);
-
-        final assetIds = (entry['assets'] as List?)?.cast<int>() ?? [];
-        final photoFiles = <String>[];
-        for (final assetId in assetIds) {
-          final asset = assetById[assetId];
-          if (asset == null || asset['type'] != 1) continue;
-
-          final file = checksumToFilePath[asset['checksum']];
-          if (file != null) photoFiles.add(file);
-        }
-
-        for (var index = 0; index < photoFiles.length; index++) {
-          await addImportedImage(
-              addedEntry.id!,
-              Uint8List.fromList(await File(photoFiles[index]).readAsBytes()),
-              photoFiles.length - 1 - index,
-              datetime,
-              takenNames);
-        }
-
-        final tagIds = (entry['tags'] as List?)?.cast<int>() ?? [];
-        final addedTagIds = <int>{};
-        for (final tagId in tagIds) {
-          final mappedTagId = tagIdMapping[tagId];
-          if (mappedTagId == null || !addedTagIds.add(mappedTagId)) continue;
-
-          await EntryTagDao.add(EntryTag(
-            entryId: addedEntry.id!,
-            tagId: mappedTagId,
-            timeCreate: datetime,
-          ));
-        }
-      }
-
-      processedEntries++;
-      updateStatus("${((processedEntries / totalEntries) * 100).round()}%");
-    }
-  } catch (error) {
-    outcome = OperationOutcome.failed(error);
-  }
-
-  updateStatus(localizations.cleanUpStatus);
-
-  outcome = await finishImport(updateStatus, outcome);
-  await TagsProvider.instance.load();
-  await AppDatabase.instance.updateExternalDatabase();
-
-  if (await File(join(tempDir.path, tempDaylioZip)).exists()) {
-    await File(join(tempDir.path, tempDaylioZip)).delete();
-  }
-  if (await tempDaylioFolder.exists()) {
-    await tempDaylioFolder.delete(recursive: true);
-  }
-
-  return outcome;
-}
-
-Future<Map<int, int>> _importTags(
-    List<dynamic> daylioTags, List<dynamic> daylioTagGroups) async {
-  final Map<String, int> categoryIdByName = {};
-  int nextCategoryOrder = 0;
-  for (final category in TagsProvider.instance.categories) {
-    categoryIdByName.putIfAbsent(
-        category.name.toLowerCase(), () => category.id!);
-    if (category.sortOrder >= nextCategoryOrder) {
-      nextCategoryOrder = category.sortOrder + 1;
-    }
-  }
-
-  final Map<String, int> tagIdByName = {};
-  final Map<int?, int> nextTagOrderByCategory = {};
-  for (final tag in TagsProvider.instance.tags) {
-    if (tag.tagType == TagType.label) {
-      tagIdByName.putIfAbsent(tag.name.toLowerCase(), () => tag.id!);
-    }
-    if (tag.sortOrder >= (nextTagOrderByCategory[tag.categoryId] ?? 0)) {
-      nextTagOrderByCategory[tag.categoryId] = tag.sortOrder + 1;
-    }
-  }
-
-  final sortedGroups = List<dynamic>.from(daylioTagGroups)
-    ..sort((a, b) =>
-        ((a['order'] as int?) ?? 0).compareTo((b['order'] as int?) ?? 0));
-
-  final Map<int, int> categoryIdMapping = {};
-  for (final group in sortedGroups) {
+  final groups = _sortedByOrder(backup['tag_groups']);
+  final categoryNameByGroupId = <int, String>{};
+  final categories = <ImportedCategory>[];
+  for (final group in groups) {
     final groupId = group['id'] as int?;
     final name = sanitizeTagName((group['name'] as String?) ?? '');
     if (groupId == null || name.isEmpty) continue;
-
-    var categoryId = categoryIdByName[name.toLowerCase()];
-    if (categoryId == null) {
-      final now = DateTime.now();
-      final addedCategory = await TagCategoryDao.add(TagCategory(
-        name: name,
-        sortOrder: nextCategoryOrder++,
-        timeCreate: now,
-        timeModified: now,
-      ));
-      categoryId = addedCategory.id!;
-      categoryIdByName[name.toLowerCase()] = categoryId;
-    }
-    categoryIdMapping[groupId] = categoryId;
+    categoryNameByGroupId[groupId] = name;
+    categories.add(ImportedCategory(name: name));
   }
 
-  final sortedTags = List<dynamic>.from(daylioTags)
-    ..sort((a, b) =>
-        ((a['order'] as int?) ?? 0).compareTo((b['order'] as int?) ?? 0));
-
-  final Map<int, int> tagIdMapping = {};
-  for (final daylioTag in sortedTags) {
-    final daylioTagId = daylioTag['id'] as int?;
-    final name = sanitizeTagName((daylioTag['name'] as String?) ?? '');
-    if (daylioTagId == null || name.isEmpty) continue;
-
-    var tagId = tagIdByName[name.toLowerCase()];
-    if (tagId == null) {
-      // Tags whose group is missing from the backup stay uncategorized
-      final categoryId = categoryIdMapping[daylioTag['id_tag_group']];
-      final createdAt = daylioTag['createdAt'] as int?;
-      final timeCreate = createdAt != null
-          ? DateTime.fromMillisecondsSinceEpoch(createdAt)
-          : DateTime.now();
-      final sortOrder = nextTagOrderByCategory[categoryId] ?? 0;
-      nextTagOrderByCategory[categoryId] = sortOrder + 1;
-
-      final addedTag = await TagDao.add(Tag(
-        categoryId: categoryId,
-        name: name,
-        tagType: TagType.label,
-        sortOrder: sortOrder,
-        timeCreate: timeCreate,
-        timeModified: timeCreate,
-      ));
-      tagId = addedTag.id!;
-      tagIdByName[name.toLowerCase()] = tagId;
-    }
-    tagIdMapping[daylioTagId] = tagId;
+  final tagNameById = <int, String>{};
+  final tagDefinitions = <ImportedTagDefinition>[];
+  for (final tag in _sortedByOrder(backup['tags'])) {
+    final tagId = tag['id'] as int?;
+    final name = sanitizeTagName((tag['name'] as String?) ?? '');
+    if (tagId == null || name.isEmpty) continue;
+    tagNameById[tagId] = name;
+    final createdAt = tag['createdAt'] as int?;
+    tagDefinitions.add(ImportedTagDefinition(
+      name: name,
+      tagType: TagType.label,
+      categoryName: categoryNameByGroupId[tag['id_tag_group']],
+      timeCreate: createdAt == null
+          ? null
+          : DateTime.fromMillisecondsSinceEpoch(createdAt),
+    ));
   }
 
-  return tagIdMapping;
+  return ImportBundle(
+    categories: categories,
+    tagDefinitions: tagDefinitions,
+    entries: [
+      for (final entry in backup['dayEntries'] as List<dynamic>)
+        _parseEntry(entry, assetsById, photoFilesByChecksum, tagNameById),
+    ],
+  );
+}
+
+List<dynamic> _sortedByOrder(Object? items) =>
+    List<dynamic>.from((items as List?) ?? const [])
+      ..sort((a, b) =>
+          ((a['order'] as int?) ?? 0).compareTo((b['order'] as int?) ?? 0));
+
+Future<Map<String, File>> _photoFilesByChecksum(ImportSource source) async {
+  final photosFolder =
+      Directory(join(source.directoryPath, 'assets', 'photos'));
+  if (!await photosFolder.exists()) return {};
+
+  return {
+    for (final file in await photosFolder.list(recursive: true).toList())
+      if (file is File) basenameWithoutExtension(file.path): file,
+  };
+}
+
+ImportedEntry _parseEntry(
+  Map<String, dynamic> entry,
+  Map<dynamic, dynamic> assetsById,
+  Map<String, File> photoFilesByChecksum,
+  Map<int, String> tagNameById,
+) {
+  final timeCreate = wallClockOf(
+      DateTime.fromMillisecondsSinceEpoch(entry['datetime'], isUtc: true)
+          .add(Duration(milliseconds: entry['timeZoneOffset'] ?? 0)));
+
+  final note = entry['note'] as String? ?? '';
+  final mood = entry['mood'] as int?;
+
+  final photoFiles = <File>[];
+  for (final assetId in (entry['assets'] as List?)?.cast<int>() ?? <int>[]) {
+    final asset = assetsById[assetId];
+    if (asset == null || asset['type'] != 1) continue;
+    final file = photoFilesByChecksum[asset['checksum']];
+    if (file != null) photoFiles.add(file);
+  }
+
+  return ImportedEntry(
+    Entry(
+      text: titledText(
+          entry['note_title'], note.isEmpty ? null : html2md.convert(note)),
+      mood: mood == null ? null : Mood.fromRating(mood, bestFirst: true),
+      timeCreate: timeCreate,
+      timeModified: timeCreate,
+    ),
+    tags: [
+      for (final tagId in (entry['tags'] as List?)?.cast<int>() ?? <int>[])
+        if (tagNameById[tagId] != null)
+          ImportedEntryTag(name: tagNameById[tagId]!, tagType: TagType.label),
+    ],
+    attachments: [
+      for (final (index, file) in photoFiles.indexed)
+        ImportedAttachment(
+          type: AttachmentType.image,
+          rank: photoFiles.length - 1 - index,
+          timeCreate: timeCreate,
+          media: FileMedia(file),
+        ),
+    ],
+  );
 }

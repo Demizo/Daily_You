@@ -135,15 +135,16 @@ void main() {
             icon: 'run',
             iconType: TagIconType.materialIcon),
       ],
-      tagDefinitions: const [
+      tagDefinitions: [
         ImportedTagDefinition(
             name: 'Run',
             tagType: TagType.label,
             categoryName: 'Activities',
             color: 0xFF445566,
             icon: 'directions_run',
-            iconType: TagIconType.materialIcon),
-        ImportedTagDefinition(name: 'Water', tagType: TagType.tracker),
+            iconType: TagIconType.materialIcon,
+            timeCreate: DateTime(2024, 1, 2)),
+        const ImportedTagDefinition(name: 'Water', tagType: TagType.tracker),
       ],
       entries: [
         ImportedEntry(
@@ -187,6 +188,8 @@ void main() {
     expect(run.color, 0xFF445566);
     expect(run.icon, 'directions_run');
     expect(run.iconType, TagIconType.materialIcon);
+    expect(run.timeCreate, DateTime(2024, 1, 2));
+    expect(run.timeModified, DateTime(2024, 1, 2));
     final water = storedTag('Water', TagType.tracker);
     expect(water.categoryId, isNull);
 

@@ -1,0 +1,150 @@
+{
+  "categories": [
+    {
+      "name": "Feelings",
+      "color": null,
+      "icon": null,
+      "iconType": "character"
+    },
+    {
+      "name": "Activities",
+      "color": null,
+      "icon": null,
+      "iconType": "character"
+    }
+  ],
+  "tagDefinitions": [
+    {
+      "name": "Exercise",
+      "type": "label",
+      "categoryName": "Activities",
+      "color": null,
+      "icon": null,
+      "iconType": "character",
+      "timeCreate": "2026-01-02T10:00:00.000"
+    },
+    {
+      "name": "Calm",
+      "type": "label",
+      "categoryName": "Feelings",
+      "color": null,
+      "icon": null,
+      "iconType": "character",
+      "timeCreate": null
+    },
+    {
+      "name": "Orphan",
+      "type": "label",
+      "categoryName": null,
+      "color": null,
+      "icon": null,
+      "iconType": "character",
+      "timeCreate": null
+    },
+    {
+      "name": "exercise",
+      "type": "label",
+      "categoryName": "Activities",
+      "color": null,
+      "icon": null,
+      "iconType": "character",
+      "timeCreate": null
+    },
+    {
+      "name": "BadName",
+      "type": "label",
+      "categoryName": null,
+      "color": null,
+      "icon": null,
+      "iconType": "character",
+      "timeCreate": null
+    }
+  ],
+  "entries": [
+    {
+      "text": "First **entry**",
+      "mood": null,
+      "timeCreate": "2026-01-02T04:00:00.000",
+      "timeModified": "2026-01-02T04:00:00.000",
+      "tags": [
+        {
+          "name": "Exercise",
+          "type": "label",
+          "value": null
+        },
+        {
+          "name": "Calm",
+          "type": "label",
+          "value": null
+        }
+      ],
+      "attachments": []
+    },
+    {
+      "text": "# Best mood, title only",
+      "mood": 5,
+      "timeCreate": "2026-01-02T05:00:00.000",
+      "timeModified": "2026-01-02T05:00:00.000",
+      "tags": [
+        {
+          "name": "Orphan",
+          "type": "label",
+          "value": null
+        },
+        {
+          "name": "exercise",
+          "type": "label",
+          "value": null
+        }
+      ],
+      "attachments": []
+    },
+    {
+      "text": "# Worst mood\n\nOffset missing",
+      "mood": 1,
+      "timeCreate": "2026-01-03T03:00:00.000",
+      "timeModified": "2026-01-03T03:00:00.000",
+      "tags": [
+        {
+          "name": "BadName",
+          "type": "label",
+          "value": null
+        }
+      ],
+      "attachments": [
+        {
+          "type": "image",
+          "rank": 1,
+          "timeCreate": "2026-01-03T03:00:00.000",
+          "media": {
+            "file": "assets/photos/ab/aaa111.jpg"
+          }
+        },
+        {
+          "type": "image",
+          "rank": 0,
+          "timeCreate": "2026-01-03T03:00:00.000",
+          "media": {
+            "file": "assets/photos/cd/bbb222.jpg"
+          }
+        }
+      ]
+    },
+    {
+      "text": "Duplicate time",
+      "mood": 3,
+      "timeCreate": "2026-01-03T03:00:00.000",
+      "timeModified": "2026-01-03T03:00:00.000",
+      "tags": [],
+      "attachments": []
+    },
+    {
+      "text": "# Evening\n\nSame day as the entry above",
+      "mood": 4,
+      "timeCreate": "2026-01-03T02:00:00.000",
+      "timeModified": "2026-01-03T02:00:00.000",
+      "tags": [],
+      "attachments": []
+    }
+  ]
+}

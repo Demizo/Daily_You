@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data version="2">
+<table name="diaro_entries">
+<r><uid>entry-a</uid><date>1767322800000</date><tz_offset>-05:00</tz_offset><title>Best mood</title><text>Recorded at UTC minus five</text><mood>1</mood></r>
+<r><uid>entry-b</uid><date>1767326400000</date><tz_offset>+05:30</tz_offset><title></title><text>Worst mood, text only</text><mood>5</mood></r>
+<r><uid>entry-c</uid><date>1767409200000</date><tz_offset>+00:00</tz_offset><title>Title only</title><text></text><mood></mood></r>
+<r><uid>entry-d</uid><date>1767412800000</date><tz_offset>+01:00</tz_offset><title>With photos</title><text>Positions decide the order</text><mood>3</mood></r>
+<r><uid>entry-e</uid><date>1767412800000</date><tz_offset>+01:00</tz_offset><title>Duplicate</title><text>Same time as the entry above</text></r>
+<r><uid></uid><date>1767416400000</date><tz_offset>+00:00</tz_offset><title>No uid</title><text>Skipped</text></r>
+</table>
+<table name="diaro_attachments">
+<r><uid>att-1</uid><entry_uid>entry-d</entry_uid><type>photo</type><filename>second.jpg</filename><position>2</position></r>
+<r><uid>att-2</uid><entry_uid>entry-d</entry_uid><type>photo</type><filename>first.jpg</filename><position>1</position></r>
+<r><uid>att-3</uid><entry_uid>entry-d</entry_uid><type>photo</type><filename>missing.jpg</filename><position>3</position></r>
+<r><uid>att-4</uid><entry_uid>entry-a</entry_uid><type>audio</type><filename>voice.m4a</filename><position>1</position></r>
+</table>
+</data>

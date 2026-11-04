@@ -82,9 +82,6 @@ class EntriesProvider with ChangeNotifier {
 
   int getEntryDayCount() => _store.getEntryDayCount();
 
-  bool hasEntryAtTimestamp(DateTime timestamp) =>
-      _store.hasEntryAtTimestamp(timestamp);
-
   List<Entry> getFilteredEntries() => _filteredEntries;
 
   void _onStoreChanged() {

@@ -1,0 +1,63 @@
+{
+  "categories": [],
+  "tagDefinitions": [],
+  "entries": [
+    {
+      "text": "# Best mood\n\nRecorded at UTC minus five",
+      "mood": 5,
+      "timeCreate": "2026-01-01T22:00:00.000",
+      "timeModified": "2026-01-01T22:00:00.000",
+      "tags": [],
+      "attachments": []
+    },
+    {
+      "text": "Worst mood, text only",
+      "mood": 1,
+      "timeCreate": "2026-01-02T09:30:00.000",
+      "timeModified": "2026-01-02T09:30:00.000",
+      "tags": [],
+      "attachments": []
+    },
+    {
+      "text": "# Title only",
+      "mood": null,
+      "timeCreate": "2026-01-03T03:00:00.000",
+      "timeModified": "2026-01-03T03:00:00.000",
+      "tags": [],
+      "attachments": []
+    },
+    {
+      "text": "# With photos\n\nPositions decide the order",
+      "mood": 3,
+      "timeCreate": "2026-01-03T05:00:00.000",
+      "timeModified": "2026-01-03T05:00:00.000",
+      "tags": [],
+      "attachments": [
+        {
+          "type": "image",
+          "rank": 0,
+          "timeCreate": "2026-01-03T05:00:00.000",
+          "media": {
+            "file": "media/photo/first.jpg"
+          }
+        },
+        {
+          "type": "image",
+          "rank": 1,
+          "timeCreate": "2026-01-03T05:00:00.000",
+          "media": {
+            "file": "media/photo/second.jpg"
+          }
+        }
+      ]
+    },
+    {
+      "text": "# Duplicate\n\nSame time as the entry above",
+      "mood": null,
+      "timeCreate": "2026-01-03T05:00:00.000",
+      "timeModified": "2026-01-03T05:00:00.000",
+      "tags": [],
+      "attachments": []
+    }
+  ]
+}

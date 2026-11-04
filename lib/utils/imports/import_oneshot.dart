@@ -4,72 +4,49 @@
 
 import 'dart:convert';
 
+import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/mood.dart';
-import 'package:daily_you/models/attachment.dart';
-import 'package:daily_you/providers/entries_provider.dart';
-import 'package:daily_you/providers/entry_attachments_provider.dart';
-import 'package:daily_you/storage/storage_picker.dart';
-import 'package:daily_you/utils/imports/import_helpers.dart';
-import 'package:daily_you/utils/operation_outcome.dart';
+import 'package:daily_you/utils/imports/import_bundle.dart';
+import 'package:daily_you/utils/imports/import_source.dart';
 
-Future<OperationOutcome> importFromOneShot(
-    Function(String) updateStatus) async {
-  updateStatus("0%");
+const _moodByHappiness = {
+  'VERY_SAD': Mood.veryUnpleasant,
+  'SAD': Mood.unpleasant,
+  'NEUTRAL': Mood.neutral,
+  'HAPPY': Mood.pleasant,
+  'VERY_HAPPY': Mood.veryPleasant,
+};
 
-  var outcome = const OperationOutcome.succeeded();
+Future<ImportBundle> parseOneShot(ImportSource source) async {
+  final root = json.decode(utf8.decode(await source.file.readAsBytes()));
 
-  try {
-    final selectedFile = await StoragePicker.pickFile(
-        allowedExtensions: ['json'], mimeTypes: ['application/json']);
-    if (selectedFile == null) return const OperationOutcome.cancelled();
+  return ImportBundle(entries: [
+    for (final entry in root as List<dynamic>)
+      _parseEntry(entry as Map<String, dynamic>),
+  ]);
+}
 
-    final bytes = await selectedFile.readBytes();
-    if (bytes == null) return const OperationOutcome.failed();
-    final jsonData = json.decode(utf8.decode(bytes.toList()));
+ImportedEntry _parseEntry(Map<String, dynamic> entry) {
+  final timeCreate =
+      DateTime.fromMillisecondsSinceEpoch((entry['created'] as int) * 1000);
+  final relativePath = entry['relativePath'] as String?;
 
-    final moodByHappiness = {
-      "VERY_SAD": Mood.veryUnpleasant,
-      "SAD": Mood.unpleasant,
-      "NEUTRAL": Mood.neutral,
-      "HAPPY": Mood.pleasant,
-      "VERY_HAPPY": Mood.veryPleasant,
-    };
-
-    final totalEntries = jsonData.length;
-    var processedEntries = 0;
-
-    for (var entry in jsonData) {
-      final createdTimestamp = entry['created'];
-      final createdDateTime =
-          DateTime.fromMillisecondsSinceEpoch(createdTimestamp * 1000);
-      final mood = moodByHappiness[entry['happiness']];
-
-      if (!EntriesProvider.instance.hasEntryAtTimestamp(createdDateTime)) {
-        var addedEntry = await EntriesProvider.instance.add(
-            Entry(
-                text: entry['textContent'],
-                mood: mood,
-                timeCreate: createdDateTime,
-                timeModified: DateTime.now()),
-            skipUpdate: true);
-        if (entry['relativePath'] != null) {
-          await EntryAttachmentsProvider.instance.add(
-              EntryAttachment(
-                  entryId: addedEntry.id,
-                  type: AttachmentType.image,
-                  filePath: entry['relativePath'],
-                  rank: 0,
-                  timeCreate: DateTime.now()),
-              skipUpdate: true);
-        }
-      }
-      processedEntries += 1;
-      updateStatus("${((processedEntries / totalEntries) * 100).round()}%");
-    }
-  } catch (error) {
-    outcome = OperationOutcome.failed(error);
-  }
-
-  return finishImport(updateStatus, outcome);
+  return ImportedEntry(
+    Entry(
+      text: entry['textContent'],
+      mood: _moodByHappiness[entry['happiness']],
+      timeCreate: timeCreate,
+      timeModified: timeCreate,
+    ),
+    attachments: [
+      if (relativePath != null)
+        ImportedAttachment(
+          type: AttachmentType.image,
+          rank: 0,
+          timeCreate: timeCreate,
+          media: ReferenceMedia(relativePath),
+        ),
+    ],
+  );
 }

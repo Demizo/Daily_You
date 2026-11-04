@@ -178,10 +178,6 @@ class EntryStore with ChangeNotifier {
 
   int getEntryDayCount() => _entriesByDay.length;
 
-  bool hasEntryAtTimestamp(DateTime timestamp) {
-    return entries.any((entry) => entry.timeCreate == timestamp);
-  }
-
   Future<Entry> _writeDraft(EntryDraft draft) async {
     late Entry saved;
     late _TagWrite tagWrite;
