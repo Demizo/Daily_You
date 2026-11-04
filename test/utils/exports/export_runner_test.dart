@@ -105,7 +105,7 @@ void main() {
       expect(
           File(join(extracted.path, 'logs', 'log_2026-03-04.md'))
               .readAsStringSync(),
-          startsWith('[video_2026-03-04_1.mp4](Video/video_2026-03-04_1.mp4)\n'
+          contains('[video_2026-03-04_1.mp4](Video/video_2026-03-04_1.mp4)\n'
               '![](Images/image_2026-03-04_0.jpg)\n'));
     });
   });

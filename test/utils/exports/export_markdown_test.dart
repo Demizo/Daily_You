@@ -6,13 +6,17 @@ import 'dart:convert';
 
 import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/models/mood_scale_level.dart';
+import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/storage/in_memory_file_store.dart';
 import 'package:daily_you/utils/exports/export_markdown.dart';
 import 'package:daily_you/utils/exports/export_snapshot.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:yaml/yaml.dart';
 
 import '../../support/export_snapshots.dart';
+
+const _frontMatterEnd = '\n---\n';
 
 void main() {
   late InMemoryFileStore store;
@@ -27,8 +31,21 @@ void main() {
   Future<InMemoryFileStore> notes() async =>
       await store.subfolder(markdownNotesFolder) as InMemoryFileStore;
 
-  Future<String> noteNamed(String name) async =>
+  Future<String> noteFileNamed(String name) async =>
       utf8.decode((await (await notes()).read(name))!);
+
+  Future<String> noteNamed(String name) async {
+    final note = await noteFileNamed(name);
+    return note
+        .substring(note.indexOf(_frontMatterEnd) + _frontMatterEnd.length);
+  }
+
+  Future<YamlMap> frontMatterOf(String name) async {
+    final note = await noteFileNamed(name);
+    expect(note, startsWith('---\n'));
+    return loadYaml(note.substring(4, note.indexOf(_frontMatterEnd)))
+        as YamlMap;
+  }
 
   test('names a note after the day it was written', () async {
     await write(
@@ -127,5 +144,64 @@ void main() {
     ]));
 
     expect(await (await notes()).list(), equals(['log_2026-03-04.md']));
+  });
+
+  group('front matter', () {
+    test('holds the date, mood, tags and trackers', () async {
+      await write(snapshotOf([
+        exportEntry(DateTime(2026, 3, 4, 8, 30), mood: 4, tags: const [
+          ExportEntryTag(name: 'Work', tagType: TagType.label),
+          ExportEntryTag(name: 'Gym', tagType: TagType.label),
+          ExportEntryTag(name: 'Water', tagType: TagType.tracker, value: 3),
+          ExportEntryTag(name: 'Sleep', tagType: TagType.tracker, value: 7.5),
+        ]),
+      ]));
+
+      final frontMatter = await frontMatterOf('log_2026-03-04.md');
+
+      expect(frontMatter['date'], '2026-03-04T08:30:00.000');
+      expect(frontMatter['mood'], 4);
+      expect(frontMatter['moodLabel'], 'Good: really');
+      expect(frontMatter['tags'], ['Work', 'Gym']);
+      expect(frontMatter['trackers'], {'Water': 3, 'Sleep': 7.5});
+    });
+
+    test('survives a mood label with a colon, quotes and a line break',
+        () async {
+      const label = 'He said: "fine"\nthen # left';
+      final snapshot = ExportSnapshot(
+        locale: 'en',
+        exportedAt: exportedAtForTests,
+        moodLabelOf: (_) => label,
+        moodScale: moodScaleForTests,
+        entries: [exportEntry(DateTime(2026, 3, 4), mood: 4)],
+      );
+
+      await write(snapshot);
+
+      expect((await frontMatterOf('log_2026-03-04.md'))['moodLabel'], label);
+    });
+
+    test('omits the keys of values that were never set', () async {
+      await write(snapshotOf([
+        exportEntry(DateTime(2026, 3, 4), tags: const [
+          ExportEntryTag(name: 'Water', tagType: TagType.tracker),
+        ]),
+      ]));
+
+      final frontMatter = await frontMatterOf('log_2026-03-04.md');
+
+      expect(frontMatter.keys, ['date']);
+    });
+
+    test('leaves the note body unchanged below it', () async {
+      await write(snapshotOf([
+        exportEntry(DateTime(2026, 3, 4),
+            mood: 2, text: '- not a list\n= not a formula'),
+      ]));
+
+      expect(await noteNamed('log_2026-03-04.md'),
+          'Bad Wed, Mar 4, 2026\n- not a list\n= not a formula\n');
+    });
   });
 }
