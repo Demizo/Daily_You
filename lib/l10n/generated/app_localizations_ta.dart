@@ -926,6 +926,9 @@ class AppLocalizationsTa extends AppLocalizations {
   String get formatMarkdown => 'மார்க் பேரூர்';
 
   @override
+  String get formatCsv => 'CSV';
+
+  @override
   String get formatJson => 'JSON';
 
   @override

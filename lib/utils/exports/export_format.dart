@@ -4,5 +4,6 @@
 
 enum ExportFormat {
   markdown,
+  csv,
   json,
 }

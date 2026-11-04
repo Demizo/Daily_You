@@ -1698,6 +1698,12 @@ abstract class AppLocalizations {
   /// **'Markdown'**
   String get formatMarkdown;
 
+  /// No description provided for @formatCsv.
+  ///
+  /// In en, this message translates to:
+  /// **'CSV'**
+  String get formatCsv;
+
   /// No description provided for @formatJson.
   ///
   /// In en, this message translates to:

@@ -921,6 +921,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get formatMarkdown => 'ماركداون (markdown)';
 
   @override
+  String get formatCsv => 'CSV';
+
+  @override
   String get formatJson => 'JSON';
 
   @override

@@ -917,6 +917,9 @@ class AppLocalizationsHi extends AppLocalizations {
   String get formatMarkdown => 'मार्कडाउन';
 
   @override
+  String get formatCsv => 'CSV';
+
+  @override
   String get formatJson => 'JSON';
 
   @override

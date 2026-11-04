@@ -511,6 +511,8 @@
   "@formatPixels": {},
   "formatMarkdown": "Markdown",
   "@formatMarkdown": {},
+  "formatCsv": "CSV",
+  "@formatCsv": {},
   "formatJson": "JSON",
   "@formatJson": {},
   "settingsDeleteAllLogsTitle": "Delete All Logs",

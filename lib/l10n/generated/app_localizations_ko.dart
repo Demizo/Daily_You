@@ -909,6 +909,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get formatMarkdown => '마크다운';
 
   @override
+  String get formatCsv => 'CSV';
+
+  @override
   String get formatJson => 'JSON';
 
   @override

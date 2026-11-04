@@ -925,6 +925,9 @@ class AppLocalizationsUk extends AppLocalizations {
   String get formatMarkdown => 'Markdown';
 
   @override
+  String get formatCsv => 'CSV';
+
+  @override
   String get formatJson => 'JSON';
 
   @override

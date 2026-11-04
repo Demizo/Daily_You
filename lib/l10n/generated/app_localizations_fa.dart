@@ -916,6 +916,9 @@ class AppLocalizationsFa extends AppLocalizations {
   String get formatMarkdown => 'مارک داون';
 
   @override
+  String get formatCsv => 'CSV';
+
+  @override
   String get formatJson => 'JSON';
 
   @override
