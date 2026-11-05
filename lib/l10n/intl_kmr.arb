@@ -17,5 +17,22 @@
     "settingsFlashbacksExcludeBadDays": "ڕۆژێن نەباش لابدە",
     "flaskbacksEmpty": "هێشتا چ بیرهاتنێن کەڤن نەهاتینە…",
     "flashbackGoodDay": "ڕۆژەکا باش",
-    "flashbackRandomDay": "ڕۆژەکا ھەرەمەکی"
+    "flashbackRandomDay": "ڕۆژەکا ھەرەمەکی",
+    "flashbackOnThisDay": "ل ل ڤێ ڕۆژێ",
+    "pageGalleryTitle": "پێشانگە",
+    "searchLogsHint": "تۆماران بگەڕە…",
+    "noLogs": "چ تۆمار نینن…",
+    "noResults": "چ ئەنجام نینن…",
+    "sortDateTitle": "بەروارد",
+    "sortOrderAscendingTitle": "بەرەف سەری",
+    "sortOrderDescendingTitle": "بەرەف خوارێ",
+    "pageStatisticsTitle": "ئامار",
+    "statisticsNotEnoughData": "پێزانینێن پێدڤی نینن…",
+    "statisticsRangeOneMonth": "١ مانگ",
+    "statisticsRangeSixMonths": "٦ مانگ",
+    "statisticsRangeOneYear": "١ ساڵ",
+    "statisticsRangeAllTime": "ھەمی دەم",
+    "chartSummaryTitle": "پوختە",
+    "chartByDayTitle": "ب ڕۆژێ",
+    "chartOverTimeTitle": "ب بورینا دەمی"
 }
