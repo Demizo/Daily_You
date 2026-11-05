@@ -293,5 +293,7 @@
     "moodUnpleasant": "不愉快",
     "moodNeutral": "一般",
     "moodPleasant": "愉快",
-    "moodVeryPleasant": "非常愉快"
+    "moodVeryPleasant": "非常愉快",
+    "formatCsv": "CSV",
+    "formatJson": "JSON"
 }
