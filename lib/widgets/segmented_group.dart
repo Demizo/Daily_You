@@ -5,9 +5,14 @@
 import 'package:material_ui/material_ui.dart';
 
 class SegmentedGroup extends StatelessWidget {
-  const SegmentedGroup({super.key, required this.children});
+  const SegmentedGroup({
+    super.key,
+    required this.children,
+    this.emphasized = false,
+  });
 
   final List<Widget> children;
+  final bool emphasized;
 
   @override
   Widget build(BuildContext context) {
@@ -19,6 +24,7 @@ class SegmentedGroup extends StatelessWidget {
           SegmentedRow(
             isFirst: index == 0,
             isLast: index == last,
+            emphasized: emphasized,
             child: children[index],
           ),
       ],
@@ -32,10 +38,12 @@ class SegmentedRow extends StatelessWidget {
     required this.isFirst,
     required this.isLast,
     required this.child,
+    this.emphasized = false,
   });
 
   final bool isFirst;
   final bool isLast;
+  final bool emphasized;
   final Widget child;
 
   static const Radius _outerRadius = Radius.circular(16);
@@ -44,10 +52,13 @@ class SegmentedRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Padding(
       padding: EdgeInsets.only(bottom: isLast ? 0 : _gap),
       child: Material(
-        color: Theme.of(context).colorScheme.surfaceContainer,
+        color: emphasized
+            ? colorScheme.primaryContainer
+            : colorScheme.surfaceContainer,
         clipBehavior: Clip.antiAlias,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(
@@ -55,7 +66,13 @@ class SegmentedRow extends StatelessWidget {
             bottom: isLast ? _outerRadius : _innerRadius,
           ),
         ),
-        child: child,
+        child: emphasized
+            ? ListTileTheme.merge(
+                iconColor: colorScheme.primary,
+                textColor: colorScheme.onPrimaryContainer,
+                child: child,
+              )
+            : child,
       ),
     );
   }

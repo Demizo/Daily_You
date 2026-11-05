@@ -74,6 +74,11 @@ class _SettingsPageState extends State<SettingsPage> {
         ],
         [
           (
+            title: l10n.settingsBackupRestoreTitle,
+            icon: Icons.settings_backup_restore_rounded,
+            page: const BackupRestoreSettings(),
+          ),
+          (
             title: l10n.settingsStorageTitle,
             icon: Icons.storage_rounded,
             page: const StorageSettings(),
@@ -82,11 +87,6 @@ class _SettingsPageState extends State<SettingsPage> {
             title: l10n.settingsSecurityTitle,
             icon: Icons.security_rounded,
             page: const SecuritySettings(),
-          ),
-          (
-            title: l10n.settingsBackupRestoreTitle,
-            icon: Icons.settings_backup_restore_rounded,
-            page: const BackupRestoreSettings(),
           ),
         ],
         [

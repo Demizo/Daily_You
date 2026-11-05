@@ -32,6 +32,15 @@ class AboutSettings extends StatelessWidget {
                 _open(Uri.https("github.com", "/Demizo/Daily_You/releases")),
           ),
           SettingsActionRow(
+            icon: Icons.bug_report_rounded,
+            title: l10n.errorReport,
+            subtitle: "github.com/Demizo/Daily_You/issues",
+            onTap: () =>
+                _open(Uri.https("github.com", "/Demizo/Daily_You/issues")),
+          ),
+        ]),
+        SegmentedGroup(children: [
+          SettingsActionRow(
             icon: Icons.code_rounded,
             title: l10n.settingsSourceCode,
             subtitle: "github.com/Demizo/Daily_You",
@@ -57,20 +66,17 @@ class AboutSettings extends StatelessWidget {
                     ))),
           ),
         ]),
-        SegmentedGroup(children: [
+        SegmentedGroup(emphasized: true, children: [
           SettingsActionRow(
-            icon: Icons.translate_rounded,
-            title: l10n.settingsHelpTranslate,
-            subtitle: "hosted.weblate.org/projects/daily-you",
-            onTap: () =>
-                _open(Uri.https("hosted.weblate.org", "/projects/daily-you")),
-          ),
-          SettingsActionRow(
-            icon: Icons.bug_report_rounded,
-            title: l10n.errorReport,
-            subtitle: "github.com/Demizo/Daily_You/issues",
-            onTap: () =>
-                _open(Uri.https("github.com", "/Demizo/Daily_You/issues")),
+            icon: Icons.volunteer_activism_rounded,
+            title:
+                '${l10n.settingsMadeWithLove} ${l10n.settingsConsiderSupporting}',
+            onTap: () => _open(Uri(
+                scheme: "https",
+                host: "github.com",
+                path: "/Demizo/Daily_You",
+                queryParameters: {"tab": "readme-ov-file"},
+                fragment: "support-the-app")),
           ),
         ]),
       ],

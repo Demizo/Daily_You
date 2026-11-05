@@ -295,11 +295,6 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
       children: [
         SegmentedGroup(children: [
           SettingsActionRow(
-            icon: Icons.restore_rounded,
-            title: l10n.settingsRestore,
-            onTap: () => _restoreData(context),
-          ),
-          SettingsActionRow(
             icon: Icons.backup_rounded,
             title: l10n.settingsBackup,
             subtitle: _lastBackupText(configProvider.get(Settings.lastBackup)),
@@ -326,6 +321,11 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
                 : null,
             onOpenOptions: () =>
                 _showBackupPasswordDialog(l10n.settingsSecurityChangePassword),
+          ),
+          SettingsActionRow(
+            icon: Icons.restore_rounded,
+            title: l10n.settingsRestore,
+            onTap: () => _restoreData(context),
           ),
         ]),
         SegmentedGroup(children: [
