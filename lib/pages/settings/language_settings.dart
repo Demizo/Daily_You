@@ -48,8 +48,10 @@ class LanguageSettings extends StatelessWidget {
             options: {
               null: l10n.themeSystem,
               for (final locale in AppLocalizations.supportedLocales)
-                LanguageOption.fromLocale(locale):
-                    LanguageOption.fromLocale(locale).displayName(),
+                if (LanguageOption.displayNameMapping
+                    .containsKey(LanguageOption.fromLocale(locale)))
+                  LanguageOption.fromLocale(locale):
+                      LanguageOption.fromLocale(locale).displayName(),
             },
             onChanged: (language) => configProvider.set(
                 Settings.overrideLanguage, language?.toJson()),
