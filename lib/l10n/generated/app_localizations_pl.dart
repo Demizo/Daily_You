@@ -21,19 +21,19 @@ class AppLocalizationsPl extends AppLocalizations {
   String get actionTakePhoto => 'Zrób zdjęcie';
 
   @override
-  String get actionTakeVideo => 'Take video';
+  String get actionTakeVideo => 'Nagraj filmik';
 
   @override
-  String get actionRecordAudio => 'Record audio';
+  String get actionRecordAudio => 'Nagraj dźwięk';
 
   @override
-  String get actionAddImage => 'Add image';
+  String get actionAddImage => 'Dodaj obraz';
 
   @override
-  String get actionAddVideo => 'Add video';
+  String get actionAddVideo => 'Dodaj wideo';
 
   @override
-  String get actionAddAudio => 'Add audio';
+  String get actionAddAudio => 'Dodaj dźwięk';
 
   @override
   String get actionToday => 'Dziś';
@@ -144,7 +144,7 @@ class AppLocalizationsPl extends AppLocalizations {
   String get noLogs => 'Brak wpisu…';
 
   @override
-  String get noResults => 'No Results…';
+  String get noResults => 'Brak wyników';
 
   @override
   String get sortDateTitle => 'Data';
@@ -185,7 +185,7 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String chartOverTimeTitle(Object tag) {
-    return '$tag Over Time';
+    return '$tag Po czasie';
   }
 
   @override
@@ -204,7 +204,7 @@ class AppLocalizationsPl extends AppLocalizations {
   String get chartGroupingYear => 'Lat';
 
   @override
-  String get chartSmoothingLabel => 'Smoothing';
+  String get chartSmoothingLabel => 'Wygładzanie';
 
   @override
   String streakCurrent(num count) {
@@ -259,24 +259,24 @@ class AppLocalizationsPl extends AppLocalizations {
       'Kontynuuj z lokalną bazą danych';
 
   @override
-  String get databaseMigrationErrorTitle => 'Couldn\'t Move Your Data';
+  String get databaseMigrationErrorTitle => 'Nie można przenieść danych';
 
   @override
   String get databaseMigrationErrorDescription =>
-      'Your entries are safe but couldn\'t be moved to the app\'s storage.\n\nTry again, and report the issue if it keeps happening.';
+      'Wystąpił błąd podczas przenoszenia danych do folderu aplikacji. Spokojnie! Twoje dane nie zostały usunięte!\n\nSpróbuj ponownie lub zgłoś błąd gdy ten nie ustępuje.';
 
   @override
-  String get databaseMigrationErrorRetry => 'Retry';
+  String get databaseMigrationErrorRetry => 'Spróbuj ponownie';
 
   @override
-  String get databaseNewerErrorTitle => 'Update Required';
+  String get databaseNewerErrorTitle => 'Wymagana aktualizacja';
 
   @override
   String get databaseNewerErrorDescription =>
-      'Your data was saved by a newer version of Daily You. This version can\'t open it safely. Update the app to continue.';
+      'Twoje dane zostały zapisane przez nowszą wersję aplikacji. By uniknąć błędów nie możesz ich otworzyć na obecnej wersji. By je zobaczyć zaktualizuj aplikację do najnowszej wersji.';
 
   @override
-  String get errorReport => 'Report Issue';
+  String get errorReport => 'Zgłoś błąd';
 
   @override
   String get lastModified => 'Zmodyfikowane';
@@ -300,21 +300,20 @@ class AppLocalizationsPl extends AppLocalizations {
   String get deletePhotoDescription => 'Czy chcesz usunąć to zdjęcie?';
 
   @override
-  String get deleteAttachmentTitle => 'Delete Attachment';
+  String get deleteAttachmentTitle => 'Usuń załącznik';
 
   @override
-  String get deleteAttachmentDescription =>
-      'Do you want to delete this attachment?';
+  String get deleteAttachmentDescription => 'Czy chcesz usunąć załącznik?';
 
   @override
   String get largeAttachmentWarningTitle => 'Large attachment';
 
   @override
   String get largeAttachmentWarningDescription =>
-      'This attachment is large and will increase your backup size.';
+      'Ten załącznik jest duży i znacznie zwiększy rozmiar twoich kopi zapasowych.';
 
   @override
-  String get dontShowAgain => 'Don\'t show again';
+  String get dontShowAgain => 'Nie pokazuj ponownie';
 
   @override
   String get pageSettingsTitle => 'Ustawienia';
@@ -368,13 +367,13 @@ class AppLocalizationsPl extends AppLocalizations {
   String get moodIconPrompt => 'Wprowadź ikonę';
 
   @override
-  String get moodVeryUnpleasant => 'Very Unpleasant';
+  String get moodVeryUnpleasant => 'Bardzo niemiły';
 
   @override
-  String get moodUnpleasant => 'Unpleasant';
+  String get moodUnpleasant => 'Słaby';
 
   @override
-  String get moodNeutral => 'Neutral';
+  String get moodNeutral => 'Neutralny';
 
   @override
   String get moodPleasant => 'Pleasant';

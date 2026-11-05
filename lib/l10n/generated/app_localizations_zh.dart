@@ -364,19 +364,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get moodIconPrompt => '输入一个图标';
 
   @override
-  String get moodVeryUnpleasant => 'Very Unpleasant';
+  String get moodVeryUnpleasant => '非常不愉快';
 
   @override
-  String get moodUnpleasant => 'Unpleasant';
+  String get moodUnpleasant => '不愉快';
 
   @override
-  String get moodNeutral => 'Neutral';
+  String get moodNeutral => '一般';
 
   @override
-  String get moodPleasant => 'Pleasant';
+  String get moodPleasant => '愉快';
 
   @override
-  String get moodVeryPleasant => 'Very Pleasant';
+  String get moodVeryPleasant => '非常愉快';
 
   @override
   String get settingsFlashbacksViewLayout => '往昔重现的视图布局';
@@ -1410,6 +1410,21 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get moodIconPrompt => '輸入圖示';
+
+  @override
+  String get moodVeryUnpleasant => '非常不愉快';
+
+  @override
+  String get moodUnpleasant => '不愉快';
+
+  @override
+  String get moodNeutral => '中性';
+
+  @override
+  String get moodPleasant => '愉快';
+
+  @override
+  String get moodVeryPleasant => '非常愉快';
 
   @override
   String get settingsFlashbacksViewLayout => '往日重現檢視佈局';

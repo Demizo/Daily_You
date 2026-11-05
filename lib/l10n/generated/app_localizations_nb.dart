@@ -12,7 +12,7 @@ class AppLocalizationsNb extends AppLocalizations {
   String get appTitle => 'Daily You';
 
   @override
-  String get dailyReminderTitle => 'Log Today!';
+  String get dailyReminderTitle => 'Logg i dag!';
 
   @override
   String get dailyReminderDescription => 'Take your daily log…';
