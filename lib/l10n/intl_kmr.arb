@@ -1,0 +1,20 @@
+{
+    "dailyReminderTitle": "ئەڤرۆ تۆمار بکە!",
+    "dailyReminderDescription": "تۆمارا خۆ یا ئەڤرۆ بکێشە…",
+    "actionTakePhoto": "وێنەی بگرە",
+    "actionTakeVideo": "ڤیدیۆیێ بگرە",
+    "actionRecordAudio": "دەنگی تۆمار بکە",
+    "actionAddImage": "وێنەی زێدەبکە",
+    "actionAddVideo": "ڤیدیۆیێ زێدە بکە",
+    "actionAddAudio": "دەنگی زێدەبکە",
+    "actionToday": "ئەڤرۆ",
+    "actionOtherDay": "ڕۆژا دی",
+    "pageHomeTitle": "سەرەکی",
+    "jumpToMonthTitle": "چوون بۆ مانگ",
+    "jumpToLogTitle": "چوون بۆ تۆمار",
+    "flashbacksTitle": "بیرھاتنان",
+    "settingsFlashbacksExcludeBadDays": "ڕۆژێن نەباش لابدە",
+    "flaskbacksEmpty": "هێشتا چ بیرهاتنێن کەڤن نەهاتینە…",
+    "flashbackGoodDay": "ڕۆژەکا باش",
+    "flashbackRandomDay": "ڕۆژەکا ھەرەمەکی"
+}

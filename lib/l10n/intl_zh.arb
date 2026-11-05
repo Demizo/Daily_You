@@ -288,5 +288,10 @@
     "recorderDiscardDescription": "此录音将被删除。",
     "recorderDiscardAction": "丢弃",
     "recorderPermissionDenied": "录制音频需要麦克风权限",
-    "recorderErrorDescription": "录制音频失败！"
+    "recorderErrorDescription": "录制音频失败！",
+    "moodVeryUnpleasant": "非常不愉快",
+    "moodUnpleasant": "不愉快",
+    "moodNeutral": "一般",
+    "moodPleasant": "愉快",
+    "moodVeryPleasant": "非常愉快"
 }
