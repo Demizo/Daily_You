@@ -1,0 +1,9 @@
+Daily You v3.9.0 has arrived! Express yourself:
+
+• Customize your mood scale
+• Redesigned the app settings
+• Improved the app's tablet and desktop layouts
+• Added more export options
+• Logs can now go further back in time
+• Various UI and performance enhancements
+• Updated translations
