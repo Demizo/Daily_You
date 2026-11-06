@@ -10,43 +10,21 @@ import 'package:daily_you/stats/stats_range.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  final worst = Mood.levels.first;
   final bad = Mood.levels[1];
   final neutral = Mood.levels[2];
-  final good = Mood.levels[3];
   final best = Mood.levels.last;
 
   Entry entryAt(DateTime time, {int? id, int? mood, String text = ''}) => Entry(
       id: id, text: text, mood: mood, timeCreate: time, timeModified: time);
+
+  double? moodPosition(Entry entry) =>
+      entry.mood == null ? null : Mood.position(entry.mood!).toDouble();
 
   EntryTag entryTag(int entryId, int tagId, {String? value}) => EntryTag(
       entryId: entryId,
       tagId: tagId,
       value: value,
       timeCreate: DateTime(2025, 1, 1));
-
-  test('counts each great day once', () {
-    final count = greatDayCount([
-      entryAt(DateTime(2025, 6, 2, 20), mood: best),
-      entryAt(DateTime(2025, 6, 2, 8), mood: good),
-      entryAt(DateTime(2025, 6, 1), mood: neutral),
-      entryAt(DateTime(2025, 5, 31), mood: null),
-      entryAt(DateTime(2025, 5, 30), mood: good),
-    ]);
-
-    expect(count, 2);
-  });
-
-  test('totals every mood level including the unused ones', () {
-    final totals = moodTotals([
-      entryAt(DateTime(2025, 6, 2), mood: best),
-      entryAt(DateTime(2025, 6, 1), mood: best),
-      entryAt(DateTime(2025, 5, 31), mood: worst),
-      entryAt(DateTime(2025, 5, 30)),
-    ]);
-
-    expect(totals, {worst: 1, bad: 0, neutral: 0, good: 0, best: 2});
-  });
 
   test('averages values per weekday and marks the empty ones', () {
     // 2025-06-02 is a Monday.
@@ -118,15 +96,6 @@ void main() {
     expect(trackerYRange([]), (0.0, 10.0));
     expect(trackerYRange([2, 8]), (0.0, 8.0));
     expect(trackerYRange([-3, 5]), (-3.0, 5.0));
-  });
-
-  test('sums the words across every entry', () {
-    expect(
-        totalWordCount([
-          entryAt(DateTime(2025, 6, 2), text: 'one two three'),
-          entryAt(DateTime(2025, 6, 1), text: 'four'),
-        ]),
-        4);
   });
 
   test('keeps only the entries inside the range', () {

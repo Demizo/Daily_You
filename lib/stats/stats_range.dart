@@ -6,17 +6,25 @@ import 'package:daily_you/models/entry.dart';
 
 enum StatsRange { month, sixMonths, year, allTime }
 
-List<Entry> entriesInRange(List<Entry> entries, StatsRange range,
-    {DateTime? now}) {
+DateTime? statsRangeStart(StatsRange range, {DateTime? now}) {
   final monthCount = switch (range) {
     StatsRange.month => 1,
     StatsRange.sixMonths => 6,
     StatsRange.year => 12,
     StatsRange.allTime => 0,
   };
-  if (monthCount == 0) return entries.toList();
+  if (monthCount == 0) return null;
 
   final today = now ?? DateTime.now();
-  final start = DateTime(today.year, today.month - monthCount, today.day);
+  return DateTime(today.year, today.month - monthCount, today.day);
+}
+
+List<Entry> entriesInRange(
+  List<Entry> entries,
+  StatsRange range, {
+  DateTime? now,
+}) {
+  final start = statsRangeStart(range, now: now);
+  if (start == null) return entries.toList();
   return entries.where((entry) => entry.timeCreate.isAfter(start)).toList();
 }

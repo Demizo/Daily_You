@@ -61,7 +61,6 @@ dependencies:
   html2md: ^1.3.2
   local_auth: ^3.0.1
   crypto: ^3.0.6
-  word_count: ^1.0.4
   xml: ^7.0.1
   csv: ^8.0.0
   quick_actions: ^1.1.0
@@ -93,6 +92,7 @@ dev_dependencies:
   icons_launcher: ^3.0.0
   yaml: ^3.1.3
   golden_screenshot: ^12.1.1
+  word_count: ^1.0.4
 
 flutter:
   generate: true

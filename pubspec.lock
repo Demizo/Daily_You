@@ -1831,7 +1831,7 @@ packages:
     source: hosted
     version: "2.0.0"
   word_count:
-    dependency: "direct main"
+    dependency: "direct dev"
     description:
       name: word_count
       sha256: "98ccd8ef6d614bcf11a7e6d39d43d08193a3a42d360104234018d1dfb86c413d"

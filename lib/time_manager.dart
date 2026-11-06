@@ -206,6 +206,11 @@ class TimeManager {
     return j1.day == j2.day && j1.month == j2.month;
   }
 
+  static bool isFirstDayOfCalendarMonth(DateTime date, bool isJalali) {
+    if (!isJalali) return date.day == 1;
+    return Jalali.fromDateTime(date).day == 1;
+  }
+
   static int calendarYearOf(DateTime date, bool isJalali) {
     if (!isJalali) return date.year;
     return Jalali.fromDateTime(date).year;
@@ -242,6 +247,14 @@ class TimeManager {
       _formatMonthDay(date, currentLocale(context),
           isJalali: isJalaliCalendar(context));
 
+  static String formatMonthName(DateTime date, BuildContext context) =>
+      _formatMonthName(date, currentLocale(context),
+          isJalali: isJalaliCalendar(context));
+
+  static String formatNarrowWeekday(int weekday, BuildContext context) =>
+      DateFormat.EEEEE(currentLocale(context))
+          .format(DateTime(2024, 1, weekday));
+
   static String formatYear(DateTime date, BuildContext context) =>
       _formatYear(date, currentLocale(context),
           isJalali: isJalaliCalendar(context));
@@ -270,6 +283,12 @@ class TimeManager {
     if (!isJalali) return DateFormat.MMMd(locale).format(date);
     final j = Jalali.fromDateTime(date);
     return '${j.formatter.d} ${jalaliMonthName(j.month, locale)}';
+  }
+
+  static String _formatMonthName(DateTime date, String locale,
+      {bool isJalali = false}) {
+    if (!isJalali) return DateFormat.MMM(locale).format(date);
+    return jalaliMonthName(Jalali.fromDateTime(date).month, locale);
   }
 
   static String _formatYear(DateTime date, String locale,
