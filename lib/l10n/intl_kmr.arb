@@ -34,5 +34,15 @@
     "statisticsRangeAllTime": "ھەمی دەم",
     "chartSummaryTitle": "پوختە",
     "chartByDayTitle": "ب ڕۆژێ",
-    "chartOverTimeTitle": "ب بورینا دەمی"
+    "chartOverTimeTitle": "ب بورینا دەمی",
+    "chartGroupingLabel": "کۆمکرن ل دویف",
+    "chartGroupingDay": "ڕۆژ",
+    "chartGroupingWeek": "حەفتی",
+    "chartGroupingMonth": "مانگ",
+    "chartGroupingYear": "ساڵ",
+    "chartSmoothingLabel": "ڕێککرن",
+    "streakCurrent": "{count, plural, other{بەردەوامییا نوکە {count}}}",
+    "streakLongest": "{count, plural, other{درێژترین ماوەی بەردەوامی {count}}}",
+    "streakGreatDays": "{count, plural, other{رۆژێن خۆش {count}}}",
+    "streakSinceBadDay": "{count, plural, other{ڕۆژێن پشتی ڕۆژەکا خراب{count}}}"
 }
