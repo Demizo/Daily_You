@@ -3,11 +3,14 @@
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
 import 'package:daily_you/config_provider.dart';
+import 'package:daily_you/stats/stats_analysis.dart';
 import 'package:daily_you/time_manager.dart';
+import 'package:daily_you/utils/chart_bar_width.dart';
 import 'package:daily_you/utils/chart_y_range.dart';
+import 'package:daily_you/widgets/no_data_overlay.dart';
+import 'package:daily_you/utils/secondary_text_style.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 typedef LeftTitleBuilder = Widget Function(double value, TitleMeta meta);
@@ -32,6 +35,8 @@ class ValueByDayChart extends StatelessWidget {
     this.color,
     this.anchorAtZero = false,
   });
+
+  static const double _leftAxisWidth = 42;
 
   static const _dummyValues = {
     'Mon': 1.0,
@@ -66,20 +71,21 @@ class ValueByDayChart extends StatelessWidget {
               ),
             ),
           ),
-          Stack(
-            alignment: Alignment.center,
-            children: [
-              Opacity(
-                opacity: hasData ? 1.0 : 0.3,
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                        left: 0, right: 42, bottom: 0, top: 8),
-                    child: AspectRatio(
-                      aspectRatio: 2,
-                      child: BarChart(
+          NoDataOverlay(
+            hasData: hasData,
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.only(right: 42, top: 8),
+                child: AspectRatio(
+                  aspectRatio: 2,
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final barWidth = chartBarWidth(
+                        plotWidth: constraints.maxWidth - _leftAxisWidth,
+                        barCount: DateTime.daysPerWeek,
+                      );
+                      return BarChart(
                         BarChartData(
-                          groupsSpace: 10,
                           alignment: BarChartAlignment.spaceAround,
                           maxY: range.maxY,
                           minY: range.minY,
@@ -87,17 +93,19 @@ class ValueByDayChart extends StatelessWidget {
                               context,
                               color ?? Theme.of(context).colorScheme.primary,
                               displayValues,
-                              range),
+                              range,
+                              barWidth),
                           titlesData: FlTitlesData(
                             leftTitles: AxisTitles(
                               sideTitles: SideTitles(
                                 interval: range.interval,
                                 showTitles: true,
-                                reservedSize: 42,
+                                reservedSize: _leftAxisWidth,
                                 getTitlesWidget: (value, meta) =>
                                     buildLeftTitle != null
                                         ? buildLeftTitle!(value, meta)
-                                        : _defaultLeftTitle(value, meta),
+                                        : _defaultLeftTitle(
+                                            context, value, meta),
                               ),
                             ),
                             bottomTitles: AxisTitles(
@@ -111,8 +119,10 @@ class ValueByDayChart extends StatelessWidget {
                                       fit: BoxFit.scaleDown,
                                       child: Padding(
                                         padding: const EdgeInsets.all(2.0),
-                                        child: Text(_getDayLabel(
-                                            context, value.toInt())),
+                                        child: Text(
+                                          _getDayLabel(context, value.toInt()),
+                                          style: secondaryTextStyle(context),
+                                        ),
                                       ),
                                     ),
                                   );
@@ -149,21 +159,12 @@ class ValueByDayChart extends StatelessWidget {
                           ),
                           barTouchData: BarTouchData(enabled: false),
                         ),
-                      ),
-                    ),
+                      );
+                    },
                   ),
                 ),
               ),
-              if (!hasData)
-                Text(
-                  AppLocalizations.of(context)!.statisticsNotEnoughData,
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).disabledColor,
-                  ),
-                ),
-            ],
+            ),
           ),
         ],
       ),
@@ -182,13 +183,13 @@ class ValueByDayChart extends StatelessWidget {
     };
   }
 
-  Widget _defaultLeftTitle(double value, TitleMeta meta) {
+  Widget _defaultLeftTitle(BuildContext context, double value, TitleMeta meta) {
     final formatted = _formatValue(value);
     return SideTitleWidget(
       meta: meta,
       child: Text(
         formatted,
-        style: const TextStyle(fontSize: 11),
+        style: secondaryTextStyle(context, fontSize: 11),
         textAlign: TextAlign.right,
       ),
     );
@@ -211,8 +212,13 @@ class ValueByDayChart extends StatelessWidget {
     return 0.0;
   }
 
-  List<BarChartGroupData> _getBarGroups(BuildContext context, Color barColor,
-      Map<String, double?> displayValues, ChartRange range) {
+  List<BarChartGroupData> _getBarGroups(
+    BuildContext context,
+    Color barColor,
+    Map<String, double?> displayValues,
+    ChartRange range,
+    double barWidth,
+  ) {
     final orderedDays = _getOrderedDays(context, displayValues);
     final baseline = _barBaseline(range.minY, range.maxY);
     return orderedDays.asMap().entries.map((entry) {
@@ -224,7 +230,7 @@ class ValueByDayChart extends StatelessWidget {
           barRods: [
             BarChartRodData(
               color: Colors.transparent,
-              width: 32,
+              width: barWidth,
               fromY: baseline,
               toY: baseline,
             ),
@@ -236,7 +242,7 @@ class ValueByDayChart extends StatelessWidget {
         barRods: [
           BarChartRodData(
             color: barColor,
-            width: 32,
+            width: barWidth,
             fromY: baseline,
             toY: value,
           ),
@@ -248,19 +254,18 @@ class ValueByDayChart extends StatelessWidget {
   List<MapEntry<String, double?>> _getOrderedDays(
       BuildContext context, Map<String, double?> displayValues) {
     final configProvider = Provider.of<ConfigProvider>(context);
-    List<MapEntry<String, double?>> days = displayValues.entries.toList();
-    final startingDayIndex = configProvider.getFirstDayOfWeekIndex(context);
-    days = days.sublist(startingDayIndex)
-      ..addAll(days.sublist(0, startingDayIndex));
-    return days;
+    final days = displayValues.entries.toList();
+    return [
+      for (final dayIndex in weekdayDisplayOrder(
+          configProvider.getFirstDayOfWeekIndex(context)))
+        days[dayIndex],
+    ];
   }
 
   String _getDayLabel(BuildContext context, int index) {
-    var days = TimeManager.daysOfWeekLabels(context);
+    final days = TimeManager.daysOfWeekLabels(context);
     final startingDayIndex =
         ConfigProvider.instance.getFirstDayOfWeekIndex(context);
-    days = days.sublist(startingDayIndex)
-      ..addAll(days.sublist(0, startingDayIndex));
-    return days[index];
+    return days[weekdayDisplayOrder(startingDayIndex)[index]];
   }
 }

@@ -32,6 +32,8 @@ class TagPickerDialog extends StatefulWidget {
   final bool initialNoTagsOnly;
   final void Function(List<int>, TagFilterMode, bool)? onFilterChanged;
 
+  final List<int> excludedTagIds;
+
   final TagType? tagTypeFilter;
 
   const TagPickerDialog({
@@ -42,6 +44,7 @@ class TagPickerDialog extends StatefulWidget {
     this.initialFilterMode = TagFilterMode.any,
     this.initialNoTagsOnly = false,
     this.onFilterChanged,
+    this.excludedTagIds = const [],
     this.tagTypeFilter,
   });
 
@@ -344,15 +347,11 @@ class _TagPickerDialogState extends State<TagPickerDialog> {
     final l10n = AppLocalizations.of(context)!;
     return Consumer<TagsProvider>(
       builder: (context, provider, _) {
-        // Available pool excludes tags already selected/attached
-        final List<int> excludedIds;
-        if (widget.mode == TagPickerMode.attach) {
-          excludedIds = widget.source!.attachedTagIds;
-        } else if (widget.mode == TagPickerMode.filter) {
-          excludedIds = _selectedTagIds;
-        } else {
-          excludedIds = [];
-        }
+        final excludedIds = switch (widget.mode) {
+          TagPickerMode.attach => widget.source!.attachedTagIds,
+          TagPickerMode.filter => _selectedTagIds,
+          TagPickerMode.selectSingle => widget.excludedTagIds,
+        };
 
         List<Tag> pool;
         bool typeMatch(Tag tag) =>

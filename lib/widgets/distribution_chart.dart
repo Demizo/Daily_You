@@ -5,7 +5,9 @@
 import 'dart:math' as math;
 import 'package:fl_chart/fl_chart.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:daily_you/l10n/generated/app_localizations.dart';
+import 'package:daily_you/utils/chart_bar_width.dart';
+import 'package:daily_you/widgets/no_data_overlay.dart';
+import 'package:daily_you/utils/secondary_text_style.dart';
 
 class _Bin {
   final double min;
@@ -17,12 +19,14 @@ class _Bin {
 
 class DistributionChart extends StatelessWidget {
   final List<double> values;
+  final bool hasData;
   final String title;
   final Color? color;
 
   const DistributionChart({
     super.key,
     required this.values,
+    required this.hasData,
     required this.title,
     this.color,
   });
@@ -54,6 +58,7 @@ class DistributionChart extends StatelessWidget {
 
   static const int _maxDiscreteValues = 10;
   static const int _maxBins = 8;
+  static const double _leftAxisWidth = 36;
 
   bool _isAllInteger(List<double> data) =>
       data.every((value) => value == value.truncateToDouble());
@@ -146,7 +151,6 @@ class DistributionChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final hasData = values.length > 1;
     final displayValues = hasData ? values : _dummyValues;
     final bins = _computeBins(displayValues);
     if (bins.isEmpty) return const SizedBox.shrink();
@@ -157,22 +161,6 @@ class DistributionChart extends StatelessWidget {
         Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2);
 
     final isInteger = _isAllInteger(displayValues);
-
-    final barGroups = bins.asMap().entries.map((entry) {
-      final i = entry.key;
-      final bin = entry.value;
-      return BarChartGroupData(
-        x: i,
-        barRods: [
-          BarChartRodData(
-            fromY: 0,
-            toY: bin.count.toDouble(),
-            color: barColor,
-            width: 32,
-          ),
-        ],
-      );
-    }).toList();
 
     return Card.filled(
       color: Theme.of(context).colorScheme.surfaceContainerLow,
@@ -189,23 +177,38 @@ class DistributionChart extends StatelessWidget {
               ),
             ),
           ),
-          Stack(
-            alignment: Alignment.center,
-            children: [
-              Opacity(
-                opacity: hasData ? 1.0 : 0.3,
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                      left: 8, right: 42, top: 8, bottom: 0),
-                  child: AspectRatio(
-                    aspectRatio: 2,
-                    child: BarChart(
+          NoDataOverlay(
+            hasData: hasData,
+            child: Padding(
+              padding:
+                  const EdgeInsets.only(left: 8, right: 42, top: 8, bottom: 0),
+              child: AspectRatio(
+                aspectRatio: 2,
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final barWidth = chartBarWidth(
+                      plotWidth: constraints.maxWidth - _leftAxisWidth,
+                      barCount: bins.length,
+                    );
+                    return BarChart(
                       BarChartData(
                         alignment: BarChartAlignment.spaceAround,
                         maxY: maxCount.toDouble() * 1.15,
                         minY: 0,
-                        barGroups: barGroups,
-                        groupsSpace: 6,
+                        barGroups: [
+                          for (final (index, bin) in bins.indexed)
+                            BarChartGroupData(
+                              x: index,
+                              barRods: [
+                                BarChartRodData(
+                                  fromY: 0,
+                                  toY: bin.count.toDouble(),
+                                  color: barColor,
+                                  width: barWidth,
+                                ),
+                              ],
+                            ),
+                        ],
                         titlesData: FlTitlesData(
                           bottomTitles: AxisTitles(
                             sideTitles: SideTitles(
@@ -224,7 +227,8 @@ class DistributionChart extends StatelessWidget {
                                     fit: BoxFit.scaleDown,
                                     child: Text(
                                       label,
-                                      style: const TextStyle(fontSize: 11),
+                                      style: secondaryTextStyle(context,
+                                          fontSize: 11),
                                       textScaler: TextScaler.noScaling,
                                     ),
                                   ),
@@ -235,7 +239,7 @@ class DistributionChart extends StatelessWidget {
                           leftTitles: AxisTitles(
                             sideTitles: SideTitles(
                               showTitles: true,
-                              reservedSize: 36,
+                              reservedSize: _leftAxisWidth,
                               getTitlesWidget: (value, meta) {
                                 if (value != value.truncateToDouble()) {
                                   return const SizedBox.shrink();
@@ -244,7 +248,8 @@ class DistributionChart extends StatelessWidget {
                                   meta: meta,
                                   child: Text(
                                     value.toInt().toString(),
-                                    style: const TextStyle(fontSize: 11),
+                                    style: secondaryTextStyle(context,
+                                        fontSize: 11),
                                   ),
                                 );
                               },
@@ -269,20 +274,11 @@ class DistributionChart extends StatelessWidget {
                         ),
                         barTouchData: BarTouchData(enabled: false),
                       ),
-                    ),
-                  ),
+                    );
+                  },
                 ),
               ),
-              if (!hasData)
-                Text(
-                  AppLocalizations.of(context)!.statisticsNotEnoughData,
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).disabledColor,
-                  ),
-                ),
-            ],
+            ),
           ),
         ],
       ),

@@ -85,6 +85,10 @@ class RenderPixelSnap extends RenderProxyBox {
   @override
   void paint(PaintingContext context, Offset offset) {
     final global = localToGlobal(Offset.zero);
+    if (!global.isFinite) {
+      super.paint(context, offset);
+      return;
+    }
     final snapped = Offset(
       (global.dx * _devicePixelRatio).roundToDouble() / _devicePixelRatio,
       (global.dy * _devicePixelRatio).roundToDouble() / _devicePixelRatio,

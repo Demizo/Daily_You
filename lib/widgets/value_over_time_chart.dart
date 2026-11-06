@@ -10,8 +10,10 @@ import 'package:daily_you/utils/chart_axis.dart';
 import 'package:daily_you/utils/chart_y_range.dart';
 import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/connected_button_group.dart';
+import 'package:daily_you/widgets/no_data_overlay.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
+import 'package:daily_you/utils/secondary_text_style.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -29,10 +31,18 @@ class ValueOverTimeChart extends StatefulWidget {
   final bool hasData;
   final ChartYRange yRange;
   final BucketCombiner combine;
-  final String title;
+  final String? title;
   final LeftTitleBuilder? buildLeftTitle;
   final Color? color;
   final bool anchorAtZero;
+  final bool compact;
+  final double leftAxisWidth;
+
+  static const double _fullLeftAxisWidth = 42;
+  static const double _aspectRatio = 2;
+  static const double _bottomLabelGap = 8;
+  static const double _bottomAxisHeight = 40;
+  static const double _addedBottomAxisHeight = 8;
 
   const ValueOverTimeChart({
     super.key,
@@ -40,11 +50,25 @@ class ValueOverTimeChart extends StatefulWidget {
     required this.hasData,
     required this.yRange,
     required this.combine,
-    required this.title,
+    required String this.title,
     this.buildLeftTitle,
     this.color,
     this.anchorAtZero = false,
-  });
+  })  : compact = false,
+        leftAxisWidth = _fullLeftAxisWidth;
+
+  const ValueOverTimeChart.compact({
+    super.key,
+    required this.dataPoints,
+    required this.hasData,
+    required this.yRange,
+    required this.combine,
+    required this.leftAxisWidth,
+    this.buildLeftTitle,
+    this.color,
+  })  : title = null,
+        anchorAtZero = false,
+        compact = true;
 
   @override
   State<ValueOverTimeChart> createState() => _ValueOverTimeChartState();
@@ -234,13 +258,23 @@ class _ValueOverTimeChartState extends State<ValueOverTimeChart> {
         Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2);
 
     final labelCount = labelDates.length.clamp(1, 6);
+    final rightInset = widget.compact ? 0.0 : widget.leftAxisWidth;
     final chartWidget = LayoutBuilder(
       builder: (context, constraints) {
-        final maxLabelWidth = ((constraints.maxWidth - 84) / labelCount);
+        final maxLabelWidth =
+            ((constraints.maxWidth - widget.leftAxisWidth - rightInset) /
+                labelCount);
+        final chartWidth = constraints.maxWidth - rightInset;
         return Padding(
-          padding: const EdgeInsets.only(right: 42, top: 8, bottom: 8),
+          padding: EdgeInsets.only(
+            right: rightInset,
+            top: 8,
+            bottom: 8,
+          ),
           child: AspectRatio(
-            aspectRatio: 2,
+            aspectRatio: chartWidth /
+                (chartWidth / ValueOverTimeChart._aspectRatio +
+                    ValueOverTimeChart._addedBottomAxisHeight),
             child: LineChart(
               LineChartData(
                 minX: 0,
@@ -269,18 +303,21 @@ class _ValueOverTimeChartState extends State<ValueOverTimeChart> {
                     sideTitles: SideTitles(
                       showTitles: true,
                       interval: 1,
-                      reservedSize: 32,
+                      reservedSize: ValueOverTimeChart._bottomAxisHeight,
                       getTitlesWidget: (value, _) {
                         final label = labelTextMap[value.toInt()];
                         if (label != null) {
                           return Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
+                            padding: const EdgeInsets.only(
+                              top: ValueOverTimeChart._bottomLabelGap,
+                            ),
                             child: SizedBox(
                               width: maxLabelWidth,
                               child: FittedBox(
                                 fit: BoxFit.scaleDown,
                                 child: Text(
                                   label,
+                                  style: secondaryTextStyle(context),
                                   textScaler: TextScaler.noScaling,
                                 ),
                               ),
@@ -295,7 +332,7 @@ class _ValueOverTimeChartState extends State<ValueOverTimeChart> {
                     sideTitles: SideTitles(
                       showTitles: true,
                       interval: yRange.interval,
-                      reservedSize: 42,
+                      reservedSize: widget.leftAxisWidth,
                       getTitlesWidget: (value, meta) =>
                           widget.buildLeftTitle != null
                               ? widget.buildLeftTitle!(value, meta)
@@ -326,6 +363,12 @@ class _ValueOverTimeChartState extends State<ValueOverTimeChart> {
       },
     );
 
+    final plot = NoDataOverlay(
+      hasData: widget.hasData,
+      child: Center(child: chartWidget),
+    );
+    if (widget.compact) return plot;
+
     return Card.filled(
       color: Theme.of(context).colorScheme.surfaceContainerLow,
       child: Column(
@@ -337,12 +380,11 @@ class _ValueOverTimeChartState extends State<ValueOverTimeChart> {
               children: [
                 const SizedBox(width: 48),
                 Expanded(
-                  child: Center(
-                    child: Text(
-                      widget.title,
-                      style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
+                  child: Text(
+                    widget.title!,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ),
                 IconButton(
@@ -355,24 +397,7 @@ class _ValueOverTimeChartState extends State<ValueOverTimeChart> {
               ],
             ),
           ),
-          Stack(
-            alignment: Alignment.center,
-            children: [
-              Opacity(
-                opacity: widget.hasData ? 1.0 : 0.3,
-                child: Center(child: chartWidget),
-              ),
-              if (!widget.hasData)
-                Text(
-                  AppLocalizations.of(context)!.statisticsNotEnoughData,
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).disabledColor,
-                  ),
-                ),
-            ],
-          ),
+          plot,
         ],
       ),
     );
@@ -384,7 +409,7 @@ class _ValueOverTimeChartState extends State<ValueOverTimeChart> {
       meta: meta,
       child: Text(
         formatted,
-        style: const TextStyle(fontSize: 11),
+        style: secondaryTextStyle(context, fontSize: 11),
         textAlign: TextAlign.right,
       ),
     );

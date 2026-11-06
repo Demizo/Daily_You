@@ -113,7 +113,7 @@ ShapeBorder _computeBorder({
   return _DynamicPillBorder(leftRadius: leftR, rightRadius: rightR);
 }
 
-class ConnectedButtonGroup extends StatelessWidget {
+class ConnectedButtonGroup extends StatefulWidget {
   final List<String> labels;
   final int selectedIndex;
   final ValueChanged<int> onSelectionChanged;
@@ -128,10 +128,58 @@ class ConnectedButtonGroup extends StatelessWidget {
   });
 
   @override
+  State<ConnectedButtonGroup> createState() => _ConnectedButtonGroupState();
+}
+
+class _ConnectedButtonGroupState extends State<ConnectedButtonGroup> {
+  final List<GlobalKey> _buttonKeys = [];
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollSelectedIntoView(Duration.zero);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(ConnectedButtonGroup oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.selectedIndex != widget.selectedIndex) {
+      _scrollSelectedIntoView(_kAnimDuration);
+    }
+  }
+
+  void _scrollSelectedIntoView(Duration duration) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final buttonBox =
+          _buttonKeys[widget.selectedIndex].currentContext?.findRenderObject();
+      if (!mounted || buttonBox == null || !_scrollController.hasClients) {
+        return;
+      }
+      _scrollController.position.ensureVisible(
+        buttonBox,
+        alignment: 0.5,
+        duration: duration,
+        curve: Curves.easeInOut,
+      );
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    while (_buttonKeys.length < widget.labels.length) {
+      _buttonKeys.add(GlobalKey());
+    }
     return LayoutBuilder(
       builder: (context, constraints) {
         return SingleChildScrollView(
+          controller: _scrollController,
           scrollDirection: Axis.horizontal,
           child: ConstrainedBox(
             constraints: BoxConstraints(
@@ -140,18 +188,19 @@ class ConnectedButtonGroup extends StatelessWidget {
             child: IntrinsicHeight(
               child: Row(
                 mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: mainAxisAlignment,
+                mainAxisAlignment: widget.mainAxisAlignment,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: List.generate(
-                  labels.length,
+                  widget.labels.length,
                   (i) => Padding(
+                    key: _buttonKeys[i],
                     padding: const EdgeInsets.symmetric(horizontal: 1.0),
                     child: _ConnectedButton(
-                      label: labels[i],
+                      label: widget.labels[i],
                       index: i,
-                      count: labels.length,
-                      selectedIndex: selectedIndex,
-                      onTap: () => onSelectionChanged(i),
+                      count: widget.labels.length,
+                      selectedIndex: widget.selectedIndex,
+                      onTap: () => widget.onSelectionChanged(i),
                     ),
                   ),
                 ),
@@ -185,7 +234,7 @@ class _ConnectedButton extends StatelessWidget {
     final bool isSelected = index == selectedIndex;
 
     return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0.0, end: isSelected ? 1.0 : 0.0),
+      tween: Tween<double>(end: isSelected ? 1.0 : 0.0),
       duration: _kAnimDuration,
       curve: !isSelected ? Curves.easeOutBack : Curves.easeInBack,
       builder: (context, selFrac, _) {

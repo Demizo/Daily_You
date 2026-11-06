@@ -2,92 +2,76 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
-import 'package:daily_you/models/mood.dart';
-import 'package:daily_you/widgets/morphing_burst.dart';
-import 'package:daily_you/widgets/mood_icon.dart';
-import 'package:daily_you/widgets/pixel_snap.dart';
-import 'package:material_ui/material_ui.dart';
+import 'dart:math' as math;
+
 import 'package:daily_you/l10n/generated/app_localizations.dart';
+import 'package:daily_you/models/mood.dart';
+import 'package:daily_you/utils/count_format.dart';
+import 'package:daily_you/utils/secondary_text_style.dart';
+import 'package:daily_you/widgets/mood_tier_bar.dart';
+import 'package:daily_you/widgets/mood_tier_mark.dart';
+import 'package:daily_you/widgets/no_data_overlay.dart';
+import 'package:material_ui/material_ui.dart';
 
 class MoodSummaryChart extends StatelessWidget {
-  final Map<int, int> moodCounts;
+  const MoodSummaryChart({
+    super.key,
+    required this.tierCounts,
+    required this.hasData,
+  });
+
+  static const List<int> _previewTierCounts = [2, 5, 9, 7, 3];
+  static const double _markSize = 34;
+
+  final List<int> tierCounts;
   final bool hasData;
-
-  const MoodSummaryChart(
-      {super.key, required this.moodCounts, required this.hasData});
-
-  static const _barHeight = 44.0;
-  static const _iconSize = 40.0;
-  static const _countWidth = 44.0;
-  static const _gap = 4.0;
-
-  static final _dummyMoodCounts = {
-    for (final (position, count) in [1, 3, 9, 8, 4].indexed)
-      Mood.fromPosition(position): count,
-  };
 
   @override
   Widget build(BuildContext context) {
-    final isRtl = Directionality.of(context) == TextDirection.rtl;
-    final displayCounts = hasData ? moodCounts : _dummyMoodCounts;
-    final maxCount = displayCounts.values.reduce((a, b) => a > b ? a : b);
-    final mostCommonMood = displayCounts.entries
-        .where((e) => e.value > 0)
-        .reduce((a, b) => a.value >= b.value ? a : b)
-        .key;
+    final colorScheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
+    final counts = hasData ? tierCounts : _previewTierCounts;
+    final total = counts.fold(0, (sum, count) => sum + count);
+    final highest = counts.reduce(math.max);
 
     return Card.filled(
-      color: Theme.of(context).colorScheme.surfaceContainerLow,
+      color: colorScheme.surfaceContainerLow,
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Padding(
-            padding: const EdgeInsets.only(top: 4.0),
+            padding: const EdgeInsets.only(top: 4),
             child: Center(
               child: Text(
-                AppLocalizations.of(context)!.chartSummaryTitle(
-                    AppLocalizations.of(context)!.tagMoodTitle),
+                l10n.chartSummaryTitle(l10n.tagMoodTitle),
                 style:
                     const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ),
           ),
-          Stack(
-            alignment: Alignment.center,
-            children: [
-              Opacity(
-                opacity: hasData ? 1.0 : 0.3,
-                child: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Column(
-                    children: Mood.levels.reversed.map((mood) {
-                      final count = displayCounts[mood] ?? 0;
-                      return _MoodBarRow(
-                        mood: mood,
+          NoDataOverlay(
+            hasData: hasData,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+              child: Column(children: [
+                MoodTierBar(
+                  shares: [
+                    for (final count in counts) total == 0 ? 0 : count / total,
+                  ],
+                ),
+                const SizedBox(height: 14),
+                Row(children: [
+                  for (final (position, count) in counts.indexed)
+                    Expanded(
+                      child: _MoodCount(
+                        mood: Mood.fromPosition(position),
                         count: count,
-                        maxCount: maxCount,
-                        isMostCommon: mood == mostCommonMood,
-                        isRtl: isRtl,
-                        showLabel: hasData,
-                        barHeight: _barHeight,
-                        iconSize: _iconSize,
-                        countWidth: _countWidth,
-                        gap: _gap,
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ),
-              if (!hasData)
-                Text(
-                  AppLocalizations.of(context)!.statisticsNotEnoughData,
-                  style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).disabledColor),
-                ),
-            ],
+                        isHighest: count > 0 && count == highest,
+                      ),
+                    ),
+                ]),
+              ]),
+            ),
           ),
         ],
       ),
@@ -95,139 +79,38 @@ class MoodSummaryChart extends StatelessWidget {
   }
 }
 
-class _MoodBarRow extends StatelessWidget {
-  final int mood;
-  final int count;
-  final int maxCount;
-  final bool isMostCommon;
-  final bool isRtl;
-  final bool showLabel;
-  final double barHeight;
-  final double iconSize;
-  final double countWidth;
-  final double gap;
-
-  const _MoodBarRow({
+class _MoodCount extends StatelessWidget {
+  const _MoodCount({
     required this.mood,
     required this.count,
-    required this.maxCount,
-    required this.isMostCommon,
-    required this.isRtl,
-    required this.showLabel,
-    required this.barHeight,
-    required this.iconSize,
-    required this.countWidth,
-    required this.gap,
+    required this.isHighest,
   });
+
+  final int mood;
+  final int count;
+  final bool isHighest;
 
   @override
   Widget build(BuildContext context) {
-    final primary = Theme.of(context).colorScheme.primary;
-    final surface = Theme.of(context).colorScheme.surface;
-    final fraction = maxCount > 0 ? count / maxCount : 0.0;
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 1),
-      child: TweenAnimationBuilder<double>(
-        tween: Tween<double>(begin: 0.0, end: fraction),
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeInOut,
-        builder: (context, animatedFraction, _) {
-          return LayoutBuilder(
-            builder: (context, constraints) {
-              final minBarWidth = iconSize + gap;
-              final maxBarWidth = constraints.maxWidth - countWidth - gap;
-              final barWidth =
-                  (minBarWidth + animatedFraction * (maxBarWidth - minBarWidth))
-                      .clamp(minBarWidth, maxBarWidth);
-
-              final iconWidget = _buildIconContainer(surface, primary);
-              final bar = _buildBar(barWidth, iconWidget, primary);
-              final countText = SizedBox(
-                width: countWidth,
-                child: Text(
-                  (count > 0 && showLabel) ? '$count' : '',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: primary),
-                  textAlign: isRtl ? TextAlign.right : TextAlign.left,
-                ),
-              );
-
-              return Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: isRtl
-                    ? [countText, SizedBox(width: gap), bar]
-                    : [bar, SizedBox(width: gap), countText],
-              );
-            },
-          );
-        },
+    final style = secondaryTextStyle(context, fontSize: 14);
+    return Column(children: [
+      FittedBox(
+        fit: BoxFit.scaleDown,
+        child: MoodTierMark(mood: mood, size: MoodSummaryChart._markSize),
       ),
-    );
-  }
-
-  Widget _buildBar(double width, Widget iconWidget, Color barColor) {
-    return SizedBox(
-      width: width,
-      height: barHeight,
-      child: Stack(
-        children: [
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                color: barColor,
-                borderRadius: BorderRadius.circular(barHeight / 2),
-              ),
-            ),
-          ),
-          Positioned(
-            left: isRtl ? null : (gap / 2),
-            right: isRtl ? (gap / 2) : null,
-            top: (barHeight - iconSize) / 2,
-            child: iconWidget,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildIconContainer(Color surface, Color primary) {
-    final icon = MoodIcon(
-      moodValue: mood,
-      allowScaling: false,
-    );
-
-    if (isMostCommon) {
-      return SizedBox(
-        width: iconSize,
-        height: iconSize,
-        child: PixelSnap(
-          child: CustomPaint(
-            painter: MorphingBurstPainter(
-              progress: 1,
-              color: surface,
-              radiusScale: 0.9,
-            ),
-            child: Center(child: icon),
-          ),
-        ),
-      );
-    }
-
-    return SizedBox(
-      width: iconSize,
-      height: iconSize,
-      child: Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: PixelSnap(
-          child: Container(
-            decoration: BoxDecoration(color: surface, shape: BoxShape.circle),
-            child: Center(child: icon),
-          ),
+      const SizedBox(height: 6),
+      FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(
+          formatCount(count, AppLocalizations.of(context)!.localeName),
+          style: isHighest
+              ? style.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontWeight: FontWeight.bold,
+                )
+              : style,
         ),
       ),
-    );
+    ]);
   }
 }
