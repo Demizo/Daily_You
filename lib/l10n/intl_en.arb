@@ -103,6 +103,83 @@
   "@streakGreatDays": {},
   "streakSinceBadDay": "{count, plural, other{Days Since a Bad Day {count}}}",
   "@streakSinceBadDay": {},
+  "streakDayLabel": "{count, plural, other{Day Streak}}",
+  "@streakDayLabel": {
+    "description": "Label shown under a large streak length, which is not part of this string"
+  },
+  "statsLogsLabel": "{count, plural, one{Log} other{Logs}}",
+  "@statsLogsLabel": {
+    "description": "Label shown under a large number of logs, which is not part of this string"
+  },
+  "statsWordsLabel": "{count, plural, one{Word} other{Words}}",
+  "@statsWordsLabel": {
+    "description": "Label shown next to or under a large number of words, which is not part of this string"
+  },
+  "statsDaysLabel": "{count, plural, one{Day} other{Days}}",
+  "@statsDaysLabel": {
+    "description": "Label shown under a large number of days, which is not part of this string"
+  },
+  "statsLongestStreakTitle": "Longest Streak",
+  "@statsLongestStreakTitle": {
+    "description": "Label shown next to or under a large number giving the longest run of consecutive days, which is not part of this string"
+  },
+  "statsWritingTitle": "Writing",
+  "@statsWritingTitle": {
+    "description": "Title of the writing statistics tile and page"
+  },
+  "statsWordsPerLogTitle": "Words per Log",
+  "@statsWordsPerLogTitle": {
+    "description": "Label for the average number of words in a log"
+  },
+  "statsLongestLogTitle": "Longest Log",
+  "@statsLongestLogTitle": {
+    "description": "Title of the tile showing the log with the most words"
+  },
+  "statsMostActiveTitle": "{count, plural, one{Most Active Day} other{Most Active Days}}",
+  "@statsMostActiveTitle": {
+    "description": "Title of the tile showing the weekday or weekdays with the most logs. The count is the number of weekdays tied for most logs",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "statsDaysOfRange": "{written} of {total, plural, one{{total} Day} other{{total} Days}}",
+  "@statsDaysOfRange": {
+    "description": "Number of days with a log out of the number of days in the selected time range, e.g. '12 of 30 Days'",
+    "placeholders": {
+      "written": {
+        "type": "int",
+        "format": "decimalPattern"
+      },
+      "total": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "statsAverageTitle": "Average",
+  "@statsAverageTitle": {
+    "description": "Label shown under a large average value"
+  },
+  "statsHighestTitle": "Highest",
+  "@statsHighestTitle": {
+    "description": "Label shown under a large number giving the highest recorded value of a tracker"
+  },
+  "statsLowestTitle": "Lowest",
+  "@statsLowestTitle": {
+    "description": "Label shown under a large number giving the lowest recorded value of a tracker"
+  },
+  "statsDaysLoggedTitle": "Days Logged",
+  "@statsDaysLoggedTitle": {},
+  "statsOfDaysLabel": "of Days",
+  "@statsOfDaysLabel": {
+    "description": "Label shown after a percentage, e.g. '45% of Days'. The percentage is not part of this string"
+  },
+  "statsCustomizeTitle": "Customize",
+  "@statsCustomizeTitle": {
+    "description": "Label of the button for choosing which tiles appear on the statistics page"
+  },
   "errorExternalStorageAccessTitle": "Can't Access External Storage",
   "@errorExternalStorageAccessTitle": {},
   "errorExternalStorageAccessDescription": "If you are using network storage make sure the service is online and you have network access.\n\nOtherwise, the app may have lost permissions for the external folder. Go to settings, and reselect the external folder to grant access.\n\nWarning, changes will not be synced until you restore access to the external storage location!",

@@ -476,6 +476,102 @@ abstract class AppLocalizations {
   /// **'{count, plural, other{Days Since a Bad Day {count}}}'**
   String streakSinceBadDay(num count);
 
+  /// Label shown under a large streak length, which is not part of this string
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, other{Day Streak}}'**
+  String streakDayLabel(num count);
+
+  /// Label shown under a large number of logs, which is not part of this string
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{Log} other{Logs}}'**
+  String statsLogsLabel(num count);
+
+  /// Label shown next to or under a large number of words, which is not part of this string
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{Word} other{Words}}'**
+  String statsWordsLabel(num count);
+
+  /// Label shown under a large number of days, which is not part of this string
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{Day} other{Days}}'**
+  String statsDaysLabel(num count);
+
+  /// Label shown next to or under a large number giving the longest run of consecutive days, which is not part of this string
+  ///
+  /// In en, this message translates to:
+  /// **'Longest Streak'**
+  String get statsLongestStreakTitle;
+
+  /// Title of the writing statistics tile and page
+  ///
+  /// In en, this message translates to:
+  /// **'Writing'**
+  String get statsWritingTitle;
+
+  /// Label for the average number of words in a log
+  ///
+  /// In en, this message translates to:
+  /// **'Words per Log'**
+  String get statsWordsPerLogTitle;
+
+  /// Title of the tile showing the log with the most words
+  ///
+  /// In en, this message translates to:
+  /// **'Longest Log'**
+  String get statsLongestLogTitle;
+
+  /// Title of the tile showing the weekday or weekdays with the most logs. The count is the number of weekdays tied for most logs
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{Most Active Day} other{Most Active Days}}'**
+  String statsMostActiveTitle(int count);
+
+  /// Number of days with a log out of the number of days in the selected time range, e.g. '12 of 30 Days'
+  ///
+  /// In en, this message translates to:
+  /// **'{written} of {total, plural, one{{total} Day} other{{total} Days}}'**
+  String statsDaysOfRange(int written, int total);
+
+  /// Label shown under a large average value
+  ///
+  /// In en, this message translates to:
+  /// **'Average'**
+  String get statsAverageTitle;
+
+  /// Label shown under a large number giving the highest recorded value of a tracker
+  ///
+  /// In en, this message translates to:
+  /// **'Highest'**
+  String get statsHighestTitle;
+
+  /// Label shown under a large number giving the lowest recorded value of a tracker
+  ///
+  /// In en, this message translates to:
+  /// **'Lowest'**
+  String get statsLowestTitle;
+
+  /// No description provided for @statsDaysLoggedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Days Logged'**
+  String get statsDaysLoggedTitle;
+
+  /// Label shown after a percentage, e.g. '45% of Days'. The percentage is not part of this string
+  ///
+  /// In en, this message translates to:
+  /// **'of Days'**
+  String get statsOfDaysLabel;
+
+  /// Label of the button for choosing which tiles appear on the statistics page
+  ///
+  /// In en, this message translates to:
+  /// **'Customize'**
+  String get statsCustomizeTitle;
+
   /// No description provided for @errorExternalStorageAccessTitle.
   ///
   /// In en, this message translates to:
