@@ -26,6 +26,7 @@ import 'package:daily_you/models/template.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/providers/mood_scale_provider.dart';
+import 'package:daily_you/providers/stats_layout_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/providers/templates_provider.dart';
 import 'package:easy_debounce/easy_debounce.dart';
@@ -167,6 +168,7 @@ class AppDatabase {
     await TemplatesProvider.instance.load();
     await TagsProvider.instance.load();
     await MoodScaleProvider.instance.load();
+    await StatsLayoutProvider.instance.load();
   }
 
   Future<void> close() async {
@@ -379,9 +381,14 @@ class AppDatabase {
     _database = db;
     await createSchema(db);
     await TemplatesProvider.instance.createDefaultTemplates();
-    await TagsProvider.instance.createDefaultTags();
+    await _createDefaultTags();
     await MoodScaleDao.save(MoodScalePreset.emoji.levels, executor: db);
     await createWelcomeEntry();
+  }
+
+  Future<void> _createDefaultTags() async {
+    final pinnedTagIds = await TagsProvider.instance.createDefaultTags();
+    await StatsLayoutProvider.instance.replace(pinnedTagIds);
   }
 
   Future<void> createSchema(Database db) async {
@@ -626,7 +633,7 @@ DROP TABLE old_entries;
     }
     if (oldVersion <= 3) {
       await _createTagTables(db);
-      await TagsProvider.instance.createDefaultTags();
+      await _createDefaultTags();
     }
     if (oldVersion <= 4) {
       await _createTemplateTagTable(db);

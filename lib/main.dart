@@ -17,6 +17,7 @@ import 'package:daily_you/pages/launch_page.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/providers/mood_scale_provider.dart';
+import 'package:daily_you/providers/stats_layout_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/providers/templates_provider.dart';
 import 'package:daily_you/widgets/morphing_burst.dart';
@@ -273,6 +274,9 @@ void main() async {
     ChangeNotifierProvider<MoodScaleProvider>(
       create: (_) => MoodScaleProvider.instance,
     ),
+    ChangeNotifierProvider<StatsLayoutProvider>(
+      create: (_) => StatsLayoutProvider.instance,
+    ),
     ChangeNotifierProvider<ConfigProvider>(
       create: (_) => ConfigProvider.instance,
     )
@@ -448,6 +452,7 @@ class _MainAppState extends State<MainApp> {
         lightTheme = _buildTheme(ColorScheme.fromSeed(
             seedColor: lightDynamic.primary,
             primaryContainer: lightDynamic.primaryContainer,
+            onPrimaryContainer: lightDynamic.onPrimaryContainer,
             dynamicSchemeVariant: noChroma
                 ? DynamicSchemeVariant.fidelity
                 : DynamicSchemeVariant.tonalSpot,
@@ -466,6 +471,7 @@ class _MainAppState extends State<MainApp> {
         darkTheme = _buildTheme(ColorScheme.fromSeed(
             seedColor: darkDynamic.primary,
             primaryContainer: darkDynamic.primaryContainer,
+            onPrimaryContainer: darkDynamic.onPrimaryContainer,
             dynamicSchemeVariant: noChroma
                 ? DynamicSchemeVariant.fidelity
                 : DynamicSchemeVariant.tonalSpot,

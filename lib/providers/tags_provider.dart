@@ -307,7 +307,7 @@ class TagsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> createDefaultTags() async {
+  Future<List<int>> createDefaultTags() async {
     final deviceLocale = WidgetsBinding.instance.platformDispatcher.locale;
     Locale locale;
     if (AppLocalizations.delegate.isSupported(deviceLocale)) {
@@ -320,6 +320,7 @@ class TagsProvider with ChangeNotifier {
     }
     final l10n = await AppLocalizations.delegate.load(locale);
     final now = DateTime.now();
+    final existingTagCount = tags.length;
 
     final defaultTags = [
       Tag(
@@ -400,5 +401,16 @@ class TagsProvider with ChangeNotifier {
         timeModified: now,
       ));
     }
+
+    final createdTags = tags.skip(existingTagCount);
+    return [
+      for (final icon in [
+        TagIconKey.batteryChargingFull,
+        TagIconKey.fitnessCenter,
+        TagIconKey.nightlight,
+        TagIconKey.groups,
+      ])
+        createdTags.firstWhere((tag) => tag.icon == icon).id!,
+    ];
   }
 }

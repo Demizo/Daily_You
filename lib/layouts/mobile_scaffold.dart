@@ -381,6 +381,7 @@ class _MobileScaffoldState extends State<MobileScaffold> {
         body: _SwipePages(
           key: _swipePagesKey,
           initialIndex: currentIndex,
+          currentIndex: currentIndex,
           prebuildViewports: _prebuildViewports,
           onPageChanged: (index) {
             FocusManager.instance.primaryFocus?.unfocus();
@@ -533,6 +534,7 @@ class _MobileScaffoldState extends State<MobileScaffold> {
 
 class _SwipePages extends StatefulWidget {
   final int initialIndex;
+  final int currentIndex;
   final int prebuildViewports;
   final ValueChanged<int> onPageChanged;
   final List<Widget> children;
@@ -540,6 +542,7 @@ class _SwipePages extends StatefulWidget {
   const _SwipePages({
     super.key,
     required this.initialIndex,
+    required this.currentIndex,
     required this.prebuildViewports,
     required this.onPageChanged,
     required this.children,
@@ -576,7 +579,10 @@ class _SwipePagesState extends State<_SwipePages> {
       scrollCacheExtent:
           ScrollCacheExtent.viewport(widget.prebuildViewports.toDouble()),
       onPageChanged: widget.onPageChanged,
-      children: widget.children,
+      children: [
+        for (final (index, child) in widget.children.indexed)
+          TickerMode(enabled: index == widget.currentIndex, child: child),
+      ],
     );
   }
 }

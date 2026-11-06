@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:daily_you/config_provider.dart';
+import 'package:daily_you/stats/stats_range.dart';
 import 'package:daily_you/storage/external_sync_settings.dart';
 import 'package:daily_you/storage/in_memory_secret_store.dart';
 import 'package:daily_you/storage/secret_store.dart';
@@ -90,6 +91,34 @@ void main() {
     expect(configProvider.get(Settings.theme), 'light');
     expect(configProvider.get(Settings.accentColor), 0xff445566);
     expect(configProvider.get(Settings.moodOverTimeSmoothing), isFalse);
+  });
+
+  test('the stats range defaults to all time and persists the choice',
+      () async {
+    expect(configProvider.statsRange, StatsRange.allTime);
+
+    await configProvider.setStatsRange(StatsRange.sixMonths);
+    await waitForConfigWrite();
+    await configProvider.readConfig();
+
+    expect(configProvider.statsRange, StatsRange.sixMonths);
+  });
+
+  test('an unknown stored stats range falls back to all time', () async {
+    await configProvider.set(Settings.statsRange, 'decade');
+
+    expect(configProvider.statsRange, StatsRange.allTime);
+  });
+
+  test('changing the stats range notifies listeners', () async {
+    var notifications = 0;
+    void onChanged() => notifications++;
+    configProvider.addListener(onChanged);
+
+    await configProvider.setStatsRange(StatsRange.year);
+
+    configProvider.removeListener(onChanged);
+    expect(notifications, 1);
   });
 
   test('a stored value of the wrong type falls back to the default', () async {
@@ -331,6 +360,18 @@ void main() {
         expect(stored['logSyncFolderUri'], 'logs');
         expect(stored['imageSyncFolderUri'], 'photos');
         expect(stored['configVersion'], '3');
+      });
+
+      test('drops the retired stats subject and keeps the other settings',
+          () async {
+        await configFile.writeAsString(
+            json.encode({'statsSubject': 'label:3', 'theme': 'amoled'}));
+
+        final stored = await storedConfigAfterStartup();
+
+        expect(stored.keys, isNot(contains('statsSubject')));
+        expect(stored['theme'], 'amoled');
+        expect(configProvider.get(Settings.theme), 'amoled');
       });
 
       test('a second launch changes nothing', () async {

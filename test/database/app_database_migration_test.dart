@@ -9,6 +9,7 @@ import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/models/mood_scale_level.dart';
 import 'package:daily_you/models/mood_scale_preset.dart';
 import 'package:daily_you/models/attachment.dart';
+import 'package:daily_you/utils/generated/tag_icon_registry.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' show join;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -19,6 +20,7 @@ typedef _Image = (int id, int entryId, String? path, int rank, String time);
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  useTemporaryConfig();
 
   late Directory directory;
   late String path;
@@ -237,8 +239,6 @@ CREATE TABLE template_tags (
   }
 
   group('from schema version 6', () {
-    useTemporaryConfig();
-
     Future<void> createVersion6(List<int?> moods) async {
       final old = await databaseFactory.openDatabase(path,
           options: OpenDatabaseOptions(
@@ -495,6 +495,30 @@ CREATE TABLE template_tags (
       expect(await db.query('entries'), hasLength(3));
       expect(await db.query('tags'), isNotEmpty);
       await expectNextAttachmentId(db, 13);
+      await db.close();
+    });
+
+    test('pins the default energy, exercise, tired and socializing tags',
+        () async {
+      await createImageDatabase(
+          version: 3, entryImagesDdl: entryImagesWithNullablePath);
+
+      final db = await upgrade();
+
+      final icons = {
+        for (final row in await db.query('tags')) row['id']: row['icon'],
+      };
+      final pinnedIcons = [
+        for (final tagId
+            in ConfigProvider.instance.get(Settings.statsPinnedTagIds)!)
+          icons[tagId],
+      ];
+      expect(pinnedIcons, [
+        TagIconKey.batteryChargingFull,
+        TagIconKey.fitnessCenter,
+        TagIconKey.nightlight,
+        TagIconKey.groups,
+      ]);
       await db.close();
     });
 

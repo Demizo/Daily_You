@@ -80,8 +80,6 @@ class EntriesProvider with ChangeNotifier {
   List<Entry> getEntriesForDate(DateTime date) =>
       _store.getEntriesForDate(date);
 
-  int getEntryDayCount() => _store.getEntryDayCount();
-
   List<Entry> getFilteredEntries() => _filteredEntries;
 
   void _onStoreChanged() {

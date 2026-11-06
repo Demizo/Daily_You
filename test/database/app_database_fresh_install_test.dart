@@ -8,6 +8,9 @@ import 'package:daily_you/database/app_database.dart';
 import 'package:daily_you/models/mood.dart';
 import 'package:daily_you/models/mood_scale_preset.dart';
 import 'package:daily_you/providers/mood_scale_provider.dart';
+import 'package:daily_you/providers/stats_layout_provider.dart';
+import 'package:daily_you/providers/tags_provider.dart';
+import 'package:daily_you/utils/generated/tag_icon_registry.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -51,5 +54,27 @@ void main() {
     expect(levels.map((level) => level.mood), Mood.levels);
     expect(levels.map((level) => level.toJson()),
         MoodScalePreset.emoji.levels.map((level) => level.toJson()));
+  });
+
+  test(
+      'a fresh install pins the default energy, exercise, tired and '
+      'socializing tags', () async {
+    await AppDatabase.instance.init();
+
+    final tagById = {
+      for (final tag in TagsProvider.instance.tags) tag.id: tag,
+    };
+    expect(
+      [
+        for (final tagId in StatsLayoutProvider.instance.pinnedTagIds)
+          tagById[tagId]!.icon,
+      ],
+      [
+        TagIconKey.batteryChargingFull,
+        TagIconKey.fitnessCenter,
+        TagIconKey.nightlight,
+        TagIconKey.groups,
+      ],
+    );
   });
 }

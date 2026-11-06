@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
 import 'package:daily_you/language_option.dart';
+import 'package:daily_you/stats/stats_range.dart';
 import 'package:daily_you/storage/secret_store.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:easy_debounce/easy_debounce.dart';
@@ -111,7 +112,8 @@ class Settings {
   static const moodOverTimeSmoothing =
       Setting<bool>("moodOverTimeSmoothing", true);
   static const statsRange = Setting<String>("statsRange", "allTime");
-  static const statsSubject = Setting<String>("statsSubject", "mood");
+  static const statsPinnedTagIds =
+      Setting<List<dynamic>?>("statsPinnedTagIds", null);
   static const tagPickerSortMode =
       Setting<String>("tagPickerSortMode", "manual");
   static const timelineSortOrder =
@@ -197,7 +199,7 @@ class Settings {
     moodOverTimeGrouping,
     moodOverTimeSmoothing,
     statsRange,
-    statsSubject,
+    statsPinnedTagIds,
     tagPickerSortMode,
     timelineSortOrder,
     requirePassword,
@@ -307,6 +309,13 @@ class ConfigProvider with ChangeNotifier {
       await writeConfig();
     }
   }
+
+  StatsRange get statsRange =>
+      StatsRange.values.asNameMap()[get(Settings.statsRange)] ??
+      StatsRange.allTime;
+
+  Future<void> setStatsRange(StatsRange range) =>
+      set(Settings.statsRange, range.name);
 
   Future<void> init() async {
     initializeDateFormatting();

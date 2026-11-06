@@ -176,8 +176,6 @@ class EntryStore with ChangeNotifier {
     return _entriesByDay[DateTime(date.year, date.month, date.day)] ?? const [];
   }
 
-  int getEntryDayCount() => _entriesByDay.length;
-
   Future<Entry> _writeDraft(EntryDraft draft) async {
     late Entry saved;
     late _TagWrite tagWrite;
