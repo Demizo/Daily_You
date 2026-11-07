@@ -117,22 +117,38 @@ class ToolbarIconButton extends StatelessWidget {
   final double size;
   final Widget icon;
   final VoidCallback? onPressed;
+  final bool selected;
+  final double dockProgress;
 
   const ToolbarIconButton({
     super.key,
     required this.size,
     required this.icon,
     required this.onPressed,
+    this.selected = false,
+    this.dockProgress = 1,
   });
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return SizedBox(
       width: size,
       height: size,
       child: IconButton(
         padding: EdgeInsets.zero,
         visualDensity: VisualDensity.compact,
+        style: IconButton.styleFrom(
+          shape: const CircleBorder(),
+          backgroundColor: selected
+              ? Color.lerp(
+                  colorScheme.primary, colorScheme.secondary, dockProgress)
+              : null,
+          foregroundColor: selected
+              ? Color.lerp(
+                  colorScheme.onPrimary, colorScheme.onSecondary, dockProgress)
+              : null,
+        ),
         icon: icon,
         onPressed: onPressed,
       ),

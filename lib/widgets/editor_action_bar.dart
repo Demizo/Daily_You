@@ -130,7 +130,7 @@ class _EditorActionBarState extends State<EditorActionBar> {
       ],
       for (final action in markdownActions(context, widget.controller))
         _iconEntry(metrics, action.icon, action.onPressed!,
-            reconnectsKeyboard: action.mayLeaveApp),
+            isActive: action.isActive, reconnectsKeyboard: action.mayLeaveApp),
       if (undoController != null) ...[
         _dividerEntry(),
         _undoEntry(metrics, undoController, isUndo: true),
@@ -166,20 +166,32 @@ class _EditorActionBarState extends State<EditorActionBar> {
     DockMetrics metrics,
     Widget icon,
     FutureOr<void> Function() action, {
+    bool Function()? isActive,
     bool claimsFocus = true,
     bool reconnectsKeyboard = false,
   }) {
     return ToolbarEntry(
       width: metrics.buttonSize,
-      build: (context, dismissOverflow) => ToolbarIconButton(
-        size: metrics.buttonSize,
-        icon: icon,
-        onPressed: () {
-          dismissOverflow?.call();
-          _focusRestorer.run(action,
-              claimsFocus: claimsFocus, reconnectsKeyboard: reconnectsKeyboard);
-        },
-      ),
+      build: (context, dismissOverflow) {
+        Widget button(bool selected) => ToolbarIconButton(
+              size: metrics.buttonSize,
+              icon: icon,
+              selected: selected,
+              dockProgress: dismissOverflow == null ? metrics.progress : 1,
+              onPressed: () {
+                dismissOverflow?.call();
+                _focusRestorer.run(action,
+                    claimsFocus: claimsFocus,
+                    reconnectsKeyboard: reconnectsKeyboard);
+              },
+            );
+
+        if (isActive == null) return button(false);
+        return ListenableBuilder(
+          listenable: widget.controller,
+          builder: (context, _) => button(isActive()),
+        );
+      },
     );
   }
 
