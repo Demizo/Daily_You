@@ -87,6 +87,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
       MarkdownPreviewController();
   final UndoHistoryController _undoController = UndoHistoryController();
   bool _deletingEntry = false;
+  bool _closing = false;
   bool _newEntry = false;
   bool _creatingNewEntry = false;
   late TagAttachmentSource _tagSource;
@@ -517,8 +518,18 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   Widget _closeButton() => IconButton(
         icon: const Icon(Icons.check_rounded),
         tooltip: MaterialLocalizations.of(context).okButtonLabel,
-        onPressed: () => Navigator.of(context).pop(),
+        onPressed: _saveAndClose,
       );
+
+  Future<void> _saveAndClose() async {
+    if (_closing) return;
+    _closing = true;
+    try {
+      await _saveEntry();
+    } finally {
+      if (mounted) Navigator.of(context).pop();
+    }
+  }
 
   Future<void> _chooseDate() async {
     DateTime? pickedDate = await TimeManager.pickDate(
