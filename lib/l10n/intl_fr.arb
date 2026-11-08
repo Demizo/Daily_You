@@ -288,5 +288,12 @@
     "largeAttachmentWarningDescription": "Cette pièce jointe est lourde et augmentera la taille de votre sauvegarde.",
     "syncErrorDescription": "Échec de la synchronisation avec l'emplacement externe !",
     "attachmentLoadFailed": "Ouverture impossible de cette pièce jointe",
-    "recorderPermissionDenied": "L'autorisation du microphone est nécessaire pour enregistrer un audio"
+    "recorderPermissionDenied": "L'autorisation du microphone est nécessaire pour enregistrer un audio",
+    "moodVeryUnpleasant": "Très désagréable",
+    "moodUnpleasant": "Désagréable",
+    "moodNeutral": "Neutre",
+    "moodPleasant": "Agréable",
+    "moodVeryPleasant": "Très agréable",
+    "formatCsv": "CSV",
+    "formatJson": "JSON"
 }
