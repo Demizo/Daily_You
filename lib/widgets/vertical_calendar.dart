@@ -26,6 +26,13 @@ import 'package:daily_you/widgets/year_month_picker.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
+const _monthHeaderRadius = BorderRadius.only(
+  topLeft: Radius.circular(14),
+  topRight: Radius.circular(14),
+  bottomLeft: Radius.circular(4),
+  bottomRight: Radius.circular(4),
+);
+
 class VerticalCalendar extends StatefulWidget {
   final ScrollController scrollController;
   final void Function(BuildContext context, DateTime date)? onDaySelected;
@@ -683,19 +690,19 @@ class _VerticalCalendarState extends State<VerticalCalendar>
         child: Container(
           height: _daysOfWeekRowHeight,
           margin: const EdgeInsets.only(bottom: 2.0),
-          decoration: BoxDecoration(
+          child: Material(
             color: Theme.of(context).colorScheme.surfaceContainerLow,
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(14),
-              topRight: Radius.circular(14),
-              bottomLeft: Radius.circular(4),
-              bottomRight: Radius.circular(4),
-            ),
-          ),
-          child: Center(
-            child: Text(
-              TimeManager.formatMonthYear(month, context),
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            borderRadius: _monthHeaderRadius,
+            child: InkWell(
+              borderRadius: _monthHeaderRadius,
+              onTap: () => _onMonthLabelTap(context),
+              child: Center(
+                child: Text(
+                  TimeManager.formatMonthYear(month, context),
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w500),
+                ),
+              ),
             ),
           ),
         ),
