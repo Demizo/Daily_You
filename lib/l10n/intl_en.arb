@@ -83,6 +83,8 @@
   "@chartByDayTitle": {},
   "chartOverTimeTitle": "{tag} Over Time",
   "@chartOverTimeTitle": {},
+  "chartInfluencesTitle": "Influences {tag}",
+  "@chartInfluencesTitle": {},
   "chartGroupingLabel": "Group by",
   "@chartGroupingLabel": {},
   "chartGroupingDay": "Day",

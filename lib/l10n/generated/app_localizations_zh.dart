@@ -189,6 +189,11 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String chartInfluencesTitle(Object tag) {
+    return 'Influences $tag';
+  }
+
+  @override
   String get chartGroupingLabel => '群组';
 
   @override

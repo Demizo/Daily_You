@@ -189,6 +189,11 @@ class AppLocalizationsRo extends AppLocalizations {
   }
 
   @override
+  String chartInfluencesTitle(Object tag) {
+    return 'Influences $tag';
+  }
+
+  @override
   String get chartGroupingLabel => 'Grupează după';
 
   @override

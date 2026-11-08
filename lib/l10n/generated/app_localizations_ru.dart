@@ -195,6 +195,11 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String chartInfluencesTitle(Object tag) {
+    return 'Influences $tag';
+  }
+
+  @override
   String get chartGroupingLabel => 'Сгруппировать по';
 
   @override

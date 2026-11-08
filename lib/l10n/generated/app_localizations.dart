@@ -416,6 +416,12 @@ abstract class AppLocalizations {
   /// **'{tag} Over Time'**
   String chartOverTimeTitle(Object tag);
 
+  /// No description provided for @chartInfluencesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Influences {tag}'**
+  String chartInfluencesTitle(Object tag);
+
   /// No description provided for @chartGroupingLabel.
   ///
   /// In en, this message translates to:

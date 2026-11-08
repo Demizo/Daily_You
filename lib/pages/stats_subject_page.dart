@@ -5,16 +5,19 @@
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/layouts/window_size_class.dart';
 import 'package:daily_you/models/entry.dart';
+import 'package:daily_you/models/mood.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/models/tag_icon_type.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/stats/entry_stats.dart';
 import 'package:daily_you/stats/stats_analysis.dart';
+import 'package:daily_you/stats/stats_influence.dart';
 import 'package:daily_you/stats/stats_range.dart';
 import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/content_width_limit.dart';
 import 'package:daily_you/widgets/distribution_chart.dart';
+import 'package:daily_you/widgets/influence_chart.dart';
 import 'package:daily_you/widgets/label_calendar_card.dart';
 import 'package:daily_you/widgets/mood_by_day_chart.dart';
 import 'package:daily_you/widgets/mood_summary_chart.dart';
@@ -121,11 +124,51 @@ class _StatsSubjectPageState extends State<StatsSubjectPage> {
     if (WindowSizeClass.of(context) != WindowSizeClass.expanded) return charts;
     return [
       charts.first,
-      Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          for (final chart in charts.skip(1)) Expanded(child: chart),
-        ],
+      for (var index = 1; index < charts.length; index += 2)
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            for (final chart in charts.skip(index).take(2))
+              Expanded(child: chart),
+          ],
+        ),
+    ];
+  }
+
+  List<Widget> _buildInfluenceChart(
+    BuildContext context,
+    _SubjectInputs inputs, {
+    required String subjectName,
+    required SampleMeasure measureOf,
+    int? tagId,
+    double? scaleRange,
+    double? minimum,
+    double? maximum,
+    bool showMoodBands = false,
+    bool padAxis = true,
+    Widget Function(double value)? scaleLabelBuilder,
+  }) {
+    final tagsProvider = inputs.tagsProvider;
+    final influences = tagInfluences(
+      influenceSamples(
+          inputs.rangedEntries, tagsProvider.entryTags, tagsProvider.tags),
+      tagsProvider.tags,
+      measureOf,
+      excludedTagId: tagId,
+      scaleRange: scaleRange,
+      requireDistinctLevels: showMoodBands,
+    );
+    if (influences.isEmpty) return const [];
+    return [
+      InfluenceChart(
+        title: AppLocalizations.of(context)!.chartInfluencesTitle(subjectName),
+        influences: influences,
+        onTagSelected: (tag) => setState(() => _tagId = tag.id),
+        minimum: minimum,
+        maximum: maximum,
+        showMoodBands: showMoodBands,
+        padAxis: padAxis,
+        scaleLabelBuilder: scaleLabelBuilder,
       ),
     ];
   }
@@ -161,6 +204,20 @@ class _StatsSubjectPageState extends State<StatsSubjectPage> {
           weekdays: weekdays,
           hasData: hasData,
           title: l10n.chartByDayTitle(l10n.tagMoodTitle),
+        ),
+        ..._buildInfluenceChart(
+          context,
+          inputs,
+          subjectName: l10n.tagMoodTitle,
+          measureOf: (sample) => sample.mood,
+          scaleRange: (Mood.count - 1).toDouble(),
+          minimum: -0.5,
+          maximum: Mood.count - 0.5,
+          showMoodBands: true,
+          scaleLabelBuilder: (value) => MoodTierMark(
+            mood: Mood.fromPosition(value.round().clamp(0, Mood.count - 1)),
+            size: 24,
+          ),
         ),
       ],
     );
@@ -243,6 +300,14 @@ class _StatsSubjectPageState extends State<StatsSubjectPage> {
           color: tagColor,
           anchorAtZero: true,
         ),
+        ..._buildInfluenceChart(
+          context,
+          inputs,
+          subjectName: tag.name,
+          measureOf: (sample) => sample.trackerValues[tag.id!],
+          tagId: tag.id,
+          scaleLabelBuilder: (value) => Text(formatDecimal(value, locale)),
+        ),
       ],
     );
   }
@@ -303,6 +368,18 @@ class _StatsSubjectPageState extends State<StatsSubjectPage> {
           yRange: const DynamicYRange(),
           title: l10n.chartByDayTitle(tag.name),
           color: tagColor,
+        ),
+        ..._buildInfluenceChart(
+          context,
+          inputs,
+          subjectName: tag.name,
+          measureOf: (sample) =>
+              sample.labelTagIds.contains(tag.id!) ? 1.0 : 0.0,
+          tagId: tag.id,
+          minimum: 0,
+          maximum: 1,
+          padAxis: false,
+          scaleLabelBuilder: (value) => Text(formatPercent(value, locale)),
         ),
       ],
     );

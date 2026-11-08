@@ -189,6 +189,11 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
+  String chartInfluencesTitle(Object tag) {
+    return 'Influences $tag';
+  }
+
+  @override
   String get chartGroupingLabel => 'Gruplama ölçütü';
 
   @override
