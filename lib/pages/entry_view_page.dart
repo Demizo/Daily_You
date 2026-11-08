@@ -41,6 +41,8 @@ class EntryViewPage extends StatefulWidget {
 }
 
 class _EntryViewPageState extends State<EntryViewPage> {
+  static const double _moodInset = 4;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -105,7 +107,7 @@ class _EntryViewPageState extends State<EntryViewPage> {
                                 timeColor: theme.dividerColor,
                               ),
                               Padding(
-                                padding: const EdgeInsets.only(right: 8),
+                                padding: const EdgeInsets.all(_moodInset),
                                 child: MoodIcon(
                                   moodValue: entry.mood,
                                   size: 24,
