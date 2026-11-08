@@ -737,6 +737,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get tagEnergyName => '能量';
 
   @override
+  String get tagCategoryPeopleName => 'People';
+
+  @override
   String get tagCategoryActivitiesName => '活动';
 
   @override

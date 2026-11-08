@@ -746,6 +746,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get tagEnergyName => 'Enerji';
 
   @override
+  String get tagCategoryPeopleName => 'People';
+
+  @override
   String get tagCategoryActivitiesName => 'Aktiviteler';
 
   @override

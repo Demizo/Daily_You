@@ -745,6 +745,9 @@ class AppLocalizationsFa extends AppLocalizations {
   String get tagEnergyName => 'انرژی';
 
   @override
+  String get tagCategoryPeopleName => 'People';
+
+  @override
   String get tagCategoryActivitiesName => 'فعالیت‌ها';
 
   @override

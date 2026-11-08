@@ -752,6 +752,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get tagEnergyName => 'Énergie';
 
   @override
+  String get tagCategoryPeopleName => 'People';
+
+  @override
   String get tagCategoryActivitiesName => 'Activités';
 
   @override

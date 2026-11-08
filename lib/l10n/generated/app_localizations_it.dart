@@ -754,6 +754,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get tagEnergyName => 'Energia';
 
   @override
+  String get tagCategoryPeopleName => 'People';
+
+  @override
   String get tagCategoryActivitiesName => 'Attività';
 
   @override

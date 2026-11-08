@@ -1292,6 +1292,12 @@ abstract class AppLocalizations {
   /// **'Energy'**
   String get tagEnergyName;
 
+  /// No description provided for @tagCategoryPeopleName.
+  ///
+  /// In en, this message translates to:
+  /// **'People'**
+  String get tagCategoryPeopleName;
+
   /// No description provided for @tagCategoryActivitiesName.
   ///
   /// In en, this message translates to:

@@ -750,6 +750,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get tagEnergyName => 'الطاقة';
 
   @override
+  String get tagCategoryPeopleName => 'People';
+
+  @override
   String get tagCategoryActivitiesName => 'الأنشطة';
 
   @override
