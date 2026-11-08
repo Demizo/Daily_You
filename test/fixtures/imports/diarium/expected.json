@@ -1,5 +1,12 @@
 {
-  "categories": [],
+  "categories": [
+    {
+      "name": "People",
+      "color": null,
+      "icon": "groups",
+      "iconType": "materialIcon"
+    }
+  ],
   "tagDefinitions": [
     {
       "name": "Thoughts",
@@ -17,6 +24,15 @@
       "color": null,
       "icon": null,
       "iconType": "character",
+      "timeCreate": null
+    },
+    {
+      "name": "Someone",
+      "type": "label",
+      "categoryName": "People",
+      "color": null,
+      "icon": "account_circle",
+      "iconType": "materialIcon",
       "timeCreate": null
     },
     {
@@ -68,6 +84,11 @@
           "name": "stress",
           "type": "tracker",
           "value": "4"
+        },
+        {
+          "name": "Someone",
+          "type": "label",
+          "value": null
         }
       ],
       "attachments": []

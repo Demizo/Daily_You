@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
+import 'package:daily_you/l10n/generated/app_localizations_en.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/utils/imports/import_bundle.dart';
 import 'package:daily_you/utils/imports/import_registry.dart';
@@ -15,7 +16,7 @@ ImportFormatOption fakeOption(ImportFormat format, List<ImportFormat> calls) {
   return ImportFormatOption(
     format,
     (localizations) => format.name,
-    (source) async {
+    (source, localizations) async {
       calls.add(format);
       return const ImportBundle();
     },
@@ -32,7 +33,9 @@ void main() {
       ]);
 
       for (final format in [ImportFormat.pixels, ImportFormat.daylio]) {
-        await registry.optionFor(format).parse(const ImportSource('', ''));
+        await registry
+            .optionFor(format)
+            .parse(const ImportSource('', ''), AppLocalizationsEn());
       }
 
       expect(calls, equals([ImportFormat.pixels, ImportFormat.daylio]));

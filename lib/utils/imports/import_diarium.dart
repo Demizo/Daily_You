@@ -8,19 +8,23 @@ import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/models/mood.dart';
 import 'package:daily_you/models/tag.dart';
+import 'package:daily_you/models/tag_icon_type.dart';
 import 'package:daily_you/utils/imports/import_bundle.dart';
 import 'package:daily_you/utils/imports/import_source.dart';
 import 'package:daily_you/utils/imports/import_text.dart';
 import 'package:daily_you/utils/imports/import_time.dart';
 import 'package:daily_you/utils/tag_name_sanitizer.dart';
+import 'package:daily_you/utils/generated/tag_icon_registry.dart';
 import 'package:html2md/html2md.dart' as html2md;
 import 'package:sqflite/sqflite.dart';
 
 const int _labelTagType = 0;
+const int _personTagType = 1;
 const int _numericTrackerType = 2;
 const int _ticksAtUnixEpoch = 621355968000000000;
 
-Future<ImportBundle> parseDiarium(ImportSource source) async {
+Future<ImportBundle> parseDiarium(ImportSource source,
+    {required String peopleCategoryName}) async {
   final database = await openDatabase(source.file.path, readOnly: true);
   try {
     final entries = await database.rawQuery('SELECT * FROM Entries');
@@ -31,18 +35,25 @@ Future<ImportBundle> parseDiarium(ImportSource source) async {
     final tagDefinitionById = <int, ImportedTagDefinition>{};
     for (final tag in tags) {
       final tagType = switch (tag['Type']) {
-        _labelTagType => TagType.label,
+        _labelTagType || _personTagType => TagType.label,
         _numericTrackerType => TagType.tracker,
         _ => null,
       };
       final name = sanitizeTagName((tag['Value'] as String?) ?? '');
       if (tagType == null || name.isEmpty) continue;
+      final isPerson = tag['Type'] == _personTagType;
       tagDefinitionById[tag['DiaryTagId'] as int] = ImportedTagDefinition(
         name: name,
         tagType: tagType,
+        categoryName: isPerson ? peopleCategoryName : null,
+        icon: isPerson ? TagIconKey.accountCircle : null,
+        iconType: isPerson ? TagIconType.materialIcon : TagIconType.character,
         color: _parseColor(tag['Color'] as String?),
       );
     }
+
+    final hasPeople = tagDefinitionById.values
+        .any((definition) => definition.categoryName != null);
 
     final mediaByEntryId = _groupByEntryId(media);
     final entryTagsByEntryId = _groupByEntryId(entryTags);
@@ -51,6 +62,14 @@ Future<ImportBundle> parseDiarium(ImportSource source) async {
         (a['DiaryEntryId'] as int).compareTo(b['DiaryEntryId'] as int));
 
     return ImportBundle(
+      categories: [
+        if (hasPeople)
+          ImportedCategory(
+            name: peopleCategoryName,
+            icon: TagIconKey.groups,
+            iconType: TagIconType.materialIcon,
+          ),
+      ],
       tagDefinitions: tagDefinitionById.values.toList(),
       entries: [
         for (final entry in sortedEntries)

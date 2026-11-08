@@ -4,6 +4,7 @@
 
 import 'dart:io';
 
+import 'package:daily_you/l10n/generated/app_localizations_en.dart';
 import 'package:daily_you/models/mood.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/utils/imports/import_bundle.dart';
@@ -27,7 +28,7 @@ void main() {
     stagedDirectory = Directory(source.directoryPath);
     bundle = await ImportRegistry.instance
         .optionFor(ImportFormat.daylio)
-        .parse(source);
+        .parse(source, AppLocalizationsEn());
   });
 
   test('matches the expected bundle', () async {
@@ -119,9 +120,9 @@ void main() {
     File(join(emptyDirectory.path, 'other.txt')).writeAsStringSync('x');
 
     expect(
-        ImportRegistry.instance
-            .optionFor(ImportFormat.daylio)
-            .parse(ImportSource(emptyDirectory.path, 'fixture.zip')),
+        ImportRegistry.instance.optionFor(ImportFormat.daylio).parse(
+            ImportSource(emptyDirectory.path, 'fixture.zip'),
+            AppLocalizationsEn()),
         throwsException);
   });
 }

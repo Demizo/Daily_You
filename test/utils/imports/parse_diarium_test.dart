@@ -4,10 +4,12 @@
 
 import 'dart:typed_data';
 
+import 'package:daily_you/l10n/generated/app_localizations_en.dart';
 import 'package:daily_you/models/mood.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/utils/imports/import_bundle.dart';
 import 'package:daily_you/utils/imports/import_registry.dart';
+import 'package:daily_you/utils/generated/tag_icon_registry.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
@@ -24,7 +26,7 @@ void main() {
   setUp(() async {
     bundle = await ImportRegistry.instance
         .optionFor(ImportFormat.diarium)
-        .parse(await stageDiariumFixture());
+        .parse(await stageDiariumFixture(), AppLocalizationsEn());
   });
 
   test('matches the expected bundle', () async {
@@ -80,9 +82,28 @@ void main() {
         equals([
           ('Thoughts', TagType.label, 0xFFFFE600),
           ('stress', TagType.tracker, null),
+          ('Someone', TagType.label, null),
           ('BadName', TagType.label, null),
           ('thoughts', TagType.label, null),
         ]));
+  });
+
+  test('gives the people category an icon', () {
+    expect(bundle.categories.map((category) => (category.name, category.icon)),
+        equals([('People', TagIconKey.groups)]));
+  });
+
+  test('puts people in the people category', () {
+    expect(
+        bundle.tagDefinitions
+            .where((definition) => definition.categoryName != null)
+            .map((definition) => (definition.name, definition.categoryName)),
+        equals([('Someone', 'People')]));
+    expect(
+        bundle.tagDefinitions
+            .where((definition) => definition.categoryName != null)
+            .map((definition) => definition.icon),
+        equals([TagIconKey.accountCircle]));
   });
 
   test('keeps tracker values that are finite numbers', () {
@@ -91,7 +112,7 @@ void main() {
             imported.tags.map((tag) => (tag.name, tag.value)).toList()),
         equals([
           [('Thoughts', null), ('stress', '2.31')],
-          [('stress', '4')],
+          [('stress', '4'), ('Someone', null)],
           [],
           [('Thoughts', null), ('thoughts', null), ('BadName', null)],
           [],

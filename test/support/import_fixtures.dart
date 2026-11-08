@@ -5,6 +5,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:daily_you/l10n/generated/app_localizations_en.dart';
 import 'package:daily_you/models/mood.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/utils/imports/import_bundle.dart';
@@ -29,7 +30,8 @@ Future<ImportBundle> parseFixture(ImportFormat format) async {
       basename(inputDirectory.listSync().whereType<File>().single.path),
     ImportSourceKind.archive => 'fixture.zip',
   };
-  return option.parse(ImportSource(inputDirectory.path, fileName));
+  return option.parse(
+      ImportSource(inputDirectory.path, fileName), AppLocalizationsEn());
 }
 
 Future<void> expectMatchesExpectedBundle(

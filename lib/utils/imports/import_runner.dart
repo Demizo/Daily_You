@@ -18,7 +18,8 @@ import 'package:path_provider/path_provider.dart';
 typedef ImportFilePicker = Future<PickedFile?> Function(
     {List<String>? allowedExtensions, List<String>? mimeTypes});
 
-typedef ImportParser = Future<ImportBundle> Function(ImportSource source);
+typedef ImportParser = Future<ImportBundle> Function(
+    ImportSource source, AppLocalizations localizations);
 
 const _archiveName = 'archive.zip';
 const _extractedFolderName = 'extracted';
@@ -50,7 +51,7 @@ Future<OperationOutcome> runImport(
         await (await getTemporaryDirectory()).createTemp('import_');
     final source = await _stage(
         pickedFile, kind, stagingDirectory, localizations, updateStatus);
-    final bundle = await parse(source);
+    final bundle = await parse(source, localizations);
     return await ImportWriter().write(bundle, updateStatus);
   } catch (error) {
     return OperationOutcome.failed(error);

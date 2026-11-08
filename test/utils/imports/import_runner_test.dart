@@ -90,7 +90,9 @@ void main() {
       expect(outcome.succeeded, isTrue);
       expect(EntriesProvider.instance.entries, hasLength(4));
       expect(await harness.imageFiles.list(), hasLength(5));
-      expect(TagsProvider.instance.tags, hasLength(3));
+      expect(TagsProvider.instance.tags, hasLength(4));
+      expect(TagsProvider.instance.categories.map((category) => category.name),
+          equals(['People']));
       expect(harness.leftoverTemporaryFiles, isEmpty);
     });
   });
