@@ -73,6 +73,14 @@ class _YearMonthPickerDialogState extends State<_YearMonthPickerDialog> {
     });
   }
 
+  void _selectMonth(int month) {
+    if (month == _month) {
+      Navigator.pop(context, _range.toDate(_year, month));
+      return;
+    }
+    setState(() => _month = month);
+  }
+
   @override
   Widget build(BuildContext context) {
     final localizations = MaterialLocalizations.of(context);
@@ -113,7 +121,7 @@ class _YearMonthPickerDialogState extends State<_YearMonthPickerDialog> {
                         selectedMonth: _month,
                         isEnabled: (month) =>
                             _range.isMonthEnabled(_year, month),
-                        onSelected: (month) => setState(() => _month = month),
+                        onSelected: _selectMonth,
                       ),
               ),
             ),
