@@ -295,5 +295,6 @@
     "moodPleasant": "Agréable",
     "moodVeryPleasant": "Très agréable",
     "formatCsv": "CSV",
-    "formatJson": "JSON"
+    "formatJson": "JSON",
+    "chartInfluencesTitle": "Influence {tag}"
 }
