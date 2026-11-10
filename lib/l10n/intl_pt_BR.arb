@@ -163,5 +163,9 @@
     "chartGroupingWeek": "Semana",
     "chartGroupingMonth": "Mês",
     "chartGroupingYear": "Ano",
-    "pageCalendarTitle": "Calendário"
+    "pageCalendarTitle": "Calendário",
+    "actionRecordAudio": "Gravar áudio",
+    "actionAddImage": "Adicionar imagem",
+    "actionAddVideo": "Adicionar vídeo",
+    "actionAddAudio": "Adicionar áudio"
 }
