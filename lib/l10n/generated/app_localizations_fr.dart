@@ -191,7 +191,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String chartInfluencesTitle(Object tag) {
-    return 'Influences $tag';
+    return 'Influence $tag';
   }
 
   @override
@@ -479,19 +479,19 @@ class AppLocalizationsFr extends AppLocalizations {
   String get moodIconPrompt => 'Saisir une icône';
 
   @override
-  String get moodVeryUnpleasant => 'Very Unpleasant';
+  String get moodVeryUnpleasant => 'Très désagréable';
 
   @override
-  String get moodUnpleasant => 'Unpleasant';
+  String get moodUnpleasant => 'Désagréable';
 
   @override
-  String get moodNeutral => 'Neutral';
+  String get moodNeutral => 'Neutre';
 
   @override
-  String get moodPleasant => 'Pleasant';
+  String get moodPleasant => 'Agréable';
 
   @override
-  String get moodVeryPleasant => 'Very Pleasant';
+  String get moodVeryPleasant => 'Très agréable';
 
   @override
   String get settingsFlashbacksViewLayout =>

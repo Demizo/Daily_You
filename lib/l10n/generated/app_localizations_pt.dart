@@ -1194,6 +1194,18 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get actionTakePhoto => 'Tirar uma foto';
 
   @override
+  String get actionRecordAudio => 'Gravar áudio';
+
+  @override
+  String get actionAddImage => 'Adicionar imagem';
+
+  @override
+  String get actionAddVideo => 'Adicionar vídeo';
+
+  @override
+  String get actionAddAudio => 'Adicionar áudio';
+
+  @override
   String get actionToday => 'Hoje';
 
   @override

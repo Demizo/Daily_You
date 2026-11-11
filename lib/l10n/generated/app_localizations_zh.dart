@@ -190,7 +190,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String chartInfluencesTitle(Object tag) {
-    return 'Influences $tag';
+    return '$tag 影响因素';
   }
 
   @override
@@ -256,7 +256,7 @@ class AppLocalizationsZh extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Day Streak',
+      other: '连续天数',
     );
     return '$_temp0';
   }
@@ -266,8 +266,8 @@ class AppLocalizationsZh extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Logs',
-      one: 'Log',
+      other: '日迹',
+      one: '日迹',
     );
     return '$_temp0';
   }
@@ -277,8 +277,8 @@ class AppLocalizationsZh extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Words',
-      one: 'Word',
+      other: '字',
+      one: '字',
     );
     return '$_temp0';
   }
@@ -288,31 +288,31 @@ class AppLocalizationsZh extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Days',
-      one: 'Day',
+      other: '天',
+      one: '天',
     );
     return '$_temp0';
   }
 
   @override
-  String get statsLongestStreakTitle => 'Longest Streak';
+  String get statsLongestStreakTitle => '最长连续天数';
 
   @override
-  String get statsWritingTitle => 'Writing';
+  String get statsWritingTitle => '写作';
 
   @override
-  String get statsWordsPerLogTitle => 'Words per Log';
+  String get statsWordsPerLogTitle => '每篇日迹字数';
 
   @override
-  String get statsLongestLogTitle => 'Longest Log';
+  String get statsLongestLogTitle => '最长日迹';
 
   @override
   String statsMostActiveTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Most Active Days',
-      one: 'Most Active Day',
+      other: '最活跃的几天',
+      one: '最活跃的一天',
     );
     return '$_temp0';
   }
@@ -329,29 +329,29 @@ class AppLocalizationsZh extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       total,
       locale: localeName,
-      other: '$totalString Days',
-      one: '$totalString Day',
+      other: '$totalString 天',
+      one: '$totalString 天',
     );
     return '$writtenString of $_temp0';
   }
 
   @override
-  String get statsAverageTitle => 'Average';
+  String get statsAverageTitle => '平均';
 
   @override
-  String get statsHighestTitle => 'Highest';
+  String get statsHighestTitle => '最高';
 
   @override
-  String get statsLowestTitle => 'Lowest';
+  String get statsLowestTitle => '最低';
 
   @override
-  String get statsDaysLoggedTitle => 'Days Logged';
+  String get statsDaysLoggedTitle => '已记录天数';
 
   @override
-  String get statsOfDaysLabel => 'of Days';
+  String get statsOfDaysLabel => '天数占比';
 
   @override
-  String get statsCustomizeTitle => 'Customize';
+  String get statsCustomizeTitle => '自定义';
 
   @override
   String get errorExternalStorageAccessTitle => '无法访问外部存储';
@@ -737,7 +737,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get tagEnergyName => '能量';
 
   @override
-  String get tagCategoryPeopleName => 'People';
+  String get tagCategoryPeopleName => '人物';
 
   @override
   String get tagCategoryActivitiesName => '活动';

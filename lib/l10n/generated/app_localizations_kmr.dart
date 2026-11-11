@@ -99,13 +99,13 @@ class AppLocalizationsKmr extends AppLocalizations {
   }
 
   @override
-  String get flashbackOnThisDay => 'On This Day';
+  String get flashbackOnThisDay => 'ل ل ڤێ ڕۆژێ';
 
   @override
-  String get pageGalleryTitle => 'Gallery';
+  String get pageGalleryTitle => 'پێشانگە';
 
   @override
-  String get searchLogsHint => 'Search Logs…';
+  String get searchLogsHint => 'تۆماران بگەڕە…';
 
   @override
   String logCount(num count) {
@@ -141,51 +141,51 @@ class AppLocalizationsKmr extends AppLocalizations {
   }
 
   @override
-  String get noLogs => 'No Logs…';
+  String get noLogs => 'چ تۆمار نینن…';
 
   @override
-  String get noResults => 'No Results…';
+  String get noResults => 'چ ئەنجام نینن…';
 
   @override
-  String get sortDateTitle => 'Date';
+  String get sortDateTitle => 'بەروارد';
 
   @override
-  String get sortOrderAscendingTitle => 'Ascending';
+  String get sortOrderAscendingTitle => 'بەرەف سەری';
 
   @override
-  String get sortOrderDescendingTitle => 'Descending';
+  String get sortOrderDescendingTitle => 'بەرەف خوارێ';
 
   @override
-  String get pageStatisticsTitle => 'Statistics';
+  String get pageStatisticsTitle => 'ئامار';
 
   @override
-  String get statisticsNotEnoughData => 'Not enough data…';
+  String get statisticsNotEnoughData => 'پێزانینێن پێدڤی نینن…';
 
   @override
-  String get statisticsRangeOneMonth => '1 Month';
+  String get statisticsRangeOneMonth => '١ مانگ';
 
   @override
-  String get statisticsRangeSixMonths => '6 Months';
+  String get statisticsRangeSixMonths => '٦ مانگ';
 
   @override
-  String get statisticsRangeOneYear => '1 Year';
+  String get statisticsRangeOneYear => '١ ساڵ';
 
   @override
-  String get statisticsRangeAllTime => 'All Time';
+  String get statisticsRangeAllTime => 'ھەمی دەم';
 
   @override
   String chartSummaryTitle(Object tag) {
-    return '$tag Summary';
+    return 'پوختە';
   }
 
   @override
   String chartByDayTitle(Object tag) {
-    return '$tag By Day';
+    return 'ب ڕۆژێ';
   }
 
   @override
   String chartOverTimeTitle(Object tag) {
-    return '$tag Over Time';
+    return 'ب بورینا دەمی';
   }
 
   @override
@@ -194,29 +194,29 @@ class AppLocalizationsKmr extends AppLocalizations {
   }
 
   @override
-  String get chartGroupingLabel => 'Group by';
+  String get chartGroupingLabel => 'کۆمکرن ل دویف';
 
   @override
-  String get chartGroupingDay => 'Day';
+  String get chartGroupingDay => 'ڕۆژ';
 
   @override
-  String get chartGroupingWeek => 'Week';
+  String get chartGroupingWeek => 'حەفتی';
 
   @override
-  String get chartGroupingMonth => 'Month';
+  String get chartGroupingMonth => 'مانگ';
 
   @override
-  String get chartGroupingYear => 'Year';
+  String get chartGroupingYear => 'ساڵ';
 
   @override
-  String get chartSmoothingLabel => 'Smoothing';
+  String get chartSmoothingLabel => 'ڕێککرن';
 
   @override
   String streakCurrent(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Current Streak $count',
+      other: 'بەردەوامییا نوکە $count',
     );
     return '$_temp0';
   }
@@ -226,7 +226,7 @@ class AppLocalizationsKmr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Longest Streak $count',
+      other: 'درێژترین ماوەی بەردەوامی $count',
     );
     return '$_temp0';
   }
@@ -236,7 +236,7 @@ class AppLocalizationsKmr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Great Days $count',
+      other: 'رۆژێن خۆش $count',
     );
     return '$_temp0';
   }
@@ -246,7 +246,7 @@ class AppLocalizationsKmr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Days Since a Bad Day $count',
+      other: 'ڕۆژێن پشتی ڕۆژەکا خراب$count',
     );
     return '$_temp0';
   }
