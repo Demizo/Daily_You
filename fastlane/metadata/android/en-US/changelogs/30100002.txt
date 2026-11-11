@@ -1,0 +1,7 @@
+Daily You v3.10.0 has arrived! Some fresh stats:
+
+• Revamped the stats page with more metrics and customization
+• Text formatting can now be easily toggled
+• Diarium imports now include People
+• Various UI enhancements
+• Updated translations
