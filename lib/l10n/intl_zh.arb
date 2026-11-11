@@ -293,5 +293,85 @@
     "moodUnpleasant": "不愉快",
     "moodNeutral": "一般",
     "moodPleasant": "愉快",
-    "moodVeryPleasant": "非常愉快"
+    "moodVeryPleasant": "非常愉快",
+    "formatCsv": "CSV",
+    "formatJson": "JSON",
+    "chartInfluencesTitle": "{tag} 影响因素",
+    "streakDayLabel": "{count, plural, other{连续天数}}",
+    "@streakDayLabel": {
+        "description": "Label shown under a large streak length, which is not part of this string"
+    },
+    "statsLongestStreakTitle": "最长连续天数",
+    "@statsLongestStreakTitle": {
+        "description": "Label shown next to or under a large number giving the longest run of consecutive days, which is not part of this string"
+    },
+    "statsWritingTitle": "写作",
+    "@statsWritingTitle": {
+        "description": "Title of the writing statistics tile and page"
+    },
+    "statsWordsPerLogTitle": "每篇日迹字数",
+    "@statsWordsPerLogTitle": {
+        "description": "Label for the average number of words in a log"
+    },
+    "statsLongestLogTitle": "最长日迹",
+    "@statsLongestLogTitle": {
+        "description": "Title of the tile showing the log with the most words"
+    },
+    "statsMostActiveTitle": "{count, plural, one{最活跃的一天} other{最活跃的几天}}",
+    "@statsMostActiveTitle": {
+        "description": "Title of the tile showing the weekday or weekdays with the most logs. The count is the number of weekdays tied for most logs",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "statsDaysOfRange": "{written} of {total, plural, one{{total} 天} other{{total} 天}}",
+    "@statsDaysOfRange": {
+        "description": "Number of days with a log out of the number of days in the selected time range, e.g. '12 of 30 Days'",
+        "placeholders": {
+            "written": {
+                "type": "int",
+                "format": "decimalPattern"
+            },
+            "total": {
+                "type": "int",
+                "format": "decimalPattern"
+            }
+        }
+    },
+    "statsAverageTitle": "平均",
+    "@statsAverageTitle": {
+        "description": "Label shown under a large average value"
+    },
+    "statsHighestTitle": "最高",
+    "@statsHighestTitle": {
+        "description": "Label shown under a large number giving the highest recorded value of a tracker"
+    },
+    "statsLowestTitle": "最低",
+    "@statsLowestTitle": {
+        "description": "Label shown under a large number giving the lowest recorded value of a tracker"
+    },
+    "statsDaysLoggedTitle": "已记录天数",
+    "statsOfDaysLabel": "天数占比",
+    "@statsOfDaysLabel": {
+        "description": "Label shown after a percentage, e.g. '45% of Days'. The percentage is not part of this string"
+    },
+    "statsCustomizeTitle": "自定义",
+    "@statsCustomizeTitle": {
+        "description": "Label of the button for choosing which tiles appear on the statistics page"
+    },
+    "statsLogsLabel": "{count, plural, one{日迹} other{日迹}}",
+    "@statsLogsLabel": {
+        "description": "Label shown under a large number of logs, which is not part of this string"
+    },
+    "statsWordsLabel": "{count, plural, one{字} other{字}}",
+    "@statsWordsLabel": {
+        "description": "Label shown next to or under a large number of words, which is not part of this string"
+    },
+    "statsDaysLabel": "{count, plural, one{天} other{天}}",
+    "@statsDaysLabel": {
+        "description": "Label shown under a large number of days, which is not part of this string"
+    },
+    "tagCategoryPeopleName": "人物"
 }
