@@ -12,7 +12,7 @@
     "pageGalleryTitle": "迹忆",
     "dailyReminderDescription": "今天的日迹还没写呢…",
     "statisticsRangeOneYear": "1 年",
-    "errorExternalStorageAccessDescription": "如果您正在使用网络存储，请确保服务在线且您具有网络访问权限。\n\n否则，该应用程序可能已失去对外部文件夹的权限。请转到设置，然后重新选择外部文件夹以授予访问权限。\n\n警告，在恢复对外部存储位置的访问之前，更改将不会同步！",
+    "errorExternalStorageAccessDescription": "如果您正在使用网络存储，请确保相关服务在线且网络连接正常。\n如果您正在使用本地存储，应用可能已失去对外部文件夹的访问权限。请前往设置，重新选择外部文件夹以授予访问权限。\n警告：在恢复对外部存储位置的访问权限之前，更改将无法同步！",
     "logCount": "{count, plural, one{日迹 {count}} other{日迹 {count}}}",
     "searchLogsHint": "搜索日迹…",
     "sortDateTitle": "日期",
@@ -105,7 +105,7 @@
     "cleanUpStatus": "正在清理…",
     "restoringBackupStatus": "正在恢复备份…{percent}%",
     "settingsAlwaysSendReminderTitle": "总是发送提醒",
-    "settingsAlwaysSendReminderDescription": "即使日志已经开始，也发送提醒",
+    "settingsAlwaysSendReminderDescription": "即使已开始撰写日迹，仍发送提醒",
     "settingsImportFromAnotherApp": "从其他应用程序导入",
     "settingsCustomizeNotificationTitle": "自定义通知",
     "settingsBackupRestoreTitle": "备份与恢复",
@@ -143,8 +143,8 @@
     "viewLayoutList": "列表",
     "settingsHideImagesInGallery": "隐藏图库中的图片",
     "actionTakePhoto": "拍张照",
-    "flashbackOnThisDay": "在这一天",
-    "settingsOnThisDayDescription": "重温过去的记忆",
+    "flashbackOnThisDay": "那年今日",
+    "settingsOnThisDayDescription": "重温过去的迹忆",
     "templateVariableTime": "时间",
     "templateDefaultTimestampTitle": "时间戳",
     "templateDefaultTimestampBody": "{date} - {time}:",
@@ -157,7 +157,7 @@
     "settingsHideImages": "隐藏图片",
     "pageCalendarTitle": "月历",
     "dayCount": "{count, plural, one{天数 {count}} other{天数 {count}}}",
-    "chartOverTimeTitle": "{tag} 起伏",
+    "chartOverTimeTitle": "{tag} 趋势",
     "settingsCalendarSystem": "历法系统",
     "calendarSystemGregorian": "公历",
     "calendarSystemJalali": "波斯历",
@@ -309,7 +309,7 @@
     "@statsWritingTitle": {
         "description": "Title of the writing statistics tile and page"
     },
-    "statsWordsPerLogTitle": "每篇日迹字数",
+    "statsWordsPerLogTitle": "日迹平均字数",
     "@statsWordsPerLogTitle": {
         "description": "Label for the average number of words in a log"
     },
@@ -365,7 +365,7 @@
     "@statsLogsLabel": {
         "description": "Label shown under a large number of logs, which is not part of this string"
     },
-    "statsWordsLabel": "{count, plural, one{字} other{字}}",
+    "statsWordsLabel": "{count, plural, one{字数} other{字数}}",
     "@statsWordsLabel": {
         "description": "Label shown next to or under a large number of words, which is not part of this string"
     },
