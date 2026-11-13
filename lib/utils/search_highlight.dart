@@ -3,18 +3,17 @@
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
 import 'package:daily_you/utils/color_utils.dart';
-import 'package:daily_you/utils/search_matcher.dart';
 import 'package:material_ui/material_ui.dart';
 
-InlineSpan highlightSpan(InlineSpan span, String query, Color background) {
-  if (query.isEmpty) return span;
-
-  final matches =
-      findMatches(span.toPlainText(includeSemanticsLabels: false), query);
-  if (matches.isEmpty) return span;
+InlineSpan highlightSpan(
+  InlineSpan span,
+  List<TextRange> ranges,
+  Color background,
+) {
+  if (ranges.isEmpty) return span;
 
   return _SpanHighlighter(
-    matches,
+    ranges,
     TextStyle(
       backgroundColor: background,
       color: contrastingTextColor(background),

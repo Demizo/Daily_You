@@ -5,6 +5,7 @@
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/models/entry.dart';
+import 'package:daily_you/models/entry_sort.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_attachments_provider.dart';

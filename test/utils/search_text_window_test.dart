@@ -16,6 +16,21 @@ void main() {
           'first needle\nsecond');
     });
 
+    test('starts at the line of a later typo match', () {
+      expect(searchTextWindow('first\nsecond receive\nthird', 'recieve'),
+          'second receive\nthird');
+    });
+
+    test('starts at the line of a later accent match', () {
+      expect(searchTextWindow('first\nsecond Café\nthird', 'cafe'),
+          'second Café\nthird');
+    });
+
+    test('starts at the earliest match of several query words', () {
+      expect(searchTextWindow('one\ntwo beach\nthree sunset', 'sunset beach'),
+          'two beach\nthree sunset');
+    });
+
     test('starts at the line of a later match', () {
       expect(searchTextWindow('first\nsecond needle\nthird', 'needle'),
           'second needle\nthird');

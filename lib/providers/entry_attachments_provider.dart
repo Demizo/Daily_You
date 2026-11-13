@@ -18,6 +18,7 @@ class EntryAttachmentsProvider with ChangeNotifier {
 
   List<EntryAttachment> attachments = List.empty(growable: true);
   Map<int, List<EntryAttachment>> _coverCandidatesByEntryId = {};
+  Map<int, Set<AttachmentType>> _typesByEntryId = {};
 
   bool _isLoaded = false;
 
@@ -31,21 +32,26 @@ class EntryAttachmentsProvider with ChangeNotifier {
 
   void _rebuildCache() {
     final cache = <int, List<EntryAttachment>>{};
+    final types = <int, Set<AttachmentType>>{};
     for (final attachment in attachments) {
-      if (!_isCoverCandidate(attachment)) continue;
       final id = attachment.entryId;
       if (id == null) continue;
+      types.putIfAbsent(id, () => {}).add(attachment.type);
+      if (!_isCoverCandidate(attachment)) continue;
       cache.putIfAbsent(id, () => []).add(attachment);
     }
     for (final candidates in cache.values) {
       candidates.sort((a, b) => b.rank.compareTo(a.rank));
     }
     _coverCandidatesByEntryId = cache;
+    _typesByEntryId = types;
   }
 
   void _addToCache(EntryAttachment attachment) {
     final id = attachment.entryId;
-    if (id == null || !_isCoverCandidate(attachment)) return;
+    if (id == null) return;
+    _typesByEntryId.putIfAbsent(id, () => {}).add(attachment.type);
+    if (!_isCoverCandidate(attachment)) return;
     _coverCandidatesByEntryId[id] = [
       ...?_coverCandidatesByEntryId[id],
       attachment,
@@ -97,6 +103,9 @@ class EntryAttachmentsProvider with ChangeNotifier {
 
   List<EntryAttachment> getCoverCandidatesForEntry(int entryId) =>
       _coverCandidatesByEntryId[entryId] ?? const [];
+
+  Set<AttachmentType> getTypesForEntry(int entryId) =>
+      _typesByEntryId[entryId] ?? const {};
 
   List<EntryAttachment> getForEntry(Entry entry) {
     final attachmentsForEntry = attachments
