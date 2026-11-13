@@ -743,6 +743,11 @@ class AppLocalizationsLt extends AppLocalizations {
   String get noTagsFilterLabel => 'No Tags';
 
   @override
+  String dateFilterRange(String start, String end) {
+    return '$start – $end';
+  }
+
+  @override
   String get addTagsTitle => 'Add Tags';
 
   @override

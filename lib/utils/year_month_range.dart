@@ -35,8 +35,24 @@ class YearMonthRange {
     return (year: year, month: clampMonth(year, yearMonth.month));
   }
 
-  DateTime toDate(int year, int month) =>
-      isJalali ? Jalali(year, month, 1).toDateTime() : DateTime(year, month, 1);
+  DateTime toDate(int year, int month, [int day = 1]) => isJalali
+      ? Jalali(year, month, day).toDateTime()
+      : DateTime(year, month, day);
+
+  int daysIn(int year, int month) => isJalali
+      ? Jalali(year, month).monthLength
+      : DateTime(year, month + 1, 0).day;
+
+  int get monthCount => _monthNumber(latest) - _monthNumber(earliest) + 1;
+
+  YearMonth monthAt(int index) {
+    final number = _monthNumber(earliest) + index;
+    return (year: (number - 1) ~/ 12, month: (number - 1) % 12 + 1);
+  }
+
+  int indexOf(DateTime date) =>
+      (_monthNumber(_yearMonthOf(date, isJalali)) - _monthNumber(earliest))
+          .clamp(0, monthCount - 1);
 }
 
 int _monthNumber(YearMonth yearMonth) => yearMonth.year * 12 + yearMonth.month;

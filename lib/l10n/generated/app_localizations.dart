@@ -1256,6 +1256,12 @@ abstract class AppLocalizations {
   /// **'No Tags'**
   String get noTagsFilterLabel;
 
+  /// No description provided for @dateFilterRange.
+  ///
+  /// In en, this message translates to:
+  /// **'{start} – {end}'**
+  String dateFilterRange(String start, String end);
+
   /// No description provided for @addTagsTitle.
   ///
   /// In en, this message translates to:

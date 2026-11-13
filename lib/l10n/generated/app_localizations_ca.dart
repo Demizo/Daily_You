@@ -731,6 +731,11 @@ class AppLocalizationsCa extends AppLocalizations {
   String get noTagsFilterLabel => 'Sense etiquetes';
 
   @override
+  String dateFilterRange(String start, String end) {
+    return '$start – $end';
+  }
+
+  @override
   String get addTagsTitle => 'Afegeix etiquetes';
 
   @override

@@ -723,6 +723,11 @@ class AppLocalizationsCs extends AppLocalizations {
   String get noTagsFilterLabel => 'Žádné štítky';
 
   @override
+  String dateFilterRange(String start, String end) {
+    return '$start – $end';
+  }
+
+  @override
   String get addTagsTitle => 'Přidat štítky';
 
   @override

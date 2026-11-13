@@ -719,6 +719,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get noTagsFilterLabel => '无标签';
 
   @override
+  String dateFilterRange(String start, String end) {
+    return '$start – $end';
+  }
+
+  @override
   String get addTagsTitle => '添加标签';
 
   @override

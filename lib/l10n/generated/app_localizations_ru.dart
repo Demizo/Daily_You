@@ -736,6 +736,11 @@ class AppLocalizationsRu extends AppLocalizations {
   String get noTagsFilterLabel => 'Нет тегов';
 
   @override
+  String dateFilterRange(String start, String end) {
+    return '$start – $end';
+  }
+
+  @override
   String get addTagsTitle => 'Добавить теги';
 
   @override

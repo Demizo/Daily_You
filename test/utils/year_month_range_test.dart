@@ -58,6 +58,30 @@ void main() {
     test('resolves to the first day of the month', () {
       expect(_gregorian().toDate(1990, 5), DateTime(1990, 5, 1));
     });
+
+    test('resolves a given day of the month', () {
+      expect(_gregorian().toDate(1990, 5, 17), DateTime(1990, 5, 17));
+    });
+
+    test('counts the days in a month', () {
+      final range = _gregorian();
+
+      expect(range.daysIn(2026, 2), 28);
+      expect(range.daysIn(2024, 2), 29);
+      expect(range.daysIn(2026, 10), 31);
+      expect(range.daysIn(2026, 12), 31);
+    });
+
+    test('indexes the months from the earliest to the latest', () {
+      final range = _gregorian();
+
+      expect(range.monthCount, (2026 - 1583) * 12 + 10 - 3 + 1);
+      expect(range.monthAt(0), (year: 1583, month: 3));
+      expect(range.monthAt(10), (year: 1584, month: 1));
+      expect(range.monthAt(range.monthCount - 1), (year: 2026, month: 10));
+      expect(range.indexOf(DateTime(1584, 1, 20)), 10);
+      expect(range.indexOf(DateTime(2100, 1, 1)), range.monthCount - 1);
+    });
   });
 
   group('Jalali', () {
@@ -80,6 +104,23 @@ void main() {
       final jalali = Jalali.fromDateTime(date);
 
       expect(range.clamp(date), (year: jalali.year, month: jalali.month));
+    });
+
+    test('counts the days in a Jalali month', () {
+      final range = _jalali();
+
+      expect(range.daysIn(1403, 1), 31);
+      expect(range.daysIn(1403, 7), 30);
+      expect(range.daysIn(1403, 12), 30);
+      expect(range.daysIn(1404, 12), 29);
+    });
+
+    test('indexes Jalali months across a year boundary', () {
+      final range = _jalali();
+      final first = range.monthAt(0);
+
+      expect(range.monthAt(range.monthCount - 1), range.latest);
+      expect(range.indexOf(range.toDate(first.year + 1, 2)), 14 - first.month);
     });
 
     test('disables months after the latest', () {
