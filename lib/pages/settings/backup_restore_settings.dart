@@ -13,12 +13,12 @@ import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/utils/auto_backup_schedule.dart';
 import 'package:daily_you/utils/backup_restore_utils.dart';
 import 'package:daily_you/utils/imports/import_registry.dart';
-import 'package:daily_you/utils/exports/export_registry.dart';
 import 'package:daily_you/utils/exports/export_runner.dart';
 import 'package:daily_you/utils/operation_outcome.dart';
 import 'package:daily_you/utils/password_store.dart';
 import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/auth_popup.dart';
+import 'package:daily_you/widgets/export_format_dialog.dart';
 import 'package:daily_you/widgets/failure_dialog.dart';
 import 'package:daily_you/widgets/segmented_group.dart';
 import 'package:daily_you/widgets/settings_dialog.dart';
@@ -73,23 +73,7 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
   }
 
   Future<void> _showExportSelectionPopup() async {
-    final l10n = AppLocalizations.of(context)!;
-    final option = await showSettingsDialog<ExportFormatOption>(
-      context: context,
-      title: l10n.logFormatTitle,
-      isSelection: true,
-      builder: (context) => [
-        SettingsInfoRow(
-            title: l10n.warningTitle,
-            subtitle: Text(l10n.settingsExportFormatDescription)),
-        for (final option in ExportRegistry.instance.options)
-          SettingsActionRow(
-            title: option.name(l10n),
-            onTap: () => Navigator.of(context).pop(option),
-          ),
-      ],
-    );
-
+    final option = await showExportFormatDialog(context);
     if (option == null) return;
     if (!mounted) return;
 
