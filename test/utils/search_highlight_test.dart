@@ -4,6 +4,7 @@
 
 import 'package:daily_you/utils/color_utils.dart';
 import 'package:daily_you/utils/search_highlight.dart';
+import 'package:daily_you/utils/search_matcher.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
@@ -27,21 +28,19 @@ void main() {
   List<String> highlightedLeafTexts(InlineSpan span) =>
       leaves(span).where(isHighlighted).map((leaf) => leaf.text!).toList();
 
+  InlineSpan highlightQuery(InlineSpan span, String query) => highlightSpan(
+        span,
+        findMatches(span.toPlainText(includeSemanticsLabels: false), query),
+        background,
+      );
+
   group('highlightSpan', () {
     test('highlights a single match', () {
       const span = TextSpan(text: 'hello world');
-      final result = highlightSpan(span, 'world', background);
+      final result = highlightQuery(span, 'world');
 
       expect(leaves(result).map((leaf) => leaf.text), ['hello ', 'world']);
       expect(highlightedLeafTexts(result), ['world']);
-    });
-
-    test('highlights multiple matches ignoring case', () {
-      const span = TextSpan(text: 'Cat and cat and CAT');
-      final result = highlightSpan(span, 'cat', background);
-
-      expect(highlightedLeafTexts(result), ['Cat', 'cat', 'CAT']);
-      expect(result.toPlainText(), 'Cat and cat and CAT');
     });
 
     test('highlights a match inside bold and keeps the bold', () {
@@ -52,7 +51,7 @@ void main() {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ]);
-      final result = highlightSpan(span, 'word', background);
+      final result = highlightQuery(span, 'word');
 
       final highlighted =
           leaves(result).singleWhere((leaf) => isHighlighted(leaf));
@@ -69,7 +68,7 @@ void main() {
         ),
         TextSpan(text: ' there'),
       ]);
-      final result = highlightSpan(span, 'hello', background);
+      final result = highlightQuery(span, 'hello');
 
       expect(highlightedLeafTexts(result), ['hel', 'lo']);
       final bold = leaves(result).singleWhere((leaf) => leaf.text == 'lo');
@@ -88,7 +87,7 @@ void main() {
           mouseCursor: SystemMouseCursors.click,
         ),
       ]);
-      final result = highlightSpan(span, 'link', background);
+      final result = highlightQuery(span, 'link');
 
       final pieces =
           leaves(result).where((leaf) => leaf.recognizer != null).toList();
@@ -106,7 +105,7 @@ void main() {
         widgetSpan,
         const TextSpan(text: 'cd'),
       ]);
-      final result = highlightSpan(span, 'cd', background);
+      final result = highlightQuery(span, 'cd');
 
       expect(highlightedLeafTexts(result), ['cd']);
       var foundWidgetSpan = false;
@@ -123,7 +122,7 @@ void main() {
         TextSpan(text: 'ab', semanticsLabel: 'a much longer label'),
         TextSpan(text: 'cd'),
       ]);
-      final result = highlightSpan(span, 'cd', background);
+      final result = highlightQuery(span, 'cd');
 
       expect(highlightedLeafTexts(result), ['cd']);
     });
@@ -133,7 +132,7 @@ void main() {
         text: 'ab',
         children: [TextSpan(text: 'cd')],
       );
-      final result = highlightSpan(span, 'bc', background);
+      final result = highlightQuery(span, 'bc');
 
       expect(leaves(result).map((leaf) => leaf.text), ['a', 'b', 'c', 'd']);
       expect(highlightedLeafTexts(result), ['b', 'c']);
@@ -141,12 +140,20 @@ void main() {
 
     test('returns the same span when nothing matches', () {
       const span = TextSpan(text: 'hello');
-      expect(identical(highlightSpan(span, 'zzz', background), span), isTrue);
+      expect(identical(highlightQuery(span, 'zzz'), span), isTrue);
     });
 
-    test('returns the same span for an empty query', () {
-      const span = TextSpan(text: 'hello');
-      expect(identical(highlightSpan(span, '', background), span), isTrue);
+    test('highlights the given ranges', () {
+      const span = TextSpan(text: 'hello world');
+      final result = highlightSpan(
+        span,
+        const [TextRange(start: 1, end: 3), TextRange(start: 6, end: 8)],
+        background,
+      );
+
+      expect(leaves(result).map((leaf) => leaf.text),
+          ['h', 'el', 'lo ', 'wo', 'rld']);
+      expect(highlightedLeafTexts(result), ['el', 'wo']);
     });
 
     test('leaves the plain text unchanged', () {
@@ -154,7 +161,7 @@ void main() {
         TextSpan(text: 'two', style: TextStyle(fontStyle: FontStyle.italic)),
         TextSpan(text: ' three two'),
       ]);
-      final result = highlightSpan(span, 'two', background);
+      final result = highlightQuery(span, 'two');
 
       expect(result.toPlainText(), span.toPlainText());
     });

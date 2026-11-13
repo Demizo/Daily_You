@@ -51,4 +51,23 @@ void main() {
     expect(provider.getCoverCandidatesForEntry(2).map((a) => a.rank), [1]);
     expect(provider.getCoverCandidatesForEntry(3), isEmpty);
   });
+
+  test('lists the attachment types of each entry, audio included', () async {
+    for (final added in [
+      attachment(1, AttachmentType.image, 0),
+      attachment(1, AttachmentType.audio, 1),
+      attachment(2, AttachmentType.video, 0),
+    ]) {
+      await provider.add(added, skipUpdate: true);
+    }
+
+    expect(provider.getTypesForEntry(1),
+        {AttachmentType.image, AttachmentType.audio});
+    expect(provider.getTypesForEntry(2), {AttachmentType.video});
+    expect(provider.getTypesForEntry(3), isEmpty);
+
+    await provider
+        .remove(provider.attachments.firstWhere((a) => a.entryId == 2));
+    expect(provider.getTypesForEntry(2), isEmpty);
+  });
 }

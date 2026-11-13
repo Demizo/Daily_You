@@ -2,21 +2,27 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
+import 'dart:async';
+import 'dart:isolate';
+
 import 'package:daily_you/database/entry_store.dart';
 import 'package:daily_you/models/entry.dart';
-import 'package:daily_you/models/mood.dart';
+import 'package:daily_you/models/entry_sort.dart';
+import 'package:daily_you/models/gallery_filter.dart';
+import 'package:daily_you/providers/entry_attachments_provider.dart';
+import 'package:daily_you/providers/tags_provider.dart';
+import 'package:daily_you/utils/folded_text_index.dart';
+import 'package:daily_you/utils/gallery_filtering.dart';
 import 'package:daily_you/utils/search_matcher.dart';
 import 'package:material_ui/material_ui.dart';
-
-enum OrderBy { date, mood, tracker }
-
-enum SortOrder { ascending, descending }
 
 class EntriesProvider with ChangeNotifier {
   static final EntriesProvider instance = EntriesProvider._init();
 
   EntriesProvider._init() {
-    _store.addListener(_onStoreChanged);
+    _store.addListener(_refresh);
+    TagsProvider.instance.addListener(_onTagsChanged);
+    EntryAttachmentsProvider.instance.addListener(_onAttachmentsChanged);
   }
 
   final EntryStore _store = EntryStore.instance;
@@ -24,15 +30,23 @@ class EntriesProvider with ChangeNotifier {
   List<Entry> get entries => _store.entries;
 
   List<Entry> _filteredEntries = [];
+  int _exactMatchCount = 0;
+  FoldedTextIndex _foldedTextIndex = FoldedTextIndex.empty;
+  int _searchSequence = 0;
 
-  String _searchText = "";
-  String get searchText => _searchText;
+  GalleryFilter _filter = const GalleryFilter();
+  GalleryFilter get filter => _filter;
+
+  set filter(GalleryFilter newFilter) {
+    _filter = newFilter;
+    _refresh();
+  }
+
+  String get searchText => _filter.searchText;
 
   set searchText(String newSearchText) {
-    if (_searchText == newSearchText) return;
-    _searchText = newSearchText;
-    _calculateFilteredEntries();
-    notifyListeners();
+    if (_filter.searchText == newSearchText) return;
+    filter = _filter.copyWith(searchText: newSearchText);
   }
 
   OrderBy _orderBy = OrderBy.date;
@@ -41,16 +55,16 @@ class EntriesProvider with ChangeNotifier {
   set orderBy(OrderBy newOrderBy) {
     if (_orderBy == newOrderBy) return;
     _orderBy = newOrderBy;
-    _calculateFilteredEntries();
-    notifyListeners();
+    _refresh();
   }
 
   int? _trackerSortTagId;
   int? get trackerSortTagId => _trackerSortTagId;
+
   set trackerSortTagId(int? id) {
     if (_trackerSortTagId == id) return;
     _trackerSortTagId = id;
-    notifyListeners();
+    _refresh();
   }
 
   SortOrder _sortOrder = SortOrder.descending;
@@ -59,8 +73,7 @@ class EntriesProvider with ChangeNotifier {
   set sortOrder(SortOrder newSortOrder) {
     if (_sortOrder == newSortOrder) return;
     _sortOrder = newSortOrder;
-    _calculateFilteredEntries();
-    notifyListeners();
+    _refresh();
   }
 
   Future<void> load() => _store.load();
@@ -82,29 +95,64 @@ class EntriesProvider with ChangeNotifier {
 
   List<Entry> getFilteredEntries() => _filteredEntries;
 
-  void _onStoreChanged() {
+  int get exactMatchCount => _exactMatchCount;
+
+  int get partialMatchCount =>
+      searchText.isNotEmpty ? _filteredEntries.length - _exactMatchCount : 0;
+
+  void _onTagsChanged() {
+    if (_filter.hasTags || _orderBy == OrderBy.tracker) _refresh();
+  }
+
+  void _onAttachmentsChanged() {
+    if (_filter.hasAttachments) _refresh();
+  }
+
+  void _refresh() {
     _calculateFilteredEntries();
     notifyListeners();
   }
 
   void _calculateFilteredEntries() {
-    List<Entry> filteredEntries;
-    if (_searchText.isNotEmpty) {
-      filteredEntries = entries
-          .where((entry) => textMatchesQuery(entry.text, _searchText))
-          .toList();
+    final matchingEntries = filterAndSortEntries(
+      entries: entries,
+      filter: _filter,
+      tagsOf: TagsProvider.instance.getEntryTagsForEntry,
+      attachmentTypesOf: EntryAttachmentsProvider.instance.getTypesForEntry,
+      orderBy: _orderBy,
+      sortOrder: _sortOrder,
+      trackerTagId: _trackerSortTagId,
+      today: DateTime.now(),
+    );
+
+    final sequence = ++_searchSequence;
+    if (_filter.hasSearchText) {
+      unawaited(_tierEntries(matchingEntries, _filter.searchText, sequence));
     } else {
-      filteredEntries = entries.toList();
+      _foldedTextIndex = FoldedTextIndex.empty;
+      _filteredEntries = matchingEntries;
+      _exactMatchCount = matchingEntries.length;
     }
+  }
 
-    if (_orderBy == OrderBy.mood) {
-      filteredEntries.sort((a, b) => Mood.compare(b.mood, a.mood));
-    }
-
-    if (_sortOrder == SortOrder.ascending) {
-      filteredEntries = filteredEntries.reversed.toList();
-    }
-
-    _filteredEntries = filteredEntries;
+  Future<void> _tierEntries(
+      List<Entry> matchingEntries, String query, int sequence) async {
+    final texts = [for (final entry in matchingEntries) entry.text];
+    final index = _foldedTextIndex;
+    final (patchedIndex, tiers) = await Isolate.run(() {
+      final patchedIndex = index.patched(texts);
+      return (
+        patchedIndex,
+        tierByMatch(patchedIndex.foldedTexts(texts), query),
+      );
+    });
+    if (sequence != _searchSequence) return;
+    _foldedTextIndex = patchedIndex;
+    _filteredEntries = [
+      for (final position in [...tiers.exact, ...tiers.partial])
+        matchingEntries[position],
+    ];
+    _exactMatchCount = tiers.exact.length;
+    notifyListeners();
   }
 }
