@@ -727,6 +727,11 @@ class AppLocalizationsFa extends AppLocalizations {
   String get noTagsFilterLabel => 'بدون برچسب';
 
   @override
+  String dateFilterRange(String start, String end) {
+    return '$start – $end';
+  }
+
+  @override
   String get addTagsTitle => 'افزودن برچسب';
 
   @override

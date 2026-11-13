@@ -732,6 +732,11 @@ class AppLocalizationsAr extends AppLocalizations {
   String get noTagsFilterLabel => 'بدون علامات';
 
   @override
+  String dateFilterRange(String start, String end) {
+    return '$start – $end';
+  }
+
+  @override
   String get addTagsTitle => 'إضافة علامات';
 
   @override

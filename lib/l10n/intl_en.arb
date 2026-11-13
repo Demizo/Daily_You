@@ -408,6 +408,13 @@
   "@clearAllFilters": {},
   "noTagsFilterLabel": "No Tags",
   "@noTagsFilterLabel": {},
+  "dateFilterRange": "{start} – {end}",
+  "@dateFilterRange": {
+    "placeholders": {
+      "start": {"type": "String"},
+      "end": {"type": "String"}
+    }
+  },
   "addTagsTitle": "Add Tags",
   "@addTagsTitle": {},
   "addTagsSearchHint": "Search tags…",

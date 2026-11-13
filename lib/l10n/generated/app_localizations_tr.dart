@@ -728,6 +728,11 @@ class AppLocalizationsTr extends AppLocalizations {
   String get noTagsFilterLabel => 'Etiket Yok';
 
   @override
+  String dateFilterRange(String start, String end) {
+    return '$start – $end';
+  }
+
+  @override
   String get addTagsTitle => 'Etiketler Ekle';
 
   @override
