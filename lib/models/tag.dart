@@ -8,6 +8,8 @@ const String tagsTable = 'tags';
 const String entryTagsTable = 'entry_tags';
 const String templateTagsTable = 'template_tags';
 
+enum TagPresence { none, some, all }
+
 enum TagType {
   label,
   tracker;

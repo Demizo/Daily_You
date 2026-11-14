@@ -152,6 +152,33 @@ void main() {
     expect(built.tagDefinitions.single.tagType, TagType.tracker);
   });
 
+  test('exports only the given entries with the tags and categories they use',
+      () async {
+    final body = await harness.addCategory('Body');
+    final mind = await harness.addCategory('Mind');
+    await harness.addCategory('Unused');
+    final walk =
+        await harness.addTag('Walk', TagType.label, categoryId: body.id);
+    final read =
+        await harness.addTag('Read', TagType.label, categoryId: mind.id);
+    final plain = await harness.addTag('Plain', TagType.label);
+    final chosen = await harness.addEntry(DateTime(2026, 3, 4),
+        text: 'chosen', tags: [SeededTag(walk), SeededTag(plain)]);
+    await harness.addEntry(DateTime(2026, 3, 5),
+        text: 'left out', tags: [SeededTag(read)]);
+
+    final built = await buildExportSnapshot(
+        localizations: localizations,
+        locale: 'en',
+        includedTypes: const {},
+        entries: [chosen]);
+
+    expect(built.entries.map((exported) => exported.entry.text), ['chosen']);
+    expect(built.tagDefinitions.map((tag) => tag.name),
+        unorderedEquals(['Walk', 'Plain']));
+    expect(built.categories.map((category) => category.name), ['Body']);
+  });
+
   test('reports progress per entry', () async {
     await harness.addEntry(DateTime(2026, 3, 4));
     await harness.addEntry(DateTime(2026, 3, 5));
