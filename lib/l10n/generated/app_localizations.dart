@@ -1256,103 +1256,103 @@ abstract class AppLocalizations {
   /// **'No Tags'**
   String get noTagsFilterLabel;
 
-  /// No description provided for @clearFilter.
+  /// Label of the button that resets a single filter
   ///
   /// In en, this message translates to:
   /// **'Clear'**
   String get clearFilter;
 
-  /// No description provided for @showLogsCount.
+  /// Label of the button that applies the filters and shows the matching logs
   ///
   /// In en, this message translates to:
   /// **'{count, plural, one{Show {count} log} other{Show {count} logs}}'**
   String showLogsCount(num count);
 
-  /// No description provided for @filterPillAttachments.
+  /// Label of the filter button for choosing attachment types
   ///
   /// In en, this message translates to:
   /// **'Attachments'**
   String get filterPillAttachments;
 
-  /// No description provided for @filterPillKeywords.
+  /// Label of the filter button for searching logs by keywords
   ///
   /// In en, this message translates to:
   /// **'Keywords'**
   String get filterPillKeywords;
 
-  /// No description provided for @noMoodFilterLabel.
+  /// Filter option for logs that have no mood
   ///
   /// In en, this message translates to:
   /// **'No Mood'**
   String get noMoodFilterLabel;
 
-  /// No description provided for @noAttachmentsFilterLabel.
+  /// Filter option for logs that have no attachments
   ///
   /// In en, this message translates to:
   /// **'No Attachments'**
   String get noAttachmentsFilterLabel;
 
-  /// No description provided for @noTextFilterLabel.
+  /// Filter option for logs that have no text
   ///
   /// In en, this message translates to:
   /// **'No Text'**
   String get noTextFilterLabel;
 
-  /// No description provided for @partialMatchCount.
+  /// Number of logs that match only some of the active filters
   ///
   /// In en, this message translates to:
   /// **'{count, plural, one{{count} partial match} other{{count} partial matches}}'**
   String partialMatchCount(num count);
 
-  /// No description provided for @tagCount.
+  /// Number of tags selected in the tag filter
   ///
   /// In en, this message translates to:
   /// **'{count, plural, one{{count} tag} other{{count} tags}}'**
   String tagCount(num count);
 
-  /// No description provided for @dateFilterLastMonths.
+  /// Date filter option covering the most recent months
   ///
   /// In en, this message translates to:
   /// **'{count, plural, one{Last month} other{Last {count} months}}'**
   String dateFilterLastMonths(num count);
 
-  /// No description provided for @dateFilterCustomRange.
+  /// Date filter option for choosing a custom start and end date
   ///
   /// In en, this message translates to:
   /// **'Custom range'**
   String get dateFilterCustomRange;
 
-  /// No description provided for @keywordFilterHint.
+  /// Hint text of the field for adding a keyword to the filter
   ///
   /// In en, this message translates to:
   /// **'Add a keyword…'**
   String get keywordFilterHint;
 
-  /// No description provided for @keywordFilterMatchAll.
+  /// Option to only match logs containing every keyword
   ///
   /// In en, this message translates to:
   /// **'All keywords'**
   String get keywordFilterMatchAll;
 
-  /// No description provided for @keywordFilterMatchAny.
+  /// Option to match logs containing at least one keyword
   ///
   /// In en, this message translates to:
   /// **'Any keyword'**
   String get keywordFilterMatchAny;
 
-  /// No description provided for @keywordFilterMatchCase.
+  /// Option to make keyword matching case sensitive
   ///
   /// In en, this message translates to:
   /// **'Match case'**
   String get keywordFilterMatchCase;
 
-  /// No description provided for @keywordCount.
+  /// Number of keywords in the keyword filter
   ///
   /// In en, this message translates to:
   /// **'{count, plural, one{{count} keyword} other{{count} keywords}}'**
   String keywordCount(num count);
 
-  /// No description provided for @dateFilterRange.
+  /// Selected date range shown on the date filter
   ///
   /// In en, this message translates to:
   /// **'{start} – {end}'**
@@ -2198,73 +2198,73 @@ abstract class AppLocalizations {
   /// **'Failed to record audio!'**
   String get recorderErrorDescription;
 
-  /// No description provided for @gallerySelectAll.
+  /// Label of the action that selects every log in the gallery
   ///
   /// In en, this message translates to:
   /// **'Select all'**
   String get gallerySelectAll;
 
-  /// No description provided for @gallerySelectAction.
+  /// Label of the action that starts selecting logs in the gallery
   ///
   /// In en, this message translates to:
   /// **'Select'**
   String get gallerySelectAction;
 
-  /// No description provided for @galleryOpenAction.
+  /// Label of the action that opens a log from the gallery
   ///
   /// In en, this message translates to:
   /// **'Open'**
   String get galleryOpenAction;
 
-  /// No description provided for @deleteLogsMessage.
+  /// Confirmation message shown before deleting the selected logs
   ///
   /// In en, this message translates to:
   /// **'{count, plural, one{Delete {count} log? Its attachments are removed with it.} other{Delete {count} logs? Their attachments are removed with them.}}'**
   String deleteLogsMessage(num count);
 
-  /// No description provided for @newLogAction.
+  /// Label of the action that creates a new log
   ///
   /// In en, this message translates to:
   /// **'New Log'**
   String get newLogAction;
 
-  /// No description provided for @removeTagsTitle.
+  /// Title of the dialog for removing tags from the selected logs
   ///
   /// In en, this message translates to:
   /// **'Remove Tags'**
   String get removeTagsTitle;
 
-  /// No description provided for @applyButtonLabel.
+  /// Label of the button that applies the chosen changes
   ///
   /// In en, this message translates to:
   /// **'Apply'**
   String get applyButtonLabel;
 
-  /// No description provided for @addTagsConfirmMessage.
+  /// Confirmation message shown before adding tags to the selected logs
   ///
   /// In en, this message translates to:
   /// **'{count, plural, one{Add the chosen tags to {count} log?} other{Add the chosen tags to {count} logs?}}'**
   String addTagsConfirmMessage(num count);
 
-  /// No description provided for @removeTagsConfirmMessage.
+  /// Confirmation message shown before removing tags from the selected logs
   ///
   /// In en, this message translates to:
   /// **'{count, plural, one{Remove the chosen tags from {count} log?} other{Remove the chosen tags from {count} logs?}}'**
   String removeTagsConfirmMessage(num count);
 
-  /// No description provided for @selectPartialMatchesMessage.
+  /// Question asking whether logs that only partially match the search text should also be selected
   ///
   /// In en, this message translates to:
   /// **'{count, plural, one{Also select {count} partial match?} other{Also select {count} partial matches?}}'**
   String selectPartialMatchesMessage(num count);
 
-  /// No description provided for @selectExactMatchesOnly.
+  /// Button choosing to select only logs that match the exact text
   ///
   /// In en, this message translates to:
   /// **'Exact only'**
   String get selectExactMatchesOnly;
 
-  /// No description provided for @selectIncludingPartialMatches.
+  /// Button choosing to also select logs that partially match the text
   ///
   /// In en, this message translates to:
   /// **'Include'**
