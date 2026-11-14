@@ -13,6 +13,7 @@ INSERT INTO Media VALUES ('media-3', 2, X'FFFF', 'report', '.pdf', 2, 6390311760
 INSERT INTO Media VALUES ('media-4', 0, X'20', 'first', '.jpg', 5, 639030240000000000);
 INSERT INTO Media VALUES ('media-5', 0, X'21', 'second', '.jpg', NULL, 639030240000000000);
 INSERT INTO Media VALUES ('media-6', 0, X'22', 'third', '.jpg', 2, 639030240000000000);
+INSERT INTO Media VALUES ('media-7', 1, X'304142', 'recording', '.mp3', 0, 639029862000000000);
 INSERT INTO Tags VALUES (1, 0, 'Thoughts', '#FFFFE600');
 INSERT INTO Tags VALUES (2, 2, 'stress', NULL);
 INSERT INTO Tags VALUES (3, 3, 'Text Tracker', NULL);

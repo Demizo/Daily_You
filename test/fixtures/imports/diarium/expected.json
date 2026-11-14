@@ -91,7 +91,17 @@
           "value": null
         }
       ],
-      "attachments": []
+      "attachments": [
+        {
+          "type": "audio",
+          "rank": 0,
+          "timeCreate": "2026-01-02T21:30:00.000",
+          "media": {
+            "fileName": "recording.mp3",
+            "bytes": "MEFC"
+          }
+        }
+      ]
     },
     {
       "text": "# Title only",

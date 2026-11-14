@@ -23,6 +23,7 @@ const int _personTagType = 1;
 const int _numericTrackerType = 2;
 const int _ticksAtUnixEpoch = 621355968000000000;
 const int _imageMediaType = 0;
+const int _audioMediaType = 1;
 
 Future<ImportBundle> parseDiarium(ImportSource source,
     {required String peopleCategoryName}) async {
@@ -31,7 +32,7 @@ Future<ImportBundle> parseDiarium(ImportSource source,
     final entries = await database.rawQuery('SELECT * FROM Entries');
     final media = await database.rawQuery(
         'SELECT DiaryMediaId, DiaryEntryId, Type, Name, FileEnding, "Index" '
-        'FROM Media WHERE Type = $_imageMediaType '
+        'FROM Media WHERE Type IN ($_imageMediaType, $_audioMediaType) '
         'AND Data IS NOT NULL');
     final tags = await database.rawQuery('SELECT * FROM Tags');
     final entryTags = await database.rawQuery('SELECT * FROM EntryTags');
@@ -140,7 +141,9 @@ List<ImportedAttachment> _mediaAttachments(List<Map<String, Object?>> media,
   return [
     for (final (rankFromEnd, position) in orderedPositions.indexed)
       ImportedAttachment(
-        type: AttachmentType.image,
+        type: media[position]['Type'] == _audioMediaType
+            ? AttachmentType.audio
+            : AttachmentType.image,
         rank: media.length - 1 - rankFromEnd,
         timeCreate: timeCreate,
         media: BytesMedia(

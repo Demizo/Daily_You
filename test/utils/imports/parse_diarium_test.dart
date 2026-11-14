@@ -3,6 +3,7 @@
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
 import 'package:daily_you/l10n/generated/app_localizations_en.dart';
+import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/models/mood.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/utils/imports/import_bundle.dart';
@@ -131,6 +132,14 @@ void main() {
           [12, 13]
         ]));
     expect(images.map((image) => image.rank), equals([1, 0]));
+  });
+
+  test('imports audio with the extension it was recorded with', () async {
+    final audio = bundle.entries[1].attachments.single;
+
+    expect(audio.type, AttachmentType.audio);
+    expect((audio.media as BytesMedia).fileName, 'recording.mp3');
+    expect(await bytesOf(audio), equals([0x30, 0x41, 0x42]));
   });
 
   test('ranks images without a usable index into unique non-negative ranks',
