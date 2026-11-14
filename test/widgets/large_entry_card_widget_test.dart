@@ -6,6 +6,7 @@ import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/providers/mood_scale_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
+import 'package:daily_you/utils/text_highlight.dart';
 import 'package:daily_you/widgets/large_entry_card_widget.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
@@ -23,7 +24,11 @@ void main() {
     timeModified: DateTime(2025, 1, 2),
   );
 
-  Future<void> pumpCard(WidgetTester tester, {String searchQuery = ''}) {
+  Future<void> pumpCard(
+    WidgetTester tester, {
+    String searchQuery = '',
+    List<String> terms = const [],
+  }) {
     return tester.pumpWidget(
       MultiProvider(
         providers: [
@@ -41,7 +46,7 @@ void main() {
                 child: LargeEntryCardWidget(
                   entry: entry,
                   attachments: const [],
-                  searchQuery: searchQuery,
+                  highlight: TextHighlight(query: searchQuery, terms: terms),
                 ),
               ),
             ),
@@ -69,6 +74,13 @@ void main() {
     expect(node.label, contains('2025'));
     expect(find.semantics.byLabel(RegExp('needle')), findsOneWidget);
     handle.dispose();
+  });
+
+  testWidgets('highlights keyword matches', (tester) async {
+    await pumpCard(tester, terms: ['needle']);
+
+    expect(find.textContaining('first line', findRichText: true), findsNothing);
+    expect(highlightedTexts(tester), ['needle']);
   });
 
   testWidgets('starts at the matching line and highlights the match',

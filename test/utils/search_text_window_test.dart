@@ -3,84 +3,116 @@
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
 import 'package:daily_you/utils/search_text_window.dart';
+import 'package:daily_you/utils/text_highlight.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('searchTextWindow', () {
+    test('starts at the line of a keyword match', () {
+      expect(
+        searchTextWindow(
+          'first\nsecond needle\nthird',
+          const TextHighlight(terms: ['needle']),
+        ),
+        'second needle\nthird',
+      );
+    });
+
     test('returns the text when nothing matches', () {
-      expect(searchTextWindow('first\nsecond', 'zzz'), 'first\nsecond');
+      expect(
+          searchTextWindow('first\nsecond', const TextHighlight(query: 'zzz')),
+          'first\nsecond');
     });
 
     test('returns the text when the match is on the first line', () {
-      expect(searchTextWindow('first needle\nsecond', 'needle'),
+      expect(
+          searchTextWindow(
+              'first needle\nsecond', const TextHighlight(query: 'needle')),
           'first needle\nsecond');
     });
 
     test('starts at the line of a later typo match', () {
-      expect(searchTextWindow('first\nsecond receive\nthird', 'recieve'),
+      expect(
+          searchTextWindow('first\nsecond receive\nthird',
+              const TextHighlight(query: 'recieve')),
           'second receive\nthird');
     });
 
     test('starts at the line of a later accent match', () {
-      expect(searchTextWindow('first\nsecond Café\nthird', 'cafe'),
+      expect(
+          searchTextWindow(
+              'first\nsecond Café\nthird', const TextHighlight(query: 'cafe')),
           'second Café\nthird');
     });
 
     test('starts at the earliest match of several query words', () {
-      expect(searchTextWindow('one\ntwo beach\nthree sunset', 'sunset beach'),
+      expect(
+          searchTextWindow('one\ntwo beach\nthree sunset',
+              const TextHighlight(query: 'sunset beach')),
           'two beach\nthree sunset');
     });
 
     test('starts at the line of a later match', () {
-      expect(searchTextWindow('first\nsecond needle\nthird', 'needle'),
+      expect(
+          searchTextWindow('first\nsecond needle\nthird',
+              const TextHighlight(query: 'needle')),
           'second needle\nthird');
     });
 
     test('starts at the line containing the first of several matches', () {
-      expect(searchTextWindow('one\ntwo x\nthree x', 'x'), 'two x\nthree x');
+      expect(
+          searchTextWindow(
+              'one\ntwo x\nthree x', const TextHighlight(query: 'x')),
+          'two x\nthree x');
     });
 
     test('starts at the opening fence for a match inside a code block', () {
       const text = 'intro\n```dart\nline\nneedle here\n```\nafter';
-      expect(searchTextWindow(text, 'needle'),
+      expect(searchTextWindow(text, const TextHighlight(query: 'needle')),
           '```dart\nline\nneedle here\n```\nafter');
     });
 
     test('starts at the opening fence of an unclosed code block', () {
       const text = 'intro\n```\nline\nneedle';
-      expect(searchTextWindow(text, 'needle'), '```\nline\nneedle');
+      expect(searchTextWindow(text, const TextHighlight(query: 'needle')),
+          '```\nline\nneedle');
     });
 
     test('keeps the match line when it is the opening fence', () {
       const text = 'intro\n```needle\ncode\n```';
-      expect(searchTextWindow(text, 'needle'), '```needle\ncode\n```');
+      expect(searchTextWindow(text, const TextHighlight(query: 'needle')),
+          '```needle\ncode\n```');
     });
 
     test('prefixes an ellipsis and cuts at whitespace for a far match', () {
       final text = '${'aaaa ' * 20}needle tail';
-      expect(searchTextWindow(text, 'needle'), '…${'aaaa ' * 4}needle tail');
+      expect(searchTextWindow(text, const TextHighlight(query: 'needle')),
+          '…${'aaaa ' * 4}needle tail');
     });
 
     test('cuts a far match on a later line from that line', () {
       final text = 'intro\n${'aaaa ' * 20}needle';
-      expect(searchTextWindow(text, 'needle'), '…${'aaaa ' * 4}needle');
+      expect(searchTextWindow(text, const TextHighlight(query: 'needle')),
+          '…${'aaaa ' * 4}needle');
     });
 
     test('keeps the line start when a far match has no whitespace before it',
         () {
       final text = 'intro\n${'a' * 60}needle';
-      expect(searchTextWindow(text, 'needle'), '${'a' * 60}needle');
+      expect(searchTextWindow(text, const TextHighlight(query: 'needle')),
+          '${'a' * 60}needle');
     });
 
     test('does not cut a code block for a far match inside it', () {
       final text = 'intro\n```\n${'aaaa ' * 20}\nneedle\n```';
-      expect(searchTextWindow(text, 'needle'),
+      expect(searchTextWindow(text, const TextHighlight(query: 'needle')),
           '```\n${'aaaa ' * 20}\nneedle\n```');
     });
 
     test('keeps the list marker for a match in a list item', () {
       const text = 'intro\n- one\n- two needle\n- three';
-      expect(searchTextWindow(text, 'needle'), '- two needle\n- three');
+      expect(searchTextWindow(text, const TextHighlight(query: 'needle')),
+          '- two needle\n- three');
     });
   });
 }

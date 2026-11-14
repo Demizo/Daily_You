@@ -3,13 +3,13 @@
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
 import 'package:daily_you/utils/markdown_preview_scanner.dart';
-import 'package:daily_you/utils/search_matcher.dart';
+import 'package:daily_you/utils/text_highlight.dart';
 
 const _longLineThreshold = 40;
 const _contextBeforeMatch = 20;
 
-String searchTextWindow(String text, String query) {
-  final matches = findMatches(text, query);
+String searchTextWindow(String text, TextHighlight highlight) {
+  final matches = highlight.findRanges(text);
   if (matches.isEmpty) return text;
 
   final matchStart = matches.first.start;

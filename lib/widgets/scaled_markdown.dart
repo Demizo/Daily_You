@@ -5,7 +5,7 @@
 import 'package:daily_you/markdown/markdown_blocks.dart';
 import 'package:daily_you/utils/color_utils.dart';
 import 'package:daily_you/utils/search_highlight.dart';
-import 'package:daily_you/utils/search_matcher.dart';
+import 'package:daily_you/utils/text_highlight.dart';
 import 'package:daily_you/widgets/markdown_highlight_syntax.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:markdown_widget/markdown_widget.dart';
@@ -17,7 +17,7 @@ class ScaledMarkdown extends StatelessWidget {
   final int? maxCharacters;
   final double scaleFactor;
   final bool compact;
-  final String highlightQuery;
+  final TextHighlight highlight;
 
   const ScaledMarkdown({
     super.key,
@@ -25,14 +25,13 @@ class ScaledMarkdown extends StatelessWidget {
     this.maxCharacters,
     this.scaleFactor = 1,
     this.compact = false,
-    this.highlightQuery = '',
+    this.highlight = TextHighlight.none,
   });
 
   InlineSpan _highlighted(InlineSpan span) {
-    if (highlightQuery.isEmpty) return span;
-    final ranges = findMatches(
+    if (highlight.isEmpty) return span;
+    final ranges = highlight.findRanges(
       span.toPlainText(includeSemanticsLabels: false),
-      highlightQuery,
     );
     return highlightSpan(span, ranges, highlightBackgroundColor);
   }

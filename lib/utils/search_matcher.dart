@@ -88,11 +88,16 @@ List<TextRange> findMatches(String text, String query) {
   if (words.isEmpty) return const [];
 
   final foldedText = foldText(text);
-  final ranges = [for (final word in words) ..._rangesOfWord(foldedText, word)]
-    ..sort((a, b) => a.start.compareTo(b.start));
+  return mergeRanges([
+    for (final word in words) ..._rangesOfWord(foldedText, word),
+  ]);
+}
+
+List<TextRange> mergeRanges(List<TextRange> ranges) {
+  final sorted = ranges.toList()..sort((a, b) => a.start.compareTo(b.start));
 
   final merged = <TextRange>[];
-  for (final range in ranges) {
+  for (final range in sorted) {
     if (merged.isNotEmpty && range.start < merged.last.end) {
       final last = merged.removeLast();
       merged.add(
