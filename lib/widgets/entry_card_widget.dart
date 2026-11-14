@@ -13,6 +13,10 @@ import 'package:daily_you/widgets/scaled_markdown.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/models/entry.dart';
 
+const double entryCardCornerRadius = 12;
+const double entryCardMargin = 4;
+const double galleryHorizontalPadding = 2;
+
 class EntryCardWidget extends StatelessWidget {
   const EntryCardWidget(
       {super.key,
@@ -35,6 +39,7 @@ class EntryCardWidget extends StatelessWidget {
         label: entrySemanticsLabel(context, entry, cardTitle),
         excludeSemantics: true,
         child: Card.filled(
+          margin: const EdgeInsets.all(entryCardMargin),
           color: Theme.of(context).colorScheme.surfaceContainer,
           clipBehavior: Clip.antiAlias,
           child: Column(
@@ -44,7 +49,7 @@ class EntryCardWidget extends StatelessWidget {
               Expanded(
                 child: ClipRRect(
                   clipBehavior: Clip.hardEdge,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(entryCardCornerRadius),
                   child: (attachments.isNotEmpty && !hideImage)
                       ? AttachmentGrid(attachments: attachments)
                       : (entry.text.isNotEmpty)

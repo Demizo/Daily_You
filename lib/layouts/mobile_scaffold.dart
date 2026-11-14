@@ -29,6 +29,8 @@ class MobileScaffold extends StatefulWidget {
 }
 
 class _MobileScaffoldState extends State<MobileScaffold> {
+  static const int _galleryPageIndex = 1;
+
   int currentIndex = 0;
   final _swipePagesKey = GlobalKey<_SwipePagesState>();
   final List<bool> _isScrolled = [false, false, false];
@@ -98,6 +100,7 @@ class _MobileScaffoldState extends State<MobileScaffold> {
   }
 
   void _updateScrolled(int pageIndex, bool scrolled) {
+    if (pageIndex == _galleryPageIndex) return;
     if (_isScrolled[pageIndex] == scrolled) return;
     if (pageIndex == currentIndex) {
       setState(() {
@@ -109,9 +112,11 @@ class _MobileScaffoldState extends State<MobileScaffold> {
   }
 
   void _switchPage(int newIndex) {
-    final c = _scrollControllers[newIndex];
-    if (c.hasClients && c.positions.length == 1) {
-      _isScrolled[newIndex] = c.position.pixels > 0;
+    final scrollController = _scrollControllers[newIndex];
+    if (newIndex != _galleryPageIndex &&
+        scrollController.hasClients &&
+        scrollController.positions.length == 1) {
+      _isScrolled[newIndex] = scrollController.position.pixels > 0;
     }
     setState(() {
       currentIndex = newIndex;
@@ -365,7 +370,7 @@ class _MobileScaffoldState extends State<MobileScaffold> {
         appBar: AppBar(
           title: Text(pageTitles[currentIndex]),
           elevation: _isScrolled[currentIndex] ? 1 : 0,
-          scrolledUnderElevation: 1,
+          scrolledUnderElevation: currentIndex == _galleryPageIndex ? 0 : 1,
           actions: [
             if (_shouldShowNotificationButton(configProvider))
               IconButton(
