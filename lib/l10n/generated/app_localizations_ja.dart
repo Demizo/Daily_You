@@ -1261,5 +1261,64 @@ class AppLocalizationsJa extends AppLocalizations {
   String get recorderErrorDescription => 'Failed to record audio!';
 
   @override
+  String get gallerySelectAll => 'Select all';
+
+  @override
+  String deleteLogsMessage(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Delete $count logs? Their attachments are removed with them.',
+      one: 'Delete $count log? Its attachments are removed with it.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get newLogAction => 'New Log';
+
+  @override
+  String get removeTagsTitle => 'Remove Tags';
+
+  @override
+  String get applyButtonLabel => 'Apply';
+
+  @override
+  String addTagsConfirmMessage(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Add the chosen tags to $count logs?',
+      one: 'Add the chosen tags to $count log?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String removeTagsConfirmMessage(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Remove the chosen tags from $count logs?',
+      one: 'Remove the chosen tags from $count log?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String selectPartialMatchesMessage(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Also select $count partial matches?',
+      one: 'Also select $count partial match?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get selectExactMatchesOnly => 'Exact only';
+
+  @override
+  String get selectIncludingPartialMatches => 'Include';
 }
