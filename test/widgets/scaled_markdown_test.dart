@@ -3,6 +3,7 @@
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
 import 'package:daily_you/custom_locale_delegates.dart';
+import 'package:daily_you/utils/text_highlight.dart';
 import 'package:daily_you/widgets/scaled_markdown.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
@@ -16,7 +17,8 @@ void main() {
         localizationsDelegates: appLocalizationsDelegates,
         home: Scaffold(
           body: SingleChildScrollView(
-            child: ScaledMarkdown(data: data, highlightQuery: query),
+            child: ScaledMarkdown(
+                data: data, highlight: TextHighlight(query: query)),
           ),
         ),
       ),

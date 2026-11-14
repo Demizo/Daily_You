@@ -18,6 +18,7 @@ import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/providers/gallery_selection.dart';
 import 'package:daily_you/providers/tags_provider.dart';
 import 'package:daily_you/utils/gallery_entry_actions.dart';
+import 'package:daily_you/utils/text_highlight.dart';
 import 'package:daily_you/widgets/gallery_action_menu.dart';
 import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/drag_select_region.dart';
@@ -531,8 +532,8 @@ class _GalleryPageState extends State<GalleryPage>
     final entryAttachmentsProvider =
         Provider.of<EntryAttachmentsProvider>(context);
     final configProvider = Provider.of<ConfigProvider>(context);
-    final searchText = entriesProvider.searchText;
-    final largeCards = listView || searchText.isNotEmpty;
+    final highlight = TextHighlight.fromFilter(entriesProvider.filter);
+    final largeCards = listView || highlight.isNotEmpty;
     final partialMatchCount = entriesProvider.partialMatchCount;
     final firstTierEnd = entries.length - partialMatchCount;
 
@@ -549,7 +550,7 @@ class _GalleryPageState extends State<GalleryPage>
                 attachments:
                     _visualAttachmentsOf(entryAttachmentsProvider, entry),
                 hideImage: configProvider.get(Settings.hideImagesInGallery),
-                searchQuery: searchText,
+                highlight: highlight,
               )
             : EntryCardWidget(
                 entry: entry,
