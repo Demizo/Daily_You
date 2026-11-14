@@ -1280,6 +1280,12 @@ class AppLocalizationsNl extends AppLocalizations {
   String get gallerySelectAll => 'Select all';
 
   @override
+  String get gallerySelectAction => 'Select';
+
+  @override
+  String get galleryOpenAction => 'Open';
+
+  @override
   String deleteLogsMessage(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

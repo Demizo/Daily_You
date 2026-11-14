@@ -2204,6 +2204,18 @@ abstract class AppLocalizations {
   /// **'Select all'**
   String get gallerySelectAll;
 
+  /// No description provided for @gallerySelectAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Select'**
+  String get gallerySelectAction;
+
+  /// No description provided for @galleryOpenAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get galleryOpenAction;
+
   /// No description provided for @deleteLogsMessage.
   ///
   /// In en, this message translates to:

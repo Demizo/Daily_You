@@ -16,6 +16,7 @@ import 'package:daily_you/notification_manager.dart';
 import 'package:daily_you/pages/launch_page.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_attachments_provider.dart';
+import 'package:daily_you/providers/gallery_selection.dart';
 import 'package:daily_you/providers/mood_scale_provider.dart';
 import 'package:daily_you/providers/stats_layout_provider.dart';
 import 'package:daily_you/providers/tags_provider.dart';
@@ -273,6 +274,9 @@ void main() async {
     ),
     ChangeNotifierProvider<MoodScaleProvider>(
       create: (_) => MoodScaleProvider.instance,
+    ),
+    ChangeNotifierProvider<GallerySelection>(
+      create: (_) => GallerySelection.instance,
     ),
     ChangeNotifierProvider<StatsLayoutProvider>(
       create: (_) => StatsLayoutProvider.instance,
