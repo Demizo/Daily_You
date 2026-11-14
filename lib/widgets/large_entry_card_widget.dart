@@ -7,6 +7,7 @@ import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/utils/entry_semantics_label.dart';
 import 'package:daily_you/utils/search_text_window.dart';
 import 'package:daily_you/widgets/bottom_fade.dart';
+import 'package:daily_you/widgets/entry_card_widget.dart';
 import 'package:daily_you/widgets/entry_card_header_row.dart';
 import 'package:daily_you/widgets/attachment_grid.dart';
 import 'package:daily_you/widgets/scaled_markdown.dart';
@@ -24,6 +25,7 @@ class LargeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card.filled(
+      margin: const EdgeInsets.all(entryCardMargin),
       color: Theme.of(context).colorScheme.surfaceContainer,
       clipBehavior: Clip.antiAlias,
       child: Row(
@@ -34,7 +36,7 @@ class LargeCard extends StatelessWidget {
           if (media != null)
             Expanded(
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(entryCardCornerRadius),
                 child: media,
               ),
             ),

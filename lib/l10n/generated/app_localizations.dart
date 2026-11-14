@@ -1256,6 +1256,102 @@ abstract class AppLocalizations {
   /// **'No Tags'**
   String get noTagsFilterLabel;
 
+  /// No description provided for @clearFilter.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get clearFilter;
+
+  /// No description provided for @showLogsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{Show {count} log} other{Show {count} logs}}'**
+  String showLogsCount(num count);
+
+  /// No description provided for @filterPillAttachments.
+  ///
+  /// In en, this message translates to:
+  /// **'Attachments'**
+  String get filterPillAttachments;
+
+  /// No description provided for @filterPillKeywords.
+  ///
+  /// In en, this message translates to:
+  /// **'Keywords'**
+  String get filterPillKeywords;
+
+  /// No description provided for @noMoodFilterLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'No Mood'**
+  String get noMoodFilterLabel;
+
+  /// No description provided for @noAttachmentsFilterLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'No Attachments'**
+  String get noAttachmentsFilterLabel;
+
+  /// No description provided for @noTextFilterLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'No Text'**
+  String get noTextFilterLabel;
+
+  /// No description provided for @partialMatchCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} partial match} other{{count} partial matches}}'**
+  String partialMatchCount(num count);
+
+  /// No description provided for @tagCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} tag} other{{count} tags}}'**
+  String tagCount(num count);
+
+  /// No description provided for @dateFilterLastMonths.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{Last month} other{Last {count} months}}'**
+  String dateFilterLastMonths(num count);
+
+  /// No description provided for @dateFilterCustomRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom range'**
+  String get dateFilterCustomRange;
+
+  /// No description provided for @keywordFilterHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a keyword…'**
+  String get keywordFilterHint;
+
+  /// No description provided for @keywordFilterMatchAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All keywords'**
+  String get keywordFilterMatchAll;
+
+  /// No description provided for @keywordFilterMatchAny.
+  ///
+  /// In en, this message translates to:
+  /// **'Any keyword'**
+  String get keywordFilterMatchAny;
+
+  /// No description provided for @keywordFilterMatchCase.
+  ///
+  /// In en, this message translates to:
+  /// **'Match case'**
+  String get keywordFilterMatchCase;
+
+  /// No description provided for @keywordCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} keyword} other{{count} keywords}}'**
+  String keywordCount(num count);
+
   /// No description provided for @dateFilterRange.
   ///
   /// In en, this message translates to:
@@ -2101,6 +2197,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to record audio!'**
   String get recorderErrorDescription;
+
+  /// No description provided for @newLogAction.
+  ///
+  /// In en, this message translates to:
+  /// **'New Log'**
+  String get newLogAction;
 }
 
 class _AppLocalizationsDelegate
