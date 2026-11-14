@@ -2198,11 +2198,65 @@ abstract class AppLocalizations {
   /// **'Failed to record audio!'**
   String get recorderErrorDescription;
 
+  /// No description provided for @gallerySelectAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Select all'**
+  String get gallerySelectAll;
+
+  /// No description provided for @deleteLogsMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{Delete {count} log? Its attachments are removed with it.} other{Delete {count} logs? Their attachments are removed with them.}}'**
+  String deleteLogsMessage(num count);
+
   /// No description provided for @newLogAction.
   ///
   /// In en, this message translates to:
   /// **'New Log'**
   String get newLogAction;
+
+  /// No description provided for @removeTagsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove Tags'**
+  String get removeTagsTitle;
+
+  /// No description provided for @applyButtonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get applyButtonLabel;
+
+  /// No description provided for @addTagsConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{Add the chosen tags to {count} log?} other{Add the chosen tags to {count} logs?}}'**
+  String addTagsConfirmMessage(num count);
+
+  /// No description provided for @removeTagsConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{Remove the chosen tags from {count} log?} other{Remove the chosen tags from {count} logs?}}'**
+  String removeTagsConfirmMessage(num count);
+
+  /// No description provided for @selectPartialMatchesMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{Also select {count} partial match?} other{Also select {count} partial matches?}}'**
+  String selectPartialMatchesMessage(num count);
+
+  /// No description provided for @selectExactMatchesOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Exact only'**
+  String get selectExactMatchesOnly;
+
+  /// No description provided for @selectIncludingPartialMatches.
+  ///
+  /// In en, this message translates to:
+  /// **'Include'**
+  String get selectIncludingPartialMatches;
 }
 
 class _AppLocalizationsDelegate
