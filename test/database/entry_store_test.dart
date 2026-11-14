@@ -297,6 +297,47 @@ void main() {
     expect(await imageFiles.exists('photo.jpg'), isFalse);
   });
 
+  test('removes several entries together and notifies once', () async {
+    final tag = await addTag('walk');
+    await TagsProvider.instance.load();
+    final aImage = await writeImageFile('a.jpg');
+    final bImage = await writeImageFile('b.jpg');
+    final keptImage = await writeImageFile('kept.jpg');
+    final deletedA = await store.beginDraft().save((_) => EntryDraft(
+          entry: draftEntry(text: 'a'),
+          tags: [EntryTag(entryId: 0, tagId: tag.id!, timeCreate: time)],
+          attachments: [aImage],
+        ));
+    final deletedB = await store.beginDraft().save((_) => EntryDraft(
+          entry: draftEntry(text: 'b'),
+          attachments: [bImage],
+        ));
+    final kept = await store.beginDraft().save((_) => EntryDraft(
+          entry: draftEntry(text: 'kept'),
+          tags: [EntryTag(entryId: 0, tagId: tag.id!, timeCreate: time)],
+          attachments: [keptImage],
+        ));
+
+    var notifications = 0;
+    void listener() => notifications += 1;
+    store.addListener(listener);
+    await store.deleteMany([deletedA, deletedB]);
+    store.removeListener(listener);
+    await reloadEverything();
+
+    expect(notifications, 1);
+    expect(store.entries.map((entry) => entry.id), [kept.id]);
+    expect(TagsProvider.instance.entryTags.map((entryTag) => entryTag.entryId),
+        [kept.id]);
+    expect(
+        EntryAttachmentsProvider.instance.attachments
+            .map((attachment) => attachment.filePath),
+        ['kept.jpg']);
+    expect(await imageFiles.exists('a.jpg'), isFalse);
+    expect(await imageFiles.exists('b.jpg'), isFalse);
+    expect(await imageFiles.exists('kept.jpg'), isTrue);
+  });
+
   test('removes the audio and video files of a deleted entry', () async {
     final audioFiles =
         await AttachmentStorage.instance.internalStore(AttachmentType.audio);

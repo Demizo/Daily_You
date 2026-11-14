@@ -119,6 +119,7 @@ Future<ExportSnapshot> buildExportSnapshot({
   required AppLocalizations localizations,
   required String locale,
   required Set<AttachmentType> includedTypes,
+  List<Entry>? entries,
   void Function(double fraction)? onProgress,
 }) async {
   final tagsProvider = TagsProvider.instance;
@@ -139,18 +140,36 @@ Future<ExportSnapshot> buildExportSnapshot({
     (attachmentsByEntryId[entryId] ??= []).add(attachment);
   }
 
-  final sortedEntries = [...EntriesProvider.instance.entries]
+  final sortedEntries = [...entries ?? EntriesProvider.instance.entries]
     ..sort(_byTimeThenId);
 
-  final entries = <ExportEntry>[];
+  final entryTagsByEntryId = {
+    for (final entry in sortedEntries)
+      entry.id!: [...tagsProvider.getEntryTagsForEntry(entry.id!)]..sort(
+          (first, second) => (tagPositionById[first.tagId] ?? 0)
+              .compareTo(tagPositionById[second.tagId] ?? 0))
+  };
+  final usedTagIds = {
+    for (final entryTags in entryTagsByEntryId.values)
+      for (final entryTag in entryTags) entryTag.tagId
+  };
+  final restrictToUsed = entries != null;
+  final exportedTags = restrictToUsed
+      ? tagsProvider.tags.where((tag) => usedTagIds.contains(tag.id))
+      : tagsProvider.tags;
+  final usedCategoryIds = {for (final tag in exportedTags) tag.categoryId};
+  final exportedCategories = restrictToUsed
+      ? tagsProvider.categories
+          .where((category) => usedCategoryIds.contains(category.id))
+      : tagsProvider.categories;
+
+  final exportedEntries = <ExportEntry>[];
   for (final entry in sortedEntries) {
-    final entryTags = [...tagsProvider.getEntryTagsForEntry(entry.id!)]..sort(
-        (first, second) => (tagPositionById[first.tagId] ?? 0)
-            .compareTo(tagPositionById[second.tagId] ?? 0));
+    final entryTags = entryTagsByEntryId[entry.id!]!;
     final attachments = [...?attachmentsByEntryId[entry.id!]]
       ..sort((first, second) => second.rank.compareTo(first.rank));
 
-    entries.add(ExportEntry(
+    exportedEntries.add(ExportEntry(
       entry,
       tags: [
         for (final entryTag in entryTags)
@@ -175,7 +194,7 @@ Future<ExportSnapshot> buildExportSnapshot({
             )
       ],
     ));
-    onProgress?.call(entries.length / sortedEntries.length);
+    onProgress?.call(exportedEntries.length / sortedEntries.length);
   }
 
   return ExportSnapshot(
@@ -186,7 +205,7 @@ Future<ExportSnapshot> buildExportSnapshot({
         Mood.defaultLabel(Mood.position(mood), localizations),
     moodScale: moodScaleProvider.levels,
     categories: [
-      for (final category in tagsProvider.categories)
+      for (final category in exportedCategories)
         ExportCategory(
           name: category.name,
           icon: category.icon,
@@ -196,7 +215,7 @@ Future<ExportSnapshot> buildExportSnapshot({
         )
     ],
     tagDefinitions: [
-      for (final tag in tagsProvider.tags)
+      for (final tag in exportedTags)
         ExportTagDefinition(
           name: tag.name,
           tagType: tag.tagType,
@@ -207,7 +226,7 @@ Future<ExportSnapshot> buildExportSnapshot({
           sortOrder: tag.sortOrder,
         )
     ],
-    entries: entries,
+    entries: exportedEntries,
   );
 }
 

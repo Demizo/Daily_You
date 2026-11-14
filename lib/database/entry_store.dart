@@ -108,23 +108,33 @@ class EntryStore with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> delete(Entry entry) async {
-    final attachments = EntryAttachmentsProvider.instance.getForEntry(entry);
+  Future<void> delete(Entry entry) => deleteMany([entry]);
+
+  Future<void> deleteMany(List<Entry> entriesToDelete) async {
+    if (entriesToDelete.isEmpty) return;
+    final entryIds = {for (final entry in entriesToDelete) entry.id!};
+    final attachments = [
+      for (final entry in entriesToDelete)
+        ...EntryAttachmentsProvider.instance.getForEntry(entry)
+    ];
 
     await AppDatabase.instance.database!.transaction((transaction) async {
       for (final attachment in attachments) {
         await EntryAttachmentDao.remove(attachment, executor: transaction);
       }
-      await EntryTagDao.removeAllForEntry(entry.id!, executor: transaction);
-      await EntryDao.remove(entry.id!, executor: transaction);
+      for (final entryId in entryIds) {
+        await EntryTagDao.removeAllForEntry(entryId, executor: transaction);
+        await EntryDao.remove(entryId, executor: transaction);
+      }
     });
 
     await _deleteAttachmentFiles(attachments);
 
-    _entries = _entries.where((existing) => existing.id != entry.id).toList();
+    _entries =
+        _entries.where((existing) => !entryIds.contains(existing.id)).toList();
     _indexEntriesByDay();
-    TagsProvider.instance.applyEntryTags(entry.id!, const []);
-    EntryAttachmentsProvider.instance.applyForEntry(entry.id!, const []);
+    TagsProvider.instance.removeEntryTagsForEntries(entryIds);
+    EntryAttachmentsProvider.instance.removeForEntries(entryIds);
     await AppDatabase.instance.updateExternalDatabase();
     notifyListeners();
   }

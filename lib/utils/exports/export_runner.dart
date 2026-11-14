@@ -6,6 +6,7 @@ import 'dart:io';
 
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/models/attachment.dart';
+import 'package:daily_you/models/entry.dart';
 import 'package:daily_you/storage/local_file_store.dart';
 import 'package:daily_you/storage/storage_picker.dart';
 import 'package:daily_you/time_manager.dart';
@@ -17,11 +18,14 @@ import 'package:daily_you/utils/zip_utils.dart';
 import 'package:flutter/widgets.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 typedef ExportAttachmentTypePicker = Future<Set<AttachmentType>?> Function(
     BuildContext context);
 
 typedef ExportDirectoryPicker = Future<PickedDirectory?> Function();
+
+enum ExportDestination { folder, shareSheet }
 
 const _documentsFolderName = 'documents';
 const _zipExtension = '.zip';
@@ -31,6 +35,8 @@ Future<OperationOutcome> runExport(
   BuildContext context,
   void Function(String) updateStatus, {
   required ExportFormatOption option,
+  List<Entry>? entries,
+  ExportDestination destination = ExportDestination.folder,
   ExportAttachmentTypePicker pickAttachmentTypes = pickExportAttachmentTypes,
   ExportDirectoryPicker pickDirectory = StoragePicker.pickDirectory,
 }) async {
@@ -42,13 +48,15 @@ Future<OperationOutcome> runExport(
 
   updateStatus("(1/2) 0%");
 
-  final PickedDirectory? destination;
-  try {
-    destination = await pickDirectory();
-  } catch (error) {
-    return OperationOutcome.failed(error);
+  PickedDirectory? folder;
+  if (destination == ExportDestination.folder) {
+    try {
+      folder = await pickDirectory();
+    } catch (error) {
+      return OperationOutcome.failed(error);
+    }
+    if (folder == null) return const OperationOutcome.cancelled();
   }
-  if (destination == null) return const OperationOutcome.cancelled();
 
   Directory? stagingDirectory;
   try {
@@ -62,6 +70,7 @@ Future<OperationOutcome> runExport(
         localizations: localizations,
         locale: locale,
         includedTypes: includedTypes,
+        entries: entries,
         onProgress: (fraction) =>
             updateStatus("(1/2) ${(fraction * 100).round()}%"));
     final attachmentSources =
@@ -89,13 +98,19 @@ Future<OperationOutcome> runExport(
       exportPath = join(documentsDirectory.path, singleDocumentName);
     }
 
-    updateStatus(localizations.tranferStatus("0"));
-    await destination.copyFileInto(exportPath, exportName,
-        mimeType: singleDocumentName == null
-            ? _zipMimeType
-            : option.documentMimeType!,
-        onProgress: (percent) =>
-            updateStatus(localizations.tranferStatus("${percent.round()}")));
+    final mimeType =
+        singleDocumentName == null ? _zipMimeType : option.documentMimeType!;
+    if (folder != null) {
+      updateStatus(localizations.tranferStatus("0"));
+      await folder.copyFileInto(exportPath, exportName,
+          mimeType: mimeType,
+          onProgress: (percent) =>
+              updateStatus(localizations.tranferStatus("${percent.round()}")));
+    } else {
+      await SharePlus.instance.share(ShareParams(
+          files: [XFile(exportPath, mimeType: mimeType)],
+          fileNameOverrides: [exportName]));
+    }
     return const OperationOutcome.succeeded();
   } catch (error) {
     return OperationOutcome.failed(error);

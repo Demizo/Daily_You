@@ -189,6 +189,69 @@ class TagsProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void removeEntryTagsForEntries(Set<int> entryIds) {
+    _setEntryTags(entryTags
+        .where((entryTag) => !entryIds.contains(entryTag.entryId))
+        .toList());
+    notifyListeners();
+  }
+
+  Map<int, TagPresence> tagPresenceFor(Set<int> entryIds) {
+    final entryCountByTag = <int, int>{};
+    for (final entryId in entryIds) {
+      for (final entryTag in getEntryTagsForEntry(entryId)) {
+        entryCountByTag[entryTag.tagId] =
+            (entryCountByTag[entryTag.tagId] ?? 0) + 1;
+      }
+    }
+    return {
+      for (final MapEntry(:key, :value) in entryCountByTag.entries)
+        key: value == entryIds.length ? TagPresence.all : TagPresence.some
+    };
+  }
+
+  Future<void> applyTagChanges(
+    Set<int> entryIds, {
+    Map<int, String?> additions = const {},
+    Set<int> removals = const {},
+  }) async {
+    final liveTagIds = tags.map((tag) => tag.id).toSet();
+    final addedEntryTags = <EntryTag>[];
+    final removedEntryTagIds = <int>{};
+    final now = DateTime.now();
+
+    await AppDatabase.instance.database!.transaction((transaction) async {
+      for (final entryId in entryIds) {
+        final current = getEntryTagsForEntry(entryId);
+        final currentTagIds = current.map((entryTag) => entryTag.tagId).toSet();
+        for (final entryTag in current) {
+          if (!removals.contains(entryTag.tagId)) continue;
+          await EntryTagDao.remove(entryTag.id!, executor: transaction);
+          removedEntryTagIds.add(entryTag.id!);
+        }
+        for (final MapEntry(:key, :value) in additions.entries) {
+          if (!liveTagIds.contains(key) || currentTagIds.contains(key)) {
+            continue;
+          }
+          addedEntryTags.add(await EntryTagDao.add(
+            EntryTag(
+                entryId: entryId, tagId: key, value: value, timeCreate: now),
+            executor: transaction,
+          ));
+        }
+      }
+    });
+
+    if (addedEntryTags.isEmpty && removedEntryTagIds.isEmpty) return;
+    _setEntryTags([
+      ...entryTags
+          .where((entryTag) => !removedEntryTagIds.contains(entryTag.id)),
+      ...addedEntryTags,
+    ]);
+    await AppDatabase.instance.updateExternalDatabase();
+    notifyListeners();
+  }
+
   /// Reconciles the tags stored for [templateId] with [tagIds], adding and
   /// removing rows so the database matches.
   Future<void> setTemplateTags(int templateId, List<int> tagIds) async {

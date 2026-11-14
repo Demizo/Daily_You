@@ -101,6 +101,14 @@ class EntryAttachmentsProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void removeForEntries(Set<int> entryIds) {
+    attachments = attachments
+        .where((attachment) => !entryIds.contains(attachment.entryId))
+        .toList();
+    _rebuildCache();
+    notifyListeners();
+  }
+
   List<EntryAttachment> getCoverCandidatesForEntry(int entryId) =>
       _coverCandidatesByEntryId[entryId] ?? const [];
 
