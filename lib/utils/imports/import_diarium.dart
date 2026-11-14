@@ -22,13 +22,17 @@ const int _labelTagType = 0;
 const int _personTagType = 1;
 const int _numericTrackerType = 2;
 const int _ticksAtUnixEpoch = 621355968000000000;
+const int _imageMediaType = 0;
 
 Future<ImportBundle> parseDiarium(ImportSource source,
     {required String peopleCategoryName}) async {
   final database = await openDatabase(source.file.path, readOnly: true);
   try {
     final entries = await database.rawQuery('SELECT * FROM Entries');
-    final media = await database.rawQuery('SELECT * FROM Media WHERE Type = 0');
+    final media = await database.rawQuery(
+        'SELECT DiaryMediaId, DiaryEntryId, Type, Name, FileEnding, "Index" '
+        'FROM Media WHERE Type = $_imageMediaType '
+        'AND Data IS NOT NULL');
     final tags = await database.rawQuery('SELECT * FROM Tags');
     final entryTags = await database.rawQuery('SELECT * FROM EntryTags');
 
@@ -76,6 +80,7 @@ Future<ImportBundle> parseDiarium(ImportSource source,
           _parseEntry(
             entry,
             mediaByEntryId[entry['DiaryEntryId']] ?? const [],
+            source.file.path,
             entryTagsByEntryId[entry['DiaryEntryId']] ?? const [],
             tagDefinitionById,
           ),
@@ -98,6 +103,7 @@ Map<int, List<Map<String, Object?>>> _groupByEntryId(
 ImportedEntry _parseEntry(
   Map<String, Object?> entry,
   List<Map<String, Object?>> media,
+  String databasePath,
   List<Map<String, Object?>> entryTags,
   Map<int, ImportedTagDefinition> tagDefinitionById,
 ) {
@@ -117,34 +123,46 @@ ImportedEntry _parseEntry(
         .map((entryTag) => _parseEntryTag(entryTag, tagDefinitionById))
         .nonNulls
         .toList(),
-    attachments: _imageAttachments(media, timeCreate),
+    attachments: _mediaAttachments(media, databasePath, timeCreate),
   );
 }
 
-List<ImportedAttachment> _imageAttachments(
-    List<Map<String, Object?>> media, DateTime timeCreate) {
-  final images = [
-    for (final item in media)
-      if (item['Data'] != null) item
-  ];
-  int mediaIndex(int imagePosition) =>
-      images[imagePosition]['Index'] as int? ?? 0;
+List<ImportedAttachment> _mediaAttachments(List<Map<String, Object?>> media,
+    String databasePath, DateTime timeCreate) {
+  int mediaIndex(int position) => media[position]['Index'] as int? ?? 0;
 
-  final orderedPositions = List.generate(images.length, (position) => position)
+  final orderedPositions = List.generate(media.length, (position) => position)
     ..sort((a, b) {
       final byIndex = mediaIndex(a).compareTo(mediaIndex(b));
       return byIndex != 0 ? byIndex : a.compareTo(b);
     });
 
   return [
-    for (final (rankFromEnd, imagePosition) in orderedPositions.indexed)
+    for (final (rankFromEnd, position) in orderedPositions.indexed)
       ImportedAttachment(
         type: AttachmentType.image,
-        rank: images.length - 1 - rankFromEnd,
+        rank: media.length - 1 - rankFromEnd,
         timeCreate: timeCreate,
-        media: BytesMedia(images[imagePosition]['Data'] as Uint8List),
+        media: BytesMedia(
+          () => _readMedia(
+              databasePath, media[position]['DiaryMediaId'] as String),
+          fileName:
+              '${media[position]['Name']}${media[position]['FileEnding']}',
+        ),
       ),
   ];
+}
+
+Future<Uint8List> _readMedia(String databasePath, String mediaId) async {
+  final database =
+      await openDatabase(databasePath, readOnly: true, singleInstance: false);
+  try {
+    final rows = await database
+        .rawQuery('SELECT Data FROM Media WHERE DiaryMediaId = ?', [mediaId]);
+    return rows.single['Data'] as Uint8List;
+  } finally {
+    await database.close();
+  }
 }
 
 ImportedEntryTag? _parseEntryTag(Map<String, Object?> entryTag,

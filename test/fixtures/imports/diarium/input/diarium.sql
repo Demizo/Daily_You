@@ -1,5 +1,5 @@
 CREATE TABLE Entries (DiaryEntryId INTEGER PRIMARY KEY, Heading TEXT, Text TEXT, Rating INTEGER);
-CREATE TABLE Media (MediaId INTEGER PRIMARY KEY, DiaryEntryId INTEGER, Type INTEGER, Data BLOB, "Index" INTEGER);
+CREATE TABLE Media (DiaryMediaId TEXT PRIMARY KEY, Type INTEGER, Data BLOB, Name TEXT, FileEnding TEXT, "Index" INTEGER, DiaryEntryId INTEGER);
 CREATE TABLE Tags (DiaryTagId INTEGER PRIMARY KEY, Type INTEGER, Value TEXT, Color TEXT);
 CREATE TABLE EntryTags (DiaryEntryId INTEGER, DiaryTagId INTEGER, TrackingValue TEXT);
 INSERT INTO Entries VALUES (639029412000000000, 'Morning', '<p>First <b>entry</b></p>', 1);
@@ -7,12 +7,12 @@ INSERT INTO Entries VALUES (639029862000000000, '', '<p>Evening text only</p>', 
 INSERT INTO Entries VALUES (639030240000000000, 'Title only', '', NULL);
 INSERT INTO Entries VALUES (639031176000000000, 'With photos', '<p>Two photos</p>', 3);
 INSERT INTO Entries VALUES (639031176000000001, 'Duplicate time', '<p>Same moment as the entry above</p>', 4);
-INSERT INTO Media VALUES (1, 639031176000000000, 0, X'0A0B', 0);
-INSERT INTO Media VALUES (2, 639031176000000000, 0, X'0C0D', 1);
-INSERT INTO Media VALUES (3, 639031176000000000, 1, X'FFFF', 2);
-INSERT INTO Media VALUES (4, 639030240000000000, 0, X'20', 5);
-INSERT INTO Media VALUES (5, 639030240000000000, 0, X'21', NULL);
-INSERT INTO Media VALUES (6, 639030240000000000, 0, X'22', 2);
+INSERT INTO Media VALUES ('media-1', 0, X'0A0B', 'photo', '.jpg', 0, 639031176000000000);
+INSERT INTO Media VALUES ('media-2', 0, X'0C0D', 'scan', '.png', 1, 639031176000000000);
+INSERT INTO Media VALUES ('media-3', 2, X'FFFF', 'report', '.pdf', 2, 639031176000000000);
+INSERT INTO Media VALUES ('media-4', 0, X'20', 'first', '.jpg', 5, 639030240000000000);
+INSERT INTO Media VALUES ('media-5', 0, X'21', 'second', '.jpg', NULL, 639030240000000000);
+INSERT INTO Media VALUES ('media-6', 0, X'22', 'third', '.jpg', 2, 639030240000000000);
 INSERT INTO Tags VALUES (1, 0, 'Thoughts', '#FFFFE600');
 INSERT INTO Tags VALUES (2, 2, 'stress', NULL);
 INSERT INTO Tags VALUES (3, 3, 'Text Tracker', NULL);

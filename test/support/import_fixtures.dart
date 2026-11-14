@@ -39,8 +39,9 @@ Future<void> expectMatchesExpectedBundle(
     {Directory? inputDirectory}) async {
   final expectedFile =
       File(join(_fixturesRoot, format.name, _expectedFileName));
-  final actual =
-      '${const JsonEncoder.withIndent('  ').convert(_bundleToJson(bundle, inputDirectory ?? fixtureInputDirectory(format)))}\n';
+  final json = await _bundleToJson(
+      bundle, inputDirectory ?? fixtureInputDirectory(format));
+  final actual = '${const JsonEncoder.withIndent('  ').convert(json)}\n';
 
   if (Platform.environment['UPDATE_GOLDENS'] == '1') {
     await expectedFile.writeAsString(actual);
@@ -93,8 +94,8 @@ void expectValidBundle(ImportBundle bundle) {
   }
 }
 
-Map<String, Object?> _bundleToJson(
-    ImportBundle bundle, Directory inputDirectory) {
+Future<Map<String, Object?>> _bundleToJson(
+    ImportBundle bundle, Directory inputDirectory) async {
   return {
     'categories': [
       for (final category in bundle.categories)
@@ -135,7 +136,10 @@ Map<String, Object?> _bundleToJson(
                 'rank': attachment.rank,
                 'timeCreate': attachment.timeCreate.toIso8601String(),
                 'media': switch (attachment.media) {
-                  BytesMedia(:final bytes) => {'bytes': base64.encode(bytes)},
+                  BytesMedia(:final read, :final fileName) => {
+                      'fileName': fileName,
+                      'bytes': base64.encode(await read()),
+                    },
                   FileMedia(:final file) => {
                       'file': relative(file.path, from: inputDirectory.path)
                     },

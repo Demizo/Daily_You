@@ -2,8 +2,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
-import 'dart:typed_data';
-
 import 'package:daily_you/l10n/generated/app_localizations_en.dart';
 import 'package:daily_you/models/mood.dart';
 import 'package:daily_you/models/tag.dart';
@@ -119,24 +117,28 @@ void main() {
         ]));
   });
 
+  Future<List<int>> bytesOf(ImportedAttachment attachment) =>
+      (attachment.media as BytesMedia).read();
+
   test('keeps image blobs with the first image highest and skips other media',
-      () {
+      () async {
     final images = bundle.entries[3].attachments;
 
     expect(
-        images.map((image) => (image.media as BytesMedia).bytes),
+        await Future.wait(images.map(bytesOf)),
         equals([
-          Uint8List.fromList([10, 11]),
-          Uint8List.fromList([12, 13])
+          [10, 11],
+          [12, 13]
         ]));
     expect(images.map((image) => image.rank), equals([1, 0]));
   });
 
   test('ranks images without a usable index into unique non-negative ranks',
-      () {
+      () async {
     final images = bundle.entries[2].attachments;
 
-    expect(images.map((image) => (image.media as BytesMedia).bytes.single),
+    expect(
+        (await Future.wait(images.map(bytesOf))).map((bytes) => bytes.single),
         equals([0x21, 0x22, 0x20]));
     expect(images.map((image) => image.rank), equals([2, 1, 0]));
   });

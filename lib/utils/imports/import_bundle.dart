@@ -99,9 +99,10 @@ sealed class ImportedMedia {
 }
 
 final class BytesMedia extends ImportedMedia {
-  const BytesMedia(this.bytes);
+  const BytesMedia(this.read, {this.fileName});
 
-  final Uint8List bytes;
+  final Future<Uint8List> Function() read;
+  final String? fileName;
 }
 
 final class FileMedia extends ImportedMedia {

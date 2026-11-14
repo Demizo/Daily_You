@@ -30,6 +30,9 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import '../../support/config_provider_harness.dart';
 
+BytesMedia bytesMedia(List<int> bytes) =>
+    BytesMedia(() async => Uint8List.fromList(bytes));
+
 void main() {
   useTemporaryConfig();
 
@@ -159,8 +162,7 @@ void main() {
                 name: 'Water', tagType: TagType.tracker, value: '2.5'),
           ],
           attachments: [
-            imageOf(BytesMedia(Uint8List.fromList([1, 2, 3])),
-                rank: 1, timeCreate: entryTime),
+            imageOf(bytesMedia([1, 2, 3]), rank: 1, timeCreate: entryTime),
             imageOf(FileMedia(photo), rank: 0, timeCreate: entryTime),
             imageOf(const ReferenceMedia('old.jpg'),
                 rank: 2, timeCreate: entryTime),
@@ -225,7 +227,7 @@ void main() {
       entryAt(time, text: 'duplicate', tags: [
         label('Skipped')
       ], attachments: [
-        imageOf(BytesMedia(Uint8List.fromList([1])))
+        imageOf(bytesMedia([1]))
       ]),
       entryAt(time.add(const Duration(hours: 1)), text: 'new'),
     ]));
@@ -381,11 +383,11 @@ void main() {
   test('gives attachments with the same time different names', () async {
     await write(ImportBundle(entries: [
       entryAt(time, attachments: [
-        imageOf(BytesMedia(Uint8List.fromList([1])), rank: 0),
-        imageOf(BytesMedia(Uint8List.fromList([2])), rank: 1),
+        imageOf(bytesMedia([1]), rank: 0),
+        imageOf(bytesMedia([2]), rank: 1),
       ]),
       entryAt(time.add(const Duration(minutes: 1)), attachments: [
-        imageOf(BytesMedia(Uint8List.fromList([3])), timeCreate: time),
+        imageOf(bytesMedia([3]), timeCreate: time),
       ]),
     ]));
 
@@ -403,7 +405,7 @@ void main() {
 
     await write(ImportBundle(entries: [
       entryAt(time, attachments: [
-        imageOf(BytesMedia(Uint8List.fromList([1]))),
+        imageOf(bytesMedia([1])),
       ]),
     ]));
 
@@ -475,7 +477,7 @@ void main() {
 
     final outcome = await write(ImportBundle(entries: [
       entryAt(time, attachments: [
-        imageOf(BytesMedia(Uint8List.fromList([1, 2]))),
+        imageOf(bytesMedia([1, 2])),
       ]),
     ]));
 

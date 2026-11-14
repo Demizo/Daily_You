@@ -153,11 +153,12 @@ class ImportWriter {
         await AttachmentStorage.instance.takenLowerCaseNames(attachment.type);
 
     final filePath = switch (attachment.media) {
-      BytesMedia(:final bytes) => await AttachmentStorage.instance.create(
-          null, bytes, attachment.type,
-          currTime: attachment.timeCreate,
-          skipExternalUpload: true,
-          takenNames: takenNames),
+      BytesMedia(:final read, :final fileName) => await AttachmentStorage
+          .instance
+          .create(fileName, await read(), attachment.type,
+              currTime: attachment.timeCreate,
+              skipExternalUpload: true,
+              takenNames: takenNames),
       FileMedia(:final file) => await AttachmentStorage.instance.createFromFile(
           basename(file.path), file, attachment.type,
           currTime: attachment.timeCreate,
