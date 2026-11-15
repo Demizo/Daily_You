@@ -827,5 +827,13 @@
   "selectIncludingPartialMatches": "Include",
   "@selectIncludingPartialMatches": {
     "description": "Button choosing to also select logs that partially match the text"
+  },
+  "onboardingContinue": "Continue",
+  "@onboardingContinue": {
+    "description": "Label of the button that moves to the next onboarding step"
+  },
+  "onboardingFinish": "Start journaling",
+  "@onboardingFinish": {
+    "description": "Label of the button on the last onboarding step that finishes onboarding and opens the app"
   }
 }
