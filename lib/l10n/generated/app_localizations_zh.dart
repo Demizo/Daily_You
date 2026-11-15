@@ -1338,6 +1338,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get selectIncludingPartialMatches => 'Include';
+
+  @override
+  String get onboardingContinue => 'Continue';
+
+  @override
+  String get onboardingFinish => 'Start journaling';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).

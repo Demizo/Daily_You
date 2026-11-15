@@ -2299,6 +2299,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Include'**
   String get selectIncludingPartialMatches;
+
+  /// Label of the button that moves to the next onboarding step
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get onboardingContinue;
+
+  /// Label of the button on the last onboarding step that finishes onboarding and opens the app
+  ///
+  /// In en, this message translates to:
+  /// **'Start journaling'**
+  String get onboardingFinish;
 }
 
 class _AppLocalizationsDelegate

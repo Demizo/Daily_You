@@ -1361,4 +1361,10 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get selectIncludingPartialMatches => 'Include';
+
+  @override
+  String get onboardingContinue => 'Continue';
+
+  @override
+  String get onboardingFinish => 'Start journaling';
 }
