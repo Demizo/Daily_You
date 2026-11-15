@@ -2300,6 +2300,12 @@ abstract class AppLocalizations {
   /// **'Include'**
   String get selectIncludingPartialMatches;
 
+  /// Label of the button that skips the rest of the onboarding flow
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get onboardingSkip;
+
   /// Label of the button that moves to the next onboarding step
   ///
   /// In en, this message translates to:
@@ -2311,6 +2317,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Start journaling'**
   String get onboardingFinish;
+
+  /// Title of the onboarding step offering to import logs from another app
+  ///
+  /// In en, this message translates to:
+  /// **'Coming from another app?'**
+  String get onboardingImportTitle;
+
+  /// Description under the title of the onboarding import step
+  ///
+  /// In en, this message translates to:
+  /// **'Bring your existing logs, or start fresh.'**
+  String get onboardingImportDescription;
+
+  /// Description under the title of the onboarding storage step, noting the choices can be changed later in settings
+  ///
+  /// In en, this message translates to:
+  /// **'You can change these later in Settings.'**
+  String get onboardingStorageNote;
+
+  /// Title of the first onboarding step
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to Daily You'**
+  String get onboardingWelcomeTitle;
+
+  /// Description under the title of the first onboarding step
+  ///
+  /// In en, this message translates to:
+  /// **'Every day is worth remembering.'**
+  String get onboardingWelcomeDescription;
+
+  /// Title of the onboarding step for turning on daily reminders
+  ///
+  /// In en, this message translates to:
+  /// **'Make it a habit'**
+  String get onboardingRemindersTitle;
+
+  /// Title of the onboarding step for password, sync, and backup options
+  ///
+  /// In en, this message translates to:
+  /// **'Keep your logs safe'**
+  String get onboardingStorageTitle;
+
+  /// Label of the button that restores logs from a backup during onboarding
+  ///
+  /// In en, this message translates to:
+  /// **'Restore from a backup'**
+  String get onboardingRestore;
+
+  /// Label of the button that opens the mood editor
+  ///
+  /// In en, this message translates to:
+  /// **'Customize moods'**
+  String get onboardingMoodsCustomize;
+
+  /// Description under the title of the onboarding reminders step
+  ///
+  /// In en, this message translates to:
+  /// **'Set random or scheduled reminders to capture your day.'**
+  String get onboardingRemindersDescription;
 }
 
 class _AppLocalizationsDelegate

@@ -118,6 +118,14 @@ class AppDatabase {
     return success;
   }
 
+  Future<bool> hasLocalDatabase() async {
+    if (await File(await getInternalPath()).exists()) return true;
+    if (!Platform.isAndroid) return false;
+    final legacyDirectory = await getExternalStorageDirectory();
+    return legacyDirectory != null &&
+        await File(join(legacyDirectory.path, databaseFileName)).exists();
+  }
+
   /// Returns whether it is safe to open the internal database. False means a
   /// migration was needed but failed, so the caller must not create a fresh
   /// database over the still-intact external copy.
