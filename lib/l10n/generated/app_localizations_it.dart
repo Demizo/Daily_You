@@ -1190,6 +1190,10 @@ class AppLocalizationsIt extends AppLocalizations {
       'Le password non coincidono';
 
   @override
+  String get settingsSecurityPasswordWarning =>
+      'If you forget it, you won\'t be able to open Daily You.';
+
+  @override
   String get requiredPrompt => 'Campo richiesto';
 
   @override

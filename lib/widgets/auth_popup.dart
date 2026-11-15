@@ -212,7 +212,7 @@ class _AuthPopupState extends State<AuthPopup> {
             children: [
               if (widget.description != null)
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 12.0),
                   child: Text(widget.description!),
                 ),
               if (widget.mode == AuthPopupMode.changePassword) ...[

@@ -1168,6 +1168,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get settingsSecurityPasswordsDoNotMatch => 'パスワードが一致しません';
 
   @override
+  String get settingsSecurityPasswordWarning =>
+      'If you forget it, you won\'t be able to open Daily You.';
+
+  @override
   String get requiredPrompt => '必要';
 
   @override

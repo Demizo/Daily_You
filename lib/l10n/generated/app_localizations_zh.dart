@@ -1163,6 +1163,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsSecurityPasswordsDoNotMatch => '密码不相符';
 
   @override
+  String get settingsSecurityPasswordWarning =>
+      'If you forget it, you won\'t be able to open Daily You.';
+
+  @override
   String get requiredPrompt => '请输入密码';
 
   @override

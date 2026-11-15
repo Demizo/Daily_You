@@ -1183,6 +1183,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Passwörter sind nicht identisch';
 
   @override
+  String get settingsSecurityPasswordWarning =>
+      'If you forget it, you won\'t be able to open Daily You.';
+
+  @override
   String get requiredPrompt => 'Notwendig';
 
   @override

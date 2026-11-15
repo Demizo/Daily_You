@@ -9,20 +9,14 @@ import 'package:daily_you/utils/backup_restore_utils.dart';
 import 'package:daily_you/database/attachment_storage.dart';
 import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/providers/entries_provider.dart';
-import 'package:daily_you/storage/external_sync.dart';
 import 'package:daily_you/storage/external_sync_settings.dart';
 import 'package:daily_you/storage/storage_picker.dart';
-import 'package:daily_you/storage/sync_progress.dart';
 import 'package:daily_you/utils/file_size_format.dart';
-import 'package:daily_you/utils/operation_outcome.dart';
+import 'package:daily_you/utils/external_sync_flow.dart';
 import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/attachment_type_presentation.dart';
-import 'package:daily_you/widgets/database_overwrite_dialog.dart';
-import 'package:daily_you/widgets/external_sync_dialog.dart';
-import 'package:daily_you/widgets/failure_dialog.dart';
 import 'package:daily_you/widgets/segmented_group.dart';
 import 'package:daily_you/widgets/settings_rows.dart';
-import 'package:daily_you/widgets/sync_progress_dialog.dart';
 import 'package:daily_you/widgets/settings_page_scaffold.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
@@ -53,56 +47,21 @@ class _StorageSettingsState extends State<StorageSettings> {
   }
 
   void _refreshUsage() {
-    if (mounted) setState(() => _usage = _loadUsage());
+    if (mounted) {
+      setState(() {
+        _usage = _loadUsage();
+      });
+    }
   }
 
-  Future<void> _editSync({ExternalSyncSettings? draft}) async {
-    final saved = ExternalSyncSettings.load();
-    final desired = await showAppDialog<ExternalSyncSettings>(
-        context: context,
-        builder: (_) => ExternalSyncDialog(initial: saved, draft: draft));
-    if (desired != null && mounted) await _applySync(saved, desired);
+  Future<void> _editSync() async {
+    await ExternalSyncFlow.edit(context);
+    _refreshUsage();
   }
 
   Future<void> _toggleSync(bool enabled) async {
-    if (!enabled) {
-      await _applySync(
-          ExternalSyncSettings.load(), const ExternalSyncSettings());
-      return;
-    }
-
-    final uri = (await StoragePicker.pickDirectoryWithAccess())?.uri;
-    if (uri == null || !mounted) return;
-    if (!await confirmDatabaseOverwrite(context, uri)) return;
-    if (!mounted) return;
-    await _editSync(draft: ExternalSyncSettings.withDefaults(uri));
-  }
-
-  Future<void> _applySync(
-      ExternalSyncSettings saved, ExternalSyncSettings desired) async {
-    final sync = ExternalSync(saved, desired);
-    if (!sync.hasWork) {
-      await sync.run((_) {});
-      return;
-    }
-
-    final navigator = Navigator.of(context);
-    final progress = ValueNotifier(SyncProgress(sync.items.first));
-    showSyncProgressDialog(context, progress);
-    final OperationOutcome outcome;
-    try {
-      outcome = await sync.run((value) => progress.value = value);
-    } finally {
-      navigator.pop();
-    }
-    if (!mounted) return;
+    await ExternalSyncFlow.toggle(context, enabled);
     _refreshUsage();
-
-    if (outcome.failed) {
-      await showFailureDialog(context,
-          description: AppLocalizations.of(context)!.syncErrorDescription,
-          error: outcome.error);
-    }
   }
 
   void _showDeleteAllLogsDialog(

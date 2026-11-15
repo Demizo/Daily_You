@@ -32,18 +32,6 @@ class AppearanceSettings extends StatelessWidget {
     }
   }
 
-  ThemeMode _themeModeFor(String theme) {
-    switch (theme) {
-      case "light":
-        return ThemeMode.light;
-      case "dark":
-      case "amoled":
-        return ThemeMode.dark;
-      default:
-        return ThemeMode.system;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -66,10 +54,7 @@ class AppearanceSettings extends StatelessWidget {
               "light": l10n.themeLight,
               "amoled": l10n.themeAmoled,
             },
-            onChanged: (theme) {
-              themeProvider.themeMode = _themeModeFor(theme);
-              configProvider.set(Settings.theme, theme);
-            },
+            onChanged: themeProvider.setTheme,
           ),
           SettingsToggleRow(
             icon: Icons.palette_rounded,

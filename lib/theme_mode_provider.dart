@@ -22,6 +22,17 @@ class ThemeModeProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  static ThemeMode modeFor(String theme) => switch (theme) {
+        'light' => ThemeMode.light,
+        'dark' || 'amoled' => ThemeMode.dark,
+        _ => ThemeMode.system,
+      };
+
+  Future<void> setTheme(String theme) {
+    themeMode = modeFor(theme);
+    return ConfigProvider.instance.set(Settings.theme, theme);
+  }
+
   set accentColor(Color color) {
     ConfigProvider.instance.set(Settings.accentColor, color.toARGB32());
     _accentColor = color;
@@ -45,12 +56,7 @@ class ThemeModeProvider with ChangeNotifier {
       _accentColor = Color(ConfigProvider.instance.get(Settings.accentColor));
     }
 
-    final configTheme = ConfigProvider.instance.get(Settings.theme);
-    if (configTheme == 'dark' || configTheme == 'amoled') {
-      _themeMode = ThemeMode.dark;
-    } else if (configTheme == 'light') {
-      _themeMode = ThemeMode.light;
-    }
+    _themeMode = modeFor(ConfigProvider.instance.get(Settings.theme));
     notifyListeners();
   }
 
