@@ -541,6 +541,13 @@ class AppLocalizationsSv extends AppLocalizations {
       'Pick a fixed time for the reminder';
 
   @override
+  String get settingsExactAlarmsTitle => 'Allow exact alarms?';
+
+  @override
+  String get settingsExactAlarmsDescription =>
+      'Alarms may be delayed by several minutes unless you allow exact alarms.';
+
+  @override
   String get settingsAlwaysSendReminderTitle => 'Always Send Reminder';
 
   @override

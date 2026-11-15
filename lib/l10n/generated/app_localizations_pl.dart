@@ -542,6 +542,13 @@ class AppLocalizationsPl extends AppLocalizations {
       'Ustaw niezmienny czas przypomnienia';
 
   @override
+  String get settingsExactAlarmsTitle => 'Allow exact alarms?';
+
+  @override
+  String get settingsExactAlarmsDescription =>
+      'Alarms may be delayed by several minutes unless you allow exact alarms.';
+
+  @override
   String get settingsAlwaysSendReminderTitle => 'Zawsze wysyłaj powiadomienie';
 
   @override

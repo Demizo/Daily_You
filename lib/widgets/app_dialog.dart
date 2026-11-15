@@ -31,6 +31,17 @@ Future<T?> showAppDialog<T>({
   );
 }
 
+Future<TimeOfDay?> showAppTimePicker({
+  required BuildContext context,
+  required TimeOfDay initialTime,
+}) {
+  return showTimePicker(
+    context: context,
+    initialTime: initialTime,
+    builder: (context, child) => AppDialogTransition(child: child!),
+  );
+}
+
 class AppDialogTransition extends StatefulWidget {
   const AppDialogTransition({super.key, required this.child});
 

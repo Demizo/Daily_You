@@ -9,7 +9,7 @@ import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/segmented_group.dart';
 import 'package:daily_you/widgets/settings_rows.dart';
-import 'package:daily_you/widgets/time_range_picker_dialog.dart';
+import 'package:daily_you/widgets/reminder_time_dialog.dart';
 import 'package:daily_you/widgets/settings_page_scaffold.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
@@ -17,25 +17,6 @@ import 'package:provider/provider.dart';
 
 class NotificationSettings extends StatelessWidget {
   const NotificationSettings({super.key});
-
-  static Future<void> _selectTime(BuildContext context) async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: TimeManager.scheduledReminderTime(),
-      builder: (context, child) => AppDialogTransition(child: child!),
-    );
-
-    if (picked != null) {
-      await ConfigProvider.instance
-          .set(Settings.scheduledReminderHour, picked.hour);
-      await ConfigProvider.instance
-          .set(Settings.scheduledReminderMinute, picked.minute);
-      if (ConfigProvider.instance.get(Settings.dailyReminders)) {
-        await NotificationManager.instance.stopDailyReminders();
-        await NotificationManager.instance.startScheduledDailyReminders();
-      }
-    }
-  }
 
   static TimeOfDay _onThisDayNotificationTime() {
     return TimeOfDay(
@@ -45,10 +26,9 @@ class NotificationSettings extends StatelessWidget {
   }
 
   static Future<void> _selectOnThisDayTime(BuildContext context) async {
-    final TimeOfDay? picked = await showTimePicker(
+    final TimeOfDay? picked = await showAppTimePicker(
       context: context,
       initialTime: _onThisDayNotificationTime(),
-      builder: (context, child) => AppDialogTransition(child: child!),
     );
 
     if (picked != null) {
@@ -63,31 +43,73 @@ class NotificationSettings extends StatelessWidget {
     }
   }
 
-  static Future<void> _selectTimeRange(BuildContext context) async {
-    final range = await showTimeRangePicker(context,
-        initialRange: TimeManager.getReminderTimeRange());
-    if (range == null) return;
+  static Future<void> selectReminderTime(BuildContext context) async {
+    final selection = await showReminderTimePicker(context, initial: (
+      fixed: ConfigProvider.instance.get(Settings.setReminderTime),
+      time: TimeManager.scheduledReminderTime(),
+      range: TimeManager.getReminderTimeRange(),
+    ));
+    if (selection == null) return;
 
-    await TimeManager.setReminderTimeRange(range);
-    if (ConfigProvider.instance.get(Settings.dailyReminders)) {
+    final configProvider = ConfigProvider.instance;
+    await configProvider.set(Settings.setReminderTime, selection.fixed);
+    await configProvider.set(
+        Settings.scheduledReminderHour, selection.time.hour);
+    await configProvider.set(
+        Settings.scheduledReminderMinute, selection.time.minute);
+    await TimeManager.setReminderTimeRange(selection.range);
+    if (configProvider.get(Settings.dailyReminders)) {
       await NotificationManager.instance.stopDailyReminders();
       await NotificationManager.instance.startScheduledDailyReminders();
     }
   }
 
+  static Future<void> _requestExactAlarms(BuildContext context) async {
+    final notificationManager = NotificationManager.instance;
+    if (await notificationManager.canScheduleExactAlarms() ||
+        !context.mounted) {
+      return;
+    }
+    final l10n = AppLocalizations.of(context)!;
+    final materialLocalizations = MaterialLocalizations.of(context);
+    final shouldRequest = await showAppDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.settingsExactAlarmsTitle),
+        content: Text(l10n.settingsExactAlarmsDescription),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(materialLocalizations.cancelButtonLabel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(materialLocalizations.continueButtonLabel),
+          ),
+        ],
+      ),
+    );
+    if (shouldRequest ?? false) {
+      await notificationManager.requestExactAlarmPermission();
+    }
+  }
+
   static Future<void> _setNotifications(
+    BuildContext context,
     Setting<bool> setting,
     bool value, {
     required Future<void> Function() start,
     required Future<void> Function() stop,
   }) async {
     if (!await NotificationManager.instance.hasNotificationPermission()) return;
+    if (value && context.mounted) await _requestExactAlarms(context);
     await (value ? start() : stop());
     await ConfigProvider.instance.set(setting, value);
   }
 
-  static Future<void> _setDailyReminders(bool value) {
+  static Future<void> setDailyReminders(BuildContext context, bool value) {
     return _setNotifications(
+      context,
       Settings.dailyReminders,
       value,
       start: NotificationManager.instance.startScheduledDailyReminders,
@@ -95,14 +117,9 @@ class NotificationSettings extends StatelessWidget {
     );
   }
 
-  static Future<void> _setFixedReminderTime(bool value) async {
-    await ConfigProvider.instance.set(Settings.setReminderTime, value);
-    await NotificationManager.instance.stopDailyReminders();
-    await NotificationManager.instance.startScheduledDailyReminders();
-  }
-
-  static Future<void> _setOnThisDay(bool value) {
+  static Future<void> _setOnThisDay(BuildContext context, bool value) {
     return _setNotifications(
+      context,
       Settings.onThisDayNotifications,
       value,
       start: NotificationManager.instance.startOnThisDayNotifications,
@@ -110,11 +127,7 @@ class NotificationSettings extends StatelessWidget {
     );
   }
 
-  static String _onThisDayTime(BuildContext context) {
-    return TimeManager.timeOfDayString(context, _onThisDayNotificationTime());
-  }
-
-  static String _dailyReminderTime(BuildContext context) {
+  static String dailyReminderTime(BuildContext context) {
     return ConfigProvider.instance.get(Settings.setReminderTime)
         ? TimeManager.timeOfDayString(
             context, TimeManager.scheduledReminderTime())
@@ -125,29 +138,15 @@ class NotificationSettings extends StatelessWidget {
   static List<Widget> buildCoreReminderSettings(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isOn = ConfigProvider.instance.get(Settings.dailyReminders);
-    final isFixedTime = ConfigProvider.instance.get(Settings.setReminderTime);
     return [
       SettingsToggleRow(
           title: l10n.settingsDailyReminderTitle,
-          subtitle: l10n.settingsDailyReminderDescription,
+          subtitle: isOn
+              ? dailyReminderTime(context)
+              : l10n.settingsDailyReminderDescription,
           value: isOn,
-          onChanged: _setDailyReminders),
-      SettingsDependents(
-        enabled: isOn,
-        child: SettingsActionRow(
-            title: l10n.settingsReminderTime,
-            subtitle: _dailyReminderTime(context),
-            onTap: () =>
-                isFixedTime ? _selectTime(context) : _selectTimeRange(context)),
-      ),
-      SettingsDependents(
-        enabled: isOn,
-        child: SettingsToggleRow(
-            title: l10n.settingsFixedReminderTimeTitle,
-            subtitle: l10n.settingsFixedReminderTimeDescription,
-            value: isFixedTime,
-            onChanged: _setFixedReminderTime),
-      ),
+          onChanged: (value) => setDailyReminders(context, value),
+          onOpenOptions: () => selectReminderTime(context)),
     ];
   }
 
@@ -157,16 +156,13 @@ class NotificationSettings extends StatelessWidget {
     return [
       SettingsToggleRow(
           title: l10n.flashbackOnThisDay,
-          subtitle: l10n.settingsOnThisDayDescription,
+          subtitle: isOn
+              ? TimeManager.timeOfDayString(
+                  context, _onThisDayNotificationTime())
+              : l10n.settingsOnThisDayDescription,
           value: isOn,
-          onChanged: _setOnThisDay),
-      SettingsDependents(
-        enabled: isOn,
-        child: SettingsActionRow(
-            title: l10n.settingsReminderTime,
-            subtitle: _onThisDayTime(context),
-            onTap: () => _selectOnThisDayTime(context)),
-      ),
+          onChanged: (value) => _setOnThisDay(context, value),
+          onOpenOptions: () => _selectOnThisDayTime(context)),
     ];
   }
 

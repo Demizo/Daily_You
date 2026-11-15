@@ -541,6 +541,13 @@ class AppLocalizationsId extends AppLocalizations {
       'Pilih waktu yang tetap untuk pengingat';
 
   @override
+  String get settingsExactAlarmsTitle => 'Allow exact alarms?';
+
+  @override
+  String get settingsExactAlarmsDescription =>
+      'Alarms may be delayed by several minutes unless you allow exact alarms.';
+
+  @override
   String get settingsAlwaysSendReminderTitle => 'Selalu Kirim Pengingat';
 
   @override

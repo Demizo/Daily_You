@@ -556,6 +556,13 @@ class AppLocalizationsLt extends AppLocalizations {
       'Pasirinkti konkretų priminimo laiką';
 
   @override
+  String get settingsExactAlarmsTitle => 'Allow exact alarms?';
+
+  @override
+  String get settingsExactAlarmsDescription =>
+      'Alarms may be delayed by several minutes unless you allow exact alarms.';
+
+  @override
   String get settingsAlwaysSendReminderTitle => 'Visada rodyti priminimą';
 
   @override

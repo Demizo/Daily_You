@@ -551,6 +551,13 @@ class AppLocalizationsRu extends AppLocalizations {
       'Выберите фиксированное время напоминания';
 
   @override
+  String get settingsExactAlarmsTitle => 'Allow exact alarms?';
+
+  @override
+  String get settingsExactAlarmsDescription =>
+      'Alarms may be delayed by several minutes unless you allow exact alarms.';
+
+  @override
   String get settingsAlwaysSendReminderTitle => 'Всегда напоминать';
 
   @override

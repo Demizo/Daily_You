@@ -534,6 +534,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsFixedReminderTimeDescription => '选择一个固定的提醒时间';
 
   @override
+  String get settingsExactAlarmsTitle => 'Allow exact alarms?';
+
+  @override
+  String get settingsExactAlarmsDescription =>
+      'Alarms may be delayed by several minutes unless you allow exact alarms.';
+
+  @override
   String get settingsAlwaysSendReminderTitle => '总是发送提醒';
 
   @override

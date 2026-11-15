@@ -79,10 +79,7 @@ class NotificationManager {
               AndroidFlutterLocalNotificationsPlugin>()!
           .requestNotificationsPermission();
 
-      if (hasPermissions ?? false) {
-        await requestExactAlarmPermission();
-        return true;
-      }
+      return hasPermissions ?? false;
     }
     return false;
   }

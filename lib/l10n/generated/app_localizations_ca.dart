@@ -544,6 +544,13 @@ class AppLocalizationsCa extends AppLocalizations {
       'Trieu una hora fixa per al recordatori';
 
   @override
+  String get settingsExactAlarmsTitle => 'Allow exact alarms?';
+
+  @override
+  String get settingsExactAlarmsDescription =>
+      'Alarms may be delayed by several minutes unless you allow exact alarms.';
+
+  @override
   String get settingsAlwaysSendReminderTitle => 'Envia sempre el recordatori';
 
   @override

@@ -537,6 +537,13 @@ class AppLocalizationsKo extends AppLocalizations {
   String get settingsFixedReminderTimeDescription => '리마인더를 보낼 고정 시간 선택';
 
   @override
+  String get settingsExactAlarmsTitle => 'Allow exact alarms?';
+
+  @override
+  String get settingsExactAlarmsDescription =>
+      'Alarms may be delayed by several minutes unless you allow exact alarms.';
+
+  @override
   String get settingsAlwaysSendReminderTitle => '항상 리마인더 전송';
 
   @override

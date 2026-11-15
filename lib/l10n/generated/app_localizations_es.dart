@@ -542,6 +542,13 @@ class AppLocalizationsEs extends AppLocalizations {
       'Elija una hora fija para el recordatorio';
 
   @override
+  String get settingsExactAlarmsTitle => 'Allow exact alarms?';
+
+  @override
+  String get settingsExactAlarmsDescription =>
+      'Alarms may be delayed by several minutes unless you allow exact alarms.';
+
+  @override
   String get settingsAlwaysSendReminderTitle => 'Siempre enviar recordatorio';
 
   @override

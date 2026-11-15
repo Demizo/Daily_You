@@ -546,6 +546,13 @@ class AppLocalizationsAr extends AppLocalizations {
       'اختر وقتًا ثابتًا للتذكير';
 
   @override
+  String get settingsExactAlarmsTitle => 'Allow exact alarms?';
+
+  @override
+  String get settingsExactAlarmsDescription =>
+      'Alarms may be delayed by several minutes unless you allow exact alarms.';
+
+  @override
   String get settingsAlwaysSendReminderTitle => 'أرسل تذكير دائمًا';
 
   @override

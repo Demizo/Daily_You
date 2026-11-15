@@ -542,6 +542,13 @@ class AppLocalizationsDe extends AppLocalizations {
       'Wähle eine feste Zeit für die Erinnerung';
 
   @override
+  String get settingsExactAlarmsTitle => 'Allow exact alarms?';
+
+  @override
+  String get settingsExactAlarmsDescription =>
+      'Alarms may be delayed by several minutes unless you allow exact alarms.';
+
+  @override
   String get settingsAlwaysSendReminderTitle => 'Erinnerung immer zeigen';
 
   @override
