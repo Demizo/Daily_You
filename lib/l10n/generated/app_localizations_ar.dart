@@ -1311,6 +1311,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get removeTagsTitle => 'Remove Tags';
 
   @override
+  String get discardChangesTitle => 'Discard changes?';
+
+  @override
+  String get discardChangesDescription => 'Your changes will be lost.';
+
+  @override
   String get applyButtonLabel => 'Apply';
 
   @override

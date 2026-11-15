@@ -2252,6 +2252,18 @@ abstract class AppLocalizations {
   /// **'Remove Tags'**
   String get removeTagsTitle;
 
+  /// Title of the dialog confirming whether to discard unsaved changes
+  ///
+  /// In en, this message translates to:
+  /// **'Discard changes?'**
+  String get discardChangesTitle;
+
+  /// Body of the discard changes dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Your changes will be lost.'**
+  String get discardChangesDescription;
+
   /// Label of the button that applies the chosen changes
   ///
   /// In en, this message translates to:

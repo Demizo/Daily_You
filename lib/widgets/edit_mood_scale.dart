@@ -10,15 +10,18 @@ import 'package:daily_you/models/tag_icon_type.dart';
 import 'package:daily_you/utils/mood_scale_visuals.dart';
 import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/color_picker_dialog.dart';
+import 'package:daily_you/widgets/confirm_dialog.dart';
 import 'package:daily_you/widgets/icon_color_label_row.dart';
 import 'package:daily_you/widgets/icon_picker_dialog.dart';
 import 'package:daily_you/widgets/mood_scale_glyph.dart';
+import 'package:flutter/foundation.dart' show listEquals;
 import 'package:material_ui/material_ui.dart';
 
 class EditMoodScale extends StatefulWidget {
   final List<MoodScaleLevel> initial;
+  final String? title;
 
-  const EditMoodScale({super.key, required this.initial});
+  const EditMoodScale({super.key, required this.initial, this.title});
 
   @override
   State<EditMoodScale> createState() => _EditMoodScaleState();
@@ -95,11 +98,24 @@ class _EditMoodScaleState extends State<EditMoodScale> {
     return text.isEmpty ? null : text;
   }
 
-  void _save() {
-    Navigator.of(context).pop([
-      for (final (position, level) in _levels.indexed)
-        level.copyWith(label: _labelAt(position)),
-    ]);
+  List<MoodScaleLevel> get _editedLevels => [
+        for (final (position, level) in _levels.indexed)
+          level.copyWith(label: _labelAt(position)),
+      ];
+
+  void _save() => Navigator.of(context).pop(_editedLevels);
+
+  Future<void> _requestClose() async {
+    final navigator = Navigator.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    final discard = listEquals(_editedLevels, widget.initial) ||
+        await showConfirmDialog(
+          context,
+          title: l10n.discardChangesTitle,
+          message: l10n.discardChangesDescription,
+          confirmLabel: l10n.recorderDiscardAction,
+        );
+    if (discard) navigator.pop();
   }
 
   Widget _buildPresets() {
@@ -137,48 +153,59 @@ class _EditMoodScaleState extends State<EditMoodScale> {
     final l10n = AppLocalizations.of(context)!;
     final screenWidth = MediaQuery.sizeOf(context).width;
     final dialogWidth = (screenWidth - 80).clamp(280.0, 400.0);
-    return Dialog(
-      child: SizedBox(
-        width: dialogWidth,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 20, 24, 8),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Flexible(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      _buildPresets(),
-                      const SizedBox(height: 12),
-                      for (var position = _levels.length - 1;
-                          position >= 0;
-                          position--)
-                        _buildRow(context, l10n, position),
-                    ],
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) _requestClose();
+      },
+      child: Dialog(
+        child: SizedBox(
+          width: dialogWidth,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 20, 24, 8),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Flexible(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        if (widget.title != null)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: Text(widget.title!,
+                                style:
+                                    Theme.of(context).textTheme.headlineSmall),
+                          ),
+                        _buildPresets(),
+                        const SizedBox(height: 12),
+                        for (var position = _levels.length - 1;
+                            position >= 0;
+                            position--)
+                          _buildRow(context, l10n, position),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    child: Text(
-                      MaterialLocalizations.of(context).cancelButtonLabel,
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: _requestClose,
+                      child: Text(
+                        MaterialLocalizations.of(context).cancelButtonLabel,
+                      ),
                     ),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                  TextButton(
-                    onPressed: _save,
-                    child: Text(
-                      MaterialLocalizations.of(context).okButtonLabel,
+                    TextButton(
+                      onPressed: _save,
+                      child: Text(l10n.applyButtonLabel),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

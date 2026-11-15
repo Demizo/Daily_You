@@ -23,7 +23,7 @@ void main() {
       level.copyWith(label: 'Mood ${level.mood}'),
   ];
 
-  Future<void> openEditor(WidgetTester tester) async {
+  Future<void> openEditor(WidgetTester tester, {String? title}) async {
     result = null;
     finished = false;
     await tester.pumpWidget(MaterialApp(
@@ -37,7 +37,7 @@ void main() {
           onPressed: () async {
             result = await showDialog<List<MoodScaleLevel>>(
               context: context,
-              builder: (_) => EditMoodScale(initial: initial),
+              builder: (_) => EditMoodScale(initial: initial, title: title),
             );
             finished = true;
           },
@@ -48,6 +48,12 @@ void main() {
     await tester.tap(find.text('open'));
     await tester.pumpAndSettle();
   }
+
+  testWidgets('shows the title it is given', (tester) async {
+    await openEditor(tester, title: 'Make moods yours');
+
+    expect(find.text('Make moods yours'), findsOneWidget);
+  });
 
   testWidgets('scrolls on a short screen', (tester) async {
     tester.view.physicalSize = const Size(400, 320);
@@ -60,7 +66,7 @@ void main() {
     await tester.drag(
         find.byType(SingleChildScrollView), const Offset(0, -400));
     await tester.pump();
-    expect(find.text('OK'), findsOneWidget);
+    expect(find.text('Apply'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -70,7 +76,7 @@ void main() {
 
     await tester.tap(find.byType(FittedBox).at(2));
     await tester.pump();
-    await tester.tap(find.text('OK'));
+    await tester.tap(find.text('Apply'));
     await tester.pumpAndSettle();
 
     expect(result!.map((level) => level.icon),
@@ -81,7 +87,19 @@ void main() {
         initial.map((level) => level.label));
   });
 
-  testWidgets('cancel discards a preset that was tried', (tester) async {
+  testWidgets('cancel closes right away when nothing changed', (tester) async {
+    await openEditor(tester);
+
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Discard changes?'), findsNothing);
+    expect(finished, isTrue);
+    expect(result, isNull);
+  });
+
+  testWidgets('cancel asks before discarding a preset that was tried',
+      (tester) async {
     await openEditor(tester);
 
     await tester.tap(find.byType(FittedBox).at(1));
@@ -89,15 +107,47 @@ void main() {
     await tester.tap(find.text('Cancel'));
     await tester.pumpAndSettle();
 
+    expect(find.text('Discard changes?'), findsOneWidget);
+    expect(finished, isFalse);
+
+    await tester.tap(find.text('Discard'));
+    await tester.pumpAndSettle();
+
     expect(finished, isTrue);
     expect(result, isNull);
+  });
+
+  testWidgets('keeping the edits closes only the confirmation', (tester) async {
+    await openEditor(tester);
+
+    await tester.enterText(find.widgetWithText(TextField, 'Mood 1'), 'Rough');
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(TextButton, 'Cancel').last);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Discard changes?'), findsNothing);
+    expect(find.byType(EditMoodScale), findsOneWidget);
+    expect(finished, isFalse);
+  });
+
+  testWidgets('dismissing the dialog with edits asks before discarding',
+      (tester) async {
+    await openEditor(tester);
+
+    await tester.enterText(find.widgetWithText(TextField, 'Mood 1'), 'Rough');
+    await tester.tapAt(const Offset(4, 4));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Discard changes?'), findsOneWidget);
+    expect(finished, isFalse);
   });
 
   testWidgets('a cleared label is saved as no label', (tester) async {
     await openEditor(tester);
 
     await tester.enterText(find.widgetWithText(TextField, 'Mood 1'), '');
-    await tester.tap(find.text('OK'));
+    await tester.tap(find.text('Apply'));
     await tester.pumpAndSettle();
 
     expect(result!.first.label, isNull);
