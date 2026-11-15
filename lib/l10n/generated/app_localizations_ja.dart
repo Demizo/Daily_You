@@ -537,6 +537,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get settingsFixedReminderTimeDescription => 'リマインダーの送信時間を固定する';
 
   @override
+  String get settingsExactAlarmsTitle => 'Allow exact alarms?';
+
+  @override
+  String get settingsExactAlarmsDescription =>
+      'Alarms may be delayed by several minutes unless you allow exact alarms.';
+
+  @override
   String get settingsAlwaysSendReminderTitle => '常にリマインダーを送信する';
 
   @override

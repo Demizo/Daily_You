@@ -12,49 +12,76 @@ import 'package:intl/intl.dart' show DateFormat;
 import 'package:material_ui/material_ui.dart';
 
 typedef TimeRangeSelection = ({TimeOfDay start, TimeOfDay end});
+typedef ReminderTimeSelection = ({
+  bool fixed,
+  TimeOfDay time,
+  TimeRangeSelection range,
+});
 
-Future<TimeRangeSelection?> showTimeRangePicker(
+Future<ReminderTimeSelection?> showReminderTimePicker(
   BuildContext context, {
-  required TimeRangeSelection initialRange,
+  required ReminderTimeSelection initial,
 }) {
-  return showAppDialog<TimeRangeSelection>(
+  return showAppDialog<ReminderTimeSelection>(
     context: context,
-    builder: (context) => TimeRangePickerDialog(initialRange: initialRange),
+    builder: (context) => ReminderTimeDialog(initial: initial),
   );
 }
 
-class TimeRangePickerDialog extends StatefulWidget {
-  final TimeRangeSelection initialRange;
+class ReminderTimeDialog extends StatefulWidget {
+  final ReminderTimeSelection initial;
 
-  const TimeRangePickerDialog({super.key, required this.initialRange});
+  const ReminderTimeDialog({super.key, required this.initial});
 
   @override
-  State<TimeRangePickerDialog> createState() => _TimeRangePickerDialogState();
+  State<ReminderTimeDialog> createState() => _ReminderTimeDialogState();
 }
 
-class _TimeRangePickerDialogState extends State<TimeRangePickerDialog> {
-  late int _start = _minutesOf(widget.initialRange.start);
-  late int _end = _minutesOf(widget.initialRange.end);
+class _ReminderTimeDialogState extends State<ReminderTimeDialog> {
+  late bool _fixed = widget.initial.fixed;
+  late int _time = _minutesOf(widget.initial.time);
+  late int _start = _minutesOf(widget.initial.range.start);
+  late int _end = _minutesOf(widget.initial.range.end);
+
+  void _change(int start, int end) => setState(() {
+        if (_fixed) {
+          _time = start;
+        } else {
+          _start = start;
+          _end = end;
+        }
+      });
 
   @override
   Widget build(BuildContext context) {
     final localizations = MaterialLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return AlertDialog(
-      title: Text(AppLocalizations.of(context)!.settingsReminderTime),
+      title: Text(l10n.settingsReminderTime),
       scrollable: true,
-      contentPadding: const EdgeInsets.fromLTRB(0, 16, 0, 0),
-      content: Center(
-        child: FittedBox(
-          fit: BoxFit.scaleDown,
-          child: _TimeRangeDial(
-            start: _start,
-            end: _end,
-            onChanged: (start, end) => setState(() {
-              _start = start;
-              _end = end;
-            }),
+      contentPadding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SwitchListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+            title: Text(l10n.settingsFixedReminderTimeTitle),
+            value: _fixed,
+            onChanged: (fixed) => setState(() => _fixed = fixed),
           ),
-        ),
+          const SizedBox(height: 8),
+          Center(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: _TimeRangeDial(
+                fixed: _fixed,
+                start: _fixed ? _time : _start,
+                end: _end,
+                onChanged: _change,
+              ),
+            ),
+          ),
+        ],
       ),
       actions: [
         TextButton(
@@ -62,8 +89,11 @@ class _TimeRangePickerDialogState extends State<TimeRangePickerDialog> {
           child: Text(localizations.cancelButtonLabel),
         ),
         TextButton(
-          onPressed: () => Navigator.of(context)
-              .pop((start: _timeOf(_start), end: _timeOf(_end))),
+          onPressed: () => Navigator.of(context).pop((
+            fixed: _fixed,
+            time: _timeOf(_time),
+            range: (start: _timeOf(_start), end: _timeOf(_end)),
+          )),
           child: Text(localizations.okButtonLabel),
         ),
       ],
@@ -109,11 +139,13 @@ double _minutesAt(Offset position) {
 }
 
 class _TimeRangeDial extends StatefulWidget {
+  final bool fixed;
   final int start;
   final int end;
   final void Function(int start, int end) onChanged;
 
   const _TimeRangeDial({
+    required this.fixed,
     required this.start,
     required this.end,
     required this.onChanged,
@@ -139,6 +171,10 @@ class _TimeRangeDialState extends State<_TimeRangeDial> {
       _wrap(widget.end - widget.start);
 
   void _onPanStart(DragStartDetails details) {
+    if (widget.fixed) {
+      _dragTarget = _DragTarget.start;
+      return;
+    }
     final position = details.localPosition;
     final startDistance = (position - _pointAt(widget.start)).distance;
     final endDistance = (position - _pointAt(widget.end)).distance;
@@ -176,17 +212,49 @@ class _TimeRangeDialState extends State<_TimeRangeDial> {
     }
   }
 
-  void _nudge(_DragTarget target, int minutes) {
-    final start = target == _DragTarget.start
-        ? _wrap(widget.start + minutes)
-        : widget.start;
-    final end =
-        target == _DragTarget.end ? _wrap(widget.end + minutes) : widget.end;
+  void _set(_DragTarget target, int minutes) {
+    final start = target == _DragTarget.start ? _wrap(minutes) : widget.start;
+    final end = target == _DragTarget.end ? _wrap(minutes) : widget.end;
     widget.onChanged(start, end);
+  }
+
+  void _nudge(_DragTarget target, int minutes) {
+    final current = target == _DragTarget.end ? widget.end : widget.start;
+    _set(target, current + minutes);
+  }
+
+  Future<void> _pickTime(_DragTarget target) async {
+    final current = target == _DragTarget.end ? widget.end : widget.start;
+    final picked = await showAppTimePicker(
+      context: context,
+      initialTime: _timeOf(_wrap(current)),
+    );
+    if (picked != null) _set(target, _minutesOf(picked));
   }
 
   String _timeText(int minutes) =>
       TimeManager.timeOfDayString(context, _timeOf(_wrap(minutes)));
+
+  Widget _timeButton(_DragTarget target, int minutes) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return TextButton(
+      key: ValueKey('time-range-${target.name}-button'),
+      onPressed: () => _pickTime(target),
+      style: TextButton.styleFrom(
+        backgroundColor: colorScheme.surfaceContainerHighest,
+        foregroundColor: colorScheme.primary,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(8)),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        minimumSize: Size.zero,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        visualDensity: VisualDensity.compact,
+        textStyle: Theme.of(context).textTheme.titleMedium,
+      ),
+      child: Text(_timeText(minutes)),
+    );
+  }
 
   Widget _handle(_DragTarget target, int minutes) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -229,6 +297,7 @@ class _TimeRangeDialState extends State<_TimeRangeDial> {
             CustomPaint(
               size: const Size.square(_dialSize),
               painter: _DialPainter(
+                fixed: widget.fixed,
                 start: widget.start,
                 end: widget.end,
                 trackColor: colorScheme.surfaceContainerHighest,
@@ -252,14 +321,16 @@ class _TimeRangeDialState extends State<_TimeRangeDial> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(_timeText(widget.start), style: timeStyle),
-                  Text('–', style: timeStyle),
-                  Text(_timeText(widget.end), style: timeStyle),
+                  _timeButton(_DragTarget.start, widget.start),
+                  if (!widget.fixed) ...[
+                    Text('–', style: timeStyle),
+                    _timeButton(_DragTarget.end, widget.end),
+                  ],
                 ],
               ),
             ),
             _handle(_DragTarget.start, widget.start),
-            _handle(_DragTarget.end, widget.end),
+            if (!widget.fixed) _handle(_DragTarget.end, widget.end),
           ],
         ),
       ),
@@ -268,6 +339,7 @@ class _TimeRangeDialState extends State<_TimeRangeDial> {
 }
 
 class _DialPainter extends CustomPainter {
+  final bool fixed;
   final int start;
   final int end;
   final Color trackColor;
@@ -278,6 +350,7 @@ class _DialPainter extends CustomPainter {
   final TextDirection textDirection;
 
   const _DialPainter({
+    required this.fixed,
     required this.start,
     required this.end,
     required this.trackColor,
@@ -299,15 +372,17 @@ class _DialPainter extends CustomPainter {
 
     canvas.drawCircle(center, radius, trackPaint..color = trackColor);
 
-    final sweep =
-        ((end - start) % _minutesPerDay) / _minutesPerDay * 2 * math.pi;
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius),
-      _angleOf(start.toDouble()),
-      sweep,
-      false,
-      trackPaint..color = rangeColor,
-    );
+    if (!fixed) {
+      final sweep =
+          ((end - start) % _minutesPerDay) / _minutesPerDay * 2 * math.pi;
+      canvas.drawArc(
+        Rect.fromCircle(center: center, radius: radius),
+        _angleOf(start.toDouble()),
+        sweep,
+        false,
+        trackPaint..color = rangeColor,
+      );
+    }
 
     final tickPaint = Paint()
       ..color = tickColor
@@ -337,6 +412,7 @@ class _DialPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_DialPainter oldDelegate) =>
+      fixed != oldDelegate.fixed ||
       start != oldDelegate.start ||
       end != oldDelegate.end ||
       trackColor != oldDelegate.trackColor ||

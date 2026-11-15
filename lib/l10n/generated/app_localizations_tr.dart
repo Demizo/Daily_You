@@ -541,6 +541,13 @@ class AppLocalizationsTr extends AppLocalizations {
       'Hatırlatma için sabit bir zaman seçin';
 
   @override
+  String get settingsExactAlarmsTitle => 'Allow exact alarms?';
+
+  @override
+  String get settingsExactAlarmsDescription =>
+      'Alarms may be delayed by several minutes unless you allow exact alarms.';
+
+  @override
   String get settingsAlwaysSendReminderTitle => 'Daima Hatırlatma Gönder';
 
   @override

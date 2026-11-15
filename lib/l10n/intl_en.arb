@@ -300,6 +300,14 @@
   "@settingsFixedReminderTimeTitle": {},
   "settingsFixedReminderTimeDescription": "Pick a fixed time for the reminder",
   "@settingsFixedReminderTimeDescription": {},
+  "settingsExactAlarmsTitle": "Allow exact alarms?",
+  "@settingsExactAlarmsTitle": {
+    "description": "Title of the dialog asking whether to allow exact alarms for reminders"
+  },
+  "settingsExactAlarmsDescription": "Alarms may be delayed by several minutes unless you allow exact alarms.",
+  "@settingsExactAlarmsDescription": {
+    "description": "Body of the exact alarms dialog explaining that reminders may be delayed without the permission"
+  },
   "settingsAlwaysSendReminderTitle": "Always Send Reminder",
   "@settingsAlwaysSendReminderTitle": {},
   "settingsAlwaysSendReminderDescription": "Send reminder even if a log was already started",

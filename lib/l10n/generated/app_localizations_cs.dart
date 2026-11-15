@@ -535,6 +535,13 @@ class AppLocalizationsCs extends AppLocalizations {
       'Vyberte pevný čas pro připomenutí';
 
   @override
+  String get settingsExactAlarmsTitle => 'Allow exact alarms?';
+
+  @override
+  String get settingsExactAlarmsDescription =>
+      'Alarms may be delayed by several minutes unless you allow exact alarms.';
+
+  @override
   String get settingsAlwaysSendReminderTitle => 'Vždy posílat připomenutí';
 
   @override

@@ -932,6 +932,18 @@ abstract class AppLocalizations {
   /// **'Pick a fixed time for the reminder'**
   String get settingsFixedReminderTimeDescription;
 
+  /// Title of the dialog asking whether to allow exact alarms for reminders
+  ///
+  /// In en, this message translates to:
+  /// **'Allow exact alarms?'**
+  String get settingsExactAlarmsTitle;
+
+  /// Body of the exact alarms dialog explaining that reminders may be delayed without the permission
+  ///
+  /// In en, this message translates to:
+  /// **'Alarms may be delayed by several minutes unless you allow exact alarms.'**
+  String get settingsExactAlarmsDescription;
+
   /// No description provided for @settingsAlwaysSendReminderTitle.
   ///
   /// In en, this message translates to:

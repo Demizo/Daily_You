@@ -544,6 +544,13 @@ class AppLocalizationsTa extends AppLocalizations {
       'நினைவூட்டலுக்கு ஒரு குறிப்பிட்ட நேரத்தைத் தேர்ந்தெடுக்கவும்';
 
   @override
+  String get settingsExactAlarmsTitle => 'Allow exact alarms?';
+
+  @override
+  String get settingsExactAlarmsDescription =>
+      'Alarms may be delayed by several minutes unless you allow exact alarms.';
+
+  @override
   String get settingsAlwaysSendReminderTitle =>
       'எப்போதும் நினைவூட்டலை அனுப்பவும்';
 
