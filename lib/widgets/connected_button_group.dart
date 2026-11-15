@@ -10,6 +10,9 @@ const double _kInnerRadius = 8.0;
 const double _kHPad = 16.0;
 const double _kVPad = 10.0;
 const double _kMinButtonWidth = _kFullRadius + _kInnerRadius + 4.0;
+const double _kIconMinButtonWidth = 88.0;
+const double _kIconVPad = 14.0;
+const double _kIconSize = 28.0;
 const Duration _kAnimDuration = Duration(milliseconds: 200);
 
 class _DynamicPillBorder extends ShapeBorder {
@@ -115,16 +118,22 @@ ShapeBorder _computeBorder({
 
 class ConnectedButtonGroup extends StatefulWidget {
   final List<String> labels;
+  final List<IconData>? icons;
   final int selectedIndex;
   final ValueChanged<int> onSelectionChanged;
   final MainAxisAlignment mainAxisAlignment;
+  final Color? restingColor;
+  final bool expanded;
 
   const ConnectedButtonGroup({
     super.key,
     required this.labels,
+    this.icons,
     required this.selectedIndex,
     required this.onSelectionChanged,
     this.mainAxisAlignment = MainAxisAlignment.center,
+    this.restingColor,
+    this.expanded = false,
   });
 
   @override
@@ -176,6 +185,30 @@ class _ConnectedButtonGroupState extends State<ConnectedButtonGroup> {
     while (_buttonKeys.length < widget.labels.length) {
       _buttonKeys.add(GlobalKey());
     }
+    final buttons = List.generate(
+      widget.labels.length,
+      (index) => Padding(
+        key: _buttonKeys[index],
+        padding: const EdgeInsets.symmetric(horizontal: 1.0),
+        child: _ConnectedButton(
+          label: widget.labels[index],
+          icon: widget.icons?[index],
+          index: index,
+          count: widget.labels.length,
+          selectedIndex: widget.selectedIndex,
+          onTap: () => widget.onSelectionChanged(index),
+          restingColor: widget.restingColor,
+        ),
+      ),
+    );
+    if (widget.expanded) {
+      return IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [for (final button in buttons) Expanded(child: button)],
+        ),
+      );
+    }
     return LayoutBuilder(
       builder: (context, constraints) {
         return SingleChildScrollView(
@@ -190,20 +223,7 @@ class _ConnectedButtonGroupState extends State<ConnectedButtonGroup> {
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: widget.mainAxisAlignment,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: List.generate(
-                  widget.labels.length,
-                  (i) => Padding(
-                    key: _buttonKeys[i],
-                    padding: const EdgeInsets.symmetric(horizontal: 1.0),
-                    child: _ConnectedButton(
-                      label: widget.labels[i],
-                      index: i,
-                      count: widget.labels.length,
-                      selectedIndex: widget.selectedIndex,
-                      onTap: () => widget.onSelectionChanged(i),
-                    ),
-                  ),
-                ),
+                children: buttons,
               ),
             ),
           ),
@@ -215,6 +235,8 @@ class _ConnectedButtonGroupState extends State<ConnectedButtonGroup> {
 
 class _ConnectedButton extends StatelessWidget {
   final String label;
+  final IconData? icon;
+  final Color? restingColor;
   final int index;
   final int count;
   final int selectedIndex;
@@ -222,6 +244,8 @@ class _ConnectedButton extends StatelessWidget {
 
   const _ConnectedButton({
     required this.label,
+    this.icon,
+    this.restingColor,
     required this.index,
     required this.count,
     required this.selectedIndex,
@@ -247,7 +271,7 @@ class _ConnectedButton extends StatelessWidget {
         );
 
         final Color bgColor = Color.lerp(
-          cs.surfaceContainer,
+          restingColor ?? cs.surfaceContainer,
           cs.primary,
           selFrac.clamp(0.0, 1.0),
         )!;
@@ -259,7 +283,8 @@ class _ConnectedButton extends StatelessWidget {
         )!;
 
         return ConstrainedBox(
-          constraints: const BoxConstraints(minWidth: _kMinButtonWidth),
+          constraints: BoxConstraints(
+              minWidth: icon == null ? _kMinButtonWidth : _kIconMinButtonWidth),
           child: Material(
             animationDuration: Duration.zero,
             color: bgColor,
@@ -269,18 +294,33 @@ class _ConnectedButton extends StatelessWidget {
               onTap: onTap,
               customBorder: shape,
               child: Padding(
-                padding: const EdgeInsets.symmetric(
+                padding: EdgeInsets.symmetric(
                   horizontal: _kHPad,
-                  vertical: _kVPad,
+                  vertical: icon == null ? _kVPad : _kIconVPad,
                 ),
                 child: Center(
-                  child: Text(
-                    label,
-                    style: Theme.of(context)
-                        .textTheme
-                        .labelLarge
-                        ?.copyWith(color: fgColor),
-                  ),
+                  child: icon == null
+                      ? Text(
+                          label,
+                          style: Theme.of(context)
+                              .textTheme
+                              .labelLarge
+                              ?.copyWith(color: fgColor),
+                        )
+                      : Column(
+                          mainAxisSize: MainAxisSize.min,
+                          spacing: 4,
+                          children: [
+                            Icon(icon, size: _kIconSize, color: fgColor),
+                            Text(
+                              label,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .labelMedium
+                                  ?.copyWith(color: fgColor),
+                            ),
+                          ],
+                        ),
                 ),
               ),
             ),

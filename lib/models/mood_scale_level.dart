@@ -49,6 +49,18 @@ class MoodScaleLevel {
         color: color == _unset ? this.color : color as int?,
       );
 
+  @override
+  bool operator ==(Object other) =>
+      other is MoodScaleLevel &&
+      other.mood == mood &&
+      other.label == label &&
+      other.icon == icon &&
+      other.iconType == iconType &&
+      other.color == color;
+
+  @override
+  int get hashCode => Object.hash(mood, label, icon, iconType, color);
+
   static MoodScaleLevel fromJson(Map<String, Object?> json) => MoodScaleLevel(
         mood: json[MoodScaleLevelFields.mood] as int,
         label: json[MoodScaleLevelFields.label] as String?,

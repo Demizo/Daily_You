@@ -18,11 +18,11 @@ class MoodScaleSetting extends StatelessWidget {
 
   const MoodScaleSetting({super.key});
 
-  Future<void> _edit(BuildContext context) async {
+  static Future<void> edit(BuildContext context, {String? title}) async {
     final provider = context.read<MoodScaleProvider>();
     final edited = await showAppDialog<List<MoodScaleLevel>>(
       context: context,
-      builder: (_) => EditMoodScale(initial: provider.levels),
+      builder: (_) => EditMoodScale(initial: provider.levels, title: title),
     );
     if (edited != null) await provider.save(edited);
   }
@@ -64,7 +64,7 @@ class MoodScaleSetting extends StatelessWidget {
     final levels = context.watch<MoodScaleProvider>().levels;
 
     return InkWell(
-      onTap: () => _edit(context),
+      onTap: () => edit(context),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
         child: Row(

@@ -796,6 +796,14 @@
   "@removeTagsTitle": {
     "description": "Title of the dialog for removing tags from the selected logs"
   },
+  "discardChangesTitle": "Discard changes?",
+  "@discardChangesTitle": {
+    "description": "Title of the dialog confirming whether to discard unsaved changes"
+  },
+  "discardChangesDescription": "Your changes will be lost.",
+  "@discardChangesDescription": {
+    "description": "Body of the discard changes dialog"
+  },
   "applyButtonLabel": "Apply",
   "@applyButtonLabel": {
     "description": "Label of the button that applies the chosen changes"
