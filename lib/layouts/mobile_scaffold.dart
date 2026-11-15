@@ -2,15 +2,10 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
-import 'dart:io';
-
-import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/layouts/fast_page_view_scroll_physics.dart';
 import 'package:daily_you/layouts/window_size_class.dart';
-import 'package:daily_you/pages/settings/notification_settings.dart';
 import 'package:daily_you/providers/gallery_selection.dart';
 import 'package:daily_you/widgets/gallery_selection_bar.dart';
-import 'package:daily_you/widgets/settings_dialog.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/rendering.dart' show ScrollCacheExtent;
 import 'package:flutter/scheduler.dart';
@@ -162,55 +157,11 @@ class _MobileScaffoldState extends State<MobileScaffold> {
     return false;
   }
 
-  void _showNotificationOnboardingPopup() {
-    showSettingsDialog(
-      context: context,
-      title: AppLocalizations.of(context)!.settingsNotificationsTitle,
-      actions: (context) => [
-        TextButton(
-          onPressed: () async {
-            await ConfigProvider.instance
-                .set(Settings.dismissedNotificationOnboarding, true);
-            if (context.mounted) Navigator.of(context).pop();
-          },
-          child: Text(MaterialLocalizations.of(context).closeButtonLabel),
-        ),
-      ],
-      builder: (context) {
-        final l10n = AppLocalizations.of(context)!;
-        return [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(l10n.settingsDailyReminderOnboarding),
-                const SizedBox(height: 8),
-                Text(l10n.settingsNotificationsPermissionsPrompt),
-              ],
-            ),
-          ),
-          const Divider(),
-          ...NotificationSettings.buildCoreReminderSettings(context),
-          const Divider(),
-          ...NotificationSettings.buildOnThisDaySettings(context),
-        ];
-      },
-    );
-  }
-
   Future<void> _navigateToSettings() async {
     await Navigator.of(context).push(MaterialPageRoute(
       allowSnapshotting: false,
       builder: (context) => const SettingsPage(),
     ));
-  }
-
-  bool _shouldShowNotificationButton(ConfigProvider configProvider) {
-    return Platform.isAndroid &&
-        !configProvider.get(Settings.dailyReminders) &&
-        !configProvider.get(Settings.onThisDayNotifications) &&
-        !configProvider.get(Settings.dismissedNotificationOnboarding);
   }
 
   Widget _buildNavItem(
@@ -361,7 +312,6 @@ class _MobileScaffoldState extends State<MobileScaffold> {
 
   Widget _buildMobileLayout(
     BuildContext context,
-    ConfigProvider configProvider,
     List<String> pageTitles,
     AppLocalizations l10n,
     bool selecting,
@@ -379,11 +329,6 @@ class _MobileScaffoldState extends State<MobileScaffold> {
             elevation: _isScrolled[currentIndex] ? 1 : 0,
             scrolledUnderElevation: currentIndex == _galleryPageIndex ? 0 : 1,
             actions: [
-              if (_shouldShowNotificationButton(configProvider))
-                IconButton(
-                  icon: const Icon(Icons.notifications_off_rounded),
-                  onPressed: _showNotificationOnboardingPopup,
-                ),
               IconButton(
                 icon: const Icon(Icons.settings_rounded),
                 onPressed: _navigateToSettings,
@@ -442,7 +387,6 @@ class _MobileScaffoldState extends State<MobileScaffold> {
 
   Widget _buildTabletLayout(
     BuildContext context,
-    ConfigProvider configProvider,
     List<String> pageTitles,
     AppLocalizations l10n,
     bool selecting,
@@ -460,13 +404,6 @@ class _MobileScaffoldState extends State<MobileScaffold> {
               : theme.colorScheme.surface,
           elevation: 0,
           scrolledUnderElevation: 0,
-          actions: [
-            if (_shouldShowNotificationButton(configProvider))
-              IconButton(
-                icon: const Icon(Icons.notifications_off_rounded),
-                onPressed: _showNotificationOnboardingPopup,
-              ),
-          ],
         ),
       ),
       drawer: Drawer(
@@ -478,7 +415,6 @@ class _MobileScaffoldState extends State<MobileScaffold> {
 
   Widget _buildDesktopLayout(
     BuildContext context,
-    ConfigProvider configProvider,
     List<String> pageTitles,
     AppLocalizations l10n,
     bool selecting,
@@ -516,13 +452,6 @@ class _MobileScaffoldState extends State<MobileScaffold> {
                           : theme.colorScheme.surface,
                       elevation: 0,
                       scrolledUnderElevation: 0,
-                      actions: [
-                        if (_shouldShowNotificationButton(configProvider))
-                          IconButton(
-                            icon: const Icon(Icons.notifications_off_rounded),
-                            onPressed: _showNotificationOnboardingPopup,
-                          ),
-                      ],
                     ),
                   ),
                   Expanded(child: _buildPageStack()),
@@ -537,7 +466,6 @@ class _MobileScaffoldState extends State<MobileScaffold> {
 
   @override
   Widget build(BuildContext context) {
-    final configProvider = Provider.of<ConfigProvider>(context);
     final l10n = AppLocalizations.of(context)!;
     final List<String> pageTitles = [
       l10n.pageHomeTitle,
@@ -554,12 +482,12 @@ class _MobileScaffoldState extends State<MobileScaffold> {
         if (!didPop) GallerySelection.instance.clear();
       },
       child: switch (WindowSizeClass.of(context)) {
-        WindowSizeClass.expanded => _buildDesktopLayout(
-            context, configProvider, pageTitles, l10n, selecting),
-        WindowSizeClass.medium => _buildTabletLayout(
-            context, configProvider, pageTitles, l10n, selecting),
-        WindowSizeClass.compact => _buildMobileLayout(
-            context, configProvider, pageTitles, l10n, selecting),
+        WindowSizeClass.expanded =>
+          _buildDesktopLayout(context, pageTitles, l10n, selecting),
+        WindowSizeClass.medium =>
+          _buildTabletLayout(context, pageTitles, l10n, selecting),
+        WindowSizeClass.compact =>
+          _buildMobileLayout(context, pageTitles, l10n, selecting),
       },
     );
   }
