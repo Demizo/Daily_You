@@ -1194,6 +1194,10 @@ class AppLocalizationsLt extends AppLocalizations {
   String get settingsSecurityPasswordsDoNotMatch => 'Slaptažodžiai nesutampa';
 
   @override
+  String get settingsSecurityPasswordWarning =>
+      'If you forget it, you won\'t be able to open Daily You.';
+
+  @override
   String get requiredPrompt => 'Būtinas';
 
   @override

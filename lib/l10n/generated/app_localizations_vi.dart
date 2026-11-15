@@ -1177,6 +1177,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get settingsSecurityPasswordsDoNotMatch => 'Passwords do not match';
 
   @override
+  String get settingsSecurityPasswordWarning =>
+      'If you forget it, you won\'t be able to open Daily You.';
+
+  @override
   String get requiredPrompt => 'Required';
 
   @override

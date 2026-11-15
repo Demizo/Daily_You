@@ -1168,6 +1168,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get settingsSecurityPasswordsDoNotMatch => '비밀번호가 일치하지 않음';
 
   @override
+  String get settingsSecurityPasswordWarning =>
+      'If you forget it, you won\'t be able to open Daily You.';
+
+  @override
   String get requiredPrompt => '필요';
 
   @override

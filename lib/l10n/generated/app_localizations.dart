@@ -2018,6 +2018,12 @@ abstract class AppLocalizations {
   /// **'Passwords do not match'**
   String get settingsSecurityPasswordsDoNotMatch;
 
+  /// Warning shown above the password fields when setting a password, explaining that a forgotten password locks the user out
+  ///
+  /// In en, this message translates to:
+  /// **'If you forget it, you won\'t be able to open Daily You.'**
+  String get settingsSecurityPasswordWarning;
+
   /// No description provided for @requiredPrompt.
   ///
   /// In en, this message translates to:

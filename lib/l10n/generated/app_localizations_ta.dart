@@ -1189,6 +1189,10 @@ class AppLocalizationsTa extends AppLocalizations {
       'கடவுச்சொற்கள் பொருந்தவில்லை';
 
   @override
+  String get settingsSecurityPasswordWarning =>
+      'If you forget it, you won\'t be able to open Daily You.';
+
+  @override
   String get requiredPrompt => 'தேவை';
 
   @override

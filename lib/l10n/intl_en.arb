@@ -700,6 +700,10 @@
   "@settingsSecurityIncorrectPassword": {},
   "settingsSecurityPasswordsDoNotMatch": "Passwords do not match",
   "@settingsSecurityPasswordsDoNotMatch": {},
+  "settingsSecurityPasswordWarning": "If you forget it, you won't be able to open Daily You.",
+  "@settingsSecurityPasswordWarning": {
+    "description": "Warning shown above the password fields when setting a password, explaining that a forgotten password locks the user out"
+  },
   "requiredPrompt": "Required",
   "@requiredPrompt": {},
   "settingsSecurityBiometricUnlock": "Biometric Unlock",

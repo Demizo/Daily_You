@@ -1189,6 +1189,10 @@ class AppLocalizationsCa extends AppLocalizations {
       'Les contrasenyes no coincideixen';
 
   @override
+  String get settingsSecurityPasswordWarning =>
+      'If you forget it, you won\'t be able to open Daily You.';
+
+  @override
   String get requiredPrompt => 'Obligatori';
 
   @override

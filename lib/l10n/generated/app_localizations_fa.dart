@@ -1176,6 +1176,10 @@ class AppLocalizationsFa extends AppLocalizations {
   String get settingsSecurityPasswordsDoNotMatch => 'گذرواژه منطبق نیست';
 
   @override
+  String get settingsSecurityPasswordWarning =>
+      'If you forget it, you won\'t be able to open Daily You.';
+
+  @override
   String get requiredPrompt => 'نیاز است';
 
   @override

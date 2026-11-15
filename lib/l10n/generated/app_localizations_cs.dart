@@ -1174,6 +1174,10 @@ class AppLocalizationsCs extends AppLocalizations {
   String get settingsSecurityPasswordsDoNotMatch => 'Hesla se neshodují';
 
   @override
+  String get settingsSecurityPasswordWarning =>
+      'If you forget it, you won\'t be able to open Daily You.';
+
+  @override
   String get requiredPrompt => 'Povinné';
 
   @override

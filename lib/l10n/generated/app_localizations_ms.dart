@@ -1127,6 +1127,10 @@ class AppLocalizationsMs extends AppLocalizations {
   String get settingsSecurityPasswordsDoNotMatch => 'Kata laluan tidak sepadan';
 
   @override
+  String get settingsSecurityPasswordWarning =>
+      'If you forget it, you won\'t be able to open Daily You.';
+
+  @override
   String get requiredPrompt => 'Diperlukan';
 
   @override

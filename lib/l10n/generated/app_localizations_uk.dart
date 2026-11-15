@@ -1185,6 +1185,10 @@ class AppLocalizationsUk extends AppLocalizations {
   String get settingsSecurityPasswordsDoNotMatch => 'Паролі не збігаються';
 
   @override
+  String get settingsSecurityPasswordWarning =>
+      'If you forget it, you won\'t be able to open Daily You.';
+
+  @override
   String get requiredPrompt => 'Обов\'язково';
 
   @override
