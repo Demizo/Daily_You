@@ -373,5 +373,129 @@
     "@statsDaysLabel": {
         "description": "Label shown under a large number of days, which is not part of this string"
     },
-    "tagCategoryPeopleName": "人物"
+    "tagCategoryPeopleName": "人物",
+    "clearFilter": "清除",
+    "@clearFilter": {
+        "description": "Label of the button that resets a single filter"
+    },
+    "showLogsCount": "{count, plural, one{显示 {count} 条日志} other{显示 {count} 条日志}}",
+    "@showLogsCount": {
+        "description": "Label of the button that applies the filters and shows the matching logs"
+    },
+    "filterPillAttachments": "附件",
+    "@filterPillAttachments": {
+        "description": "Label of the filter button for choosing attachment types"
+    },
+    "filterPillKeywords": "关键词",
+    "@filterPillKeywords": {
+        "description": "Label of the filter button for searching logs by keywords"
+    },
+    "noMoodFilterLabel": "无心情",
+    "@noMoodFilterLabel": {
+        "description": "Filter option for logs that have no mood"
+    },
+    "noAttachmentsFilterLabel": "无附件",
+    "@noAttachmentsFilterLabel": {
+        "description": "Filter option for logs that have no attachments"
+    },
+    "noTextFilterLabel": "无文本",
+    "@noTextFilterLabel": {
+        "description": "Filter option for logs that have no text"
+    },
+    "partialMatchCount": "{count, plural, one{{count} 个部分匹配} other{{count} 个部分匹配}}",
+    "@partialMatchCount": {
+        "description": "Number of logs that match only some of the active filters"
+    },
+    "tagCount": "{count, plural, one{{count} 个标签} other{{count} 个标签}}",
+    "@tagCount": {
+        "description": "Number of tags selected in the tag filter"
+    },
+    "dateFilterLastMonths": "{count, plural, one{上个月} other{最近 {count} 个月}}",
+    "@dateFilterLastMonths": {
+        "description": "Date filter option covering the most recent months"
+    },
+    "dateFilterCustomRange": "自定义范围",
+    "@dateFilterCustomRange": {
+        "description": "Date filter option for choosing a custom start and end date"
+    },
+    "keywordFilterHint": "添加关键词…",
+    "@keywordFilterHint": {
+        "description": "Hint text of the field for adding a keyword to the filter"
+    },
+    "keywordFilterMatchAll": "所有关键词",
+    "@keywordFilterMatchAll": {
+        "description": "Option to only match logs containing every keyword"
+    },
+    "keywordFilterMatchAny": "任意关键词",
+    "@keywordFilterMatchAny": {
+        "description": "Option to match logs containing at least one keyword"
+    },
+    "keywordFilterMatchCase": "区分大小写",
+    "@keywordFilterMatchCase": {
+        "description": "Option to make keyword matching case sensitive"
+    },
+    "keywordCount": "{count, plural, one{{count} 个关键词} other{{count} 个关键词}}",
+    "@keywordCount": {
+        "description": "Number of keywords in the keyword filter"
+    },
+    "dateFilterRange": "{start} – {end}",
+    "@dateFilterRange": {
+        "description": "Selected date range shown on the date filter",
+        "placeholders": {
+            "start": {
+                "type": "String"
+            },
+            "end": {
+                "type": "String"
+            }
+        }
+    },
+    "gallerySelectAll": "全选",
+    "@gallerySelectAll": {
+        "description": "Label of the action that selects every log in the gallery"
+    },
+    "gallerySelectAction": "选择",
+    "@gallerySelectAction": {
+        "description": "Label of the action that starts selecting logs in the gallery"
+    },
+    "galleryOpenAction": "打开",
+    "@galleryOpenAction": {
+        "description": "Label of the action that opens a log from the gallery"
+    },
+    "deleteLogsMessage": "{count, plural, one{删除 {count} 条日迹？其附件也将一并删除。} other{删除 {count} 条日迹？其附件也将一并删除。}}",
+    "@deleteLogsMessage": {
+        "description": "Confirmation message shown before deleting the selected logs"
+    },
+    "newLogAction": "新日迹",
+    "@newLogAction": {
+        "description": "Label of the action that creates a new log"
+    },
+    "removeTagsTitle": "移除标签",
+    "@removeTagsTitle": {
+        "description": "Title of the dialog for removing tags from the selected logs"
+    },
+    "applyButtonLabel": "应用",
+    "@applyButtonLabel": {
+        "description": "Label of the button that applies the chosen changes"
+    },
+    "addTagsConfirmMessage": "{count, plural, one{将所选标签添加到 {count} 条日迹？} other{将所选标签添加到 {count} 条日迹？}}",
+    "@addTagsConfirmMessage": {
+        "description": "Confirmation message shown before adding tags to the selected logs"
+    },
+    "removeTagsConfirmMessage": "{count, plural, one{从 {count} 条日迹中移除所选标签？} other{从 {count} 条日迹中移除所选标签？}}",
+    "@removeTagsConfirmMessage": {
+        "description": "Confirmation message shown before removing tags from the selected logs"
+    },
+    "selectPartialMatchesMessage": "{count, plural, one{是否也选择 {count} 个部分匹配？} other{是否也选择 {count} 个部分匹配？}}",
+    "@selectPartialMatchesMessage": {
+        "description": "Question asking whether logs that only partially match the search text should also be selected"
+    },
+    "selectExactMatchesOnly": "仅精确匹配",
+    "@selectExactMatchesOnly": {
+        "description": "Button choosing to select only logs that match the exact text"
+    },
+    "selectIncludingPartialMatches": "包含",
+    "@selectIncludingPartialMatches": {
+        "description": "Button choosing to also select logs that partially match the text"
+    }
 }
