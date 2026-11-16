@@ -18,6 +18,7 @@ import 'package:daily_you/pages/share_page.dart';
 import 'package:share_receiver/share_receiver.dart';
 import 'package:daily_you/time_manager.dart';
 import 'package:daily_you/widgets/expressive_carousel.dart';
+import 'package:daily_you/widgets/entry_attachment_actions.dart';
 import 'package:daily_you/widgets/expressive_fab_menu.dart';
 import 'package:daily_you/widgets/flashback_card.dart';
 import 'package:daily_you/widgets/support_banner.dart';
@@ -65,20 +66,20 @@ class _HomePageState extends State<HomePage>
     super.dispose();
   }
 
-  Future<void> _openWithCamera(
-      Entry? entry, List<EntryAttachment> attachments) async {
+  Future<void> _openWithCapture(Entry? entry, List<EntryAttachment> attachments,
+      CameraCapture capture) async {
     await Navigator.of(context).push(MaterialPageRoute(
       allowSnapshotting: false,
       builder: (context) => AddEditEntryPage(
-          entry: entry, openCamera: true, attachments: attachments),
+          entry: entry, initialCapture: capture, attachments: attachments),
     ));
   }
 
   Future<void> _addNewEntryForToday() async {
     await Navigator.of(context).push(MaterialPageRoute(
       allowSnapshotting: false,
-      builder: (context) => AddEditEntryPage(
-          entry: null, openCamera: false, attachments: const []),
+      builder: (context) =>
+          AddEditEntryPage(entry: null, attachments: const []),
     ));
   }
 
@@ -86,8 +87,8 @@ class _HomePageState extends State<HomePage>
       Entry entry, List<EntryAttachment> attachments) async {
     await Navigator.of(context).push(MaterialPageRoute(
       allowSnapshotting: false,
-      builder: (context) => AddEditEntryPage(
-          entry: entry, openCamera: false, attachments: attachments),
+      builder: (context) =>
+          AddEditEntryPage(entry: entry, attachments: attachments),
     ));
   }
 
@@ -106,7 +107,6 @@ class _HomePageState extends State<HomePage>
       allowSnapshotting: false,
       builder: (context) => AddEditEntryPage(
         entry: null,
-        openCamera: false,
         attachments: const [],
         overrideCreateDate: overrideDate,
       ),
@@ -122,7 +122,11 @@ class _HomePageState extends State<HomePage>
           : [];
       DeviceInfoService().launchIntent = null;
       if (intent is TakePhotoIntent) {
-        await _openWithCamera(todayEntry, todayAttachments);
+        await _openWithCapture(
+            todayEntry, todayAttachments, CameraCapture.photo);
+      } else if (intent is TakeVideoIntent) {
+        await _openWithCapture(
+            todayEntry, todayAttachments, CameraCapture.video);
       } else if (todayEntry != null) {
         await _editEntry(todayEntry, todayAttachments);
       } else {
@@ -197,7 +201,6 @@ class _HomePageState extends State<HomePage>
                 allowSnapshotting: false,
                 builder: (context) => AddEditEntryPage(
                       entry: entry,
-                      openCamera: false,
                       attachments: entryAttachments,
                       overrideCreateDate: TimeManager.isToday(targetDate)
                           ? DateTime.now()
@@ -299,8 +302,8 @@ class _HomePageState extends State<HomePage>
             ExpressiveFabMenuItem(
                 icon: Icons.camera_alt_rounded,
                 label: AppLocalizations.of(context)!.actionTakePhoto,
-                onTap: () async =>
-                    await _openWithCamera(todayEntry, todayAttachments)),
+                onTap: () async => await _openWithCapture(
+                    todayEntry, todayAttachments, CameraCapture.photo)),
             ExpressiveFabMenuItem(
                 icon: Icons.event_rounded,
                 label: AppLocalizations.of(context)!.actionOtherDay,

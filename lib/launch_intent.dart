@@ -7,10 +7,15 @@ sealed class LaunchIntent {
 
   const factory LaunchIntent.logToday() = LogTodayIntent;
   const factory LaunchIntent.takePhoto() = TakePhotoIntent;
+  const factory LaunchIntent.takeVideo() = TakeVideoIntent;
 }
 
 class TakePhotoIntent extends LaunchIntent {
   const TakePhotoIntent();
+}
+
+class TakeVideoIntent extends LaunchIntent {
+  const TakeVideoIntent();
 }
 
 class LogTodayIntent extends LaunchIntent {

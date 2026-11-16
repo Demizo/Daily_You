@@ -152,7 +152,6 @@ class _GalleryPageState extends State<GalleryPage>
         allowSnapshotting: false,
         builder: (context) => const AddEditEntryPage(
               entry: null,
-              openCamera: false,
               attachments: [],
             )));
   }
