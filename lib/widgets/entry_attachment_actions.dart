@@ -22,6 +22,8 @@ import 'package:v_video_compressor/v_video_compressor.dart';
 
 typedef _Store = Future<NewAttachment?> Function(String path, String? fileName);
 
+enum CameraCapture { photo, video }
+
 class PendingAttachment {
   const PendingAttachment({
     required this.type,
@@ -51,6 +53,12 @@ class EntryAttachmentActions {
         [pickedFile.path], AttachmentType.image, _storeImagePath,
         keepNames: false, deleteAfterwards: _pickerReturnsCopies);
   }
+
+  static Future<List<PendingAttachment>> capture(CameraCapture capture) =>
+      switch (capture) {
+        CameraCapture.photo => takePhoto(),
+        CameraCapture.video => takeVideo(),
+      };
 
   static Future<List<PendingAttachment>> pickFromGallery() async {
     final pickedFiles = await ImagePicker().pickMultiImage();

@@ -48,7 +48,7 @@ import 'package:daily_you/widgets/markdown_preview_controller.dart';
 class AddEditEntryPage extends StatefulWidget {
   final Entry? entry;
   final DateTime? overrideCreateDate;
-  final bool openCamera;
+  final CameraCapture? initialCapture;
   final List<EntryAttachment> attachments;
   final String? sharedText;
 
@@ -56,7 +56,7 @@ class AddEditEntryPage extends StatefulWidget {
     super.key,
     this.entry,
     this.overrideCreateDate,
-    this.openCamera = false,
+    this.initialCapture,
     this.attachments = const <EntryAttachment>[],
     this.sharedText,
   });
@@ -80,7 +80,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   late List<EntryAttachment> _currentAttachments;
   int _pendingAttachmentCount = 0;
   bool _loadingEntry = true;
-  bool _openedCamera = false;
+  bool _openedInitialCapture = false;
   final ScrollController _scrollController = ScrollController();
   final FocusNode _focusNode = FocusNode();
   final MarkdownPreviewController _textEditingController =
@@ -161,9 +161,10 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
       });
     }
 
-    if (widget.openCamera && !_openedCamera) {
-      _openedCamera = true;
-      _importAttachments(EntryAttachmentActions.takePhoto());
+    if (widget.initialCapture != null && !_openedInitialCapture) {
+      _openedInitialCapture = true;
+      _importAttachments(
+          EntryAttachmentActions.capture(widget.initialCapture!));
     }
   }
 

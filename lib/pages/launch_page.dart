@@ -71,6 +71,8 @@ class _LaunchPageState extends State<LaunchPage> {
         DeviceInfoService().launchIntent = LaunchIntent.logToday();
       } else if (shortcutType == 'action_take_photo') {
         DeviceInfoService().launchIntent = LaunchIntent.takePhoto();
+      } else if (shortcutType == 'action_take_video') {
+        DeviceInfoService().launchIntent = LaunchIntent.takeVideo();
       }
     });
 
@@ -86,7 +88,12 @@ class _LaunchPageState extends State<LaunchPage> {
         type: 'action_take_photo',
         localizedTitle: AppLocalizations.of(context)!.actionTakePhoto,
         icon: '@drawable/ic_shortcut_camera_alt',
-      )
+      ),
+      ShortcutItem(
+        type: 'action_take_video',
+        localizedTitle: AppLocalizations.of(context)!.actionTakeVideo,
+        icon: '@drawable/ic_shortcut_videocam',
+      ),
     ]);
   }
 
