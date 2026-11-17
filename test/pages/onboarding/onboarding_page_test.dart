@@ -5,6 +5,8 @@
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/pages/onboarding/onboarding_page.dart';
+import 'package:daily_you/pages/onboarding/onboarding_scope.dart';
+import 'package:daily_you/pages/onboarding/welcome_step.dart';
 import 'package:daily_you/providers/mood_scale_provider.dart';
 import 'package:daily_you/theme_mode_provider.dart';
 import 'package:easy_debounce/easy_debounce.dart';
@@ -76,6 +78,43 @@ void main() {
     expect(
         find.text('You can change these later in Settings.'), findsOneWidget);
     expect(find.text('Skip'), findsOneWidget);
+  });
+
+  testWidgets('page content is drawn as snapshots only while changing pages',
+      (tester) async {
+    await pumpPage(tester);
+
+    bool snapshotting() => tester
+        .widgetList<SnapshotWidget>(find.byType(SnapshotWidget))
+        .any((widget) => widget.controller.allowSnapshotting);
+
+    expect(snapshotting(), isFalse);
+
+    await tester.tap(find.text('Continue'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(snapshotting(), isTrue);
+
+    await tester.pump(const Duration(milliseconds: 600));
+    expect(snapshotting(), isFalse);
+  });
+
+  testWidgets('the ambient motion holds still while changing pages',
+      (tester) async {
+    await pumpPage(tester);
+    final ambient =
+        OnboardingScope.of(tester.element(find.byType(WelcomeStep))).ambient;
+
+    await tester.tap(find.text('Continue'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+    final heldValue = ambient.value;
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(ambient.value, heldValue);
+
+    await tester.pump(const Duration(milliseconds: 600));
+    await tester.pump(const Duration(seconds: 1));
+    expect(ambient.value, isNot(heldValue));
   });
 
   testWidgets('the theme buttons change the app theme', (tester) async {

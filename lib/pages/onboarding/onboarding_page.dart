@@ -37,8 +37,10 @@ class _OnboardingPageState extends State<OnboardingPage>
       OnboardingStep.sequence(includesReminders: Platform.isAndroid);
   final PageController _pageController = PageController();
   final ValueNotifier<double> _position = ValueNotifier(0);
+  final ValueNotifier<bool> _transitioning = ValueNotifier(false);
   late final AnimationController _ambient =
       AnimationController(vsync: this, duration: const Duration(seconds: 12));
+  bool _animationsDisabled = false;
   int _targetPage = 0;
   bool _navigating = false;
   bool _finishing = false;
@@ -47,12 +49,18 @@ class _OnboardingPageState extends State<OnboardingPage>
   void initState() {
     super.initState();
     _pageController.addListener(_syncPosition);
+    _transitioning.addListener(_syncAmbient);
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (MediaQuery.disableAnimationsOf(context)) {
+    _animationsDisabled = MediaQuery.disableAnimationsOf(context);
+    _syncAmbient();
+  }
+
+  void _syncAmbient() {
+    if (_animationsDisabled || _transitioning.value) {
       _ambient.stop();
     } else if (!_ambient.isAnimating) {
       _ambient.repeat();
@@ -63,8 +71,19 @@ class _OnboardingPageState extends State<OnboardingPage>
   void dispose() {
     _pageController.dispose();
     _position.dispose();
+    _transitioning.dispose();
     _ambient.dispose();
     super.dispose();
+  }
+
+  bool _onScrollNotification(ScrollNotification notification) {
+    if (notification.depth != 0) return false;
+    if (notification is ScrollStartNotification) {
+      _transitioning.value = true;
+    } else if (notification is ScrollEndNotification) {
+      _transitioning.value = false;
+    }
+    return false;
   }
 
   void _syncPosition() {
@@ -159,6 +178,7 @@ class _OnboardingPageState extends State<OnboardingPage>
           child: OnboardingScope(
             ambient: _ambient,
             position: _position,
+            transitioning: _transitioning,
             onFinish: _finish,
             child: Column(
               children: [
@@ -174,16 +194,19 @@ class _OnboardingPageState extends State<OnboardingPage>
                           child: OnboardingBackground(
                               ambient: _ambient, position: _position),
                         ),
-                        PageView(
-                          controller: _pageController,
-                          allowImplicitScrolling: true,
-                          scrollCacheExtent:
-                              ScrollCacheExtent.viewport(_steps.length - 1.0),
-                          onPageChanged: (index) => _targetPage = index,
-                          children: [
-                            for (final (index, step) in _steps.indexed)
-                              _buildStep(step, index),
-                          ],
+                        NotificationListener<ScrollNotification>(
+                          onNotification: _onScrollNotification,
+                          child: PageView(
+                            controller: _pageController,
+                            allowImplicitScrolling: true,
+                            scrollCacheExtent:
+                                ScrollCacheExtent.viewport(_steps.length - 1.0),
+                            onPageChanged: (index) => _targetPage = index,
+                            children: [
+                              for (final (index, step) in _steps.indexed)
+                                _buildStep(step, index),
+                            ],
+                          ),
                         ),
                       ],
                     ),

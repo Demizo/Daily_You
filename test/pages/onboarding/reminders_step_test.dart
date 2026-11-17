@@ -29,6 +29,7 @@ void main() {
           home: OnboardingScope(
             ambient: const AlwaysStoppedAnimation(0),
             position: ValueNotifier(0),
+            transitioning: ValueNotifier(false),
             onFinish: () {},
             child: const Scaffold(body: RemindersStep(index: 0)),
           ),
