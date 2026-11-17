@@ -121,7 +121,6 @@ class _EditorActionBarState extends State<EditorActionBar> {
 
   List<ToolbarEntry> _markdownEntries(
       BuildContext context, DockMetrics metrics) {
-    final undoController = widget.undoController;
     return _spaced([
       // Keep template button in edit actions for full screen editor
       if (widget.showTemplateButton && widget.mainActions == null) ...[
@@ -131,11 +130,15 @@ class _EditorActionBarState extends State<EditorActionBar> {
       for (final action in markdownActions(context, widget.controller))
         _iconEntry(metrics, action.icon, action.onPressed!,
             isActive: action.isActive, reconnectsKeyboard: action.mayLeaveApp),
-      if (undoController != null) ...[
-        _dividerEntry(),
-        _undoEntry(metrics, undoController, isUndo: true),
-        _undoEntry(metrics, undoController, isUndo: false),
-      ],
+    ]);
+  }
+
+  List<ToolbarEntry> _undoEntries(DockMetrics metrics) {
+    final undoController = widget.undoController;
+    if (undoController == null) return const [];
+    return _spaced([
+      _undoEntry(metrics, undoController, isUndo: true),
+      _undoEntry(metrics, undoController, isUndo: false),
     ]);
   }
 
@@ -300,17 +303,49 @@ class _EditorActionBarState extends State<EditorActionBar> {
             final maxPillWidth = (constraints.maxWidth -
                     toggleReserved -
                     mirroredReserved -
-                    metrics.contentInset * 2)
+                    metrics.contentInset * 2 -
+                    metrics.pillPadding * 2)
                 .clamp(0.0, constraints.maxWidth);
             final pillAlignment = showToggle && !isWide
                 ? AlignmentDirectional.centerStart
                 : AlignmentDirectional.center;
 
+            final actions = showingMainActions
+                ? _mainActionEntries(metrics)
+                : _markdownEntries(context, metrics);
+            // docked layout starts at the midpoint of the floating transition
+            final isDocked = metrics.progress >= 0.5;
+            var fixedEntries = !showingMainActions && isDocked
+                ? _spaced([_dividerEntry(), ..._undoEntries(metrics)])
+                : const <ToolbarEntry>[];
+            final canPinUndo = maxPillWidth >=
+                fixedEntries.fold<double>(
+                        0, (width, entry) => width + entry.width) +
+                    metrics.buttonSize;
+            if (fixedEntries.isNotEmpty && !canPinUndo) {
+              fixedEntries = const <ToolbarEntry>[];
+            }
+            final entries = showingMainActions || metrics.progress < 0.5
+                ? [
+                    ...actions,
+                    if (!showingMainActions)
+                      ..._spaced([
+                        _dividerEntry(),
+                        ..._undoEntries(metrics),
+                      ]),
+                  ]
+                : fixedEntries.isEmpty && !showingMainActions
+                    ? [
+                        ...actions,
+                        ..._spaced([
+                          _dividerEntry(),
+                          ..._undoEntries(metrics),
+                        ]),
+                      ]
+                    : actions;
             final split = ToolbarEntrySplit.fit(
-              showingMainActions
-                  ? _mainActionEntries(metrics)
-                  : _markdownEntries(context, metrics),
-              maxWidth: maxPillWidth,
+              entries,
+              maxWidth: maxPillWidth + metrics.pillPadding * 2,
               overflowButtonWidth: metrics.buttonSize,
               padding: metrics.pillPadding,
             );
@@ -338,6 +373,10 @@ class _EditorActionBarState extends State<EditorActionBar> {
                           child: ActionBarPill(
                             metrics: metrics,
                             split: split,
+                            entries: entries,
+                            scrollEntries: actions,
+                            fixedEntries: fixedEntries,
+                            maxWidth: maxPillWidth,
                             showingMainActions: showingMainActions,
                             onShowOverflow: (buttonContext) => _overflowPopup
                                 .show(buttonContext, split.overflow),

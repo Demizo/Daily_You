@@ -3,6 +3,7 @@
 // Additional terms under GPLv3 section 7 apply; see ADDITIONAL_TERMS.md.
 
 import 'package:daily_you/widgets/editor_action_bar.dart';
+import 'package:daily_you/widgets/editor_action_bar/dock_metrics.dart';
 import 'package:daily_you/widgets/markdown_preview_controller.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
@@ -20,6 +21,41 @@ bool isHighlighted(WidgetTester tester, IconData icon) {
 }
 
 void main() {
+  testWidgets('docked actions scroll and indicate hidden actions',
+      (tester) async {
+    final controller = MarkdownPreviewController();
+    final focusNode = FocusNode();
+    addTearDown(controller.dispose);
+    addTearDown(focusNode.dispose);
+
+    await tester.pumpWidget(MaterialApp(
+      home: Scaffold(
+        body: Center(
+          child: SizedBox(
+            width: 220,
+            child: DockProgressScope(
+              progress: const AlwaysStoppedAnimation(1),
+              child: EditorActionBar(
+                controller: controller,
+                focusNode: focusNode,
+                showTemplateButton: false,
+              ),
+            ),
+          ),
+        ),
+      ),
+    ));
+
+    expect(find.byIcon(Icons.more_horiz_rounded), findsNothing);
+    expect(find.byIcon(Icons.chevron_right), findsOneWidget);
+    // drags left, no more icons remain on the right, so right chevron disappears
+    await tester.drag(find.byType(SingleChildScrollView), const Offset(-600, 0));
+    await tester.pumpAndSettle();
+    expect(find.byIcon(Icons.chevron_left), findsOneWidget);
+    expect(find.byIcon(Icons.chevron_right), findsNothing);
+    expect(find.byIcon(Icons.link_rounded), findsOneWidget);
+  });
+
   testWidgets('format buttons follow the cursor and toggle off',
       (tester) async {
     final controller = MarkdownPreviewController(text: 'a **bold** b');

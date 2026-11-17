@@ -14,6 +14,10 @@ class ActionBarPill extends StatelessWidget {
 
   final DockMetrics metrics;
   final ToolbarEntrySplit split;
+  final List<ToolbarEntry> entries;
+  final List<ToolbarEntry> scrollEntries;
+  final List<ToolbarEntry> fixedEntries;
+  final double maxWidth;
   final bool showingMainActions;
   final void Function(BuildContext buttonContext) onShowOverflow;
 
@@ -21,6 +25,10 @@ class ActionBarPill extends StatelessWidget {
     super.key,
     required this.metrics,
     required this.split,
+    required this.entries,
+    required this.scrollEntries,
+    required this.fixedEntries,
+    required this.maxWidth,
     required this.showingMainActions,
     required this.onShowOverflow,
   });
@@ -50,31 +58,145 @@ class ActionBarPill extends StatelessWidget {
             data: IconThemeData(color: iconTint),
             child: MorphContent(
               child: KeyedSubtree(
-                key: ValueKey(showingMainActions),
-                child: IntrinsicHeight(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      for (final entry in split.visible)
-                        entry.build(context, null),
-                      if (split.hasOverflow)
-                        Builder(
-                          builder: (buttonContext) => ToolbarIconButton(
-                            size: metrics.buttonSize,
-                            icon: const Icon(Icons.more_horiz_rounded),
-                            onPressed: () => onShowOverflow(buttonContext),
-                          ),
+                key: ValueKey((showingMainActions, metrics.progress >= 0.5)),
+                child: metrics.progress >= 0.5
+                    ? _ScrollableActions(
+                        entries: scrollEntries,
+                        fixedEntries: fixedEntries,
+                        maxWidth: maxWidth,
+                        height: metrics.buttonSize,
+                      )
+                    : IntrinsicHeight(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            for (final entry in split.visible)
+                              entry.build(context, null),
+                            if (split.hasOverflow)
+                              Builder(
+                                builder: (buttonContext) => ToolbarIconButton(
+                                  size: metrics.buttonSize,
+                                  icon: const Icon(Icons.more_horiz_rounded),
+                                  onPressed: () => onShowOverflow(buttonContext),
+                                ),
+                              ),
+                          ],
                         ),
-                    ],
-                  ),
-                ),
+                      ),
               ),
             ),
           ),
         ),
       ),
     );
+  }
+}
+
+class _ScrollableActions extends StatefulWidget {
+  final List<ToolbarEntry> entries;
+  final List<ToolbarEntry> fixedEntries;
+  final double maxWidth;
+  final double height;
+
+  const _ScrollableActions({
+    required this.entries,
+    required this.fixedEntries,
+    required this.maxWidth,
+    required this.height,
+  });
+
+  @override
+  State<_ScrollableActions> createState() => _ScrollableActionsState();
+}
+
+class _ScrollableActionsState extends State<_ScrollableActions> {
+  final ScrollController _controller = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.addListener(_update);
+  }
+
+  void _update() => setState(() {});
+
+  @override
+  void dispose() {
+    _controller.removeListener(_update);
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final fixedWidth = widget.fixedEntries
+        .fold<double>(0, (width, entry) => width + entry.width);
+    final scrollMaxWidth =
+        (widget.maxWidth - fixedWidth).clamp(0.0, widget.maxWidth);
+    final contentWidth =
+        widget.entries.fold<double>(0, (total, entry) => total + entry.width);
+    final viewportWidth = contentWidth.clamp(0.0, scrollMaxWidth);
+    final position = _controller.hasClients ? _controller.position : null;
+    final hasStart =
+        position?.extentBefore != null && position!.extentBefore > 0;
+    final hasEnd = position?.extentAfter != null
+        ? position!.extentAfter > 0
+        : contentWidth > viewportWidth;
+    final surface = Theme.of(context).colorScheme.surfaceContainerHigh;
+
+    Widget indicator(IconData icon) => IgnorePointer(
+          child: ColoredBox(
+            color: surface.withValues(alpha: 0.9),
+            child: Icon(icon, size: 16),
+          ),
+        );
+
+    return Row(mainAxisSize: MainAxisSize.min, children: [
+      SizedBox(
+        width: viewportWidth,
+        height: widget.height,
+        child: Stack(
+          children: [
+            SingleChildScrollView(
+              controller: _controller,
+              scrollDirection: Axis.horizontal,
+              physics: const ClampingScrollPhysics(),
+              child: SizedBox(
+                height: widget.height,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    for (final entry in widget.entries)
+                      entry.build(context, null),
+                  ],
+                ),
+              ),
+            ),
+            if (hasStart)
+              PositionedDirectional(
+                start: 0,
+                top: 0,
+                bottom: 0,
+                child: indicator(Directionality.of(context) == TextDirection.ltr
+                    ? Icons.chevron_left
+                    : Icons.chevron_right),
+              ),
+            if (hasEnd)
+              PositionedDirectional(
+                end: 0,
+                top: 0,
+                bottom: 0,
+                child: indicator(Directionality.of(context) == TextDirection.ltr
+                    ? Icons.chevron_right
+                    : Icons.chevron_left),
+              ),
+          ],
+        ),
+      ),
+      for (final entry in widget.fixedEntries) entry.build(context, null),
+    ]);
   }
 }
 
