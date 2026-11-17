@@ -10,12 +10,14 @@ class OnboardingScope extends InheritedWidget {
     super.key,
     required this.ambient,
     required this.position,
+    required this.transitioning,
     required this.onFinish,
     required super.child,
   });
 
   final Animation<double> ambient;
   final ValueListenable<double> position;
+  final ValueListenable<bool> transitioning;
   final VoidCallback onFinish;
 
   static OnboardingScope of(BuildContext context) =>
@@ -23,5 +25,7 @@ class OnboardingScope extends InheritedWidget {
 
   @override
   bool updateShouldNotify(OnboardingScope oldWidget) =>
-      ambient != oldWidget.ambient || position != oldWidget.position;
+      ambient != oldWidget.ambient ||
+      position != oldWidget.position ||
+      transitioning != oldWidget.transitioning;
 }

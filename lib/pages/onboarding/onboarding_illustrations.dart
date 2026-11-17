@@ -175,6 +175,26 @@ class _IllustrationHalo extends StatelessWidget {
   }
 }
 
+class _BadgeCutoutClipper extends CustomClipper<Path> {
+  const _BadgeCutoutClipper({required this.center, required this.radius});
+
+  final Offset center;
+  final double radius;
+
+  @override
+  Path getClip(Size size) {
+    return Path.combine(
+      PathOperation.difference,
+      Path()..addRect(Offset.zero & size),
+      Path()..addOval(Rect.fromCircle(center: center, radius: radius)),
+    );
+  }
+
+  @override
+  bool shouldReclip(_BadgeCutoutClipper oldClipper) =>
+      oldClipper.center != center || oldClipper.radius != radius;
+}
+
 class OnboardingIllustration extends StatelessWidget {
   static const double _iconScale = 0.55;
   static const double _badgeScale = 0.42;
@@ -211,17 +231,28 @@ class OnboardingIllustration extends StatelessWidget {
                   child: Stack(
                     clipBehavior: Clip.none,
                     children: [
-                      Icon(icon, size: iconSize, color: colorScheme.primary),
+                      ClipPath(
+                        clipper: badgeIcon == null
+                            ? null
+                            : _BadgeCutoutClipper(
+                                center: Offset(
+                                  iconSize * _badgeCenter.dx,
+                                  iconSize * _badgeCenter.dy,
+                                ),
+                                radius: badgeExtent / 2,
+                              ),
+                        child: Icon(
+                          icon,
+                          size: iconSize,
+                          color: colorScheme.primary,
+                        ),
+                      ),
                       if (badgeIcon != null)
                         Positioned(
                           left: iconSize * _badgeCenter.dx - badgeExtent / 2,
                           top: iconSize * _badgeCenter.dy - badgeExtent / 2,
-                          child: Container(
+                          child: Padding(
                             padding: EdgeInsets.all(badgeRing),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: colorScheme.onPrimary,
-                            ),
                             child: Icon(
                               badgeIcon,
                               size: badgeSize,

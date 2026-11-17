@@ -5,6 +5,7 @@
 import 'dart:math' as math;
 
 import 'package:daily_you/pages/onboarding/onboarding_scope.dart';
+import 'package:daily_you/widgets/snapshot_while_scrolling.dart';
 import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -59,6 +60,7 @@ class OnboardingStepLayout extends StatelessWidget {
                     child: _PageDelta(
                       index: index,
                       position: scope.position,
+                      transitioning: scope.transitioning,
                       builder: (context, delta, child) => Transform.scale(
                         scale: 1 - 0.2 * delta.abs().clamp(0.0, 1.0),
                         child: Opacity(
@@ -80,6 +82,7 @@ class OnboardingStepLayout extends StatelessWidget {
                         child: _PageDelta(
                           index: index,
                           position: scope.position,
+                          transitioning: scope.transitioning,
                           builder: (context, delta, child) =>
                               Opacity(opacity: _fade(delta, 1.6), child: child),
                           child: Column(
@@ -124,12 +127,14 @@ class _PageDelta extends StatelessWidget {
   const _PageDelta({
     required this.index,
     required this.position,
+    required this.transitioning,
     required this.builder,
     required this.child,
   });
 
   final int index;
   final ValueListenable<double> position;
+  final ValueListenable<bool> transitioning;
   final Widget Function(BuildContext context, double delta, Widget child)
       builder;
   final Widget child;
@@ -138,7 +143,7 @@ class _PageDelta extends StatelessWidget {
   Widget build(BuildContext context) {
     return ValueListenableBuilder<double>(
       valueListenable: position,
-      child: child,
+      child: SnapshotWhileScrolling(scrolling: transitioning, child: child),
       builder: (context, value, child) =>
           builder(context, value - index, child!),
     );
