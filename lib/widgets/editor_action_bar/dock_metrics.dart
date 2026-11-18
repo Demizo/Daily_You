@@ -43,6 +43,7 @@ class DockMetrics {
   static const double _floatingHeight =
       _floatingButtonSize + _floatingPillPadding * 2;
 
+  static const double _dockedLayoutThreshold = 0.5;
   static const double _elevationEaseBand = 0.3;
   static const double _floatingElevation = 3.0;
 
@@ -90,6 +91,8 @@ class DockMetrics {
 
   static DockMetrics of(BuildContext context) =>
       DockMetrics.at(DockProgressScope.of(context));
+
+  bool get isDocked => progress >= _dockedLayoutThreshold;
 
   double get barHeight => buttonSize + pillPadding * 2;
 
