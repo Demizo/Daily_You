@@ -20,7 +20,11 @@ void insertAtCursor(TextEditingController controller, String text) {
 void insertTemplateText(TextEditingController controller, String text,
     {required bool hasFocus}) {
   if (controller.text.isEmpty) {
-    controller.text = text;
+    // initially places cursor after the inserted template to give undo history a valid starting state
+    controller.value = TextEditingValue(
+      text: text,
+      selection: TextSelection.collapsed(offset: text.length),
+    );
   } else if (hasFocus) {
     insertAtCursor(controller, text);
   } else {

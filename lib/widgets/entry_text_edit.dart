@@ -33,7 +33,11 @@ class _EntryTextEditorState extends State<EntryTextEditor> {
 
   @override
   void initState() {
-    widget.textEditingController.text = widget.text;
+    // initially places cursor at the end of the entry to give undo history a valid starting state
+    widget.textEditingController.value = TextEditingValue(
+      text: widget.text,
+      selection: TextSelection.collapsed(offset: widget.text.length),
+    );
     super.initState();
   }
 
