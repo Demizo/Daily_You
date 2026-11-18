@@ -497,5 +497,77 @@
     "selectIncludingPartialMatches": "包含",
     "@selectIncludingPartialMatches": {
         "description": "Button choosing to also select logs that partially match the text"
+    },
+    "settingsExactAlarmsTitle": "是否允许精确闹钟权限？",
+    "@settingsExactAlarmsTitle": {
+        "description": "Title of the dialog asking whether to allow exact alarms for reminders"
+    },
+    "settingsExactAlarmsDescription": "如果不允许精确闹钟权限，闹钟可能会延迟几分钟。",
+    "@settingsExactAlarmsDescription": {
+        "description": "Body of the exact alarms dialog explaining that reminders may be delayed without the permission"
+    },
+    "settingsSecurityPasswordWarning": "如果你忘记了密码，你将无法打开 Daily You。",
+    "@settingsSecurityPasswordWarning": {
+        "description": "Warning shown above the password fields when setting a password, explaining that a forgotten password locks the user out"
+    },
+    "discardChangesTitle": "放弃更改？",
+    "@discardChangesTitle": {
+        "description": "Title of the dialog confirming whether to discard unsaved changes"
+    },
+    "discardChangesDescription": "您的更改将会丢失。",
+    "@discardChangesDescription": {
+        "description": "Body of the discard changes dialog"
+    },
+    "onboardingSkip": "跳过",
+    "@onboardingSkip": {
+        "description": "Label of the button that skips the rest of the onboarding flow"
+    },
+    "onboardingContinue": "继续",
+    "@onboardingContinue": {
+        "description": "Label of the button that moves to the next onboarding step"
+    },
+    "onboardingFinish": "开始写日迹",
+    "@onboardingFinish": {
+        "description": "Label of the button on the last onboarding step that finishes onboarding and opens the app"
+    },
+    "onboardingImportTitle": "用过其他日记 App？",
+    "@onboardingImportTitle": {
+        "description": "Title of the onboarding step offering to import logs from another app"
+    },
+    "onboardingImportDescription": "导入你现有的日记，或从头开始。",
+    "@onboardingImportDescription": {
+        "description": "Description under the title of the onboarding import step"
+    },
+    "onboardingStorageNote": "你之后可以在“设置”中更改这些选项。",
+    "@onboardingStorageNote": {
+        "description": "Description under the title of the onboarding storage step, noting the choices can be changed later in settings"
+    },
+    "onboardingWelcomeTitle": "欢迎来到 Daily You",
+    "@onboardingWelcomeTitle": {
+        "description": "Title of the first onboarding step"
+    },
+    "onboardingWelcomeDescription": "每一天都值得留下痕迹。",
+    "@onboardingWelcomeDescription": {
+        "description": "Description under the title of the first onboarding step"
+    },
+    "onboardingRemindersTitle": "让它成为习惯",
+    "@onboardingRemindersTitle": {
+        "description": "Title of the onboarding step for turning on daily reminders"
+    },
+    "onboardingStorageTitle": "保护好你的日迹",
+    "@onboardingStorageTitle": {
+        "description": "Title of the onboarding step for password, sync, and backup options"
+    },
+    "onboardingRestore": "从备份恢复",
+    "@onboardingRestore": {
+        "description": "Label of the button that restores logs from a backup during onboarding"
+    },
+    "onboardingMoodsCustomize": "自定义心情",
+    "@onboardingMoodsCustomize": {
+        "description": "Label of the button that opens the mood editor"
+    },
+    "onboardingRemindersDescription": "设置随机或定时提醒，记录你的一天。",
+    "@onboardingRemindersDescription": {
+        "description": "Description under the title of the onboarding reminders step"
     }
 }
