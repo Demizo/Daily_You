@@ -1,1 +1,25 @@
-<p>Capture the moments that matter. <b>Daily You</b> helps you log your thoughts, track your mood, and keep a diary of meaningful moments, every day. Whether you're journaling, reflecting, or just noting what made you smile, <b>Daily You</b> gives you a private space that's truly yours.</p><p><b>Daily You</b> is free, open source, and community supported. Built around the belief that your diary should be yours forever, not a subscription. No accounts, No ads, no locked features, and no tracking or data collection. Just your story, on your device, owned by you.</p><p>✨ <b>Features</b></p><ul><li>✍️ <b>Take daily logs:</b> Journal your thoughts, reflections, or routines.</li><li>📈 <b>Track your mood:</b> Gain insight into how your mood changes over time.</li><li>🖼️ <b>Keep photo memories:</b> Add pictures to enrich your memories.</li><li>📝 <b>Rich note taking:</b> Format notes your own way with Markdown.</li><li>🔔 <b>Gentle reminders:</b> Random daily nudges to keep you consistent.</li><li>🔒 <b>Control your data:</b> Choose where your data lives, including external storage.</li><li>🌐 <b>Offline-first:</b> Works without internet. Always.</li></ul><p>Join a community that believes <b>your journal should be yours</b>, not a product.</p>
+Your private journal and mood tracker, because every day is worth remembering. Daily You helps you capture your thoughts, photos, and mood over time. Enjoy a distraction-free diary with no paywalls, accounts, or subscriptions.
+
+Daily You is open-source and community-supported, built around the belief that your journal should be yours, not a product.
+
+While simple by default, Daily You is packed with features:
+
+• Add photos, video, audio, and other attachments
+• Track your mood and see how it changes over time
+• Set random or scheduled reminders to stay consistent
+• Write rich notes with text formatting and Markdown support
+• Organize with a robust tag system to keep track of anything
+• Use advanced search tools and statistics to gain insights
+
+Daily You keeps your data safe:
+
+• No data is collected
+• Lock the app with a password
+• Encrypted backups and optional sync
+• Works fully offline; you control where your data lives
+
+Coming from another app? Daily You lets you import your existing journal. You can also export in a variety of formats so your data stays portable.
+
+Reflect on what you feel matters most. Daily You can be used to track anxiety, stress, or just general wellness. It can complement therapy such as Cognitive Behavioral Therapy (CBT) and Interpersonal and Social Rhythm Therapy (IPSRT). No matter how you journal, Daily You helps you recognize achievements, trends, and connections between your mood and habits.
+
+Join a community that believes everyone should have access to a journal! Don't let your day get forgotten.
