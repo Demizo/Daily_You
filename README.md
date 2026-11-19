@@ -18,7 +18,7 @@
 
 </div>
 
-Your **private journal and mood tracker**. Daily You helps you capture your thoughts, photos, and mood over time. Enjoy a distraction-free diary with powerful tools and **NO paywalls, accounts, or subscriptions**.
+Your **private journal and mood tracker**. Daily You helps you capture your thoughts, photos, and mood over time. Enjoy a distraction-free diary with **NO paywalls, accounts, or subscriptions**.
 
 Daily You is open-source and community-supported, built around the belief that **your journal should be yours**, not a product.
 
@@ -27,7 +27,7 @@ While **simple by default**, Daily You is packed with features:
 - Add **photos**, video, audio, and other attachments
 - Track your **mood** and see how it changes over time
 - Set random or scheduled **reminders** to stay consistent
-- Write rich notes with **text formatting** with Markdown support
+- Write rich notes with **text formatting** and Markdown support
 - Organize with a robust **tag system** to keep track of anything
 - Use advanced **search tools and statistics** to gain insights
 
@@ -49,7 +49,7 @@ Daily You **keeps your data safe**:
 - Set a password lock to protect your memories
 - Works fully offline; you control where your data lives
 
-Reflect on what matters most to you. People within the community use Daily You to track anxiety, stress, and general wellness. It can aid in therapy such as Cognitive Behavioral Therapy (CBT) and Interpersonal and Social Rhythm Therapy (IPSRT). No matter how you journal, Daily You helps you recognize achievements, trends, and connections between your mood and habits.
+Reflect on what you feel matters most. Daily You can be used to track anxiety, stress, or just general wellness. It can complement therapy such as Cognitive Behavioral Therapy (CBT) and Interpersonal and Social Rhythm Therapy (IPSRT). No matter how you journal, Daily You helps you recognize achievements, trends, and connections between your mood and habits.
 
 Join a community that believes _everyone should have access to a journal!_ Don't let your day get forgotten.
 
