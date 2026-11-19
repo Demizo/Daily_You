@@ -21,19 +21,19 @@ class AppLocalizationsFa extends AppLocalizations {
   String get actionTakePhoto => 'عکس بگیر';
 
   @override
-  String get actionTakeVideo => 'Take video';
+  String get actionTakeVideo => 'ویدیو بگیر';
 
   @override
-  String get actionRecordAudio => 'Record audio';
+  String get actionRecordAudio => 'ظبط صدا';
 
   @override
-  String get actionAddImage => 'Add image';
+  String get actionAddImage => 'افزودن تصویر';
 
   @override
-  String get actionAddVideo => 'Add video';
+  String get actionAddVideo => 'افزودن ویدیو';
 
   @override
-  String get actionAddAudio => 'Add audio';
+  String get actionAddAudio => 'افزودن صدا';
 
   @override
   String get actionToday => 'امروز';
@@ -190,7 +190,7 @@ class AppLocalizationsFa extends AppLocalizations {
 
   @override
   String chartInfluencesTitle(Object tag) {
-    return 'Influences $tag';
+    return '$tagمتاثرها';
   }
 
   @override
@@ -209,7 +209,7 @@ class AppLocalizationsFa extends AppLocalizations {
   String get chartGroupingYear => 'سال';
 
   @override
-  String get chartSmoothingLabel => 'Smoothing';
+  String get chartSmoothingLabel => 'ملایم کردن';
 
   @override
   String streakCurrent(num count) {
@@ -253,12 +253,7 @@ class AppLocalizationsFa extends AppLocalizations {
 
   @override
   String streakDayLabel(num count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'Day Streak',
-    );
-    return '$_temp0';
+    return '«برچسبی که زیر یک طول رگه یا خط بزرگ نمایش داده می‌شود، که بخشی از این رشته نیست.»';
   }
 
   @override

@@ -99,7 +99,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get flashbackOnThisDay => '在这一天';
+  String get flashbackOnThisDay => '那年今日';
 
   @override
   String get pageGalleryTitle => '迹忆';
@@ -185,7 +185,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String chartOverTimeTitle(Object tag) {
-    return '$tag 起伏';
+    return '$tag 趋势';
   }
 
   @override
@@ -277,8 +277,8 @@ class AppLocalizationsZh extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '字',
-      one: '字',
+      other: '字数',
+      one: '字数',
     );
     return '$_temp0';
   }
@@ -301,7 +301,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get statsWritingTitle => '写作';
 
   @override
-  String get statsWordsPerLogTitle => '每篇日迹字数';
+  String get statsWordsPerLogTitle => '日迹平均字数';
 
   @override
   String get statsLongestLogTitle => '最长日迹';
@@ -358,7 +358,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get errorExternalStorageAccessDescription =>
-      '如果您正在使用网络存储，请确保服务在线且您具有网络访问权限。\n\n否则，该应用程序可能已失去对外部文件夹的权限。请转到设置，然后重新选择外部文件夹以授予访问权限。\n\n警告，在恢复对外部存储位置的访问之前，更改将不会同步！';
+      '如果您正在使用网络存储，请确保相关服务在线且网络连接正常。\n如果您正在使用本地存储，应用可能已失去对外部文件夹的访问权限。请前往设置，重新选择外部文件夹以授予访问权限。\n警告：在恢复对外部存储位置的访问权限之前，更改将无法同步！';
 
   @override
   String get errorExternalStorageAccessContinue => '继续使用本地数据库';
@@ -519,7 +519,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsDailyReminderTitle => '每日提醒';
 
   @override
-  String get settingsOnThisDayDescription => '重温过去的记忆';
+  String get settingsOnThisDayDescription => '重温过去的迹忆';
 
   @override
   String get settingsDailyReminderDescription => '每天一次温和的提醒';
@@ -534,17 +534,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsFixedReminderTimeDescription => '选择一个固定的提醒时间';
 
   @override
-  String get settingsExactAlarmsTitle => 'Allow exact alarms?';
+  String get settingsExactAlarmsTitle => '是否允许精确闹钟权限？';
 
   @override
-  String get settingsExactAlarmsDescription =>
-      'Alarms may be delayed by several minutes unless you allow exact alarms.';
+  String get settingsExactAlarmsDescription => '如果不允许精确闹钟权限，闹钟可能会延迟几分钟。';
 
   @override
   String get settingsAlwaysSendReminderTitle => '总是发送提醒';
 
   @override
-  String get settingsAlwaysSendReminderDescription => '即使日志已经开始，也发送提醒';
+  String get settingsAlwaysSendReminderDescription => '即使已开始撰写日迹，仍发送提醒';
 
   @override
   String get settingsCustomizeNotificationTitle => '自定义通知';
@@ -726,41 +725,41 @@ class AppLocalizationsZh extends AppLocalizations {
   String get noTagsFilterLabel => '无标签';
 
   @override
-  String get clearFilter => 'Clear';
+  String get clearFilter => '清除';
 
   @override
   String showLogsCount(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Show $count logs',
-      one: 'Show $count log',
+      other: '显示 $count 条日志',
+      one: '显示 $count 条日志',
     );
     return '$_temp0';
   }
 
   @override
-  String get filterPillAttachments => 'Attachments';
+  String get filterPillAttachments => '附件';
 
   @override
-  String get filterPillKeywords => 'Keywords';
+  String get filterPillKeywords => '关键词';
 
   @override
-  String get noMoodFilterLabel => 'No Mood';
+  String get noMoodFilterLabel => '无心情';
 
   @override
-  String get noAttachmentsFilterLabel => 'No Attachments';
+  String get noAttachmentsFilterLabel => '无附件';
 
   @override
-  String get noTextFilterLabel => 'No Text';
+  String get noTextFilterLabel => '无文本';
 
   @override
   String partialMatchCount(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count partial matches',
-      one: '$count partial match',
+      other: '$count 个部分匹配',
+      one: '$count 个部分匹配',
     );
     return '$_temp0';
   }
@@ -770,8 +769,8 @@ class AppLocalizationsZh extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count tags',
-      one: '$count tag',
+      other: '$count 个标签',
+      one: '$count 个标签',
     );
     return '$_temp0';
   }
@@ -781,34 +780,34 @@ class AppLocalizationsZh extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Last $count months',
-      one: 'Last month',
+      other: '最近 $count 个月',
+      one: '上个月',
     );
     return '$_temp0';
   }
 
   @override
-  String get dateFilterCustomRange => 'Custom range';
+  String get dateFilterCustomRange => '自定义范围';
 
   @override
-  String get keywordFilterHint => 'Add a keyword…';
+  String get keywordFilterHint => '添加关键词…';
 
   @override
-  String get keywordFilterMatchAll => 'All keywords';
+  String get keywordFilterMatchAll => '所有关键词';
 
   @override
-  String get keywordFilterMatchAny => 'Any keyword';
+  String get keywordFilterMatchAny => '任意关键词';
 
   @override
-  String get keywordFilterMatchCase => 'Match case';
+  String get keywordFilterMatchCase => '区分大小写';
 
   @override
   String keywordCount(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count keywords',
-      one: '$count keyword',
+      other: '$count 个关键词',
+      one: '$count 个关键词',
     );
     return '$_temp0';
   }
@@ -1170,8 +1169,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsSecurityPasswordsDoNotMatch => '密码不相符';
 
   @override
-  String get settingsSecurityPasswordWarning =>
-      'If you forget it, you won\'t be able to open Daily You.';
+  String get settingsSecurityPasswordWarning => '如果你忘记了密码，你将无法打开 Daily You。';
 
   @override
   String get requiredPrompt => '请输入密码';
@@ -1266,47 +1264,47 @@ class AppLocalizationsZh extends AppLocalizations {
   String get recorderErrorDescription => '录制音频失败！';
 
   @override
-  String get gallerySelectAll => 'Select all';
+  String get gallerySelectAll => '全选';
 
   @override
-  String get gallerySelectAction => 'Select';
+  String get gallerySelectAction => '选择';
 
   @override
-  String get galleryOpenAction => 'Open';
+  String get galleryOpenAction => '打开';
 
   @override
   String deleteLogsMessage(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Delete $count logs? Their attachments are removed with them.',
-      one: 'Delete $count log? Its attachments are removed with it.',
+      other: '删除 $count 条日迹？其附件也将一并删除。',
+      one: '删除 $count 条日迹？其附件也将一并删除。',
     );
     return '$_temp0';
   }
 
   @override
-  String get newLogAction => 'New Log';
+  String get newLogAction => '新日迹';
 
   @override
-  String get removeTagsTitle => 'Remove Tags';
+  String get removeTagsTitle => '移除标签';
 
   @override
-  String get discardChangesTitle => 'Discard changes?';
+  String get discardChangesTitle => '放弃更改？';
 
   @override
-  String get discardChangesDescription => 'Your changes will be lost.';
+  String get discardChangesDescription => '您的更改将会丢失。';
 
   @override
-  String get applyButtonLabel => 'Apply';
+  String get applyButtonLabel => '应用';
 
   @override
   String addTagsConfirmMessage(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Add the chosen tags to $count logs?',
-      one: 'Add the chosen tags to $count log?',
+      other: '将所选标签添加到 $count 条日迹？',
+      one: '将所选标签添加到 $count 条日迹？',
     );
     return '$_temp0';
   }
@@ -1316,8 +1314,8 @@ class AppLocalizationsZh extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Remove the chosen tags from $count logs?',
-      one: 'Remove the chosen tags from $count log?',
+      other: '从 $count 条日迹中移除所选标签？',
+      one: '从 $count 条日迹中移除所选标签？',
     );
     return '$_temp0';
   }
@@ -1327,58 +1325,56 @@ class AppLocalizationsZh extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Also select $count partial matches?',
-      one: 'Also select $count partial match?',
+      other: '是否也选择 $count 个部分匹配？',
+      one: '是否也选择 $count 个部分匹配？',
     );
     return '$_temp0';
   }
 
   @override
-  String get selectExactMatchesOnly => 'Exact only';
+  String get selectExactMatchesOnly => '仅精确匹配';
 
   @override
-  String get selectIncludingPartialMatches => 'Include';
+  String get selectIncludingPartialMatches => '包含';
 
   @override
-  String get onboardingSkip => 'Skip';
+  String get onboardingSkip => '跳过';
 
   @override
-  String get onboardingContinue => 'Continue';
+  String get onboardingContinue => '继续';
 
   @override
-  String get onboardingFinish => 'Start journaling';
+  String get onboardingFinish => '开始写日迹';
 
   @override
-  String get onboardingImportTitle => 'Coming from another app?';
+  String get onboardingImportTitle => '用过其他日记 App？';
 
   @override
-  String get onboardingImportDescription =>
-      'Bring your existing logs, or start fresh.';
+  String get onboardingImportDescription => '导入你现有的日记，或从头开始。';
 
   @override
-  String get onboardingStorageNote => 'You can change these later in Settings.';
+  String get onboardingStorageNote => '你之后可以在“设置”中更改这些选项。';
 
   @override
-  String get onboardingWelcomeTitle => 'Welcome to Daily You';
+  String get onboardingWelcomeTitle => '欢迎来到 Daily You';
 
   @override
-  String get onboardingWelcomeDescription => 'Every day is worth remembering.';
+  String get onboardingWelcomeDescription => '每一天都值得留下痕迹。';
 
   @override
-  String get onboardingRemindersTitle => 'Make it a habit';
+  String get onboardingRemindersTitle => '让它成为习惯';
 
   @override
-  String get onboardingStorageTitle => 'Keep your logs safe';
+  String get onboardingStorageTitle => '保护好你的日迹';
 
   @override
-  String get onboardingRestore => 'Restore from a backup';
+  String get onboardingRestore => '从备份恢复';
 
   @override
-  String get onboardingMoodsCustomize => 'Customize moods';
+  String get onboardingMoodsCustomize => '自定义心情';
 
   @override
-  String get onboardingRemindersDescription =>
-      'Set random or scheduled reminders to capture your day.';
+  String get onboardingRemindersDescription => '设置随机或定时提醒，记录你的一天。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).

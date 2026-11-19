@@ -21,7 +21,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get actionTakePhoto => 'Scatta una foto';
 
   @override
-  String get actionTakeVideo => 'Take video';
+  String get actionTakeVideo => 'Registra video';
 
   @override
   String get actionRecordAudio => 'Record audio';
