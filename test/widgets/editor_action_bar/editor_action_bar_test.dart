@@ -60,43 +60,43 @@ void main() {
     await pumpDockedBar(tester, width: 220);
 
     expect(find.byIcon(Icons.more_horiz_rounded), findsNothing);
-    expect(find.byIcon(Icons.chevron_right), findsOneWidget);
-    expect(find.byIcon(Icons.chevron_left), findsNothing);
+    expect(find.byIcon(Icons.chevron_right_rounded), findsOneWidget);
+    expect(find.byIcon(Icons.chevron_left_rounded), findsNothing);
 
     await tester.drag(
         find.byType(SingleChildScrollView), const Offset(-600, 0));
     await tester.pumpAndSettle();
-    expect(find.byIcon(Icons.chevron_left), findsOneWidget);
-    expect(find.byIcon(Icons.chevron_right), findsNothing);
+    expect(find.byIcon(Icons.chevron_left_rounded), findsOneWidget);
+    expect(find.byIcon(Icons.chevron_right_rounded), findsNothing);
     expect(find.byIcon(Icons.link_rounded), findsOneWidget);
   });
 
   testWidgets('tapping an arrow scrolls toward that end', (tester) async {
     await pumpDockedBar(tester, width: 220);
 
-    await tester.tap(find.byIcon(Icons.chevron_right));
+    await tester.tap(find.byIcon(Icons.chevron_right_rounded));
     await tester.pumpAndSettle();
-    expect(find.byIcon(Icons.chevron_left), findsOneWidget);
+    expect(find.byIcon(Icons.chevron_left_rounded), findsOneWidget);
 
-    await tester.tap(find.byIcon(Icons.chevron_left));
+    await tester.tap(find.byIcon(Icons.chevron_left_rounded));
     await tester.pumpAndSettle();
-    expect(find.byIcon(Icons.chevron_left), findsNothing);
+    expect(find.byIcon(Icons.chevron_left_rounded), findsNothing);
   });
 
   testWidgets('arrows swap sides in right to left layouts', (tester) async {
     await pumpDockedBar(tester, width: 220, textDirection: TextDirection.rtl);
 
-    expect(find.byIcon(Icons.chevron_left), findsOneWidget);
-    expect(find.byIcon(Icons.chevron_right), findsNothing);
+    expect(find.byIcon(Icons.chevron_left_rounded), findsOneWidget);
+    expect(find.byIcon(Icons.chevron_right_rounded), findsNothing);
   });
 
   testWidgets('arrows update when the bar is resized', (tester) async {
     await pumpDockedBar(tester, width: 220);
-    expect(find.byIcon(Icons.chevron_right), findsOneWidget);
+    expect(find.byIcon(Icons.chevron_right_rounded), findsOneWidget);
 
     await pumpDockedBar(tester, width: 600);
     await tester.pumpAndSettle();
-    expect(find.byIcon(Icons.chevron_right), findsNothing);
+    expect(find.byIcon(Icons.chevron_right_rounded), findsNothing);
   });
 
   testWidgets('undo and redo scroll with the actions', (tester) async {

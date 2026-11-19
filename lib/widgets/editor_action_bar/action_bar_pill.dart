@@ -50,7 +50,10 @@ class ActionBarPill extends StatelessWidget {
         curve: toolbarMorphCurve,
         alignment: AlignmentDirectional.centerStart,
         child: Padding(
-          padding: EdgeInsets.all(metrics.pillPadding),
+          padding: EdgeInsets.symmetric(
+            horizontal: metrics.pillPadding,
+            vertical: metrics.isDocked ? 0 : metrics.pillPadding,
+          ),
           child: IconTheme.merge(
             data: IconThemeData(color: iconTint),
             child: MorphContent(
@@ -61,6 +64,7 @@ class ActionBarPill extends StatelessWidget {
                         entries: entries,
                         maxWidth: maxWidth - metrics.pillPadding * 2,
                         height: metrics.buttonSize,
+                        verticalInset: metrics.pillPadding,
                       )
                     : IntrinsicHeight(
                         child: Row(

@@ -11,12 +11,14 @@ class ScrollableToolbarActions extends StatefulWidget {
   final List<ToolbarEntry> entries;
   final double maxWidth;
   final double height;
+  final double verticalInset;
 
   const ScrollableToolbarActions({
     super.key,
     required this.entries,
     required this.maxWidth,
     required this.height,
+    required this.verticalInset,
   });
 
   @override
@@ -25,10 +27,12 @@ class ScrollableToolbarActions extends StatefulWidget {
 }
 
 class _ScrollableToolbarActionsState extends State<ScrollableToolbarActions> {
-  static const double _arrowSize = 16.0;
-  static const double _fadeWidth = 16.0;
+  static const double _arrowWidth = 32.0;
+  static const double _arrowIconSize = 24.0;
+  static const double _fadeWidth = 24.0;
   static const double _pageFraction = 0.75;
   static const Duration _pageDuration = Duration(milliseconds: 200);
+  static const Duration _revealDuration = Duration(milliseconds: 150);
 
   final ScrollController _controller = ScrollController();
   bool _hasStart = false;
@@ -70,13 +74,13 @@ class _ScrollableToolbarActionsState extends State<ScrollableToolbarActions> {
   }
 
   Shader _fadeShader(Rect bounds,
-      {required bool hasStart, required bool hasEnd}) {
-    const opaque = Color(0xFFFFFFFF);
-    const transparent = Color(0x00FFFFFF);
-    final fadeEnd = math.min(_arrowSize + _fadeWidth, bounds.width / 2);
-    final arrowEnd = math.min(_arrowSize, fadeEnd);
-    final startColor = hasStart ? transparent : opaque;
-    final endColor = hasEnd ? transparent : opaque;
+      {required double startAmount, required double endAmount}) {
+    Color whiteWithAlpha(double alpha) => Color.fromRGBO(255, 255, 255, alpha);
+    final opaque = whiteWithAlpha(1);
+    final startColor = whiteWithAlpha(1 - startAmount);
+    final endColor = whiteWithAlpha(1 - endAmount);
+    final fadeEnd = math.min(_arrowWidth + _fadeWidth, bounds.width / 2);
+    final arrowEnd = math.min(_arrowWidth, fadeEnd);
     return LinearGradient(
       begin: AlignmentDirectional.centerStart,
       end: AlignmentDirectional.centerEnd,
@@ -92,13 +96,23 @@ class _ScrollableToolbarActionsState extends State<ScrollableToolbarActions> {
     ).createShader(bounds, textDirection: Directionality.of(context));
   }
 
-  Widget _arrow(IconData icon, {required bool towardEnd}) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: () => _page(towardEnd: towardEnd),
-      child: SizedBox(
-        width: _arrowSize,
-        child: Center(child: Icon(icon, size: _arrowSize)),
+  Widget _arrow(IconData icon,
+      {required bool towardEnd, required double opacity}) {
+    return Opacity(
+      opacity: opacity,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => _page(towardEnd: towardEnd),
+        child: SizedBox(
+          width: _arrowWidth,
+          child: Center(
+            child: Icon(
+              icon,
+              size: _arrowIconSize,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -112,53 +126,71 @@ class _ScrollableToolbarActionsState extends State<ScrollableToolbarActions> {
     final hasEnd = _hasEnd ?? contentWidth > viewportWidth;
     final isLeftToRight = Directionality.of(context) == TextDirection.ltr;
 
+    final scrollView = NotificationListener<Notification>(
+      onNotification: _onNotification,
+      child: SingleChildScrollView(
+        controller: _controller,
+        scrollDirection: Axis.horizontal,
+        physics: const ClampingScrollPhysics(),
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: widget.verticalInset),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              for (final entry in widget.entries) entry.build(context, null),
+            ],
+          ),
+        ),
+      ),
+    );
+
     return SizedBox(
       width: viewportWidth,
-      height: widget.height,
-      child: Stack(
-        children: [
-          NotificationListener<Notification>(
-            onNotification: _onNotification,
-            child: ShaderMask(
-              blendMode: BlendMode.dstIn,
-              shaderCallback: (bounds) =>
-                  _fadeShader(bounds, hasStart: hasStart, hasEnd: hasEnd),
-              child: SingleChildScrollView(
-                controller: _controller,
-                scrollDirection: Axis.horizontal,
-                physics: const ClampingScrollPhysics(),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    for (final entry in widget.entries)
-                      entry.build(context, null),
-                  ],
+      height: widget.height + widget.verticalInset * 2,
+      child: TweenAnimationBuilder<double>(
+        tween: Tween(end: hasStart ? 1.0 : 0.0),
+        duration: _revealDuration,
+        builder: (context, startAmount, _) => TweenAnimationBuilder<double>(
+          tween: Tween(end: hasEnd ? 1.0 : 0.0),
+          duration: _revealDuration,
+          builder: (context, endAmount, _) => Stack(
+            children: [
+              ShaderMask(
+                blendMode: BlendMode.dstIn,
+                shaderCallback: (bounds) => _fadeShader(bounds,
+                    startAmount: startAmount, endAmount: endAmount),
+                child: scrollView,
+              ),
+              if (startAmount > 0)
+                PositionedDirectional(
+                  start: 0,
+                  top: 0,
+                  bottom: 0,
+                  child: _arrow(
+                    isLeftToRight
+                        ? Icons.chevron_left_rounded
+                        : Icons.chevron_right_rounded,
+                    towardEnd: false,
+                    opacity: startAmount,
+                  ),
                 ),
-              ),
-            ),
+              if (endAmount > 0)
+                PositionedDirectional(
+                  end: 0,
+                  top: 0,
+                  bottom: 0,
+                  child: _arrow(
+                    isLeftToRight
+                        ? Icons.chevron_right_rounded
+                        : Icons.chevron_left_rounded,
+                    towardEnd: true,
+                    opacity: endAmount,
+                  ),
+                ),
+            ],
           ),
-          if (hasStart)
-            PositionedDirectional(
-              start: 0,
-              top: 0,
-              bottom: 0,
-              child: _arrow(
-                isLeftToRight ? Icons.chevron_left : Icons.chevron_right,
-                towardEnd: false,
-              ),
-            ),
-          if (hasEnd)
-            PositionedDirectional(
-              end: 0,
-              top: 0,
-              bottom: 0,
-              child: _arrow(
-                isLeftToRight ? Icons.chevron_right : Icons.chevron_left,
-                towardEnd: true,
-              ),
-            ),
-        ],
+        ),
       ),
     );
   }
