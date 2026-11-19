@@ -12,7 +12,7 @@
     "pageGalleryTitle": "迹忆",
     "dailyReminderDescription": "今天的日迹还没写呢…",
     "statisticsRangeOneYear": "1 年",
-    "errorExternalStorageAccessDescription": "如果您正在使用网络存储，请确保服务在线且您具有网络访问权限。\n\n否则，该应用程序可能已失去对外部文件夹的权限。请转到设置，然后重新选择外部文件夹以授予访问权限。\n\n警告，在恢复对外部存储位置的访问之前，更改将不会同步！",
+    "errorExternalStorageAccessDescription": "如果您正在使用网络存储，请确保相关服务在线且网络连接正常。\n如果您正在使用本地存储，应用可能已失去对外部文件夹的访问权限。请前往设置，重新选择外部文件夹以授予访问权限。\n警告：在恢复对外部存储位置的访问权限之前，更改将无法同步！",
     "logCount": "{count, plural, one{日迹 {count}} other{日迹 {count}}}",
     "searchLogsHint": "搜索日迹…",
     "sortDateTitle": "日期",
@@ -105,7 +105,7 @@
     "cleanUpStatus": "正在清理…",
     "restoringBackupStatus": "正在恢复备份…{percent}%",
     "settingsAlwaysSendReminderTitle": "总是发送提醒",
-    "settingsAlwaysSendReminderDescription": "即使日志已经开始，也发送提醒",
+    "settingsAlwaysSendReminderDescription": "即使已开始撰写日迹，仍发送提醒",
     "settingsImportFromAnotherApp": "从其他应用程序导入",
     "settingsCustomizeNotificationTitle": "自定义通知",
     "settingsBackupRestoreTitle": "备份与恢复",
@@ -143,8 +143,8 @@
     "viewLayoutList": "列表",
     "settingsHideImagesInGallery": "隐藏图库中的图片",
     "actionTakePhoto": "拍张照",
-    "flashbackOnThisDay": "在这一天",
-    "settingsOnThisDayDescription": "重温过去的记忆",
+    "flashbackOnThisDay": "那年今日",
+    "settingsOnThisDayDescription": "重温过去的迹忆",
     "templateVariableTime": "时间",
     "templateDefaultTimestampTitle": "时间戳",
     "templateDefaultTimestampBody": "{date} - {time}:",
@@ -157,7 +157,7 @@
     "settingsHideImages": "隐藏图片",
     "pageCalendarTitle": "月历",
     "dayCount": "{count, plural, one{天数 {count}} other{天数 {count}}}",
-    "chartOverTimeTitle": "{tag} 起伏",
+    "chartOverTimeTitle": "{tag} 趋势",
     "settingsCalendarSystem": "历法系统",
     "calendarSystemGregorian": "公历",
     "calendarSystemJalali": "波斯历",
@@ -309,7 +309,7 @@
     "@statsWritingTitle": {
         "description": "Title of the writing statistics tile and page"
     },
-    "statsWordsPerLogTitle": "每篇日迹字数",
+    "statsWordsPerLogTitle": "日迹平均字数",
     "@statsWordsPerLogTitle": {
         "description": "Label for the average number of words in a log"
     },
@@ -365,7 +365,7 @@
     "@statsLogsLabel": {
         "description": "Label shown under a large number of logs, which is not part of this string"
     },
-    "statsWordsLabel": "{count, plural, one{字} other{字}}",
+    "statsWordsLabel": "{count, plural, one{字数} other{字数}}",
     "@statsWordsLabel": {
         "description": "Label shown next to or under a large number of words, which is not part of this string"
     },
@@ -373,5 +373,201 @@
     "@statsDaysLabel": {
         "description": "Label shown under a large number of days, which is not part of this string"
     },
-    "tagCategoryPeopleName": "人物"
+    "tagCategoryPeopleName": "人物",
+    "clearFilter": "清除",
+    "@clearFilter": {
+        "description": "Label of the button that resets a single filter"
+    },
+    "showLogsCount": "{count, plural, one{显示 {count} 条日志} other{显示 {count} 条日志}}",
+    "@showLogsCount": {
+        "description": "Label of the button that applies the filters and shows the matching logs"
+    },
+    "filterPillAttachments": "附件",
+    "@filterPillAttachments": {
+        "description": "Label of the filter button for choosing attachment types"
+    },
+    "filterPillKeywords": "关键词",
+    "@filterPillKeywords": {
+        "description": "Label of the filter button for searching logs by keywords"
+    },
+    "noMoodFilterLabel": "无心情",
+    "@noMoodFilterLabel": {
+        "description": "Filter option for logs that have no mood"
+    },
+    "noAttachmentsFilterLabel": "无附件",
+    "@noAttachmentsFilterLabel": {
+        "description": "Filter option for logs that have no attachments"
+    },
+    "noTextFilterLabel": "无文本",
+    "@noTextFilterLabel": {
+        "description": "Filter option for logs that have no text"
+    },
+    "partialMatchCount": "{count, plural, one{{count} 个部分匹配} other{{count} 个部分匹配}}",
+    "@partialMatchCount": {
+        "description": "Number of logs that match only some of the active filters"
+    },
+    "tagCount": "{count, plural, one{{count} 个标签} other{{count} 个标签}}",
+    "@tagCount": {
+        "description": "Number of tags selected in the tag filter"
+    },
+    "dateFilterLastMonths": "{count, plural, one{上个月} other{最近 {count} 个月}}",
+    "@dateFilterLastMonths": {
+        "description": "Date filter option covering the most recent months"
+    },
+    "dateFilterCustomRange": "自定义范围",
+    "@dateFilterCustomRange": {
+        "description": "Date filter option for choosing a custom start and end date"
+    },
+    "keywordFilterHint": "添加关键词…",
+    "@keywordFilterHint": {
+        "description": "Hint text of the field for adding a keyword to the filter"
+    },
+    "keywordFilterMatchAll": "所有关键词",
+    "@keywordFilterMatchAll": {
+        "description": "Option to only match logs containing every keyword"
+    },
+    "keywordFilterMatchAny": "任意关键词",
+    "@keywordFilterMatchAny": {
+        "description": "Option to match logs containing at least one keyword"
+    },
+    "keywordFilterMatchCase": "区分大小写",
+    "@keywordFilterMatchCase": {
+        "description": "Option to make keyword matching case sensitive"
+    },
+    "keywordCount": "{count, plural, one{{count} 个关键词} other{{count} 个关键词}}",
+    "@keywordCount": {
+        "description": "Number of keywords in the keyword filter"
+    },
+    "dateFilterRange": "{start} – {end}",
+    "@dateFilterRange": {
+        "description": "Selected date range shown on the date filter",
+        "placeholders": {
+            "start": {
+                "type": "String"
+            },
+            "end": {
+                "type": "String"
+            }
+        }
+    },
+    "gallerySelectAll": "全选",
+    "@gallerySelectAll": {
+        "description": "Label of the action that selects every log in the gallery"
+    },
+    "gallerySelectAction": "选择",
+    "@gallerySelectAction": {
+        "description": "Label of the action that starts selecting logs in the gallery"
+    },
+    "galleryOpenAction": "打开",
+    "@galleryOpenAction": {
+        "description": "Label of the action that opens a log from the gallery"
+    },
+    "deleteLogsMessage": "{count, plural, one{删除 {count} 条日迹？其附件也将一并删除。} other{删除 {count} 条日迹？其附件也将一并删除。}}",
+    "@deleteLogsMessage": {
+        "description": "Confirmation message shown before deleting the selected logs"
+    },
+    "newLogAction": "新日迹",
+    "@newLogAction": {
+        "description": "Label of the action that creates a new log"
+    },
+    "removeTagsTitle": "移除标签",
+    "@removeTagsTitle": {
+        "description": "Title of the dialog for removing tags from the selected logs"
+    },
+    "applyButtonLabel": "应用",
+    "@applyButtonLabel": {
+        "description": "Label of the button that applies the chosen changes"
+    },
+    "addTagsConfirmMessage": "{count, plural, one{将所选标签添加到 {count} 条日迹？} other{将所选标签添加到 {count} 条日迹？}}",
+    "@addTagsConfirmMessage": {
+        "description": "Confirmation message shown before adding tags to the selected logs"
+    },
+    "removeTagsConfirmMessage": "{count, plural, one{从 {count} 条日迹中移除所选标签？} other{从 {count} 条日迹中移除所选标签？}}",
+    "@removeTagsConfirmMessage": {
+        "description": "Confirmation message shown before removing tags from the selected logs"
+    },
+    "selectPartialMatchesMessage": "{count, plural, one{是否也选择 {count} 个部分匹配？} other{是否也选择 {count} 个部分匹配？}}",
+    "@selectPartialMatchesMessage": {
+        "description": "Question asking whether logs that only partially match the search text should also be selected"
+    },
+    "selectExactMatchesOnly": "仅精确匹配",
+    "@selectExactMatchesOnly": {
+        "description": "Button choosing to select only logs that match the exact text"
+    },
+    "selectIncludingPartialMatches": "包含",
+    "@selectIncludingPartialMatches": {
+        "description": "Button choosing to also select logs that partially match the text"
+    },
+    "settingsExactAlarmsTitle": "是否允许精确闹钟权限？",
+    "@settingsExactAlarmsTitle": {
+        "description": "Title of the dialog asking whether to allow exact alarms for reminders"
+    },
+    "settingsExactAlarmsDescription": "如果不允许精确闹钟权限，闹钟可能会延迟几分钟。",
+    "@settingsExactAlarmsDescription": {
+        "description": "Body of the exact alarms dialog explaining that reminders may be delayed without the permission"
+    },
+    "settingsSecurityPasswordWarning": "如果你忘记了密码，你将无法打开 Daily You。",
+    "@settingsSecurityPasswordWarning": {
+        "description": "Warning shown above the password fields when setting a password, explaining that a forgotten password locks the user out"
+    },
+    "discardChangesTitle": "放弃更改？",
+    "@discardChangesTitle": {
+        "description": "Title of the dialog confirming whether to discard unsaved changes"
+    },
+    "discardChangesDescription": "您的更改将会丢失。",
+    "@discardChangesDescription": {
+        "description": "Body of the discard changes dialog"
+    },
+    "onboardingSkip": "跳过",
+    "@onboardingSkip": {
+        "description": "Label of the button that skips the rest of the onboarding flow"
+    },
+    "onboardingContinue": "继续",
+    "@onboardingContinue": {
+        "description": "Label of the button that moves to the next onboarding step"
+    },
+    "onboardingFinish": "开始写日迹",
+    "@onboardingFinish": {
+        "description": "Label of the button on the last onboarding step that finishes onboarding and opens the app"
+    },
+    "onboardingImportTitle": "用过其他日记 App？",
+    "@onboardingImportTitle": {
+        "description": "Title of the onboarding step offering to import logs from another app"
+    },
+    "onboardingImportDescription": "导入你现有的日记，或从头开始。",
+    "@onboardingImportDescription": {
+        "description": "Description under the title of the onboarding import step"
+    },
+    "onboardingStorageNote": "你之后可以在“设置”中更改这些选项。",
+    "@onboardingStorageNote": {
+        "description": "Description under the title of the onboarding storage step, noting the choices can be changed later in settings"
+    },
+    "onboardingWelcomeTitle": "欢迎来到 Daily You",
+    "@onboardingWelcomeTitle": {
+        "description": "Title of the first onboarding step"
+    },
+    "onboardingWelcomeDescription": "每一天都值得留下痕迹。",
+    "@onboardingWelcomeDescription": {
+        "description": "Description under the title of the first onboarding step"
+    },
+    "onboardingRemindersTitle": "让它成为习惯",
+    "@onboardingRemindersTitle": {
+        "description": "Title of the onboarding step for turning on daily reminders"
+    },
+    "onboardingStorageTitle": "保护好你的日迹",
+    "@onboardingStorageTitle": {
+        "description": "Title of the onboarding step for password, sync, and backup options"
+    },
+    "onboardingRestore": "从备份恢复",
+    "@onboardingRestore": {
+        "description": "Label of the button that restores logs from a backup during onboarding"
+    },
+    "onboardingMoodsCustomize": "自定义心情",
+    "@onboardingMoodsCustomize": {
+        "description": "Label of the button that opens the mood editor"
+    },
+    "onboardingRemindersDescription": "设置随机或定时提醒，记录你的一天。",
+    "@onboardingRemindersDescription": {
+        "description": "Description under the title of the onboarding reminders step"
+    }
 }

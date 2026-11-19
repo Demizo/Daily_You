@@ -232,5 +232,6 @@
     "labelAbsentLabel": "Assente",
     "labelCoverageLabel": "Periodo",
     "chartDistributionTitle": "Distribuzione di {tag}",
-    "chartSmoothingLabel": "Smussamento delle curve"
+    "chartSmoothingLabel": "Smussamento delle curve",
+    "actionTakeVideo": "Registra video"
 }
