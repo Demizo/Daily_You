@@ -1,0 +1,10 @@
+Daily You v3.11.0 has arrived! All Aboard:
+
+• New on-boarding flow to get set up
+• Logs can be selected in the gallery to perform bulk actions
+• Added search filters to home in on logs
+• Improved text search to find disjoint words and partial matches
+• The text editing toolbar can now scroll
+• Added an Android shortcut to quickly record video
+• Various UI enhancements
+• Updated translations
