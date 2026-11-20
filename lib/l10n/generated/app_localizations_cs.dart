@@ -1218,6 +1218,12 @@ class AppLocalizationsCs extends AppLocalizations {
   String get settingsConsiderSupporting => 'zvažte podporu';
 
   @override
+  String get supportBannerOpenSourceTitle => 'Daily You is open-source';
+
+  @override
+  String get supportBannerFeedbackPrompt => 'Share your feedback';
+
+  @override
   String get imagesTitle => 'Obrázky';
 
   @override

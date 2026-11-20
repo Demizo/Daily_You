@@ -1225,6 +1225,12 @@ class AppLocalizationsPl extends AppLocalizations {
   String get settingsConsiderSupporting => 'rozważ wsparcie';
 
   @override
+  String get supportBannerOpenSourceTitle => 'Daily You is open-source';
+
+  @override
+  String get supportBannerFeedbackPrompt => 'Share your feedback';
+
+  @override
   String get imagesTitle => 'Zdjęcia';
 
   @override

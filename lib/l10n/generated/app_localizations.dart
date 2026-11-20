@@ -2102,6 +2102,18 @@ abstract class AppLocalizations {
   /// **'consider supporting'**
   String get settingsConsiderSupporting;
 
+  /// No description provided for @supportBannerOpenSourceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily You is open-source'**
+  String get supportBannerOpenSourceTitle;
+
+  /// No description provided for @supportBannerFeedbackPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Share your feedback'**
+  String get supportBannerFeedbackPrompt;
+
   /// No description provided for @imagesTitle.
   ///
   /// In en, this message translates to:

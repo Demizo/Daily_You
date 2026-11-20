@@ -1233,6 +1233,12 @@ class AppLocalizationsTa extends AppLocalizations {
   String get settingsConsiderSupporting => 'ஆதரிப்பதை கருத்தில் கொள்ளுங்கள்';
 
   @override
+  String get supportBannerOpenSourceTitle => 'Daily You is open-source';
+
+  @override
+  String get supportBannerFeedbackPrompt => 'Share your feedback';
+
+  @override
   String get imagesTitle => 'படங்கள்';
 
   @override

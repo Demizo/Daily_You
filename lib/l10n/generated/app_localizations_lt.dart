@@ -1238,6 +1238,12 @@ class AppLocalizationsLt extends AppLocalizations {
   String get settingsConsiderSupporting => 'apsvarstykite galimybę paremti';
 
   @override
+  String get supportBannerOpenSourceTitle => 'Daily You is open-source';
+
+  @override
+  String get supportBannerFeedbackPrompt => 'Share your feedback';
+
+  @override
   String get imagesTitle => 'Paveikslai';
 
   @override

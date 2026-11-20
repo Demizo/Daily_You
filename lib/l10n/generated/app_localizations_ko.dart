@@ -1212,6 +1212,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get settingsConsiderSupporting => '앱을 후원해주세요';
 
   @override
+  String get supportBannerOpenSourceTitle => 'Daily You is open-source';
+
+  @override
+  String get supportBannerFeedbackPrompt => 'Share your feedback';
+
+  @override
   String get imagesTitle => 'Images';
 
   @override

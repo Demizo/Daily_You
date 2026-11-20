@@ -15,6 +15,8 @@ import 'package:daily_you/pages/settings/storage_settings.dart';
 import 'package:daily_you/pages/settings/tags_settings.dart';
 import 'package:daily_you/pages/settings/templates_page.dart';
 import 'package:daily_you/providers/entries_provider.dart';
+import 'package:daily_you/utils/app_distribution.dart';
+import 'package:daily_you/utils/support_page.dart';
 import 'package:daily_you/widgets/segmented_group.dart';
 import 'package:daily_you/widgets/settings_page_scaffold.dart';
 import 'package:daily_you/widgets/settings_rows.dart';
@@ -164,14 +166,7 @@ class _SupportFooterState extends State<_SupportFooter> {
     super.initState();
     _supportTapRecognizer = TapGestureRecognizer()
       ..onTap = () async {
-        await launchUrl(
-            Uri(
-                scheme: "https",
-                host: "github.com",
-                path: "/Demizo/Daily_You",
-                queryParameters: {"tab": "readme-ov-file"},
-                fragment: "support-the-app"),
-            mode: LaunchMode.externalApplication);
+        await launchUrl(supportPageUri, mode: LaunchMode.externalApplication);
       };
   }
 
@@ -184,6 +179,8 @@ class _SupportFooterState extends State<_SupportFooter> {
   @override
   Widget build(BuildContext context) {
     final entriesProvider = Provider.of<EntriesProvider>(context);
+    final showSupportLink =
+        !isPlayStoreBuild && entriesProvider.entries.length > 30;
     return Center(
       child: RichText(
         textAlign: TextAlign.center,
@@ -194,13 +191,13 @@ class _SupportFooterState extends State<_SupportFooter> {
                 style: TextStyle(
                     fontSize: 14,
                     color: Theme.of(context).colorScheme.secondary)),
-            if (entriesProvider.entries.length > 30)
+            if (showSupportLink)
               TextSpan(
                   text: " ",
                   style: TextStyle(
                       fontSize: 14,
                       color: Theme.of(context).colorScheme.secondary)),
-            if (entriesProvider.entries.length > 30)
+            if (showSupportLink)
               TextSpan(
                 text: AppLocalizations.of(context)!.settingsConsiderSupporting,
                 style: TextStyle(

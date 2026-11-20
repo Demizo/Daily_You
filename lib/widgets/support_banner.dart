@@ -4,6 +4,8 @@
 
 import 'package:daily_you/config_provider.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
+import 'package:daily_you/utils/app_distribution.dart';
+import 'package:daily_you/utils/support_page.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -43,65 +45,87 @@ class SupportBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final title = isPlayStoreBuild
+        ? l10n.supportBannerOpenSourceTitle
+        : l10n.settingsMadeWithLove;
+    final actionLabel = isPlayStoreBuild
+        ? l10n.supportBannerFeedbackPrompt
+        : l10n.settingsConsiderSupporting;
+    final separator = isPlayStoreBuild ? '\n' : ' ';
+    final titleStyle =
+        textTheme.titleSmall?.copyWith(color: colorScheme.onSurface);
+    final actionStyle = titleStyle?.copyWith(
+      color: colorScheme.primary,
+      decorationColor: colorScheme.primary,
+    );
+
     return Card.filled(
-      color: Theme.of(context).colorScheme.secondaryContainer,
-      child: Padding(
-        padding:
-            const EdgeInsets.only(left: 4.0, right: 4.0, top: 4.0, bottom: 4.0),
-        child: Row(
+      color: colorScheme.surfaceContainer,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: colorScheme.primary, width: 1.5),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () =>
+            launchUrl(supportPageUri, mode: LaunchMode.externalApplication),
+        child: Stack(
           children: [
-            const SizedBox(width: 8),
-            Icon(
-              Icons.volunteer_activism_rounded,
-              color: Theme.of(context).colorScheme.secondary,
-              size: 20,
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text.rich(
-                TextSpan(children: [
-                  TextSpan(
-                    text:
-                        '${AppLocalizations.of(context)!.settingsMadeWithLove} ${AppLocalizations.of(context)!.settingsConsiderSupporting}',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Theme.of(context).colorScheme.onSecondaryContainer,
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 20,
+                    backgroundColor: colorScheme.primary,
+                    child: Icon(
+                      Icons.volunteer_activism_rounded,
+                      color: colorScheme.onPrimary,
                     ),
                   ),
-                ]),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsetsDirectional.only(end: 28),
+                      child: Text.rich(
+                        TextSpan(
+                          style: titleStyle,
+                          children: [
+                            TextSpan(text: title),
+                            TextSpan(text: separator),
+                            TextSpan(text: actionLabel, style: actionStyle),
+                            const TextSpan(text: ' '),
+                            WidgetSpan(
+                              alignment: PlaceholderAlignment.middle,
+                              child: Icon(
+                                Icons.open_in_new_rounded,
+                                size: 16,
+                                color: colorScheme.primary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-            IconButton(
-              icon: const Icon(Icons.open_in_new_rounded, size: 18),
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
-              visualDensity: VisualDensity.compact,
-              color: Theme.of(context).colorScheme.onSecondaryContainer,
-              onPressed: () async {
-                await launchUrl(
-                  Uri(
-                    scheme: 'https',
-                    host: 'github.com',
-                    path: '/Demizo/Daily_You',
-                    queryParameters: {'tab': 'readme-ov-file'},
-                    fragment: 'support-the-app',
-                  ),
-                  mode: LaunchMode.externalApplication,
-                );
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.close_rounded, size: 18),
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
-              visualDensity: VisualDensity.compact,
-              color: Theme.of(context).colorScheme.onSecondaryContainer,
-              onPressed: () async {
-                await configProvider.set(
+            PositionedDirectional(
+              top: 0,
+              end: 0,
+              child: IconButton(
+                icon: const Icon(Icons.close_rounded, size: 18),
+                color: colorScheme.onSurfaceVariant,
+                visualDensity: VisualDensity.compact,
+                onPressed: () => configProvider.set(
                   Settings.lastDismissedSupportBannerDate,
                   DateTime.now().toIso8601String(),
-                );
-              },
+                ),
+              ),
             ),
           ],
         ),

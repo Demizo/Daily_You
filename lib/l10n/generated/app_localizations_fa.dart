@@ -1215,6 +1215,12 @@ class AppLocalizationsFa extends AppLocalizations {
   String get settingsConsiderSupporting => 'حمایت را در نظر بگیرید';
 
   @override
+  String get supportBannerOpenSourceTitle => 'Daily You is open-source';
+
+  @override
+  String get supportBannerFeedbackPrompt => 'Share your feedback';
+
+  @override
   String get imagesTitle => 'تصاویر';
 
   @override

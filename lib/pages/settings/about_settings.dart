@@ -4,6 +4,8 @@
 
 import 'package:daily_you/device_info_service.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
+import 'package:daily_you/utils/app_distribution.dart';
+import 'package:daily_you/utils/support_page.dart';
 import 'package:daily_you/widgets/segmented_group.dart';
 import 'package:daily_you/widgets/settings_page_scaffold.dart';
 import 'package:daily_you/widgets/settings_rows.dart';
@@ -66,19 +68,15 @@ class AboutSettings extends StatelessWidget {
                     ))),
           ),
         ]),
-        SegmentedGroup(emphasized: true, children: [
-          SettingsActionRow(
-            icon: Icons.volunteer_activism_rounded,
-            title:
-                '${l10n.settingsMadeWithLove} ${l10n.settingsConsiderSupporting}',
-            onTap: () => _open(Uri(
-                scheme: "https",
-                host: "github.com",
-                path: "/Demizo/Daily_You",
-                queryParameters: {"tab": "readme-ov-file"},
-                fragment: "support-the-app")),
-          ),
-        ]),
+        if (!isPlayStoreBuild)
+          SegmentedGroup(emphasized: true, children: [
+            SettingsActionRow(
+              icon: Icons.volunteer_activism_rounded,
+              title:
+                  '${l10n.settingsMadeWithLove} ${l10n.settingsConsiderSupporting}',
+              onTap: () => _open(supportPageUri),
+            ),
+          ]),
       ],
     );
   }

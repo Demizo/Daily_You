@@ -1236,6 +1236,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settingsConsiderSupporting => 'pensez à soutenir';
 
   @override
+  String get supportBannerOpenSourceTitle => 'Daily You is open-source';
+
+  @override
+  String get supportBannerFeedbackPrompt => 'Share your feedback';
+
+  @override
   String get imagesTitle => 'Images';
 
   @override
