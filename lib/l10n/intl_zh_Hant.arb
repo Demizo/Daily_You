@@ -115,7 +115,7 @@
     "settingsMadeWithLove": "用❤️製作",
     "settingsBackupRestoreTitle": "備份與還原",
     "settingsDailyReminderOnboarding": "開啟每日提醒，助你持之以恆！",
-    "settingsNotificationsPermissionsPrompt": "為了在隨機或您設定的時間發送提醒，系統將請求「排程鬧鐘」權限。",
+    "settingsNotificationsPermissionsPrompt": "為了在隨機或您設定的時間發送提醒，系統將請求「定時鬧鐘」權限。",
     "wordCount": "{count, plural, one{{count} 個字} other{{count} 個字}}",
     "settingsAppLanguageTitle": "應用程式語言",
     "settingsOverrideAppLanguageTitle": "覆寫應用程式語言",
@@ -200,10 +200,10 @@
     "tagFilterModeAny": "任意標籤",
     "tagFilterModeAll": "所有標籤",
     "clearAllFilters": "清除全部",
-    "noTagsFilterLabel": "無標籤",
+    "noTagsFilterLabel": "沒有標籤",
     "addTagsTitle": "新增標籤",
     "addTagsSearchHint": "搜尋標籤…",
-    "tagExerciseName": "鍛煉",
+    "tagExerciseName": "運動",
     "tagSocializingName": "社交",
     "tagHobbyName": "愛好",
     "tagEntertainmentName": "娛樂",
@@ -294,5 +294,281 @@
     "moodUnpleasant": "不愉快",
     "moodNeutral": "中性",
     "moodPleasant": "愉快",
-    "moodVeryPleasant": "非常愉快"
+    "moodVeryPleasant": "非常愉快",
+    "chartInfluencesTitle": "影響因素 {tag}",
+    "streakDayLabel": "{count, plural, other{連續天數}}",
+    "@streakDayLabel": {
+        "description": "Label shown under a large streak length, which is not part of this string"
+    },
+    "statsLogsLabel": "{count, plural, one{紀錄} other{紀錄}}",
+    "@statsLogsLabel": {
+        "description": "Label shown under a large number of logs, which is not part of this string"
+    },
+    "statsWordsLabel": "{count, plural, one{字數} other{字數}}",
+    "@statsWordsLabel": {
+        "description": "Label shown next to or under a large number of words, which is not part of this string"
+    },
+    "statsDaysLabel": "{count, plural, one{天數} other{天數}}",
+    "@statsDaysLabel": {
+        "description": "Label shown under a large number of days, which is not part of this string"
+    },
+    "statsLongestStreakTitle": "最長連續天數",
+    "@statsLongestStreakTitle": {
+        "description": "Label shown next to or under a large number giving the longest run of consecutive days, which is not part of this string"
+    },
+    "statsWritingTitle": "寫作",
+    "@statsWritingTitle": {
+        "description": "Title of the writing statistics tile and page"
+    },
+    "statsWordsPerLogTitle": "平均紀錄字數",
+    "@statsWordsPerLogTitle": {
+        "description": "Label for the average number of words in a log"
+    },
+    "statsLongestLogTitle": "最長的紀錄",
+    "@statsLongestLogTitle": {
+        "description": "Title of the tile showing the log with the most words"
+    },
+    "statsMostActiveTitle": "{count, plural, one{最活躍的一天} other{最活躍的日子}}",
+    "@statsMostActiveTitle": {
+        "description": "Title of the tile showing the weekday or weekdays with the most logs. The count is the number of weekdays tied for most logs",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "statsDaysOfRange": "{written} of {total, plural, one{{total} 天} other{{total} 天}}",
+    "@statsDaysOfRange": {
+        "description": "Number of days with a log out of the number of days in the selected time range, e.g. '12 of 30 Days'",
+        "placeholders": {
+            "written": {
+                "type": "int",
+                "format": "decimalPattern"
+            },
+            "total": {
+                "type": "int",
+                "format": "decimalPattern"
+            }
+        }
+    },
+    "statsAverageTitle": "平均",
+    "@statsAverageTitle": {
+        "description": "Label shown under a large average value"
+    },
+    "statsHighestTitle": "最高",
+    "@statsHighestTitle": {
+        "description": "Label shown under a large number giving the highest recorded value of a tracker"
+    },
+    "statsLowestTitle": "最低",
+    "@statsLowestTitle": {
+        "description": "Label shown under a large number giving the lowest recorded value of a tracker"
+    },
+    "statsDaysLoggedTitle": "已記錄天數",
+    "statsOfDaysLabel": "天數占比",
+    "@statsOfDaysLabel": {
+        "description": "Label shown after a percentage, e.g. '45% of Days'. The percentage is not part of this string"
+    },
+    "statsCustomizeTitle": "自訂",
+    "@statsCustomizeTitle": {
+        "description": "Label of the button for choosing which tiles appear on the statistics page"
+    },
+    "settingsExactAlarmsTitle": "允許鬧鐘與提醒權限？",
+    "@settingsExactAlarmsTitle": {
+        "description": "Title of the dialog asking whether to allow exact alarms for reminders"
+    },
+    "settingsExactAlarmsDescription": "除非您允許鬧鐘與提醒權限，否則鬧鐘可能會延遲幾分鐘。",
+    "@settingsExactAlarmsDescription": {
+        "description": "Body of the exact alarms dialog explaining that reminders may be delayed without the permission"
+    },
+    "clearFilter": "清除",
+    "@clearFilter": {
+        "description": "Label of the button that resets a single filter"
+    },
+    "showLogsCount": "{count, plural, one{Show {count} 則紀錄} other{Show {count} 則紀錄}}",
+    "@showLogsCount": {
+        "description": "Label of the button that applies the filters and shows the matching logs"
+    },
+    "filterPillAttachments": "附件",
+    "@filterPillAttachments": {
+        "description": "Label of the filter button for choosing attachment types"
+    },
+    "filterPillKeywords": "關鍵字",
+    "@filterPillKeywords": {
+        "description": "Label of the filter button for searching logs by keywords"
+    },
+    "noMoodFilterLabel": "沒有心情",
+    "@noMoodFilterLabel": {
+        "description": "Filter option for logs that have no mood"
+    },
+    "noAttachmentsFilterLabel": "沒有附件",
+    "@noAttachmentsFilterLabel": {
+        "description": "Filter option for logs that have no attachments"
+    },
+    "noTextFilterLabel": "沒有文字",
+    "@noTextFilterLabel": {
+        "description": "Filter option for logs that have no text"
+    },
+    "partialMatchCount": "{count, plural, one{{count} 部分符合} other{{count} 部分符合}}",
+    "@partialMatchCount": {
+        "description": "Number of logs that match only some of the active filters"
+    },
+    "tagCount": "{count, plural, one{{count} 個標籤} other{{count} 個標籤}}",
+    "@tagCount": {
+        "description": "Number of tags selected in the tag filter"
+    },
+    "dateFilterLastMonths": "{count, plural, one{上個月} other{最近 {count} 個月}}",
+    "@dateFilterLastMonths": {
+        "description": "Date filter option covering the most recent months"
+    },
+    "dateFilterCustomRange": "自訂區間",
+    "@dateFilterCustomRange": {
+        "description": "Date filter option for choosing a custom start and end date"
+    },
+    "keywordFilterHint": "新增關鍵字…",
+    "@keywordFilterHint": {
+        "description": "Hint text of the field for adding a keyword to the filter"
+    },
+    "keywordFilterMatchAll": "所有關鍵字",
+    "@keywordFilterMatchAll": {
+        "description": "Option to only match logs containing every keyword"
+    },
+    "keywordFilterMatchAny": "任何關鍵字",
+    "@keywordFilterMatchAny": {
+        "description": "Option to match logs containing at least one keyword"
+    },
+    "keywordFilterMatchCase": "區分大小寫",
+    "@keywordFilterMatchCase": {
+        "description": "Option to make keyword matching case sensitive"
+    },
+    "keywordCount": "{count, plural, one{{count} 個關鍵字} other{{count} 個關鍵字}}",
+    "@keywordCount": {
+        "description": "Number of keywords in the keyword filter"
+    },
+    "dateFilterRange": "{start} – {end}",
+    "@dateFilterRange": {
+        "description": "Selected date range shown on the date filter",
+        "placeholders": {
+            "start": {
+                "type": "String"
+            },
+            "end": {
+                "type": "String"
+            }
+        }
+    },
+    "tagCategoryPeopleName": "人物",
+    "formatCsv": "CSV",
+    "formatJson": "JSON",
+    "settingsSecurityPasswordWarning": "如果你忘記了，就無法打開 Daily You。",
+    "@settingsSecurityPasswordWarning": {
+        "description": "Warning shown above the password fields when setting a password, explaining that a forgotten password locks the user out"
+    },
+    "gallerySelectAll": "全選",
+    "@gallerySelectAll": {
+        "description": "Label of the action that selects every log in the gallery"
+    },
+    "gallerySelectAction": "選擇",
+    "@gallerySelectAction": {
+        "description": "Label of the action that starts selecting logs in the gallery"
+    },
+    "galleryOpenAction": "打開",
+    "@galleryOpenAction": {
+        "description": "Label of the action that opens a log from the gallery"
+    },
+    "deleteLogsMessage": "{count, plural, one{刪除 {count} 筆紀錄？其附件也將一併刪除。} other{刪除 {count} 筆紀錄？其附件也將一併刪除。}}",
+    "@deleteLogsMessage": {
+        "description": "Confirmation message shown before deleting the selected logs"
+    },
+    "newLogAction": "新紀錄",
+    "@newLogAction": {
+        "description": "Label of the action that creates a new log"
+    },
+    "removeTagsTitle": "刪除標籤",
+    "@removeTagsTitle": {
+        "description": "Title of the dialog for removing tags from the selected logs"
+    },
+    "discardChangesTitle": "要捨棄變更嗎？",
+    "@discardChangesTitle": {
+        "description": "Title of the dialog confirming whether to discard unsaved changes"
+    },
+    "discardChangesDescription": "您的變更將會遺失。",
+    "@discardChangesDescription": {
+        "description": "Body of the discard changes dialog"
+    },
+    "applyButtonLabel": "應用",
+    "@applyButtonLabel": {
+        "description": "Label of the button that applies the chosen changes"
+    },
+    "addTagsConfirmMessage": "{count, plural, one{要將選取的標籤加入 {count} 筆紀錄嗎？} other{要將選取的標籤加入 {count} 筆紀錄嗎？}}",
+    "@addTagsConfirmMessage": {
+        "description": "Confirmation message shown before adding tags to the selected logs"
+    },
+    "removeTagsConfirmMessage": "{count, plural, one{要從 {count} 筆紀錄中移除所選標籤嗎？} other{要從 {count} 筆紀錄中移除所選標籤嗎？}}",
+    "@removeTagsConfirmMessage": {
+        "description": "Confirmation message shown before removing tags from the selected logs"
+    },
+    "selectPartialMatchesMessage": "{count, plural, one{也要選取 {count} 個部分符合項目嗎？} other{也要選取 {count} 個部分符合項目嗎？}}",
+    "@selectPartialMatchesMessage": {
+        "description": "Question asking whether logs that only partially match the search text should also be selected"
+    },
+    "selectExactMatchesOnly": "僅完全符合",
+    "@selectExactMatchesOnly": {
+        "description": "Button choosing to select only logs that match the exact text"
+    },
+    "selectIncludingPartialMatches": "包含",
+    "@selectIncludingPartialMatches": {
+        "description": "Button choosing to also select logs that partially match the text"
+    },
+    "onboardingSkip": "跳過",
+    "@onboardingSkip": {
+        "description": "Label of the button that skips the rest of the onboarding flow"
+    },
+    "onboardingContinue": "繼續",
+    "@onboardingContinue": {
+        "description": "Label of the button that moves to the next onboarding step"
+    },
+    "onboardingFinish": "開始記錄",
+    "@onboardingFinish": {
+        "description": "Label of the button on the last onboarding step that finishes onboarding and opens the app"
+    },
+    "onboardingImportTitle": "來自其他應用程式？",
+    "@onboardingImportTitle": {
+        "description": "Title of the onboarding step offering to import logs from another app"
+    },
+    "onboardingImportDescription": "匯入你現有的紀錄，或重新開始。",
+    "@onboardingImportDescription": {
+        "description": "Description under the title of the onboarding import step"
+    },
+    "onboardingStorageNote": "您可以稍後於設定中更改。",
+    "@onboardingStorageNote": {
+        "description": "Description under the title of the onboarding storage step, noting the choices can be changed later in settings"
+    },
+    "onboardingWelcomeTitle": "歡迎來到 Daily You",
+    "@onboardingWelcomeTitle": {
+        "description": "Title of the first onboarding step"
+    },
+    "onboardingWelcomeDescription": "每一天都值得被記住。",
+    "@onboardingWelcomeDescription": {
+        "description": "Description under the title of the first onboarding step"
+    },
+    "onboardingRemindersTitle": "養成習慣",
+    "@onboardingRemindersTitle": {
+        "description": "Title of the onboarding step for turning on daily reminders"
+    },
+    "onboardingStorageTitle": "保護您的紀錄安全",
+    "@onboardingStorageTitle": {
+        "description": "Title of the onboarding step for password, sync, and backup options"
+    },
+    "onboardingRestore": "從備份還原",
+    "@onboardingRestore": {
+        "description": "Label of the button that restores logs from a backup during onboarding"
+    },
+    "onboardingMoodsCustomize": "自訂心情",
+    "@onboardingMoodsCustomize": {
+        "description": "Label of the button that opens the mood editor"
+    },
+    "onboardingRemindersDescription": "設定隨機或定時提醒，記錄你的一天。",
+    "@onboardingRemindersDescription": {
+        "description": "Description under the title of the onboarding reminders step"
+    }
 }
