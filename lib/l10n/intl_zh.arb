@@ -534,7 +534,7 @@
     "@onboardingImportTitle": {
         "description": "Title of the onboarding step offering to import logs from another app"
     },
-    "onboardingImportDescription": "导入你现有的日记，或从头开始。",
+    "onboardingImportDescription": "导入你现有的日记，或从零开始。",
     "@onboardingImportDescription": {
         "description": "Description under the title of the onboarding import step"
     },
