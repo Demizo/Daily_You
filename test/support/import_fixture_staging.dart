@@ -5,13 +5,15 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:daily_you/utils/imports/import_archive.dart';
 import 'package:daily_you/utils/imports/import_registry.dart';
 import 'package:daily_you/utils/imports/import_source.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:path/path.dart' show join, relative;
+import 'package:path/path.dart' show basename, join, relative;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'import_fixtures.dart';
+import 'import_run_harness.dart';
 
 Future<Directory> _stagingDirectory(String name) async {
   final directory = await Directory.systemTemp.createTemp(name);
@@ -58,3 +60,12 @@ Future<ImportSource> stageDiariumFixture() async {
 
   return ImportSource(staged.path, databaseName);
 }
+
+Future<ImportSource> stageDayOneFixture() async {
+  final archive = File(
+      await zipDirectoryContents(fixtureInputDirectory(ImportFormat.dayOne)));
+  return ImportSource(archive.parent.path, basename(archive.path));
+}
+
+Directory extractedDayOneFixture(ImportSource source) =>
+    Directory(join(source.directoryPath, extractedArchiveFolderName));

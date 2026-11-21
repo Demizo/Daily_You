@@ -1,0 +1,121 @@
+{
+  "categories": [],
+  "tagDefinitions": [],
+  "entries": [
+    {
+      "text": "",
+      "mood": null,
+      "timeCreate": "2026-01-01T06:30:00.000",
+      "timeModified": "2026-01-01T06:30:00.000",
+      "tags": [
+        {
+          "name": "Journal",
+          "type": "label",
+          "value": null
+        }
+      ],
+      "attachments": []
+    },
+    {
+      "text": "# First entry\nA well-known (example).\n\n**Bold** stays",
+      "mood": null,
+      "timeCreate": "2026-01-01T21:04:05.000",
+      "timeModified": "2026-01-01T22:00:00.000",
+      "tags": [
+        {
+          "name": "Gratitude",
+          "type": "label",
+          "value": null
+        },
+        {
+          "name": "SlashName",
+          "type": "label",
+          "value": null
+        },
+        {
+          "name": "gratitude",
+          "type": "label",
+          "value": null
+        },
+        {
+          "name": "Favorite",
+          "type": "label",
+          "value": null
+        },
+        {
+          "name": "Journal",
+          "type": "label",
+          "value": null
+        }
+      ],
+      "attachments": [
+        {
+          "type": "image",
+          "rank": 1,
+          "timeCreate": "2026-01-01T21:04:05.000",
+          "media": {
+            "file": "photos/aaaa1111.jpg"
+          }
+        },
+        {
+          "type": "image",
+          "rank": 0,
+          "timeCreate": "2026-01-01T21:04:05.000",
+          "media": {
+            "file": "photos/bbbb2222.png"
+          }
+        }
+      ]
+    },
+    {
+      "text": "Second journal",
+      "mood": null,
+      "timeCreate": "2026-03-29T01:30:00.000",
+      "timeModified": "2026-03-29T01:30:00.000",
+      "tags": [
+        {
+          "name": "Gratitude",
+          "type": "label",
+          "value": null
+        },
+        {
+          "name": "Journal Two",
+          "type": "label",
+          "value": null
+        }
+      ],
+      "attachments": []
+    },
+    {
+      "text": "No time zone",
+      "mood": null,
+      "timeCreate": "2026-07-01T19:00:00.000",
+      "timeModified": "2026-07-01T19:00:00.000",
+      "tags": [
+        {
+          "name": "Journal",
+          "type": "label",
+          "value": null
+        }
+      ],
+      "attachments": [
+        {
+          "type": "audio",
+          "rank": 1,
+          "timeCreate": "2026-07-01T19:00:00.000",
+          "media": {
+            "file": "audios/dddd4444.m4a"
+          }
+        },
+        {
+          "type": "video",
+          "rank": 0,
+          "timeCreate": "2026-07-01T19:00:00.000",
+          "media": {
+            "file": "videos/cccc3333.mov"
+          }
+        }
+      ]
+    }
+  ]
+}

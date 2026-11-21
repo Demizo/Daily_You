@@ -660,6 +660,8 @@
   "@formatDaybook": {},
   "formatDaylio": "Daylio",
   "@formatDaylio": {},
+  "formatDayOne": "Day One",
+  "@formatDayOne": {},
   "formatDiarium": "Diarium",
   "@formatDiarium": {},
   "formatDiaro": "Diaro",

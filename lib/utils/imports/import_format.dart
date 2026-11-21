@@ -6,6 +6,7 @@ enum ImportFormat {
   dailyYouJson,
   daybook,
   daylio,
+  dayOne,
   diarium,
   diaro,
   myBrain,

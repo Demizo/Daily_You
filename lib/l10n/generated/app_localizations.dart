@@ -1886,6 +1886,12 @@ abstract class AppLocalizations {
   /// **'Daylio'**
   String get formatDaylio;
 
+  /// No description provided for @formatDayOne.
+  ///
+  /// In en, this message translates to:
+  /// **'Day One'**
+  String get formatDayOne;
+
   /// No description provided for @formatDiarium.
   ///
   /// In en, this message translates to:
