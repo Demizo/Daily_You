@@ -34,7 +34,7 @@
     "titleHint": "标题…",
     "writeSomethingHint": "写点什么…",
     "deleteLogTitle": "删除日迹",
-    "deleteLogDescription": "您确定要删除该条日迹吗？",
+    "deleteLogDescription": "您确定要删除这篇日迹吗？",
     "deletePhotoTitle": "删除图片",
     "deletePhotoDescription": "您确定要删除这张图片吗？",
     "pageSettingsTitle": "设置",
@@ -222,7 +222,7 @@
     "tagTypeLabelTitle": "标签",
     "iconGroupMoodPeople": "心情与人物",
     "iconGroupSymbols": "符号",
-    "deleteTagMessage": "删除「{name}」？{count, plural, =0{} =1{ 它被用于 1 条记录中。} other{ 它被用于 {count} 条记录中。}}",
+    "deleteTagMessage": "删除“{name}”？{count, plural, =0{} =1{ 有 1 篇日迹正在使用它。} other{ 有 {count} 篇日迹正在使用它。}}",
     "deleteCategoryMessage": "删除「{name}」？{count, plural, =0{} =1{其 1 个标签也将被删除。} other{其 {count} 个标签也将被删除。}}",
     "tagPickerSortManualLabel": "手动排序",
     "tagPickerSortUsageLabel": "按使用次数排序",
@@ -378,7 +378,7 @@
     "@clearFilter": {
         "description": "Label of the button that resets a single filter"
     },
-    "showLogsCount": "{count, plural, one{显示 {count} 条日志} other{显示 {count} 条日志}}",
+    "showLogsCount": "{count, plural, one{显示 {count} 篇日迹} other{显示 {count} 篇日迹}}",
     "@showLogsCount": {
         "description": "Label of the button that applies the filters and shows the matching logs"
     },
@@ -462,7 +462,7 @@
     "@galleryOpenAction": {
         "description": "Label of the action that opens a log from the gallery"
     },
-    "deleteLogsMessage": "{count, plural, one{删除 {count} 条日迹？其附件也将一并删除。} other{删除 {count} 条日迹？其附件也将一并删除。}}",
+    "deleteLogsMessage": "{count, plural, one{删除 {count} 篇日迹？其附件也将一并删除。} other{删除 {count} 篇日迹？其附件也将一并删除。}}",
     "@deleteLogsMessage": {
         "description": "Confirmation message shown before deleting the selected logs"
     },
@@ -478,11 +478,11 @@
     "@applyButtonLabel": {
         "description": "Label of the button that applies the chosen changes"
     },
-    "addTagsConfirmMessage": "{count, plural, one{将所选标签添加到 {count} 条日迹？} other{将所选标签添加到 {count} 条日迹？}}",
+    "addTagsConfirmMessage": "{count, plural, one{将所选标签添加到 {count} 篇日迹？} other{将所选标签添加到 {count} 篇日迹？}}",
     "@addTagsConfirmMessage": {
         "description": "Confirmation message shown before adding tags to the selected logs"
     },
-    "removeTagsConfirmMessage": "{count, plural, one{从 {count} 条日迹中移除所选标签？} other{从 {count} 条日迹中移除所选标签？}}",
+    "removeTagsConfirmMessage": "{count, plural, one{从 {count} 篇日迹中移除所选标签？} other{从 {count} 篇日迹中移除所选标签？}}",
     "@removeTagsConfirmMessage": {
         "description": "Confirmation message shown before removing tags from the selected logs"
     },
@@ -498,11 +498,11 @@
     "@selectIncludingPartialMatches": {
         "description": "Button choosing to also select logs that partially match the text"
     },
-    "settingsExactAlarmsTitle": "是否允许精确闹钟权限？",
+    "settingsExactAlarmsTitle": "允许闹钟和提醒权限？",
     "@settingsExactAlarmsTitle": {
         "description": "Title of the dialog asking whether to allow exact alarms for reminders"
     },
-    "settingsExactAlarmsDescription": "如果不允许精确闹钟权限，闹钟可能会延迟几分钟。",
+    "settingsExactAlarmsDescription": "如果不允许闹钟和提醒权限，闹钟可能会延迟几分钟。",
     "@settingsExactAlarmsDescription": {
         "description": "Body of the exact alarms dialog explaining that reminders may be delayed without the permission"
     },
@@ -538,7 +538,7 @@
     "@onboardingImportDescription": {
         "description": "Description under the title of the onboarding import step"
     },
-    "onboardingStorageNote": "你之后可以在“设置”中更改这些选项。",
+    "onboardingStorageNote": "你之后可以在设置中更改这些选项。",
     "@onboardingStorageNote": {
         "description": "Description under the title of the onboarding storage step, noting the choices can be changed later in settings"
     },
@@ -550,7 +550,7 @@
     "@onboardingWelcomeDescription": {
         "description": "Description under the title of the first onboarding step"
     },
-    "onboardingRemindersTitle": "让它成为习惯",
+    "onboardingRemindersTitle": "养成习惯",
     "@onboardingRemindersTitle": {
         "description": "Title of the onboarding step for turning on daily reminders"
     },
@@ -569,5 +569,7 @@
     "onboardingRemindersDescription": "设置随机或定时提醒，记录你的一天。",
     "@onboardingRemindersDescription": {
         "description": "Description under the title of the onboarding reminders step"
-    }
+    },
+    "supportBannerOpenSourceTitle": "Daily You 是开源的",
+    "supportBannerFeedbackPrompt": "留下你的意见"
 }
