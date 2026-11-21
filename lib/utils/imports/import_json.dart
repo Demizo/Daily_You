@@ -11,17 +11,14 @@ import 'package:daily_you/models/mood.dart';
 import 'package:daily_you/models/tag.dart';
 import 'package:daily_you/models/tag_icon_type.dart';
 import 'package:daily_you/utils/exports/export_json.dart';
+import 'package:daily_you/utils/imports/import_archive.dart';
 import 'package:daily_you/utils/imports/import_bundle.dart';
 import 'package:daily_you/utils/imports/import_source.dart';
 import 'package:daily_you/utils/tag_name_sanitizer.dart';
-import 'package:daily_you/utils/zip_utils.dart';
 import 'package:path/path.dart';
 
-const _zipSignature = [0x50, 0x4B, 0x03, 0x04];
-const _extractedFolderName = 'archive_contents';
-
 Future<ImportBundle> parseJson(ImportSource source) async {
-  final extractedPath = await _extractIfArchive(source);
+  final extractedPath = await extractIfArchive(source);
   final document =
       extractedPath == null ? source.file : _singleJsonDocument(extractedPath);
   final root = json.decode(utf8.decode(await document.readAsBytes()));
@@ -38,26 +35,6 @@ Future<ImportBundle> parseJson(ImportSource source) async {
   }
   throw const FormatException('Not a Daily You JSON file');
 }
-
-Future<String?> _extractIfArchive(ImportSource source) async {
-  final handle = await source.file.open();
-  final List<int> header;
-  try {
-    header = await handle.read(_zipSignature.length);
-  } finally {
-    await handle.close();
-  }
-  if (!_hasZipSignature(header)) return null;
-
-  final extractedPath = join(source.directoryPath, _extractedFolderName);
-  await ZipUtils.extract(source.file.path, extractedPath);
-  return extractedPath;
-}
-
-bool _hasZipSignature(List<int> header) =>
-    header.length == _zipSignature.length &&
-    [for (final (index, byte) in _zipSignature.indexed) header[index] == byte]
-        .every((matches) => matches);
 
 File _singleJsonDocument(String extractedPath) {
   final documents = [
