@@ -56,6 +56,34 @@ void main() {
     });
   });
 
+  testWidgets(
+      'imports every journal of a Day One zip and removes the staged files',
+      (tester) async {
+    final context = await harness.pumpContext(tester);
+
+    await tester.runAsync(() async {
+      final archive = await zipDirectoryContents(
+          fixtureInputDirectory(ImportFormat.dayOne));
+
+      final outcome = await harness.run(
+          context, registry.optionFor(ImportFormat.dayOne), archive);
+
+      expect(outcome.succeeded, isTrue);
+      expect(EntriesProvider.instance.entries, hasLength(4));
+      expect(await harness.imageFiles.list(), hasLength(2));
+      expect(
+          TagsProvider.instance.tags.map((tag) => tag.name),
+          unorderedEquals([
+            'Gratitude',
+            'SlashName',
+            'Favorite',
+            'Journal',
+            'Journal Two'
+          ]));
+      expect(harness.leftoverTemporaryFiles, isEmpty);
+    });
+  });
+
   testWidgets('removes the extracted files when the archive has no entries',
       (tester) async {
     final context = await harness.pumpContext(tester);

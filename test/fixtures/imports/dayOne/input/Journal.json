@@ -1,0 +1,43 @@
+{
+  "metadata": { "version": "1.0" },
+  "entries": [
+    {
+      "uuid": "00000000000000000000000000000001",
+      "creationDate": "2026-01-02T03:04:05Z",
+      "modifiedDate": "2026-01-02T04:00:00Z",
+      "timeZone": "America/Chicago",
+      "starred": true,
+      "isPinned": false,
+      "tags": ["Gratitude", "Slash/Name", "gratitude", "  "],
+      "text": "![](dayone-moment://AAAA1111AAAA1111)\n\n# First entry\nA well\\-known \\(example\\)\\.\n\n![](dayone-moment://BBBB2222BBBB2222)\n\n**Bold** stays\n",
+      "richText": "{\"contents\":[]}",
+      "photos": [
+        { "identifier": "BBBB2222BBBB2222", "md5": "bbbb2222", "type": "png", "orderInEntry": 1 },
+        { "identifier": "AAAA1111AAAA1111", "md5": "aaaa1111", "type": "jpg", "orderInEntry": 0 },
+        { "identifier": "FFFF6666FFFF6666", "md5": "missing", "type": "jpg", "orderInEntry": 2 }
+      ]
+    },
+    {
+      "uuid": "00000000000000000000000000000002",
+      "creationDate": "2026-07-01T12:00:00Z",
+      "modifiedDate": "2026-07-01T12:00:00Z",
+      "starred": false,
+      "text": "No time zone\n![](dayone-moment:/video/CCCC3333CCCC3333)\n![](dayone-moment:/audio/DDDD4444DDDD4444)\n",
+      "videos": [
+        { "identifier": "CCCC3333CCCC3333", "md5": "cccc3333", "type": "mov", "orderInEntry": 1 }
+      ],
+      "audios": [
+        { "identifier": "DDDD4444DDDD4444", "md5": "dddd4444", "type": "m4a", "orderInEntry": 0 }
+      ]
+    },
+    {
+      "uuid": "00000000000000000000000000000003",
+      "creationDate": "2025-12-31T23:30:00Z",
+      "timeZone": "Not/AZone",
+      "text": "[](dayone-moment:/pdfAttachment/EEEE5555EEEE5555)",
+      "pdfAttachments": [
+        { "identifier": "EEEE5555EEEE5555", "md5": "eeee5555", "type": "pdf" }
+      ]
+    }
+  ]
+}
