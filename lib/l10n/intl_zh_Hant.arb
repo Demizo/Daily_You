@@ -567,8 +567,10 @@
     "@onboardingMoodsCustomize": {
         "description": "Label of the button that opens the mood editor"
     },
-    "onboardingRemindersDescription": "設定隨機或定時提醒，記錄你的一天。",
+    "onboardingRemindersDescription": "設定隨機或排程提醒，記錄你的一天。",
     "@onboardingRemindersDescription": {
         "description": "Description under the title of the onboarding reminders step"
-    }
+    },
+    "supportBannerOpenSourceTitle": "Daily You 是開源的",
+    "supportBannerFeedbackPrompt": "分享您的回饋"
 }
