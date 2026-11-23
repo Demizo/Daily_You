@@ -13,6 +13,7 @@ import 'package:daily_you/utils/attachment_mime.dart';
 import 'package:daily_you/utils/duration_format.dart';
 import 'package:daily_you/utils/file_size_format.dart';
 import 'package:daily_you/widgets/app_dialog.dart';
+import 'package:daily_you/widgets/attachment_info_row.dart';
 import 'package:daily_you/widgets/edge_navigation_arrows.dart';
 import 'package:daily_you/widgets/failure_dialog.dart';
 import 'package:daily_you/widgets/media_attachment_page.dart';
@@ -160,22 +161,28 @@ class _AttachmentViewPageState extends State<AttachmentViewPage> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _infoRow(Icons.label_rounded, attachment.filePath),
+              AttachmentInfoRow(
+                  icon: Icons.label_rounded, value: attachment.filePath),
               const SizedBox(height: 8),
-              _infoRow(Icons.storage_rounded, sizeString),
+              AttachmentInfoRow(icon: Icons.storage_rounded, value: sizeString),
               const SizedBox(height: 8),
               if (resolution != null) ...[
-                _infoRow(Icons.image_aspect_ratio_rounded,
-                    "${resolution.width.round()} x ${resolution.height.round()}"),
+                AttachmentInfoRow(
+                    icon: Icons.image_aspect_ratio_rounded,
+                    value:
+                        "${resolution.width.round()} x ${resolution.height.round()}"),
                 const SizedBox(height: 8),
               ],
               if (duration != null) ...[
-                _infoRow(Icons.timer_outlined, formatDuration(duration)),
+                AttachmentInfoRow(
+                    icon: Icons.timer_outlined,
+                    value: formatDuration(duration)),
                 const SizedBox(height: 8),
               ],
-              _infoRow(
-                Icons.schedule_rounded,
-                "${TimeManager.formatDateWithWeekday(attachment.timeCreate, context)} ${TimeManager.localizedTimeFormat(context, TimeManager.currentLocale(context)).format(attachment.timeCreate)}",
+              AttachmentInfoRow(
+                icon: Icons.schedule_rounded,
+                value:
+                    "${TimeManager.formatDateWithWeekday(attachment.timeCreate, context)} ${TimeManager.localizedTimeFormat(context, TimeManager.currentLocale(context)).format(attachment.timeCreate)}",
               ),
             ],
           ),
@@ -261,16 +268,6 @@ class _AttachmentViewPageState extends State<AttachmentViewPage> {
       _logger.warning('Reading image size failed', error, stackTrace);
       return null;
     }
-  }
-
-  Widget _infoRow(IconData icon, String value) {
-    return Row(
-      children: [
-        Icon(icon, color: Theme.of(context).disabledColor),
-        const SizedBox(width: 8),
-        Text(value),
-      ],
-    );
   }
 
   Future<void> _showNotice(String message) => showAppDialog(
