@@ -4,7 +4,6 @@
 
 import 'dart:io';
 
-import 'package:daily_you/database/attachment_storage.dart';
 import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/models/attachment.dart';
 import 'package:daily_you/pages/edit_entry_page.dart';
@@ -13,7 +12,7 @@ import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/entry_attachments_provider.dart';
 import 'package:daily_you/providers/mood_scale_provider.dart';
 import 'package:daily_you/time_manager.dart';
-import 'package:daily_you/utils/attachment_mime.dart';
+import 'package:daily_you/utils/entry_share.dart';
 import 'package:daily_you/widgets/attachment_tile_background.dart';
 import 'package:daily_you/widgets/content_width_limit.dart';
 import 'package:daily_you/widgets/entry_date_time_labels.dart';
@@ -24,7 +23,6 @@ import 'package:daily_you/widgets/entry_tag_chips.dart';
 import 'package:daily_you/widgets/tag_chip.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
-import 'package:share_plus/share_plus.dart';
 
 class EntryViewPage extends StatefulWidget {
   const EntryViewPage({
@@ -188,19 +186,7 @@ class _EntryViewPageState extends State<EntryViewPage> {
             final sharedText =
                 "$moodPrefix${TimeManager.formatDateWithWeekday(entry.timeCreate, context)}\n${entry.text}";
 
-            final files = <XFile>[];
-            final fileNames = <String>[];
-            for (final attachment in attachments) {
-              final localPath = await AttachmentStorage.instance
-                  .getLocalPath(attachment.filePath, attachment.type);
-              if (localPath == null) continue;
-              files.add(XFile(localPath,
-                  mimeType: attachmentMimeType(
-                      attachment.filePath, attachment.type)));
-              fileNames.add(attachment.filePath);
-            }
-            await SharePlus.instance.share(ShareParams(
-                files: files, fileNameOverrides: fileNames, text: sharedText));
+            await shareEntry(text: sharedText, attachments: attachments);
           });
     }
     return Container();
