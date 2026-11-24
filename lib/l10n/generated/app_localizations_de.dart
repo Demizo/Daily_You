@@ -1200,6 +1200,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get requiredPrompt => 'Notwendig';
 
   @override
+  String get templateNameRequired => 'Enter a template name';
+
+  @override
   String get settingsSecurityBiometricUnlock => 'Biometrisch Entsperren';
 
   @override

@@ -1202,6 +1202,9 @@ class AppLocalizationsUk extends AppLocalizations {
   String get requiredPrompt => 'Обов\'язково';
 
   @override
+  String get templateNameRequired => 'Enter a template name';
+
+  @override
   String get settingsSecurityBiometricUnlock => 'Біометричне розблокування';
 
   @override

@@ -1194,6 +1194,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get requiredPrompt => 'Required';
 
   @override
+  String get templateNameRequired => 'Enter a template name';
+
+  @override
   String get settingsSecurityBiometricUnlock => 'Biometric Unlock';
 
   @override

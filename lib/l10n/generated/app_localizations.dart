@@ -2048,6 +2048,12 @@ abstract class AppLocalizations {
   /// **'Required'**
   String get requiredPrompt;
 
+  /// Validation error shown when saving a template with an empty name
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a template name'**
+  String get templateNameRequired;
+
   /// No description provided for @settingsSecurityBiometricUnlock.
   ///
   /// In en, this message translates to:
