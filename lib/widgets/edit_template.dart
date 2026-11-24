@@ -33,6 +33,7 @@ class EditTemplate extends StatefulWidget {
 
 class _EditTemplateState extends State<EditTemplate> {
   late TextEditingController _nameController;
+  bool _showNameError = false;
   late String templateText;
   late final TagAttachmentSource _tagSource;
   final FocusNode _focusNode = FocusNode();
@@ -71,19 +72,22 @@ class _EditTemplateState extends State<EditTemplate> {
   }
 
   Future<void> _saveTemplate() async {
+    final name = _nameController.text.trim();
+    if (name.isEmpty) {
+      setState(() => _showNameError = true);
+      return;
+    }
     final int templateId;
     if (widget.template == null) {
       final created = await TemplatesProvider.instance.add(Template(
-          name: _nameController.text,
+          name: name,
           text: templateText,
           timeCreate: DateTime.now(),
           timeModified: DateTime.now()));
       templateId = created.id!;
     } else {
-      final updated = widget.template!.copy(
-          name: _nameController.text,
-          text: templateText,
-          timeModified: DateTime.now());
+      final updated = widget.template!
+          .copy(name: name, text: templateText, timeModified: DateTime.now());
       await TemplatesProvider.instance.update(updated);
       templateId = updated.id!;
     }
@@ -211,6 +215,11 @@ class _EditTemplateState extends State<EditTemplate> {
                         ),
                         child: TextField(
                           controller: _nameController,
+                          onChanged: (value) {
+                            if (_showNameError && value.trim().isNotEmpty) {
+                              setState(() => _showNameError = false);
+                            }
+                          },
                           maxLines: 1,
                           textCapitalization: TextCapitalization.words,
                           spellCheckConfiguration: SpellCheckConfiguration(
@@ -218,6 +227,25 @@ class _EditTemplateState extends State<EditTemplate> {
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             hintText: AppLocalizations.of(context)!.titleHint,
+                            errorBorder: InputBorder.none,
+                            focusedErrorBorder: InputBorder.none,
+                            error: _showNameError
+                                ? Padding(
+                                    padding: const EdgeInsets.only(bottom: 12),
+                                    child: Text(
+                                      AppLocalizations.of(context)!
+                                          .templateNameRequired,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .error,
+                                          ),
+                                    ),
+                                  )
+                                : null,
                           ),
                         ),
                       ),

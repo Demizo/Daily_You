@@ -1198,6 +1198,9 @@ class AppLocalizationsFi extends AppLocalizations {
   String get requiredPrompt => 'Pakollinen';
 
   @override
+  String get templateNameRequired => 'Enter a template name';
+
+  @override
   String get settingsSecurityBiometricUnlock =>
       'Biometrinen lukituksen avaaminen';
 

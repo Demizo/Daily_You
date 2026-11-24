@@ -1206,6 +1206,9 @@ class AppLocalizationsTa extends AppLocalizations {
   String get requiredPrompt => 'தேவை';
 
   @override
+  String get templateNameRequired => 'Enter a template name';
+
+  @override
   String get settingsSecurityBiometricUnlock => 'பயோமெட்ரிக் திறத்தல்';
 
   @override
