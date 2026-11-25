@@ -3,7 +3,7 @@
     "cleanUpStatus": "Rydder op…",
     "settingsTheme": "Tema",
     "imageFolderErrorDescription": "Kunne ikke ændre billedmappe!",
-    "settingsDailyReminderDescription": "Lad appen køre i baggrunden for bedste resultater",
+    "settingsDailyReminderDescription": "En blid påmindelse hver dag",
     "deleteLogDescription": "Vil du slette denne log?",
     "deletePhotoDescription": "Vil du slette dette foto?",
     "settingsNotificationsTitle": "Meddelelser",
@@ -115,5 +115,105 @@
     "settingsFlashbacksExcludeBadDays": "Ekskluder dårlige dage",
     "wordCount": "{count, plural, one{{count} ord} other{{count} ord}}",
     "settingsShowFlashbacks": "Vis minder",
-    "settingsDailyReminderOnboarding": "Aktivér daglige påmindelser for at forblive konsekvent!"
+    "settingsDailyReminderOnboarding": "Aktivér daglige påmindelser for at forblive konsekvent!",
+    "actionTakeVideo": "Tag video",
+    "actionRecordAudio": "Optag lyd",
+    "actionAddImage": "Tilføj billede",
+    "actionAddVideo": "Tilføj video",
+    "actionAddAudio": "Tilføj lyd",
+    "actionToday": "I dag",
+    "actionOtherDay": "Anden dag",
+    "jumpToMonthTitle": "Gå til måned",
+    "jumpToLogTitle": "Gå til log",
+    "flashbackOnThisDay": "På denne dag",
+    "noResults": "Ingen resultater…",
+    "chartOverTimeTitle": "{tag} Over tid",
+    "chartGroupingLabel": "Gruppe efter",
+    "chartGroupingDay": "Dag",
+    "chartGroupingWeek": "Uge",
+    "chartGroupingMonth": "Måned",
+    "chartGroupingYear": "År",
+    "statsLongestStreakTitle": "Længste Streak",
+    "@statsLongestStreakTitle": {
+        "description": "Label shown next to or under a large number giving the longest run of consecutive days, which is not part of this string"
+    },
+    "statsWritingTitle": "Skrivning",
+    "@statsWritingTitle": {
+        "description": "Title of the writing statistics tile and page"
+    },
+    "statsWordsPerLogTitle": "Ord pr. Log",
+    "@statsWordsPerLogTitle": {
+        "description": "Label for the average number of words in a log"
+    },
+    "statsLongestLogTitle": "Længste Log",
+    "@statsLongestLogTitle": {
+        "description": "Title of the tile showing the log with the most words"
+    },
+    "statsAverageTitle": "Gennemsnit",
+    "@statsAverageTitle": {
+        "description": "Label shown under a large average value"
+    },
+    "statsHighestTitle": "Højeste",
+    "@statsHighestTitle": {
+        "description": "Label shown under a large number giving the highest recorded value of a tracker"
+    },
+    "statsLowestTitle": "Laveste",
+    "@statsLowestTitle": {
+        "description": "Label shown under a large number giving the lowest recorded value of a tracker"
+    },
+    "statsDaysLoggedTitle": "Dage Logget",
+    "statsOfDaysLabel": "af dage",
+    "@statsOfDaysLabel": {
+        "description": "Label shown after a percentage, e.g. '45% of Days'. The percentage is not part of this string"
+    },
+    "statsCustomizeTitle": "Tilpas",
+    "@statsCustomizeTitle": {
+        "description": "Label of the button for choosing which tiles appear on the statistics page"
+    },
+    "databaseMigrationErrorTitle": "Kunne ikke flytte dine data",
+    "databaseNewerErrorTitle": "Opdatering påkrævet",
+    "databaseNewerErrorDescription": "Dine data blev gemt af en nyere version af Daily You. Denne version kan ikke åbne den sikkert. Opdater app'en for at fortsætte.",
+    "errorReport": "Rapporter fejl",
+    "deleteAttachmentTitle": "Slet vedhæftet fil",
+    "deleteAttachmentDescription": "Vil du slette denne vedhæftede fil?",
+    "largeAttachmentWarningTitle": "Stor vedhæftet fil",
+    "largeAttachmentWarningDescription": "Denne vedhæftede fil er stor og vil øge din backup størrelse.",
+    "dontShowAgain": "Vis ikke igen",
+    "settingsCalendarSystem": "Kalendersystem",
+    "calendarSystemGregorian": "Gregorian",
+    "moodVeryUnpleasant": "Meget ubehageligt",
+    "moodUnpleasant": "Ubehageligt",
+    "moodNeutral": "Neutral",
+    "moodPleasant": "Behagelig",
+    "moodVeryPleasant": "Meget behageligt",
+    "settingsHideImagesInGallery": "Skjul billeder i Galleri",
+    "settingsHideImages": "Skjul billeder",
+    "pageCalendarTitle": "Kalender",
+    "viewLayoutList": "Liste",
+    "settingsOnThisDayDescription": "Besøg tidligere minder",
+    "settingsExactAlarmsTitle": "Tillad nøjagtige alarmer?",
+    "@settingsExactAlarmsTitle": {
+        "description": "Title of the dialog asking whether to allow exact alarms for reminders"
+    },
+    "settingsExactAlarmsDescription": "Alarmer kan blive forsinket med flere minutter, medmindre du tillader nøjagtige alarmer.",
+    "@settingsExactAlarmsDescription": {
+        "description": "Body of the exact alarms dialog explaining that reminders may be delayed without the permission"
+    },
+    "templateDefaultSummaryTitle": "Dagsoversigt",
+    "templateDefaultReflectionTitle": "Refleksion",
+    "templateDefaultReflectionBody": "## Hvad var det bedste ved i dag?\n- \n\n## Hvad er du taknemmelig for?\n- \n\n## Hvad ser du frem til?\n- ",
+    "settingsTagsTitle": "Tags",
+    "manageTags": "Administrer tags",
+    "tagTypeLabelTitle": "Etiketter",
+    "tagTypeTrackerTitle": "Tracker",
+    "nameHint": "Navn",
+    "tagColorLabel": "Farve",
+    "iconPickerTitle": "Vælg ikon",
+    "iconPickerIconsTab": "Ikoner",
+    "iconPickerSearchHint": "Søg ikoner…",
+    "colorPickerTitle": "Vælg farve",
+    "colorPickerPaletteTab": "Farver",
+    "iconGroupMoodPeople": "Humør & Personer",
+    "iconGroupHealth": "Sundhed",
+    "iconGroupWorkFinance": "Arbejde & Finans"
 }
