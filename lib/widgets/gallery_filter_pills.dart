@@ -10,6 +10,7 @@ import 'package:daily_you/widgets/app_dialog.dart';
 import 'package:daily_you/widgets/attachment_filter_dialog.dart';
 import 'package:daily_you/widgets/date_filter_dialog.dart';
 import 'package:daily_you/widgets/date_selection_label.dart';
+import 'package:daily_you/widgets/desktop_arrow_button.dart';
 import 'package:daily_you/widgets/entry_card_widget.dart';
 import 'package:daily_you/widgets/filter_pill.dart';
 import 'package:daily_you/widgets/icons/svg_icon.dart';
@@ -61,13 +62,12 @@ class GalleryFilterPills extends StatelessWidget {
       required String label,
       required bool hasSelection,
       required GalleryFilter Function() cleared,
-    }) =>
-        FilterPill(
-          icon: icon,
-          onPressed: onPressed,
-          onClear: hasSelection ? () => provider.filter = cleared() : null,
-          child: Text(label),
-        );
+    }) => FilterPill(
+      icon: icon,
+      onPressed: onPressed,
+      onClear: hasSelection ? () => provider.filter = cleared() : null,
+      child: Text(label),
+    );
 
     final pills = [
       pill(
@@ -83,8 +83,8 @@ class GalleryFilterPills extends StatelessWidget {
         label: filter.noTags
             ? l10n.noTagsFilterLabel
             : filter.hasTags
-                ? l10n.tagCount(filter.tagIds.length)
-                : l10n.settingsTagsTitle,
+            ? l10n.tagCount(filter.tagIds.length)
+            : l10n.settingsTagsTitle,
         hasSelection: filter.hasTags,
         cleared: filter.withoutTags,
       ),
@@ -101,8 +101,8 @@ class GalleryFilterPills extends StatelessWidget {
         label: filter.noText
             ? l10n.noTextFilterLabel
             : filter.hasText
-                ? l10n.keywordCount(filter.textTerms.length)
-                : l10n.filterPillKeywords,
+            ? l10n.keywordCount(filter.textTerms.length)
+            : l10n.filterPillKeywords,
         hasSelection: filter.hasText,
         cleared: filter.withoutText,
       ),
@@ -126,7 +126,7 @@ class GalleryFilterPills extends StatelessWidget {
         ),
     ];
 
-    if (WindowSizeClass.of(context).isWide) {
+    if (isDesktopPlatform || WindowSizeClass.of(context).isWide) {
       return Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: entryCardMargin + galleryHorizontalPadding,
