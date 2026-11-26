@@ -1,3 +1,552 @@
 {
-    "dailyReminderTitle": "Logga dagen!"
+    "dailyReminderTitle": "Dags att skriva dagbok!",
+    "dailyReminderDescription": "Berätta om din dag…",
+    "actionTakePhoto": "Ta ett foto",
+    "actionTakeVideo": "Spela in video",
+    "actionRecordAudio": "Spela in ljud",
+    "actionAddImage": "Lägg till bild",
+    "actionAddVideo": "Lägg till video",
+    "actionAddAudio": "Lägg till ljud",
+    "actionToday": "I dag",
+    "actionOtherDay": "En annan dag",
+    "pageHomeTitle": "Hem",
+    "jumpToMonthTitle": "Gå till månad",
+    "jumpToLogTitle": "Gå till anteckning",
+    "flashbacksTitle": "Tillbakablickar",
+    "settingsFlashbacksExcludeBadDays": "Uteslut dåliga dagar",
+    "flaskbacksEmpty": "Inga tillbakablickar än…",
+    "flashbackGoodDay": "En bra dag",
+    "flashbackRandomDay": "En slumpvald dag",
+    "flashbackWeek": "{count, plural, one{För {count} vecka sedan} other{För {count} veckor sedan}}",
+    "flashbackMonth": "{count, plural, one{För {count} månad sedan} other{För {count} månader sedan}}",
+    "flashbackYear": "{count, plural, one{För {count} år sedan} other{För {count} år sedan}}",
+    "flashbackOnThisDay": "Den här dagen tidigare år",
+    "pageGalleryTitle": "Galleri",
+    "searchLogsHint": "Sök bland anteckningarna…",
+    "logCount": "{count, plural, one{{count} anteckning} other{{count} anteckningar}}",
+    "dayCount": "{count, plural, one{{count} dag} other{{count} dagar}}",
+    "wordCount": "{count, plural, one{{count} ord} other{{count} ord}}",
+    "noLogs": "Inga anteckningar…",
+    "noResults": "Inga träffar…",
+    "sortDateTitle": "Datum",
+    "sortOrderAscendingTitle": "Stigande",
+    "sortOrderDescendingTitle": "Fallande",
+    "pageStatisticsTitle": "Statistik",
+    "statisticsNotEnoughData": "För lite underlag än så länge…",
+    "statisticsRangeOneMonth": "1 månad",
+    "statisticsRangeSixMonths": "6 månader",
+    "statisticsRangeOneYear": "1 år",
+    "statisticsRangeAllTime": "Hela perioden",
+    "chartSummaryTitle": "Översikt över {tag}",
+    "chartByDayTitle": "{tag} per veckodag",
+    "chartOverTimeTitle": "{tag} över tid",
+    "chartInfluencesTitle": "Samband med {tag}",
+    "chartGroupingLabel": "Gruppera efter",
+    "chartGroupingDay": "Dag",
+    "chartGroupingWeek": "Vecka",
+    "chartGroupingMonth": "Månad",
+    "chartGroupingYear": "År",
+    "chartSmoothingLabel": "Utjämning",
+    "streakDayLabel": "{count, plural, one{dag i rad} other{dagar i rad}}",
+    "@streakDayLabel": {
+        "description": "Label shown under a large streak length, which is not part of this string"
+    },
+    "statsLogsLabel": "{count, plural, one{anteckning} other{anteckningar}}",
+    "@statsLogsLabel": {
+        "description": "Label shown under a large number of logs, which is not part of this string"
+    },
+    "statsWordsLabel": "{count, plural, one{ord} other{ord}}",
+    "@statsWordsLabel": {
+        "description": "Label shown next to or under a large number of words, which is not part of this string"
+    },
+    "statsDaysLabel": "{count, plural, one{dag} other{dagar}}",
+    "@statsDaysLabel": {
+        "description": "Label shown under a large number of days, which is not part of this string"
+    },
+    "statsLongestStreakTitle": "Längsta svit",
+    "@statsLongestStreakTitle": {
+        "description": "Label shown next to or under a large number giving the longest run of consecutive days, which is not part of this string"
+    },
+    "statsWritingTitle": "Skrivande",
+    "@statsWritingTitle": {
+        "description": "Title of the writing statistics tile and page"
+    },
+    "statsWordsPerLogTitle": "Ord per anteckning",
+    "@statsWordsPerLogTitle": {
+        "description": "Label for the average number of words in a log"
+    },
+    "statsLongestLogTitle": "Längsta anteckningen",
+    "@statsLongestLogTitle": {
+        "description": "Title of the tile showing the log with the most words"
+    },
+    "statsMostActiveTitle": "{count, plural, one{Veckodag med flest anteckningar} other{Veckodagar med flest anteckningar}}",
+    "@statsMostActiveTitle": {
+        "description": "Title of the tile showing the weekday or weekdays with the most logs. The count is the number of weekdays tied for most logs",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "statsDaysOfRange": "{written} av {total, plural, one{{total} dag} other{{total} dagar}}",
+    "@statsDaysOfRange": {
+        "description": "Number of days with a log out of the number of days in the selected time range, e.g. '12 of 30 Days'",
+        "placeholders": {
+            "written": {
+                "type": "int",
+                "format": "decimalPattern"
+            },
+            "total": {
+                "type": "int",
+                "format": "decimalPattern"
+            }
+        }
+    },
+    "statsAverageTitle": "Genomsnitt",
+    "@statsAverageTitle": {
+        "description": "Label shown under a large average value"
+    },
+    "statsHighestTitle": "Högsta värde",
+    "@statsHighestTitle": {
+        "description": "Label shown under a large number giving the highest recorded value of a tracker"
+    },
+    "statsLowestTitle": "Lägsta värde",
+    "@statsLowestTitle": {
+        "description": "Label shown under a large number giving the lowest recorded value of a tracker"
+    },
+    "statsDaysLoggedTitle": "Dagar med anteckningar",
+    "statsOfDaysLabel": "av dagarna",
+    "@statsOfDaysLabel": {
+        "description": "Label shown after a percentage, e.g. '45% of Days'. The percentage is not part of this string"
+    },
+    "statsCustomizeTitle": "Anpassa",
+    "@statsCustomizeTitle": {
+        "description": "Label of the button for choosing which tiles appear on the statistics page"
+    },
+    "errorExternalStorageAccessTitle": "Kommer inte åt den externa lagringen",
+    "errorExternalStorageAccessDescription": "Om du använder nätverkslagring behöver du kontrollera att tjänsten är tillgänglig och att du är ansluten till nätverket.\n\nAppen kan också ha förlorat åtkomsten till den externa mappen. Öppna inställningarna och välj mappen igen för att ge appen åtkomst.\n\nVarning! Dina ändringar synkroniseras först när appen har åtkomst till den externa lagringen igen.",
+    "errorExternalStorageAccessContinue": "Fortsätt med den lokala databasen",
+    "databaseMigrationErrorTitle": "Det gick inte att flytta dina data",
+    "databaseMigrationErrorDescription": "Dina anteckningar finns kvar, men det gick inte att flytta dem till appens lagringsutrymme.\n\nFörsök igen. Rapportera problemet om det kvarstår.",
+    "databaseMigrationErrorRetry": "Försök igen",
+    "databaseNewerErrorTitle": "Appen behöver uppdateras",
+    "databaseNewerErrorDescription": "En nyare version av Daily You har sparat dina data. Den här versionen kan inte öppna dem på ett säkert sätt. Uppdatera appen för att fortsätta.",
+    "errorReport": "Rapportera problemet",
+    "lastModified": "Senast ändrad",
+    "writeSomethingHint": "Skriv något…",
+    "titleHint": "Rubrik…",
+    "deleteLogTitle": "Ta bort anteckning",
+    "deleteLogDescription": "Vill du ta bort den här anteckningen?",
+    "deleteAttachmentTitle": "Ta bort bilaga",
+    "deleteAttachmentDescription": "Vill du ta bort den här bilagan?",
+    "largeAttachmentWarningTitle": "Stor bilaga",
+    "largeAttachmentWarningDescription": "Den här bilagan är stor och gör säkerhetskopian större.",
+    "dontShowAgain": "Visa inte igen",
+    "pageSettingsTitle": "Inställningar",
+    "settingsAppearanceTitle": "Utseende",
+    "settingsTheme": "Tema",
+    "themeSystem": "Följ systemet",
+    "themeLight": "Ljust",
+    "themeDark": "Mörkt",
+    "themeAmoled": "AMOLED",
+    "settingsFirstDayOfWeek": "Veckans första dag",
+    "settingsCalendarSystem": "Kalendersystem",
+    "calendarSystemGregorian": "Gregorianska kalendern",
+    "calendarSystemJalali": "Persiska kalendern (jalali)",
+    "settingsUseSystemAccentColor": "Använd systemets accentfärg",
+    "settingsCustomAccentColor": "Egen accentfärg",
+    "settingsShowFlashbacks": "Visa tillbakablickar",
+    "settingsChangeMoodIcons": "Ändra humörikoner",
+    "moodIconPrompt": "Ange ett tecken som ikon",
+    "moodVeryUnpleasant": "Mycket dåligt",
+    "moodUnpleasant": "Dåligt",
+    "moodNeutral": "Neutralt",
+    "moodPleasant": "Bra",
+    "moodVeryPleasant": "Mycket bra",
+    "settingsGalleryViewLayout": "Gallerivy",
+    "settingsHideImagesInGallery": "Dölj bilder i galleriet",
+    "settingsHideImages": "Dölj bilder",
+    "pageCalendarTitle": "Kalender",
+    "viewLayoutList": "Lista",
+    "viewLayoutGrid": "Rutnät",
+    "settingsNotificationsTitle": "Aviseringar",
+    "settingsDailyReminderOnboarding": "Slå på dagliga påminnelser så blir det lättare att skriva regelbundet.",
+    "settingsNotificationsPermissionsPrompt": "Appen kommer att be om behörighet att schemalägga alarm så att du kan få påminnelsen vid en slumpmässig tidpunkt eller vid den tid du själv väljer.",
+    "settingsDailyReminderTitle": "Daglig påminnelse",
+    "settingsOnThisDayDescription": "Se vad du skrev den här dagen tidigare år",
+    "settingsDailyReminderDescription": "En liten påminnelse varje dag",
+    "settingsReminderTime": "Tid för påminnelse",
+    "settingsFixedReminderTimeTitle": "Fast tid för påminnelsen",
+    "settingsFixedReminderTimeDescription": "Välj en fast tid för påminnelsen",
+    "settingsExactAlarmsTitle": "Tillåt exakta alarm?",
+    "@settingsExactAlarmsTitle": {
+        "description": "Title of the dialog asking whether to allow exact alarms for reminders"
+    },
+    "settingsExactAlarmsDescription": "Påminnelserna kan bli flera minuter försenade om du inte tillåter exakta alarm.",
+    "@settingsExactAlarmsDescription": {
+        "description": "Body of the exact alarms dialog explaining that reminders may be delayed without the permission"
+    },
+    "settingsAlwaysSendReminderTitle": "Skicka alltid en påminnelse",
+    "settingsAlwaysSendReminderDescription": "Skicka en påminnelse även om du redan har börjat på en anteckning",
+    "settingsCustomizeNotificationTitle": "Anpassa aviseringar",
+    "settingsTemplatesTitle": "Mallar",
+    "settingsDefaultTemplate": "Standardmall",
+    "manageTemplates": "Hantera mallar",
+    "addTemplate": "Lägg till en mall",
+    "noTemplateTitle": "Ingen mall",
+    "noTemplatesDescription": "Du har inte skapat några mallar än…",
+    "templateDefaultTimestampTitle": "Tidsstämpel",
+    "templateDefaultTimestampBody": "{date} – {time}:",
+    "templateDefaultSummaryTitle": "Dagens sammanfattning",
+    "templateDefaultSummaryBody": "### Sammanfattning\n- \n\n### Citat\n> ",
+    "templateDefaultReflectionTitle": "Reflektion",
+    "templateDefaultReflectionBody": "### Vad uppskattade du i dag?\n- \n\n### Vad är du tacksam för?\n- \n\n### Vad ser du fram emot?\n- ",
+    "settingsTagsTitle": "Taggar",
+    "manageTags": "Hantera taggar",
+    "tagTypeLabelTitle": "Etikett",
+    "tagTypeTrackerTitle": "Mätvärde",
+    "nameHint": "Namn",
+    "tagColorLabel": "Färg",
+    "iconPickerTitle": "Välj ikon",
+    "iconPickerIconsTab": "Ikoner",
+    "iconPickerCustomTab": "Egen",
+    "iconPickerSearchHint": "Sök efter ikoner…",
+    "colorPickerTitle": "Välj färg",
+    "colorPickerPaletteTab": "Färger",
+    "iconGroupMoodPeople": "Humör och människor",
+    "iconGroupHealth": "Hälsa",
+    "iconGroupWorkFinance": "Arbete och ekonomi",
+    "iconGroupHabitsGoals": "Vanor och mål",
+    "iconGroupNature": "Natur",
+    "iconGroupFoodDrink": "Mat och dryck",
+    "iconGroupHome": "Hem",
+    "iconGroupTravel": "Resor",
+    "iconGroupSymbols": "Symboler",
+    "tagCategoryLabel": "Kategori",
+    "tagLabel": "Tagg",
+    "tagCategoryUncategorized": "Utan kategori",
+    "newCategoryTitle": "Ny kategori",
+    "shareButtonLabel": "Dela",
+    "importErrorDescription": "Det gick inte att importera filen.",
+    "exportErrorDescription": "Det gick inte att exportera filen.",
+    "deleteTitle": "Ta bort",
+    "deleteTagMessage": "Ta bort ”{name}”?{count, plural, =0{} =1{ Taggen används i en anteckning.} other{ Taggen används i {count} anteckningar.}}",
+    "deleteCategoryMessage": "Ta bort ”{name}”?{count, plural, =0{} =1{ Taggen i kategorin tas också bort.} other{ Även de {count} taggarna i kategorin tas bort.}}",
+    "deleteTemplateMessage": "Ta bort ”{name}”?",
+    "filterTagsTitle": "Filter",
+    "tagFilterModeAny": "Minst en av taggarna",
+    "tagFilterModeAll": "Alla taggar",
+    "clearAllFilters": "Rensa alla filter",
+    "noTagsFilterLabel": "Utan taggar",
+    "clearFilter": "Rensa",
+    "@clearFilter": {
+        "description": "Label of the button that resets a single filter"
+    },
+    "showLogsCount": "{count, plural, one{Visa {count} anteckning} other{Visa {count} anteckningar}}",
+    "@showLogsCount": {
+        "description": "Label of the button that applies the filters and shows the matching logs"
+    },
+    "filterPillAttachments": "Bilagor",
+    "@filterPillAttachments": {
+        "description": "Label of the filter button for choosing attachment types"
+    },
+    "filterPillKeywords": "Sökord",
+    "@filterPillKeywords": {
+        "description": "Label of the filter button for searching logs by keywords"
+    },
+    "noMoodFilterLabel": "Utan angivet humör",
+    "@noMoodFilterLabel": {
+        "description": "Filter option for logs that have no mood"
+    },
+    "noAttachmentsFilterLabel": "Utan bilagor",
+    "@noAttachmentsFilterLabel": {
+        "description": "Filter option for logs that have no attachments"
+    },
+    "noTextFilterLabel": "Utan text",
+    "@noTextFilterLabel": {
+        "description": "Filter option for logs that have no text"
+    },
+    "partialMatchCount": "{count, plural, one{{count} delträff} other{{count} delträffar}}",
+    "@partialMatchCount": {
+        "description": "Number of logs that match only some of the active filters"
+    },
+    "tagCount": "{count, plural, one{{count} tagg} other{{count} taggar}}",
+    "@tagCount": {
+        "description": "Number of tags selected in the tag filter"
+    },
+    "dateFilterLastMonths": "{count, plural, one{Senaste månaden} other{Senaste {count} månaderna}}",
+    "@dateFilterLastMonths": {
+        "description": "Date filter option covering the most recent months"
+    },
+    "dateFilterCustomRange": "Välj period",
+    "@dateFilterCustomRange": {
+        "description": "Date filter option for choosing a custom start and end date"
+    },
+    "keywordFilterHint": "Lägg till ett sökord…",
+    "@keywordFilterHint": {
+        "description": "Hint text of the field for adding a keyword to the filter"
+    },
+    "keywordFilterMatchAll": "Alla sökord",
+    "@keywordFilterMatchAll": {
+        "description": "Option to only match logs containing every keyword"
+    },
+    "keywordFilterMatchAny": "Minst ett sökord",
+    "@keywordFilterMatchAny": {
+        "description": "Option to match logs containing at least one keyword"
+    },
+    "keywordFilterMatchCase": "Skilj på stora och små bokstäver",
+    "@keywordFilterMatchCase": {
+        "description": "Option to make keyword matching case sensitive"
+    },
+    "keywordCount": "{count, plural, one{{count} sökord} other{{count} sökord}}",
+    "@keywordCount": {
+        "description": "Number of keywords in the keyword filter"
+    },
+    "dateFilterRange": "{start} – {end}",
+    "@dateFilterRange": {
+        "description": "Selected date range shown on the date filter",
+        "placeholders": {
+            "start": {
+                "type": "String"
+            },
+            "end": {
+                "type": "String"
+            }
+        }
+    },
+    "addTagsTitle": "Lägg till taggar",
+    "addTagsSearchHint": "Sök bland taggar…",
+    "tagPickerSortManualLabel": "Manuell ordning",
+    "tagPickerSortUsageLabel": "Mest använda först",
+    "tagFavoriteName": "Favorit",
+    "tagEnergyName": "Energi",
+    "tagCategoryPeopleName": "Personer",
+    "tagCategoryActivitiesName": "Aktiviteter",
+    "tagExerciseName": "Träning",
+    "tagSocializingName": "Umgänge",
+    "tagHobbyName": "Hobby",
+    "tagEntertainmentName": "Nöjen",
+    "tagDiningName": "Måltider",
+    "tagChoresName": "Hushållssysslor",
+    "tagCategoryEmotionsName": "Känslor",
+    "tagExcitedName": "Förväntansfull",
+    "tagGratefulName": "Tacksam",
+    "tagCalmName": "Lugn",
+    "tagTiredName": "Trött",
+    "tagAnxiousName": "Orolig",
+    "tagAnnoyedName": "Irriterad",
+    "welcomeLogBodyText": "## Välkommen till Daily You\n\n> Varje dag är värd att minnas. Spara ett minne från i dag!\n\n**Daily You** är gratis, har [öppen källkod](https://github.com/Demizo/Daily_You) och får stöd av sina användare. Appen bygger på tanken att din dagbok ska tillhöra dig.\n\n- Ingen reklam\n- Inga låsta funktioner\n- Ingen spårning eller datainsamling\n\nI **Daily You** har du en plats _helt för dig själv_, vare sig du vill skriva dagbok, tänka tillbaka på dagen eller bara anteckna vad som fick dig att le.",
+    "settingsStorageTitle": "Lagring och synkronisering",
+    "settingsMediaQualityTitle": "Mediekvalitet",
+    "imageQualityHigh": "Hög",
+    "imageQualityMedium": "Medel",
+    "imageQualityLow": "Låg",
+    "imageQualityNoCompression": "Ingen komprimering",
+    "settingsStorageUsage": "Använt lagringsutrymme",
+    "settingsLogFolder": "Mapp för anteckningar",
+    "settingsExternalSyncTitle": "Synkronisera med en extern plats",
+    "chooseFolderHint": "Välj en mapp",
+    "warningTitle": "Varning",
+    "logFolderWarningDescription": "Den valda mappen innehåller redan filen daily_you.db. Om du fortsätter ersätts dina nuvarande anteckningar med dem som finns i filen.",
+    "errorTitle": "Fel",
+    "syncErrorDescription": "Det gick inte att synkronisera med den externa platsen.",
+    "backupErrorDescription": "Det gick inte att skapa en säkerhetskopia.",
+    "restoreErrorDescription": "Det gick inte att återställa säkerhetskopian.",
+    "settingsBackupRestoreTitle": "Säkerhetskopiering och återställning",
+    "settingsBackup": "Säkerhetskopiera",
+    "settingsRestore": "Återställ",
+    "settingsRestorePromptDescription": "Om du återställer säkerhetskopian skrivs dina nuvarande data över.",
+    "settingsBackupPasswordProtect": "Lösenordsskydda säkerhetskopior",
+    "backupEncryptedTitle": "Krypterad säkerhetskopia",
+    "backupEncryptedContent": "Den här säkerhetskopian är lösenordsskyddad.",
+    "settingsAutoBackup": "Automatisk säkerhetskopiering",
+    "settingsAutoBackupLocation": "Plats för säkerhetskopior",
+    "settingsAutoBackupInterval": "Intervall för säkerhetskopiering",
+    "settingsAutoBackupIntervalDaily": "Varje dag",
+    "settingsAutoBackupIntervalWeekly": "Varje vecka",
+    "settingsAutoBackupIntervalMonthly": "Varje månad",
+    "settingsAutoBackupMaxCount": "Antal säkerhetskopior att behålla",
+    "settingsAutoBackupRequireCharging": "Endast under laddning",
+    "settingsBackupLast": "Senaste säkerhetskopiering: {time}",
+    "settingsBackupNever": "Ingen säkerhetskopia har skapats",
+    "settingsAutoBackupNext": "Nästa säkerhetskopiering: {time}",
+    "settingsAutoBackupKeepAll": "Alla",
+    "autoBackupFailedTitle": "Säkerhetskopieringen misslyckades",
+    "tranferStatus": "Överför… {percent} %",
+    "creatingBackupStatus": "Skapar säkerhetskopia… {percent} %",
+    "restoringBackupStatus": "Återställer säkerhetskopia… {percent} %",
+    "encryptingBackupStatus": "Krypterar säkerhetskopia… {percent} %",
+    "decryptingBackupStatus": "Dekrypterar säkerhetskopia… {percent} %",
+    "cleanUpStatus": "Rensar…",
+    "migratingImagesStatus": "Flyttar foton… {current} av {total}",
+    "settingsExportToAnotherFormat": "Exportera till ett annat format",
+    "settingsExportFormatDescription": "Använd inte den exporterade filen som säkerhetskopia.",
+    "exportIncludeTitle": "Ta med",
+    "settingsImportFromAnotherApp": "Importera från en annan app",
+    "settingsTranslateCallToAction": "Alla ska kunna skriva dagbok!",
+    "settingsHelpTranslate": "Hjälp till att översätta",
+    "logFormatTitle": "Välj format",
+    "logFormatDescription": "Andra appars format kanske inte stöder alla funktioner. Rapportera gärna problem, eftersom formaten kan ändras. Dina befintliga anteckningar påverkas inte.",
+    "formatMarkdown": "Markdown",
+    "formatCsv": "CSV",
+    "formatJson": "JSON",
+    "settingsDeleteAllLogsTitle": "Ta bort alla anteckningar",
+    "settingsDeleteAllLogsDescription": "Vill du ta bort alla dina anteckningar?",
+    "settingsDeleteAllLogsPrompt": "Skriv ”{prompt}” för att bekräfta. Det går inte att ångra.",
+    "settingsLanguageTitle": "Språk",
+    "settingsAppLanguageTitle": "Appspråk",
+    "settingsOverrideAppLanguageTitle": "Använd ett annat språk i appen",
+    "settingsSecurityTitle": "Säkerhet",
+    "settingsSecurityRequirePassword": "Kräv lösenord",
+    "settingsSecurityEnterPassword": "Ange lösenord",
+    "settingsSecuritySetPassword": "Välj lösenord",
+    "settingsSecurityChangePassword": "Ändra lösenord",
+    "settingsSecurityPassword": "Lösenord",
+    "settingsSecurityConfirmPassword": "Bekräfta lösenord",
+    "settingsSecurityOldPassword": "Nuvarande lösenord",
+    "settingsSecurityIncorrectPassword": "Fel lösenord",
+    "settingsSecurityPasswordsDoNotMatch": "Lösenorden stämmer inte överens",
+    "settingsSecurityPasswordWarning": "Om du glömmer lösenordet kan du inte öppna Daily You.",
+    "@settingsSecurityPasswordWarning": {
+        "description": "Warning shown above the password fields when setting a password, explaining that a forgotten password locks the user out"
+    },
+    "requiredPrompt": "Obligatoriskt",
+    "settingsSecurityBiometricUnlock": "Biometrisk upplåsning",
+    "unlockAppPrompt": "Lås upp appen",
+    "settingsAboutTitle": "Om",
+    "settingsVersion": "Version",
+    "settingsLicense": "Licens",
+    "licenseGPLv3": "GPL-3.0",
+    "settingsSourceCode": "Källkod",
+    "settingsOpenSourceLicenses": "Licenser för öppen källkod",
+    "settingsMadeWithLove": "Skapad med ❤️",
+    "settingsConsiderSupporting": "Stöd gärna projektet",
+    "supportBannerOpenSourceTitle": "Daily You har öppen källkod",
+    "supportBannerFeedbackPrompt": "Lämna synpunkter",
+    "imagesTitle": "Bilder",
+    "audioTitle": "Ljud",
+    "videoTitle": "Video",
+    "tagMoodTitle": "Humör",
+    "calendarTagDisplayLabel": "Tagg",
+    "selectTagTitle": "Välj tagg",
+    "labelPresentLabel": "Med taggen",
+    "labelAbsentLabel": "Utan taggen",
+    "chartDistributionTitle": "Fördelning av {tag}",
+    "shareAddToLogPickerTitle": "Välj en anteckning",
+    "attachmentAddErrorDescription": "Det gick inte att lägga till bilagan.",
+    "attachmentLoadFailed": "Det gick inte att öppna bilagan.",
+    "attachmentNoAppToOpen": "Ingen app kan öppna bilagan.",
+    "recorderDiscardTitle": "Kassera inspelningen?",
+    "recorderDiscardDescription": "Inspelningen tas bort.",
+    "recorderDiscardAction": "Kassera",
+    "recorderPermissionDenied": "Ge appen åtkomst till mikrofonen för att spela in ljud.",
+    "recorderErrorDescription": "Det gick inte att spela in ljud.",
+    "gallerySelectAll": "Markera alla",
+    "@gallerySelectAll": {
+        "description": "Label of the action that selects every log in the gallery"
+    },
+    "gallerySelectAction": "Markera",
+    "@gallerySelectAction": {
+        "description": "Label of the action that starts selecting logs in the gallery"
+    },
+    "galleryOpenAction": "Öppna",
+    "@galleryOpenAction": {
+        "description": "Label of the action that opens a log from the gallery"
+    },
+    "deleteLogsMessage": "{count, plural, one{Vill du ta bort {count} anteckning? Tillhörande bilagor tas också bort.} other{Vill du ta bort {count} anteckningar? Tillhörande bilagor tas också bort.}}",
+    "@deleteLogsMessage": {
+        "description": "Confirmation message shown before deleting the selected logs"
+    },
+    "newLogAction": "Ny anteckning",
+    "@newLogAction": {
+        "description": "Label of the action that creates a new log"
+    },
+    "removeTagsTitle": "Ta bort taggar",
+    "@removeTagsTitle": {
+        "description": "Title of the dialog for removing tags from the selected logs"
+    },
+    "discardChangesTitle": "Kassera ändringarna?",
+    "@discardChangesTitle": {
+        "description": "Title of the dialog confirming whether to discard unsaved changes"
+    },
+    "discardChangesDescription": "Dina ändringar går förlorade.",
+    "@discardChangesDescription": {
+        "description": "Body of the discard changes dialog"
+    },
+    "applyButtonLabel": "Verkställ",
+    "@applyButtonLabel": {
+        "description": "Label of the button that applies the chosen changes"
+    },
+    "addTagsConfirmMessage": "{count, plural, one{Vill du lägga till de valda taggarna i {count} anteckning?} other{Vill du lägga till de valda taggarna i {count} anteckningar?}}",
+    "@addTagsConfirmMessage": {
+        "description": "Confirmation message shown before adding tags to the selected logs"
+    },
+    "removeTagsConfirmMessage": "{count, plural, one{Vill du ta bort de valda taggarna från {count} anteckning?} other{Vill du ta bort de valda taggarna från {count} anteckningar?}}",
+    "@removeTagsConfirmMessage": {
+        "description": "Confirmation message shown before removing tags from the selected logs"
+    },
+    "selectPartialMatchesMessage": "{count, plural, one{Vill du också markera {count} delträff?} other{Vill du också markera {count} delträffar?}}",
+    "@selectPartialMatchesMessage": {
+        "description": "Question asking whether logs that only partially match the search text should also be selected"
+    },
+    "selectExactMatchesOnly": "Endast exakta träffar",
+    "@selectExactMatchesOnly": {
+        "description": "Button choosing to select only logs that match the exact text"
+    },
+    "selectIncludingPartialMatches": "Ta med delträffar",
+    "@selectIncludingPartialMatches": {
+        "description": "Button choosing to also select logs that partially match the text"
+    },
+    "onboardingSkip": "Hoppa över",
+    "@onboardingSkip": {
+        "description": "Label of the button that skips the rest of the onboarding flow"
+    },
+    "onboardingContinue": "Fortsätt",
+    "@onboardingContinue": {
+        "description": "Label of the button that moves to the next onboarding step"
+    },
+    "onboardingFinish": "Börja skriva dagbok",
+    "@onboardingFinish": {
+        "description": "Label of the button on the last onboarding step that finishes onboarding and opens the app"
+    },
+    "onboardingImportTitle": "Har du använt en annan dagboksapp?",
+    "@onboardingImportTitle": {
+        "description": "Title of the onboarding step offering to import logs from another app"
+    },
+    "onboardingImportDescription": "Ta med dina tidigare anteckningar eller börja med en tom dagbok.",
+    "@onboardingImportDescription": {
+        "description": "Description under the title of the onboarding import step"
+    },
+    "onboardingStorageNote": "Du kan ändra de här valen senare i inställningarna.",
+    "@onboardingStorageNote": {
+        "description": "Description under the title of the onboarding storage step, noting the choices can be changed later in settings"
+    },
+    "onboardingWelcomeTitle": "Välkommen till Daily You",
+    "@onboardingWelcomeTitle": {
+        "description": "Title of the first onboarding step"
+    },
+    "onboardingWelcomeDescription": "Varje dag är värd att minnas.",
+    "@onboardingWelcomeDescription": {
+        "description": "Description under the title of the first onboarding step"
+    },
+    "onboardingRemindersTitle": "Gör det till en vana",
+    "@onboardingRemindersTitle": {
+        "description": "Title of the onboarding step for turning on daily reminders"
+    },
+    "onboardingStorageTitle": "Skydda dina anteckningar",
+    "@onboardingStorageTitle": {
+        "description": "Title of the onboarding step for password, sync, and backup options"
+    },
+    "onboardingRestore": "Återställ från en säkerhetskopia",
+    "@onboardingRestore": {
+        "description": "Label of the button that restores logs from a backup during onboarding"
+    },
+    "onboardingMoodsCustomize": "Anpassa humörskalan",
+    "@onboardingMoodsCustomize": {
+        "description": "Label of the button that opens the mood editor"
+    },
+    "onboardingRemindersDescription": "Få en påminnelse om att skriva dagbok vid en slumpmässig tidpunkt eller på en tid som du själv väljer.",
+    "@onboardingRemindersDescription": {
+        "description": "Description under the title of the onboarding reminders step"
+    }
 }
