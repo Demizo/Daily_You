@@ -1195,9 +1195,6 @@ class AppLocalizationsId extends AppLocalizations {
   String get requiredPrompt => 'Wajib diisi';
 
   @override
-  String get templateNameRequired => 'Enter a template name';
-
-  @override
   String get settingsSecurityBiometricUnlock => 'Buka Kunci Biometrik';
 
   @override

@@ -1193,9 +1193,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get requiredPrompt => 'Gerekli';
 
   @override
-  String get templateNameRequired => 'Enter a template name';
-
-  @override
   String get settingsSecurityBiometricUnlock => 'Biyometrik Açma';
 
   @override

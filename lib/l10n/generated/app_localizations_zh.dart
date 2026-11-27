@@ -1178,9 +1178,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get requiredPrompt => '请输入密码';
 
   @override
-  String get templateNameRequired => 'Enter a template name';
-
-  @override
   String get settingsSecurityBiometricUnlock => '生物识别解锁';
 
   @override

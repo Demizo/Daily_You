@@ -1204,9 +1204,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get requiredPrompt => 'При входе требуется пароль';
 
   @override
-  String get templateNameRequired => 'Enter a template name';
-
-  @override
   String get settingsSecurityBiometricUnlock => 'Отпечаток пальца';
 
   @override

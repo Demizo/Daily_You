@@ -1209,9 +1209,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get requiredPrompt => 'Requis';
 
   @override
-  String get templateNameRequired => 'Enter a template name';
-
-  @override
   String get settingsSecurityBiometricUnlock => 'Déverrouillage biométrique';
 
   @override

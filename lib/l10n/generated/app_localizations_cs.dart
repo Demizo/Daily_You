@@ -1191,9 +1191,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get requiredPrompt => 'Povinné';
 
   @override
-  String get templateNameRequired => 'Enter a template name';
-
-  @override
   String get settingsSecurityBiometricUnlock => 'Biometrické odemykání';
 
   @override

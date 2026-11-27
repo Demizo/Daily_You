@@ -1144,9 +1144,6 @@ class AppLocalizationsMs extends AppLocalizations {
   String get requiredPrompt => 'Diperlukan';
 
   @override
-  String get templateNameRequired => 'Enter a template name';
-
-  @override
   String get settingsSecurityBiometricUnlock => 'Buka Kunci Biometrik';
 
   @override

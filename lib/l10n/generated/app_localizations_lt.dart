@@ -1211,9 +1211,6 @@ class AppLocalizationsLt extends AppLocalizations {
   String get requiredPrompt => 'Būtinas';
 
   @override
-  String get templateNameRequired => 'Enter a template name';
-
-  @override
   String get settingsSecurityBiometricUnlock => 'Biometrinis atrakinimas';
 
   @override

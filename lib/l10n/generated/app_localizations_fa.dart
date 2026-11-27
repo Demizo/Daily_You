@@ -1188,9 +1188,6 @@ class AppLocalizationsFa extends AppLocalizations {
   String get requiredPrompt => 'نیاز است';
 
   @override
-  String get templateNameRequired => 'Enter a template name';
-
-  @override
   String get settingsSecurityBiometricUnlock => 'بازکردن بایومتریک';
 
   @override

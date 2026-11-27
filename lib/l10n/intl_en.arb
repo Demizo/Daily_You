@@ -716,10 +716,6 @@
   },
   "requiredPrompt": "Required",
   "@requiredPrompt": {},
-  "templateNameRequired": "Enter a template name",
-  "@templateNameRequired": {
-    "description": "Validation error shown when saving a template with an empty name"
-  },
   "settingsSecurityBiometricUnlock": "Biometric Unlock",
   "@settingsSecurityBiometricUnlock": {},
   "unlockAppPrompt": "Unlock the app",

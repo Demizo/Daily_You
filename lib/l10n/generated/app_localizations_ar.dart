@@ -1197,9 +1197,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get requiredPrompt => 'مطلوب';
 
   @override
-  String get templateNameRequired => 'Enter a template name';
-
-  @override
   String get settingsSecurityBiometricUnlock =>
       'افتح باستخدام القياسات الحيوية';
 

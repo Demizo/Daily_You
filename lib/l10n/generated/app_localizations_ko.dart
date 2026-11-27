@@ -1185,9 +1185,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get requiredPrompt => '필요';
 
   @override
-  String get templateNameRequired => 'Enter a template name';
-
-  @override
   String get settingsSecurityBiometricUnlock => '생체인식 잠금해제';
 
   @override

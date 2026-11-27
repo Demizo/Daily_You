@@ -31,49 +31,42 @@ void main() {
     await database.close();
   });
 
-  testWidgets('rejects empty and whitespace-only template names',
-      (tester) async {
+  Future<void> pumpEditor(WidgetTester tester) async {
     await tester.pumpWidget(MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: const EditTemplate(),
     ));
     await tester.pumpAndSettle();
+  }
 
+  final save = find.widgetWithIcon(IconButton, Icons.check);
+
+  testWidgets('disables saving for empty and whitespace-only names',
+      (tester) async {
+    await pumpEditor(tester);
     final name = find.byType(TextField).first;
-    final save = find.widgetWithIcon(IconButton, Icons.check);
-    for (final value in ['', '   ']) {
-      await tester.enterText(name, value);
-      await tester.tap(save);
-      await tester.pump();
 
-      expect(find.text('Enter a template name'), findsOneWidget);
-      expect(find.byType(EditTemplate), findsOneWidget);
-    }
-
-    expect(await tester.runAsync(TemplateDao.getAll), isEmpty);
+    expect(tester.widget<IconButton>(save).onPressed, isNull);
+    await tester.enterText(name, '   ');
+    await tester.pump();
+    expect(tester.widget<IconButton>(save).onPressed, isNull);
+    await tester.enterText(name, 'A template');
+    await tester.pump();
+    expect(tester.widget<IconButton>(save).onPressed, isNotNull);
   });
 
-  testWidgets('successfully creates a template with a non-empty name',
-      (tester) async {
-    await tester.pumpWidget(MaterialApp(
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      home: const EditTemplate(),
-    ));
-    await tester.pumpAndSettle();
+  testWidgets('saves a template with a trimmed name', (tester) async {
+    await pumpEditor(tester);
 
-    await tester.enterText(find.byType(TextField).first, 'A template');
+    await tester.enterText(find.byType(TextField).first, '  A template ');
     await tester.pump();
-    expect(find.text('Enter a template name'), findsNothing);
     await tester.runAsync(() async {
-      final save = tester
-          .widget<IconButton>(find.widgetWithIcon(IconButton, Icons.check));
-      await Function.apply(save.onPressed!, []);
+      tester.widget<IconButton>(save).onPressed!();
+      await Future<void>.delayed(const Duration(milliseconds: 200));
     });
     await tester.pumpAndSettle();
     final templates = await tester.runAsync(TemplateDao.getAll);
-    expect(templates, hasLength(1));
     expect(templates!.single.name, 'A template');
   });
 }
