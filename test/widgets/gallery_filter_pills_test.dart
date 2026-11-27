@@ -10,6 +10,7 @@ import 'package:daily_you/models/mood_scale_preset.dart';
 import 'package:daily_you/providers/entries_provider.dart';
 import 'package:daily_you/providers/mood_scale_provider.dart';
 import 'package:daily_you/widgets/attachment_filter_dialog.dart';
+import 'package:daily_you/widgets/desktop_arrow_button.dart';
 import 'package:daily_you/widgets/gallery_filter_pills.dart';
 import 'package:daily_you/widgets/mood_filter_dialog.dart';
 import 'package:daily_you/widgets/mood_icon.dart';
@@ -93,14 +94,27 @@ void main() {
       expect(provider.filter.hasDate, isTrue);
     });
 
-    testWidgets('scrolls horizontally on a narrow screen', (tester) async {
+    testWidgets('wraps on a wide screen', (tester) async {
+      tester.view.physicalSize = const Size(1200, 800);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      await pump(tester, GalleryFilterPills(onClearAll: () {}));
+
+      expect(find.byType(Wrap), findsOneWidget);
+      expect(find.byType(SingleChildScrollView), findsNothing);
+    });
+
+    testWidgets('on a narrow screen wraps on desktop and scrolls elsewhere',
+        (tester) async {
       tester.view.physicalSize = const Size(400, 800);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
       await pump(tester, GalleryFilterPills(onClearAll: () {}));
 
-      expect(find.byType(SingleChildScrollView), findsOneWidget);
-      expect(find.byType(Wrap), findsNothing);
+      expect(
+          find.byType(Wrap), isDesktopPlatform ? findsOneWidget : findsNothing);
+      expect(find.byType(SingleChildScrollView),
+          isDesktopPlatform ? findsNothing : findsOneWidget);
     });
   });
 
