@@ -215,5 +215,7 @@
     "colorPickerPaletteTab": "Farver",
     "iconGroupMoodPeople": "Humør & Personer",
     "iconGroupHealth": "Sundhed",
-    "iconGroupWorkFinance": "Arbejde & Finans"
+    "iconGroupWorkFinance": "Arbejde & Finans",
+    "chartSmoothingLabel": "Smoothing",
+    "settingsNotificationsPermissionsPrompt": "Du vil blive bedt om 'scheduler alarmer' tilladelsen for at kunne sende påmindelser på et tilfældigt tidspunkt eller på din foretrukne tid."
 }
