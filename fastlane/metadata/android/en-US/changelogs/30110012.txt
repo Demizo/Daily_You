@@ -1,0 +1,6 @@
+Daily You v3.11.1 has arrived! One day at a time:
+
+• Added the option to import from Day One
+• Fixed logs without attachments failing to share
+• Various UI enhancements
+• Updated translations
