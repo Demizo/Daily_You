@@ -12,66 +12,66 @@ class AppLocalizationsSv extends AppLocalizations {
   String get appTitle => 'Daily You';
 
   @override
-  String get dailyReminderTitle => 'Logga dagen!';
+  String get dailyReminderTitle => 'Dags att skriva dagbok!';
 
   @override
-  String get dailyReminderDescription => 'Take your daily log…';
+  String get dailyReminderDescription => 'Berätta om din dag…';
 
   @override
-  String get actionTakePhoto => 'Take photo';
+  String get actionTakePhoto => 'Ta ett foto';
 
   @override
-  String get actionTakeVideo => 'Take video';
+  String get actionTakeVideo => 'Spela in video';
 
   @override
-  String get actionRecordAudio => 'Record audio';
+  String get actionRecordAudio => 'Spela in ljud';
 
   @override
-  String get actionAddImage => 'Add image';
+  String get actionAddImage => 'Lägg till bild';
 
   @override
-  String get actionAddVideo => 'Add video';
+  String get actionAddVideo => 'Lägg till video';
 
   @override
-  String get actionAddAudio => 'Add audio';
+  String get actionAddAudio => 'Lägg till ljud';
 
   @override
-  String get actionToday => 'Today';
+  String get actionToday => 'I dag';
 
   @override
-  String get actionOtherDay => 'Other day';
+  String get actionOtherDay => 'En annan dag';
 
   @override
-  String get pageHomeTitle => 'Home';
+  String get pageHomeTitle => 'Hem';
 
   @override
-  String get jumpToMonthTitle => 'Jump to month';
+  String get jumpToMonthTitle => 'Gå till månad';
 
   @override
-  String get jumpToLogTitle => 'Jump to log';
+  String get jumpToLogTitle => 'Gå till anteckning';
 
   @override
-  String get flashbacksTitle => 'Flashbacks';
+  String get flashbacksTitle => 'Tillbakablickar';
 
   @override
-  String get settingsFlashbacksExcludeBadDays => 'Exclude bad days';
+  String get settingsFlashbacksExcludeBadDays => 'Uteslut dåliga dagar';
 
   @override
-  String get flaskbacksEmpty => 'No Flashbacks Yet…';
+  String get flaskbacksEmpty => 'Inga tillbakablickar än…';
 
   @override
-  String get flashbackGoodDay => 'A Good Day';
+  String get flashbackGoodDay => 'En bra dag';
 
   @override
-  String get flashbackRandomDay => 'A Random Day';
+  String get flashbackRandomDay => 'En slumpvald dag';
 
   @override
   String flashbackWeek(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count Weeks Ago',
-      one: '$count Week Ago',
+      other: 'För $count veckor sedan',
+      one: 'För $count vecka sedan',
     );
     return '$_temp0';
   }
@@ -81,8 +81,8 @@ class AppLocalizationsSv extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count Months Ago',
-      one: '$count Month Ago',
+      other: 'För $count månader sedan',
+      one: 'För $count månad sedan',
     );
     return '$_temp0';
   }
@@ -92,28 +92,28 @@ class AppLocalizationsSv extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count Years Ago',
-      one: '$count Year Ago',
+      other: 'För $count år sedan',
+      one: 'För $count år sedan',
     );
     return '$_temp0';
   }
 
   @override
-  String get flashbackOnThisDay => 'On This Day';
+  String get flashbackOnThisDay => 'Den här dagen tidigare år';
 
   @override
-  String get pageGalleryTitle => 'Gallery';
+  String get pageGalleryTitle => 'Galleri';
 
   @override
-  String get searchLogsHint => 'Search Logs…';
+  String get searchLogsHint => 'Sök bland anteckningarna…';
 
   @override
   String logCount(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count logs',
-      one: '$count log',
+      other: '$count anteckningar',
+      one: '$count anteckning',
     );
     return '$_temp0';
   }
@@ -123,8 +123,8 @@ class AppLocalizationsSv extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count days',
-      one: '$count day',
+      other: '$count dagar',
+      one: '$count dag',
     );
     return '$_temp0';
   }
@@ -134,82 +134,82 @@ class AppLocalizationsSv extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count words',
-      one: '$count word',
+      other: '$count ord',
+      one: '$count ord',
     );
     return '$_temp0';
   }
 
   @override
-  String get noLogs => 'No Logs…';
+  String get noLogs => 'Inga anteckningar…';
 
   @override
-  String get noResults => 'No Results…';
+  String get noResults => 'Inga träffar…';
 
   @override
-  String get sortDateTitle => 'Date';
+  String get sortDateTitle => 'Datum';
 
   @override
-  String get sortOrderAscendingTitle => 'Ascending';
+  String get sortOrderAscendingTitle => 'Stigande';
 
   @override
-  String get sortOrderDescendingTitle => 'Descending';
+  String get sortOrderDescendingTitle => 'Fallande';
 
   @override
-  String get pageStatisticsTitle => 'Statistics';
+  String get pageStatisticsTitle => 'Statistik';
 
   @override
-  String get statisticsNotEnoughData => 'Not enough data…';
+  String get statisticsNotEnoughData => 'För lite underlag än så länge…';
 
   @override
-  String get statisticsRangeOneMonth => '1 Month';
+  String get statisticsRangeOneMonth => '1 månad';
 
   @override
-  String get statisticsRangeSixMonths => '6 Months';
+  String get statisticsRangeSixMonths => '6 månader';
 
   @override
-  String get statisticsRangeOneYear => '1 Year';
+  String get statisticsRangeOneYear => '1 år';
 
   @override
-  String get statisticsRangeAllTime => 'All Time';
+  String get statisticsRangeAllTime => 'Hela perioden';
 
   @override
   String chartSummaryTitle(Object tag) {
-    return '$tag Summary';
+    return 'Översikt över $tag';
   }
 
   @override
   String chartByDayTitle(Object tag) {
-    return '$tag By Day';
+    return '$tag per veckodag';
   }
 
   @override
   String chartOverTimeTitle(Object tag) {
-    return '$tag Over Time';
+    return '$tag över tid';
   }
 
   @override
   String chartInfluencesTitle(Object tag) {
-    return 'Influences $tag';
+    return 'Samband med $tag';
   }
 
   @override
-  String get chartGroupingLabel => 'Group by';
+  String get chartGroupingLabel => 'Gruppera efter';
 
   @override
-  String get chartGroupingDay => 'Day';
+  String get chartGroupingDay => 'Dag';
 
   @override
-  String get chartGroupingWeek => 'Week';
+  String get chartGroupingWeek => 'Vecka';
 
   @override
-  String get chartGroupingMonth => 'Month';
+  String get chartGroupingMonth => 'Månad';
 
   @override
-  String get chartGroupingYear => 'Year';
+  String get chartGroupingYear => 'År';
 
   @override
-  String get chartSmoothingLabel => 'Smoothing';
+  String get chartSmoothingLabel => 'Utjämning';
 
   @override
   String streakCurrent(num count) {
@@ -256,7 +256,8 @@ class AppLocalizationsSv extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Day Streak',
+      other: 'dagar i rad',
+      one: 'dag i rad',
     );
     return '$_temp0';
   }
@@ -266,8 +267,8 @@ class AppLocalizationsSv extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Logs',
-      one: 'Log',
+      other: 'anteckningar',
+      one: 'anteckning',
     );
     return '$_temp0';
   }
@@ -277,8 +278,8 @@ class AppLocalizationsSv extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Words',
-      one: 'Word',
+      other: 'ord',
+      one: 'ord',
     );
     return '$_temp0';
   }
@@ -288,31 +289,31 @@ class AppLocalizationsSv extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Days',
-      one: 'Day',
+      other: 'dagar',
+      one: 'dag',
     );
     return '$_temp0';
   }
 
   @override
-  String get statsLongestStreakTitle => 'Longest Streak';
+  String get statsLongestStreakTitle => 'Längsta svit';
 
   @override
-  String get statsWritingTitle => 'Writing';
+  String get statsWritingTitle => 'Skrivande';
 
   @override
-  String get statsWordsPerLogTitle => 'Words per Log';
+  String get statsWordsPerLogTitle => 'Ord per anteckning';
 
   @override
-  String get statsLongestLogTitle => 'Longest Log';
+  String get statsLongestLogTitle => 'Längsta anteckningen';
 
   @override
   String statsMostActiveTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Most Active Days',
-      one: 'Most Active Day',
+      other: 'Veckodagar med flest anteckningar',
+      one: 'Veckodag med flest anteckningar',
     );
     return '$_temp0';
   }
@@ -329,76 +330,77 @@ class AppLocalizationsSv extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       total,
       locale: localeName,
-      other: '$totalString Days',
-      one: '$totalString Day',
+      other: '$totalString dagar',
+      one: '$totalString dag',
     );
-    return '$writtenString of $_temp0';
+    return '$writtenString av $_temp0';
   }
 
   @override
-  String get statsAverageTitle => 'Average';
+  String get statsAverageTitle => 'Genomsnitt';
 
   @override
-  String get statsHighestTitle => 'Highest';
+  String get statsHighestTitle => 'Högsta värde';
 
   @override
-  String get statsLowestTitle => 'Lowest';
+  String get statsLowestTitle => 'Lägsta värde';
 
   @override
-  String get statsDaysLoggedTitle => 'Days Logged';
+  String get statsDaysLoggedTitle => 'Dagar med anteckningar';
 
   @override
-  String get statsOfDaysLabel => 'of Days';
+  String get statsOfDaysLabel => 'av dagarna';
 
   @override
-  String get statsCustomizeTitle => 'Customize';
+  String get statsCustomizeTitle => 'Anpassa';
 
   @override
   String get errorExternalStorageAccessTitle =>
-      'Can\'t Access External Storage';
+      'Kommer inte åt den externa lagringen';
 
   @override
   String get errorExternalStorageAccessDescription =>
-      'If you are using network storage make sure the service is online and you have network access.\n\nOtherwise, the app may have lost permissions for the external folder. Go to settings, and reselect the external folder to grant access.\n\nWarning, changes will not be synced until you restore access to the external storage location!';
+      'Om du använder nätverkslagring behöver du kontrollera att tjänsten är tillgänglig och att du är ansluten till nätverket.\n\nAppen kan också ha förlorat åtkomsten till den externa mappen. Öppna inställningarna och välj mappen igen för att ge appen åtkomst.\n\nVarning! Dina ändringar synkroniseras först när appen har åtkomst till den externa lagringen igen.';
 
   @override
   String get errorExternalStorageAccessContinue =>
-      'Continue With Local Database';
+      'Fortsätt med den lokala databasen';
 
   @override
-  String get databaseMigrationErrorTitle => 'Couldn\'t Move Your Data';
+  String get databaseMigrationErrorTitle =>
+      'Det gick inte att flytta dina data';
 
   @override
   String get databaseMigrationErrorDescription =>
-      'Your entries are safe but couldn\'t be moved to the app\'s storage.\n\nTry again, and report the issue if it keeps happening.';
+      'Dina anteckningar finns kvar, men det gick inte att flytta dem till appens lagringsutrymme.\n\nFörsök igen. Rapportera problemet om det kvarstår.';
 
   @override
-  String get databaseMigrationErrorRetry => 'Retry';
+  String get databaseMigrationErrorRetry => 'Försök igen';
 
   @override
-  String get databaseNewerErrorTitle => 'Update Required';
+  String get databaseNewerErrorTitle => 'Appen behöver uppdateras';
 
   @override
   String get databaseNewerErrorDescription =>
-      'Your data was saved by a newer version of Daily You. This version can\'t open it safely. Update the app to continue.';
+      'En nyare version av Daily You har sparat dina data. Den här versionen kan inte öppna dem på ett säkert sätt. Uppdatera appen för att fortsätta.';
 
   @override
-  String get errorReport => 'Report Issue';
+  String get errorReport => 'Rapportera problemet';
 
   @override
-  String get lastModified => 'Modified';
+  String get lastModified => 'Senast ändrad';
 
   @override
-  String get writeSomethingHint => 'Write something…';
+  String get writeSomethingHint => 'Skriv något…';
 
   @override
-  String get titleHint => 'Title…';
+  String get titleHint => 'Rubrik…';
 
   @override
-  String get deleteLogTitle => 'Delete Log';
+  String get deleteLogTitle => 'Ta bort anteckning';
 
   @override
-  String get deleteLogDescription => 'Do you want to delete this log?';
+  String get deleteLogDescription => 'Vill du ta bort den här anteckningen?';
 
   @override
   String get deletePhotoTitle => 'Delete Photo';
@@ -407,298 +409,300 @@ class AppLocalizationsSv extends AppLocalizations {
   String get deletePhotoDescription => 'Do you want to delete this photo?';
 
   @override
-  String get deleteAttachmentTitle => 'Delete Attachment';
+  String get deleteAttachmentTitle => 'Ta bort bilaga';
 
   @override
-  String get deleteAttachmentDescription =>
-      'Do you want to delete this attachment?';
+  String get deleteAttachmentDescription => 'Vill du ta bort den här bilagan?';
 
   @override
-  String get largeAttachmentWarningTitle => 'Large attachment';
+  String get largeAttachmentWarningTitle => 'Stor bilaga';
 
   @override
   String get largeAttachmentWarningDescription =>
-      'This attachment is large and will increase your backup size.';
+      'Den här bilagan är stor och gör säkerhetskopian större.';
 
   @override
-  String get dontShowAgain => 'Don\'t show again';
+  String get dontShowAgain => 'Visa inte igen';
 
   @override
-  String get pageSettingsTitle => 'Settings';
+  String get pageSettingsTitle => 'Inställningar';
 
   @override
-  String get settingsAppearanceTitle => 'Appearance';
+  String get settingsAppearanceTitle => 'Utseende';
 
   @override
-  String get settingsTheme => 'Theme';
+  String get settingsTheme => 'Tema';
 
   @override
-  String get themeSystem => 'System';
+  String get themeSystem => 'Följ systemet';
 
   @override
-  String get themeLight => 'Light';
+  String get themeLight => 'Ljust';
 
   @override
-  String get themeDark => 'Dark';
+  String get themeDark => 'Mörkt';
 
   @override
   String get themeAmoled => 'AMOLED';
 
   @override
-  String get settingsFirstDayOfWeek => 'First Day Of Week';
+  String get settingsFirstDayOfWeek => 'Veckans första dag';
 
   @override
-  String get settingsCalendarSystem => 'Calendar System';
+  String get settingsCalendarSystem => 'Kalendersystem';
 
   @override
-  String get calendarSystemGregorian => 'Gregorian';
+  String get calendarSystemGregorian => 'Gregorianska kalendern';
 
   @override
-  String get calendarSystemJalali => 'Jalali';
+  String get calendarSystemJalali => 'Persiska kalendern (jalali)';
 
   @override
-  String get settingsUseSystemAccentColor => 'Use System Accent Color';
+  String get settingsUseSystemAccentColor => 'Använd systemets accentfärg';
 
   @override
-  String get settingsCustomAccentColor => 'Custom Accent Color';
+  String get settingsCustomAccentColor => 'Egen accentfärg';
 
   @override
   String get settingsShowMarkdownToolbar => 'Show Markdown Toolbar';
 
   @override
-  String get settingsShowFlashbacks => 'Show Flashbacks';
+  String get settingsShowFlashbacks => 'Visa tillbakablickar';
 
   @override
-  String get settingsChangeMoodIcons => 'Change Mood Icons';
+  String get settingsChangeMoodIcons => 'Ändra humörikoner';
 
   @override
-  String get moodIconPrompt => 'Enter an icon';
+  String get moodIconPrompt => 'Ange ett tecken som ikon';
 
   @override
-  String get moodVeryUnpleasant => 'Very Unpleasant';
+  String get moodVeryUnpleasant => 'Mycket dåligt';
 
   @override
-  String get moodUnpleasant => 'Unpleasant';
+  String get moodUnpleasant => 'Dåligt';
 
   @override
-  String get moodNeutral => 'Neutral';
+  String get moodNeutral => 'Neutralt';
 
   @override
-  String get moodPleasant => 'Pleasant';
+  String get moodPleasant => 'Bra';
 
   @override
-  String get moodVeryPleasant => 'Very Pleasant';
+  String get moodVeryPleasant => 'Mycket bra';
 
   @override
   String get settingsFlashbacksViewLayout => 'Flashbacks View Layout';
 
   @override
-  String get settingsGalleryViewLayout => 'Gallery View Layout';
+  String get settingsGalleryViewLayout => 'Gallerivy';
 
   @override
-  String get settingsHideImagesInGallery => 'Hide Images In Gallery';
+  String get settingsHideImagesInGallery => 'Dölj bilder i galleriet';
 
   @override
-  String get settingsHideImages => 'Hide Images';
+  String get settingsHideImages => 'Dölj bilder';
 
   @override
-  String get pageCalendarTitle => 'Calendar';
+  String get pageCalendarTitle => 'Kalender';
 
   @override
-  String get viewLayoutList => 'List';
+  String get viewLayoutList => 'Lista';
 
   @override
-  String get viewLayoutGrid => 'Grid';
+  String get viewLayoutGrid => 'Rutnät';
 
   @override
-  String get settingsNotificationsTitle => 'Notifications';
+  String get settingsNotificationsTitle => 'Aviseringar';
 
   @override
   String get settingsDailyReminderOnboarding =>
-      'Enable daily reminders to keep yourself consistent!';
+      'Slå på dagliga påminnelser så blir det lättare att skriva regelbundet.';
 
   @override
   String get settingsNotificationsPermissionsPrompt =>
-      'The \'schedule alarms\' permission will be requested to send the reminder at a random moment or at your preferred time.';
+      'Appen kommer att be om behörighet att schemalägga alarm så att du kan få påminnelsen vid en slumpmässig tidpunkt eller vid den tid du själv väljer.';
 
   @override
-  String get settingsDailyReminderTitle => 'Daily Reminder';
+  String get settingsDailyReminderTitle => 'Daglig påminnelse';
 
   @override
-  String get settingsOnThisDayDescription => 'Revisit past memories';
+  String get settingsOnThisDayDescription =>
+      'Se vad du skrev den här dagen tidigare år';
 
   @override
-  String get settingsDailyReminderDescription => 'A gentle reminder each day';
+  String get settingsDailyReminderDescription =>
+      'En liten påminnelse varje dag';
 
   @override
-  String get settingsReminderTime => 'Reminder Time';
+  String get settingsReminderTime => 'Tid för påminnelse';
 
   @override
-  String get settingsFixedReminderTimeTitle => 'Fixed Reminder Time';
+  String get settingsFixedReminderTimeTitle => 'Fast tid för påminnelsen';
 
   @override
   String get settingsFixedReminderTimeDescription =>
-      'Pick a fixed time for the reminder';
+      'Välj en fast tid för påminnelsen';
 
   @override
-  String get settingsExactAlarmsTitle => 'Allow exact alarms?';
+  String get settingsExactAlarmsTitle => 'Tillåt exakta alarm?';
 
   @override
   String get settingsExactAlarmsDescription =>
-      'Alarms may be delayed by several minutes unless you allow exact alarms.';
+      'Påminnelserna kan bli flera minuter försenade om du inte tillåter exakta alarm.';
 
   @override
-  String get settingsAlwaysSendReminderTitle => 'Always Send Reminder';
+  String get settingsAlwaysSendReminderTitle => 'Skicka alltid en påminnelse';
 
   @override
   String get settingsAlwaysSendReminderDescription =>
-      'Send reminder even if a log was already started';
+      'Skicka en påminnelse även om du redan har börjat på en anteckning';
 
   @override
-  String get settingsCustomizeNotificationTitle => 'Customize Notifications';
+  String get settingsCustomizeNotificationTitle => 'Anpassa aviseringar';
 
   @override
-  String get settingsTemplatesTitle => 'Templates';
+  String get settingsTemplatesTitle => 'Mallar';
 
   @override
-  String get settingsDefaultTemplate => 'Default Template';
+  String get settingsDefaultTemplate => 'Standardmall';
 
   @override
-  String get manageTemplates => 'Manage Templates';
+  String get manageTemplates => 'Hantera mallar';
 
   @override
-  String get addTemplate => 'Add a Template';
+  String get addTemplate => 'Lägg till en mall';
 
   @override
   String get newTemplate => 'New Template';
 
   @override
-  String get noTemplateTitle => 'None';
+  String get noTemplateTitle => 'Ingen mall';
 
   @override
-  String get noTemplatesDescription => 'No templates created yet…';
+  String get noTemplatesDescription => 'Du har inte skapat några mallar än…';
 
   @override
   String get templateVariableTime => 'Time';
 
   @override
-  String get templateDefaultTimestampTitle => 'Timestamp';
+  String get templateDefaultTimestampTitle => 'Tidsstämpel';
 
   @override
   String templateDefaultTimestampBody(Object date, Object time) {
-    return '$date - $time:';
+    return '$date – $time:';
   }
 
   @override
-  String get templateDefaultSummaryTitle => 'Day Summary';
+  String get templateDefaultSummaryTitle => 'Dagens sammanfattning';
 
   @override
-  String get templateDefaultSummaryBody => '### Summary\n- \n\n### Quote\n> ';
+  String get templateDefaultSummaryBody =>
+      '### Sammanfattning\n- \n\n### Citat\n> ';
 
   @override
-  String get templateDefaultReflectionTitle => 'Reflection';
+  String get templateDefaultReflectionTitle => 'Reflektion';
 
   @override
   String get templateDefaultReflectionBody =>
-      '### What did you enjoy about today?\n- \n\n### What are you thankful for?\n- \n\n### What are you looking forward to?\n- ';
+      '### Vad uppskattade du i dag?\n- \n\n### Vad är du tacksam för?\n- \n\n### Vad ser du fram emot?\n- ';
 
   @override
-  String get settingsTagsTitle => 'Tags';
+  String get settingsTagsTitle => 'Taggar';
 
   @override
-  String get manageTags => 'Manage Tags';
+  String get manageTags => 'Hantera taggar';
 
   @override
-  String get tagTypeLabelTitle => 'Label';
+  String get tagTypeLabelTitle => 'Etikett';
 
   @override
-  String get tagTypeTrackerTitle => 'Tracker';
+  String get tagTypeTrackerTitle => 'Mätvärde';
 
   @override
-  String get nameHint => 'Name';
+  String get nameHint => 'Namn';
 
   @override
-  String get tagColorLabel => 'Color';
+  String get tagColorLabel => 'Färg';
 
   @override
-  String get iconPickerTitle => 'Choose Icon';
+  String get iconPickerTitle => 'Välj ikon';
 
   @override
-  String get iconPickerIconsTab => 'Icons';
+  String get iconPickerIconsTab => 'Ikoner';
 
   @override
-  String get iconPickerCustomTab => 'Custom';
+  String get iconPickerCustomTab => 'Egen';
 
   @override
-  String get iconPickerSearchHint => 'Search icons…';
+  String get iconPickerSearchHint => 'Sök efter ikoner…';
 
   @override
-  String get colorPickerTitle => 'Choose Color';
+  String get colorPickerTitle => 'Välj färg';
 
   @override
-  String get colorPickerPaletteTab => 'Colors';
+  String get colorPickerPaletteTab => 'Färger';
 
   @override
-  String get iconGroupMoodPeople => 'Mood & People';
+  String get iconGroupMoodPeople => 'Humör och människor';
 
   @override
-  String get iconGroupHealth => 'Health';
+  String get iconGroupHealth => 'Hälsa';
 
   @override
-  String get iconGroupWorkFinance => 'Work & Finance';
+  String get iconGroupWorkFinance => 'Arbete och ekonomi';
 
   @override
-  String get iconGroupHabitsGoals => 'Habits & Goals';
+  String get iconGroupHabitsGoals => 'Vanor och mål';
 
   @override
-  String get iconGroupNature => 'Nature';
+  String get iconGroupNature => 'Natur';
 
   @override
-  String get iconGroupFoodDrink => 'Food & Drink';
+  String get iconGroupFoodDrink => 'Mat och dryck';
 
   @override
-  String get iconGroupHome => 'Home';
+  String get iconGroupHome => 'Hem';
 
   @override
-  String get iconGroupTravel => 'Travel';
+  String get iconGroupTravel => 'Resor';
 
   @override
-  String get iconGroupSymbols => 'Symbols';
+  String get iconGroupSymbols => 'Symboler';
 
   @override
-  String get tagCategoryLabel => 'Category';
+  String get tagCategoryLabel => 'Kategori';
 
   @override
-  String get tagLabel => 'Tag';
+  String get tagLabel => 'Tagg';
 
   @override
-  String get tagCategoryUncategorized => 'Uncategorized';
+  String get tagCategoryUncategorized => 'Utan kategori';
 
   @override
-  String get newCategoryTitle => 'New Category';
+  String get newCategoryTitle => 'Ny kategori';
 
   @override
-  String get shareButtonLabel => 'Share';
+  String get shareButtonLabel => 'Dela';
 
   @override
-  String get importErrorDescription => 'Failed to import file!';
+  String get importErrorDescription => 'Det gick inte att importera filen.';
 
   @override
-  String get exportErrorDescription => 'Failed to export file!';
+  String get exportErrorDescription => 'Det gick inte att exportera filen.';
 
   @override
-  String get deleteTitle => 'Delete';
+  String get deleteTitle => 'Ta bort';
 
   @override
   String deleteTagMessage(num count, Object name) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: ' It is used in $count logs.',
-      one: ' It is used in 1 log.',
+      other: ' Taggen används i $count anteckningar.',
+      one: ' Taggen används i en anteckning.',
       zero: '',
     );
-    return 'Delete \"$name\"?$_temp0';
+    return 'Ta bort ”$name”?$_temp0';
   }
 
   @override
@@ -706,69 +710,69 @@ class AppLocalizationsSv extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: ' Its $count tags will also be deleted.',
-      one: ' Its 1 tag will also be deleted.',
+      other: ' Även de $count taggarna i kategorin tas bort.',
+      one: ' Taggen i kategorin tas också bort.',
       zero: '',
     );
-    return 'Delete \"$name\"?$_temp0';
+    return 'Ta bort ”$name”?$_temp0';
   }
 
   @override
   String deleteTemplateMessage(Object name) {
-    return 'Delete \"$name\"?';
+    return 'Ta bort ”$name”?';
   }
 
   @override
   String get filterTagsTitle => 'Filter';
 
   @override
-  String get tagFilterModeAny => 'Any Tag';
+  String get tagFilterModeAny => 'Minst en av taggarna';
 
   @override
-  String get tagFilterModeAll => 'All Tags';
+  String get tagFilterModeAll => 'Alla taggar';
 
   @override
-  String get clearAllFilters => 'Clear All';
+  String get clearAllFilters => 'Rensa alla filter';
 
   @override
-  String get noTagsFilterLabel => 'No Tags';
+  String get noTagsFilterLabel => 'Utan taggar';
 
   @override
-  String get clearFilter => 'Clear';
+  String get clearFilter => 'Rensa';
 
   @override
   String showLogsCount(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Show $count logs',
-      one: 'Show $count log',
+      other: 'Visa $count anteckningar',
+      one: 'Visa $count anteckning',
     );
     return '$_temp0';
   }
 
   @override
-  String get filterPillAttachments => 'Attachments';
+  String get filterPillAttachments => 'Bilagor';
 
   @override
-  String get filterPillKeywords => 'Keywords';
+  String get filterPillKeywords => 'Sökord';
 
   @override
-  String get noMoodFilterLabel => 'No Mood';
+  String get noMoodFilterLabel => 'Utan angivet humör';
 
   @override
-  String get noAttachmentsFilterLabel => 'No Attachments';
+  String get noAttachmentsFilterLabel => 'Utan bilagor';
 
   @override
-  String get noTextFilterLabel => 'No Text';
+  String get noTextFilterLabel => 'Utan text';
 
   @override
   String partialMatchCount(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count partial matches',
-      one: '$count partial match',
+      other: '$count delträffar',
+      one: '$count delträff',
     );
     return '$_temp0';
   }
@@ -778,8 +782,8 @@ class AppLocalizationsSv extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count tags',
-      one: '$count tag',
+      other: '$count taggar',
+      one: '$count tagg',
     );
     return '$_temp0';
   }
@@ -789,34 +793,34 @@ class AppLocalizationsSv extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Last $count months',
-      one: 'Last month',
+      other: 'Senaste $count månaderna',
+      one: 'Senaste månaden',
     );
     return '$_temp0';
   }
 
   @override
-  String get dateFilterCustomRange => 'Custom range';
+  String get dateFilterCustomRange => 'Välj period';
 
   @override
-  String get keywordFilterHint => 'Add a keyword…';
+  String get keywordFilterHint => 'Lägg till ett sökord…';
 
   @override
-  String get keywordFilterMatchAll => 'All keywords';
+  String get keywordFilterMatchAll => 'Alla sökord';
 
   @override
-  String get keywordFilterMatchAny => 'Any keyword';
+  String get keywordFilterMatchAny => 'Minst ett sökord';
 
   @override
-  String get keywordFilterMatchCase => 'Match case';
+  String get keywordFilterMatchCase => 'Skilj på stora och små bokstäver';
 
   @override
   String keywordCount(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count keywords',
-      one: '$count keyword',
+      other: '$count sökord',
+      one: '$count sökord',
     );
     return '$_temp0';
   }
@@ -827,117 +831,117 @@ class AppLocalizationsSv extends AppLocalizations {
   }
 
   @override
-  String get addTagsTitle => 'Add Tags';
+  String get addTagsTitle => 'Lägg till taggar';
 
   @override
-  String get addTagsSearchHint => 'Search tags…';
+  String get addTagsSearchHint => 'Sök bland taggar…';
 
   @override
-  String get tagPickerSortManualLabel => 'Manual order';
+  String get tagPickerSortManualLabel => 'Manuell ordning';
 
   @override
-  String get tagPickerSortUsageLabel => 'Sort by usage';
+  String get tagPickerSortUsageLabel => 'Mest använda först';
 
   @override
-  String get tagFavoriteName => 'Favorite';
+  String get tagFavoriteName => 'Favorit';
 
   @override
-  String get tagEnergyName => 'Energy';
+  String get tagEnergyName => 'Energi';
 
   @override
-  String get tagCategoryPeopleName => 'People';
+  String get tagCategoryPeopleName => 'Personer';
 
   @override
-  String get tagCategoryActivitiesName => 'Activities';
+  String get tagCategoryActivitiesName => 'Aktiviteter';
 
   @override
-  String get tagExerciseName => 'Exercise';
+  String get tagExerciseName => 'Träning';
 
   @override
-  String get tagSocializingName => 'Socializing';
+  String get tagSocializingName => 'Umgänge';
 
   @override
   String get tagHobbyName => 'Hobby';
 
   @override
-  String get tagEntertainmentName => 'Entertainment';
+  String get tagEntertainmentName => 'Nöjen';
 
   @override
-  String get tagDiningName => 'Dining';
+  String get tagDiningName => 'Måltider';
 
   @override
-  String get tagChoresName => 'Chores';
+  String get tagChoresName => 'Hushållssysslor';
 
   @override
-  String get tagCategoryEmotionsName => 'Emotions';
+  String get tagCategoryEmotionsName => 'Känslor';
 
   @override
-  String get tagExcitedName => 'Excited';
+  String get tagExcitedName => 'Förväntansfull';
 
   @override
-  String get tagGratefulName => 'Grateful';
+  String get tagGratefulName => 'Tacksam';
 
   @override
-  String get tagCalmName => 'Calm';
+  String get tagCalmName => 'Lugn';
 
   @override
-  String get tagTiredName => 'Tired';
+  String get tagTiredName => 'Trött';
 
   @override
-  String get tagAnxiousName => 'Anxious';
+  String get tagAnxiousName => 'Orolig';
 
   @override
-  String get tagAnnoyedName => 'Annoyed';
+  String get tagAnnoyedName => 'Irriterad';
 
   @override
   String get welcomeLogBodyText =>
-      '## Welcome to Daily You\n\n> Every day is worth remembering, capture it!\n\n**Daily You** is free, [open source](https://github.com/Demizo/Daily_You), and community supported. Built around the belief that your diary should be yours, not a product:\n\n- No ads\n- No locked features\n- No tracking or data collection\n\nWhether you\'re journaling, reflecting, or just noting what made you smile, **Daily You** gives you a private space that\'s _truly your own_.';
+      '## Välkommen till Daily You\n\n> Varje dag är värd att minnas. Spara ett minne från i dag!\n\n**Daily You** är gratis, har [öppen källkod](https://github.com/Demizo/Daily_You) och får stöd av sina användare. Appen bygger på tanken att din dagbok ska tillhöra dig.\n\n- Ingen reklam\n- Inga låsta funktioner\n- Ingen spårning eller datainsamling\n\nI **Daily You** har du en plats _helt för dig själv_, vare sig du vill skriva dagbok, tänka tillbaka på dagen eller bara anteckna vad som fick dig att le.';
 
   @override
-  String get settingsStorageTitle => 'Storage & Sync';
+  String get settingsStorageTitle => 'Lagring och synkronisering';
 
   @override
   String get settingsImageQuality => 'Image Quality';
 
   @override
-  String get settingsMediaQualityTitle => 'Media Quality';
+  String get settingsMediaQualityTitle => 'Mediekvalitet';
 
   @override
-  String get imageQualityHigh => 'High';
+  String get imageQualityHigh => 'Hög';
 
   @override
-  String get imageQualityMedium => 'Medium';
+  String get imageQualityMedium => 'Medel';
 
   @override
-  String get imageQualityLow => 'Low';
+  String get imageQualityLow => 'Låg';
 
   @override
-  String get imageQualityNoCompression => 'No Compression';
+  String get imageQualityNoCompression => 'Ingen komprimering';
 
   @override
-  String get settingsStorageUsage => 'Storage Usage';
+  String get settingsStorageUsage => 'Använt lagringsutrymme';
 
   @override
-  String get settingsLogFolder => 'Log Folder';
+  String get settingsLogFolder => 'Mapp för anteckningar';
 
   @override
   String get settingsImageFolder => 'Image Folder';
 
   @override
-  String get settingsExternalSyncTitle => 'Sync with External Location';
+  String get settingsExternalSyncTitle => 'Synkronisera med en extern plats';
 
   @override
-  String get chooseFolderHint => 'Choose a folder';
+  String get chooseFolderHint => 'Välj en mapp';
 
   @override
-  String get warningTitle => 'Warning';
+  String get warningTitle => 'Varning';
 
   @override
   String get logFolderWarningDescription =>
-      'The selected folder already contains a \'daily_you.db\' file, it will be used to overwrite your existing logs!';
+      'Den valda mappen innehåller redan filen daily_you.db. Om du fortsätter ersätts dina nuvarande anteckningar med dem som finns i filen.';
 
   @override
-  String get errorTitle => 'Error';
+  String get errorTitle => 'Fel';
 
   @override
   String get logFolderErrorDescription => 'Failed to change log folder!';
@@ -947,121 +951,125 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get syncErrorDescription =>
-      'Failed to sync with the external location!';
+      'Det gick inte att synkronisera med den externa platsen.';
 
   @override
-  String get backupErrorDescription => 'Failed to create backup!';
+  String get backupErrorDescription =>
+      'Det gick inte att skapa en säkerhetskopia.';
 
   @override
-  String get restoreErrorDescription => 'Failed to restore backup!';
+  String get restoreErrorDescription =>
+      'Det gick inte att återställa säkerhetskopian.';
 
   @override
-  String get settingsBackupRestoreTitle => 'Backup & Restore';
+  String get settingsBackupRestoreTitle =>
+      'Säkerhetskopiering och återställning';
 
   @override
-  String get settingsBackup => 'Backup';
+  String get settingsBackup => 'Säkerhetskopiera';
 
   @override
-  String get settingsRestore => 'Restore';
+  String get settingsRestore => 'Återställ';
 
   @override
   String get settingsRestorePromptDescription =>
-      'Restoring a backup will overwrite your existing data!';
+      'Om du återställer säkerhetskopian skrivs dina nuvarande data över.';
 
   @override
-  String get settingsBackupPasswordProtect => 'Password Protect Backups';
+  String get settingsBackupPasswordProtect => 'Lösenordsskydda säkerhetskopior';
 
   @override
-  String get backupEncryptedTitle => 'Encrypted Backup';
+  String get backupEncryptedTitle => 'Krypterad säkerhetskopia';
 
   @override
-  String get backupEncryptedContent => 'This backup is password protected.';
+  String get backupEncryptedContent =>
+      'Den här säkerhetskopian är lösenordsskyddad.';
 
   @override
-  String get settingsAutoBackup => 'Automatic Backups';
+  String get settingsAutoBackup => 'Automatisk säkerhetskopiering';
 
   @override
-  String get settingsAutoBackupLocation => 'Backup Location';
+  String get settingsAutoBackupLocation => 'Plats för säkerhetskopior';
 
   @override
-  String get settingsAutoBackupInterval => 'Backup Interval';
+  String get settingsAutoBackupInterval => 'Intervall för säkerhetskopiering';
 
   @override
-  String get settingsAutoBackupIntervalDaily => 'Daily';
+  String get settingsAutoBackupIntervalDaily => 'Varje dag';
 
   @override
-  String get settingsAutoBackupIntervalWeekly => 'Weekly';
+  String get settingsAutoBackupIntervalWeekly => 'Varje vecka';
 
   @override
-  String get settingsAutoBackupIntervalMonthly => 'Monthly';
+  String get settingsAutoBackupIntervalMonthly => 'Varje månad';
 
   @override
-  String get settingsAutoBackupMaxCount => 'Backups To Keep';
+  String get settingsAutoBackupMaxCount => 'Antal säkerhetskopior att behålla';
 
   @override
-  String get settingsAutoBackupRequireCharging => 'Only While Charging';
+  String get settingsAutoBackupRequireCharging => 'Endast under laddning';
 
   @override
   String settingsBackupLast(Object time) {
-    return 'Last backup $time';
+    return 'Senaste säkerhetskopiering: $time';
   }
 
   @override
-  String get settingsBackupNever => 'Never backed up';
+  String get settingsBackupNever => 'Ingen säkerhetskopia har skapats';
 
   @override
   String settingsAutoBackupNext(Object time) {
-    return 'Next backup $time';
+    return 'Nästa säkerhetskopiering: $time';
   }
 
   @override
-  String get settingsAutoBackupKeepAll => 'All';
+  String get settingsAutoBackupKeepAll => 'Alla';
 
   @override
-  String get autoBackupFailedTitle => 'Backup Failed';
+  String get autoBackupFailedTitle => 'Säkerhetskopieringen misslyckades';
 
   @override
   String tranferStatus(Object percent) {
-    return 'Transferring… $percent%';
+    return 'Överför… $percent %';
   }
 
   @override
   String creatingBackupStatus(Object percent) {
-    return 'Creating Backup… $percent%';
+    return 'Skapar säkerhetskopia… $percent %';
   }
 
   @override
   String restoringBackupStatus(Object percent) {
-    return 'Restoring Backup… $percent%';
+    return 'Återställer säkerhetskopia… $percent %';
   }
 
   @override
   String encryptingBackupStatus(Object percent) {
-    return 'Encrypting Backup… $percent%';
+    return 'Krypterar säkerhetskopia… $percent %';
   }
 
   @override
   String decryptingBackupStatus(Object percent) {
-    return 'Decrypting Backup… $percent%';
+    return 'Dekrypterar säkerhetskopia… $percent %';
   }
 
   @override
-  String get cleanUpStatus => 'Cleaning Up…';
+  String get cleanUpStatus => 'Rensar…';
 
   @override
   String migratingImagesStatus(Object current, Object total) {
-    return 'Migrating photos… $current/$total';
+    return 'Flyttar foton… $current av $total';
   }
 
   @override
   String get settingsExport => 'Export';
 
   @override
-  String get settingsExportToAnotherFormat => 'Export To Another Format';
+  String get settingsExportToAnotherFormat => 'Exportera till ett annat format';
 
   @override
   String get settingsExportFormatDescription =>
-      'This should not be used as a backup!';
+      'Använd inte den exporterade filen som säkerhetskopia.';
 
   @override
   String get exportLogs => 'Export Logs';
@@ -1070,20 +1078,19 @@ class AppLocalizationsSv extends AppLocalizations {
   String get exportImages => 'Export Images';
 
   @override
-  String get exportIncludeTitle => 'Include';
+  String get exportIncludeTitle => 'Ta med';
 
   @override
   String get settingsImport => 'Import';
 
   @override
-  String get settingsImportFromAnotherApp => 'Import From Another App';
+  String get settingsImportFromAnotherApp => 'Importera från en annan app';
 
   @override
-  String get settingsTranslateCallToAction =>
-      'Everyone should have access to a journal!';
+  String get settingsTranslateCallToAction => 'Alla ska kunna skriva dagbok!';
 
   @override
-  String get settingsHelpTranslate => 'Help Translate';
+  String get settingsHelpTranslate => 'Hjälp till att översätta';
 
   @override
   String get importLogs => 'Import Logs';
@@ -1092,11 +1099,11 @@ class AppLocalizationsSv extends AppLocalizations {
   String get importImages => 'Import Images';
 
   @override
-  String get logFormatTitle => 'Choose Format';
+  String get logFormatTitle => 'Välj format';
 
   @override
   String get logFormatDescription =>
-      'Another app\'s format may not support all features. Please report any issues since third party formats may change at any time. This will not impact existing logs!';
+      'Andra appars format kanske inte stöder alla funktioner. Rapportera gärna problem, eftersom formaten kan ändras. Dina befintliga anteckningar påverkas inte.';
 
   @override
   String get formatDailyYouJson => 'Daily You (JSON)';
@@ -1135,201 +1142,206 @@ class AppLocalizationsSv extends AppLocalizations {
   String get formatJson => 'JSON';
 
   @override
-  String get settingsDeleteAllLogsTitle => 'Delete All Logs';
+  String get settingsDeleteAllLogsTitle => 'Ta bort alla anteckningar';
 
   @override
   String get settingsDeleteAllLogsDescription =>
-      'Do you want to delete all of your logs?';
+      'Vill du ta bort alla dina anteckningar?';
 
   @override
   String settingsDeleteAllLogsPrompt(Object prompt) {
-    return 'Enter \'$prompt\' to confirm. This cannot be undone!';
+    return 'Skriv ”$prompt” för att bekräfta. Det går inte att ångra.';
   }
 
   @override
-  String get settingsLanguageTitle => 'Language';
+  String get settingsLanguageTitle => 'Språk';
 
   @override
-  String get settingsAppLanguageTitle => 'App Language';
+  String get settingsAppLanguageTitle => 'Appspråk';
 
   @override
-  String get settingsOverrideAppLanguageTitle => 'Override App Language';
+  String get settingsOverrideAppLanguageTitle =>
+      'Använd ett annat språk i appen';
 
   @override
-  String get settingsSecurityTitle => 'Security';
+  String get settingsSecurityTitle => 'Säkerhet';
 
   @override
-  String get settingsSecurityRequirePassword => 'Require Password';
+  String get settingsSecurityRequirePassword => 'Kräv lösenord';
 
   @override
-  String get settingsSecurityEnterPassword => 'Enter Password';
+  String get settingsSecurityEnterPassword => 'Ange lösenord';
 
   @override
-  String get settingsSecuritySetPassword => 'Set Password';
+  String get settingsSecuritySetPassword => 'Välj lösenord';
 
   @override
-  String get settingsSecurityChangePassword => 'Change Password';
+  String get settingsSecurityChangePassword => 'Ändra lösenord';
 
   @override
-  String get settingsSecurityPassword => 'Password';
+  String get settingsSecurityPassword => 'Lösenord';
 
   @override
-  String get settingsSecurityConfirmPassword => 'Confirm Password';
+  String get settingsSecurityConfirmPassword => 'Bekräfta lösenord';
 
   @override
-  String get settingsSecurityOldPassword => 'Old Password';
+  String get settingsSecurityOldPassword => 'Nuvarande lösenord';
 
   @override
-  String get settingsSecurityIncorrectPassword => 'Incorrect Password';
+  String get settingsSecurityIncorrectPassword => 'Fel lösenord';
 
   @override
-  String get settingsSecurityPasswordsDoNotMatch => 'Passwords do not match';
+  String get settingsSecurityPasswordsDoNotMatch =>
+      'Lösenorden stämmer inte överens';
 
   @override
   String get settingsSecurityPasswordWarning =>
-      'If you forget it, you won\'t be able to open Daily You.';
+      'Om du glömmer lösenordet kan du inte öppna Daily You.';
 
   @override
-  String get requiredPrompt => 'Required';
+  String get requiredPrompt => 'Obligatoriskt';
 
   @override
-  String get settingsSecurityBiometricUnlock => 'Biometric Unlock';
+  String get settingsSecurityBiometricUnlock => 'Biometrisk upplåsning';
 
   @override
-  String get unlockAppPrompt => 'Unlock the app';
+  String get unlockAppPrompt => 'Lås upp appen';
 
   @override
-  String get settingsAboutTitle => 'About';
+  String get settingsAboutTitle => 'Om';
 
   @override
   String get settingsVersion => 'Version';
 
   @override
-  String get settingsLicense => 'License';
+  String get settingsLicense => 'Licens';
 
   @override
   String get licenseGPLv3 => 'GPL-3.0';
 
   @override
-  String get settingsSourceCode => 'Source Code';
+  String get settingsSourceCode => 'Källkod';
 
   @override
-  String get settingsOpenSourceLicenses => 'Open Source Licenses';
+  String get settingsOpenSourceLicenses => 'Licenser för öppen källkod';
 
   @override
-  String get settingsMadeWithLove => 'Made with ❤️';
+  String get settingsMadeWithLove => 'Skapad med ❤️';
 
   @override
-  String get settingsConsiderSupporting => 'consider supporting';
+  String get settingsConsiderSupporting => 'Stöd gärna projektet';
 
   @override
-  String get supportBannerOpenSourceTitle => 'Daily You is open-source';
+  String get supportBannerOpenSourceTitle => 'Daily You har öppen källkod';
 
   @override
-  String get supportBannerFeedbackPrompt => 'Share your feedback';
+  String get supportBannerFeedbackPrompt => 'Lämna synpunkter';
 
   @override
-  String get imagesTitle => 'Images';
+  String get imagesTitle => 'Bilder';
 
   @override
-  String get audioTitle => 'Audio';
+  String get audioTitle => 'Ljud';
 
   @override
   String get videoTitle => 'Video';
 
   @override
-  String get tagMoodTitle => 'Mood';
+  String get tagMoodTitle => 'Humör';
 
   @override
-  String get calendarTagDisplayLabel => 'Tag';
+  String get calendarTagDisplayLabel => 'Tagg';
 
   @override
-  String get selectTagTitle => 'Select Tag';
+  String get selectTagTitle => 'Välj tagg';
 
   @override
-  String get labelPresentLabel => 'Present';
+  String get labelPresentLabel => 'Med taggen';
 
   @override
-  String get labelAbsentLabel => 'Absent';
+  String get labelAbsentLabel => 'Utan taggen';
 
   @override
   String get labelCoverageLabel => 'Coverage';
 
   @override
   String chartDistributionTitle(Object tag) {
-    return '$tag Distribution';
+    return 'Fördelning av $tag';
   }
 
   @override
-  String get shareAddToLogPickerTitle => 'Choose a log';
+  String get shareAddToLogPickerTitle => 'Välj en anteckning';
 
   @override
-  String get attachmentAddErrorDescription => 'Failed to add attachment!';
+  String get attachmentAddErrorDescription =>
+      'Det gick inte att lägga till bilagan.';
 
   @override
-  String get attachmentLoadFailed => 'Could not open this attachment';
+  String get attachmentLoadFailed => 'Det gick inte att öppna bilagan.';
 
   @override
-  String get attachmentNoAppToOpen => 'No app can open this attachment';
+  String get attachmentNoAppToOpen => 'Ingen app kan öppna bilagan.';
 
   @override
-  String get recorderDiscardTitle => 'Discard recording?';
+  String get recorderDiscardTitle => 'Kassera inspelningen?';
 
   @override
-  String get recorderDiscardDescription => 'This recording will be deleted.';
+  String get recorderDiscardDescription => 'Inspelningen tas bort.';
 
   @override
-  String get recorderDiscardAction => 'Discard';
+  String get recorderDiscardAction => 'Kassera';
 
   @override
   String get recorderPermissionDenied =>
-      'Microphone permission is required to record audio';
+      'Ge appen åtkomst till mikrofonen för att spela in ljud.';
 
   @override
-  String get recorderErrorDescription => 'Failed to record audio!';
+  String get recorderErrorDescription => 'Det gick inte att spela in ljud.';
 
   @override
-  String get gallerySelectAll => 'Select all';
+  String get gallerySelectAll => 'Markera alla';
 
   @override
-  String get gallerySelectAction => 'Select';
+  String get gallerySelectAction => 'Markera';
 
   @override
-  String get galleryOpenAction => 'Open';
+  String get galleryOpenAction => 'Öppna';
 
   @override
   String deleteLogsMessage(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Delete $count logs? Their attachments are removed with them.',
-      one: 'Delete $count log? Its attachments are removed with it.',
+      other:
+          'Vill du ta bort $count anteckningar? Tillhörande bilagor tas också bort.',
+      one:
+          'Vill du ta bort $count anteckning? Tillhörande bilagor tas också bort.',
     );
     return '$_temp0';
   }
 
   @override
-  String get newLogAction => 'New Log';
+  String get newLogAction => 'Ny anteckning';
 
   @override
-  String get removeTagsTitle => 'Remove Tags';
+  String get removeTagsTitle => 'Ta bort taggar';
 
   @override
-  String get discardChangesTitle => 'Discard changes?';
+  String get discardChangesTitle => 'Kassera ändringarna?';
 
   @override
-  String get discardChangesDescription => 'Your changes will be lost.';
+  String get discardChangesDescription => 'Dina ändringar går förlorade.';
 
   @override
-  String get applyButtonLabel => 'Apply';
+  String get applyButtonLabel => 'Verkställ';
 
   @override
   String addTagsConfirmMessage(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Add the chosen tags to $count logs?',
-      one: 'Add the chosen tags to $count log?',
+      other: 'Vill du lägga till de valda taggarna i $count anteckningar?',
+      one: 'Vill du lägga till de valda taggarna i $count anteckning?',
     );
     return '$_temp0';
   }
@@ -1339,8 +1351,8 @@ class AppLocalizationsSv extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Remove the chosen tags from $count logs?',
-      one: 'Remove the chosen tags from $count log?',
+      other: 'Vill du ta bort de valda taggarna från $count anteckningar?',
+      one: 'Vill du ta bort de valda taggarna från $count anteckning?',
     );
     return '$_temp0';
   }
@@ -1350,56 +1362,57 @@ class AppLocalizationsSv extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Also select $count partial matches?',
-      one: 'Also select $count partial match?',
+      other: 'Vill du också markera $count delträffar?',
+      one: 'Vill du också markera $count delträff?',
     );
     return '$_temp0';
   }
 
   @override
-  String get selectExactMatchesOnly => 'Exact only';
+  String get selectExactMatchesOnly => 'Endast exakta träffar';
 
   @override
-  String get selectIncludingPartialMatches => 'Include';
+  String get selectIncludingPartialMatches => 'Ta med delträffar';
 
   @override
-  String get onboardingSkip => 'Skip';
+  String get onboardingSkip => 'Hoppa över';
 
   @override
-  String get onboardingContinue => 'Continue';
+  String get onboardingContinue => 'Fortsätt';
 
   @override
-  String get onboardingFinish => 'Start journaling';
+  String get onboardingFinish => 'Börja skriva dagbok';
 
   @override
-  String get onboardingImportTitle => 'Coming from another app?';
+  String get onboardingImportTitle => 'Har du använt en annan dagboksapp?';
 
   @override
   String get onboardingImportDescription =>
-      'Bring your existing logs, or start fresh.';
+      'Ta med dina tidigare anteckningar eller börja med en tom dagbok.';
 
   @override
-  String get onboardingStorageNote => 'You can change these later in Settings.';
+  String get onboardingStorageNote =>
+      'Du kan ändra de här valen senare i inställningarna.';
 
   @override
-  String get onboardingWelcomeTitle => 'Welcome to Daily You';
+  String get onboardingWelcomeTitle => 'Välkommen till Daily You';
 
   @override
-  String get onboardingWelcomeDescription => 'Every day is worth remembering.';
+  String get onboardingWelcomeDescription => 'Varje dag är värd att minnas.';
 
   @override
-  String get onboardingRemindersTitle => 'Make it a habit';
+  String get onboardingRemindersTitle => 'Gör det till en vana';
 
   @override
-  String get onboardingStorageTitle => 'Keep your logs safe';
+  String get onboardingStorageTitle => 'Skydda dina anteckningar';
 
   @override
-  String get onboardingRestore => 'Restore from a backup';
+  String get onboardingRestore => 'Återställ från en säkerhetskopia';
 
   @override
-  String get onboardingMoodsCustomize => 'Customize moods';
+  String get onboardingMoodsCustomize => 'Anpassa humörskalan';
 
   @override
   String get onboardingRemindersDescription =>
-      'Set random or scheduled reminders to capture your day.';
+      'Få en påminnelse om att skriva dagbok vid en slumpmässig tidpunkt eller på en tid som du själv väljer.';
 }

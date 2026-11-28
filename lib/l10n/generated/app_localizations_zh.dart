@@ -396,7 +396,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get deleteLogTitle => '删除日迹';
 
   @override
-  String get deleteLogDescription => '您确定要删除该条日迹吗？';
+  String get deleteLogDescription => '您确定要删除这篇日迹吗？';
 
   @override
   String get deletePhotoTitle => '删除图片';
@@ -534,10 +534,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsFixedReminderTimeDescription => '选择一个固定的提醒时间';
 
   @override
-  String get settingsExactAlarmsTitle => '是否允许精确闹钟权限？';
+  String get settingsExactAlarmsTitle => '允许闹钟和提醒权限？';
 
   @override
-  String get settingsExactAlarmsDescription => '如果不允许精确闹钟权限，闹钟可能会延迟几分钟。';
+  String get settingsExactAlarmsDescription => '如果不允许闹钟和提醒权限，闹钟可能会延迟几分钟。';
 
   @override
   String get settingsAlwaysSendReminderTitle => '总是发送提醒';
@@ -685,11 +685,11 @@ class AppLocalizationsZh extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: ' 它被用于 $count 条记录中。',
-      one: ' 它被用于 1 条记录中。',
+      other: ' 有 $count 篇日迹正在使用它。',
+      one: ' 有 1 篇日迹正在使用它。',
       zero: '',
     );
-    return '删除「$name」？$_temp0';
+    return '删除“$name”？$_temp0';
   }
 
   @override
@@ -732,8 +732,8 @@ class AppLocalizationsZh extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '显示 $count 条日志',
-      one: '显示 $count 条日志',
+      other: '显示 $count 篇日迹',
+      one: '显示 $count 篇日迹',
     );
     return '$_temp0';
   }
@@ -1208,10 +1208,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsConsiderSupporting => '考虑支持';
 
   @override
-  String get supportBannerOpenSourceTitle => 'Daily You is open-source';
+  String get supportBannerOpenSourceTitle => 'Daily You 是开源的';
 
   @override
-  String get supportBannerFeedbackPrompt => 'Share your feedback';
+  String get supportBannerFeedbackPrompt => '留下你的意见';
 
   @override
   String get imagesTitle => '图像';
@@ -1286,8 +1286,8 @@ class AppLocalizationsZh extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '删除 $count 条日迹？其附件也将一并删除。',
-      one: '删除 $count 条日迹？其附件也将一并删除。',
+      other: '删除 $count 篇日迹？其附件也将一并删除。',
+      one: '删除 $count 篇日迹？其附件也将一并删除。',
     );
     return '$_temp0';
   }
@@ -1312,8 +1312,8 @@ class AppLocalizationsZh extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '将所选标签添加到 $count 条日迹？',
-      one: '将所选标签添加到 $count 条日迹？',
+      other: '将所选标签添加到 $count 篇日迹？',
+      one: '将所选标签添加到 $count 篇日迹？',
     );
     return '$_temp0';
   }
@@ -1323,8 +1323,8 @@ class AppLocalizationsZh extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '从 $count 条日迹中移除所选标签？',
-      one: '从 $count 条日迹中移除所选标签？',
+      other: '从 $count 篇日迹中移除所选标签？',
+      one: '从 $count 篇日迹中移除所选标签？',
     );
     return '$_temp0';
   }
@@ -1359,10 +1359,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onboardingImportTitle => '用过其他日记 App？';
 
   @override
-  String get onboardingImportDescription => '导入你现有的日记，或从头开始。';
+  String get onboardingImportDescription => '导入你现有的日记，或从零开始。';
 
   @override
-  String get onboardingStorageNote => '你之后可以在“设置”中更改这些选项。';
+  String get onboardingStorageNote => '你之后可以在设置中更改这些选项。';
 
   @override
   String get onboardingWelcomeTitle => '欢迎来到 Daily You';
@@ -1371,7 +1371,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onboardingWelcomeDescription => '每一天都值得留下痕迹。';
 
   @override
-  String get onboardingRemindersTitle => '让它成为习惯';
+  String get onboardingRemindersTitle => '养成习惯';
 
   @override
   String get onboardingStorageTitle => '保护好你的日迹';
@@ -1571,6 +1571,11 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   }
 
   @override
+  String chartInfluencesTitle(Object tag) {
+    return '影響因素 $tag';
+  }
+
+  @override
   String get chartGroupingLabel => '群組';
 
   @override
@@ -1627,6 +1632,108 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
     );
     return '$_temp0';
   }
+
+  @override
+  String streakDayLabel(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '連續天數',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String statsLogsLabel(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '紀錄',
+      one: '紀錄',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String statsWordsLabel(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '字數',
+      one: '字數',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String statsDaysLabel(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '天數',
+      one: '天數',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get statsLongestStreakTitle => '最長連續天數';
+
+  @override
+  String get statsWritingTitle => '寫作';
+
+  @override
+  String get statsWordsPerLogTitle => '平均紀錄字數';
+
+  @override
+  String get statsLongestLogTitle => '最長的紀錄';
+
+  @override
+  String statsMostActiveTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '最活躍的日子',
+      one: '最活躍的一天',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String statsDaysOfRange(int written, int total) {
+    final intl.NumberFormat writtenNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String writtenString = writtenNumberFormat.format(written);
+    final intl.NumberFormat totalNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String totalString = totalNumberFormat.format(total);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      total,
+      locale: localeName,
+      other: '$totalString 天',
+      one: '$totalString 天',
+    );
+    return '$writtenString of $_temp0';
+  }
+
+  @override
+  String get statsAverageTitle => '平均';
+
+  @override
+  String get statsHighestTitle => '最高';
+
+  @override
+  String get statsLowestTitle => '最低';
+
+  @override
+  String get statsDaysLoggedTitle => '已記錄天數';
+
+  @override
+  String get statsOfDaysLabel => '天數占比';
+
+  @override
+  String get statsCustomizeTitle => '自訂';
 
   @override
   String get errorExternalStorageAccessTitle => '無法存取外部儲存裝置';
@@ -1789,7 +1896,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get settingsNotificationsPermissionsPrompt =>
-      '為了在隨機或您設定的時間發送提醒，系統將請求「排程鬧鐘」權限。';
+      '為了在隨機或您設定的時間發送提醒，系統將請求「定時鬧鐘」權限。';
 
   @override
   String get settingsDailyReminderTitle => '每日提醒';
@@ -1808,6 +1915,12 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get settingsFixedReminderTimeDescription => '選擇一個固定的時間來設置提醒';
+
+  @override
+  String get settingsExactAlarmsTitle => '允許鬧鐘與提醒權限？';
+
+  @override
+  String get settingsExactAlarmsDescription => '除非您允許鬧鐘與提醒權限，否則鬧鐘可能會延遲幾分鐘。';
 
   @override
   String get settingsAlwaysSendReminderTitle => '總是發送提醒';
@@ -1992,7 +2105,100 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get clearAllFilters => '清除全部';
 
   @override
-  String get noTagsFilterLabel => '無標籤';
+  String get noTagsFilterLabel => '沒有標籤';
+
+  @override
+  String get clearFilter => '清除';
+
+  @override
+  String showLogsCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Show $count 則紀錄',
+      one: 'Show $count 則紀錄',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get filterPillAttachments => '附件';
+
+  @override
+  String get filterPillKeywords => '關鍵字';
+
+  @override
+  String get noMoodFilterLabel => '沒有心情';
+
+  @override
+  String get noAttachmentsFilterLabel => '沒有附件';
+
+  @override
+  String get noTextFilterLabel => '沒有文字';
+
+  @override
+  String partialMatchCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 部分符合',
+      one: '$count 部分符合',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String tagCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 個標籤',
+      one: '$count 個標籤',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dateFilterLastMonths(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '最近 $count 個月',
+      one: '上個月',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get dateFilterCustomRange => '自訂區間';
+
+  @override
+  String get keywordFilterHint => '新增關鍵字…';
+
+  @override
+  String get keywordFilterMatchAll => '所有關鍵字';
+
+  @override
+  String get keywordFilterMatchAny => '任何關鍵字';
+
+  @override
+  String get keywordFilterMatchCase => '區分大小寫';
+
+  @override
+  String keywordCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 個關鍵字',
+      one: '$count 個關鍵字',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dateFilterRange(String start, String end) {
+    return '$start – $end';
+  }
 
   @override
   String get addTagsTitle => '新增標籤';
@@ -2013,10 +2219,13 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get tagEnergyName => '能量';
 
   @override
+  String get tagCategoryPeopleName => '人物';
+
+  @override
   String get tagCategoryActivitiesName => '活動';
 
   @override
-  String get tagExerciseName => '鍛煉';
+  String get tagExerciseName => '運動';
 
   @override
   String get tagSocializingName => '社交';
@@ -2269,6 +2478,12 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get formatMarkdown => 'Markdown';
 
   @override
+  String get formatCsv => 'CSV';
+
+  @override
+  String get formatJson => 'JSON';
+
+  @override
   String get settingsDeleteAllLogsTitle => '刪除所有紀錄';
 
   @override
@@ -2319,6 +2534,9 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get settingsSecurityPasswordsDoNotMatch => '密碼不相符';
 
   @override
+  String get settingsSecurityPasswordWarning => '如果你忘記了，就無法打開 Daily You。';
+
+  @override
   String get requiredPrompt => '必填';
 
   @override
@@ -2350,6 +2568,12 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get settingsConsiderSupporting => '考慮支持';
+
+  @override
+  String get supportBannerOpenSourceTitle => 'Daily You 是開源的';
+
+  @override
+  String get supportBannerFeedbackPrompt => '分享您的回饋';
 
   @override
   String get imagesTitle => '影像';
@@ -2409,4 +2633,117 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get recorderErrorDescription => '錄音失敗！';
+
+  @override
+  String get gallerySelectAll => '全選';
+
+  @override
+  String get gallerySelectAction => '選擇';
+
+  @override
+  String get galleryOpenAction => '打開';
+
+  @override
+  String deleteLogsMessage(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '刪除 $count 筆紀錄？其附件也將一併刪除。',
+      one: '刪除 $count 筆紀錄？其附件也將一併刪除。',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get newLogAction => '新紀錄';
+
+  @override
+  String get removeTagsTitle => '刪除標籤';
+
+  @override
+  String get discardChangesTitle => '要捨棄變更嗎？';
+
+  @override
+  String get discardChangesDescription => '您的變更將會遺失。';
+
+  @override
+  String get applyButtonLabel => '應用';
+
+  @override
+  String addTagsConfirmMessage(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '要將選取的標籤加入 $count 筆紀錄嗎？',
+      one: '要將選取的標籤加入 $count 筆紀錄嗎？',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String removeTagsConfirmMessage(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '要從 $count 筆紀錄中移除所選標籤嗎？',
+      one: '要從 $count 筆紀錄中移除所選標籤嗎？',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String selectPartialMatchesMessage(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '也要選取 $count 個部分符合項目嗎？',
+      one: '也要選取 $count 個部分符合項目嗎？',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get selectExactMatchesOnly => '僅完全符合';
+
+  @override
+  String get selectIncludingPartialMatches => '包含';
+
+  @override
+  String get onboardingSkip => '跳過';
+
+  @override
+  String get onboardingContinue => '繼續';
+
+  @override
+  String get onboardingFinish => '開始記錄';
+
+  @override
+  String get onboardingImportTitle => '來自其他應用程式？';
+
+  @override
+  String get onboardingImportDescription => '匯入你現有的紀錄，或重新開始。';
+
+  @override
+  String get onboardingStorageNote => '您可以稍後於設定中更改。';
+
+  @override
+  String get onboardingWelcomeTitle => '歡迎來到 Daily You';
+
+  @override
+  String get onboardingWelcomeDescription => '每一天都值得被記住。';
+
+  @override
+  String get onboardingRemindersTitle => '養成習慣';
+
+  @override
+  String get onboardingStorageTitle => '保護您的紀錄安全';
+
+  @override
+  String get onboardingRestore => '從備份還原';
+
+  @override
+  String get onboardingMoodsCustomize => '自訂心情';
+
+  @override
+  String get onboardingRemindersDescription => '設定隨機或排程提醒，記錄你的一天。';
 }

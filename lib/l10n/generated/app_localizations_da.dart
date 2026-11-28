@@ -21,34 +21,34 @@ class AppLocalizationsDa extends AppLocalizations {
   String get actionTakePhoto => 'Take photo';
 
   @override
-  String get actionTakeVideo => 'Take video';
+  String get actionTakeVideo => 'Tag video';
 
   @override
-  String get actionRecordAudio => 'Record audio';
+  String get actionRecordAudio => 'Optag lyd';
 
   @override
-  String get actionAddImage => 'Add image';
+  String get actionAddImage => 'Tilføj billede';
 
   @override
-  String get actionAddVideo => 'Add video';
+  String get actionAddVideo => 'Tilføj video';
 
   @override
-  String get actionAddAudio => 'Add audio';
+  String get actionAddAudio => 'Tilføj lyd';
 
   @override
-  String get actionToday => 'Today';
+  String get actionToday => 'I dag';
 
   @override
-  String get actionOtherDay => 'Other day';
+  String get actionOtherDay => 'Anden dag';
 
   @override
   String get pageHomeTitle => 'Hjem';
 
   @override
-  String get jumpToMonthTitle => 'Jump to month';
+  String get jumpToMonthTitle => 'Gå til måned';
 
   @override
-  String get jumpToLogTitle => 'Jump to log';
+  String get jumpToLogTitle => 'Gå til log';
 
   @override
   String get flashbacksTitle => 'Minder';
@@ -99,7 +99,7 @@ class AppLocalizationsDa extends AppLocalizations {
   }
 
   @override
-  String get flashbackOnThisDay => 'On This Day';
+  String get flashbackOnThisDay => 'På denne dag';
 
   @override
   String get pageGalleryTitle => 'Galleri';
@@ -144,7 +144,7 @@ class AppLocalizationsDa extends AppLocalizations {
   String get noLogs => 'Ingen logs…';
 
   @override
-  String get noResults => 'No Results…';
+  String get noResults => 'Ingen resultater…';
 
   @override
   String get sortDateTitle => 'Dato';
@@ -185,7 +185,7 @@ class AppLocalizationsDa extends AppLocalizations {
 
   @override
   String chartOverTimeTitle(Object tag) {
-    return '$tag Over Time';
+    return '$tag Over tid';
   }
 
   @override
@@ -194,19 +194,19 @@ class AppLocalizationsDa extends AppLocalizations {
   }
 
   @override
-  String get chartGroupingLabel => 'Group by';
+  String get chartGroupingLabel => 'Gruppe efter';
 
   @override
-  String get chartGroupingDay => 'Day';
+  String get chartGroupingDay => 'Dag';
 
   @override
-  String get chartGroupingWeek => 'Week';
+  String get chartGroupingWeek => 'Uge';
 
   @override
-  String get chartGroupingMonth => 'Month';
+  String get chartGroupingMonth => 'Måned';
 
   @override
-  String get chartGroupingYear => 'Year';
+  String get chartGroupingYear => 'År';
 
   @override
   String get chartSmoothingLabel => 'Smoothing';
@@ -295,16 +295,16 @@ class AppLocalizationsDa extends AppLocalizations {
   }
 
   @override
-  String get statsLongestStreakTitle => 'Longest Streak';
+  String get statsLongestStreakTitle => 'Længste Streak';
 
   @override
-  String get statsWritingTitle => 'Writing';
+  String get statsWritingTitle => 'Skrivning';
 
   @override
-  String get statsWordsPerLogTitle => 'Words per Log';
+  String get statsWordsPerLogTitle => 'Ord pr. Log';
 
   @override
-  String get statsLongestLogTitle => 'Longest Log';
+  String get statsLongestLogTitle => 'Længste Log';
 
   @override
   String statsMostActiveTitle(int count) {
@@ -336,22 +336,22 @@ class AppLocalizationsDa extends AppLocalizations {
   }
 
   @override
-  String get statsAverageTitle => 'Average';
+  String get statsAverageTitle => 'Gennemsnit';
 
   @override
-  String get statsHighestTitle => 'Highest';
+  String get statsHighestTitle => 'Højeste';
 
   @override
-  String get statsLowestTitle => 'Lowest';
+  String get statsLowestTitle => 'Laveste';
 
   @override
-  String get statsDaysLoggedTitle => 'Days Logged';
+  String get statsDaysLoggedTitle => 'Dage Logget';
 
   @override
-  String get statsOfDaysLabel => 'of Days';
+  String get statsOfDaysLabel => 'af dage';
 
   @override
-  String get statsCustomizeTitle => 'Customize';
+  String get statsCustomizeTitle => 'Tilpas';
 
   @override
   String get errorExternalStorageAccessTitle => 'Kan ikke tilgå eksternt lager';
@@ -364,7 +364,7 @@ class AppLocalizationsDa extends AppLocalizations {
   String get errorExternalStorageAccessContinue => 'Fortsæt med lokal database';
 
   @override
-  String get databaseMigrationErrorTitle => 'Couldn\'t Move Your Data';
+  String get databaseMigrationErrorTitle => 'Kunne ikke flytte dine data';
 
   @override
   String get databaseMigrationErrorDescription =>
@@ -374,14 +374,14 @@ class AppLocalizationsDa extends AppLocalizations {
   String get databaseMigrationErrorRetry => 'Retry';
 
   @override
-  String get databaseNewerErrorTitle => 'Update Required';
+  String get databaseNewerErrorTitle => 'Opdatering påkrævet';
 
   @override
   String get databaseNewerErrorDescription =>
-      'Your data was saved by a newer version of Daily You. This version can\'t open it safely. Update the app to continue.';
+      'Dine data blev gemt af en nyere version af Daily You. Denne version kan ikke åbne den sikkert. Opdater app\'en for at fortsætte.';
 
   @override
-  String get errorReport => 'Report Issue';
+  String get errorReport => 'Rapporter fejl';
 
   @override
   String get lastModified => 'Ændret';
@@ -405,21 +405,21 @@ class AppLocalizationsDa extends AppLocalizations {
   String get deletePhotoDescription => 'Vil du slette dette foto?';
 
   @override
-  String get deleteAttachmentTitle => 'Delete Attachment';
+  String get deleteAttachmentTitle => 'Slet vedhæftet fil';
 
   @override
   String get deleteAttachmentDescription =>
-      'Do you want to delete this attachment?';
+      'Vil du slette denne vedhæftede fil?';
 
   @override
-  String get largeAttachmentWarningTitle => 'Large attachment';
+  String get largeAttachmentWarningTitle => 'Stor vedhæftet fil';
 
   @override
   String get largeAttachmentWarningDescription =>
-      'This attachment is large and will increase your backup size.';
+      'Denne vedhæftede fil er stor og vil øge din backup størrelse.';
 
   @override
-  String get dontShowAgain => 'Don\'t show again';
+  String get dontShowAgain => 'Vis ikke igen';
 
   @override
   String get pageSettingsTitle => 'Indstillinger';
@@ -446,7 +446,7 @@ class AppLocalizationsDa extends AppLocalizations {
   String get settingsFirstDayOfWeek => 'Ugens første dag';
 
   @override
-  String get settingsCalendarSystem => 'Calendar System';
+  String get settingsCalendarSystem => 'Kalendersystem';
 
   @override
   String get calendarSystemGregorian => 'Gregorian';
@@ -473,19 +473,19 @@ class AppLocalizationsDa extends AppLocalizations {
   String get moodIconPrompt => 'Angiv et ikon';
 
   @override
-  String get moodVeryUnpleasant => 'Very Unpleasant';
+  String get moodVeryUnpleasant => 'Meget ubehageligt';
 
   @override
-  String get moodUnpleasant => 'Unpleasant';
+  String get moodUnpleasant => 'Ubehageligt';
 
   @override
   String get moodNeutral => 'Neutral';
 
   @override
-  String get moodPleasant => 'Pleasant';
+  String get moodPleasant => 'Behagelig';
 
   @override
-  String get moodVeryPleasant => 'Very Pleasant';
+  String get moodVeryPleasant => 'Meget behageligt';
 
   @override
   String get settingsFlashbacksViewLayout => 'Flashbacks View Layout';
@@ -494,16 +494,16 @@ class AppLocalizationsDa extends AppLocalizations {
   String get settingsGalleryViewLayout => 'Gallery View Layout';
 
   @override
-  String get settingsHideImagesInGallery => 'Hide Images In Gallery';
+  String get settingsHideImagesInGallery => 'Skjul billeder i Galleri';
 
   @override
-  String get settingsHideImages => 'Hide Images';
+  String get settingsHideImages => 'Skjul billeder';
 
   @override
-  String get pageCalendarTitle => 'Calendar';
+  String get pageCalendarTitle => 'Kalender';
 
   @override
-  String get viewLayoutList => 'List';
+  String get viewLayoutList => 'Liste';
 
   @override
   String get viewLayoutGrid => 'Grid';
@@ -517,17 +517,16 @@ class AppLocalizationsDa extends AppLocalizations {
 
   @override
   String get settingsNotificationsPermissionsPrompt =>
-      'The \'schedule alarms\' permission will be requested to send the reminder at a random moment or at your preferred time.';
+      'Du vil blive bedt om \'scheduler alarmer\' tilladelsen for at kunne sende påmindelser på et tilfældigt tidspunkt eller på din foretrukne tid.';
 
   @override
   String get settingsDailyReminderTitle => 'Daglig påmindelse';
 
   @override
-  String get settingsOnThisDayDescription => 'Revisit past memories';
+  String get settingsOnThisDayDescription => 'Besøg tidligere minder';
 
   @override
-  String get settingsDailyReminderDescription =>
-      'Lad appen køre i baggrunden for bedste resultater';
+  String get settingsDailyReminderDescription => 'En blid påmindelse hver dag';
 
   @override
   String get settingsReminderTime => 'Påmindelsestid';
@@ -540,11 +539,11 @@ class AppLocalizationsDa extends AppLocalizations {
       'Vælg et fast tidspunkt for påmindelsen';
 
   @override
-  String get settingsExactAlarmsTitle => 'Allow exact alarms?';
+  String get settingsExactAlarmsTitle => 'Tillad nøjagtige alarmer?';
 
   @override
   String get settingsExactAlarmsDescription =>
-      'Alarms may be delayed by several minutes unless you allow exact alarms.';
+      'Alarmer kan blive forsinket med flere minutter, medmindre du tillader nøjagtige alarmer.';
 
   @override
   String get settingsAlwaysSendReminderTitle => 'Send altid påmindelse';
@@ -589,62 +588,62 @@ class AppLocalizationsDa extends AppLocalizations {
   }
 
   @override
-  String get templateDefaultSummaryTitle => 'Day Summary';
+  String get templateDefaultSummaryTitle => 'Dagsoversigt';
 
   @override
   String get templateDefaultSummaryBody => '### Summary\n- \n\n### Quote\n> ';
 
   @override
-  String get templateDefaultReflectionTitle => 'Reflection';
+  String get templateDefaultReflectionTitle => 'Refleksion';
 
   @override
   String get templateDefaultReflectionBody =>
-      '### What did you enjoy about today?\n- \n\n### What are you thankful for?\n- \n\n### What are you looking forward to?\n- ';
+      '## Hvad var det bedste ved i dag?\n- \n\n## Hvad er du taknemmelig for?\n- \n\n## Hvad ser du frem til?\n- ';
 
   @override
   String get settingsTagsTitle => 'Tags';
 
   @override
-  String get manageTags => 'Manage Tags';
+  String get manageTags => 'Administrer tags';
 
   @override
-  String get tagTypeLabelTitle => 'Label';
+  String get tagTypeLabelTitle => 'Etiketter';
 
   @override
   String get tagTypeTrackerTitle => 'Tracker';
 
   @override
-  String get nameHint => 'Name';
+  String get nameHint => 'Navn';
 
   @override
-  String get tagColorLabel => 'Color';
+  String get tagColorLabel => 'Farve';
 
   @override
-  String get iconPickerTitle => 'Choose Icon';
+  String get iconPickerTitle => 'Vælg ikon';
 
   @override
-  String get iconPickerIconsTab => 'Icons';
+  String get iconPickerIconsTab => 'Ikoner';
 
   @override
   String get iconPickerCustomTab => 'Custom';
 
   @override
-  String get iconPickerSearchHint => 'Search icons…';
+  String get iconPickerSearchHint => 'Søg ikoner…';
 
   @override
-  String get colorPickerTitle => 'Choose Color';
+  String get colorPickerTitle => 'Vælg farve';
 
   @override
-  String get colorPickerPaletteTab => 'Colors';
+  String get colorPickerPaletteTab => 'Farver';
 
   @override
-  String get iconGroupMoodPeople => 'Mood & People';
+  String get iconGroupMoodPeople => 'Humør & Personer';
 
   @override
-  String get iconGroupHealth => 'Health';
+  String get iconGroupHealth => 'Sundhed';
 
   @override
-  String get iconGroupWorkFinance => 'Work & Finance';
+  String get iconGroupWorkFinance => 'Arbejde & Finans';
 
   @override
   String get iconGroupHabitsGoals => 'Habits & Goals';
