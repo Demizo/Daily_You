@@ -14,6 +14,7 @@ import 'package:daily_you/l10n/generated/app_localizations.dart';
 import 'package:daily_you/pages/statistics_page.dart';
 import 'package:daily_you/pages/gallery_page.dart';
 import 'package:daily_you/pages/home_page.dart';
+import 'package:daily_you/pages/feed_page.dart';
 import 'package:provider/provider.dart';
 
 import '../pages/settings_page.dart';
@@ -30,7 +31,7 @@ class _MobileScaffoldState extends State<MobileScaffold> {
 
   int currentIndex = 0;
   final _swipePagesKey = GlobalKey<_SwipePagesState>();
-  final List<bool> _isScrolled = [false, false, false];
+  final List<bool> _isScrolled = [false, false, false, false];
   int _prebuildViewports = 0;
 
   late final List<ScrollController> _scrollControllers;
@@ -39,6 +40,7 @@ class _MobileScaffoldState extends State<MobileScaffold> {
     const HomePage(),
     const GalleryPage(),
     const StatsPage(),
+    const FeedPage(),
   ];
 
   @override
@@ -301,6 +303,19 @@ class _MobileScaffoldState extends State<MobileScaffold> {
                   }
                 : null,
           ),
+          _buildNavItem(
+            context,
+            theme,
+            3,
+            Icons.dynamic_feed_rounded,
+            feedPageTitle,
+            onTap: closeDrawer
+                ? () {
+                    Navigator.of(context).pop();
+                    _switchPage(3);
+                  }
+                : null,
+          ),
           const Spacer(),
           const Divider(indent: 16, endIndent: 16),
           _buildSettingsItem(context, theme, l10n, closeDrawer: closeDrawer),
@@ -378,6 +393,10 @@ class _MobileScaffoldState extends State<MobileScaffold> {
             NavigationDestination(
               icon: const Icon(Icons.auto_graph_rounded),
               label: l10n.pageStatisticsTitle,
+            ),
+            const NavigationDestination(
+              icon: Icon(Icons.dynamic_feed_rounded),
+              label: feedPageTitle,
             ),
           ],
         ),
@@ -471,6 +490,7 @@ class _MobileScaffoldState extends State<MobileScaffold> {
       l10n.pageHomeTitle,
       l10n.pageGalleryTitle,
       l10n.pageStatisticsTitle,
+      feedPageTitle,
     ];
 
     final selecting =
